@@ -1,0 +1,28 @@
+export(clusterAlgo
+      ,clusterInit
+      ,clusterStrategy
+      ,diagGaussianNames
+      ,clusterDiagGaussian
+      )
+
+export(CxxFlags,
+       LdFlags
+      )
+
+exportClasses(ClusterAlgo
+             ,ClusterInit
+             ,ClusterStrategy
+             ,IClusterModel
+             ,ClusterCategoricalModel
+             ,ClusterDiagGaussianModel
+             ,ClusterGammaModel
+             )
+
+exportMethods(print)
+exportMethods(show)
+exportPattern("^[[:alpha:]]+")
+
+import(Rcpp)
+importFrom(methods,show)
+
+useDynLib(rtkpp)

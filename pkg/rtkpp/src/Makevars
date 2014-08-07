@@ -1,0 +1,46 @@
+#------------------------------------------------------------------------
+#   Copyright (C) Inria 2014
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#------------------------------------------------------------------------
+#   Project:    rtkpp
+#   Created on: Feb 17, 2014
+#   Authors:    Vincent KUBICKI <vincent.kubicki@inria.fr>,
+#               Serge IOVLEFF <serge.iovleff@stkpp.org>
+#-----------------------------------------------------------------------
+# Name of the STK++ library
+LIB_STKPP_A = libSTKpp.a
+
+STK_DIR = ../inst
+STK_LIB = ../inst/lib/$(LIB_STKPP_A)
+
+## Use the R_HOME indirection to support installations of multiple R version
+PKG_CXXFLAGS += `${R_HOME}/bin/Rscript -e "Rcpp:::CxxFlags()"`
+PKG_LIBS     += `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` $(STK_LIB)
+PKG_CPPFLAGS += -I../inst/projects/ -I../inst/include/ -DRTKPP_LIB
+
+export
+
+.PHONY: all pkglib
+
+## $(SHLIB) is the usual default target that is built automatically from all source 
+## files in this directory. pkglib is an additional target for the libraries
+## that will be installed in $(STK_LIB) and which users can link against.
+all: $(SHLIB)
+$(SHLIB): pkglib
+
+pkglib:
+	($(MAKE) -C $(STK_DIR))
+	(cd $(STK_DIR) && $(MAKE) clean_obj)
+	

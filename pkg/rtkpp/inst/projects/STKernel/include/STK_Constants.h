@@ -32,10 +32,12 @@
  *  @brief In this file we define the main constant which will be used through
  *  the STK++ project.
  **/
-#include "STK_Integer.h"
 
 #ifndef STK_CONSTANTS_H
 #define STK_CONSTANTS_H
+
+//#include "STK_Integer.h"
+#include "STK_String.h"
 
 #ifndef STKBASEARRAYS
 /** This value means that the default range for a vector or the rows/columns of

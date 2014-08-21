@@ -6,28 +6,19 @@
 \alias{[,ClusterAlgo-method}
 \alias{[,ClusterInit-method}
 \alias{[,ClusterStrategy-method}
-\alias{[,ClusteringAlgo-method}
-\alias{[,ClusteringInit-method}
-\alias{[,ClusteringStrategy-method}
+\alias{[,IClusterModel-method}
 \alias{[<-,ClusterAlgo-method}
 \alias{[<-,ClusterInit-method}
 \alias{[<-,ClusterStrategy-method}
-\alias{[<-,ClusteringAlgo-method}
-\alias{[<-,ClusteringInit-method}
-\alias{[<-,ClusteringStrategy-method}
 \title{Extract parts of a rtkpp S4 class}
 \usage{
 \S4method{[}{ClusterAlgo}(x, i, j, drop)
 
 \S4method{[}{ClusterInit}(x, i, j, drop)
 
+\S4method{[}{IClusterModel}(x, i, j, drop)
+
 \S4method{[}{ClusterStrategy}(x, i, j, drop)
-
-\S4method{[}{ClusteringAlgo}(x, i, j, drop)
-
-\S4method{[}{ClusteringInit}(x, i, j, drop)
-
-\S4method{[}{ClusteringStrategy}(x, i, j, drop)
 }
 \arguments{
 \item{x}{object from which to extract element(s) or in which to replace element(s).}

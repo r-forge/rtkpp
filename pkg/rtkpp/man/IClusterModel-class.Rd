@@ -22,8 +22,6 @@ A Cluster model is a model of the form
 
 \item{\code{nbCluster}}{Integer with the number of cluster of the model.}
 
-\item{\code{hasFreeProportions}}{Logical \code{TRUE} if the proportions of each clusters are free.}
-
 \item{\code{pk}}{Vector with the proportions of each mixture.}
 
 \item{\code{tik}}{Matrix with the posterior probability of the ith individual to belong to kth cluster.}
@@ -34,13 +32,9 @@ A Cluster model is a model of the form
 
 \item{\code{lnLikelihood}}{Real given the ln-liklihood of the Cluster model.}
 
-\item{\code{BicCriterion}}{Real given the value of the BIC criterion.}
-
-\item{\code{AicCriterion}}{Real given the value of the AIC criterion.}
+\item{\code{criterion}}{Real given the value of the AIC or BIC criterion.}
 
 \item{\code{modelName}}{mixture model name.}
-
-\item{\code{error}}{Character string giving the error, if an error occured during the estimation process.}
 }}
 \examples{
 getSlots("IClusterModel")

@@ -40,6 +40,6 @@ The model names are summarized in the following array:
 }
 \examples{
 diagGaussianNames()
-diagGaussianNames("free", "equal", "free") # same as c("gaussian_p_sk", "gaussian_pk_sk")
+diagGaussianNames("all", "equal", "free") # same as c("gaussian_p_sk", "gaussian_pk_sk")
 }
 

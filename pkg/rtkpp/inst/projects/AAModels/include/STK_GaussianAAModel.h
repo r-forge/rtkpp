@@ -38,7 +38,7 @@
 #define STK_GAUSSIANAAMODEL_H
 
 #include "STK_IAAModel.h"
-#include "StatModels/include/STK_StatisticalModel.h"
+#include "StatModels/include/STK_IStatModel.h"
 #include "../../../include/Arrays.h"
 
 namespace STK
@@ -79,7 +79,7 @@ namespace STK
  *  of the model. It can be sub-classed or used by any class.
  **/
 class GaussianAAModel : public IAAModel
-                      , public StatisticalModel<Matrix>
+                      , public IStatModel<Matrix>
 {
   public:
     /** Constructor.

@@ -5,138 +5,138 @@ library('rtkpp')
 
 base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
 cleanEx()
-nameEx("ClusteringAlgo-class")
-### * ClusteringAlgo-class
+nameEx("ClusterAlgo-class")
+### * ClusterAlgo-class
 
 flush(stderr()); flush(stdout())
 
-### Name: ClusteringAlgo
-### Title: ['ClusteringAlgo'] class for clustering algorithms.
-### Aliases: ClusteringAlgo ClusteringAlgo-class
+### Name: ClusterAlgo
+### Title: ['ClusterAlgo'] class for clustering algorithms.
+### Aliases: ClusterAlgo ClusterAlgo-class
 
 ### ** Examples
 
-new("ClusteringAlgo")
-new("ClusteringAlgo", algo="SEM", nbIteration=1000)
-getSlots("ClusteringAlgo")
+new("ClusterAlgo")
+new("ClusterAlgo", algo="SEM", nbIteration=1000)
+getSlots("ClusterAlgo")
 
 
 
 cleanEx()
-nameEx("ClusteringCategoricalModel-class")
-### * ClusteringCategoricalModel-class
+nameEx("ClusterCategoricalModel-class")
+### * ClusterCategoricalModel-class
 
 flush(stderr()); flush(stdout())
 
-### Name: ClusteringCategoricalModel-class
-### Title: Definition of the ['ClusteringCategoricalModel'] class
-### Aliases: ClusteringCategoricalModel-class
+### Name: ClusterCategoricalModel-class
+### Title: Definition of the ['ClusterCategoricalModel'] class
+### Aliases: ClusterCategoricalModel-class
 
 ### ** Examples
 
-getSlots("ClusteringCategoricalModel")
-  new("ClusteringCategoricalModel", data=iris[1:4])
+getSlots("ClusterCategoricalModel")
+  new("ClusterCategoricalModel", data=iris[1:4])
 
 
 
 cleanEx()
-nameEx("ClusteringDiagGaussianModel-class")
-### * ClusteringDiagGaussianModel-class
+nameEx("ClusterDiagGaussianModel-class")
+### * ClusterDiagGaussianModel-class
 
 flush(stderr()); flush(stdout())
 
-### Name: ClusteringDiagGaussianModel
-### Title: Definition of the ['ClusteringDiagGaussianModel'] class
-### Aliases: ClusteringDiagGaussianModel ClusteringDiagGaussianModel-class
+### Name: ClusterDiagGaussianModel
+### Title: Definition of the ['ClusterDiagGaussianModel'] class
+### Aliases: ClusterDiagGaussianModel ClusterDiagGaussianModel-class
 
 ### ** Examples
 
-getSlots("ClusteringDiagGaussianModel")
-  new("ClusteringDiagGaussianModel", data=iris[1:4])
+getSlots("ClusterDiagGaussianModel")
+  new("ClusterDiagGaussianModel", data=iris[1:4])
 
 
 
 cleanEx()
-nameEx("ClusteringGammaModel-class")
-### * ClusteringGammaModel-class
+nameEx("ClusterGammaModel-class")
+### * ClusterGammaModel-class
 
 flush(stderr()); flush(stdout())
 
-### Name: ClusteringGammaModel
-### Title: Definition of the ['ClusteringGammaModel'] class
-### Aliases: ClusteringGammaModel ClusteringGammaModel-class
+### Name: ClusterGammaModel
+### Title: Definition of the ['ClusterGammaModel'] class
+### Aliases: ClusterGammaModel ClusterGammaModel-class
 
 ### ** Examples
 
-getSlots("ClusteringGammaModel")
-  new("ClusteringGammaModel", data=iris[1:4])
+getSlots("ClusterGammaModel")
+  new("ClusterGammaModel", data=iris[1:4])
 
 
 
 cleanEx()
-nameEx("ClusteringInit-class")
-### * ClusteringInit-class
+nameEx("ClusterInit-class")
+### * ClusterInit-class
 
 flush(stderr()); flush(stdout())
 
-### Name: ClusteringInit
-### Title: ['ClusteringInit'] class
-### Aliases: ClusteringInit ClusteringInit-class
+### Name: ClusterInit
+### Title: ['ClusterInit'] class
+### Aliases: ClusterInit ClusterInit-class
 
 ### ** Examples
 
-getSlots("ClusteringInit")
-  new("ClusteringInit")
+getSlots("ClusterInit")
+  new("ClusterInit")
 
 
 
 cleanEx()
-nameEx("ClusteringStrategy-class")
-### * ClusteringStrategy-class
+nameEx("ClusterStrategy-class")
+### * ClusterStrategy-class
 
 flush(stderr()); flush(stdout())
 
-### Name: ClusteringStrategy
-### Title: Constructor of ['ClusteringStrategy'] class
-### Aliases: ClusteringStrategy ClusteringStrategy-class
+### Name: ClusterStrategy
+### Title: Constructor of ['ClusterStrategy'] class
+### Aliases: ClusterStrategy ClusterStrategy-class
 
 ### ** Examples
 
-new("ClusteringStrategy")
-  new("ClusteringStrategy", shortAlgo=clusteringAlgo("SEM",1000))
-  getSlots("ClusteringStrategy")
+new("ClusterStrategy")
+  new("ClusterStrategy", shortAlgo=clusteringAlgo("SEM",1000))
+  getSlots("ClusterStrategy")
 
 
 
 cleanEx()
-nameEx("IClusteringModel-class")
-### * IClusteringModel-class
+nameEx("IClusterModel-class")
+### * IClusterModel-class
 
 flush(stderr()); flush(stdout())
 
-### Name: IClusteringModel
-### Title: Interface Class ['IClusteringModel'] for clustering models.
-### Aliases: IClusteringModel IClusteringModel-class
+### Name: IClusterModel
+### Title: Interface Class ['IClusterModel'] for clustering models.
+### Aliases: IClusterModel IClusterModel-class
 
 ### ** Examples
 
-getSlots("IClusteringModel")
+getSlots("IClusterModel")
 
 
 
 cleanEx()
-nameEx("IClusteringModelNames-class")
-### * IClusteringModelNames-class
+nameEx("IClusterModelNames-class")
+### * IClusterModelNames-class
 
 flush(stderr()); flush(stdout())
 
-### Name: IClusteringModelNames
-### Title: Interface base class ['IClusteringModelNames']
-### Aliases: IClusteringModelNames IClusteringModelNames-class
+### Name: IClusterModelNames
+### Title: Interface base class ['IClusterModelNames']
+### Aliases: IClusterModelNames IClusterModelNames-class
 
 ### ** Examples
 
-getSlots("IClusteringModelNames")
+getSlots("IClusterModelNames")
 
 
 
@@ -147,7 +147,7 @@ nameEx("clusteringAlgo")
 flush(stderr()); flush(stdout())
 
 ### Name: clusteringAlgo
-### Title: Create an instance of ['ClusteringAlgo'] class
+### Title: Create an instance of ['ClusterAlgo'] class
 ### Aliases: clusteringAlgo
 
 ### ** Examples
@@ -165,7 +165,7 @@ nameEx("clusteringInit")
 flush(stderr()); flush(stdout())
 
 ### Name: clusteringInit
-### Title: Create an instance of ['ClusteringInit'] class
+### Title: Create an instance of ['ClusterInit'] class
 ### Aliases: clusteringInit
 
 ### ** Examples
@@ -182,7 +182,7 @@ nameEx("clusteringStrategy")
 flush(stderr()); flush(stdout())
 
 ### Name: clusteringStrategy
-### Title: Create an instance of ['ClusteringStrategy'] class
+### Title: Create an instance of ['ClusterStrategy'] class
 ### Aliases: clusteringStrategy
 
 ### ** Examples
@@ -199,14 +199,14 @@ nameEx("print-methods")
 
 flush(stderr()); flush(stdout())
 
-### Name: print,ClusteringAlgo-method
+### Name: print,ClusterAlgo-method
 ### Title: Print a rtkpp class to standard output.
-### Aliases: print print,ClusteringAlgo-method print,ClusteringInit-method
-###   print,ClusteringStrategy-method print,IClusteringModelNames-method
-###   print-algo,ClusteringAlgo,ClusteringAlgo-method
-###   print-init,ClusteringInit,ClusteringInit-method
-###   print-strategy,ClusteringStrategy,ClusteringStrategy-method
-###   print-strategy,IClusteringModelNames-method
+### Aliases: print print,ClusterAlgo-method print,ClusterInit-method
+###   print,ClusterStrategy-method print,IClusterModelNames-method
+###   print-algo,ClusterAlgo,ClusterAlgo-method
+###   print-init,ClusterInit,ClusterInit-method
+###   print-strategy,ClusterStrategy,ClusterStrategy-method
+###   print-strategy,IClusterModelNames-method
 
 ### ** Examples
 
@@ -222,14 +222,14 @@ nameEx("show-methods")
 
 flush(stderr()); flush(stdout())
 
-### Name: show,ClusteringAlgo-method
+### Name: show,ClusterAlgo-method
 ### Title: Show description of a rtkpp class to standard output.
-### Aliases: show show,ClusteringAlgo-method show,ClusteringInit-method
-###   show,ClusteringStrategy-method show,IClusteringModelNames-method
-###   show-algo,ClusteringAlgo,ClusteringAlgo-method
-###   show-init,ClusteringInit,ClusteringInit-method
-###   show-strategy,ClusteringStrategy,ClusteringStrategy-method
-###   show-strategy,IClusteringModelNames-method
+### Aliases: show show,ClusterAlgo-method show,ClusterInit-method
+###   show,ClusterStrategy-method show,IClusterModelNames-method
+###   show-algo,ClusterAlgo,ClusterAlgo-method
+###   show-init,ClusterInit,ClusterInit-method
+###   show-strategy,ClusterStrategy,ClusterStrategy-method
+###   show-strategy,IClusterModelNames-method
 
 ### ** Examples
 

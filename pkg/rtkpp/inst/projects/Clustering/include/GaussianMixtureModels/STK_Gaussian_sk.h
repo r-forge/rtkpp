@@ -48,11 +48,13 @@ namespace Clust
 /** @ingroup Clustering
  *  Traits class for the Gaussian_sk traits policy. */
 template<class _Array>
-struct MixtureModelTraits< Gaussian_sk<_Array> >
+struct MixtureTraits< Gaussian_sk<_Array> >
 {
   typedef _Array Array;
+  typedef typename Array::Type Type;
   typedef Gaussian_sk_Parameters Parameters;
   typedef MixtureComponent<_Array, Parameters> Component;
+  typedef Array2D<Real>        Param;
 };
 
 } // namespace hidden
@@ -71,9 +73,10 @@ class Gaussian_sk : public DiagGaussianBase<Gaussian_sk<Array> >
 {
   public:
     typedef DiagGaussianBase<Gaussian_sk<Array> > Base;
-    typedef typename Clust::MixtureModelTraits< Gaussian_sk<Array> >::Component Component;
-    typedef typename Clust::MixtureModelTraits< Gaussian_sk<Array> >::Parameters Parameters;
-    typedef typename Array::Col ColVector;
+    typedef typename Clust::MixtureTraits< Gaussian_sk<Array> >::Component Component;
+    typedef typename Clust::MixtureTraits< Gaussian_sk<Array> >::Parameters Parameters;
+
+    typedef Array2D<Real>::ColVector ColVector;
 
     using Base::p_tik;
     using Base::p_data;

@@ -38,8 +38,6 @@
 
 #include "../include/STK_IGaussianModel.h"
 
-#include "STKernel/include/STK_Arithmetic.h"
-
 namespace STK
 {
 

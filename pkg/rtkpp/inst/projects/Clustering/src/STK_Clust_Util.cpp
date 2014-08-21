@@ -25,24 +25,79 @@
 /*
  * Project:  stkpp::Clustering
  * created on: 4 sept. 2013
- * Author:   iovleff, serge.iovleff@stkpp.org
+ * Author:   iovleff, s...DOTi...ATstkppDOTorg
  **/
 
 /** @file STK_Clust_Util.cpp
  *  @brief In this file we implement the utilities functions of the Clustering project.
  **/
-
-#include "STKernel/include/STK_String.h"
-
-#include "../include/STK_Clust_Util.h"
+#include "../include/STK_IMixtureComposer.h"
 #include "../include/STK_MixtureAlgo.h"
 #include "../include/STK_MixtureInit.h"
+#include "../include/STK_MixtureStrategy.h"
 
 namespace STK
 {
 
 namespace Clust
 {
+
+/* @ingroup Clustering
+ *  Convert a String to a initType. The recognized strings are
+ * <table>
+ * <tr> <th> Initialization   </th></tr>
+ * <tr> <td> "randomInit"</td></tr>
+ * <tr> <td> "randomParamInit"</td></tr>
+ * <tr> <td> "randomClassInit"</td></tr>
+ * <tr> <td> "randomFuzzyInit"</td></tr>
+ * <tr> <td> "random"         </td></tr>
+ * <tr> <td> "class"          </td></tr>
+ * <tr> <td> "fuzzy"          </td></tr>
+ * </table>
+ *  @param type the type of initialization wanted
+ *  @return the initType corresponding (default is randomClassInit)
+ *  @note if the string is not found in the list above,the type Clust::randomClassInit_
+ *  is returned.
+ **/
+initType stringToInit( std::string const& type)
+{
+  if (toUpperString(type) == toUpperString(_T("randomInit"))) return randomInit_;
+  if (toUpperString(type) == toUpperString(_T("randomParamInit"))) return randomParamInit_;
+  if (toUpperString(type) == toUpperString(_T("randomClassInit"))) return randomClassInit_;
+  if (toUpperString(type) == toUpperString(_T("randomFuzzyInit"))) return randomFuzzyInit_;
+  if (toUpperString(type) == toUpperString(_T("random"))) return randomParamInit_;
+  if (toUpperString(type) == toUpperString(_T("class"))) return randomClassInit_;
+  if (toUpperString(type) == toUpperString(_T("fuzzy"))) return randomFuzzyInit_;
+  return randomClassInit_;
+}
+
+/* @ingroup Clustering
+ *  Convert a String to an algoType. The recognized strings are
+ * <table>
+ * <tr> <th> Algorithm   </th></tr>
+ * <tr> <td> "emAlgo"</td></tr>
+ * <tr> <td> "cemAlgo"</td></tr>
+ * <tr> <td> "semAlgo"</td></tr>
+ * <tr> <td> "em"</td></tr>
+ * <tr> <td> "cem"         </td></tr>
+ * <tr> <td> "sem"          </td></tr>
+ * </table>
+ *  @param type the type of algorithm wanted
+ *  @return the algoType corresponding (default is emAlgo)
+ *  @note if the string is not found in the list above,the type Clust::emAlgo_
+ *  is returned.
+ **/
+algoType stringToAlgo( std::string const& type)
+{
+  if (toUpperString(type) == toUpperString(_T("emAlgo"))) return emAlgo_;
+  if (toUpperString(type) == toUpperString(_T("cemAlgo"))) return cemAlgo_;
+  if (toUpperString(type) == toUpperString(_T("semAlgo"))) return semAlgo_;
+  if (toUpperString(type) == toUpperString(_T("em"))) return emAlgo_;
+  if (toUpperString(type) == toUpperString(_T("cem"))) return cemAlgo_;
+  if (toUpperString(type) == toUpperString(_T("sem"))) return semAlgo_;
+  return emAlgo_;
+}
+
 
 /* @ingroup Clustering
  *  convert a TypeReduction to a String.
@@ -77,6 +132,34 @@ Mixture stringToMixture( std::string const& type)
   if (toUpperString(type) == toUpperString(_T("Gaussian_s"))) return Gaussian_s_;
   if (toUpperString(type) == toUpperString(_T("Categorical_pjk"))) return Categorical_pjk_;
   if (toUpperString(type) == toUpperString(_T("Categorical_pk"))) return Categorical_pk_;
+  return unknown_mixture_;
+}
+/* @ingroup Clustering
+ *  convert a String to an Mixture.
+ *  @param type the String we want to convert
+ *  @return the Mixture represented by the String @c type. if the string
+ *  does not match any known name, the @c unknown_mixture_ type is returned.
+ **/
+Mixture stringToMixture( std::string const& type, bool& freeProp)
+{
+  freeProp = false;
+  if (toUpperString(type) == toUpperString(_T("Gamma_p_ajk_bjk"))) return Gamma_ajk_bjk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_p_ajk_bj"))) return Gamma_ajk_bj_;
+  if (toUpperString(type) == toUpperString(_T("Gaussian_p_sjk"))) return Gaussian_sjk_;
+  if (toUpperString(type) == toUpperString(_T("Gaussian_p_sk"))) return Gaussian_sk_;
+  if (toUpperString(type) == toUpperString(_T("Gaussian_p_sj"))) return Gaussian_sj_;
+  if (toUpperString(type) == toUpperString(_T("Gaussian_p_s"))) return Gaussian_s_;
+  if (toUpperString(type) == toUpperString(_T("Categorical_p_pjk"))) return Categorical_pjk_;
+  if (toUpperString(type) == toUpperString(_T("Categorical_p_pk"))) return Categorical_pk_;
+  freeProp = true;
+  if (toUpperString(type) == toUpperString(_T("Gamma_pk_ajk_bjk"))) return Gamma_ajk_bjk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_pk_ajk_bj"))) return Gamma_ajk_bj_;
+  if (toUpperString(type) == toUpperString(_T("Gaussian_pk_sjk"))) return Gaussian_sjk_;
+  if (toUpperString(type) == toUpperString(_T("Gaussian_pk_sk"))) return Gaussian_sk_;
+  if (toUpperString(type) == toUpperString(_T("Gaussian_pk_sj"))) return Gaussian_sj_;
+  if (toUpperString(type) == toUpperString(_T("Gaussian_pk_s"))) return Gaussian_s_;
+  if (toUpperString(type) == toUpperString(_T("Categorical_pk_pjk"))) return Categorical_pjk_;
+  if (toUpperString(type) == toUpperString(_T("Categorical_pk_pk"))) return Categorical_pk_;
   return unknown_mixture_;
 }
 
@@ -136,11 +219,11 @@ IMixtureAlgo* createAlgo(Clust::algoType algo, int nbIterMax, Real epsilon)
  *  @param nbIterMax the maximal number of iteration of the algorithm
  *  @param epsilon the tolerance of the algorithm
  **/
-IMixtureInit* createInit(Clust::initType init,  int nbTrials, Clust::algoType algo, int nbIterMax, Real epsilon)
+IMixtureInit* createInit(Clust::initType init,  int nbInits, Clust::algoType algo, int nbIterMax, Real epsilon)
 {
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Entering createInit() with:\n")
-           << _T("nbTrials = ") << nbTrials << _T("\n")
+           << _T("nbInits = ") << nbInits << _T("\n")
            << _T("nbIterMax = ") << nbIterMax << _T("\n")
            << _T("epsilon = ") << epsilon << _T("\n");
 #endif
@@ -160,9 +243,66 @@ IMixtureInit* createInit(Clust::initType init,  int nbTrials, Clust::algoType al
     default:
       break;
   }
-  p_init->setNbTrials(nbTrials);
+  p_init->setNbTry(nbInits);
   p_init->setInitAlgo(Clust::createAlgo(algo, nbIterMax, epsilon));
   return p_init;
+}
+
+/* @ingroup Clustering
+ *  Utility function for creating a SimpleStrategy.
+ *  @param nbTry the number of tries.
+ *  @param p_init the initializer to use.
+ *  @param algo the algorithm to use in the long run.
+ *  @return an instance of the SimpleStrategy
+ **/
+IMixtureStrategy* createSimpleStrategy( IMixtureComposer*& p_composer
+                                      , int nbTry
+                                      , IMixtureInit* const& p_init
+                                      , IMixtureAlgo* const& algo)
+{
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("Entering createSimpleStrategy() with:\n")
+           << _T("nbTry = ") << nbTry  << _T("\n");
+#endif
+  SimpleStrategyParam* p_strategyParam = new SimpleStrategyParam();
+  p_strategyParam->p_algo_ = algo;
+  SimpleStrategy* p_strategy = new SimpleStrategy(p_composer);
+  p_strategy->setNbTry(nbTry);
+  p_strategy->setMixtureInit(p_init);
+  p_strategy->setParam(p_strategyParam);
+  return p_strategy;
+}
+
+
+/* @ingroup Clustering
+ *  Utility function for creating a FullStrategy.
+ *  @param nbTry the number of tries.
+ *  @param p_init the initializer to use.
+ *  @param nbShortRun the number of shortRun.
+ *  @param shortRunAlgo the algorithm to use in the short run.
+ *  @param longRunAlgo the algorithm to use in the long run.
+ *  @return an instance of the SimpleStrategy
+ **/
+IMixtureStrategy* createFullStrategy( IMixtureComposer*& p_composer
+                                    , int nbTry, int nbInitRun
+                                    , IMixtureInit* const& p_init
+                                    , int nbShortRun, IMixtureAlgo* const& shortRunAlgo
+                                    , IMixtureAlgo* const& longRunAlgo)
+{
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("Entering createFullStrategy() with:\n")
+           << _T("nbTry = ") << nbTry  << _T("\n");
+#endif
+  FullStrategyParam* p_strategyParam = new FullStrategyParam();
+  p_strategyParam->nbInitRun_  = nbInitRun;
+  p_strategyParam->nbShortRun_  = nbShortRun;
+  p_strategyParam->p_shortAlgo_ = shortRunAlgo;
+  p_strategyParam->p_longAlgo_  = longRunAlgo;
+  FullStrategy* p_strategy = new FullStrategy(p_composer);
+  p_strategy->setNbTry(nbTry);
+  p_strategy->setMixtureInit(p_init);
+  p_strategy->setParam(p_strategyParam);
+  return p_strategy;
 }
 
 } // namespace Clust

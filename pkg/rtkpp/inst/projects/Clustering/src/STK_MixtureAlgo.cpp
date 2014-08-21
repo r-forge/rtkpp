@@ -35,7 +35,7 @@
 
 #include "STKernel/include/STK_Exceptions.h"
 #include "../include/STK_MixtureAlgo.h"
-#include "../include/STK_IMixtureComposerBase.h"
+#include "../include/STK_IMixtureComposer.h"
 
 namespace STK
 {

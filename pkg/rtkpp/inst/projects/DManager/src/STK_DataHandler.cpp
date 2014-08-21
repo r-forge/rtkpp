@@ -38,7 +38,7 @@
 namespace STK
 {
 
-/** read a data file and its companion description file. */
+/* read a data file and its companion description file. */
 bool DataHandler::readDataFromCsvFile(std::string const& datafile, std::string descriptorfile)
 {
   ReadWriteCsv rwdata(datafile);
@@ -91,54 +91,17 @@ bool DataHandler::readDataFromCsvFile(std::string const& datafile, std::string d
   return true;
 }
 
-std::vector<int> DataHandler::colIndex(std::string const& id) const
+/* lookup on the descriptors in order to get the columns of the ReadWriteCsv
+ *  with the Id idData.
+ *  @param idData id of the data to get
+ **/
+std::vector<int> DataHandler::colIndex(std::string const& idData) const
 {
-  int rowNames = descriptor_.beginRows() +1;
+  int rowIdData = descriptor_.beginRows()+1;
   std::vector<int> colindex;
   for (int i = descriptor_.beginCols(); i <= descriptor_.lastIdxCols(); ++i)
-  {
-    if (descriptor_.var(i).at(rowNames) == id) colindex.push_back(i);
-  }
+  { if (descriptor_.var(i).at(rowIdData) == idData) colindex.push_back(i);}
   return colindex;
-}
-
-void DataHandler::getData(std::string const& id, Array2D<int>& data, int& nbVariable) const
-{
-  std::vector<int> colindex = colIndex(id);
-  nbVariable = colindex.size();
-  data.resize(nbSample(), nbVariable);
-  int j= data.beginCols();
-  for (std::vector<int>::const_iterator it = colindex.begin(); it != colindex.end(); ++it, ++j)
-  {
-    for (int i = data_.firstRow(*it); i <= data_.lastRow(*it); ++i)
-    { data(i, j) = STK::stringToType<int>(data_(i,*it));}
-  }
-}
-
-void DataHandler::getData(std::string const& id, Array2D<Real>& data, int& nbVariable) const
-{
-  std::vector<int> colindex = colIndex(id);
-  nbVariable = colindex.size();
-  data.resize(data_.rows(), nbVariable);
-  int j= data.beginCols();
-  for (std::vector<int>::const_iterator it = colindex.begin(); it != colindex.end(); ++it, ++j)
-  {
-    for (int i = data_.firstRow(*it); i <= data_.lastRow(*it); ++i)
-    { data(i, j) = STK::stringToType<Real>(data_(i,*it));}
-  }
-}
-
-void DataHandler::getData(std::string const& id, Array2D<std::string>& data, int& nbVariable) const
-{
-  std::vector<int> colindex = colIndex(id);
-  nbVariable = colindex.size();
-  data.resize(data_.rows(), nbVariable);
-  int j= data.beginCols();
-  for (std::vector<int>::const_iterator it = colindex.begin(); it != colindex.end(); ++it, ++j)
-  {
-    for (int i = data_.firstRow(*it); i <= data_.lastRow(*it); ++i)
-    { data(i, j) = data_(i,*it);}
-  }
 }
 
 

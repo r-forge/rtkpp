@@ -23,7 +23,7 @@ Imports: methods
 URL: http://www.stkpp.org
 NeedsCompilation: yes
 SystemRequirements: GNU make
-Packaged: 2014-08-07 14:34:27 UTC; iovleff
+Packaged: 2014-08-21 20:13:35 UTC; iovleff
 Author: Serge Iovleff [aut, cre],
   Vincent Kubicki [ctb],
   Parmeet Bhatia [ctb]

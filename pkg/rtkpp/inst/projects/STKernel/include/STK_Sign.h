@@ -36,8 +36,8 @@
 #ifndef STK_SIGN_H
 #define STK_SIGN_H
 
-#include "STK_String.h"
 #include <map>
+#include "STK_String.h"
 
 namespace STK
 {
@@ -52,8 +52,9 @@ namespace STK
    signNA_ = __INT_MAX__  ///< Not Available value
  };
 
-template<> struct Arithmetic<Sign>;
-template<> struct IdTypeImpl<Sign>;
+// forward declaration
+template<typename Type> struct Arithmetic;
+template<typename Type> struct IdTypeImpl;
 
 /** @ingroup Arithmetic
  *  @brief Specialization for Sign.
@@ -80,10 +81,10 @@ struct Arithmetic<Sign> : public std::numeric_limits<Sign>
     **/
    static bool isFinite(const Sign& x) throw() { return (!isNA(x) && !isInfinite(x));}
  };
- 
-/** @ingroup RTTI 
+
+/** @ingroup RTTI
  *  @brief Specialization of the IdTypeImpl for the Type Sign.
- * 
+ *
  *  Return the IdType of a Sign.
  **/
 template<>
@@ -92,7 +93,7 @@ struct IdTypeImpl<Sign>
   /** Give the IdType of the type Sign. */
   static IdType returnType() { return(sign_);}
 };
-  
+
 /** @ingroup stream
  *  @brief Overloading of the ostream << for the type Sign.
  *  @param os the output stream

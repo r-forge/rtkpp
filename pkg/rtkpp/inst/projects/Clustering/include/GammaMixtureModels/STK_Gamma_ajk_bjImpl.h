@@ -77,7 +77,8 @@ struct MixtureModelImpl<  Array, Gamma_ajk_bj_Parameters >
 {
   typedef MixtureComponent<Array, Gamma_ajk_bj_Parameters> Component;
   typedef Gamma_ajk_bj_Parameters Parameters;
-  typedef typename Array::Col ColVector;
+
+  typedef Array2D<Real>::ColVector ColVector;
 
   // run mStep
   static void mStep(Array1D< Component* >& components, Array2D<Real> const* p_tik, Array const* p_dataij)

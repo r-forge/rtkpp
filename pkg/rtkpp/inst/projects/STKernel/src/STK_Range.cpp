@@ -36,7 +36,7 @@
 
 #include <algorithm>
 #include "../include/STK_Range.h"
-#include "../include/STK_String.h"
+#include "../include/STK_Integer.h"
 
 namespace STK
 {

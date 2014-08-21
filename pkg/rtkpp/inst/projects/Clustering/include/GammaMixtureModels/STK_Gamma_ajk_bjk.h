@@ -51,11 +51,13 @@ namespace Clust
  * Traits class for the Gamma_ajk_bjk traits policy
  **/
 template<class _Array>
-struct MixtureModelTraits< Gamma_ajk_bjk<_Array> >
+struct MixtureTraits< Gamma_ajk_bjk<_Array> >
 {
   typedef _Array Array;
+  typedef typename Array::Type Type;
   typedef MixtureComponent<_Array, Gamma_ajk_bjk_Parameters> Component;
   typedef Gamma_ajk_bjk_Parameters        Parameters;
+  typedef Array2D<Real>        Param;
 };
 
 } // namespace hidden
@@ -73,8 +75,8 @@ template<class Array>
 class Gamma_ajk_bjk : public GammaBase< Gamma_ajk_bjk<Array> >
 {
   public:
-    typedef typename Clust::MixtureModelTraits< Gamma_ajk_bjk<Array> >::Component Component;
-    typedef typename Clust::MixtureModelTraits< Gamma_ajk_bjk<Array> >::Parameters Parameters;
+    typedef typename Clust::MixtureTraits< Gamma_ajk_bjk<Array> >::Component Component;
+    typedef typename Clust::MixtureTraits< Gamma_ajk_bjk<Array> >::Parameters Parameters;
     typedef GammaBase< Gamma_ajk_bjk<Array> > Base;
 
     using Base::p_tik;

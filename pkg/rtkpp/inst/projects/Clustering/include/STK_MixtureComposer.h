@@ -37,13 +37,12 @@
 #define STK_MIXTURECOMPOSER_H
 
 #include <vector>
-#include "STK_IMixtureComposerBase.h"
+#include "STK_IMixtureComposer.h"
 
 namespace STK
 {
 
 class IMixture;
-
 /** @ingroup Clustering
  *  Main class for handling composed mixture models.
  *  A composed mixture model on some composed space
@@ -59,7 +58,7 @@ class IMixture;
  * \f$\boldsymbol{\lambda}^l_k, \, k=1,\ldots K \f$ are the cluster specific parameters
  * and the parameters \f$ \boldsymbol{\alpha}^l \f$ are the shared parameters.
  * */
-class MixtureComposer : public IMixtureComposerBase
+class MixtureComposer : public IMixtureComposer
 {
   public:
     typedef std::vector<IMixture*>::const_iterator ConstMixtIterator;
@@ -77,11 +76,11 @@ class MixtureComposer : public IMixtureComposerBase
 
     /** @return a constant reference on the vector of mixture */
     inline std::vector<IMixture*> const& v_mixtures() const { return v_mixtures_;}
-    /** Utility lookup function allowing to find a Mixture from its idName
-     *  @param idName the id name of the mixture we want to get
+    /** Utility lookup function allowing to find a Mixture from its idData
+     *  @param idData the id name of the data
      *  @return a pointer on the mixture, NULL if the mixture is not found
      **/
-     IMixture* getMixture( String const& idName) const;
+     IMixture* getMixture( String const& idData) const;
 
     /** Create a composer, but reinitialize the mixtures parameters. */
     virtual MixtureComposer* create() const;
@@ -131,37 +130,50 @@ class MixtureComposer : public IMixtureComposerBase
      *  be called only once after we finish running the estimation algorithm.
      **/
     virtual void finalizeStep();
-    /** register a mixture to the composer.
+    /** @brief register a mixture to the composer.
      *  When a mixture is registered, the composer:
      *  - assign composer pointer (itself) to the mixture
      *  - add it to v_mixtures_
-     *  @note the mixture is not initialized, so don't forget to call
+     * @param p_mixture a pointer on the mixture
      **/
-    void registerMixture(IMixture* mixture);
+    void registerMixture(IMixture* p_mixture);
     /** Utility method allowing to create all the mixtures using the DataHandler
      *  info of the manager.
      **/
     template<class MixtureManager>
     void createMixtures(MixtureManager& manager)
     { manager.createMixtures(*this, nbCluster());}
-    /** Create a specific mixture and register it.
+    /** Utility method allowing to create a specific mixture and register it.
      *  @param manager the manager with the responsibility of the creation
      *  @param idModel the id of the mixture we want to create
-     *  @param idName the name of the mixture
+     *  @param idData the id name of the data
      **/
     template<class MixtureManager>
-    void createMixture(MixtureManager& manager, Clust::Mixture idModel, String const& idName)
+    void createMixture(MixtureManager& manager, Clust::Mixture idModel, String const& idData)
     {
-      IMixture* p_mixture = manager.createMixture(idModel, idName, nbCluster_);
+      IMixture* p_mixture = manager.createMixture(idModel, idData, nbCluster());
       if (p_mixture) registerMixture(p_mixture);
     }
-    /** Get the parameters of a specific mixture.
-     *  @param manager the manager with the responsibility of the parameters
-     *  @param idName the id name of the mixture we want the parameters
+    /** Utility method allowing to create a mixture with a given data set
+     *  and register it. The Mixture Manager will find the associated model
+     *  to use with this data set.
+     *  @param manager the manager with the responsibility of the creation.
+     *  @param idData the id name of the data to modelize.
      **/
-    template<class ParametersManager>
-    void getParameters(ParametersManager& manager, String const& idName)
-    { manager.getParamaters(getMixture(idName));}
+    template<class MixtureManager>
+    void createMixture(MixtureManager& manager, String const& idData)
+    {
+      IMixture* p_mixture = manager.createMixture( idData, nbCluster());
+      if (p_mixture) registerMixture(p_mixture);
+    }
+    /** Utility method allowing to get the parameters of a specific mixture.
+     *  @param manager the manager with the responsibility of the parameters
+     *  @param idData the Id of the data we want the parameters
+     *  @param data the structure which will receive the data
+     **/
+    template<class ParametersManager, class Param>
+    void getParameters(ParametersManager const& manager, String const& idData, Param& data)
+    { manager.getParameters(getMixture(idData), idData, data);}
 
   protected:
     /** @brief Create the composer using existing data handler and mixtures.
@@ -170,10 +182,9 @@ class MixtureComposer : public IMixtureComposerBase
      * @sa MixtureComposerFixedProp
      **/
     void createComposer( std::vector<IMixture*> const& v_mixtures_);
+  private:
     /** vector of pointers to the mixtures components */
     std::vector<IMixture*> v_mixtures_;
-
-  private:
 };
 
 /** @brief specialization of the composer for the fixed proportion case.

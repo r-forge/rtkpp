@@ -36,24 +36,25 @@
 #ifndef STK_STRING_H
 #define STK_STRING_H
 
-// C++ headers
 #include <string>
 
 #include "STK_Stream.h"
+#include "STK_Arithmetic.h"
+#include "STK_IdTypeImpl.h"
 
 namespace STK
 {
 /** @ingroup Base
  *  @brief STK fundamental type of a String.
  *
- *  The type String is defined for the internal representation 
+ *  The type String is defined for the internal representation
  *  of the string variables (strings).
  **/
 typedef std::basic_string<Char> String;
 
 /** @ingroup Arithmetic
  *  @brief Specialization for String.
- * 
+ *
  * The STK fundamental type String use the empty String to represent
  * NA String.
  */
@@ -81,9 +82,9 @@ struct Arithmetic<String> : public std::numeric_limits<String>
   static bool isFinite(String const& x) throw() { return (!isNA(x));}
 };
 
-/** @ingroup RTTI 
+/** @ingroup RTTI
  *  @brief Specialization of the IdTypeImpl for the Type String.
- * 
+ *
  *  @return the IdType of a String.
  **/
 template<>
@@ -92,7 +93,6 @@ struct IdTypeImpl<String>
   /** @return the IdType string_ */
   static IdType returnType() { return(string_);}
 };
-
 /** @ingroup Base
   * @brief Set a new value to the na String representation and modify
   * stringNaSize accordingly.
@@ -114,7 +114,6 @@ String& toUpperString( String& s);
  *  @return a copy of @c s in upper case
  **/
 String toUpperString( String const& s);
-
 }
 
 #include "STK_Proxy.h"

@@ -45,8 +45,9 @@ namespace STK
  **/
 Real stringToReal( String const& str)
 {
+  istringstream is(str);
   Real x;
-  istringstream(str) >> Proxy<Real>(x);
+  is >> Proxy<Real>(x);
   return x;
 }
 

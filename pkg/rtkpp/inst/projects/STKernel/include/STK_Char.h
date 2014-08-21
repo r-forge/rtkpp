@@ -36,16 +36,19 @@
 #ifndef STK_CHAR_H
 #define STK_CHAR_H
 
-#include "STK_Arithmetic.h"
-#include "STK_IdTypeImpl.h"
+#include <limits>
+#include "STK_enum.h"
 
 namespace STK
 {
+// forward declarations
+template<typename Type> struct Arithmetic;
+template<typename Type> struct IdTypeImpl;
 
 /** @ingroup Base
  *  @brief STK fundamental type of a Char.
  *
- *  The type Char is defined for the internal representation 
+ *  The type Char is defined for the internal representation
  *  of the characters. Note that if you change the representation,
  *  you don't have to modify the stream classes defined in
  *  the file STK_StreamBase.h, but you have to modify the
@@ -104,7 +107,7 @@ typedef char Char;
 
 /** @ingroup Arithmetic
  *  @brief Specialization of the struct Arithmetic for Char.
- * 
+ *
  * The STK fundamental type Char does not have NA value. If the user
  * ask for a NA value, the method return 0.
  */
@@ -125,7 +128,7 @@ struct Arithmetic<Char> : public std::numeric_limits<Char>
    *  @return always @c false as the Char type does not have NA value.
    **/
   static bool isNA(const Char& x) throw() { return false; }
-    
+
   /** Test if x is  infinite.
    *  @param x the Char to test.
    *  @return always @c false
@@ -139,9 +142,9 @@ struct Arithmetic<Char> : public std::numeric_limits<Char>
   static bool isFinite(const Char& x) throw() { return true; }
 };
 
-/** @ingroup RTTI 
+/** @ingroup RTTI
  *  @brief Specialization of the IdTypeImpl for the Type Char.
- *  This struct return the IdType of a Char. 
+ *  This struct return the IdType of a Char.
  **/
 template<>
 struct IdTypeImpl<Char>
@@ -151,7 +154,7 @@ struct IdTypeImpl<Char>
    **/
   static IdType returnType()  { return(character_);}
 };
-  
+
 
 } // namespace STK
 

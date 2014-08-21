@@ -34,33 +34,52 @@
 
 
 #include <Rcpp.h>
-#include "../inst/include/rtkpp.h"
+#include "Rtkpp.h"
 
 using namespace Rcpp;
 using namespace STK;
 
 /**  @param tab2d R matrix
  */
-RcppExport SEXP wrapper( SEXP tab2d )
+RcppExport SEXP wrapper( SEXP tab1,SEXP tab2,SEXP tab3 )
 {
   BEGIN_RCPP
 
   // wrap SEXP
-  NumericMatrix RData(tab2d);
+  NumericMatrix RData1(tab1);
+  NumericMatrix RData2(tab2);
+  NumericMatrix RData3(tab3);
 
   // wrap Rcpp matrix
-  RcppMatrix<double> data(RData);
-  for (int i=data.beginRows(); i< data.endRows(); ++i)
+  RcppMatrix<double> data1(RData1);
+  // start tests
+  for (int i=data1.beginRows(); i< data1.endRows(); ++i)
   {
-    for (int j= data.beginCols(); j < data.endCols(); ++j)
+    for (int j= data1.beginCols(); j < data1.endCols(); ++j)
     {
-      if (Arithmetic<Real>::isNA(data(i,j)))
-      { data(i,j)= 100*i+j;}
+      if (Arithmetic<Real>::isNA(data1(i,j)))
+      { data1(i,j)= 100*i+j;}
     }
   }
-  data(0,0) = Arithmetic<double>::NA();
+  data1(0,0) = Arithmetic<double>::NA();
+  RDataHandler handler(RData2, "model1", "gaussian_sjk");
+  handler.addData(RData3,  "model2", "gaussian_sj");
+
+  RcppMatrix<double> data2;
+  int nbVar;
+  handler.getData("model1", data2, nbVar);
+
+  data2(0,0) = 10;
+
+  Rcpp::List l;
+  l.push_back(tab1, "1");
+  data1(1,1) = 11;
+  l.push_back(tab1, "2");
+  data1(2,2) = 22;
+  l.push_back(tab2, "3");
+
   // return final output
-  return tab2d;
+  return l;
 
   END_RCPP
 }

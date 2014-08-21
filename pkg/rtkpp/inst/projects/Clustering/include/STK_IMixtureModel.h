@@ -38,12 +38,36 @@
 #define STK_IMIXTUREMODEL_H
 
 #include "STK_IMixtureModelBase.h"
-#include "STK_Clust_Traits.h"
 #include "STK_MixtureComponent.h"
 #include "Arrays/include/STK_Array1D.h"
 
 namespace STK
 {
+/** @ingroup Clustering
+ *  Main class for the maximization step implementation and for
+ *  the random initialization of the parameters.
+ *
+ *  The MixtureModelImpl struct can be specialized for any
+ *  models deriving from the IMixtureModel. Typically, it can be used
+ *  for implementing the following method
+ *  @code
+ *    static void mStep(Array1D< Component* >& components, Array2D<Real> const* p_tik);
+ *  @endcode
+ **/
+template<class Array, class Parameter>
+struct MixtureModelImpl;
+
+namespace Clust
+{
+/** Main class for the mixtures traits policy.
+ *  The traits struct MixtureTraits must be specialized for any
+ *  Mixture deriving from the Interface IMixtureModel.
+ **/
+template <class Mixture> struct MixtureTraits;
+
+} // namespace Clust
+
+
 /**@ingroup Clustering
  * @brief Main interface class for mixture models.
  * At this level we create the array of Components
@@ -54,9 +78,9 @@ template<class Derived>
 class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBase
 {
   public:
-    typedef typename Clust::MixtureModelTraits<Derived>::Array Array;
-    typedef typename Clust::MixtureModelTraits<Derived>::Component Component;
-    typedef typename Clust::MixtureModelTraits<Derived>::Parameters Parameters;
+    typedef typename Clust::MixtureTraits<Derived>::Array Array;
+    typedef typename Clust::MixtureTraits<Derived>::Component Component;
+    typedef typename Clust::MixtureTraits<Derived>::Parameters Parameters;
 
   protected:
     /** Default constructor.
@@ -110,7 +134,7 @@ class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBa
     void initializeModel()
     {
       if (!p_dataij_)
-        STKRUNTIME_ERROR_NO_ARG(IMixtureModel::initializeModel,p_data is not set);
+        STKRUNTIME_ERROR_NO_ARG(IMixtureModel::initializeModel,p_dataij_ is not set);
       // set dimensions
       this->setNbSample(p_dataij_->sizeRows());
       this->setNbVariable(p_dataij_->sizeCols());
@@ -123,8 +147,8 @@ class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBa
     void setData(Array const& data)
     {
       p_dataij_ = &data;
-      this->setNbSample(p_dataij_->rows().size());
-      this->setNbVariable(p_dataij_->cols().size());
+      this->setNbSample(p_dataij_->sizeRows());
+      this->setNbVariable(p_dataij_->sizeCols());
     }
     /** @return the value of the probability of the i-th sample in the k-th component.
      *  @param i,k indexes of the sample and of the component

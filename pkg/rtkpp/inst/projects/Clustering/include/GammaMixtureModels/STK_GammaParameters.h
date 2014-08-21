@@ -39,6 +39,7 @@
 
 #include <cmath>
 
+#include "../../../STKernel/include/STK_Real.h"
 #include "../../../Arrays/include/STK_Const_Arrays.h"
 #include "../../../Arrays/include/STK_Display.h"
 #include "../../../StatModels/include/STK_IMultiParameters.h"

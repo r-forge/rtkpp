@@ -5,7 +5,7 @@
 \title{Initialize an instance of the [\code{\linkS4class{ClusterDiagGaussianModel}}] class.}
 \usage{
 \S4method{initialize}{ClusterDiagGaussianModel}(.Object, data, nbCluster = 2,
-  modelName = "gaussian_sjk", hasFreeProportions = TRUE)
+  modelName = "gaussian_sjk")
 }
 \arguments{
 \item{.Object}{ An object:  see the Details section.}

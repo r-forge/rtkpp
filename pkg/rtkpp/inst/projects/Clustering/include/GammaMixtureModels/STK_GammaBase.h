@@ -150,6 +150,7 @@ void GammaBase<Derived>::moments()
       {
 #ifdef STK_MIXTURE_DEBUG
         stk_cout << _T("Error in GammaUtil::moments. k=")<< k << _T("meanLog = ") << p_param(k)->meanLog_;
+        stk_cout << _T("dataij_=\n") << *(this->asDerived().p_data());
 #endif
         throw Clust::estimFail_;
       }

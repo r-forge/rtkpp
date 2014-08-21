@@ -56,7 +56,7 @@ namespace STK
  **/
 GaussianAAModel::GaussianAAModel( Matrix* p_workData)
                                 : IAAModel(p_workData)
-                                , StatisticalModel<Matrix>(p_workData)
+                                , IStatModel<Matrix>(p_workData)
                                 , projectedCovariance_()
                                 , residualCovariance_()
                                 , residualVariance_(0.)
@@ -67,7 +67,7 @@ GaussianAAModel::GaussianAAModel( Matrix* p_workData)
 // constructor
 GaussianAAModel::GaussianAAModel( Matrix& workData)
                                 : IAAModel(workData)
-                                , StatisticalModel<Matrix>(workData)
+                                , IStatModel<Matrix>(workData)
                                 , projectedCovariance_()
                                 , residualCovariance_()
                                 , residualVariance_(0.)
@@ -84,8 +84,8 @@ void GaussianAAModel::setWorkData(Matrix& workData)
 {
   // update data set and flags for the IAAModel part
   IAAModel::setWorkData(workData);
-  // set dimensions to new size for the StatisticalModel part
-  StatisticalModel<Matrix>::setData(workData);
+  // set dimensions to new size for the IStatModel part
+  IStatModel<Matrix>::setData(workData);
 }
 
 /* compute the ln-likelihood of the model */

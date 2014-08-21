@@ -34,9 +34,9 @@
  **/
 
 #include "STKernel/include/STK_Real.h"
+#include "STKernel/include/STK_Exceptions.h"
 
 #include "../include/STK_ImportFromCsv.h"
-#include "STKernel/include/STK_Exceptions.h"
 
 namespace STK
 {
@@ -53,6 +53,7 @@ ImportFromCsv::ImportFromCsv( ReadWriteCsv const& import, Import::TypeImport typ
  **/
 ImportFromCsv::ImportFromCsv( ImportFromCsv const& import)
                             : p_dataFrame_(import.p_dataFrame_)
+                            , typeImport_(import.typeImport_)
                             , import_(import.import_)
 {}
 

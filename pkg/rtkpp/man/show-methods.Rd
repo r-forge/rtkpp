@@ -5,17 +5,9 @@
 \alias{show,ClusterAlgo-method}
 \alias{show,ClusterInit-method}
 \alias{show,ClusterStrategy-method}
-\alias{show,ClusteringAlgo-method}
-\alias{show,ClusteringInit-method}
-\alias{show,ClusteringStrategy-method}
-\alias{show,IClusteringModelNames-method}
 \alias{show-algo,ClusterAlgo-method}
-\alias{show-algo,ClusteringAlgo-method}
 \alias{show-init,ClusterInit,ClusterInit-method}
-\alias{show-init,ClusteringInit,ClusteringInit-method}
-\alias{show-modelnames,IClusteringModelNames-method}
 \alias{show-strategy,ClusterStrategy-method}
-\alias{show-strategy,ClusteringStrategy-method}
 \title{Show description of a rtkpp class to standard output.}
 \usage{
 \S4method{show}{ClusterAlgo}(object)
@@ -23,14 +15,6 @@
 \S4method{show}{ClusterInit}(object)
 
 \S4method{show}{ClusterStrategy}(object)
-
-\S4method{show}{ClusteringAlgo}(object)
-
-\S4method{show}{ClusteringInit}(object)
-
-\S4method{show}{IClusteringModelNames}(object)
-
-\S4method{show}{ClusteringStrategy}(object)
 }
 \arguments{
 \item{object}{a rtkpp object: a \code{\linkS4class{ClusterStrategy}},

@@ -50,11 +50,13 @@ namespace Clust
 /** @ingroup Clustering
  *  Traits class for the Gamma_ajk_bj traits policy. */
 template<class _Array>
-struct MixtureModelTraits< Gamma_ajk_bj<_Array> >
+struct MixtureTraits< Gamma_ajk_bj<_Array> >
 {
   typedef _Array Array;
+  typedef typename Array::Type Type;
   typedef Gamma_ajk_bj_Parameters Parameters;
   typedef MixtureComponent<_Array, Parameters> Component;
+  typedef Array2D<Real>        Param;
 };
 
 } // namespace Clust
@@ -72,10 +74,11 @@ template<class Array>
 class Gamma_ajk_bj : public GammaBase<Gamma_ajk_bj<Array> >
 {
   public:
-    typedef typename Clust::MixtureModelTraits< Gamma_ajk_bj<Array> >::Component Component;
-    typedef typename Clust::MixtureModelTraits< Gamma_ajk_bj<Array> >::Parameters Parameters;
+    typedef typename Clust::MixtureTraits< Gamma_ajk_bj<Array> >::Component Component;
+    typedef typename Clust::MixtureTraits< Gamma_ajk_bj<Array> >::Parameters Parameters;
     typedef GammaBase<Gamma_ajk_bj<Array> > Base;
-    typedef typename Array::Col ColVector;
+
+    typedef Array2D<Real>::ColVector ColVector;
 
     using Base::p_tik;
     using Base::p_data;
@@ -181,7 +184,7 @@ void Gamma_ajk_bj<Array>::randomInit()
   }
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Gamma_ajk_bj<Array>::randomInit done\n");
-  for (int k= components.begin(); k <= components.lastIdx(); ++k)
+  for (int k= components().begin(); k < components().end(); ++k)
   {
     stk_cout << _T("Component no ") << k << _T("\n");
     stk_cout << p_param(k)->shape_;

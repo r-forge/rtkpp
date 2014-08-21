@@ -41,6 +41,10 @@
 namespace STK
 {
 // forward declaration
+template<typename Type> struct Arithmetic;
+template<typename Type> struct IdTypeImpl;
+
+// forward declaration
 template<int Size_> class TRange;
 typedef TRange<UnknownSize> Range;
 
@@ -405,7 +409,6 @@ struct Arithmetic< TRange<Size_> > : public std::numeric_limits< TRange<Size_> >
   static inline bool isFinite(TRange<Size_> const& x) throw() { return (!isNA(x) && !isInfinite(x));}
 };
 
-
 /** @ingroup RTTI
  *  @brief Partial Specialization of the IdTypeImpl for the Type TRange.
  **/
@@ -417,6 +420,12 @@ struct IdTypeImpl< TRange<Size_> >
 };
 
 
+} // namespace STK
+
+#include <map>
+
+namespace STK
+{
 /** @brief Write a TRange in the form first:last (MATLAB-like form) in an
  *  output stream.
  *  @param os output stream

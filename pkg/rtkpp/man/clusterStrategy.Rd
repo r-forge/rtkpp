@@ -24,7 +24,8 @@ Default value: 20.}
 \item{initEpsilon}{Real defining the epsilon value for the algorithm.
 epsilon is not used by the \code{SEM} algorithm. Default value: 0.01.}
 
-\item{nbShortRun}{Integer defining the number of short run to try. Default value: 5.}
+\item{nbShortRun}{Integer defining the number of short run to try
+(the strategy launch an initialization before each short run). Default value: 5.}
 
 \item{shortRunAlgo}{A character string with the algorithm to use in the short run stage
 Default value: "EM".}
@@ -59,8 +60,10 @@ good estimate in the clusering estimation process.
 A strategy is a way to find a good estimate of the parameters of a mixture model
 when using an EM algorithm. A ``try'' is composed of three stages
 \itemize{
-  \item \code{nbInit} initializations of the \code{EM}, \code{CEM} or \code{SEM} algorithm.
-  \item \code{nbShortRun} short iterations of the \code{EM}, \code{CEM} or \code{SEM} algorithm.
+  \item \code{nbShortRun} short iterations of the initialization step and
+   of the \code{EM}, \code{CEM} or \code{SEM} algorithm.
+  \item \code{nbInit} initializations using the \code{\link{clusterInit}}]
+  method.
   \item A long run of the \code{EM}, \code{CEM} or \code{SEM} algorithm.
 }
 For exemple if \code{nbInit} is 5 and \code{nbShortRun} is also 5, there will be

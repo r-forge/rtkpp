@@ -36,11 +36,19 @@
 #ifndef STK_REAL_H
 #define STK_REAL_H
 
-#include "STK_String.h"
 #include <map>
+#include "STK_String.h"
+
+#ifdef IS_RTKPP_LIB
+#include <Rcpp.h>
+#include "STK_RcppTraits.h"
+#endif
 
 namespace STK
 {
+// forward declarations
+template<typename Type> struct Arithmetic;
+template<typename Type> struct IdTypeImpl;
 
 #ifdef STKREALAREFLOAT
 /**  @ingroup Base
@@ -67,14 +75,14 @@ typedef  double Real;
 
 /** @ingroup Arithmetic
  *   @brief Specialization for Real.
- * 
+ *
  *  We are using the quiet_NaN() representation of the underlying
  *  Type for representing NA (not available) numbers.
  */
 template<>
 struct Arithmetic<Real> : public std::numeric_limits<Real>
 {
-#ifdef RTKPP_LIB
+#ifdef IS_RTKPP_LIB
   enum
   {
     Rtype_ = hidden::RcppTraits<Real>::Rtype_
@@ -83,7 +91,7 @@ struct Arithmetic<Real> : public std::numeric_limits<Real>
   /** True if the type has a representation for a "Not Available."    */
   static const bool hasNA = true;
   /** @return a Non Avalaible (NA) special number using the quiet_NaN method. */
-#ifdef RTKPP_LIB
+#ifdef IS_RTKPP_LIB
   static inline Real NA() throw()  { return Rcpp::traits::get_na<Rtype_>();}
 #else
   static inline Real NA() throw() { return std::numeric_limits<Real>::quiet_NaN();}
@@ -93,7 +101,7 @@ struct Arithmetic<Real> : public std::numeric_limits<Real>
   /** Test if x is a Non Avalaible (NA) special number.
    *  @param x the Integer number to test.
    **/
-#ifdef RTKPP_LIB
+#ifdef IS_RTKPP_LIB
   static inline bool isNA(Real const& x) throw() { return Rcpp::traits::is_na<Rtype_>(x);}
 #else
   static inline bool isNA(Real const& x) throw() { return !(x==x);}
@@ -109,9 +117,9 @@ struct Arithmetic<Real> : public std::numeric_limits<Real>
   static inline bool isFinite(Real const& x) throw() { return (!isNA(x) && !isInfinite(x));}
 };
 
-/** @ingroup RTTI 
+/** @ingroup RTTI
  *  @brief Specialization of the IdTypeImpl for the Type Real.
- * 
+ *
  *  Return the IdType of a Real.
  **/
 template<>
@@ -121,6 +129,51 @@ struct IdTypeImpl<Real>
   static IdType returnType() { return(real_);}
 };
 
+#ifdef IS_RTKPP_LIB
+/** @ingroup Arithmetic
+ *   @brief Specialization for const Real (needed by Rcpp).
+ *
+ *  We are using the quiet_NaN() representation of the underlying
+ *  Type for representing NA (not available) numbers.
+ */
+template<>
+struct Arithmetic<const Real>
+{
+  enum
+  {
+    Rtype_ = hidden::RcppTraits<Real>::Rtype_
+  };
+  /** True if the type has a representation for a "Not Available."    */
+  static const bool hasNA = true;
+  /** @return a Non Avalaible (NA) special number using the quiet_NaN method. */
+  static inline Real NA() throw()  { return Rcpp::traits::get_na<Rtype_>();}
+  /** Test if x is a Non Avalaible (NA) special number.
+   *  @param x the Integer number to test.
+   **/
+  static inline bool isNA(Real const& x) throw() { return Rcpp::traits::is_na<Rtype_>(x);}
+  /** @return @c true if x is  infinite.
+   *  @param x the Real to test.
+   **/
+  static inline bool isInfinite(Real const& x) throw()
+  { return ( (x < -std::numeric_limits<Real>::max())||(x > std::numeric_limits<Real>::max()));}
+  /** @return @c true if x is  finite.
+   *  @param x the Real to test.
+   **/
+  static inline bool isFinite(Real const& x) throw() { return (!isNA(x) && !isInfinite(x));}
+};
+
+/** @ingroup RTTI
+ *  @brief Specialization of the IdTypeImpl for the Type const Real (needed by Rcpp).
+ *
+ *  Return the IdType of a Real.
+ **/
+template<>
+struct IdTypeImpl<const Real>
+{
+  /** Give the IdType of the type Real.*/
+  static IdType returnType() { return(real_);}
+};
+#endif
 /** @ingroup Base
  *  @brief Convert a String to a Real.
  *  @param str the String we want to convert

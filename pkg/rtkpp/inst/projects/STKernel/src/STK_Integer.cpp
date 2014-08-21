@@ -47,7 +47,8 @@ namespace STK
 Integer stringToInt( String const& str)
 {
   Integer x;
-  istringstream(str) >> Proxy<Integer>(x);
+  istringstream is(str);
+  is >> Proxy<Integer>(x);
   return x;
 }
 

@@ -5,7 +5,7 @@
 \title{Initialize an instance of the [\code{\linkS4class{ClusterGammaModel}}] class.}
 \usage{
 \S4method{initialize}{ClusterGammaModel}(.Object, data, nbCluster = 2,
-  modelName = "gamma_ajk_bjk", hasFreeProportions = TRUE)
+  modelName = "gamma_ajk_bjk")
 }
 \arguments{
 \item{.Object}{ An object:  see the Details section.}

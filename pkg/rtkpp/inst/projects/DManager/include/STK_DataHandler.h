@@ -23,7 +23,7 @@
 */
 
 /*
- * Project:  stkpp::
+ * Project:  stkpp::DManager
  * created on: 15 nov. 2013
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
@@ -40,13 +40,31 @@
 
 #include "STK_IDataHandler.h"
 #include "STK_ReadWriteCsv.h"
+#include "Arrays/include/STK_Array2D.h"
 
 namespace STK
 {
+// forward declaration
+class DataHandler;
+
+namespace hidden
+{
+/** @ingroup hidden
+ *  Specialization of the  DataHandlerTraits for DataHandler
+ **/
+template<typename Type>
+struct DataHandlerTraits<DataHandler, Type>
+{
+  typedef Array2D<Type> Data;
+};
+
+} // namespace hidden
+
 /** @ingroup DManager
+ * @c implementation of the IDataHandler class using ReadWriteCsv and Array2D.
  *  The DataHandler class allow to read various csv files with their description
- *  files and to get the column by using an id.
- *  All files are stored in memory in a ReadWriteCsv structure.
+ *  files and to get the columns identified by an idData in an @c Array2D.
+ *  All data are stored in memory in a ReadWriteCsv structure.
  */
 class DataHandler : public IDataHandler
 {
@@ -69,27 +87,25 @@ class DataHandler : public IDataHandler
 
     /** read a data file and its companion description file. */
     bool readDataFromCsvFile(std::string const& datafile, std::string descriptorfile);
-    /** @brief read a data set from an array.
+    /** @brief read a data set from an Array2D.
      * This method should be essentially used:
-     * - for testing the method as the data  will be converted in a String format.
+     * - for testing some statistical method as the data  will be converted in a
+     * String format (whcih is not an efficient way to store the data..).
      * - if the data are already stored in a String format.
      * @param data the data set
-     * @param idMixture the id of the Mixture Model
-     * @param idModel an id identifying uniquely the model
+     * @param idData the id of the data
+     * @param idModel an id identifying the model to use with the data set
      **/
     template<typename Type>
-    bool readDataFromArray2D(Array2D<Type> const& data, std::string const& idMixture, std::string const& idModel);
+    bool readDataFromArray2D(Array2D<Type> const& data, std::string const& idData, std::string const& idModel);
 
     /** return in an Array2D<int> the data with the given idData */
-    virtual void getData(std::string const& idData, Array2D<int>& data, int& nbVariable) const;
-    /** return in an Array2D<Real> the data with the given idModel */
-    virtual void getData(std::string const& idData, Array2D<Real>& data, int& nbVariable) const;
-    /** return in an Array2D<std::string> the data with the given idModel */
-    virtual void getData(std::string const& idData, Array2D<std::string>& data, int& nbVariable) const;
-
+    template<typename Type>
+    void getData(std::string const& idData, Array2D<Type>& data, int& nbVariable) const;
 
   protected:
-    /** lookup on the descriptors in order to get the columns with correct id
+    /** lookup on the descriptors in order to get the columns of the ReadWriteCsv
+     *  with the Id idData.
      *  @param idData id of the data to get
      **/
     std::vector<int> colIndex(std::string const& idData) const;
@@ -97,18 +113,41 @@ class DataHandler : public IDataHandler
   private:
     /** data files */
     ReadWriteCsv data_;
-    /** descriptor files */
+    /** descriptor files with two rows. On the first row,w e get the idModel,
+     * on the second row, we get the idData
+     **/
     ReadWriteCsv descriptor_;
 };
 
 
 template<typename Type>
-bool DataHandler::readDataFromArray2D(Array2D<Type> const& data, std::string const& idMixture, std::string const& idModel)
+void DataHandler::getData(std::string const& idData, Array2D<Type>& data, int& nbVariable) const
+{
+  std::vector<int> indexes = colIndex(idData);
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("In DataHandler::getData, idData = ") << idData << _T("\n");
+  stk_cout << _T("column found = ");
+  for (std::vector<int>::const_iterator it = indexes.begin(); it != indexes.end(); ++it)
+  { stk_cout << (*it) << _T("");}
+  stk_cout << _T("\n");
+#endif
+  nbVariable = indexes.size();
+  data.resize(nbSample(), nbVariable);
+  int j= data.beginCols();
+  for (std::vector<int>::const_iterator it = indexes.begin(); it != indexes.end(); ++it, ++j)
+  {
+    for (int i = data_.firstRow(*it); i <= data_.lastRow(*it); ++i)
+    { data(i, j) = STK::stringToType<Type>(data_(i,*it));}
+  }
+}
+
+template<typename Type>
+bool DataHandler::readDataFromArray2D(Array2D<Type> const& data, std::string const& idData, std::string const& idModel)
 {
   // add descriptor
   Variable<std::string> desc(2);
-  desc[baseIdx] = idMixture; desc[baseIdx+1] = idModel;
-  if (!addInfo(idMixture, idModel)) return false;
+  desc[baseIdx] = idModel ; desc[baseIdx+1] = idData;
+  if (!addInfo(idData, idModel)) return false;
   // store data at the end of the ReadWriteCsv array in a string format
   for (int j=data.beginCols(); j<= data.lastIdxCols(); ++j)
   {

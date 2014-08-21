@@ -34,7 +34,6 @@
  **/
 
 #include "../include/STK_Binary.h"
-#include "../include/STK_Integer.h"
 
 namespace STK
 {

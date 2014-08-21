@@ -48,11 +48,13 @@ namespace Clust
 /** @ingroup hidden
  *  Traits class for the Gaussian_s traits policy. */
 template<class _Array>
-struct MixtureModelTraits< Gaussian_sj<_Array> >
+struct MixtureTraits< Gaussian_sj<_Array> >
 {
   typedef _Array Array;
+  typedef typename Array::Type Type;
   typedef Gaussian_sj_Parameters Parameters;
   typedef MixtureComponent<_Array, Parameters> Component;
+  typedef Array2D<Real>        Param;
 };
 
 } // namespace hidden
@@ -70,8 +72,8 @@ class Gaussian_sj : public DiagGaussianBase<Gaussian_sj<Array> >
 {
   public:
     typedef DiagGaussianBase<Gaussian_sj<Array> > Base;
-    typedef typename Clust::MixtureModelTraits< Gaussian_sj<Array> >::Component Component;
-    typedef typename Clust::MixtureModelTraits< Gaussian_sj<Array> >::Parameters Parameters;
+    typedef typename Clust::MixtureTraits< Gaussian_sj<Array> >::Component Component;
+    typedef typename Clust::MixtureTraits< Gaussian_sj<Array> >::Parameters Parameters;
 
     using Base::p_tik;
     using Base::p_data;

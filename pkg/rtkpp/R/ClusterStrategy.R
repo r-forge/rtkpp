@@ -22,37 +22,40 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
-#' Create an instance of [\code{\linkS4class{ClusterStrategy}}] class 
+#' Create an instance of [\code{\linkS4class{ClusterStrategy}}] class
 #'
 #' A strategy is a multistage empirical process for finding a
 #' good estimate in the clusering estimation process.
-#' 
+#'
 #' A strategy is a way to find a good estimate of the parameters of a mixture model
-#' when using an EM algorithm. A ``try'' is composed of three stages 
+#' when using an EM algorithm. A ``try'' is composed of three stages
 #' \itemize{
-#'   \item \code{nbInit} initializations of the \code{EM}, \code{CEM} or \code{SEM} algorithm. 
-#'   \item \code{nbShortRun} short iterations of the \code{EM}, \code{CEM} or \code{SEM} algorithm.
+#'   \item \code{nbShortRun} short iterations of the initialization step and
+#'    of the \code{EM}, \code{CEM} or \code{SEM} algorithm.
+#'   \item \code{nbInit} initializations using the \code{\link{clusterInit}}]
+#'   method.
 #'   \item A long run of the \code{EM}, \code{CEM} or \code{SEM} algorithm.
 #' }
 #' For exemple if \code{nbInit} is 5 and \code{nbShortRun} is also 5, there will be
 #' 5 packets of 5 models initialized. In each packet, the best model will be ameliorated using
 #' a short run. Among the 5 models ameliorated one will be estimated until convergence
 #' using a long run.
-#'   
+#'
 #' This process can be repeated at least \code{nbTry} times. If all the tries failed,
 #' an empty model is returned.
 #'
 #' @param nbInit Integer defining the number of initialization to try. Default value: 5.
 #' @param initMethod Character string with the initialisation method.
 #' @param initAlgo Character string with the algorithm to use in the initialization stage.
-#' Default value: "SEM" 
+#' Default value: "SEM"
 #' @param nbInitIteration Integer defining the maximal number of iterations in initialization algorithm
 #' if \code{initAlgo} = "EM or "CEM. This is the number of iterations if \code{initAlgo} = "SEM".
 #' Default value: 20.
 #' @param initEpsilon Real defining the epsilon value for the algorithm.
 #' epsilon is not used by the \code{SEM} algorithm. Default value: 0.01.
-#' 
-#' @param nbShortRun Integer defining the number of short run to try. Default value: 5.
+#'
+#' @param nbShortRun Integer defining the number of short run to try
+#' (the strategy launch an initialization before each short run). Default value: 5.
 #' @param shortRunAlgo A character string with the algorithm to use in the short run stage
 #' Default value: "EM".
 #' @param nbShortIteration Integer defining the maximal number of iterations in the short runs
@@ -60,7 +63,7 @@
 #' Default value: 100.
 #' @param shortEpsilon Real defining the epsilon value for the algorithm.
 #' epsilon is not used by the \code{SEM} algorithm. Default value: 1e-04.
-#' 
+#'
 #' @param longRunAlgo A character string with the algorithm to use in the long run stage
 #' Default value: "EM".
 #' @param nbLongIteration  Integer defining the maximal number of iterations in the short runs
@@ -68,7 +71,7 @@
 #' Default value: 1000.
 #' @param longEpsilon Real defining the epsilon value for the algorithm.
 #' epsilon is not used by the \code{SEM} algorithm. Default value: 1e-07.
-#' 
+#'
 #' @param nbTry number of estimation to attempt.
 #'
 #' @examples
@@ -92,7 +95,7 @@ clusterStrategy <- function( nbTry =1
   # create longAlgo
   longAlgo = clusterAlgo(longRunAlgo, nbLongIteration, longEpsilon);
   # create strategy
-  new("ClusterStrategy", nbTry =nbTry, initMethod =initMethod, shortAlgo =shortAlgo, longAlgo =longAlgo);
+  new("ClusterStrategy", nbTry =nbTry, nbShortRun =nbShortRun, initMethod =initMethod, shortAlgo =shortAlgo, longAlgo =longAlgo);
 }
 
 ###################################################################################
@@ -102,10 +105,12 @@ clusterStrategy <- function( nbTry =1
 #' Cluster models.
 #'
 #'   @slot nbTry Integer defining the number of tries. Default value: 1.
+#'   @slot nbShortRun Integer definining the number of short run
+#'   (the strategy launch an initialization before each short run).
 #'   @slot initMethod A [\code{\linkS4class{ClusterInit}}] object defining the way to
-#'   initialize the estimation method. 
+#'   initialize the estimation method.
 #'   @slot shortAlgo A [\code{\linkS4class{ClusterAlgo}}] object defining the algorithm
-#'   to use during the short runs of the estimation method. 
+#'   to use during the short runs of the estimation method.
 #'   @slot longAlgo A [\code{\linkS4class{ClusterAlgo}}] object defining the algorithm
 #'   to use during the long run of the estimation method.
 #'
@@ -115,15 +120,15 @@ clusterStrategy <- function( nbTry =1
 #'   getSlots("ClusterStrategy")
 #'
 #' @author Serge Iovleff
-#' 
+#'
 #' @name ClusterStrategy
 #' @rdname ClusterStrategy-class
 #' @aliases ClusterStrategy-class
 #' @exportClass ClusterStrategy
 setClass(
     Class="ClusterStrategy",
-    slots=c( nbTry = "numeric", initMethod = "ClusterInit", shortAlgo="ClusterAlgo", longAlgo="ClusterAlgo" ),
-    prototype=list(  nbTry = 5, initMethod = clusterInit(), shortAlgo=clusterAlgo("EM",100,1e-04), longAlgo=clusterAlgo("EM",1000,1e-07)),
+    slots=c( nbTry = "numeric", nbShortRun = "numeric", initMethod = "ClusterInit", shortAlgo="ClusterAlgo", longAlgo="ClusterAlgo" ),
+    prototype=list(  nbTry = 5, nbShortRun=5, initMethod = clusterInit(), shortAlgo=clusterAlgo("EM",100,1e-04), longAlgo=clusterAlgo("EM",1000,1e-07)),
     # validity function
     validity=function(object)
     {
@@ -131,8 +136,10 @@ setClass(
       {stop("nbTry must be an integer.")}
       if( object@nbTry < 1 ) # can't be zero
       {stop("nbTry must be strictly greater than 0");}
+      if (round(object@nbShortRun)!=object@nbShortRun)
+      {stop("nbShortRun must be an integer.")}
       if(class(object@initMethod)[1] != "ClusterInit")
-      {stop("shortAlgo is not of a Cluster algorithm (must be an instance of the class ClusterAlgo).")}
+      {stop("initMethod is not of a Cluster Initialization method (must be an instance of the class ClusterInit).")}
       if(class(object@shortAlgo)[1] != "ClusterAlgo")
       {stop("shortAlgo is not of a Cluster algorithm (must be an instance of the class ClusterAlgo).")}
       if(class(object@longAlgo)[1] != "ClusterAlgo")
@@ -144,9 +151,9 @@ setClass(
 
 ###################################################################################
 #' Create an instance of the [\code{\linkS4class{ClusterStrategy}}] class using new/initialize.
-#' 
+#'
 #' Initialization method. Used internally in the `rtkpp' package.
-#' 
+#'
 # @seealso \code{\link{initialize}}
 #' @keywords internal
 # @rdname initialize-methods
@@ -154,11 +161,14 @@ setClass(
 setMethod(
   f="initialize",
   signature=c("ClusterStrategy"),
-  definition=function(.Object, nbTry, initMethod, shortAlgo, longAlgo)
+  definition=function(.Object, nbTry, nbShortRun, initMethod, shortAlgo, longAlgo)
   {
     # for nbtry
     if(missing(nbTry)) {.Object@nbTry<-5}
     else  {.Object@nbTry<-nbTry}
+    # for nbtry
+    if(missing(nbShortRun)) {.Object@nbShortRun<-5}
+    else  {.Object@nbShortRun<-nbShortRun}
     # for initMethod
     if( missing(initMethod) ){ .Object@initMethod<-clusterInit() }
     else{.Object@initMethod<-initMethod}
@@ -169,7 +179,7 @@ setMethod(
     if(missing(longAlgo)){ .Object@longAlgo<-clusterAlgo("EM", 1000, 1e-07) }
     else{.Object@longAlgo<-longAlgo}
     # validate
-    validObject(.Object)        
+    validObject(.Object)
     return(.Object)
   }
 )
@@ -186,10 +196,11 @@ setMethod(
     cat("****************************************\n")
     cat("*** Cluster Strategy:\n")
     cat("* number of try         = ", x@nbTry, "\n")
+    cat("* number of short run   = ", x@nbShortRun, "\n")
     cat("****************************************\n")
     cat("*** Initialization :\n")
     cat("* method = ", x@initMethod@method, "\n")
-    cat("* number of init       = ", x@initMethod@nbInit, "\n")
+    cat("* number of init       = ", x@initMethod@nbInitRun, "\n")
     cat("* algorithm            = ", x@initMethod@algo@algo, "\n")
     cat("* number of iterations = ", x@initMethod@algo@nbIteration, "\n")
     cat("* epsilon              = ", x@initMethod@algo@epsilon, "\n")
@@ -202,7 +213,7 @@ setMethod(
     cat("*** long algorithm :\n")
     cat("* algorithm            = ", x@longAlgo@algo, "\n")
     cat("* number of iterations = ", x@longAlgo@nbIteration, "\n")
-    cat("* epsilon              = ", x@longAlgo@epsilon, "\n")    
+    cat("* epsilon              = ", x@longAlgo@epsilon, "\n")
     cat("****************************************\n")
   }
 )
@@ -219,10 +230,11 @@ setMethod(
     cat("****************************************\n")
     cat("*** Cluster Strategy:\n")
     cat("* number of try         = ", object@nbTry, "\n")
+    cat("* number of short run   = ", object@nbShortRun, "\n")
     cat("****************************************\n")
     cat("*** Initialization :\n")
     cat("* method = ", object@initMethod@method, "\n")
-    cat("* number of init       = ", object@initMethod@nbInit, "\n")
+    cat("* number of init       = ", object@initMethod@nbInitRun, "\n")
     cat("* algorithm            = ", object@initMethod@algo@algo, "\n")
     cat("* number of iterations = ", object@initMethod@algo@nbIteration, "\n")
     cat("* epsilon              = ", object@initMethod@algo@epsilon, "\n")
@@ -235,7 +247,7 @@ setMethod(
     cat("*** long algorithm :\n")
     cat("* algorithm            = ", object@longAlgo@algo, "\n")
     cat("* number of iterations = ", object@longAlgo@nbIteration, "\n")
-    cat("* epsilon              = ", object@longAlgo@epsilon, "\n")    
+    cat("* epsilon              = ", object@longAlgo@epsilon, "\n")
     cat("****************************************\n")
   }
 )
@@ -247,12 +259,13 @@ setMethod(
 #' @aliases [,ClusterStrategy-method
 #'
 setMethod(
-  f="[", 
+  f="[",
   signature(x = "ClusterStrategy"),
   definition=function(x,i,j,drop){
     if ( missing(j) ){
       switch(EXPR=i,
         "nbTry"={return(x@nbTry)},
+        "nbShortRun"={return(x@nbShortRun)},
         "initMethod"={return(x@initMethod)},
         "shortAlgo"={return(x@shortAlgo)},
         "longAlgo"={return(x@longAlgo)},
@@ -270,13 +283,14 @@ setMethod(
 #' @rdname extract-methods
 #' @aliases [<-,ClusterStrategy-method
 setReplaceMethod(
-  f="[", 
-  signature(x = "ClusterStrategy"), 
+  f="[",
+  signature(x = "ClusterStrategy"),
   definition=function(x,i,j,value){
     if ( missing(j) )
     {
       switch(EXPR=i,
              "nbTry"={x@nbTry<-value},
+             "nbShortRun"={x@nbShortRun<-value},
              "initMethod"={x@initMethod<-value},
              "shortAlgo"={x@shortAlgo<-value},
              "longAlgo"={x@longAlgo<-value},

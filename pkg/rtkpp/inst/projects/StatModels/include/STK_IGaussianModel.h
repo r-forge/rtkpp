@@ -37,7 +37,7 @@
 #ifndef STK_IGAUSSIANMODEL_H
 #define STK_IGAUSSIANMODEL_H
 
-#include "STK_StatisticalModel.h"
+#include "STK_IStatModel.h"
 #include "STatistiK/include/STK_Stat_MultivariateReal.h"
 
 #include "Arrays/include/STK_Array2DSquare.h"
@@ -121,9 +121,9 @@ Real diagonalGaussianLnLikelihood(Matrix const& data, Point const& mu, MatrixSqu
  *  to impose various constraint on the covariance matrix.
  **/
 template <class Array>
-class IGaussianModel : public StatisticalModel<Array>
+class IGaussianModel : public IStatModel<Array>
 {
-  typedef StatisticalModel<Array> Base;
+  typedef IStatModel<Array> Base;
   typedef typename Array::Row RowVector;
   typedef typename Array::Col ColVector;
 

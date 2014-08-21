@@ -48,11 +48,13 @@ namespace Clust
 /** @ingroup Clustering
  *  Traits class for the Categorical_pjk traits policy. */
 template<class _Array>
-struct MixtureModelTraits< Categorical_pjk<_Array> >
+struct MixtureTraits< Categorical_pjk<_Array> >
 {
   typedef _Array Array;
+  typedef typename Array::Type Type;
   typedef MixtureComponent<_Array, Categorical_pjkParameters> Component;
   typedef Categorical_pjkParameters        Parameters;
+  typedef Array2D<Real>        Param;
 };
 
 } // namespace hidden
@@ -71,9 +73,10 @@ class Categorical_pjk : public CategoricalBase<Categorical_pjk<Array> >
 {
   public:
     typedef CategoricalBase<Categorical_pjk<Array> > Base;
-    typedef typename Clust::MixtureModelTraits< Categorical_pjk<Array> >::Component Component;
-    typedef typename Clust::MixtureModelTraits< Categorical_pjk<Array> >::Parameters Parameters;
-    typedef typename Array::Col ColVector;
+    typedef typename Clust::MixtureTraits< Categorical_pjk<Array> >::Component Component;
+    typedef typename Clust::MixtureTraits< Categorical_pjk<Array> >::Parameters Parameters;
+
+    typedef Array2D<Real>::ColVector ColVector;
 
     using Base::p_tik;
     using Base::p_data;

@@ -4,8 +4,8 @@
 \alias{initialize,ClusterInit-method}
 \title{Create an instance of the [\code{\linkS4class{ClusterInit}}] class using new/initialize.}
 \usage{
-\S4method{initialize}{ClusterInit}(.Object, method = "random", nbInit = 5,
-  algo = clusterAlgo("SEM", 20, 0))
+\S4method{initialize}{ClusterInit}(.Object, method = "random",
+  nbInitRun = 5, algo = clusterAlgo("SEM", 20, 0))
 }
 \arguments{
 \item{.Object}{ An object:  see the Details section.}

@@ -34,29 +34,105 @@
 
 
 #include <Rcpp.h>
-#include "../inst/include/rtkpp.h"
-#include "../inst/include/DManager.h"
+#include "../inst/include/StatModels.h"
+#include "../inst/include/Clustering.h"
+
+#include "../inst/projects/Rtkpp/include/STK_RcppMatrix.h"
+#include "../inst/projects/Rtkpp/include/STK_RDataHandler.h"
+#include "../inst/projects/Rtkpp/include/STK_ClusterFacade.h"
 
 using namespace Rcpp;
 using namespace STK;
 
 /**  @param model ClusterDiagModel S4 class
  */
-RcppExport SEXP clusterDiagGaussianModel( SEXP model, SEXP k, SEXP modelNames, SEXP strategy )
+RcppExport SEXP clusterDiagGaussianModel( SEXP model, SEXP nbCluster, SEXP modelNames, SEXP strategy, SEXP criterion )
 {
   BEGIN_RCPP
 
-  // wrap S4 model with Rcpp
-  S4 Rcppmodel(model);
+  // wrap S4 model and strategy with S4 Rcpp class
+  S4 R_model(model);
+  S4 R_strategy(strategy);
+  // wrap other fields
+  IntegerVector R_nbCluster(nbCluster);
+  CharacterVector R_modelNames(modelNames);
+  std::string R_criterion(as<std::string>(criterion));
+
   // wrap data matrix with Rcpp
-  NumericMatrix RData = Rcppmodel.slot("data");
-  // wrap Rcpp matrix with stk++
-  RcppMatrix<double> data(RData);
+  NumericMatrix R_data = R_model.slot("data");
+  // wrap Rcpp matrix with stk++ wrapper
+  RcppMatrix<double> data(R_data);
+  int nbSample = R_data.rows();
+  int nbVariable = R_data.cols();
 
-  // start
-  DataHandler handler;
-  // ... TODO
+  //  build handler
+  RDataHandler handler;
+  // free prop or not ?
+  Array1D<bool> v_free;
+  for (int l= 0; l <R_modelNames.size() ; ++l)
+  {
+    std::string idData = "model" + typeToString<int>(l);
+    std::string idModel(as<std::string>(R_modelNames[l]));
+    bool free;
+    Clust::Mixture model = Clust::stringToMixture(idModel, free);
+    v_free.push_back(free);
+    handler.addData(R_data, idData, Clust::mixtureToString(model));
+  }
 
+  // create MixtureManager
+  MixtureManager<RDataHandler> manager(handler);
+
+  // create criterion
+  std::cout << R_criterion << "\n";
+  ICriterion* crit =0;
+  if (R_criterion == "BIC") { crit = new BICCriterion();}
+  if (R_criterion == "AIC") { crit = new AICCriterion();}
+
+  // start the estimation process, should end with the best model according to the criteria
+  IMixtureComposer* p_composer;
+  for (int k=0; k <R_nbCluster.length(); ++k)
+  {
+    for (int l=0; l <R_modelNames.size(); ++l)
+    {
+      // create composer
+      if (v_free[l])
+      { p_composer = new MixtureComposer(nbSample, nbVariable, R_nbCluster[k]);}
+      else
+      { p_composer = new MixtureComposerFixedProp(nbSample, nbVariable, R_nbCluster[k]);}
+      MixtureComposer* p_aux = static_cast<MixtureComposer*>(p_composer);
+
+      // create current mixture and register it
+      std::string idData = "model" + typeToString<int>(l);
+      p_aux->createMixture(manager, idData);
+
+      // create facade and strategy
+      ClusterFacade facade(p_composer);
+      facade.createFullStrategy(strategy);
+      // run estimation
+      if (facade.run())
+      {
+        MixtureComposer* p_aux = static_cast<MixtureComposer*>(p_composer);
+        // compute criterion
+        crit->setModel(p_composer);
+        if (!crit->run()) { delete p_composer; break;}
+        // update model
+        if (as<double>(R_model.slot("lnLikelihood")) < crit->value())
+        {
+          //std::cout << "R_nbCluster[k] = " << R_nbCluster[k] << "\n";
+          //std::cout << "critValue = " << crit->value() << "\n";
+          R_model.slot("nbCluster")    = R_nbCluster[k];
+          R_model.slot("lnLikelihood") = p_aux->lnLikelihood();
+          R_model.slot("criterion")    = crit->value();
+          Array2D<Real> params;
+          p_aux->getParameters(manager,idData, params);
+        }
+      }
+      // release current composer
+      delete p_composer; p_composer = 0;
+    }
+  }
+  delete crit;
+  if (p_composer) delete p_composer;
   // return true
   return Rcpp::wrap(1);
 

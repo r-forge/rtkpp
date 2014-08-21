@@ -31,7 +31,7 @@
 rtkpp.system.file <- function(...)
 { tools::file_path_as_absolute( base::system.file( ..., package = "rtkpp" ) )}
 
-#' Provide compiler flags -- i.e. -I/path/to/rtkpp.h
+#' Provide compiler flags -- i.e. -I/path/to/Rtkpp.h
 #' @keywords internal
 rtkppCxxFlags <- function(cpp11=FALSE)
 {

@@ -38,8 +38,7 @@
 #ifndef STK_DATAFRAMETOARRAY2D_H
 #define STK_DATAFRAMETOARRAY2D_H
 
-#include "STK_DataFrame.h"
-#include "../../../include/Arrays.h"
+#include "../../Arrays/include/STK_Array2D.h"
 
 namespace STK
 {

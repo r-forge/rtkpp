@@ -57,43 +57,35 @@
 #'
 clusterDiagGaussian <- function(data, nbCluster=2, modelNames=NULL, strategy=clusterStrategy(), criterion="BIC")
 {
-  # for nbCluster
+  # check nbCluster
   nbClusterModel = length(nbCluster);
   nbClusterMin = min(nbCluster);
   nbClusterMax = max(nbCluster);
-  if (nbClusterMin < 2) { stop("nbCluster must be greater or equal to 2")}
-  # for criterion
+  if (nbClusterMin < 2) { stop("The number of clusters must be greater or equal to 2")}
+
+  # check criterion
   if(sum(criterion %in% c("BIC","AIC")) != 1)
   { stop("criterion is not valid. See ?clusterDiagGaussian for the list of valid criterion")}
-  # for data
+
+  # check data
   data = as.matrix(data)
   if (nrow(data) <= 3*nbClusterMax) {stop("There is not enough individuals (rows) in the data set")}
   if (ncol(data) < 1) {stop("Error: empty data set")}
-  # for modelNames
+
+  # check modelNames
   if (is.null(modelNames)) { modelNames = diagGaussianNames()}
   if (!checkDiagGaussianNames(modelNames))
   { stop("modelNames is not valid. See ?diagGaussianNames for the list of valid model names")}
+
+  # check strategy (TODO)
+
   # start estimation of the models
-  nbModel = length(modelNames)
-  bestModel = Inf;
-  for (k in nbCluster)
-  {
-    for (n in 1:nbModel)
-    {
-      model = new("ClusterDiagGaussianModel", data)
-      resFlag = .Call("clusterDiagGaussianModel", model, k, modelNames[n], strategy, PACKAGE="rtkpp")
-      if (resFlag == 1)
-      {
-        if (criterion=="BIC")
-        {
-        }
-        else if (criterion=="AIC")
-        {}
-
-      }
-    }
-
-  }
+  model = new("ClusterDiagGaussianModel", data)
+  resFlag = .Call("clusterDiagGaussianModel", model, nbCluster, modelNames, strategy, criterion, PACKAGE="rtkpp")
+  if (resFlag != 1) {cat("An error occur during the clustering process")}
+  print(model)
+  model
 }
+
 
 

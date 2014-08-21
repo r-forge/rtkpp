@@ -3,34 +3,25 @@
 \name{print,ClusterAlgo-method}
 \alias{print}
 \alias{print,ClusterAlgo-method}
+\alias{print,ClusterDiagGaussianModel-method}
 \alias{print,ClusterInit-method}
 \alias{print,ClusterStrategy-method}
-\alias{print,ClusteringAlgo-method}
-\alias{print,ClusteringInit-method}
-\alias{print,ClusteringStrategy-method}
-\alias{print,IClusteringModelNames-method}
+\alias{print,IClusterModel-method}
+\alias{print,MixmodCluster-method}
 \alias{print-algo,ClusterAlgo-method}
-\alias{print-algo,ClusteringAlgo-method}
 \alias{print-init,ClusterInit,ClusterInit-method}
-\alias{print-init,ClusteringInit,ClusteringInit-method}
-\alias{print-modelnames,IClusteringModelNames-method}
 \alias{print-strategy,ClusterStrategy-method}
-\alias{print-strategy,ClusteringStrategy-method}
 \title{Print a rtkpp class to standard output.}
 \usage{
 \S4method{print}{ClusterAlgo}(x, ...)
 
 \S4method{print}{ClusterInit}(x, ...)
 
+\S4method{print}{IClusterModel}(x, ...)
+
+\S4method{print}{ClusterDiagGaussianModel}(x, ...)
+
 \S4method{print}{ClusterStrategy}(x, ...)
-
-\S4method{print}{ClusteringAlgo}(x, ...)
-
-\S4method{print}{ClusteringInit}(x, ...)
-
-\S4method{print}{IClusteringModelNames}(x, ...)
-
-\S4method{print}{ClusteringStrategy}(x, ...)
 }
 \arguments{
 \item{x}{a rtkpp object: a \code{\linkS4class{ClusterStrategy}},

@@ -39,7 +39,7 @@
 #include "Sdk/include/STK_MetaTemplate.h"
 #include "STK_Global.h"
 
-namespace STK 
+namespace STK
 {
 /** @ingroup Base
  *  The Proxy class allow to surdefine operators and methods for

@@ -35,15 +35,7 @@
 #ifndef STK_IPAGE_H
 #define STK_IPAGE_H
 
-// C++ headers
 #include <vector>
-#include <string>
-
-// STK+ headers
-#include "STKernel/include/STK_Integer.h"
-#include "STKernel/include/STK_Real.h"
-#include "STKernel/include/STK_String.h"
-#include "STKernel/include/STK_Stream.h"
 
 #include "STK_Option.h"
 

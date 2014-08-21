@@ -30,45 +30,34 @@
  **/
 
 /** @file STK_PenCriterion.h
- *  @brief In this file we implement the penalization criterion class.
+ *  @brief In this file we implement the penalization criterion classes.
  **/
 
 #include "../include/STK_PenCriterion.h"
-
-#include "STKernel/include/STK_Exceptions.h"
-
+#include "../../Sdk/include/STK_Macros.h"
 
 namespace STK
 {
 //* Compute AIC Criterion */
 bool AICCriterion::run()
 {
-  try
-  {
-    // AIC criteria
-    value_  = 2.*(-p_model_->lnLikelihood()+p_model_->nbFreeParameter());
-  }
-  catch( Exception const& e)
-  {
-    msg_error_ = e.error();
+  if (!p_model_)
+  { msg_error_ = STKERROR_NO_ARG(AICCriterion::run,p_model_ is not set);
     return false;
   }
+  // AIC criteria
+  value_  = 2.*(-p_model_->lnLikelihood()+p_model_->nbFreeParameter());
   return true;
 }
 
 //* Compute BIC Criterion */
 bool BICCriterion::run()
 {
-  try
-  {
-    // BIC criteria
-    value_  = (-2.*p_model_->lnLikelihood())+(p_model_->nbFreeParameter()*p_model_->lnNbSample());
-  }
-  catch( Exception const& e)
-  {
-    msg_error_ = e.error();
+  if (!p_model_)
+  { msg_error_ = STKERROR_NO_ARG(BICCriterion::run,p_model_ is not set);
     return false;
   }
+    value_  = (-2.*p_model_->lnLikelihood())+(p_model_->nbFreeParameter()*p_model_->lnNbSample());
   return true;
 }
 

@@ -36,12 +36,11 @@
 #ifndef STK_BINARY_H
 #define STK_BINARY_H
 
-#include "STK_String.h"
 #include <map>
+#include "STK_String.h"
 
 namespace STK
 {
-
 /** @ingroup Base
  *  @brief STK fundamental type of a binary.
  *
@@ -52,9 +51,6 @@ enum Binary
   one_  =1, ///< 1 value
   binaryNA_=__INT_MAX__ ///< Not Available value
 };
-
-template<> struct Arithmetic<Binary>;
-template<> struct IdTypeImpl<Binary>;
 
  /** @ingroup Arithmetic
   *  @brief Specialization for Binary.
@@ -81,7 +77,7 @@ template<> struct IdTypeImpl<Binary>;
    static inline bool isFinite(const Binary& x) throw() { return (!isNA(x) && !isInfinite(x));}
  };
 
-/** @ingroup RTTI 
+/** @ingroup RTTI
  *  @brief Specialization of the IdTypeImpl for the Type Binary.
  **/
 template<>
@@ -90,7 +86,6 @@ struct IdTypeImpl<Binary>
   /** @return the IdType of the type Binary. */
   static inline IdType returnType() { return(binary_);}
 };
-
 /** @ingroup stream
  *  @brief Overloading of the ostream << for the type Binary.
  *  @param os the output stream

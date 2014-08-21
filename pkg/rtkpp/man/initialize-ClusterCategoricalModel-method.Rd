@@ -5,7 +5,7 @@
 \title{Initialize an instance of the [\code{\linkS4class{ClusterCategoricalModel}}] class.}
 \usage{
 \S4method{initialize}{ClusterCategoricalModel}(.Object, data, nbCluster = 2,
-  modelName = "categorical_pjk", hasFreeProportions = TRUE)
+  modelName = "categorical_pjk")
 }
 \arguments{
 \item{.Object}{ An object:  see the Details section.}

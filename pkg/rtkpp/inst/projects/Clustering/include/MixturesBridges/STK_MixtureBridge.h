@@ -38,9 +38,170 @@
 
 #include "../STK_IMixture.h"
 
-#include "STK_Bridges.h"
-#include "STK_DataBridge.h"
-#include "STK_InitializeMixtureImpl.h"
+#include "../CategoricalMixtureModels/STK_Categorical_pjk.h"
+#include "../CategoricalMixtureModels/STK_Categorical_pk.h"
+#include "../GammaMixtureModels/STK_Gamma_ajk_bjk.h"
+#include "../GammaMixtureModels/STK_Gamma_ajk_bj.h"
+#include "../GaussianMixtureModels/STK_Gaussian_sjk.h"
+#include "../GaussianMixtureModels/STK_Gaussian_sj.h"
+#include "../GaussianMixtureModels/STK_Gaussian_sk.h"
+#include "../GaussianMixtureModels/STK_Gaussian_s.h"
+
+#include "../STK_DataManager.h"
+
+namespace STK
+{
+
+namespace hidden
+{
+/** @ingroup hidden
+ *  Partial specialization of the MixtureBridgeTraits for the Categorical_pjk model
+ **/
+template<int Id, class Data> struct MixtureBridgeTraits;
+/** @ingroup hidden
+ *  Partial specialization of the MixtureBridgeTraits for the Categorical_pjk model
+ **/
+template<class Data>
+struct MixtureBridgeTraits<Clust::Categorical_pjk_, Data>
+{
+  /** Type of the Mixture model */
+  typedef Categorical_pjk<Data> Mixture;
+  /** Type of the DataManager */
+  typedef DataManager<Clust::Categorical_pjk_, Data> DataBridge;
+};
+/** @ingroup hidden
+ *  Partial specialization of the MixtureBridgeTraits for the Categorical_pk model
+ **/
+template<class Data>
+struct MixtureBridgeTraits<Clust::Categorical_pk_, Data>
+{
+  /** Type of the mixture model */
+  typedef Categorical_pk<Data> Mixture;
+  /** Type of the DataManager */
+  typedef DataManager<Clust::Categorical_pk_, Data> DataBridge;
+};
+/** @ingroup hidden
+ *  Partial  specialization of the MixtureBridgeTraits for the Gamma_ajk_bj_ model
+ **/
+template<class Data>
+struct MixtureBridgeTraits<Clust::Gamma_ajk_bjk_, Data>
+{
+  /** Type of the mixture model */
+  typedef Gamma_ajk_bjk<Data> Mixture;
+  /** Type of the DataManager */
+  typedef DataManager<Clust::Gamma_ajk_bjk_, Data> DataBridge;
+};
+/** @ingroup hidden
+ *  Partial  specialization of the MixtureBridgeTraits for the Gamma_ajk_bj_ model
+ **/
+template<class Data>
+struct MixtureBridgeTraits<Clust::Gamma_ajk_bj_, Data>
+{
+  /** Type of the mixture model */
+  typedef Gamma_ajk_bj<Data> Mixture;
+  /** Type of the DataManager */
+  typedef DataManager<Clust::Gamma_ajk_bj_, Data> DataBridge;
+};
+/** @ingroup hidden
+ *  Partial specialization of the MixtureBridgeTraits for the Gaussian_sjk model
+ **/
+template<class Data>
+struct MixtureBridgeTraits<Clust::Gaussian_sjk_, Data>
+{
+  /** Type of the mixture model */
+  typedef Gaussian_sjk<Data> Mixture;
+  /** Type of the DataManager */
+  typedef DataManager<Clust::Gaussian_sjk_, Data> DataBridge;
+};
+/** @ingroup hidden
+ *  Partial specialization of the MixtureBridgeTraits for the Gaussian_sk model
+ **/
+template<class Data>
+struct MixtureBridgeTraits<Clust::Gaussian_sk_, Data>
+{
+  /** Type of the mixture model */
+  typedef Gaussian_sk<Data> Mixture;
+  /** Type of the DataManager */
+  typedef DataManager<Clust::Gaussian_sk_, Data> DataBridge;
+};
+/** @ingroup hidden
+ *  Partial specialization of the MixtureBridgeTraits for the Gaussian_sj model
+ **/
+template<class Data>
+struct MixtureBridgeTraits<Clust::Gaussian_sj_, Data>
+{
+  /** Type of the mixture model */
+  typedef Gaussian_sj<Data> Mixture;
+  /** Type of the DataManager */
+  typedef DataManager<Clust::Gaussian_sj_, Data> DataBridge;
+};
+/** @ingroup hidden
+ *  Partial specialization of the MixtureBridgeTraits for the Gaussian_s model
+ **/
+template<class Data>
+struct MixtureBridgeTraits<Clust::Gaussian_s_, Data>
+{
+  /** Type of the mixture model */
+  typedef Gaussian_s<Data> Mixture;
+  /** Type of the DataManager */
+  typedef DataManager<Clust::Gaussian_s_, Data> DataBridge;
+};
+
+} // namespace hidden
+
+
+namespace hidden
+{
+/** @ingroup hidden
+ *  Initialize mixture, default implementation */
+template<int Id, class Data>
+struct InitializeMixtureImpl
+{
+  typedef typename MixtureBridgeTraits<Id, Data>::Mixture Mixture;
+  typedef typename MixtureBridgeTraits<Id, Data>::DataBridge DataBridge;
+  static void run( Mixture& mixture, DataBridge* p_data)
+  { mixture.setData(p_data->m_dataij()); mixture.initializeModel();}
+};
+
+/** @ingroup hidden
+ *  Initialize mixture, specialization for Categorical_pjk_ models
+ **/
+template<class Data>
+struct InitializeMixtureImpl<Clust::Categorical_pjk_, Data>
+{
+  typedef typename MixtureBridgeTraits<Clust::Categorical_pjk_, Data>::Mixture Mixture;
+  typedef typename MixtureBridgeTraits<Clust::Categorical_pjk_, Data>::DataBridge DataBridge;
+  static void run( Mixture& mixture, DataBridge* p_data)
+  {
+    mixture.setData(p_data->m_dataij());
+    int min = p_data->m_dataij().minElt();
+    int max = p_data->m_dataij().maxElt();
+    mixture.setModalities(Range(min, max, 0));
+    mixture.initializeModel();
+  }
+};
+
+/** @ingroup hidden
+ *  Initialize mixture, specialization for Categorical_pk_ models
+ **/
+template<class Data>
+struct InitializeMixtureImpl<Clust::Categorical_pk_, Data>
+{
+  typedef typename MixtureBridgeTraits<Clust::Categorical_pk_, Data>::Mixture Mixture;
+  typedef typename MixtureBridgeTraits<Clust::Categorical_pk_, Data>::DataBridge DataBridge;
+  static void run( Mixture& mixture, DataBridge* p_data)
+  {
+    mixture.setData(p_data->m_dataij());
+    int min = p_data->m_dataij().minElt();
+    int max = p_data->m_dataij().maxElt();
+    mixture.setModalities(Range(min, max, 0));
+    mixture.initializeModel();
+  }
+};
+
+} // namespace hidden
+
+} /* namespace STK */
 
 namespace STK
 {
@@ -52,42 +213,38 @@ namespace STK
  * @tparam Id is any identifier of a concrete model deriving from the
  * interface STK::IMixtureModel class.
  */
-template<int Id>
+template<int Id, class Data>
 class MixtureBridge: public IMixture
 {
   public:
     // type of Mixture
-    typedef typename Clust::BridgeTraits<Id>::Mixture Mixture;
-    // data type to set
-    typedef typename Clust::BridgeTraits<Id>::Data Data;
+    typedef typename hidden::MixtureBridgeTraits<Id, Data>::Mixture Mixture;
     // parameters type to get
-    typedef typename Clust::BridgeTraits<Id>::Param Param;
-    // type of the data
-    typedef typename Clust::BridgeTraits<Id>::Type Type;
+    typedef typename Clust::MixtureTraits<Mixture>::Param Param;
 
     /** default constructor.
-     *  @param idName id name of the mixture model
+     *  @param p_data pointer on the DataManager that will be used by the bridge.
+     *  @param idData id name of the mixture model
      *  @param nbCluster number of cluster
      **/
-    MixtureBridge( std::string const& idName, int nbCluster)
-                 : IMixture( idName, nbCluster)
-                 , mixture_(nbCluster)
-                 , data_()
-    {}
+    MixtureBridge( DataManager<Id, Data>* p_data, std::string const& idData, int nbCluster)
+                 : IMixture( idData, nbCluster)
+                 , mixture_( nbCluster)
+                 , p_data_(p_data)
+    { initializeMixture();}
     /** copy constructor */
     MixtureBridge( MixtureBridge const& mixture)
                  : IMixture(mixture)
                  , mixture_(mixture.mixture_)
-                 , data_(mixture.data_)
-    {  mixture_.setData(data_.m_dataij()); mixture_.initializeModel();} /* default implementation of initializeMixture*/
+                 , p_data_(mixture.p_data_)
+    {  mixture_.setData(p_data_->m_dataij()); mixture_.initializeModel();}
     /** This is a standard clone function in usual sense. It must be defined to
      *  provide new object of your class with values of various parameters
      *  equal to the values of calling object. In other words, this is
      *  equivalent to polymorphic copy constructor.
      *  @return New instance of class as that of calling object.
      */
-    virtual MixtureBridge* clone() const
-    { return new MixtureBridge(*this);}
+    virtual MixtureBridge* clone() const { return new MixtureBridge(*this);}
     /** This is a standard create function in usual sense. It must be defined to
      *  provide new object of your class with correct dimensions and state.
      *  In other words, this is equivalent to virtual constructor.
@@ -96,9 +253,9 @@ class MixtureBridge: public IMixture
     virtual MixtureBridge* create() const
     {
       MixtureBridge* p_bridge = new MixtureBridge( mixture_, idName(), nbCluster());
-      p_bridge->data_ = data_;
+      p_bridge->p_data_ = p_data_;
       // Bug Fix: set the correct data set
-      p_bridge->mixture_.setData(p_bridge->data_.m_dataij());
+      p_bridge->mixture_.setData(p_bridge->p_data_->m_dataij());
       p_bridge->mixture_.initializeModel();
       return p_bridge;
     }
@@ -114,15 +271,6 @@ class MixtureBridge: public IMixture
         STKRUNTIME_ERROR_NO_ARG(MixtureBridge::initializeStep,composer is not set);
       mixture_.setMixtureParameters( p_pk(), p_tik(), p_zi());
       mixture_.initializeStep();
-    }
-    /** This function will be defined to set the data into your data container
-     *  (aka DataBridge<Id>). To facilitate data handling, framework provide
-     *  templated functions, that can be called directly to get the data.
-     **/
-    template<class MixtureManager>
-    void setData(MixtureManager const* p_manager)
-    { data_.setData(p_manager, idName());
-      initializeMixture();
     }
      /** This function must be defined to return the component probability (PDF)
      *  for corresponding sample i and cluster k.
@@ -145,8 +293,8 @@ class MixtureBridge: public IMixture
     virtual void imputationStep()
     {
       typedef std::vector<std::pair<int,int> >::const_iterator ConstIterator;
-      for(ConstIterator it = data_.v_missing().begin(); it!= data_.v_missing().end(); ++it)
-      { data_.m_dataij_(it->first, it->second) = mixture_.impute(it->first, it->second);}
+      for(ConstIterator it = p_data_->v_missing().begin(); it!= p_data_->v_missing().end(); ++it)
+      { p_data_->m_dataij_(it->first, it->second) = mixture_.impute(it->first, it->second);}
     }
     /** This function must be defined for simulation of all the latent variables
      * and/or missing data excluding class labels. The class labels will be
@@ -156,8 +304,8 @@ class MixtureBridge: public IMixture
     virtual void samplingStep()
     {
       typedef std::vector<std::pair<int,int> >::const_iterator ConstIterator;
-      for(ConstIterator it = data_.v_missing().begin(); it!= data_.v_missing().end(); ++it)
-      { data_.m_dataij_(it->first, it->second) = mixture_.sample(it->first, it->second);}
+      for(ConstIterator it = p_data_->v_missing().begin(); it!= p_data_->v_missing().end(); ++it)
+      { p_data_->m_dataij_(it->first, it->second) = mixture_.sample(it->first, it->second);}
     }
     /** This function must return the number of free parameters.
      *  @return Number of free parameters
@@ -176,31 +324,34 @@ class MixtureBridge: public IMixture
      *  in an Array2D.
      *  @param param the array with the parameters of the mixture.
      */
-    void getParameters(Param& param) const
-    { mixture_.getParameters(param);}
-
+    void getParameters(Param& param) const { mixture_.getParameters(param);}
 
   private:
     /** This function will be used in order to initialize the mixture model
-     *  using informations stored by the data_ container.
+     *  using informations stored by the p_data_ container.
      **/
      void initializeMixture()
-     { InitializeMixtureImpl<Id>::run(mixture_, data_);}
+     { hidden::InitializeMixtureImpl<Id, Data>::run(mixture_, p_data_);}
     /** protected constructor to use in order to create a bridge.
      *  @param mixture the mixture to copy
-     *  @param idName id name of the mixture
+     *  @param idData id name of the mixture
      *  @param nbCluster number of cluster
      **/
-    MixtureBridge( Mixture const& mixture, std::string const& idName, int nbCluster)
-                 : IMixture( idName, nbCluster)
+    MixtureBridge( Mixture const& mixture, std::string const& idData, int nbCluster)
+                 : IMixture( idData, nbCluster)
                  , mixture_(mixture)
-                 , data_()
+                 , p_data_(0)
     {}
     /** The Mixture to bridge with the composer */
     Mixture mixture_;
     /** Bridge for the data */
-    DataBridge<Id> data_;
+    DataManager<Id, Data>* p_data_;
 };
+
+} // namespace STK
+
+namespace STK
+{
 
 } // namespace STK
 

@@ -38,17 +38,13 @@
 #ifndef STK_ARITHMETIC_H
 #define STK_ARITHMETIC_H
 
-#ifdef RTKPP_LIB
-#include <rtkpp.h>
-#endif
-
 #include <limits>
 
 namespace STK
 {
 /** @ingroup Base
  *  @defgroup Arithmetic Arithmetic properties.
- *  
+ *
  *
  *  These classes extend the @c numeric_limits C++ struct. They
  *  allow to handle in a transparent way a possible
@@ -201,30 +197,16 @@ namespace STK
 template<class Type>
 struct Arithmetic : public std::numeric_limits<Type>
 {
-#ifdef RTKPP_LIB
-  enum
-  {
-    Rtype_ = hidden::RcppTraits<Type>::Rtype_
-  };
-#endif
   /** True if the type has a representation for a "Not Available."    */
   static const bool hasNA = false;
   /** Adding a Non Avalaible (NA) special number
    * @return the NA value of the type @c Type
    **/
-#ifdef RTKPP_LIB
-  static inline Type NA() throw()  { return Rcpp::traits::get_na<Rtype_>();}
-#else
   static inline Type NA() throw() { return static_cast<Type>(0);}
-#endif
   /** @param x the value to test.
    *  @return @c true if the parameter @c x is a NA value, @c false otherwise
    **/
-#ifdef RTKPP_LIB
-  static inline bool isNA(Type const& x) throw() { return Rcpp::traits::is_na<Rtype_>(x);}
-#else
   static inline bool isNA(Type const& x) throw() { return false;}
-#endif
   /** @param x the value to test.
    *  @return @c true if the parameter @c x is an infinite value, @c false
    *  otherwise

@@ -27,6 +27,4 @@
 # Author:   Serge Iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
-# specific STK flags
-STK_CXXFLAGS = -ansi -pedantic -Wall -Wno-long-long
-#-march=native -funroll-loops
+# All flags are defined and exported in the src/Makevars file

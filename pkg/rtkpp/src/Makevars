@@ -16,31 +16,36 @@
 #------------------------------------------------------------------------
 #   Project:    rtkpp
 #   Created on: Feb 17, 2014
-#   Authors:    Vincent KUBICKI <vincent.kubicki@inria.fr>,
-#               Serge IOVLEFF <serge.iovleff@stkpp.org>
+#   Authors:    Serge IOVLEFF <serge.iovleff@stkpp.org>
+#						    Vincent KUBICKI <vincent.kubicki@inria.fr>
 #-----------------------------------------------------------------------
 # Name of the STK++ library
 LIB_STKPP_A = libSTKpp.a
 
-STK_DIR = ../inst
-STK_LIB = ../inst/lib/$(LIB_STKPP_A)
+STKPP_DIR = ../inst
+STKPP_LIB = ../inst/lib/$(LIB_STKPP_A)
+
+STK_FLAGS = -ansi -pedantic -Wall -Wno-long-long
+## -march=native -funroll-loops ## optimisation does not work under window
 
 ## Use the R_HOME indirection to support installations of multiple R version
-PKG_CXXFLAGS += `${R_HOME}/bin/Rscript -e "Rcpp:::CxxFlags()"`
-PKG_LIBS     += `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` $(STK_LIB)
-PKG_CPPFLAGS += -I../inst/projects/ -I../inst/include/ -DRTKPP_LIB
+PKG_CXXFLAGS += `${R_HOME}/bin/Rscript -e "Rcpp:::CxxFlags()"` $(STK_FLAGS)
+PKG_LIBS     += `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` $(STKPP_LIB)
+PKG_CPPFLAGS += -I../inst/projects/ -I../inst/include/ -I../inst/projects/Rtkpp/include/ -DIS_RTKPP_LIB
+
+## Define STK flags at this level
+STK_CXXFLAGS = $(PKG_CXXFLAGS)
 
 export
 
 .PHONY: all pkglib
 
-## $(SHLIB) is the usual default target that is built automatically from all source 
-## files in this directory. pkglib is an additional target for the libraries
-## that will be installed in $(STK_LIB) and which users can link against.
+## $(SHLIB) is the usual default target that is built automatically from all source
+## files in this directory. pkglib is an additional target for the library
+## that will be installed in inst/ and which users can link against.
 all: $(SHLIB)
 $(SHLIB): pkglib
 
 pkglib:
-	($(MAKE) -C $(STK_DIR))
-	(cd $(STK_DIR) && $(MAKE) clean_obj)
-	
+	($(MAKE) -C $(STKPP_DIR))
+	(cd $(STKPP_DIR) && $(MAKE) clean_obj)

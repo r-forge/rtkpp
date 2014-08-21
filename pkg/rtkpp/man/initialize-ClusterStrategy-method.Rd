@@ -4,8 +4,8 @@
 \alias{initialize,ClusterStrategy-method}
 \title{Create an instance of the [\code{\linkS4class{ClusterStrategy}}] class using new/initialize.}
 \usage{
-\S4method{initialize}{ClusterStrategy}(.Object, nbTry, initMethod, shortAlgo,
-  longAlgo)
+\S4method{initialize}{ClusterStrategy}(.Object, nbTry, nbShortRun, initMethod,
+  shortAlgo, longAlgo)
 }
 \arguments{
 \item{.Object}{ An object:  see the Details section.}

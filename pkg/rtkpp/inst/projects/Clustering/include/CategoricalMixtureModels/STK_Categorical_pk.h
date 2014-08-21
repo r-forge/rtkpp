@@ -48,11 +48,13 @@ namespace Clust
 /** @ingroup Clustering
  *  Traits class for the Categorical_pk traits policy. */
 template<class _Array>
-struct MixtureModelTraits< Categorical_pk<_Array> >
+struct MixtureTraits< Categorical_pk<_Array> >
 {
   typedef _Array Array;
+  typedef typename Array::Type Type;
   typedef Categorical_pkParameters Parameters;
   typedef MixtureComponent<_Array, Parameters> Component;
+  typedef Array2D<Real>   Param;
 };
 
 } // namespace hidden
@@ -71,9 +73,10 @@ class Categorical_pk : public CategoricalBase<Categorical_pk<Array> >
 {
   public:
     typedef CategoricalBase<Categorical_pk<Array> > Base;
-    typedef typename Clust::MixtureModelTraits< Categorical_pk<Array> >::Component Component;
-    typedef typename Clust::MixtureModelTraits< Categorical_pk<Array> >::Parameters Parameters;
-    typedef typename Array::Col ColVector;
+    typedef typename Clust::MixtureTraits< Categorical_pk<Array> >::Component Component;
+    typedef typename Clust::MixtureTraits< Categorical_pk<Array> >::Parameters Parameters;
+
+    typedef Array2D<Real>::ColVector ColVector;
 
     using Base::p_tik;
     using Base::p_data;
@@ -149,8 +152,23 @@ void Categorical_pk<Array>::mStep()
 template<class Array>
 void Categorical_pk<Array>::getParameters(Array2D<Real>& params) const
 {
-  for (int k = baseIdx; k <= p_tik()->lastIdxCols(); ++k)
-    params.pushBackRows(p_param(k)->proba_*Const::Point<Real>(this->nbCluster()));
+    int nbClust = this->nbCluster();
+    int nbModalities = this->modalities_.size();
+
+    params.resize(nbModalities * nbClust, p_data()->cols());
+    for (int k = 0; k < nbClust; ++k)
+    {
+      for (int j = p_data()->beginCols(); j < p_data()->endCols(); ++j)
+      {
+        for (int l = 0; l < nbModalities; ++l)
+        {
+          params(k * nbModalities + l + baseIdx, j) = p_param(k)->proba(j, baseIdx + l);
+        }
+      }
+    }
+
+//  for (int k = baseIdx; k < p_tik()->endCols(); ++k)
+//    params.pushBackRows(p_param(k)->proba_*Const::Point<Real>(this->nbCluster()));
 //  int firstId = params.beginRows();
 //  int nbClust = this->nbCluster();
 //  int nbModalities = modalities_.size();

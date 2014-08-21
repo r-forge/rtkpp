@@ -25,57 +25,51 @@
 #' Interface Class [\code{\linkS4class{IClusterModel}}] for Cluster models.
 #'
 #' This class encapsulate the common parameters of all the Cluster models.
-#' 
+#'
 #' A Cluster model is a model of the form
 #' \deqn{
 #'   f({x}|\boldsymbol{\theta}) \\
 #'     \sum_{k=1}^K p_k f({x};\boldsymbol{\lambda}_k,\boldsymbol{\alpha}) \\
 #'    \quad {x} \in J.
 #' }
-#' 
+#'
 #' @slot data \code{\link{matrix}} with the data set to cluster.
 #' @slot nbCluster Integer with the number of cluster of the model.
-#' @slot hasFreeProportions Logical \code{TRUE} if the proportions of each clusters are free.
 #' @slot pk        Vector with the proportions of each mixture.
 #' @slot tik       Matrix with the posterior probability of the ith individual to belong to kth cluster.
 #' @slot fi        Vector with the mixture probabilities of the individuals.
 #' @slot zi        Vector with the class label of the individuals.
 #' @slot lnLikelihood Real given the ln-liklihood of the Cluster model.
-#' @slot BicCriterion Real given the value of the BIC criterion.
-#' @slot AicCriterion Real given the value of the AIC criterion.
+#' @slot criterion Real given the value of the AIC or BIC criterion.
 #' @slot modelName mixture model name.
-#' @slot error Character string giving the error, if an error occured during the estimation process.
 #'
 #' @examples
 #'   getSlots("IClusterModel")
 #'
 #' @author Serge Iovleff
-#' 
+#'
 #' @name IClusterModel
 #' @rdname IClusterModel-class
 #' @aliases IClusterModel-class
 #' @exportClass IClusterModel
-setClass( 
+setClass(
   Class="IClusterModel",
   representation( data = "matrix", nbCluster = "numeric"
-                , hasFreeProportions = "logical", pk = "numeric", tik = "matrix"
+                , pk = "numeric", tik = "matrix"
                 , fi = "numeric", zi = "numeric"
-                , lnLikelihood = "numeric", BicCriterion = "numeric", AicCriterion = "numeric"
-                , modelName = "character", error = "character"
+                , lnLikelihood = "numeric", criterion = "numeric"
+                , modelName = "character"
                 , "VIRTUAL"
                 ),
   prototype=list( data = matrix(nrow=0,ncol=0)
                 , nbCluster = 0
-                , hasFreeProportions = TRUE
                 , pk = vector("numeric")
                 , tik = matrix(nrow=0, ncol=0)
                 , fi  = vector("numeric")
                 , zi  = vector("numeric")
                 , lnLikelihood = -Inf
-                , BicCriterion = -Inf
-                , AicCriterion = -Inf
+                , criterion = -Inf
                 , modelName = character(1)
-                , error     = character(1)
   ),
   # validity function
   validity=function(object)
@@ -104,7 +98,7 @@ setClass(
 #' Definition of the [\code{\linkS4class{ClusterDiagGaussianModel}}] class
 #'
 #' This class defines a diagonal Gaussian mixture Model.
-#' 
+#'
 #' This class inherits from the [\code{\linkS4class{IClusterModel}}] class.
 #' A diagonal gaussian model is a mixture model of the form:
 #' \deqn{
@@ -112,16 +106,16 @@ setClass(
 #'   =\sum_{k=1}^K p_k \prod_{j=1}^d \psi(x_j;\mu_{jk},\sigma^2_{jk}) \\
 #'    \quad {x} \in {R}^d.
 #' }
-#' 
+#'
 #' @slot meanjk  Matrix with the mean of the jth variable in the kth cluster.
 #' @slot sigma2jk  Matrix with the variance of the jth variable in the kth cluster.
 #'
 #' @examples
 #'   getSlots("ClusterDiagGaussianModel")
 #'   new("ClusterDiagGaussianModel", data=iris[1:4])
-#' 
+#'
 #' @author Serge Iovleff
-#' 
+#'
 #' @name ClusterDiagGaussianModel
 #' @rdname ClusterDiagGaussianModel-class
 #' @aliases ClusterDiagGaussianModel-class
@@ -152,14 +146,14 @@ setClass(
 
 ###################################################################################
 #' Initialize an instance of the [\code{\linkS4class{ClusterDiagGaussianModel}}] class.
-#' 
+#'
 #' Initialization method. Used internally in the `rtkpp' package.
-#' 
+#'
 #' @keywords internal
 setMethod(
     f="initialize",
     signature=c("ClusterDiagGaussianModel"),
-    definition=function(.Object, data, nbCluster=2, modelName="gaussian_sjk", hasFreeProportions=TRUE)
+    definition=function(.Object, data, nbCluster=2, modelName="gaussian_sjk")
     {
       # for data
       if(missing(data)) {stop("data is mandatory.")}
@@ -170,9 +164,6 @@ setMethod(
       # for modelName
       if(missing(modelName)) {.Object@modelName<-"gaussian_sjk"}
       else  {.Object@modelName<-modelName}
-      # for hasFreeProportions 
-      if(missing(hasFreeProportions)) {.Object@hasFreeProportions<-TRUE}
-      else  {.Object@hasFreeProportions<-hasFreeProportions}
       # resize
       nbSample <- nrow(.Object@data)
       nbVariable <- ncol(.Object@data)
@@ -183,7 +174,7 @@ setMethod(
       .Object@meanjk <- matrix(0, nbVariable, nbCluster)
       .Object@sigma2jk <- matrix(1, nbVariable, nbCluster)
       # validate
-      validObject(.Object)        
+      validObject(.Object)
       return(.Object)
     }
 )
@@ -195,22 +186,22 @@ setMethod(
 #' This class defines a gamma mixture Model. Inherits from the
 #'[\code{\linkS4class{IClusterModel}}] class. A gamma mixture model is
 #' a mixture model of the form
-#' 
+#'
 #' \deqn{
 #'   f({x}|\boldsymbol{\theta}) \\
 #'   =\sum_{k=1}^K p_k \prod_{j=1}^d \gamma(x_j;a_{jk},b_{jk}) \\
 #'    \quad {x} \in {R}^d.
 #' }
-#' 
+#'
 #' @slot ajk  Matrix with the shape of the jth variable in the kth cluster.
 #' @slot bjk  Matrix with the scale of the jth variable in the kth cluster.
 #'
 #' @examples
 #'   getSlots("ClusterGammaModel")
 #'   new("ClusterGammaModel", data=iris[1:4])
-#' 
+#'
 #' @author Serge Iovleff
-#' 
+#'
 #' @name ClusterGammaModel
 #' @rdname ClusterGammaModel-class
 #' @aliases ClusterGammaModel-class
@@ -241,14 +232,14 @@ setClass(
 
 ###################################################################################
 #' Initialize an instance of the [\code{\linkS4class{ClusterGammaModel}}] class.
-#' 
+#'
 #' Initialization method. Used internally in the `rtkpp' package.
-#' 
+#'
 #' @keywords internal
 setMethod(
     f="initialize",
     signature=c("ClusterGammaModel"),
-    definition=function(.Object, data, nbCluster=2, modelName="gamma_ajk_bjk", hasFreeProportions = TRUE )
+    definition=function(.Object, data, nbCluster=2, modelName="gamma_ajk_bjk")
     {
       # for data
       if(missing(data)) {stop("data is mandatory.")}
@@ -259,9 +250,6 @@ setMethod(
       # for modelName
       if(missing(modelName)) {.Object@modelName<-"gamma_ajk_bjk"}
       else  {.Object@modelName<-modelName}
-      # for hasFreeProportions 
-      if(missing(hasFreeProportions )) {.Object@hasFreeProportions <-TRUE}
-      else  {.Object@hasFreeProportions <-hasFreeProportions }
       # resize
       nbSample <- nrow(.Object@data)
       nbVariable <- ncol(.Object@data)
@@ -272,7 +260,7 @@ setMethod(
       .Object@ajk <- matrix(0, nbVariable, nbCluster)
       .Object@bjk <- matrix(1, nbVariable, nbCluster)
       # validate
-      validObject(.Object)        
+      validObject(.Object)
       return(.Object)
     }
 )
@@ -283,22 +271,22 @@ setMethod(
 #' This class defines a categorical mixture Model. Inherits from the
 #'[\code{\linkS4class{IClusterModel}}] class. A categorical mixture model is
 #' a mixture model of the form
-#' 
+#'
 #' \deqn{
 #'   f({x}|\boldsymbol{\theta}) \\
 #'   =\sum_{k=1}^K p_k \prod_{j=1}^d \mathcal{M}(x_j;p_{jk},1) \\
 #'    \quad {x} \in \{1,\ldots,L\}^d.
 #' }
-#' 
+#'
 #' @slot pljk  Array with the probability of the jth variable in the kth cluster
 #' to be l.
 #'
 #' @examples
 #'   getSlots("ClusterCategoricalModel")
 #'   new("ClusterCategoricalModel", data=iris[1:4])
-#' 
+#'
 #' @author Serge Iovleff
-#' 
+#'
 #' @name ClusterCategoricalModel-class
 #' @rdname ClusterCategoricalModel-class
 #' @aliases ClusterCategoricalModel-class
@@ -313,7 +301,7 @@ setClass(
     {
       dims <- dim(object@pljk)
       nbVariable <- ncol(object@data)
-      
+
       if (dims[3]!=object@nbCluster)
       {stop("Third dimension in pljk must be nbCluster.")}
       if (dims[2]!=ncol(object@data))
@@ -326,14 +314,14 @@ setClass(
 
 ###################################################################################
 #' Initialize an instance of the [\code{\linkS4class{ClusterCategoricalModel}}] class.
-#' 
+#'
 #' Initialization method. Used internally in the `rtkpp' package.
-#' 
+#'
 #' @keywords internal
 setMethod(
     f="initialize",
     signature=c("ClusterCategoricalModel"),
-    definition=function(.Object, data, nbCluster=2, modelName="categorical_pjk", hasFreeProportions=TRUE )
+    definition=function(.Object, data, nbCluster=2, modelName="categorical_pjk")
     {
       # for data
       if(missing(data)) {stop("data is mandatory.")}
@@ -344,10 +332,6 @@ setMethod(
       # for modelName
       if(missing(modelName)) {.Object@modelName<-"categorical_pjk"}
       else  {.Object@modelName<-modelName}
-      # for hasFreeProportions 
-      if(missing(hasFreeProportions )) {.Object@hasFreeProportions <-TRUE}
-      else  {.Object@hasFreeProportions <-hasFreeProportions }
-      # resize
       # get number of modalities
       if ( is.factor(data) ) { nbModalities <- nlevels(data)}
       else {  nbModalities <- nlevels(factor(.Object@data))}
@@ -359,7 +343,78 @@ setMethod(
       .Object@zi <- rep(1, nbSample)
       .Object@pljk <- array(data = 1/nbModalities,dim=c(nbModalities,nbVariable,.Object@nbCluster))
       # validate
-      validObject(.Object)        
+      validObject(.Object)
       return(.Object)
     }
 )
+
+###################################################################################
+# @name [
+# @docType methods
+#' @rdname extract-methods
+#' @aliases [,IClusterModel-method
+#'
+setMethod(
+    f="[",
+    signature(x = "IClusterModel"),
+    definition=function(x,i,j,drop){
+      if ( missing(j) ){
+        switch(EXPR=i,
+            "data"={return(x@data)},
+            "nbCluster"={return(x@nbCluster)},
+            "pk"={return(x@pk)},
+            "tik"={return(x@tik)},
+            "fi"={return(x@fi)},
+            "zi"={return(x@zi)},
+            "lnLikelihood"={return(x@lnLikelihood)},
+            "criterion"={return(x@criterion)},
+            "modelName"={return(x@modelName)},
+            stop("This attribute doesn't exist !")
+        )
+      }else{
+        stop("This attribute is not a list !")
+      }
+    }
+)
+
+###################################################################################
+#' @rdname print-methods
+#' @aliases print print,IClusterModel-method
+#'
+setMethod(
+  f="print",
+  signature=c("IClusterModel"),
+  function(x,...)
+  {
+    cat("* nbCluster    = ", x@nbCluster, "\n")
+    cat("* lnLikelihood = ", x@lnLikelihood, "\n")
+    cat("* criterion    = ", x@criterion, "\n")
+    cat("* model name   = ", x@modelName, "\n")
+    cat("* pk           = ", x@pk, "\n")
+    cat("* tik          = ", x@tik, "\n")
+    cat("* fi           = ", x@fi, "\n")
+    cat("* zi           = ", x@zi, "\n")
+  }
+)
+
+###################################################################################
+#' @rdname print-methods
+#' @aliases print print,MixmodCluster-method
+#'
+setMethod(
+  f="print",
+  signature=c("ClusterDiagGaussianModel"),
+  function(x,...){
+    cat("****************************************\n")
+    callNextMethod()
+    cat("****************************************\n")
+    for(k in 1:length(x@pk))
+    {
+      cat("*** Cluster: ",k,"\n")
+#      cat("* proportion = ", format(x@pk[k]), "\n")
+      cat("****************************************\n")
+    }
+    return(invisible())
+  }
+)
+

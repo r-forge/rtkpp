@@ -36,13 +36,17 @@
 #ifndef STK_INTEGER_H
 #define STK_INTEGER_H
 
+#include <map>
+#include "STK_String.h"
+
 // for building
-#ifdef RTKPP_LIB
+#ifdef IS_RTKPP_LIB
+#ifdef IS_RTKPP_LIB
 #include <Rcpp.h>
+#include "STK_RcppTraits.h"
 #endif
 
-#include "STK_String.h"
-#include <map>
+#endif
 
 namespace STK
 {
@@ -54,19 +58,16 @@ namespace STK
   **/
 typedef int Integer ;
 
-template<> struct Arithmetic<Integer>;
-template<> struct IdTypeImpl<Integer>;
-
 /** @ingroup Arithmetic
  *  @brief Specialization for Integer (long).
- * 
+ *
  *  We are using the largest element of the underlying
  *  Type for representing NA (not available) discrete numbers.
  */
 template<>
 struct Arithmetic<Integer>  : public std::numeric_limits<Integer>
 {
-#ifdef RTKPP_LIB
+#ifdef IS_RTKPP_LIB
   enum
   {
     Rtype_ = hidden::RcppTraits<Integer>::Rtype_
@@ -88,7 +89,7 @@ struct Arithmetic<Integer>  : public std::numeric_limits<Integer>
    *  @param x the Integer number to test.
    **/
 #ifdef RTKP_LIB
-  static bool isNA(Integer const& x) throw() { Rcpp::traits::is_na<Rtype_>(x);}
+  static bool isNA(Integer const& x) throw() { return Rcpp::traits::is_na<Rtype_>(x);}
 #else
   static inline bool isNA(Integer const& x) throw()
   { return (x==std::numeric_limits<Integer>::max());}
@@ -103,7 +104,7 @@ struct Arithmetic<Integer>  : public std::numeric_limits<Integer>
   static inline bool isFinite(Integer const& x) throw() { return (!isNA(x));}
 };
 
-/** @ingroup RTTI 
+/** @ingroup RTTI
  *  @brief Specialization of the IdTypeImpl for the type Integer.
  **/
 template<>
@@ -113,6 +114,48 @@ struct IdTypeImpl<Integer>
   static inline IdType returnType() { return(integer_);}
 };
 
+#ifdef IS_RTKPP_LIB
+/** @ingroup Arithmetic
+ *  @brief Specialization for Integer (long).
+ *
+ *  We are using the largest element of the underlying
+ *  Type for representing NA (not available) discrete numbers.
+ */
+template<>
+struct Arithmetic<const Integer>
+{
+  enum
+  {
+    Rtype_ = hidden::RcppTraits<Integer>::Rtype_
+  };
+  /** True if the type has a representation for a "Not Available". */
+  static const bool hasNA = true;
+  /** Adding a Non Avalaible (NA) special number. */
+  static inline Integer NA() throw()  { return Rcpp::traits::get_na<Rtype_>();}
+  /** Test if x is a Non Avalaible (NA) special number.
+   *  @param x the Integer number to test.
+   **/
+  static bool isNA(Integer const& x) throw() { return Rcpp::traits::is_na<Rtype_>(x);}
+  /** @return @c true if x is  infinite : always false for Integer.
+   *  @param x the Integer number to test.
+   **/
+  static inline bool isInfinite(Integer const& x) throw() { return false; }
+  /** @return @¢ true if x is  finite : i.e. if x is not a NA value.
+   *  @param x the value to test.
+   **/
+  static inline bool isFinite(Integer const& x) throw() { return (!isNA(x));}
+};
+
+/** @ingroup RTTI
+ *  @brief Specialization of the IdTypeImpl for the type const Integer (needed by Rcpp).
+ **/
+template<>
+struct IdTypeImpl<const Integer>
+{
+  /** Give the IdType of the type Integer. */
+  static inline IdType returnType() { return(integer_);}
+};
+#endif
 /** @ingroup Base
  *  @brief Convert a String to an Integer.
  *  @param str the String we want to convert

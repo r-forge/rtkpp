@@ -41,11 +41,11 @@ namespace STK
 
 
 MixtureComposer::MixtureComposer( int nbSample, int nbVariable, int nbCluster)
-                                : IMixtureComposerBase( nbSample, nbVariable, nbCluster)
+                                : IMixtureComposer( nbSample, nbVariable, nbCluster)
 {}
 
 MixtureComposer::MixtureComposer( MixtureComposer const& composer)
-                                : IMixtureComposerBase(composer)
+                                : IMixtureComposer(composer)
                                 , v_mixtures_(composer.v_mixtures_)
 {
   // clone mixtures
@@ -97,7 +97,7 @@ void MixtureComposer::writeParameters(std::ostream& os) const
 
   for (ConstMixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
   {
-    stk_cout << _T("Parameters of the mixtures:") << (*it)->idName() << _T("\n");
+    stk_cout << _T("Parameters of the mixture: ") << (*it)->idName() << _T("\n");
     (*it)->writeParameters(os);
   }
 }
@@ -106,12 +106,18 @@ void MixtureComposer::initializeStep()
 {
   if (v_mixtures_.size() == 0)
     STKRUNTIME_ERROR_NO_ARG(MixtureComposer::initializeStep,no mixture have been registered);
+  // initialize IStatModelBase
+  initialize(nbSample(), nbVariable());
+  // initialize IMixtureComposer
+  intializeMixtureParameters();
+  // initialize registered mixtures
+  for (MixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
+  { (*it)->initializeStep();}
   // compute number of free parameters
   setNbFreeParameter(computeNbFreeParameters());
   // compute proportions
   pStep();
-  for (MixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
-  { (*it)->initializeStep();}
+  // model intialized
   setState(Clust::modelInitialized_);
 }
 
@@ -149,20 +155,22 @@ void MixtureComposer::samplingStep()
 void MixtureComposer::storeIntermediateResults(int iteration)
 {
   for (MixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
-  {
-    (*it)->storeIntermediateResults(iteration);
-  }
+  { (*it)->storeIntermediateResults(iteration);}
 }
 
 void MixtureComposer::finalizeStep()
 {
-  for (size_t l = 0; l < v_mixtures_.size(); ++l)
-  { v_mixtures_[l]->finalizeStep();}
+  for (MixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
+  { (*it)->finalizeStep();}
 }
 
 /* register the mixture in the composer*/
 void MixtureComposer::registerMixture(IMixture* p_mixture)
 {
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("In MixtureComposer::registerMixture, registering mixture: ")
+           << p_mixture->idName() << _T("\n");
+#endif
   p_mixture->setMixtureComposer(this);
   v_mixtures_.push_back(p_mixture);
 }
@@ -182,16 +190,16 @@ void MixtureComposer::createComposer( std::vector<IMixture*> const& v_mixtures)
   }
 }
 
-/* Utility lookup function allowing to find a Mixture from its idName
- *  @param idName the id name of the mixture we want to get
+/* Utility lookup function allowing to find a Mixture from its idData
+ *  @param idData the id name of the mixture we want to get
  *  @return a pointer on the mixture
  **/
- IMixture* MixtureComposer::getMixture( String const& idName) const
- {
-   for (size_t l = 0; l < v_mixtures_.size(); ++l)
-   { if(v_mixtures_[l]->idName() == idName) return v_mixtures_[l];}
-   return 0;
- }
+IMixture* MixtureComposer::getMixture( String const& idData) const
+{
+  for (ConstMixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
+  {  if ((*it)->idName() == idData) return (*it);}
+  return 0;
+}
 
 /* Create a composer, but reinitialize the ingredients parameters. */
 MixtureComposerFixedProp* MixtureComposerFixedProp::create() const

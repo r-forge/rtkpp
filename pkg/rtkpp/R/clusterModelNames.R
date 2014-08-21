@@ -23,7 +23,7 @@
 #
 #-----------------------------------------------------------------------
 #' Build a vector of diagonal Gaussian model names.
-#' 
+#'
 #' In a diagonal Gaussian model, we assume that the variance
 #' matrices are diagonal in each cluster. This gives rise to 8 models:
 #' \enumerate{
@@ -31,14 +31,14 @@
 #'  \item {The variances can be equal or free for all the variables.}
 #'  \item {The variances can be equal or free for all the clusters.}
 #' }
-#'   
-#' The model names are summarized in the following array: 
+#'
+#' The model names are summarized in the following array:
 #' \tabular{llll}{
 #'     Model Name      \tab Prop. \tab Variance of the variables \tab Variance of the clusters \cr
 #'     gaussian_p_sjk  \tab Equal \tab Free  \tab Free  \cr
 #'     gaussian_p_sj   \tab Equal \tab Free  \tab Equal \cr
 #'     gaussian_p_sk   \tab Equal \tab Equal \tab Free  \cr
-#'     gaussian_p_s    \tab Equal \tab Equal \tab Equal \cr 
+#'     gaussian_p_s    \tab Equal \tab Equal \tab Equal \cr
 #'     gaussian_pk_sjk \tab Free  \tab Free  \tab Free  \cr
 #'     gaussian_pk_sj  \tab Free  \tab Free  \tab Equal \cr
 #'     gaussian_pk_sk  \tab Free  \tab Equal \tab Free  \cr
@@ -46,14 +46,14 @@
 #' }
 #'
 #' @title diagGaussianNames: get the names of the diagonal Gaussian models
-#' 
+#'
 #' @param prop A character string equal to "equal", "free" or "all". Default is "all".
 #' @param varianceVariables A character string equal to "equal", "free" or "all". Default is "all".
 #' @param varianceClusters A character string equal to "equal", "free" or "all". Default is "all".
-#' 
+#'
 #' @examples
 #' diagGaussianNames()
-#' diagGaussianNames("free", "equal", "free") # same as c("gaussian_p_sk", "gaussian_pk_sk")
+#' diagGaussianNames("all", "equal", "free") # same as c("gaussian_p_sk", "gaussian_pk_sk")
 #'
 #' @rdname diagGaussianNames
 #' @export diagGaussianNames
@@ -65,7 +65,7 @@ diagGaussianNames <- function(prop = "all", varianceVariables="all", varianceClu
   { stop("varianceVariables is not valid. See ?diagGaussianNames for the list of varianceVariables.")}
   if(sum(varianceClusters %in% c("equal","free","all")) != 1)
   { stop("varianceClusters is not valid. See ?diagGaussianNames for the list of varianceClusters.")}
-  
+
   all = c( "gaussian_pk_sjk", "gaussian_pk_sj", "gaussian_pk_sk", "gaussian_pk_s"
          , "gaussian_p_sjk", "gaussian_p_sj", "gaussian_p_sk", "gaussian_p_s")
   propFree = c( "gaussian_pk_sjk", "gaussian_pk_sj", "gaussian_pk_sk", "gaussian_pk_s")
@@ -74,7 +74,7 @@ diagGaussianNames <- function(prop = "all", varianceVariables="all", varianceClu
   varVarEqual = c( "gaussian_pk_sk", "gaussian_pk_s", "gaussian_p_sk", "gaussian_p_s")
   varClustFree = c( "gaussian_pk_sjk", "gaussian_pk_sk", "gaussian_p_sjk", "gaussian_p_sk")
   varClustEqual = c( "gaussian_pk_sj", "gaussian_pk_s", "gaussian_p_sj", "gaussian_p_s")
-  
+
   res = all;
   if (prop == "free")  { res = intersect(res, propFree);}
   if (prop == "equal") { res = intersect(res, propEqual);}
@@ -82,22 +82,21 @@ diagGaussianNames <- function(prop = "all", varianceVariables="all", varianceClu
   if (varianceVariables == "equal") { res = intersect(res, varVarEqual);}
   if (varianceClusters =="free")  { res = intersect(res, varClustFree);}
   if (varianceClusters =="equal") { res = intersect(res, varClustEqual);}
-  
+
   res
 }
 
-#' check if a vector of diagonal Gaussian model name comply 
+#' check if a vector of diagonal Gaussian model name comply
 #' @rdname checkModelNames
 #' @keywords internal
 checkDiagGaussianNames <- function(modelNames)
 {
   nb = length(modelNames)
   if ( nb == 0 ) { return(FALSE);}
-  
+
   all = c( "gaussian_pk_sjk", "gaussian_pk_sj", "gaussian_pk_sk", "gaussian_pk_s"
          , "gaussian_p_sjk", "gaussian_p_sj", "gaussian_p_sk", "gaussian_p_s")
   for (i in 1:nb)
-  {  if ( sum(modelNames[i] %in% all) != 1 ) { return(FALSE);}
-  }
+  {  if ( sum(modelNames[i] %in% all) != 1 ) { return(FALSE);}}
   return(TRUE)
 }

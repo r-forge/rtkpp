@@ -10,20 +10,22 @@ Authors@R: c(person("Serge", "Iovleff", role=c("aut","cre"),
     email="Vincent.Kubicki@inria.fr"),
     person("Parmeet", "Bhatia", role="ctb",
     email="bhatia.parmeet@gmail.com"))
-Copyright: Authors, and specifically inst/COPYRIGHTS for the stk++
-        library
+Copyright: Authors, and specifically inst/COPYRIGHTS for the stk++ library
 Maintainer: Serge Iovleff <serge.iovleff@stkpp.org>
 Description: R and stk++ integration using Rcpp.
 License: LGPL (>= 2) | file LICENSE
 BugReports: https://www.stkpp.org
 LazyLoad: yes
-Depends: R (>= 3.0.2), Rcpp
+Depends:
+    R (>= 3.0.2),
+    Rcpp
 LinkingTo: Rcpp
-Imports: methods
+Imports:
+    methods
 URL: http://www.stkpp.org
 NeedsCompilation: yes
 SystemRequirements: GNU make
 Packaged: 2014-08-21 20:13:35 UTC; iovleff
 Author: Serge Iovleff [aut, cre],
-  Vincent Kubicki [ctb],
-  Parmeet Bhatia [ctb]
+    Vincent Kubicki [ctb],
+    Parmeet Bhatia [ctb]

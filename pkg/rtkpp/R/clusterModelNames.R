@@ -87,9 +87,9 @@ diagGaussianNames <- function(prop = "all", varianceVariables="all", varianceClu
 }
 
 #' check if a vector of diagonal Gaussian model name comply
-#' @rdname checkModelNames
+#' @rdname diagGaussianNames
 #' @keywords internal
-checkDiagGaussianNames <- function(modelNames)
+validDiagGaussianNames <- function(modelNames)
 {
   nb = length(modelNames)
   if ( nb == 0 ) { return(FALSE);}

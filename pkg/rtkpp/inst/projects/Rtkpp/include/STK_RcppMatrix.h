@@ -36,9 +36,6 @@
 #ifndef RCPPMATRIX_H
 #define RCPPMATRIX_H
 
-#include <Rcpp.h>
-#include "STK_RcppTraits.h"
-
 #include "../../Arrays/include/STK_ExprBaseVisitor.h"
 #include "../../Arrays/include/STK_ExprBaseDot.h"
 #include "../../Arrays/include/STK_ExprBaseProduct.h"
@@ -93,12 +90,12 @@ class RcppMatrix : public ArrayBase< RcppMatrix<Type_> >
     /** Default Constructor. */
     inline RcppMatrix() : matrix_() {}
     /** Constructor */
-    inline RcppMatrix( Rcpp::Matrix<Rtype_>& matrix) : matrix_(matrix) {}
+    inline RcppMatrix( Rcpp::Matrix<Rtype_> matrix) : matrix_(matrix) {}
     /** set Matrix .
      *  @param matrix the Rcpp matrix to wrap
      *  @note cannot be passed as const& due to a bug from the Rcpop side
      * */
-    inline void setMatrix( Rcpp::Matrix<Rtype_>& matrix) { matrix_ = matrix;}
+    inline void setMatrix( Rcpp::Matrix<Rtype_> matrix) { matrix_ = matrix;}
     /** cast operator */
     inline operator Rcpp::Matrix<Rtype_>() const { return matrix_;}
 

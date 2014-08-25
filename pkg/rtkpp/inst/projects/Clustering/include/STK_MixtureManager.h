@@ -162,7 +162,6 @@ class MixtureManager
           handler_.getData(idData, p_data->m_dataij_, p_data->nbVariable_ );
           p_data->initialize();
           MixtureBridge_sjk* p_bridge = new MixtureBridge_sjk(p_data, idData, nbCluster);
-          stk_cout << p_bridge->idName() <<"\n";
           return p_bridge;
         }
         break;

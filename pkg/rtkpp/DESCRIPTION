@@ -10,7 +10,8 @@ Authors@R: c(person("Serge", "Iovleff", role=c("aut","cre"),
     email="Vincent.Kubicki@inria.fr"),
     person("Parmeet", "Bhatia", role="ctb",
     email="bhatia.parmeet@gmail.com"))
-Copyright: Authors, and specifically inst/COPYRIGHTS for the stk++ library
+Copyright: Authors, and specifically inst/COPYRIGHTS for the stk++
+    library
 Maintainer: Serge Iovleff <serge.iovleff@stkpp.org>
 Description: R and stk++ integration using Rcpp.
 License: LGPL (>= 2) | file LICENSE
@@ -25,7 +26,18 @@ Imports:
 URL: http://www.stkpp.org
 NeedsCompilation: yes
 SystemRequirements: GNU make
-Packaged: 2014-08-21 20:13:35 UTC; iovleff
+Collate:
+    'ClusterAlgo.R'
+    'ClusterModels.R'
+    'ClusterDiagGaussianModels.R'
+    'ClusterInit.R'
+    'ClusterStrategy.R'
+    'clusterDiagGaussian.R'
+    'clusterModelNames.R'
+    'clusterPlot.R'
+    'global.R'
+    'rtkppFlags.R'
+Packaged: 2014-08-25 15:28:22 UTC; iovleff
 Author: Serge Iovleff [aut, cre],
     Vincent Kubicki [ctb],
     Parmeet Bhatia [ctb]

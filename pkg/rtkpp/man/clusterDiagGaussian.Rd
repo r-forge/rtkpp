@@ -34,13 +34,14 @@ algorithms specified in [\code{modelNames}].
   ## with default values
   clusterDiagGaussian(geyser, nbCluster=2:6)
   ## use graphics functions
-  xem <- clusterDiagGaussian(data=geyser, nbCluster=2:3)
+  model <- clusterDiagGaussian(data=geyser, nbCluster=2:3)
   \dontrun{
-  plot(xem)
-  hist(xem)
+  plot(model)
   }
+  ## print model
+  print(model)
   ## get summary
-  summary(xem)
+  summary(model)
 }
 \author{
 Serge Iovleff

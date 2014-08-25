@@ -28,7 +28,7 @@ A Cluster model is a model of the form
 
 \item{\code{fi}}{Vector with the mixture probabilities of the individuals.}
 
-\item{\code{zi}}{Vector with the class label of the individuals.}
+\item{\code{zi}}{Vector of integer with the class label of the individuals.}
 
 \item{\code{lnLikelihood}}{Real given the ln-liklihood of the Cluster model.}
 

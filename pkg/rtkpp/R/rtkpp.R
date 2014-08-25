@@ -28,19 +28,19 @@
 #' library. The typical usage is to install this package and list it in
 #' the \env{LinkingTo: } line in the \file{DESCRIPTION} file of
 #' other packages.
-#' 
-#' As described at the STK++ project's home page, \url{http://stkpp.org},
+#'
+#' As described at the STK++ project's home page, \url{http://www.stkpp.org},
 #' STK++ is a versatile, fast, reliable and elegant collection of C++ classes
-#' for statistics, clustering, linear algebra, regression, dimension reduction,
-#' etc. Some functionalities provided by the library are available in the R
-#' environment.
-#' 
+#' for statistics, clustering, linear algebra, arrays (with  Eigen),
+#' regression, dimension reduction, etc. Some functionalities provided by the
+#' library are available in the R environment.
+#'
 #' \tabular{ll}{
-#'   Package: \tab rtkpp\cr 
-#'   Type: \tab Package\cr 
+#'   Package: \tab rtkpp\cr
+#'   Type: \tab Package\cr
 #'   Version: \tab 2.0.1\cr
-#'   Date: \tab 2014-07-05\cr 
-#'   License: \tab LGPL + file LICENSE\cr 
+#'   Date: \tab 2014-07-05\cr
+#'   License: \tab GPL for the rtkpp side, LGPL for the stkpp side  + file LICENSE\cr
 #'   LazyLoad: \tab yes\cr
 #' }
 #'
@@ -48,7 +48,7 @@
 #' @name rtkpp
 #' @aliases rtkpp
 #' @docType package
-#' @keywords stk++
+#' @keywords stk++, stkpp
 #' @import Rcpp
 #'
 #' @author
@@ -57,7 +57,7 @@
 #' @useDynLib rtkpp
 NULL
 #' Quantitative data: Old Faithful Geyser
-#' 
+#'
 #' The file geyser.rda contains 272 observations from the Old Faithful Geyser
 #' in the Yellowstone National Park. Each observation consists of two
 #' measurements: the duration (in minutes) of the eruption and the waiting
@@ -81,14 +81,14 @@ NULL
 #'
 #' @source \url{http://www.geyserstudy.org/geyser.aspx?pGeyserNo=OLDFAITHFUL}
 #'
-#' @references 
-#' Hardle, W. (1991). "Smoothing Techniques with Implementation in S". Springer-Verlag, New York. 
+#' @references
+#' Hardle, W. (1991). "Smoothing Techniques with Implementation in S". Springer-Verlag, New York.
 #' Azzalini, A. and Bowman, A. W. (1990). "A look at some data on the Old Faithful geyser". Applied Statistics 39, 357-365.
 #'
 #' @name geyser
 #' @docType data
 #' @keywords datasets
-#' 
+#'
 #' @examples
 #'   data(geyser)
 NULL

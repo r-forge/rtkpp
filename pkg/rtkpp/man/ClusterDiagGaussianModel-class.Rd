@@ -19,13 +19,14 @@ A diagonal gaussian model is a mixture model of the form:
 \section{Slots}{
 
 \describe{
-\item{\code{meanjk}}{Matrix with the mean of the jth variable in the kth cluster.}
+\item{\code{meankj}}{Matrix with the mean of the jth variable in the kth cluster.}
 
-\item{\code{sigma2jk}}{Matrix with the variance of the jth variable in the kth cluster.}
+\item{\code{sigma2kj}}{Matrix with the variance of the jth variable in the kth cluster.}
 }}
 \examples{
 getSlots("ClusterDiagGaussianModel")
-  new("ClusterDiagGaussianModel", data=iris[1:4])
+  data(geyser)
+  new("ClusterDiagGaussianModel", data=geyser)
 }
 \author{
 Serge Iovleff

@@ -23,7 +23,7 @@
 */
 
 /*
- * Project:  rtkpp::
+ * Project:  rtkpp
  * created on: 8 août 2014
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
@@ -32,7 +32,7 @@
  *  @brief In this file we implement the RDataHandler class.
  **/
 
-#include "../inst/projects/Rtkpp/include/STK_RDataHandler.h"
+#include "RTKpp.h"
 
 namespace STK
 {

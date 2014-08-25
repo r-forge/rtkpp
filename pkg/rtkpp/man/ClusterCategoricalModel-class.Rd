@@ -23,7 +23,8 @@ to be l.}
 }}
 \examples{
 getSlots("ClusterCategoricalModel")
-  new("ClusterCategoricalModel", data=iris[1:4])
+  data(geyser)
+  new("ClusterCategoricalModel", data=geyser)
 }
 \author{
 Serge Iovleff

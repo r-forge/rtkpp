@@ -3,14 +3,18 @@
 \name{show,ClusterAlgo-method}
 \alias{show}
 \alias{show,ClusterAlgo-method}
+\alias{show,ClusterDiagGaussianModel-method}
 \alias{show,ClusterInit-method}
 \alias{show,ClusterStrategy-method}
 \alias{show-algo,ClusterAlgo-method}
+\alias{show-diagGaussian,ClusterDiagGaussianModel,ClusterDiagGaussianModel-method}
 \alias{show-init,ClusterInit,ClusterInit-method}
 \alias{show-strategy,ClusterStrategy-method}
 \title{Show description of a rtkpp class to standard output.}
 \usage{
 \S4method{show}{ClusterAlgo}(object)
+
+\S4method{show}{ClusterDiagGaussianModel}(object)
 
 \S4method{show}{ClusterInit}(object)
 
@@ -30,6 +34,12 @@ Show description of a rtkpp class to standard output.
 ## for strategy
   strategy <- clusterStrategy()
   show(strategy)
+  ## for cluster init
+  init <- clusterInit()
+  show(init)
+  ## for cluster algo
+  algo <- clusterAlgo()
+  show(algo)
 }
 \seealso{
 \code{\link{show}}

@@ -36,10 +36,6 @@
 #ifndef RCPPVECTOR_H
 #define RCPPVECTOR_H
 
-#include <Rcpp.h>
-#include "STK_RcppTraits.h"
-
-
 #include "../projects/Arrays/include/STK_ExprBaseVisitor.h"
 #include "../projects/Arrays/include/STK_ExprBaseDot.h"
 #include "../projects/Arrays/include/STK_ExprBaseProduct.h"
@@ -93,7 +89,13 @@ class RcppVector : public ArrayBase< RcppVector<Type_> >
       Rtype_ = hidden::RcppTraits<Type_>::Rtype_
     };
     /** Constructor */
-    inline RcppVector(Rcpp::Vector<Rtype_>& vector) : vector_(vector) {}
+    inline RcppVector(Rcpp::Vector<Rtype_> vector) : vector_(vector) {}
+    /** set Vector .
+     *  @param vector the Rcpp matrix to wrap
+     *  @note cannot be passed as const& due to a bug from the (old versions of) Rcpp side
+     * */
+    inline void setVector( Rcpp::Vector<Rtype_> vector) { vector_ = vector;}
+
     /** @return the Vertical range */
     inline Range rows() const { return Range(0, vector_.size());}
     /** @return the index of the first row */

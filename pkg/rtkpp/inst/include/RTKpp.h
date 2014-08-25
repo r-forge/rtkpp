@@ -28,7 +28,7 @@
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
 
-/** @file Rtkpp.h
+/** @file RTKpp.h
  *  @brief In this file we include all the files of the rtkpp projects.
  **/
 
@@ -36,8 +36,16 @@
 #ifndef RTKPP_H
 #define RTKPP_H
 
+
+#include "RTKppForward.h"
+#include <Rcpp.h>
+
+#include "../projects/Rtkpp/include/STK_RcppTraits.h"
 #include "../projects/Rtkpp/include/STK_RcppVector.h"
 #include "../projects/Rtkpp/include/STK_RcppMatrix.h"
 #include "../projects/Rtkpp/include/STK_RDataHandler.h"
+#include "../projects/Rtkpp/include/STK_ClusterFacade.h"
+
+#include "../projects/Rtkpp/include/Rcpp_wrap.h"
 
 #endif /* RTKPP_H */

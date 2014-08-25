@@ -33,8 +33,7 @@
  **/
 
 
-#include <Rcpp.h>
-#include "Rtkpp.h"
+#include "RTKpp.h"
 
 using namespace Rcpp;
 using namespace STK;

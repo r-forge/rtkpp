@@ -37,8 +37,6 @@
 #ifndef STK_CLUSTERFACADE_H
 #define STK_CLUSTERFACADE_H
 
-#include <Rcpp.h>
-#include "STK_RcppTraits.h"
 
 namespace STK
 {

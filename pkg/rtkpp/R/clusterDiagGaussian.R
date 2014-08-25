@@ -43,13 +43,14 @@
 #'   ## with default values
 #'   clusterDiagGaussian(geyser, nbCluster=2:6)
 #'   ## use graphics functions
-#'   xem <- clusterDiagGaussian(data=geyser, nbCluster=2:3)
+#'   model <- clusterDiagGaussian(data=geyser, nbCluster=2:3)
 #'   \dontrun{
-#'   plot(xem)
-#'   hist(xem)
+#'   plot(model)
 #'   }
+#'   ## print model
+#'   print(model)
 #'   ## get summary
-#'   summary(xem)
+#'   summary(model)
 #'
 #' @return An instance of the [\code{\linkS4class{ClusterDiagGaussianModel}}] class.
 #' @author Serge Iovleff
@@ -74,16 +75,21 @@ clusterDiagGaussian <- function(data, nbCluster=2, modelNames=NULL, strategy=clu
 
   # check modelNames
   if (is.null(modelNames)) { modelNames = diagGaussianNames()}
-  if (!checkDiagGaussianNames(modelNames))
+  if (!validDiagGaussianNames(modelNames))
   { stop("modelNames is not valid. See ?diagGaussianNames for the list of valid model names")}
 
-  # check strategy (TODO)
+  # check strategy
+  if(class(strategy)[1] != "ClusterStrategy")
+  {stop("strategy is not a Cluster Stategy class (must be an instance of the class ClusterStrategy).")}
+  validObject(strategy);
 
   # start estimation of the models
   model = new("ClusterDiagGaussianModel", data)
   resFlag = .Call("clusterDiagGaussianModel", model, nbCluster, modelNames, strategy, criterion, PACKAGE="rtkpp")
-  if (resFlag != 1) {cat("An error occur during the clustering process")}
-  print(model)
+  # set names
+  colnames(model@meankj)   <- colnames(model@data)
+  colnames(model@sigma2kj) <- colnames(model@data)
+  if (resFlag != 1) {cat("WARNING: An error occur during the clustering process")}
   model
 }
 

@@ -33,18 +33,14 @@
  **/
 
 
-#include <Rcpp.h>
-#include "../inst/include/StatModels.h"
-#include "../inst/include/Clustering.h"
+#include "RTKpp.h"
 
-#include "../inst/projects/Rtkpp/include/STK_RcppMatrix.h"
-#include "../inst/projects/Rtkpp/include/STK_RDataHandler.h"
-#include "../inst/projects/Rtkpp/include/STK_ClusterFacade.h"
 
 using namespace Rcpp;
 using namespace STK;
 
-/**  @param model ClusterDiagModel S4 class
+/** @param model ClusterDiagModel S4 class
+ *  @param nbCluster a vector with the number of clusters to test
  */
 RcppExport SEXP clusterDiagGaussianModel( SEXP model, SEXP nbCluster, SEXP modelNames, SEXP strategy, SEXP criterion )
 {
@@ -73,37 +69,39 @@ RcppExport SEXP clusterDiagGaussianModel( SEXP model, SEXP nbCluster, SEXP model
   {
     std::string idData = "model" + typeToString<int>(l);
     std::string idModel(as<std::string>(R_modelNames[l]));
+    // transform R models names to stk++ models names
+    // check have been done on the R side so.... Let's go
     bool free;
     Clust::Mixture model = Clust::stringToMixture(idModel, free);
-    v_free.push_back(free);
     handler.addData(R_data, idData, Clust::mixtureToString(model));
+    v_free.push_back(free);
   }
 
   // create MixtureManager
   MixtureManager<RDataHandler> manager(handler);
 
   // create criterion
-  std::cout << R_criterion << "\n";
   ICriterion* crit =0;
   if (R_criterion == "BIC") { crit = new BICCriterion();}
   if (R_criterion == "AIC") { crit = new AICCriterion();}
 
   // start the estimation process, should end with the best model according to the criteria
   IMixtureComposer* p_composer;
+  // update model
+  Real criter = Arithmetic<Real>::max();
   for (int k=0; k <R_nbCluster.length(); ++k)
   {
+    int K = R_nbCluster[k];
     for (int l=0; l <R_modelNames.size(); ++l)
     {
       // create composer
       if (v_free[l])
-      { p_composer = new MixtureComposer(nbSample, nbVariable, R_nbCluster[k]);}
+      { p_composer = new MixtureComposer(nbSample, nbVariable, K);}
       else
-      { p_composer = new MixtureComposerFixedProp(nbSample, nbVariable, R_nbCluster[k]);}
-      MixtureComposer* p_aux = static_cast<MixtureComposer*>(p_composer);
-
+      { p_composer = new MixtureComposerFixedProp(nbSample, nbVariable, K);}
       // create current mixture and register it
       std::string idData = "model" + typeToString<int>(l);
-      p_aux->createMixture(manager, idData);
+      static_cast<MixtureComposer*>(p_composer)->createMixture(manager, idData);
 
       // create facade and strategy
       ClusterFacade facade(p_composer);
@@ -111,20 +109,35 @@ RcppExport SEXP clusterDiagGaussianModel( SEXP model, SEXP nbCluster, SEXP model
       // run estimation
       if (facade.run())
       {
+        // convenient static cast
         MixtureComposer* p_aux = static_cast<MixtureComposer*>(p_composer);
-        // compute criterion
-        crit->setModel(p_composer);
-        if (!crit->run()) { delete p_composer; break;}
-        // update model
-        if (as<double>(R_model.slot("lnLikelihood")) < crit->value())
+        // compute criterion and update model
+        crit->setModel(p_aux);
+        if (!crit->run()) { delete p_composer; p_composer = 0; continue;}
+        if (criter > crit->value())
         {
-          //std::cout << "R_nbCluster[k] = " << R_nbCluster[k] << "\n";
-          //std::cout << "critValue = " << crit->value() << "\n";
+          criter = crit->value();
+          R_model.slot("modelName")    = as<std::string>(R_modelNames[l]);
           R_model.slot("nbCluster")    = R_nbCluster[k];
           R_model.slot("lnLikelihood") = p_aux->lnLikelihood();
-          R_model.slot("criterion")    = crit->value();
+          R_model.slot("criterion")    = criter;
+          R_model.slot("pk")           = wrap(p_aux->pk());
+          R_model.slot("tik")          = wrap(p_aux->tik());
+          R_model.slot("zi")           = wrap(p_aux->zi());
+          // get parameters of the Gaussian mixture
           Array2D<Real> params;
           p_aux->getParameters(manager,idData, params);
+          Array2D<Real> meankj(K, nbVariable), sigma2kj(K, nbVariable);
+          for (int k=0; k<K; ++k)
+          {
+            meankj.row(k)   = params.row(2*k);
+            sigma2kj.row(k) = params.row(2*k+1);
+          }
+          R_model.slot("meankj")   = wrap(meankj);
+          R_model.slot("sigma2kj") = wrap(sigma2kj);
+          // compute fi
+          NumericVector fi = R_model.slot("fi");
+          for (int i=0; i< fi.length(); ++i) { fi[i] = p_aux->likelihood(i);}
         }
       }
       // release current composer
@@ -133,6 +146,7 @@ RcppExport SEXP clusterDiagGaussianModel( SEXP model, SEXP nbCluster, SEXP model
   }
   delete crit;
   if (p_composer) delete p_composer;
+  // terminate
   // return true
   return Rcpp::wrap(1);
 

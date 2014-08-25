@@ -97,7 +97,7 @@ class MixtureComposer : public IMixtureComposer
      *  @param i index of the sample
      *  @param k index of the component
      **/
-    virtual Real lnComponentProbability(int i, int k);
+    virtual Real lnComponentProbability(int i, int k) const;
     /** write the parameters of the model in the stream os. */
     virtual void writeParameters(ostream& os) const;
     /** @brief compute the number of free parameters of the model.
@@ -130,6 +130,10 @@ class MixtureComposer : public IMixtureComposer
      *  be called only once after we finish running the estimation algorithm.
      **/
     virtual void finalizeStep();
+    /** @return the likelihood of the i-th sample.
+     *  @param i index of the sample
+     **/
+    Real likelihood(int i) const;
     /** @brief register a mixture to the composer.
      *  When a mixture is registered, the composer:
      *  - assign composer pointer (itself) to the mixture
@@ -171,9 +175,18 @@ class MixtureComposer : public IMixtureComposer
      *  @param idData the Id of the data we want the parameters
      *  @param data the structure which will receive the data
      **/
-    template<class ParametersManager, class Param>
-    void getParameters(ParametersManager const& manager, String const& idData, Param& data)
+    template<class ParametersManager, class Array>
+    void getParameters(ParametersManager const& manager, String const& idData, Array& data)
     { manager.getParameters(getMixture(idData), idData, data);}
+
+    /** Utility method allowing to get the missing values imputed by the
+     * estimation process.
+     *  @param manager the manager with the responsibility of the missing values
+     *  @param data the structure which will receive the data
+     **/
+    template<class MissingValuesManager, class Array>
+    void getMissingValue(MissingValuesManager const& manager, Array& data)
+    { manager.getMissingValues(data);}
 
   protected:
     /** @brief Create the composer using existing data handler and mixtures.
@@ -182,6 +195,7 @@ class MixtureComposer : public IMixtureComposer
      * @sa MixtureComposerFixedProp
      **/
     void createComposer( std::vector<IMixture*> const& v_mixtures_);
+
   private:
     /** vector of pointers to the mixtures components */
     std::vector<IMixture*> v_mixtures_;

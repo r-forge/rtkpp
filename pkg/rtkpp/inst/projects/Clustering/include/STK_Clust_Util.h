@@ -207,7 +207,7 @@ Mixture stringToMixture( std::string const& type);
  * <tr> <td> "Categorical_pk_pk"  </td><td> "Categorical_p_pk"  </td> </tr>
  * </table>
  *  @param type the String we want to convert
- *  @param[out] @c true if the model have free proportions, @c false otherwise.
+ *  @param[out] freeProp @c true if the model have free proportions, @c false otherwise.
  *  @return the Mixture represented by the String @c type. if the string
  *  does not match any known name, the @c unknown_mixture_ type is returned.
  **/

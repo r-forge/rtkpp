@@ -38,7 +38,7 @@
 #' @slot pk        Vector with the proportions of each mixture.
 #' @slot tik       Matrix with the posterior probability of the ith individual to belong to kth cluster.
 #' @slot fi        Vector with the mixture probabilities of the individuals.
-#' @slot zi        Vector with the class label of the individuals.
+#' @slot zi        Vector of integer with the class label of the individuals.
 #' @slot lnLikelihood Real given the ln-liklihood of the Cluster model.
 #' @slot criterion Real given the value of the AIC or BIC criterion.
 #' @slot modelName mixture model name.
@@ -56,7 +56,7 @@ setClass(
   Class="IClusterModel",
   representation( data = "matrix", nbCluster = "numeric"
                 , pk = "numeric", tik = "matrix"
-                , fi = "numeric", zi = "numeric"
+                , fi = "numeric", zi = "integer"
                 , lnLikelihood = "numeric", criterion = "numeric"
                 , modelName = "character"
                 , "VIRTUAL"
@@ -66,7 +66,7 @@ setClass(
                 , pk = vector("numeric")
                 , tik = matrix(nrow=0, ncol=0)
                 , fi  = vector("numeric")
-                , zi  = vector("numeric")
+                , zi  = vector("integer")
                 , lnLikelihood = -Inf
                 , criterion = -Inf
                 , modelName = character(1)
@@ -79,7 +79,7 @@ setClass(
     if (round(object@nbCluster)!=object@nbCluster)
     {stop("nbCluster must be an integer.")}
     if( object@nbCluster < 2 )
-    {  stop("nbCluster must begreater than 1.")}
+    {  stop("nbCluster must be greater than 1.")}
     if (length(object@pk)!=object@nbCluster)
     {stop("pk must have length nbCluster.")}
     if (ncol(object@tik)!=object@nbCluster)
@@ -95,86 +95,34 @@ setClass(
 )
 
 ###################################################################################
-#' Definition of the [\code{\linkS4class{ClusterDiagGaussianModel}}] class
-#'
-#' This class defines a diagonal Gaussian mixture Model.
-#'
-#' This class inherits from the [\code{\linkS4class{IClusterModel}}] class.
-#' A diagonal gaussian model is a mixture model of the form:
-#' \deqn{
-#'   f({x}|\boldsymbol{\theta}) \\
-#'   =\sum_{k=1}^K p_k \prod_{j=1}^d \psi(x_j;\mu_{jk},\sigma^2_{jk}) \\
-#'    \quad {x} \in {R}^d.
-#' }
-#'
-#' @slot meanjk  Matrix with the mean of the jth variable in the kth cluster.
-#' @slot sigma2jk  Matrix with the variance of the jth variable in the kth cluster.
-#'
-#' @examples
-#'   getSlots("ClusterDiagGaussianModel")
-#'   new("ClusterDiagGaussianModel", data=iris[1:4])
-#'
-#' @author Serge Iovleff
-#'
-#' @name ClusterDiagGaussianModel
-#' @rdname ClusterDiagGaussianModel-class
-#' @aliases ClusterDiagGaussianModel-class
-#' @exportClass ClusterDiagGaussianModel
-#'
-setClass(
-    Class="ClusterDiagGaussianModel",
-    representation( meanjk = "matrix", sigma2jk = "matrix"),
-    contains=c("IClusterModel"),
-    prototype=list( meanjk   = matrix(nrow=0,ncol=0)
-                  , sigma2jk = matrix(nrow=0,ncol=0)
-                  ),
-    validity=function(object)
-    {
-      if (ncol(object@meanjk)!=object@nbCluster)
-      {stop("meanjk must have nbCluster columns.")}
-      if (nrow(object@meanjk)!=ncol(object@data))
-      {stop("meanjk must have nbVariable rows.")}
-      if (ncol(object@sigma2jk)!=object@nbCluster)
-      {stop("sigma2jk must have nbCluster columns.")}
-      if (nrow(object@sigma2jk)!=ncol(object@data))
-      {stop("sigma2jk must have nbVariable rows.")}
-      if (!(object@modelName %in% c("gaussian_sjk", "gaussian_sj", "gaussian_sk", "gaussian_s")))
-      {stop("Invalid Gaussian model name.")}
-      return(TRUE)
-    }
-)
-
-###################################################################################
-#' Initialize an instance of the [\code{\linkS4class{ClusterDiagGaussianModel}}] class.
+#' Initialize an instance of the [\code{\linkS4class{IClusterModel}}] class.
 #'
 #' Initialization method. Used internally in the `rtkpp' package.
 #'
 #' @keywords internal
 setMethod(
     f="initialize",
-    signature=c("ClusterDiagGaussianModel"),
-    definition=function(.Object, data, nbCluster=2, modelName="gaussian_sjk")
+    signature=c("IClusterModel"),
+    definition=function(.Object, data, nbCluster, modelName)
     {
       # for data
       if(missing(data)) {stop("data is mandatory.")}
-      else  {.Object@data<-as.matrix(data)}
+      .Object@data<-as.matrix(data)
       # for nbCluster
-      if(missing(nbCluster)) {.Object@nbCluster<-2}
-      else  {.Object@nbCluster<-nbCluster}
-      # for modelName
-      if(missing(modelName)) {.Object@modelName<-"gaussian_sjk"}
-      else  {.Object@modelName<-modelName}
+      if(missing(nbCluster)) {stop("nbCluster is mandatory.")}
+      .Object@nbCluster<-nbCluster
+      # for nbCluster
+      if(missing(modelName)) {stop("modelName is mandatory.")}
+      .Object@modelName<-modelName
       # resize
-      nbSample <- nrow(.Object@data)
-      nbVariable <- ncol(.Object@data)
-      .Object@pk <- rep(1/.Object@nbCluster, nbCluster)
+      nbSample    <- nrow(.Object@data)
+      nbVariable  <- ncol(.Object@data)
+      .Object@pk  <- rep(1/.Object@nbCluster, nbCluster)
       .Object@tik <- matrix(1/nbCluster, nbSample, nbCluster)
-      .Object@fi <- rep(0, nbSample)
-      .Object@zi <- rep(1, nbSample)
-      .Object@meanjk <- matrix(0, nbVariable, nbCluster)
-      .Object@sigma2jk <- matrix(1, nbVariable, nbCluster)
+      .Object@fi  <- rep(0, nbSample)
+      .Object@zi  <- as.integer(rep(1, nbSample))
       # validate
-      validObject(.Object)
+      # validObject(.Object) will be called at the end of the intialization process
       return(.Object)
     }
 )
@@ -198,7 +146,8 @@ setMethod(
 #'
 #' @examples
 #'   getSlots("ClusterGammaModel")
-#'   new("ClusterGammaModel", data=iris[1:4])
+#'   data(geyser)
+#'   new("ClusterGammaModel", data=geyser)
 #'
 #' @author Serge Iovleff
 #'
@@ -241,22 +190,12 @@ setMethod(
     signature=c("ClusterGammaModel"),
     definition=function(.Object, data, nbCluster=2, modelName="gamma_ajk_bjk")
     {
-      # for data
-      if(missing(data)) {stop("data is mandatory.")}
-      else  {.Object@data<-as.matrix(data)}
-      # for nbCluster
-      if(missing(nbCluster)) {.Object@nbCluster<-2}
-      else  {.Object@nbCluster<-nbCluster}
+      .Object <- callNextMethod(.Object, data, nbCluster, modelName)
       # for modelName
       if(missing(modelName)) {.Object@modelName<-"gamma_ajk_bjk"}
       else  {.Object@modelName<-modelName}
       # resize
-      nbSample <- nrow(.Object@data)
       nbVariable <- ncol(.Object@data)
-      .Object@pk <- rep(1/nbCluster, nbCluster)
-      .Object@tik <- matrix(1/nbCluster,nbSample,nbCluster)
-      .Object@fi <- rep(0, nbSample)
-      .Object@zi <- rep(1, nbSample)
       .Object@ajk <- matrix(0, nbVariable, nbCluster)
       .Object@bjk <- matrix(1, nbVariable, nbCluster)
       # validate
@@ -283,7 +222,8 @@ setMethod(
 #'
 #' @examples
 #'   getSlots("ClusterCategoricalModel")
-#'   new("ClusterCategoricalModel", data=iris[1:4])
+#'   data(geyser)
+#'   new("ClusterCategoricalModel", data=geyser)
 #'
 #' @author Serge Iovleff
 #'
@@ -323,24 +263,16 @@ setMethod(
     signature=c("ClusterCategoricalModel"),
     definition=function(.Object, data, nbCluster=2, modelName="categorical_pjk")
     {
-      # for data
-      if(missing(data)) {stop("data is mandatory.")}
-      else  {.Object@data<-as.matrix(data)}
-      # for nbCluster
-      if(missing(nbCluster)) {.Object@nbCluster<-2}
-      else  {.Object@nbCluster<-nbCluster}
+      .Object <- callNextMethod(.Object, data, nbCluster, modelName)
       # for modelName
       if(missing(modelName)) {.Object@modelName<-"categorical_pjk"}
       else  {.Object@modelName<-modelName}
+      # resize
+      nbVariable <- ncol(.Object@data)
       # get number of modalities
       if ( is.factor(data) ) { nbModalities <- nlevels(data)}
       else {  nbModalities <- nlevels(factor(.Object@data))}
-      nbSample <- nrow(.Object@data)
       nbVariable <- ncol(.Object@data)
-      .Object@pk <- rep(1/.Object@nbCluster, .Object@nbCluster)
-      .Object@tik <- matrix(1/.Object@nbCluster,nbSample,.Object@nbCluster)
-      .Object@fi <- rep(0, nbSample)
-      .Object@zi <- rep(1, nbSample)
       .Object@pljk <- array(data = 1/nbModalities,dim=c(nbModalities,nbVariable,.Object@nbCluster))
       # validate
       validObject(.Object)
@@ -387,34 +319,24 @@ setMethod(
   function(x,...)
   {
     cat("* nbCluster    = ", x@nbCluster, "\n")
-    cat("* lnLikelihood = ", x@lnLikelihood, "\n")
+    cat("* lnLikelihood = ", x@lnLikelihood,"\n")
     cat("* criterion    = ", x@criterion, "\n")
     cat("* model name   = ", x@modelName, "\n")
-    cat("* pk           = ", x@pk, "\n")
-    cat("* tik          = ", x@tik, "\n")
-    cat("* fi           = ", x@fi, "\n")
-    cat("* zi           = ", x@zi, "\n")
   }
 )
 
 ###################################################################################
 #' @rdname print-methods
-#' @aliases print print,MixmodCluster-method
+#' @aliases print print,IClusterModel-method
 #'
 setMethod(
-  f="print",
-  signature=c("ClusterDiagGaussianModel"),
-  function(x,...){
-    cat("****************************************\n")
-    callNextMethod()
-    cat("****************************************\n")
-    for(k in 1:length(x@pk))
+    f="show",
+    signature=c("IClusterModel"),
+    function(object)
     {
-      cat("*** Cluster: ",k,"\n")
-#      cat("* proportion = ", format(x@pk[k]), "\n")
-      cat("****************************************\n")
+      cat("* nbCluster    = ", object@nbCluster, "\n")
+      cat("* lnLikelihood = ", object@lnLikelihood,"\n")
+      cat("* criterion    = ", object@criterion, "\n")
+      cat("* model name   = ", object@modelName, "\n")
     }
-    return(invisible())
-  }
 )
-

@@ -29,36 +29,31 @@
 #-----------------------------------------------------------------------
 # Macros and definitions
 RELATIVEMAKEVARS = makevars
+include $(RELATIVEMAKEVARS)
+
+#-----------------------------------------------------------------------
+# main directories
+PROJECTS_DIR  = ./projects/
+RTKPP_BIN_DIR = ./bin/
+RTKPP_LIB_DIR = ./lib/
 
 # check if we are using symoblic paths
-ifneq ($(patsubst $(CURDIR)/projects/../%,%,$(wildcard $(CURDIR)/projects/../*)),$(wildcard *))
+ifneq ($(patsubst $(PROJECTS_DIR)STKernel/../%,%,$(wildcard $(PROJECTS_DIR)STKernel/../*)),$(wildcard $(PROJECTS_DIR)*))
+# We are using symoblic paths for the STKernel project, we use full path in this case
 MAKEVARS = $(CURDIR)/makevars
+BIN_DIR = $(CURDIR)/bin/
 else
+# use relative path
 MAKEVARS = ../../../makevars
+BIN_DIR = ../../../bin/
 endif
 
 export RELATIVEMAKEVARS
 export MAKEVARS
-
-# A this level there is no ambiguity about the makevars to include
-include $(RELATIVEMAKEVARS)
-
-#-----------------------------------------------------------------------
-# main Paths
-PROJECTS_DIR  = ./projects/
-RTKPP_BIN_DIR = ./bin/
-
-# check if we are using symoblic paths and use full path in this case
-ifneq ($(patsubst $(CURDIR)/projects/../%,%,$(wildcard $(CURDIR)/projects/../*)),$(wildcard *))
-BIN_DIR = $(CURDIR)/bin/
-else
-BIN_DIR = ../../../bin/
-endif
 export BIN_DIR
 
 #-----------------------------------------------------------------------
 # library name
-RTKPP_LIB_DIR = ./lib/
 STKPP_LIB = $(RTKPP_LIB_DIR)$(LIB_STKPP_A)
 
 .PHONY: echo obj lib
@@ -67,8 +62,8 @@ all: echo lib
 # use to debug
 echo:
 	@echo $(BIN_DIR)
-	@echo $(wildcard $(CURDIR)/projects/../*)
-	@echo $(wildcard *)
+	@echo $(patsubst $(PROJECTS_DIR)STKernel/../%,%,$(wildcard $(PROJECTS_DIR)STKernel/../*))
+	@echo $(wildcard $(PROJECTS_DIR)*)
 	@echo $(CXXFLAGS)
 	@echo $(CXXPICFLAGS)
 	@echo $(STK_CXXFLAGS)

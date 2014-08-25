@@ -75,12 +75,25 @@ MixtureComposer* MixtureComposer::create() const
   return p_composer;
 }
 
-Real MixtureComposer::lnComponentProbability(int i, int k)
+Real MixtureComposer::lnComponentProbability(int i, int k) const
 {
   Real sum=0.0;
   for (ConstMixtIterator it = v_mixtures_.begin() ; it != v_mixtures_.end(); ++it)
   { sum += (*it)->lnComponentProbability(i,k);}
   return sum;
+}
+// compute likelihhod of the i-th sample
+Real MixtureComposer::likelihood(int i) const
+{
+  Real res = 0.0;
+  for (int k = pk().begin(); k< pk().end(); ++k)
+  {
+    Real sum=0.0;
+    for (ConstMixtIterator it = v_mixtures_.begin() ; it != v_mixtures_.end(); ++it)
+    { sum += (*it)->lnComponentProbability(i,k);}
+    res += pk()[k] * std::exp(sum);
+  }
+  return res;
 }
 
 void MixtureComposer::mStep()

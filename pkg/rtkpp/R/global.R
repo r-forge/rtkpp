@@ -23,7 +23,7 @@
 #
 #-----------------------------------------------------------------------
 #' Extract parts of a rtkpp S4 class
-#' 
+#'
 #' @param x object from which to extract element(s) or in which to replace element(s).
 #' @param i the name of the element we want to extract or replace.
 #' @param j if the element designing by i is complex, j specifying elements to extract or replace.
@@ -54,9 +54,15 @@ NULL
 #'
 #' @seealso \code{\link{print}}
 #' @examples
-#'   ## for strategy
+#'   ## for cluster strategy
 #'   strategy <- clusterStrategy()
 #'   print(strategy)
+#'   ## for cluster init
+#'   init <- clusterInit()
+#'   print(init)
+#'   ## for cluster algo
+#'   algo <- clusterAlgo()
+#'   print(algo)
 #'
 NULL
 
@@ -79,28 +85,11 @@ NULL
 #'   ## for strategy
 #'   strategy <- clusterStrategy()
 #'   show(strategy)
-NULL
-
-
-###################################################################################
-# @title Produce result summaries of a rtkpp class 
-#
-# @param x Either a \code{\linkS4class{ClusterAlgo}} object,
-# a \code{\linkS4class{ClusterInit}} object or a \code{\linkS4class{ClusterModels}} object.
-# @param ... further arguments passed to or from other methods
-#
-# @return NULL. Summaries to standard out.
-#
-# @name summary
-# @docType methods
-# @rdname summary-methods
-# @exportMethod summary
-#
-# @seealso \code{\link{summary}}
-# @examples
-#   data(geyser)
-#   xem <- rtkppCluster(geyser,3)
-#   summary(xem)
-#
+#'   ## for cluster init
+#'   init <- clusterInit()
+#'   show(init)
+#'   ## for cluster algo
+#'   algo <- clusterAlgo()
+#'   show(algo)
 NULL
 

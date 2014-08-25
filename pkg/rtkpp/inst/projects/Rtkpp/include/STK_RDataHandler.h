@@ -23,7 +23,7 @@
 */
 
 /*
- * Project:  stkpp::
+ * Project:  stkpp::rtkpp
  * created on: 15 nov. 2013
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
@@ -35,11 +35,6 @@
 
 #ifndef RDATAHANDLER_H
 #define RDATAHANDLER_H
-
-#include <vector>
-
-#include "../../DManager/include/STK_IDataHandler.h"
-#include "STK_RcppMatrix.h"
 
 namespace STK
 {
@@ -119,7 +114,7 @@ class RDataHandler : public IDataHandler
         Rtype_ = hidden::RcppTraits<Type>::Rtype_
       };
       Rcpp::Matrix<Rtype_> Rdata = data_[idData];
-      data.setMatrix(Rdata);
+      data.setMatrix(Rcpp::clone(Rdata));
       nbVariable = data.sizeCols();
     }
 
@@ -132,12 +127,12 @@ class RDataHandler : public IDataHandler
      *  Rtype, @c true otherwise.
      **/
     bool addType(std::string const& idData, int Rtype);
-    /** R data */
+    /** List of R data */
     Rcpp::List data_;
-    /** Store the Rtype of a given data set
-     * - idData: an arbitrary idData for a model
+    /** Store the Rtype of a given data set by pair:
+     * - idData: an arbitrary idData for a model,
      * - Rtype: an integer (defined in Rinternal.h) giving the type of the data
-     * @sa stringToMixture */
+     **/
     InfoType infoType_;
     /** Number of sample */
     int nbSample_;

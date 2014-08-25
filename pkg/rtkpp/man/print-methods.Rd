@@ -7,19 +7,21 @@
 \alias{print,ClusterInit-method}
 \alias{print,ClusterStrategy-method}
 \alias{print,IClusterModel-method}
-\alias{print,MixmodCluster-method}
 \alias{print-algo,ClusterAlgo-method}
 \alias{print-init,ClusterInit,ClusterInit-method}
 \alias{print-strategy,ClusterStrategy-method}
+\alias{show,IClusterModel-method}
 \title{Print a rtkpp class to standard output.}
 \usage{
 \S4method{print}{ClusterAlgo}(x, ...)
+
+\S4method{print}{ClusterDiagGaussianModel}(x, ...)
 
 \S4method{print}{ClusterInit}(x, ...)
 
 \S4method{print}{IClusterModel}(x, ...)
 
-\S4method{print}{ClusterDiagGaussianModel}(x, ...)
+\S4method{show}{IClusterModel}(object)
 
 \S4method{print}{ClusterStrategy}(x, ...)
 }
@@ -28,6 +30,8 @@
 a \code{\linkS4class{ClusterInit}} or a \code{\linkS4class{ClusterAlgo}}.}
 
 \item{...}{further arguments passed to or from other methods}
+
+\item{object}{Any R object}
 }
 \value{
 NULL. Prints to standard out.
@@ -36,9 +40,15 @@ NULL. Prints to standard out.
 Print a rtkpp class to standard output.
 }
 \examples{
-## for strategy
+## for cluster strategy
   strategy <- clusterStrategy()
   print(strategy)
+  ## for cluster init
+  init <- clusterInit()
+  print(init)
+  ## for cluster algo
+  algo <- clusterAlgo()
+  print(algo)
 }
 \seealso{
 \code{\link{print}}

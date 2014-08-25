@@ -23,38 +23,45 @@
 */
 
 /*
- * Project:  rtkpp::
- * created on: 28 juil. 2014
+ * Project:  rtkpp
+ * created on: 22 août 2014
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
 
-/** @file RcppTraits.h
- *  @brief In this file .
+/** @file RTKppForward.h
+ *  @brief In this file we include the header files needed for the integration of stkpp to Rcpp.
  **/
 
 
-#ifndef RCPPTRAITS_H
-#define RCPPTRAITS_H
+#ifndef RTKPPFORWARD_H
+#define RTKPPFORWARD_H
 
+#include <RcppCommon.h>
+#include "STKpp.h"
+
+/* forward declarations */
 namespace STK
 {
+template <typename Type> class RcppVector;
+template <typename Type> class RcppMatrix;
+}
 
-namespace hidden
+
+/* Rcpp integration */
+namespace Rcpp
 {
-/** @ingroup hidden
- * Indicates the storage type associated with a SEXP type
- * for example: RcppTraits<int>::Rtype_ is a INTSXP
- * The default is VECSXP.
- */
-template<typename Type> struct RcppTraits
-{
- enum
-  { Rtype_ = Rcpp::traits::r_sexptype_traits<Type>::rtype };
-};
+  /* support for wrap */
+  template<typename Derived>
+  SEXP wrap(STK::ITContainer<Derived, STK::hidden::Traits<Derived>::structure_> const& obj);
+
+  namespace traits
+  {
+    /* TODO: support for as */
+    template<typename T> class Exporter< STK::RcppVector<T>  >;
+    template<typename T> class Exporter< STK::RcppMatrix<T>  >;
+  } // namespace traits
+
+} // namespace Rcpp
 
 
-} // namespace hidden
-
-} // namespace STK
-
-#endif /* RCPPTRAITS_H */
+#endif /* RTKPPFORWARD_H */

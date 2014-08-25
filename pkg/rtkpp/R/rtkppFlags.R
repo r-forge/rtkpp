@@ -25,50 +25,59 @@
 # Some part of the code below is an adaptation of the code from the
 # Rcpp package.
 #-----------------------------------------------------------------------
-#' make sure system.file returns an absolute path
-#' @rdname rtkppFlags
-#' @keywords internal
-rtkpp.system.file <- function(...)
+# make sure system.file returns an absolute path
+###########################
+# Adapted from Rcpp package
+###########################
+# @rdname rtkppFlags
+# @keywords internal
+.rtkpp.system.file <- function(...)
 { tools::file_path_as_absolute( base::system.file( ..., package = "rtkpp" ) )}
 
-#' Provide compiler flags -- i.e. -I/path/to/Rtkpp.h
-#' @keywords internal
-rtkppCxxFlags <- function(cpp11=FALSE)
+# Provide compiler flags -- i.e. -I/path/to/RTKpp.h
+# @keywords internal
+.rtkppCxxFlags <- function(cpp11=FALSE)
 {
-  path1 <- rtkpp.system.file( "include" )
-  path2 <- rtkpp.system.file( "projects" )
-  if (.Platform$OS.type=="windows") { path1 <- asBuildPath(path1) }
-  if (.Platform$OS.type=="windows") { path2 <- asBuildPath(path2) }
+  path1 <- .rtkpp.system.file( "include" )
+  path2 <- .rtkpp.system.file( "projects" )
+  if (.Platform$OS.type=="windows") { path1 <- .asBuildPath(path1) }
+  if (.Platform$OS.type=="windows") { path2 <- .asBuildPath(path2) }
   paste("-I", path1, " -I", path2, if (cpp11) " -std=c++11 " else "", sep="")
 }
 
-#' Provide linker flags -- i.e. /path/to/libSTKpp.a.
-#' @rdname rtkppFlags
-#' @keywords internal
-rtkppLdFlags <- function()
+# Provide linker flags -- i.e. /path/to/libSTKpp.a.
+###########################
+# Adapted from Rcpp package
+###########################
+# @rdname rtkppFlags
+# @keywords internal
+.rtkppLdFlags <- function()
 {
   path <- rtkpp.system.file( "lib" )
-  if (.Platform$OS.type=="windows") { path <- asBuildPath(path) }
+  if (.Platform$OS.type=="windows") { path <- .asBuildPath(path) }
   paste(path, "/libSTKpp.a", sep="")
 }
 
-#' CxxFlags defaults
+#' CxxFlags defaults for the rtkpp
 #' @rdname rtkppFlags
 #' @keywords internal
-CxxFlags <- function(cpp11=FALSE) { cat(rtkppCxxFlags(cpp11=cpp11)) }
+CxxFlags <- function(cpp11=FALSE) { cat(.rtkppCxxFlags(cpp11=cpp11)) }
 #' LdFlags defaults
 #' @rdname rtkppFlags
 #' @keywords internal
-LdFlags <- function() { cat(rtkppLdFlags()) }
+LdFlags <- function() { cat(.rtkppLdFlags()) }
 
-#' Transform a path for passing to the build system on the command line.
-#' Leave paths alone for posix. For Windows, mirror the behavior of the 
-#' R package build system by starting with the fully resolved absolute path,
-#' transforming it to a short path name if it contains spaces, and then 
-#' converting backslashes to forward slashes
-#' @rdname rtkppFlags
-#' @keywords internal
-asBuildPath <- function(path)
+# Transform a path for passing to the build system on the command line.
+# Leave paths alone for posix. For Windows, mirror the behavior of the
+# R package build system by starting with the fully resolved absolute path,
+# transforming it to a short path name if it contains spaces, and then
+# converting backslashes to forward slashes
+###########################
+# Adapted from Rcpp package
+###########################
+# @rdname rtkppFlags
+# @keywords internal
+.asBuildPath <- function(path)
 {
   if (.Platform$OS.type == "windows")
   {
@@ -77,6 +86,5 @@ asBuildPath <- function(path)
       path <- utils::shortPathName(path)
     path <- gsub("\\\\", "/", path)
   }
-  
   return(path)
 }

@@ -123,11 +123,19 @@ class IMixtureComposer : public IStatModelBase
     inline int nbCluster() const { return nbCluster_;}
     /** @return the state of the model*/
     inline Clust::modelState state() const { return state_;}
+
     /** @return the proportions of each mixtures */
-    inline CArrayPoint<Real> const* p_pk() const { return &prop_;};
+    inline CArrayPoint<Real> const& pk() const { return prop_;};
     /** @return the tik probabilities */
+    inline Array2D<Real> const& tik() const { return tik_;};
+    /** @return the zi class label */
+    inline CArrayVector<int> const& zi() const { return zi_;};
+
+    /** @return a pointer on the proportions of each mixtures */
+    inline CArrayPoint<Real> const* p_pk() const { return &prop_;};
+    /** @return a pointer on the the tik probabilities */
     inline Array2D<Real> const* p_tik() const { return &tik_;};
-    /** @return  the zi class label */
+    /** @return a pointer on the zi class labels */
     inline CArrayVector<int> const* p_zi() const { return &zi_;};
 
     /** set the state of the model : should be used by any strategy*/
@@ -148,7 +156,7 @@ class IMixtureComposer : public IStatModelBase
      *  @param i index of the sample
      *  @param k index of the component
      **/
-    virtual Real lnComponentProbability(int i, int k) = 0;
+    virtual Real lnComponentProbability(int i, int k) const = 0;
 
     // virtual with default implementation
     /** write the parameters of the model in the stream os. */

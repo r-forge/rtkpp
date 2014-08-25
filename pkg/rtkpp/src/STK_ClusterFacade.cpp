@@ -32,10 +32,10 @@
  *  @brief In this file we implement the ClusterFacade class.
  **/
 
-#include "../inst/projects/Rtkpp/include/STK_ClusterFacade.h"
-#include "../inst/projects/Clustering/include/STK_MixtureStrategy.h"
-#include "../inst/projects/Clustering/include/STK_MixtureInit.h"
-#include "../inst/projects/Clustering/include/STK_IMixtureComposer.h"
+#include "RTKpp.h"
+#include "../projects/Clustering/include/STK_MixtureInit.h"
+#include "../projects/Clustering/include/STK_MixtureAlgo.h"
+#include "../projects/Clustering/include/STK_MixtureStrategy.h"
 
 namespace STK
 {
@@ -95,6 +95,7 @@ bool ClusterFacade::run()
   stk_cout << _T("In ClusterFacade::run(), initializeStep()\n");
 #endif
       p_model_->initializeStep();
+      p_model_->setState(Clust::modelInitialized_);
     }
     if (p_strategy_->run()) flag = true;
     p_model_->finalizeStep();

@@ -122,7 +122,9 @@ struct SafeValueImpl<Clust::Categorical_pk_, Data>
   typedef typename Data::Type Type;
 
   /** @return a safe value for the jth variable
-   *  @param j index of the column with the safe value needed */
+   *  @param m_dataij the matrix with the data
+   *  @param j index of the column with the safe value needed
+   **/
   static Type run(Data const& m_dataij, int j)
   {
      int lmin = m_dataij.col(j).safe().minElt(), lmax = m_dataij.col(j).safe().maxElt();

@@ -25,7 +25,8 @@ a mixture model of the form
 }}
 \examples{
 getSlots("ClusterGammaModel")
-  new("ClusterGammaModel", data=iris[1:4])
+  data(geyser)
+  new("ClusterGammaModel", data=geyser)
 }
 \author{
 Serge Iovleff

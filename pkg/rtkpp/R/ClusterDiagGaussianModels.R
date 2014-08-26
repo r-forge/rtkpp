@@ -32,18 +32,18 @@ NULL
 #' This class inherits from the [\code{\linkS4class{IClusterModel}}] class.
 #' A diagonal gaussian model is a mixture model of the form:
 #' \deqn{
-#'   f({x}|\boldsymbol{\theta}) \\
-#'   =\sum_{k=1}^K p_k \prod_{j=1}^d \psi(x_j;\mu_{jk},\sigma^2_{jk}) \\
-#'    \quad {x} \in {R}^d.
+#'   f({x}|\boldsymbol{\theta})
+#'   =\sum_{k=1}^K p_k \prod_{j=1}^d \phi(x_j;\mu_{jk},\sigma^2_{jk})
+#'    \quad x \in {R}^d.
 #' }
 #'
 #' @slot meankj  Matrix with the mean of the jth variable in the kth cluster.
 #' @slot sigma2kj  Matrix with the variance of the jth variable in the kth cluster.
 #'
 #' @examples
-#'   getSlots("ClusterDiagGaussianModel")
-#'   data(geyser)
-#'   new("ClusterDiagGaussianModel", data=geyser)
+#' getSlots("ClusterDiagGaussianModel")
+#' data(geyser)
+#' new("ClusterDiagGaussianModel", data=geyser)
 #'
 #' @author Serge Iovleff
 #'

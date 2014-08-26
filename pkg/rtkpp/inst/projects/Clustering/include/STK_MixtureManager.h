@@ -124,8 +124,8 @@ class MixtureManager
       return createMixture( idModel, idData, nbCluster);
     }
     /** create a mixture and initialize it.
-     *  @param idModel id of the model
-     *  @param idData name of the model
+     *  @param idModel Id name of the model
+     *  @param idData Id name of the data
      *  @param nbCluster number of cluster of the model
      **/
     IMixture* createMixture(Clust::Mixture idModel, String const& idData, int nbCluster)
@@ -135,7 +135,7 @@ class MixtureManager
         // gamma_ajk_bjk_ model
         case Clust::Gamma_ajk_bjk_:
         {
-          DataManager_ajk_bjk* p_data = new DataManager_ajk_bjk();
+          DataManager_ajk_bjk* p_data = new DataManager_ajk_bjk(idData);
           registerDataManager(p_data);
           handler_.getData(idData, p_data->m_dataij_, p_data->nbVariable_ );
           p_data->initialize();
@@ -146,7 +146,7 @@ class MixtureManager
         // gamma_ajk_bj_ model
         case Clust::Gamma_ajk_bj_:
         {
-          DataManager_ajk_bj* p_data = new DataManager_ajk_bj();
+          DataManager_ajk_bj* p_data = new DataManager_ajk_bj(idData);
           registerDataManager(p_data);
           handler_.getData(idData, p_data->m_dataij_, p_data->nbVariable_ );
           p_data->initialize();
@@ -157,7 +157,7 @@ class MixtureManager
         // Gaussian_sjk_ model
         case Clust::Gaussian_sjk_:
         {
-          DataManager_sjk* p_data = new DataManager_sjk();
+          DataManager_sjk* p_data = new DataManager_sjk(idData);
           registerDataManager(p_data);
           handler_.getData(idData, p_data->m_dataij_, p_data->nbVariable_ );
           p_data->initialize();
@@ -168,7 +168,7 @@ class MixtureManager
         // Gaussian_sk_ model
         case Clust::Gaussian_sk_:
         {
-          DataManager_sk* p_data = new DataManager_sk();
+          DataManager_sk* p_data = new DataManager_sk(idData);
           registerDataManager(p_data);
           handler_.getData(idData, p_data->m_dataij_, p_data->nbVariable_ );
           p_data->initialize();
@@ -179,7 +179,7 @@ class MixtureManager
         // Gaussian_sj_ model
         case Clust::Gaussian_sj_:
         {
-          DataManager_sj* p_data = new DataManager_sj();
+          DataManager_sj* p_data = new DataManager_sj(idData);
           registerDataManager(p_data);
           handler_.getData(idData, p_data->m_dataij_, p_data->nbVariable_ );
           p_data->initialize();
@@ -190,7 +190,7 @@ class MixtureManager
         // Gaussian_s_ model
         case Clust::Gaussian_s_:
         {
-          DataManager_s* p_data = new DataManager_s();
+          DataManager_s* p_data = new DataManager_s(idData);
           registerDataManager(p_data);
           handler_.getData(idData, p_data->m_dataij_, p_data->nbVariable_ );
           p_data->initialize();
@@ -201,7 +201,7 @@ class MixtureManager
         // Categorical_pjk_ model
         case Clust::Categorical_pjk_:
         {
-          DataManager_pjk* p_data = new DataManager_pjk();
+          DataManager_pjk* p_data = new DataManager_pjk(idData);
           registerDataManager(p_data);
           handler_.getData(idData, p_data->m_dataij_, p_data->nbVariable_ );
           p_data->initialize();
@@ -212,7 +212,7 @@ class MixtureManager
         // Categorical_pjk_ model
         case Clust::Categorical_pk_:
         {
-          DataManager_pk* p_data = new DataManager_pk();
+          DataManager_pk* p_data = new DataManager_pk(idData);
           registerDataManager(p_data);
           handler_.getData(idData, p_data->m_dataij_, p_data->nbVariable_ );
           p_data->initialize();
@@ -226,27 +226,15 @@ class MixtureManager
       }
       return 0; // 0 if idModel is not a stk++ model
     }
-    /** get the parameters from an IMixture given its Id.*/
+    /** get the parameters from an IMixture.
+     *  @param p_mixture pointer on the mixture
+     *  @param idData Id name of the data set attached to the mixture
+     *  @param data the array to return with the parameters
+     **/
     void getParameters(IMixture* p_mixture, std::string idData, Array2D<Real>& data) const
     {
-#ifdef STK_MIXTURE_VERY_VERBOSE
-      stk_cout << _T("-------------------------------\n")
-               << _T("Entering MixtureManager::getParameters with")
-               << _T("idData = ") << idData << _T("\n");
-#endif
-      std::string idModelName;
-      if (!handler_.getIdModel( idData, idModelName))
-      {
-#ifdef STK_MIXTURE_VERY_VERBOSE
-        stk_cout << _T("In MixtureManager::getParameters, fail to get idData = ") << idData << _T("\n");
-#endif
-        return;
-      }
-#ifdef STK_MIXTURE_VERY_VERBOSE
-      stk_cout << _T("In MixtureManager::getParameters, success to get idData = ") << idData << _T("\n");
-      stk_cout << _T("In MixtureManager::getParameters, idModelName = ") << idModelName << _T("\n");
-#endif
-      Clust::Mixture idModel = Clust::stringToMixture(idModelName);
+      Clust::Mixture idModel = getIdModel(idData);
+      if (idModel == Clust::unknown_mixture_) return;
       // up-cast... (Yes it's bad....;)...)
       switch (idModel)
       {
@@ -286,6 +274,56 @@ class MixtureManager
         break;
       }
     }
+    /** get the missing values of a data set.
+     *  @param idData Id name of the data set attached to the mixture
+     *  @param data the array to return with the missing values
+     **/
+    template<typename Type>
+    void getMissingValues( String const& idData, std::vector< std::pair< std::pair<int,int>, Type > >& data) const
+    {
+      Clust::Mixture idModel = getIdModel(idData);
+      if (idModel == Clust::unknown_mixture_) return;
+      IDataManager* p_manager = getDataManager(idData);
+      // up-cast... (Yes it's bad....;)...)
+      switch (idModel)
+      {
+        // gamma_ajk_bjk_ model
+        case Clust::Gamma_ajk_bjk_:
+        { static_cast<DataManager_ajk_bjk const*>(p_manager)->getMissingValues(data);}
+        break;
+        // gamma_ajk_bj_ model
+        case Clust::Gamma_ajk_bj_:
+        { static_cast<DataManager_ajk_bj const*>(p_manager)->getMissingValues(data);}
+        break;
+        // Gaussian_sjk_ model
+        case Clust::Gaussian_sjk_:
+        { static_cast<DataManager_sjk const*>(p_manager)->getMissingValues(data);}
+        break;
+        // Gaussian_sk_ model
+        case Clust::Gaussian_sk_:
+        { static_cast<DataManager_sk const*>(p_manager)->getMissingValues(data);}
+        break;
+        // Gaussian_sj_ model
+        case Clust::Gaussian_sj_:
+        { static_cast<DataManager_sj const*>(p_manager)->getMissingValues(data);}
+        break;
+        // Gaussian_s_ model
+        case Clust::Gaussian_s_:
+        { static_cast<DataManager_s const*>(p_manager)->getMissingValues(data);}
+        break;
+        // Categorical_pjk_ model
+        case Clust::Categorical_pjk_:
+        { static_cast<DataManager_pjk const*>(p_manager)->getMissingValues(data);}
+        break;
+        // Categorical_pjk_ model
+        case Clust::Categorical_pk_:
+        { static_cast<DataManager_pk const*>(p_manager)->getMissingValues(data);}
+        break;
+        default: // idModel is not implemented
+        break;
+      }
+    }
+
   protected:
     /** @brief register a data manager to the MixtureManager.
      *  For each mixture created and registered, a data manager is created
@@ -301,6 +339,37 @@ class MixtureManager
     DataHandler const& handler_;
     /** vector of pointers to the data components */
     std::vector<IDataManager*> v_data_;
+    /** Utility function allowing to find the idModel from the idData
+     *  @param idData the id name of the data we want the idModel
+     *  @return the idModel
+     **/
+    Clust::Mixture getIdModel( String const& idData) const
+    {
+      std::string idModelName;
+      if (!handler_.getIdModel( idData, idModelName))
+      {
+#ifdef STK_MIXTURE_VERY_VERBOSE
+        stk_cout << _T("In MixtureManager::getIdModel, fail to get idData = ") << idData << _T("\n");
+#endif
+        return Clust::unknown_mixture_;
+      }
+#ifdef STK_MIXTURE_VERY_VERBOSE
+      stk_cout << _T("In MixtureManager::getIdModel, success to get idData = ") << idData << _T("\n");
+      stk_cout << _T("In MixtureManager::getIdModel, idModelName = ") << idModelName << _T("\n");
+#endif
+      return Clust::stringToMixture(idModelName);
+    }
+
+    /** Utility lookup function allowing to find a DataManager from its idData
+     *  @param idData the id name of the mixture we want to get
+     *  @return a pointer on the DataManager
+     **/
+    IDataManager* getDataManager( String const& idData) const
+    {
+      for (ConstDataIterator it = v_data_.begin(); it != v_data_.end(); ++it)
+      {  if ((*it)->idData() == idData) return (*it);}
+      return 0;
+    }
 };
 
 } // namespace STK

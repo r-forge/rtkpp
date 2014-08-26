@@ -51,12 +51,13 @@
 #' @param varianceVariables A character string equal to "equal", "free" or "all". Default is "all".
 #' @param varianceClusters A character string equal to "equal", "free" or "all". Default is "all".
 #'
+#' @return A vector of character with the models names.
 #' @examples
 #' diagGaussianNames()
 #' diagGaussianNames("all", "equal", "free") # same as c("gaussian_p_sk", "gaussian_pk_sk")
 #'
 #' @rdname diagGaussianNames
-#' @export diagGaussianNames
+#' @export
 diagGaussianNames <- function(prop = "all", varianceVariables="all", varianceClusters = "all")
 {
   if(sum(prop %in% c("equal","free","all")) != 1)
@@ -87,16 +88,17 @@ diagGaussianNames <- function(prop = "all", varianceVariables="all", varianceClu
 }
 
 #' check if a vector of diagonal Gaussian model name comply
+#' @param names a vector of character
 #' @rdname diagGaussianNames
 #' @keywords internal
-validDiagGaussianNames <- function(modelNames)
+validDiagGaussianNames <- function(names)
 {
-  nb = length(modelNames)
+  nb = length(names)
   if ( nb == 0 ) { return(FALSE);}
 
   all = c( "gaussian_pk_sjk", "gaussian_pk_sj", "gaussian_pk_sk", "gaussian_pk_s"
          , "gaussian_p_sjk", "gaussian_p_sj", "gaussian_p_sk", "gaussian_p_s")
   for (i in 1:nb)
-  {  if ( sum(modelNames[i] %in% all) != 1 ) { return(FALSE);}}
+  {  if ( sum(names[i] %in% all) != 1 ) { return(FALSE);}}
   return(TRUE)
 }

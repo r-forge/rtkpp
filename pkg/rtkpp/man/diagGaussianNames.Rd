@@ -7,7 +7,7 @@
 diagGaussianNames(prop = "all", varianceVariables = "all",
   varianceClusters = "all")
 
-validDiagGaussianNames(modelNames)
+validDiagGaussianNames(names)
 }
 \arguments{
 \item{prop}{A character string equal to "equal", "free" or "all". Default is "all".}
@@ -15,6 +15,11 @@ validDiagGaussianNames(modelNames)
 \item{varianceVariables}{A character string equal to "equal", "free" or "all". Default is "all".}
 
 \item{varianceClusters}{A character string equal to "equal", "free" or "all". Default is "all".}
+
+\item{names}{a vector of character}
+}
+\value{
+A vector of character with the models names.
 }
 \description{
 Build a vector of diagonal Gaussian model names.

@@ -99,6 +99,7 @@ bool ClusterFacade::run()
     }
     if (p_strategy_->run()) flag = true;
     p_model_->finalizeStep();
+    p_model_->setState(Clust::modelFinalized_);
   }
   return flag;
 }

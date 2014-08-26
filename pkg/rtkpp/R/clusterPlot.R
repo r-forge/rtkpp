@@ -23,6 +23,9 @@
 #
 #-----------------------------------------------------------------------
 # Plotting of a class  deriving from[\code{\linkS4class{IClusterModel}}]
+##############################
+# Adapted from Rmixmod package
+##############################
 # x is a clas deriving from IClusterModel
 # y is a list of variable
 # ddensity : the density to plot on the histograms
@@ -52,7 +55,7 @@
   par(cex = .75)                        # decreasing font size
   nbCol = length(y)                     # size of the matrix screen
   split.screen(c(nbCol, nbCol))         # create layout matrix screens
-  col=model@zi+1; pch=model@zi;                 # colors and labels
+  col=model@zi+1; pch=model@zi;         # colors and labels
   # create histograms on the diagonal
   for ( i in 1:nbCol )
   {
@@ -79,12 +82,12 @@
     { lines(xValues, density[k,], col=k+1, lty=2, lwd=2)}
   }
   # add biplots
-  if (length(y)>1)
+  if (nbCol>1)
   {
     for ( i in 2:nbCol )
     {
-      if (is.numeric(y)) {xlab=colnames(model@data)[y[i]];}
-      else {xlab= y[i];}
+      if (is.numeric(y)) { xlab=colnames(model@data)[y[i]];}
+      else               { xlab= y[i];}
       for( j in 1:(i-1) )
       {
         screen(j+((i-1)*nbCol)) # screen(i,j)

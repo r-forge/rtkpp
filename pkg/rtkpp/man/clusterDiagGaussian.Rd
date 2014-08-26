@@ -7,41 +7,50 @@ clusterDiagGaussian(data, nbCluster = 2, modelNames = NULL,
   strategy = clusterStrategy(), criterion = "BIC")
 }
 \arguments{
-\item{data}{frame or matrix containing the data. Rows correspond to observations and columns correspond to variables.}
+\item{data}{frame or matrix containing the data. Rows correspond to observations
+and columns correspond to variables. If the data set contains NA values, they
+will be estimated during the estimation process.}
 
-\item{nbCluster}{numeric listing the number of clusters.}
+\item{nbCluster}{[\code{\link{vector}}] listing the number of clusters to test.}
 
-\item{modelNames}{a list of models to run. By default all diagoanl Gaussian models are estimated.}
+\item{modelNames}{[\code{\link{vector}}] of models names to run. By default all diagonal
+Gaussian models are estimated.}
 
-\item{strategy}{a [\code{\linkS4class{ClusterStrategy}}] object containing the strategy to run.
-clusterStrategy() method by default.}
+\item{strategy}{a [\code{\linkS4class{ClusterStrategy}}] object containing
+the strategy to run. clusterStrategy() method by default.}
 
-\item{criterion}{character defining the criterion to select the best model. The best model is the one with
-the lowest criterion value. Possible values: "BIC", "AIC". Default is "BIC".}
+\item{criterion}{character defining the criterion to select the best model.
+The best model is the one with the lowest criterion value.
+Possible values: "BIC", "AIC". Default is "BIC".}
 }
 \value{
 An instance of the [\code{\linkS4class{ClusterDiagGaussianModel}}] class.
 }
 \description{
-This function computes an optimal diagonal Gaussian mixture model according
-to the criteria furnished and the list of model defined in
-[\code{modelNames}], using the
-algorithms specified in [\code{modelNames}].
+This function computes the optimal diagonal Gaussian mixture model according
+to the [\code{criterion}] among the list of model given in [\code{modelNames}]
+and the number of clusters given in [\code{nbCluster}], using the strategy specified in [\code{strategy}].
 }
 \examples{
 ## A quantitative example with the famous geyser data set
-  data(geyser)
-  ## with default values
-  clusterDiagGaussian(geyser, nbCluster=2:6)
-  ## use graphics functions
-  model <- clusterDiagGaussian(data=geyser, nbCluster=2:3)
-  \dontrun{
-  plot(model)
-  }
-  ## print model
-  print(model)
-  ## get summary
-  summary(model)
+data(geyser)
+## add 10 missing values
+x = geyser;
+x[round(runif(5,1,nrow(geyser))), 1] <- NA
+x[round(runif(5,1,nrow(geyser))), 2] <- NA
+## with default values
+clusterDiagGaussian(x, nbCluster=2:6)
+
+## use graphics functions
+model <- clusterDiagGaussian(data=x, nbCluster=2:3)
+\dontrun{
+plot(model)
+}
+
+## print model
+print(model)
+## get summary
+summary(model)
 }
 \author{
 Serge Iovleff

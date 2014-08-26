@@ -37,11 +37,11 @@
 #' }
 #' A few iteration of an algorithm [\code{\link{clusterAlgo}}] are then performed.
 #' It is strongly recommended to use a few number of iterations of the \code{SEM}
-#' or \code{CEM} algorithms after initialization. This allow to detect "bad" initialization
-#' starting point of the estimation algorithm.
+#' or \code{CEM} algorithms after initialization. This allow to detect "bad"
+#' initialization starting point of the estimation algorithm.
 #'
-#' These two stages are repeated until \code{nbInitRun} is reached. The initial point with the best
-#' log-likelihood is conserved as the initial starting point.
+#' These two stages are repeated until \code{nbInitRun} is reached. The initial
+#' point with the best log-likelihood is conserved as the initial starting point.
 #'
 #' @param method Character string with the initialisation method.
 #' Possible values: "random", "class", "fuzzy". Default value is "random".
@@ -62,7 +62,7 @@
 clusterInit <- function( method="random", nbInitRun=5,  algo = "SEM", nbIteration=20, epsilon=0.01)
 { return(new("ClusterInit", nbInitRun=nbInitRun, algo=new("ClusterAlgo", algo, nbIteration, epsilon)))}
 
-###################################################################################
+#-----------------------------------------------------------------------
 #' Constructor of the [\code{\linkS4class{ClusterInit}}] class
 #'
 #' This class encapsulates the parameters of initialization methods of the
@@ -94,7 +94,7 @@ setClass(
     {
       # for method
       if ( sum(object@method %in% c("random","class","fuzzy")) != 1 )
-      {stop("Initialization method is not valid. See ?ClusterInit for the list of available initialization method.")}
+      {stop("Initialization method is not valid. See ?clusterInit for the list of available initialization method.")}
       # for nbInitRun
       if (round(object@nbInitRun)!=object@nbInitRun)
       {stop("nbIInit must be an integer.")}
@@ -105,13 +105,15 @@ setClass(
       {
         if(class(object@algo)[1] != "ClusterAlgo")
         {stop("algo is not of a Cluster algorithm (must be an instance of the class ClusterAlgo).")}
+        if (!validObject(object@algo))
+        {stop("algo is not of a valid algorithm. See ?clusterAlgo).")}
       }
       return(TRUE)
     }
 )
 
 
-###################################################################################
+#-----------------------------------------------------------------------
 #' Create an instance of the [\code{\linkS4class{ClusterInit}}] class using new/initialize.
 #'
 #' Initialization method. Used internally in the `rtkpp' package.
@@ -140,7 +142,7 @@ setMethod(
   }
 )
 
-###################################################################################
+#-----------------------------------------------------------------------
 # @name print
 # @docType methods
 #' @aliases print-init,ClusterInit,ClusterInit-method
@@ -162,7 +164,7 @@ setMethod(
   }
 )
 
-###################################################################################
+#-----------------------------------------------------------------------
 # @name show
 # @docType methods
 #' @rdname show-methods
@@ -182,7 +184,7 @@ setMethod(
   }
 )
 
-###################################################################################
+#-----------------------------------------------------------------------
 # @name [
 # @docType methods
 #' @rdname extract-methods
@@ -204,7 +206,7 @@ setMethod(
   }
 )
 
-###################################################################################
+#-----------------------------------------------------------------------
 #' @name [
 # @docType methods
 #' @rdname extract-methods

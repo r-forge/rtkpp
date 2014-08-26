@@ -37,13 +37,14 @@
 namespace STK
 {
 /* default constructor. */
-IDataManager::IDataManager(): nbVariable_(0), v_missing_() {}
+IDataManager::IDataManager(std::string const& idData): nbVariable_(0), v_missing_(), idData_(idData) {}
 /* copy constructor
  *  @param manager the IDataManager to copy
  **/
 IDataManager::IDataManager( IDataManager const& manager)
             : nbVariable_(manager.nbVariable_)
             , v_missing_(manager.v_missing_)
+            , idData_(manager.idData_)
 {}
 
 } // namespace STK

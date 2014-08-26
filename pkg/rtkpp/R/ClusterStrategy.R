@@ -98,7 +98,7 @@ clusterStrategy <- function( nbTry =1
   new("ClusterStrategy", nbTry =nbTry, nbShortRun =nbShortRun, initMethod =initMethod, shortAlgo =shortAlgo, longAlgo =longAlgo);
 }
 
-###################################################################################
+#-----------------------------------------------------------------------
 #' Constructor of [\code{\linkS4class{ClusterStrategy}}] class
 #'
 #' This class encapsulate the parameters of the strategy of estimation of the rtkpp
@@ -149,7 +149,7 @@ setClass(
 )
 
 
-###################################################################################
+#-----------------------------------------------------------------------
 #' Create an instance of the [\code{\linkS4class{ClusterStrategy}}] class using new/initialize.
 #'
 #' Initialization method. Used internally in the `rtkpp' package.
@@ -184,7 +184,7 @@ setMethod(
   }
 )
 
-###################################################################################
+#-----------------------------------------------------------------------
 # @name print
 # @docType methods
 #' @aliases print print-strategy,ClusterStrategy-method
@@ -218,7 +218,7 @@ setMethod(
   }
 )
 
-###################################################################################
+#-----------------------------------------------------------------------
 # @name show
 # @docType methods
 #' @rdname show-methods
@@ -252,7 +252,7 @@ setMethod(
   }
 )
 
-###################################################################################
+#-----------------------------------------------------------------------
 # @name [
 # @docType methods
 #' @rdname extract-methods
@@ -277,7 +277,7 @@ setMethod(
   }
 )
 
-###################################################################################
+#-----------------------------------------------------------------------
 #' @name [
 # @docType methods
 #' @rdname extract-methods

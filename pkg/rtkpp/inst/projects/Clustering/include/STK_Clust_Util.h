@@ -154,7 +154,7 @@ enum modelState
   initialization_, ///< The parameters of the model have been initialized
   shortRun_,      ///< A short run has been done
   longRun_,   ///< a long run has been done
-  finalized_ ///< the model is finalized
+  modelFinalized_ ///< the model is finalized
 };
 
 /** @ingroup Clustering

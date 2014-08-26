@@ -11,33 +11,24 @@ Authors@R: c(person("Serge", "Iovleff", role=c("aut","cre"),
     person("Parmeet", "Bhatia", role="ctb",
     email="bhatia.parmeet@gmail.com"))
 Copyright: Authors, and specifically inst/COPYRIGHTS for the stk++
-    library
+        library
 Maintainer: Serge Iovleff <serge.iovleff@stkpp.org>
 Description: R and stk++ integration using Rcpp.
 License: LGPL (>= 2) | file LICENSE
 BugReports: https://www.stkpp.org
 LazyLoad: yes
-Depends:
-    R (>= 3.0.2),
-    Rcpp
+Depends: R (>= 3.0.2), Rcpp
 LinkingTo: Rcpp
-Imports:
-    methods
+Imports: methods
 URL: http://www.stkpp.org
 NeedsCompilation: yes
 SystemRequirements: GNU make
-Collate:
-    'ClusterAlgo.R'
-    'ClusterModels.R'
-    'ClusterDiagGaussianModels.R'
-    'ClusterInit.R'
-    'ClusterStrategy.R'
-    'clusterDiagGaussian.R'
-    'clusterModelNames.R'
-    'clusterPlot.R'
-    'global.R'
-    'rtkppFlags.R'
-Packaged: 2014-08-25 15:28:22 UTC; iovleff
+Collate: 'ClusterAlgo.R' 'ClusterModels.R'
+        'ClusterDiagGaussianModels.R' 'ClusterInit.R'
+        'ClusterStrategy.R' 'clusterDiagGaussian.R'
+        'clusterModelNames.R' 'clusterPlot.R' 'global.R' 'rtkpp.R'
+        'rtkppFlags.R'
+Packaged: 2014-08-26 18:22:55 UTC; iovleff
 Author: Serge Iovleff [aut, cre],
-    Vincent Kubicki [ctb],
-    Parmeet Bhatia [ctb]
+  Vincent Kubicki [ctb],
+  Parmeet Bhatia [ctb]

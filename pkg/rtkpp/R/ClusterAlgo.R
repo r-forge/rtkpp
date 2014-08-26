@@ -22,7 +22,7 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
-#' Create an instance of the [\code{\linkS4class{ClusterAlgo}}] class 
+#' Create an instance of the [\code{\linkS4class{ClusterAlgo}}] class
 #'
 #' There is three algorithms and two stopping rules possibles for an algorithm.
 #' \itemize{
@@ -40,10 +40,10 @@
 #'        \item Default values are \eqn{200} \code{nbIteration} of \code{EM}
 #'         with an \code{epsilon} value of \eqn{1.e-8}.
 #' }
-#' 
+#'
 #' @param algo character string with the estimation algorithm.
 #' Possible values are "EM", "SEM", "CEM". Default value is "EM".
-#' @param nbIteration Integer defining the maximal number of iterations. Default value is 200. 
+#' @param nbIteration Integer defining the maximal number of iterations. Default value is 200.
 #' @param epsilon Real defining the epsilon value for the algorithm. Note that
 #' epsilon is not used by the SEM algorithm. Default value is 1.e-8.
 #'
@@ -59,7 +59,7 @@
 clusterAlgo <- function( algo="EM", nbIteration=200, epsilon=1e-08)
 { new("ClusterAlgo", algo=algo, nbIteration=nbIteration, epsilon=epsilon)}
 
-###################################################################################
+#-----------------------------------------------------------------------
 #' @title [\code{\linkS4class{ClusterAlgo}}] class for Cluster algorithms.
 #'
 #' @description
@@ -109,11 +109,11 @@ setClass (
   }
 )
 
-###################################################################################
+#-----------------------------------------------------------------------
 #' Initialize an instance of the [\code{\linkS4class{ClusterAlgo}}] class.
-#' 
+#'
 #' Initialization method. Used internally in the `rtkpp' package.
-#' 
+#'
 # @seealso \code{\link{initialize}}
 #' @keywords internal
 # @rdname initialize-methods
@@ -132,12 +132,12 @@ setMethod(
       if(missing(nbIteration)){ .Object@nbIteration<-200 }
       else{.Object@nbIteration<-nbIteration}
       # validate
-      validObject(.Object)        
+      validObject(.Object)
       return(.Object)
     }
 )
 
-###################################################################################
+#-----------------------------------------------------------------------
 # @name print
 # @docType methods
 #' @rdname print-methods
@@ -155,7 +155,7 @@ setMethod(
     }
 )
 
-###################################################################################
+#-----------------------------------------------------------------------
 # @name show
 # @docType methods
 #' @rdname show-methods
@@ -173,13 +173,13 @@ setMethod(
     }
 )
 
-###################################################################################
+#-----------------------------------------------------------------------
 # @name [
 # @docType methods
 #' @rdname extract-methods
 #' @aliases [,ClusterAlgo-method
 setMethod(
-    f="[", 
+    f="[",
     signature(x = "ClusterAlgo"),
     definition=function(x, i, j, drop){
       if ( missing(j) ){
@@ -195,14 +195,14 @@ setMethod(
     }
 )
 
-###################################################################################
+#-----------------------------------------------------------------------
 #' @name [
 # @docType methods
 #' @rdname extract-methods
 #' @aliases [<-,ClusterAlgo-method
 setReplaceMethod(
-    f="[", 
-    signature(x = "ClusterAlgo"), 
+    f="[",
+    signature(x = "ClusterAlgo"),
     definition=function(x,i,j,value){
       if ( missing(j) )
       {

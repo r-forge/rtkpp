@@ -176,17 +176,18 @@ class MixtureComposer : public IMixtureComposer
      *  @param data the structure which will receive the data
      **/
     template<class ParametersManager, class Array>
-    void getParameters(ParametersManager const& manager, String const& idData, Array& data)
+    void getParameters(ParametersManager const& manager, String const& idData, Array& data) const
     { manager.getParameters(getMixture(idData), idData, data);}
 
     /** Utility method allowing to get the missing values imputed by the
-     * estimation process.
+     *  estimation process.
      *  @param manager the manager with the responsibility of the missing values
+     *  @param idData the Id of the data we want the missing values
      *  @param data the structure which will receive the data
      **/
     template<class MissingValuesManager, class Array>
-    void getMissingValue(MissingValuesManager const& manager, Array& data)
-    { manager.getMissingValues(data);}
+    void getMissingValues(MissingValuesManager const& manager, String const& idData, Array& data) const
+    { manager.getMissingValues(idData, data);}
 
   protected:
     /** @brief Create the composer using existing data handler and mixtures.

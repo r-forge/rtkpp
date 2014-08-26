@@ -36,6 +36,7 @@
 #define STK_IDATAMANAGER_H
 
 #include <vector>
+#include <string>
 
 namespace STK
 {
@@ -53,7 +54,7 @@ class IDataManager
 {
   protected:
     /** default constructor. */
-    IDataManager();
+    IDataManager(std::string const& idData);
     /** copy constructor
      *  @param manager the IDataManager to copy
      **/
@@ -62,6 +63,8 @@ class IDataManager
   public:
     /** destructor */
     inline virtual ~IDataManager() {}
+    /** return the Id of the mixture */
+    inline std::string const& idData() const { return idData_;}
     /** getter. @return a the number of variables (the number of columns of the data)  */
     inline int nbVariable() const { return nbVariable_;}
     /** getter. @return the coordinates of the missing values in the data set */
@@ -76,12 +79,13 @@ class IDataManager
     std::vector<std::pair<int,int> > v_missing_;
 
   private:
+    /** Id data of the mixture */
+    std::string idData_;
     /** utility function for lookup the data set and find missing values
      *  coordinates. Store the result in v_missing_ */
     virtual void findMissing() =0;
     /** utility function for lookup the data set and remove the missing values.*/
     virtual void removeMissing() =0;
-
 };
 
 } // namespace STK

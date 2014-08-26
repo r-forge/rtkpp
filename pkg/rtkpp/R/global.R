@@ -38,7 +38,7 @@
 #'
 NULL
 
-###################################################################################
+#-----------------------------------------------------------------------
 #' Print a rtkpp class to standard output.
 #'
 #' @param x a rtkpp object: a \code{\linkS4class{ClusterStrategy}},
@@ -66,7 +66,7 @@ NULL
 #'
 NULL
 
-###################################################################################
+#-----------------------------------------------------------------------
 #' Show description of a rtkpp class to standard output.
 #'
 #' @param object a rtkpp object: a \code{\linkS4class{ClusterStrategy}},

@@ -37,11 +37,11 @@ There is three ways to initialize the parameters:
 }
 A few iteration of an algorithm [\code{\link{clusterAlgo}}] are then performed.
 It is strongly recommended to use a few number of iterations of the \code{SEM}
-or \code{CEM} algorithms after initialization. This allow to detect "bad" initialization
-starting point of the estimation algorithm.
+or \code{CEM} algorithms after initialization. This allow to detect "bad"
+initialization starting point of the estimation algorithm.
 
-These two stages are repeated until \code{nbInitRun} is reached. The initial point with the best
-log-likelihood is conserved as the initial starting point.
+These two stages are repeated until \code{nbInitRun} is reached. The initial
+point with the best log-likelihood is conserved as the initial starting point.
 }
 \examples{
 clusterInit(method = "class", nbInitRun=1, algo="CEM",nbIteration=50, epsilon=0.00001)

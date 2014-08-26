@@ -28,17 +28,21 @@
 #'
 #' A Cluster model is a model of the form
 #' \deqn{
-#'   f({x}|\boldsymbol{\theta}) \\
-#'     \sum_{k=1}^K p_k f({x};\boldsymbol{\lambda}_k,\boldsymbol{\alpha}) \\
+#'   f({x}|\boldsymbol{\theta})
+#'     \sum_{k=1}^K p_k h({x};\boldsymbol{\lambda}_k,\boldsymbol{\alpha})
 #'    \quad {x} \in J.
 #' }
+#'where h can be either a pdf or a discrete probability.
 #'
-#' @slot data \code{\link{matrix}} with the data set to cluster.
+#' @slot data      \code{\link{matrix}} of size \eqn{n \times p} with the data set to cluster.
+#' If the original data set had NA values, they have been estimated in the estimation process.
 #' @slot nbCluster Integer with the number of cluster of the model.
-#' @slot pk        Vector with the proportions of each mixture.
-#' @slot tik       Matrix with the posterior probability of the ith individual to belong to kth cluster.
-#' @slot fi        Vector with the mixture probabilities of the individuals.
-#' @slot zi        Vector of integer with the class label of the individuals.
+#' @slot pk        Vector of size K with the proportions of each mixture.
+#' @slot tik       Matrix of size \eqn{n \times K} with the posterior probability of
+#' the ith individual to belong to kth cluster.
+#' @slot fi        Vector of size n with the likelihood of the ith individuals.
+#' @slot zi        Vector of integer of size n  with the attributed class label of the individuals.
+#' @slot missings   \code{\link{matrix}} of two columns with the indexes (i,j) of the missing values.
 #' @slot lnLikelihood Real given the ln-liklihood of the Cluster model.
 #' @slot criterion Real given the value of the AIC or BIC criterion.
 #' @slot modelName mixture model name.
@@ -49,15 +53,20 @@
 #' @author Serge Iovleff
 #'
 #' @name IClusterModel
-#' @rdname IClusterModel-class
+#' @rdname ClusterModels-class
 #' @aliases IClusterModel-class
 #' @exportClass IClusterModel
 setClass(
   Class="IClusterModel",
-  representation( data = "matrix", nbCluster = "numeric"
-                , pk = "numeric", tik = "matrix"
-                , fi = "numeric", zi = "integer"
-                , lnLikelihood = "numeric", criterion = "numeric"
+  representation( data = "matrix"
+                , nbCluster = "numeric"
+                , pk = "numeric"
+                , tik = "matrix"
+                , fi = "numeric"
+                , zi = "integer"
+                , missings = "matrix"
+                , lnLikelihood = "numeric"
+                , criterion = "numeric"
                 , modelName = "character"
                 , "VIRTUAL"
                 ),
@@ -67,6 +76,7 @@ setClass(
                 , tik = matrix(nrow=0, ncol=0)
                 , fi  = vector("numeric")
                 , zi  = vector("integer")
+                , missings = matrix(nrow=0, ncol=2)
                 , lnLikelihood = -Inf
                 , criterion = -Inf
                 , modelName = character(1)
@@ -74,27 +84,28 @@ setClass(
   # validity function
   validity=function(object)
   {
-    nbSample = nrow(object@data)
+    nbSample  = nrow(object@data)
+    nbCluster = object@nbCluster
     # check nbCluster dimensions
-    if (round(object@nbCluster)!=object@nbCluster)
+    if (round(nbCluster)!=object@nbCluster)
     {stop("nbCluster must be an integer.")}
-    if( object@nbCluster < 2 )
+    if( nbCluster < 2 )
     {  stop("nbCluster must be greater than 1.")}
-    if (length(object@pk)!=object@nbCluster)
+    if (length(object@pk) != nbCluster)
     {stop("pk must have length nbCluster.")}
-    if (ncol(object@tik)!=object@nbCluster)
+    if (ncol(object@tik) != nbCluster)
     {stop("tik must have nbCluster columns.")}
-    if (nrow(object@tik)!=nbSample)
+    if (nrow(object@tik) != nbSample)
     {stop("tik must have nbSample rows.")}
-    if (length(object@fi)!=nbSample)
+    if (length(object@fi) != nbSample)
     {stop("fi must have nbSample size.")}
-    if (length(object@zi)!=nbSample)
+    if (length(object@zi) != nbSample)
     {stop("zi must have nbSample size.")}
     return(TRUE)
   }
 )
 
-###################################################################################
+#-----------------------------------------------------------------------
 #' Initialize an instance of the [\code{\linkS4class{IClusterModel}}] class.
 #'
 #' Initialization method. Used internally in the `rtkpp' package.
@@ -128,7 +139,7 @@ setMethod(
 )
 
 
-###################################################################################
+#-----------------------------------------------------------------------
 #' Definition of the [\code{\linkS4class{ClusterGammaModel}}] class
 #'
 #' This class defines a gamma mixture Model. Inherits from the
@@ -179,7 +190,7 @@ setClass(
     }
 )
 
-###################################################################################
+#-----------------------------------------------------------------------
 #' Initialize an instance of the [\code{\linkS4class{ClusterGammaModel}}] class.
 #'
 #' Initialization method. Used internally in the `rtkpp' package.
@@ -204,7 +215,7 @@ setMethod(
     }
 )
 
-###################################################################################
+#-----------------------------------------------------------------------
 #' Definition of the [\code{\linkS4class{ClusterCategoricalModel}}] class
 #'
 #' This class defines a categorical mixture Model. Inherits from the
@@ -252,7 +263,7 @@ setClass(
     }
 )
 
-###################################################################################
+#-----------------------------------------------------------------------
 #' Initialize an instance of the [\code{\linkS4class{ClusterCategoricalModel}}] class.
 #'
 #' Initialization method. Used internally in the `rtkpp' package.
@@ -298,6 +309,7 @@ setMethod(
             "tik"={return(x@tik)},
             "fi"={return(x@fi)},
             "zi"={return(x@zi)},
+            "missing"={return(x@missing)},
             "lnLikelihood"={return(x@lnLikelihood)},
             "criterion"={return(x@criterion)},
             "modelName"={return(x@modelName)},
@@ -309,7 +321,7 @@ setMethod(
     }
 )
 
-###################################################################################
+#-----------------------------------------------------------------------
 #' @rdname print-methods
 #' @aliases print print,IClusterModel-method
 #'
@@ -325,7 +337,7 @@ setMethod(
   }
 )
 
-###################################################################################
+#-----------------------------------------------------------------------
 #' @rdname print-methods
 #' @aliases print print,IClusterModel-method
 #'

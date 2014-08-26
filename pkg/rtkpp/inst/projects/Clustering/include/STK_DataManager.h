@@ -151,16 +151,17 @@ template<int Id, class Data>
 class DataManager : public IDataManager
 {
   public:
+    typedef std::vector<std::pair<int,int> >::const_iterator ConstIterator;
     // type of the data
     typedef typename Data::Type Type;
 
     /** default constructor. */
-    inline DataManager() : IDataManager(), m_dataij_() {}
+    inline DataManager(std::string const& idData) : IDataManager(idData), m_dataij_() {}
     /** copy constructor (Warning: will copy the data set)
      *  @param data the DataManager to copy
      **/
-    DataManager( DataManager const& data)
-               : IDataManager(data), m_dataij_(data.m_dataij_)
+    DataManager( DataManager const& manager)
+               : IDataManager(manager), m_dataij_(manager.m_dataij_)
     {}
     /** getter. @return a constant reference on the data set */
     Data const& m_dataij() const { return m_dataij_;}
@@ -178,8 +179,7 @@ class DataManager : public IDataManager
        for (int i=m_dataij_.beginRows(); i< m_dataij_.endRows(); ++i)
        {
          if (Arithmetic<Type>::isNA(m_dataij_(i,j)))
-         { v_missing_.push_back(std::pair<int,int>(i,j));
-         }
+         { v_missing_.push_back(std::pair<int,int>(i,j));}
        }
      }
 #ifdef STK_MIXTURE_VERBOSE
@@ -189,7 +189,6 @@ class DataManager : public IDataManager
    /** utility function for lookup the data set and remove the missing values.*/
    virtual void removeMissing()
    {
-     typedef std::vector<std::pair<int,int> >::const_iterator ConstIterator;
      Type value = Type();
      int j, old_j = UnknownSize;
      for(ConstIterator it = v_missing_.begin(); it!= v_missing_.end(); ++it)
@@ -208,6 +207,20 @@ class DataManager : public IDataManager
     **/
    Type safeValue( int j) const
    { return hidden::SafeValueImpl<Id, Data>::run(m_dataij_, j);}
+   /** get the (Real) missing values of a data set.
+    *  @param idData Id name of the data set attached to the mixture
+    *  @param data the array to return with the missing values
+    **/
+   template<typename Type_>
+   void getMissingValues( std::vector< std::pair<std::pair<int,int>, Type_ > >& data) const
+   {
+     data.resize(v_missing_.size());
+     for(size_t i = 0; i< v_missing_.size(); ++i)
+     {
+       data[i].first  = v_missing_[i];
+       data[i].second = m_dataij_(v_missing_[i].first, v_missing_[i].second);
+     }
+   }
 };
 
 } // namespace STK

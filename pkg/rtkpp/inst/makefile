@@ -38,7 +38,7 @@ RTKPP_BIN_DIR = ./bin/
 RTKPP_LIB_DIR = ./lib/
 
 # check if we are using symoblic paths
-ifneq ($(patsubst $(PROJECTS_DIR)STKernel/../%,%,$(wildcard $(PROJECTS_DIR)STKernel/../*)), $(patsubst $(PROJECTS_DIR)%,%,$(wildcard $(PROJECTS_DIR)*)) )
+ifneq ($(patsubst $(PROJECTS_DIR)STKernel/../%,%,$(wildcard $(PROJECTS_DIR)STKernel/../Rtk*)), $(patsubst $(PROJECTS_DIR)%,%,$(wildcard $(PROJECTS_DIR)Rtk*)) )
 # We are using symoblic paths for the STKernel project, we use full path in this case
 MAKEVARS = $(CURDIR)/makevars
 BIN_DIR = $(CURDIR)/bin/
@@ -62,8 +62,8 @@ all: echo lib
 # use to debug
 echo:
 	@echo $(BIN_DIR)
-	@echo $(patsubst $(PROJECTS_DIR)STKernel/../%,%,$(wildcard $(PROJECTS_DIR)STKernel/../*))
-	@echo $(patsubst $(PROJECTS_DIR)%,%,$(wildcard $(PROJECTS_DIR)*))
+	@echo $(patsubst $(PROJECTS_DIR)STKernel/../%,%,$(wildcard $(PROJECTS_DIR)STKernel/../Rtk*))
+	@echo $(patsubst $(PROJECTS_DIR)%,%,$(wildcard $(PROJECTS_DIR)Rtk*))
 	@echo $(CXXFLAGS)
 	@echo $(CXXPICFLAGS)
 	@echo $(STK_CXXFLAGS)

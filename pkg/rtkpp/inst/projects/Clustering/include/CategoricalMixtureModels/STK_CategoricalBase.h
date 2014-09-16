@@ -90,7 +90,7 @@ class CategoricalBase : public IMixtureModel<Derived >
     void writeParameters(ostream& os) const
     {
       Array2D<Real> proba(modalities_, p_data()->cols());
-      for (int k= baseIdx; k <= components().lastIdx(); ++k)
+      for (int k= baseIdx; k < components().end(); ++k)
       {
         // store proba values in an array for a nice output
         for (int j= baseIdx;  j <= proba.lastIdxCols(); ++j)

@@ -29,17 +29,18 @@
  **/
 
 /** @file STK_Gamma_ajk_bj.h
- *  @brief In this file we define the Gamma_ajk_bj and Gamma_p_ajk_bj mixture classes.
+ *  @brief In this file we define the Gamma_pk_ajk_bj and Gamma_p_ajk_bj mixture models.
  **/
 
 #ifndef STK_GAMMA_AJK_BJ_H
 #define STK_GAMMA_AJK_BJ_H
 
 #include "STK_GammaBase.h"
-#include "STK_Gamma_ajk_bjImpl.h"
 
 #include "../../../STatistiK/include/STK_Law_Exponential.h"
 
+#define MAXITER 400
+#define TOL 1e-8
 
 namespace STK
 {
@@ -84,6 +85,8 @@ class Gamma_ajk_bj : public GammaBase<Gamma_ajk_bj<Array> >
     using Base::p_data;
     using Base::p_param;
     using Base::components;
+    using Base::meanjk;
+    using Base::variancejk;
 
     /** default constructor
      * @param nbCluster number of cluster in the model
@@ -106,20 +109,20 @@ class Gamma_ajk_bj : public GammaBase<Gamma_ajk_bj<Array> >
       Base::initializeModel();
       scale_.resize(this->nbVariable());
       scale_ = 1.;
-      for (int k= baseIdx; k <= components().lastIdx(); ++k)
+      for (int k= baseIdx; k < components().end(); ++k)
       { p_param(k)->p_scale_ = &scale_;}
     }
     /** use the default static method initializeStep() for a first initialization
      *  of the parameters using tik values.
      **/
-    void initializeStep();
+    inline bool initializeStep() { return mStep();}
     /** Initialize randomly the parameters of the Gaussian mixture. The centers
      *  will be selected randomly among the data set and the standard-deviation
      *  will be set to 1.
      */
     void randomInit();
     /** Compute the weighted mean and the common variance. */
-    void mStep();
+    bool mStep();
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable()+ this->nbVariable();}
@@ -129,83 +132,100 @@ class Gamma_ajk_bj : public GammaBase<Gamma_ajk_bj<Array> >
     Array2DPoint<Real> scale_;
 };
 
-/* Initialize the parameters using mStep. */
-template<class Array>
-void Gamma_ajk_bj<Array>::initializeStep()
-{
-  try
-  { this->initialMoments();}
-  catch (Clust::exceptions const & e)
-  { throw Clust::initializeStepFail_;}
-  // estimate ajk and bj
-  for (int k= baseIdx; k <= p_tik()->lastIdxCols(); ++k)
-  {
-    for (int j=p_data()->beginCols(); j<=p_data()->lastIdxCols(); ++j)
-    {
-      // set a values
-      Real a = p_param(k)->mean_[j]*p_param(k)->mean_[j]/p_param(k)->variance_[j];
-      if ((a<=0)||Arithmetic<Real>::isNA(a)) throw Clust::initializeStepFail_;
-      p_param(k)->shape_[j] = a;
-    }
-  }
-  for (int j=scale_.begin(); j<=scale_.lastIdx(); ++j)
-  {
-    Array2DPoint<Real> meank(p_tik()->cols()), ak(p_tik()->cols()), tk(p_tik()->cols());
-    for (int k= baseIdx; k <= p_tik()->lastIdxCols(); ++k)
-    {
-      tk[k]    = p_tik()->col(k).sum();
-      ak[k]    = p_param(k)->shape_[j];
-      meank[k] = p_param(k)->mean_[j];
-    }
-    Real b = tk.dot(meank)/tk.dot(ak);
-    if ((b<=0)||Arithmetic<Real>::isNA(b)) throw Clust::initializeStepFail_;
-    scale_[j] = b;
-  }
-}
-
-/* Initialize randomly the parameters of the Gaussian mixture. The centers
+/* Initialize randomly the parameters of the gamma mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation
  *  will be set to 1.
  */
 template<class Array>
 void Gamma_ajk_bj<Array>::randomInit()
 {
-  for (int j=p_data()->beginCols(); j<=p_data()->lastIdxCols(); ++j)
+  for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
   {
-    Real mean = p_data()->col(j).mean();
-    if ((mean <=0.) || (Arithmetic<Real>::isNA(mean))) throw Clust::randomInitFail_;
-    Real variance = p_data()->col(j).variance();
-    if ((variance <=0.) || (Arithmetic<Real>::isNA(variance))) throw Clust::randomInitFail_;
-    // random shape for each cluster
-    for (int k= baseIdx; k <= components().lastIdx(); ++k)
-    { p_param(k)->shape_[j] = STK::Law::Exponential::rand(mean*mean/variance);}
-    // random scale
-    scale_[j] = STK::Law::Exponential::rand(variance/mean);
+    Real value =0.;
+    for (int k= baseIdx; k < components().end(); ++k)
+    {
+      Real mean = meanjk(j,k), variance = variancejk(j,k);
+      p_param(k)->shape_[j] = Law::Exponential::rand(mean*mean/variance);
+      value += p_param(k)->tk_ * variance/mean;
+    }
+    scale_[j] = Law::Exponential::rand(value/this->nbSample());
   }
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Gamma_ajk_bj<Array>::randomInit done\n");
-  for (int k= components().begin(); k < components().end(); ++k)
-  {
-    stk_cout << _T("Component no ") << k << _T("\n");
-    stk_cout << p_param(k)->shape_;
-    stk_cout << scale_;
-  }
+  this->writeParameters(stk_cout);
 #endif
 }
 
 /* Compute the weighted mean and the common variance. */
 template<class Array>
-void Gamma_ajk_bj<Array>::mStep()
+bool Gamma_ajk_bj<Array>::mStep()
 {
-  try
-  { this->moments();}
-  catch (Clust::exceptions const & e)
-  { throw Clust::mStepFail_;}
+  if (!this->moments()) { return false;}
+  // start estimations of the ajk and bj
+  Real qvalue = this->qValue();
+  int iter;
+  for(iter=0; iter<MAXITER; ++iter)
+  {
+    for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)
+    {
+      Real num=0., den = 0.;
+      // compute ajk
+      for (int k= baseIdx; k < p_tik()->endCols(); ++k)
+      {
+        // moment estimate and oldest value
+        Real x0 = this->meanjk(j,k)*this->meanjk(j,k)/this->variancejk(j,k);
+        Real x1 = p_param(k)->shape_[j];
+        if ((x0 <=0.) || !Arithmetic<Real>::isFinite(x0)) return false;
+        // compute shape
+        hidden::invPsi f(p_param(k)->meanLog_[j] - std::log(scale_[j]));
+        Real a =  Algo::findZero(f, x0, x1, TOL);
 
-  MixtureModelImpl<  Array, Gamma_ajk_bj_Parameters >::mStep(components(), p_tik(), p_data());
+        if (!Arithmetic<Real>::isFinite(a))
+        {
+          p_param(k)->shape_[j] = x0; // use moment estimate
+#ifdef STK_MIXTURE_DEBUG
+          stk_cout << _T("ML estimation failed in Gamma_ajk_bj::mStep()\n");
+          stk_cout << "x0 =" << x0 << _T("\n";);
+          stk_cout << "f(x0) =" << f(x0) << _T("\n";);
+          stk_cout << "x1 =" << x1 << _T("\n";);
+          stk_cout << "f(x1) =" << f(x1) << _T("\n";);
+#endif
+        }
+        else { p_param(k)->shape_[j] = a;}
+        num += p_param(k)->mean_[j]  * p_param(k)->tk_;
+        den += p_param(k)->shape_[j] * p_param(k)->tk_;
+      }
+      // compute b_j
+      Real b = num/den;
+      // divergence
+      if (!Arithmetic<Real>::isFinite(b)) { return false;}
+      scale_[j] = b;
+    }
+    // check convergence
+    Real value = this->qValue();
+#ifdef STK_MIXTURE_DEBUG
+    if (value < qvalue)
+    {
+      stk_cout << _T("In Gamma_ajk_bj::mStep(): mStep diverge\n");
+      stk_cout << _T("New value =") << value << _T(", qvalue =") << qvalue << _T("\n");
+    }
+#endif
+    if ((value - qvalue) < TOL) break;
+    qvalue = value;
+  }
+#ifdef STK_MIXTURE_DEBUG
+  if (iter == MAXITER)
+  {
+    stk_cout << _T("In Gamma_ajk_bj::mStep(): mStep did not converge\n");
+    stk_cout << _T("qvalue =") << qvalue << _T("\n");
+  }
+#endif
+  return true;
 }
 
-
 }  // namespace STK
+
+#undef MAXITER
+#undef TOL
 
 #endif /* STK_GAMMA_AJK_BJ_H */

@@ -64,7 +64,7 @@ struct MixtureTraits< Categorical_pjk<_Array> >
  *  the most general diagonal Categorical model and have a probability
  *  function of the form
  * \f[
- *    f(\mathbf{x}=(l_1,\ldots,l_d)|\theta)
+ *    P(\mathbf{x}=(l_1,\ldots,l_d)|\theta)
  *      = \sum_{k=1}^K p_k \prod_{j=1}^d p_{kl_j}^j.
  * \f]
  **/
@@ -94,11 +94,11 @@ class Categorical_pjk : public CategoricalBase<Categorical_pjk<Array> >
     /** destructor */
     ~Categorical_pjk() {}
     /** Compute the initial weighted probabilities of the mixture */
-    void initializeStep();
+    bool initializeStep();
     /** Initialize randomly the parameters of the Categorical mixture. */
     void randomInit();
     /** Compute the weighted probabilities. */
-    void mStep();
+    bool mStep();
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable()*(this->modalities_.size()-1);}
@@ -110,8 +110,8 @@ class Categorical_pjk : public CategoricalBase<Categorical_pjk<Array> >
 
 /* Initialize the parameters using mStep. */
 template<class Array>
-void Categorical_pjk<Array>::initializeStep()
-{mStep();}
+bool Categorical_pjk<Array>::initializeStep()
+{  return mStep();}
 
 /* Initialize randomly the parameters of the Categorical mixture.
  */
@@ -131,7 +131,7 @@ void Categorical_pjk<Array>::randomInit()
 
 /* Compute the modalities probabilities */
 template<class Array>
-void Categorical_pjk<Array>::mStep()
+bool Categorical_pjk<Array>::mStep()
 {
   for (int k = baseIdx; k < p_tik()->endCols(); ++k)
   {
@@ -140,9 +140,12 @@ void Categorical_pjk<Array>::mStep()
       for (int i = p_tik()->beginRows(); i < p_tik()->endRows(); ++i)
       { p_param(k)->proba_[j][(*p_data())(i, j)] += (*p_tik())(i, k);}
       // normalize the probabilities
-      p_param(k)->proba_[j] /=  p_param(k)->proba_[j].sum();
+      Real sum = p_param(k)->proba_[j].sum();
+      if (sum<=0.) return false;
+      p_param(k)->proba_[j] /= sum;
     }
   }
+  return true;
 }
 
 /** get the parameters of the model

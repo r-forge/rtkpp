@@ -29,7 +29,7 @@
  **/
 
 /** @file STK_Gamma_ajk_bjk.h
- *  @brief In this file we define the Gamma_ajk_bjk and Gamma_p_ajk_bjk models.
+ *  @brief In this file we define the Gamma_pk_ajk_bjk and Gamma_p_ajk_bjk models.
  **/
 
 #ifndef STK_GAMMA_AJK_BJK_H
@@ -39,15 +39,13 @@
 
 #include "../../../STatistiK/include/STK_Law_Exponential.h"
 
-#include "STK_Gamma_ajk_bjkImpl.h"
-
 namespace STK
 {
 template<class Array>class Gamma_ajk_bjk;
 
 namespace Clust
 {
-/** @ingroup hidden
+/** @ingroup Clustering
  * Traits class for the Gamma_ajk_bjk traits policy
  **/
 template<class _Array>
@@ -60,7 +58,7 @@ struct MixtureTraits< Gamma_ajk_bjk<_Array> >
   typedef Array2D<Real>        Param;
 };
 
-} // namespace hidden
+} // namespace Clust
 
 /** @ingroup Clustering
  *  Gamma_ajk_bjk is a mixture model of the following form
@@ -83,6 +81,8 @@ class Gamma_ajk_bjk : public GammaBase< Gamma_ajk_bjk<Array> >
     using Base::p_data;
     using Base::p_param;
     using Base::components;
+    using Base::meanjk;
+    using Base::variancejk;
 
     /** default constructor
      * @param nbCluster number of cluster in the model
@@ -94,84 +94,80 @@ class Gamma_ajk_bjk : public GammaBase< Gamma_ajk_bjk<Array> >
     inline Gamma_ajk_bjk( Gamma_ajk_bjk const& model) : Base(model) {}
     /** destructor */
     inline ~Gamma_ajk_bjk() {}
-    /** initialize shape and scale parameters using weighted moment estimators.*/
-    void initializeStep();
-    /** Initialize randomly the parameters of the Gaussian mixture. The centers
-     *  will be selected randomly among the data set and the standard-deviation
-     *  will be set to 1.
+    /** initialize shape and scale parameters using weighted moment estimates.*/
+    inline bool initializeStep() { return mStep();}
+    /** Initialize randomly the parameters of the Gamma mixture. The shape
+     *  will be selected randomly using an exponential of parameter mean^2/variance
+     *  and the scale will be selected randomly using an exponential of parameter
+     *  variance/mean.
      */
     void randomInit();
-    /** Compute the weighted mean and the common variance. */
-    void mStep();
+    /** Compute the mStep. */
+    bool mStep();
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return 2*this->nbCluster()*this->nbVariable();}
 };
 
-/* Initialize the parameters using moment estimators. */
-template<class Array>
-void Gamma_ajk_bjk<Array>::initializeStep()
-{
-    try
-    { this->initialMoments();}
-    catch (Clust::exceptions const & e)
-    { throw e;}
-    // estimate a and b
-    for (int k= baseIdx; k <= p_tik()->lastIdxCols(); ++k)
-    {
-      for (int j=p_data()->beginCols(); j<=p_data()->lastIdxCols(); ++j)
-      {
-        Real a = p_param(k)->mean_[j]*p_param(k)->mean_[j]/p_param(k)->variance_[j];
-        if ((a<=0)||Arithmetic<Real>::isNA(a)) throw Clust::initializeStepFail_;
-
-        p_param(k)->shape_[j] = a;
-        p_param(k)->scale_[j] = p_param(k)->mean_[j]/a;
-      }
-    }
-}
-
-/* Initialize randomly the parameters of the Gaussian mixture. The centers
+/* Initialize randomly the parameters of the gamma mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation
  *  will be set to 1.
  */
 template<class Array>
 void Gamma_ajk_bjk<Array>::randomInit()
 {
-  for (int j=p_data()->beginCols(); j<=p_data()->lastIdxCols(); ++j)
+  for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
   {
-    Real mean = p_data()->col(j).mean();
-    Real variance = p_data()->col(j).variance();
-    for (int k= baseIdx; k <= components().lastIdx(); ++k)
+    for (int k= baseIdx; k < components().end(); ++k)
     {
-      // generate values
-      Real a = STK::Law::Exponential::rand(mean*mean/variance);
-      Real b = STK::Law::Exponential::rand(variance/mean);
-      p_param(k)->shape_[j] = a;
-      p_param(k)->scale_[j] = b;
+      Real mean = meanjk(j,k), variance = variancejk(j,k);
+      p_param(k)->shape_[j] = Law::Exponential::rand(mean*mean/variance);
+      p_param(k)->scale_[j] = Law::Exponential::rand(variance/mean);
     }
   }
 #ifdef STK_MIXTURE_VERY_VERBOSE
-  stk_cout << _T("Gamma_ajk_bjk<Array>::randomInit() done\n");
-  for (int k= baseIdx; k <= components().lastIdx(); ++k)
-  {
-    stk_cout << _T("Component no ") << k << _T("\n");
-    stk_cout << p_param(k)->shape_ << _T("\n");
-    stk_cout << p_param(k)->scale_ << _T("\n");
-  }
+  stk_cout << _T("Gamma_ajk_bjk<Array>::randomInit done\n");
+  this->writeParameters(stk_cout);
 #endif
 }
 
 /* Compute the weighted mean and the common variance. */
 template<class Array>
-void Gamma_ajk_bjk<Array>::mStep()
+bool Gamma_ajk_bjk<Array>::mStep()
 {
-    try
-    { this->moments();}
-    catch (Clust::exceptions const & e)
-    { throw Clust::mStepFail_;}
-    // call mStep implementation
-    MixtureModelImpl<  Array, Gamma_ajk_bjk_Parameters >::mStep(components(), p_tik(), p_data());
+  if (!this->moments()) { return false;}
+  // estimate a and b
+  for (int k= baseIdx; k < p_tik()->endCols(); ++k)
+  {
+    for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
+    {
+      // moment estimate and oldest value
+      Real x0 = meanjk(j,k)*meanjk(j,k)/variancejk(j,k);
+      Real x1 = p_param(k)->shape_[j];
+      if ((x0 <=0.) || (Arithmetic<Real>::isNA(x0))) return false;
+
+      // get shape
+      hidden::invPsiMLog f(p_param(k)->meanLog_[j]-std::log(p_param(k)->mean_[j]));
+      Real a = Algo::findZero(f, x0, x1, 1e-08);
+      if (!Arithmetic<Real>::isFinite(a))
+      {
+#ifdef STK_MIXTURE_DEBUG
+        stk_cout << "ML estimation failed in Gamma_ajk_bjk::mStep()\n";
+        stk_cout << "x0 =" << x0 << _T("\n";);
+        stk_cout << "f(x0) =" << f(x0) << _T("\n";);
+        stk_cout << "x1 =" << x1 << _T("\n";);
+        stk_cout << "f(x1) =" << f(x1) << _T("\n";);
+#endif
+        a = x0; // use moment estimate
+      }
+      // set values
+      p_param(k)->shape_[j] = a;
+      p_param(k)->scale_[j] = p_param(k)->mean_[j]/a;
+    }
+  }
+  return true;
 }
+
 
 }  // namespace STK
 

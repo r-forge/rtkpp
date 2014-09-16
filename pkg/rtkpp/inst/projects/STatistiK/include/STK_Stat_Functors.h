@@ -382,7 +382,7 @@ struct VarianceOp
     { STK_STATICASSERT_ONE_DIMENSION_ONLY(Derived);}
     /** @return the variance of the variable V.
      *  \f[ \hat{\sigma}^2 = \frac{1}{n} \sum_{i=1}^n (V(i)-\hat{\mu})^2. \f]
-     *  @param unbiased @c true if we want an unbiased estimator of the variance,
+     *  @param unbiased @c true if we want an unbiased estimate of the variance,
      *  @c false otherwise
      **/
     inline Type const operator()(bool unbiased) const
@@ -415,7 +415,7 @@ struct VarianceOp
      * If there is no weights, this definition reduces to the usual
      * definition of the variance with factor 1/(n-1).
      *  @param w weights
-     *  @param unbiased @c true if we want an unbiased estimator of the variance,
+     *  @param unbiased @c true if we want an unbiased estimate of the variance,
      *  @c false otherwise
      **/
     template< class Weights>
@@ -460,7 +460,7 @@ struct VarianceSafeOp
     { STK_STATICASSERT_ONE_DIMENSION_ONLY(Derived);}
     /** @return the variance of the variable V discarding all missing values.
      *  \f[ \hat{\sigma}^2 = \frac{1}{n} \sum_{i=1}^n (V(i)-\hat{\mu})^2. \f]
-     *  @param unbiased @c true if we want an unbiased estimator of the variance,
+     *  @param unbiased @c true if we want an unbiased estimate of the variance,
      *  @c false otherwise
      **/
     Type const operator()(bool unbiased) const
@@ -499,7 +499,7 @@ struct VarianceSafeOp
      * If there is no weights, this definition reduces to the usual
      * definition of the variance with factor 1/(n-1).
      *  @param w weights
-     *  @param unbiased @c true if we want an unbiased estimator of the variance,
+     *  @param unbiased @c true if we want an unbiased estimate of the variance,
      *  @c false otherwise
     **/
     template< class Weights>
@@ -554,7 +554,7 @@ struct VarianceWithFixedMeanOp
    *  Algorithms for Computing the Sample Variance: Analysis and Recommendations.
    *  The American Statistician 37, 242-247.
    *  @param mu the fixed mean
-   *  @param unbiased @c true if we want an unbiased estimator of the variance,
+   *  @param unbiased @c true if we want an unbiased estimate of the variance,
    *  @c false otherwise
    **/
     Type const operator()( Type const& mu, bool unbiased) const
@@ -584,7 +584,7 @@ struct VarianceWithFixedMeanOp
      *  \f]
      *  @param w weights
      *  @param mu the mean
-     *  @param unbiased @c true if we want an unbiased estimator of the variance,
+     *  @param unbiased @c true if we want an unbiased estimate of the variance,
      *  @c false otherwise
      **/
     template< class Weights>
@@ -634,7 +634,7 @@ struct VarianceWithFixedMeanSafeOp
      *  Algorithms for Computing the Sample Variance: Analysis and Recommendations.
      *  The American Statistician 37, 242-247.
      *  @param mu the fixed mean
-     *  @param unbiased @c true if we want an unbiased estimator of the variance,
+     *  @param unbiased @c true if we want an unbiased estimate of the variance,
      *  @c false otherwise
      **/
     Type const operator()( Type mu, bool unbiased) const
@@ -670,7 +670,7 @@ struct VarianceWithFixedMeanSafeOp
      *  \f]
      *  @param w weights
      *  @param mu the mean
-     *  @param unbiased @c true if we want an unbiased estimator of the variance,
+     *  @param unbiased @c true if we want an unbiased estimate of the variance,
      *  @c false otherwise
      **/
     template< class Weights>

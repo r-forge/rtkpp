@@ -86,9 +86,23 @@ bool DataHandler::readDataFromCsvFile(std::string const& datafile, std::string d
     if (!addInfo(idData, idModel)) return false;
   }
   // store data and descriptors
-  data_ += rwdata;
+  data_       += rwdata;
   descriptor_ += rwdesc;
   return true;
+}
+
+/* remove the data with the given idData */
+void DataHandler::removeData(std::string const& idData)
+{
+  int rowIdData = descriptor_.beginRows()+1;
+  for (int i = descriptor_.endCols()-1; i >= descriptor_.beginCols(); --i)
+  { if (descriptor_.var(i)[rowIdData] == idData)
+    {
+      data_.eraseColumn(i);
+      descriptor_.eraseColumn(i);
+     }
+  }
+  info_.erase(idData);
 }
 
 /* lookup on the descriptors in order to get the columns of the ReadWriteCsv

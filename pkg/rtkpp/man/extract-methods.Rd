@@ -16,9 +16,9 @@
 
 \S4method{[}{ClusterInit}(x, i, j, drop)
 
-\S4method{[}{IClusterModel}(x, i, j, drop)
-
 \S4method{[}{ClusterStrategy}(x, i, j, drop)
+
+\S4method{[}{IClusterModel}(x, i, j, drop)
 }
 \arguments{
 \item{x}{object from which to extract element(s) or in which to replace element(s).}

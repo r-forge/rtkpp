@@ -68,8 +68,7 @@ namespace STK
  *
  * In this interface we assume there is an underline generative model that will
  * be estimated using either an EM, SEM or CEM algorithm.
- * All mixture parameters: proportions, Tik, Zi and components are accessed by
- * pointer. These parameters are created using the method
+ * All mixture parameters are created using the method
  * @code
  *   void intializeMixtureParameters();
  * @endcode
@@ -80,7 +79,6 @@ namespace STK
  * @code
  *   virtual IMixtureComposer* create() const = 0;
  *   virtual IMixtureComposer* clone() const = 0;
- *   virtual void initializeStep() =0;
  *   virtual bool randomInit() =0;
  *   virtual void mStep() = 0;
  *   virtual Real lnComponentProbability(int i, int k) = 0;
@@ -89,16 +87,19 @@ namespace STK
  * The virtual function that can be re-implemented in derived class for a
  * specific behavior are:
  * @code
- *   virtual void writeParameters(std::ostream& os) const;
+ *   virtual void initializeStep();
  *   virtual void pStep();
- *   virtual void inputationStep();
+ *   virtual void imputationStep();
  *   virtual void samplingStep();
  *   virtual void finalizeStep();
+ *   virtual void writeParameters(std::ostream& os) const;
  * @endcode
  *
- * @note the virtual method @c IMixtureComposer::initializeStep have to be
- * called before any use of the class as it will create/resize the arrays
- * and initialize the constants of the model.
+ * @sa IMixture
+ *
+ * @note the virtual method @c IMixtureComposer::initializeStep is called in all
+ * the initialization method.  Don't forget to called it in the randomInit
+ * implementation.
  */
 class IMixtureComposer : public IStatModelBase
 {
@@ -138,6 +139,18 @@ class IMixtureComposer : public IStatModelBase
     /** @return a pointer on the zi class labels */
     inline CArrayVector<int> const* p_zi() const { return &zi_;};
 
+    /** @return the computed log-likelihood of the i-th sample.
+     *  @param i index of the sample
+     **/
+    Real computeLnLikelihood(int i) const;
+    /** @return the computed likelihood of the i-th sample.
+     *  @param i index of the sample
+     **/
+    inline Real computeLikelihood(int i) const
+    { return std::exp(computeLnLikelihood(i));}
+    /** @return the computed log-likelihood. */
+    Real computeLnLikelihood() const;
+
     /** set the state of the model : should be used by any strategy*/
     inline void setState(Clust::modelState state) { state_ = state;}
 
@@ -171,12 +184,12 @@ class IMixtureComposer : public IStatModelBase
      *  This function can be overloaded in derived class for initialization of
      *  the specific model parameters. It should be called prior to any used of
      *  the class.
-     *  @sa IMixture,MixtureBridge
+     *  @sa IMixture,MixtureBridge,MixtureComposer
      **/
-    virtual void initializeStep() =0;
+    virtual void initializeStep();
 
-    /** Compute proportions using the ML estimator, default implementation. Set
-     *  as virtual in case we impose fixed proportions in derived model.
+    /** Compute proportions using the ML estimates, default implementation. Set
+     *  as virtual in case we impose fixed proportions in derived Composer.
      **/
     virtual void pStep();
     /** @brief Impute the missing values.
@@ -210,11 +223,11 @@ class IMixtureComposer : public IStatModelBase
      *  @return the minimal value of individuals in a class
      **/
     int sStep();
-    /** compute the zi and the lnLikelihodd of the current estimators (pk and paramk)
+    /** compute the zi, the lnLikelihood of the current estimates
      *  and the next value of the tik.
      **/
     void eStep();
-    /** Compute zi using the Map estimator. */
+    /** Compute zi using the Map estimate. */
     void mapStep();
 
   protected:

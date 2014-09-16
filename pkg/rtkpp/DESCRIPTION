@@ -11,34 +11,31 @@ Authors@R: c(person("Serge", "Iovleff", role=c("aut","cre"),
     person("Parmeet", "Bhatia", role="ctb",
     email="bhatia.parmeet@gmail.com"))
 Copyright: Authors, and specifically inst/COPYRIGHTS for the stk++
-    library
+        library
 Maintainer: Serge Iovleff <serge.iovleff@stkpp.org>
 Description: R and stk++ integration using Rcpp.
+    stk++ is a versatile, fast, reliable and elegant collection of C++ classes
+    for statistics, clustering, linear algebra, arrays (with an Eigen-like API),
+    regression, dimension reduction, etc. Some functionalities provided by the
+    library are available in the R environment as R functions.
+ .
+      The rtkpp package includes the header files from the stk++
+    library (currently version 0.8.0). Thus users do not need to
+    install stk++ itself in order to use rtkpp.
 License: LGPL (>= 2) | file LICENSE
 BugReports: https://www.stkpp.org
 LazyLoad: yes
-Depends:
-    R (>= 3.0.2),
-    Rcpp
+Depends: R (>= 3.0.2), Rcpp
 LinkingTo: Rcpp
-Imports:
-    methods
+Imports: methods
 URL: http://www.stkpp.org
 NeedsCompilation: yes
 SystemRequirements: GNU make
-Collate:
-    'ClusterAlgo.R'
-    'ClusterModels.R'
-    'ClusterDiagGaussianModels.R'
-    'ClusterInit.R'
-    'ClusterStrategy.R'
-    'clusterDiagGaussian.R'
-    'clusterModelNames.R'
-    'clusterPlot.R'
-    'global.R'
-    'rtkpp.R'
-    'rtkppFlags.R'
-Packaged: 2014-08-26 18:22:55 UTC; iovleff
+Collate: 'ClusterAlgo.R' 'ClusterInit.R' 'ClusterStrategy.R'
+        'IClusterModel.R' 'ClusterCategorical.R'
+        'ClusterDiagGaussian.R' 'ClusterGamma.R' 'clusterModelNames.R'
+        'clusterPlot.R' 'global.R' 'rtkpp.R' 'rtkppFlags.R'
+Packaged: 2014-09-16 22:12:40 UTC; iovleff
 Author: Serge Iovleff [aut, cre],
-    Vincent Kubicki [ctb],
-    Parmeet Bhatia [ctb]
+  Vincent Kubicki [ctb],
+  Parmeet Bhatia [ctb]

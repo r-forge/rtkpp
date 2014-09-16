@@ -110,13 +110,13 @@ setClass (
 )
 
 #-----------------------------------------------------------------------
-#' Initialize an instance of the [\code{\linkS4class{ClusterAlgo}}] class.
+#' Initialize an instance of a rtkpp class.
 #'
-#' Initialization method. Used internally in the `rtkpp' package.
+#' Initialization method of the [\code{\linkS4class{ClusterAlgo}}] class.
+#' Used internally in the `rtkpp' package.
 #'
-# @seealso \code{\link{initialize}}
 #' @keywords internal
-# @rdname initialize-methods
+#' @rdname initialize-methods
 setMethod(
     f="initialize",
     signature=c("ClusterAlgo"),

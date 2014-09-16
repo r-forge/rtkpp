@@ -23,14 +23,14 @@
 */
 
 /*
- * Project:  stkpp::Clustering
+ * Project:  rtkpp
  * created on: 4 sept. 2013
  * Author:   iovleff, serge.iovleff@stkpp.org
  * Originally created by Parmeet Bhatia <b..._DOT_p..._AT_gmail_Dot_com>
  **/
 
 /** @file STK_ClusterFacade.h
- *  @brief In this file we define the ClusterFacade which construct properly a mixture model.
+ *  @brief In this file we define the ClusterFacade which create the strategy for estimating a mixture model.
  **/
 
 

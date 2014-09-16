@@ -151,7 +151,7 @@ class JointBernoulliModel : public IMultiStatModel<Array, WColVector, JointBerno
     /** compute the parameters */
     virtual void computeParameters()
     {
-      for (int j=p_data()->beginCols(); j<=p_data()->lastIdxCols(); ++j)
+      for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
       {
         Real sum=0.;
         int nbObs=p_data()->sizeRows();
@@ -168,7 +168,7 @@ class JointBernoulliModel : public IMultiStatModel<Array, WColVector, JointBerno
     virtual void computeParameters(WColVector const& weights)
     {
       // compute
-      for (int j=p_data()->beginCols(); j<=p_data()->lastIdxCols(); ++j)
+      for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
       {
         Real sum=0., wsum = 0.;
         for (int i=p_data()->beginRows(); i<=p_data()->lastIdxRows(); ++i)

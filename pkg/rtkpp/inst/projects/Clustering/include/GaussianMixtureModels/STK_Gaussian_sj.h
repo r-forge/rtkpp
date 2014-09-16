@@ -101,18 +101,18 @@ class Gaussian_sj : public DiagGaussianBase<Gaussian_sj<Array> >
       Base::initializeModel();
       sigma_.resize(this->nbVariable());
       sigma_ = 1.;
-      for (int k= baseIdx; k <= components().lastIdx(); ++k)
+      for (int k= baseIdx; k < components().end(); ++k)
       { p_param(k)->p_sigma_ = &sigma_;}
     }
     /** Compute the inital weighted mean and the initial common variance. */
-    void initializeStep();
+    inline bool initializeStep() { return mStep();}
     /** Initialize randomly the parameters of the Gaussian mixture. The centers
      *  will be selected randomly among the data set and the standard-deviation
      *  will be set to 1.
      */
     void randomInit();
     /** Compute the weighted mean and the common variance. */
-    void mStep();
+    bool mStep();
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable()+this->nbVariable();}
@@ -121,13 +121,6 @@ class Gaussian_sj : public DiagGaussianBase<Gaussian_sj<Array> >
     Array2DPoint<Real> sigma_;
 };
 
-/* Initialize the parameters using mStep. */
-template<class Array>
-void Gaussian_sj<Array>::initializeStep()
-{ this->initialMean();
-  sigma_ = 1.;
-}
-
 /* Initialize randomly the parameters of the Gaussian mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation
  *  will be set to 1.
@@ -135,28 +128,31 @@ void Gaussian_sj<Array>::initializeStep()
 template<class Array>
 void Gaussian_sj<Array>::randomInit()
 {
-    this->randomMean();
+  // compute the initial mean
+  this->randomMean();
   sigma_ = 1.;
 }
 
 /* Compute the weighted mean and the common variance. */
 template<class Array>
-void Gaussian_sj<Array>::mStep()
+bool Gaussian_sj<Array>::mStep()
 {
   // compute the means
-  this->updateMean();
+  if (!this->updateMean()) return false;
+  // compute the variance
   Array2DPoint<Real> variance(p_data()->cols(), 0.);
-  for (int k= baseIdx; k <= components().lastIdx(); ++k)
+  for (int k= baseIdx; k < components().end(); ++k)
   {
     variance += p_tik()->col(k).transpose()
                *(*p_data() - (Const::Vector<Real>(p_data()->rows()) * p_param(k)->mean_)
                 ).square()
                 ;
   }
-  if (variance.nbAvailableValues() != this->nbVariable()) throw Clust::mStepFail_;
-  if ((variance > 0.).template cast<int>().sum() != this->nbVariable()) throw Clust::mStepFail_;
+  if (variance.nbAvailableValues() != this->nbVariable()) return false;
+  if ((variance > 0.).template cast<int>().sum() != this->nbVariable()) return false;
   // compute the standard deviation
   sigma_ = (variance /= this->nbSample()).sqrt();
+  return true;
 }
 
 } // namespace STK

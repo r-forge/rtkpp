@@ -51,7 +51,7 @@ namespace Stat
  *  @param Y second variable
  *  @param xMean the mean of X
  *  @param yMean the mean of Y
- *  @param unbiased @c true if we want an unbiased estimator of the variance,
+ *  @param unbiased @c true if we want an unbiased estimate of the variance,
  *  @c false otherwise (default is @c false)
  **/
 template<class TContainer1D>
@@ -111,7 +111,7 @@ Real covarianceWithFixedMean( TContainer1D const& X
  *  @param W weights
  *  @param xMean the mean of X
  *  @param yMean the mean of Y
- *  @param unbiased @c true if we want an unbiased estimator of the variance,
+ *  @param unbiased @c true if we want an unbiased estimate of the variance,
  *  @c false otherwise (default is @c false)
  **/
 template<class TContainer1D>
@@ -171,7 +171,7 @@ Real covarianceWithFixedMean( TContainer1D const& X
  *  \f]
  *  @param X first variable
  *  @param Y second variable
- *  @param unbiased @c true if we want an unbiased estimator of the variance,
+ *  @param unbiased @c true if we want an unbiased estimate of the variance,
  *  @c false otherwise (default is @c false)
  **/
 template<class TContainer1D>
@@ -226,7 +226,7 @@ Real covariance( TContainer1D const& X
  *  @param X first variable
  *  @param Y second variable
  *  @param W weights
- *  @param unbiased @c true if we want an unbiased estimator of the variance,
+ *  @param unbiased @c true if we want an unbiased estimate of the variance,
  *  @c false otherwise (default is @c false)
  **/
 template<class TContainer1D>

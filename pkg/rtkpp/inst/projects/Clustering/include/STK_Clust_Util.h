@@ -23,7 +23,7 @@
 */
 
 /*
- * Project:  stkpp::
+ * Project:  stkpp::Clustering
  * created on: 2 sept. 2013
  * Author:   iovleff, serge.iovleff@stkpp.org
  * Originally created by Parmeet Bhatia <b..._DOT_p..._AT_gmail_Dot_com>
@@ -97,12 +97,12 @@ enum algoType
  *  Convert a String to an algoType. The recognized strings are
  * <table>
  * <tr> <th> Algorithm   </th></tr>
- * <tr> <td> "emAlgo"</td></tr>
- * <tr> <td> "cemAlgo"</td></tr>
- * <tr> <td> "semAlgo"</td></tr>
- * <tr> <td> "em"</td></tr>
- * <tr> <td> "cem"         </td></tr>
- * <tr> <td> "sem"          </td></tr>
+ * <tr> <td> "emAlgo"    </td></tr>
+ * <tr> <td> "cemAlgo"   </td></tr>
+ * <tr> <td> "semAlgo"   </td></tr>
+ * <tr> <td> "em"        </td></tr>
+ * <tr> <td> "cem"       </td></tr>
+ * <tr> <td> "sem"       </td></tr>
  * </table>
  *  @param type the type of algorithm wanted
  *  @return the algoType corresponding (default is emAlgo)
@@ -158,12 +158,33 @@ enum modelState
 };
 
 /** @ingroup Clustering
+ *  list of the class of mixture implemented in stkpp
+ **/
+enum MixtureClass
+{
+  Gamma_,
+  Gaussian_,
+  Categorical_,
+  unknown_mixture_class_
+};
+
+/** @ingroup Clustering
  * list of the mixtures that can be used by the composer
  **/
 enum Mixture
 {
   Gamma_ajk_bjk_,
+  Gamma_ajk_bk_,
   Gamma_ajk_bj_,
+  Gamma_ajk_b_,
+  Gamma_ak_bjk_,
+  Gamma_ak_bk_,
+  Gamma_ak_bj_,
+  Gamma_ak_b_,
+  Gamma_aj_bjk_,
+  Gamma_aj_bk_,
+  Gamma_a_bjk_,
+  Gamma_a_bk_,
   Gaussian_sjk_,
   Gaussian_sk_,
   Gaussian_sj_,
@@ -174,11 +195,28 @@ enum Mixture
 };
 
 /** @ingroup Clustering
+ *  convert a Mixture to a MixtureClass.
+ *  @param type the type of Mixture
+ *  @return the MixtureClass associated to this Mixture.
+ **/
+MixtureClass MixtureToMixtureClass( Mixture const& type);
+
+/** @ingroup Clustering
  *  Convert a String to a Mixture. The recognized strings are
  * <table >
- * <tr> <th> Model                </th> </tr>
+ * <tr> <th> Model             </th> </tr>
  * <tr> <td> "Gamma_ajk_bjk"   </td></tr>
+ * <tr> <td> "Gamma_ajk_bk"    </td></tr>
  * <tr> <td> "Gamma_ajk_bj"    </td></tr>
+ * <tr> <td> "Gamma_ajk_b"     </td></tr>
+ * <tr> <td> "Gamma_ak_bjk"    </td></tr>
+ * <tr> <td> "Gamma_ak_bk"     </td></tr>
+ * <tr> <td> "Gamma_ak_bj"     </td></tr>
+ * <tr> <td> "Gamma_ak_b"      </td></tr>
+ * <tr> <td> "Gamma_aj_bjk"    </td></tr>
+ * <tr> <td> "Gamma_aj_bk"     </td></tr>
+ * <tr> <td> "Gamma_a_bjk"     </td></tr>
+ * <tr> <td> "Gamma_a_bk"      </td></tr>
  * <tr> <td> "Gaussian_sjk"    </td></tr>
  * <tr> <td> "Gaussian_sk"     </td></tr>
  * <tr> <td> "Gaussian_sj"     </td></tr>
@@ -198,7 +236,17 @@ Mixture stringToMixture( std::string const& type);
  * <table border >
  * <tr> <th> Free proportions     </th><th> Fixed Proportions   </th> </tr>
  * <tr> <td> "Gamma_pk_ajk_bjk"   </td><td> "Gamma_p_ajk_bjk"   </td> </tr>
+ * <tr> <td> "Gamma_pk_ajk_bk"    </td><td> "Gamma_p_ajk_bk"    </td> </tr>
  * <tr> <td> "Gamma_pk_ajk_bj"    </td><td> "Gamma_p_ajk_bj"    </td> </tr>
+ * <tr> <td> "Gamma_pk_ajk_b"     </td><td> "Gamma_p_ajk_b"     </td> </tr>
+ * <tr> <td> "Gamma_pk_ak_bjk"    </td><td> "Gamma_p_ak_bjk"    </td> </tr>
+ * <tr> <td> "Gamma_pk_ak_bk"     </td><td> "Gamma_p_ak_bk"     </td> </tr>
+ * <tr> <td> "Gamma_pk_ak_bj"     </td><td> "Gamma_p_ak_bj"     </td> </tr>
+ * <tr> <td> "Gamma_pk_ak_b"      </td><td> "Gamma_p_ak_b"      </td> </tr>
+ * <tr> <td> "Gamma_pk_aj_bjk"    </td><td> "Gamma_p_aj_bjk"    </td> </tr>
+ * <tr> <td> "Gamma_pk_aj_bk"     </td><td> "Gamma_p_aj_bk"     </td> </tr>
+ * <tr> <td> "Gamma_pk_a_bjk"     </td><td> "Gamma_p_a_bjk"     </td> </tr>
+ * <tr> <td> "Gamma_pk_a_bk"      </td><td> "Gamma_p_a_bk"      </td> </tr>
  * <tr> <td> "Gaussian_pk_sjk"    </td><td> "Gaussian_p_sjk"    </td> </tr>
  * <tr> <td> "Gaussian_pk_sk"     </td><td> "Gaussian_p_sk"     </td> </tr>
  * <tr> <td> "Gaussian_pk_sj"     </td><td> "Gaussian_p_sj"     </td> </tr>
@@ -221,40 +269,51 @@ Mixture stringToMixture( std::string const& type, bool& freeProp);
 std::string mixtureToString( Mixture const& type);
 
 /** @ingroup Clustering
- * Default number of trial in an initialization */
-const int defaultNbTrialInInit = 5;
-/** @ingroup Clustering
- * Default number of iteration in an algorithm */
-const int defaultNbIterMaxInInit = 20;
-/**  @ingroup Clustering
- * Default epsilon in the short runs (used in strategy) */
-const Real defaultEpsilonInInit = 1e-02;
-
-/** @ingroup Clustering
- *  Default epsilon in algorithm */
-const int defaultnbIterInAlgo = 200;
-/** @ingroup Clustering
- *  Default epsilon in algorithm */
-const Real defaultEpsilonInAlgo = 1e-08;
+ *  convert a Mixture to a string specifying if the model is with free
+ *  proportions.
+ *  @sa stringToMixture
+ *  @param type the Mixture we want to convert
+ *  @param freeProp @c true if the model have free proportions, @c false otherwise.
+ *  @return the string represented by the Mixture @c type.
+ **/
+std::string mixtureToString(Mixture type, bool freeProp);
 
 /** @ingroup Clustering
  * Default number of try in an estimation strategy */
 const int defaultNbTry = 5;
 
 /** @ingroup Clustering
+ * Default number of trial in an initialization */
+const int defaultNbTrialInInit = 5;
+/** @ingroup Clustering
+ * Default algorithm type in initialization */
+const Clust::algoType defaultAlgoInInit = semAlgo_;
+/** @ingroup Clustering
+ * Default number of iteration in an initialization algorithm */
+const int defaultNbIterMaxInInit = 20;
+/**  @ingroup Clustering
+ * Default epsilon in the short runs (used in strategy) */
+const Real defaultEpsilonInInit = 1e-02;
+
+/** @ingroup Clustering
+ * Default algorithm type in short run */
+const Clust::algoType algoShortRun = cemAlgo_;
+/** @ingroup Clustering
  * Default number of iterations in the short runs (used in FullStrategy) */
 const int maxIterShortRun = 200;
-/**  @ingroup Clustering
- * Default number of iterations in the long run (used in FullStrategy) */
-const int maxIterLongRun = 1000;
-
 /** @ingroup Clustering
  *  Default epsilon in the short runs (used in strategy) */
 const Real epsilonShortRun = 1e-04;
+
+/** @ingroup Clustering
+ * Default algorithm type in long run */
+const Clust::algoType algoLongRun = emAlgo_;
+/**  @ingroup Clustering
+ * Default number of iterations in the long run (used in FullStrategy) */
+const int maxIterLongRun = 1000;
 /**  @ingroup Clustering
  * Default epsilon in the long run (used in strategy) */
-const Real epsilonLongRun = Arithmetic<Real>::epsilon();
-
+const Real epsilonLongRun = 1e-08;
 
 /** @ingroup Clustering
  *  utility function for creating an estimation algorithm.
@@ -262,9 +321,29 @@ const Real epsilonLongRun = Arithmetic<Real>::epsilon();
  *  @param nbIterMax the maximal number of iteration of the algorithm
  *  @param epsilon the tolerance of the algorithm
  **/
-IMixtureAlgo* createAlgo( Clust::algoType algo
-                        , int nbIterMax = defaultnbIterInAlgo
-                        , Real epsilon = defaultEpsilonInAlgo);
+IMixtureAlgo* createAlgo( Clust::algoType algo, int nbIterMax, Real epsilon);
+
+/** @ingroup Clustering
+ *  utility function for creating a a short Run algorithm.
+ *  @param algo the algorithm to create
+ *  @param nbIterMax the maximal number of iteration of the algorithm
+ *  @param epsilon the tolerance of the algorithm
+ **/
+inline IMixtureAlgo* createShortRunAlgo( Clust::algoType algo = algoShortRun
+                                       , int nbIterMax = maxIterShortRun
+                                       , Real epsilon = epsilonShortRun)
+{ return createAlgo(algo, nbIterMax, epsilon);}
+
+/** @ingroup Clustering
+ *  utility function for creating a a short Run algorithm.
+ *  @param algo the algorithm to create
+ *  @param nbIterMax the maximal number of iteration of the algorithm
+ *  @param epsilon the tolerance of the algorithm
+ **/
+inline IMixtureAlgo* createLongRunAlgo( Clust::algoType algo = algoLongRun
+                                      , int nbIterMax = maxIterLongRun
+                                      , Real epsilon = epsilonLongRun)
+{ return createAlgo(algo, nbIterMax, epsilon);}
 
 /** @ingroup Clustering
  *  Utility function for creating a model initializer.
@@ -276,7 +355,7 @@ IMixtureAlgo* createAlgo( Clust::algoType algo
  **/
 IMixtureInit* createInit( Clust::initType init
                         , int nbInits = Clust::defaultNbTrialInInit
-                        , Clust::algoType algo = semAlgo_
+                        , Clust::algoType algo = defaultAlgoInInit
                         , int nbIterMax = defaultNbIterMaxInInit
                         , Real epsilon = defaultEpsilonInInit);
 

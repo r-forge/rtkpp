@@ -2,13 +2,13 @@
 \docType{methods}
 \name{plot}
 \alias{plot}
-\alias{plot,ClusterDiagGaussianModel-method}
-\title{Plotting of a class [\code{\linkS4class{ClusterDiagGaussianModel}}]}
+\alias{plot,ClusterGamma-method}
+\title{Plotting of a class [\code{\linkS4class{ClusterGamma}}]}
 \usage{
-\S4method{plot}{ClusterDiagGaussianModel}(x, y, ...)
+\S4method{plot}{ClusterGamma}(x, y, ...)
 }
 \arguments{
-\item{x}{an object of class [\code{\linkS4class{ClusterDiagGaussianModel}}]}
+\item{x}{an object of class [\code{\linkS4class{ClusterGamma}}]}
 
 \item{y}{a list of variables to plot (subset). Variables names or indices.
 If missing all the variables are represented.}
@@ -16,17 +16,17 @@ If missing all the variables are represented.}
 \item{...}{further arguments passed to or from other methods}
 }
 \description{
-Plotting data from a [\code{\linkS4class{ClusterDiagGaussianModel}}] object
+Plotting data from a [\code{\linkS4class{ClusterGamma}}] object
 using the estimated parameters and partition.
 }
 \examples{
 ## for quantitative case
   data(iris)
-  mixt <- clusterDiagGaussian(iris[1:4],3)
+  model <- clusterGamma(iris[1:4],3)
 \dontrun{
-  plot(mixt)
-  plot(mixt, c(1,3))
-  plot(mixt, c("Sepal.Length","Sepal.Width"))
+  plot(model)
+  plot(model, c(1,3))
+  plot(model, c("Sepal.Length","Sepal.Width"))
   }
 }
 \seealso{

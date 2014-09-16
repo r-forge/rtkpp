@@ -77,7 +77,7 @@ Real diagonalGaussianLnLikelihood(Matrix const& data, Point const& mu, MatrixSqu
  *               \exp\left(-\frac{1}{2} (X_i-\mu)^T \Sigma^{-1} (X_i-\mu)\right)
  * \f]
  *
- * The maximum likelihood estimator can be performed via matrix calculus formulae
+ * The maximum likelihood estimate can be performed via matrix calculus formulae
  * Re-write the likelihood in the log form using the trace trick:
  * \f[
  * \ln L(\mu,\Sigma) = \operatorname{const} -{n \over 2} \ln \det(\Sigma)
@@ -99,7 +99,7 @@ Real diagonalGaussianLnLikelihood(Matrix const& data, Point const& mu, MatrixSqu
  * \f[
  *  \sum_{i=1}^n (X_i - \mu) = 0,
  * \f]
- * which leads to the maximum likelihood estimator
+ * which leads to the maximum likelihood estimate
  * \f[
  *  \hat{\mu} = \bar{X} = \frac{1}{n} \sum_{i=1}^n X_i.
  * \f]

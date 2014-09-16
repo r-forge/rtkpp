@@ -103,6 +103,9 @@ class DataHandler : public IDataHandler
     template<typename Type>
     void getData(std::string const& idData, Array2D<Type>& data, int& nbVariable) const;
 
+    /** remove the data with the given idData */
+    void removeData(std::string const& idData);
+
   protected:
     /** lookup on the descriptors in order to get the columns of the ReadWriteCsv
      *  with the Id idData.
@@ -113,7 +116,7 @@ class DataHandler : public IDataHandler
   private:
     /** data files */
     ReadWriteCsv data_;
-    /** descriptor files with two rows. On the first row,w e get the idModel,
+    /** descriptor files with two rows. On the first row we get the idModel,
      * on the second row, we get the idData
      **/
     ReadWriteCsv descriptor_;
@@ -126,9 +129,9 @@ void DataHandler::getData(std::string const& idData, Array2D<Type>& data, int& n
   std::vector<int> indexes = colIndex(idData);
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("In DataHandler::getData, idData = ") << idData << _T("\n");
-  stk_cout << _T("column found = ");
+  stk_cout << _T("columns found = ");
   for (std::vector<int>::const_iterator it = indexes.begin(); it != indexes.end(); ++it)
-  { stk_cout << (*it) << _T("");}
+  { stk_cout << (*it) << _T(" ");}
   stk_cout << _T("\n");
 #endif
   nbVariable = indexes.size();

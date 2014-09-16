@@ -61,22 +61,7 @@ struct SafeValueImpl
  *  Implementation of the safeValue method. Specialization for Gamma_ajk_bjk_ models
  */
 template<class Data>
-struct SafeValueImpl<Clust::Gamma_ajk_bjk_, Data>
-{
-  // type of the data
-  typedef typename Data::Type Type;
-
-  /** @return a safe value for the jth variable
-   *  @param  m_dataij the matrix of the data set
-   *  @param j index of the column with the safe value needed */
-  static Type run(Data const& m_dataij, int j)
-  { return m_dataij.col(j).safe(1).mean();}
-};
-/** @ingroup hidden
- *  Implementation of the safeValue method. Speciualization for Gamma_ajk_bj_ models
- */
-template<class Data>
-struct SafeValueImpl<Clust::Gamma_ajk_bj_, Data>
+struct SafeValueImpl<Clust::Gamma_, Data>
 {
   // type of the data
   typedef typename Data::Type Type;
@@ -91,7 +76,7 @@ struct SafeValueImpl<Clust::Gamma_ajk_bj_, Data>
  *  Implementation of the safeValue method. Speciualization for Categorical_pjk_ models
  */
 template<class Data>
-struct SafeValueImpl<Clust::Categorical_pjk_, Data>
+struct SafeValueImpl<Clust::Categorical_, Data>
 {
   // type of the data
   typedef typename Data::Type Type;
@@ -103,33 +88,7 @@ struct SafeValueImpl<Clust::Categorical_pjk_, Data>
   {
      int lmin = m_dataij.col(j).safe().minElt(), lmax = m_dataij.col(j).safe().maxElt();
      Array2DVector<int> count(Range(lmin, lmax, 0), 0);
-     for (int i= m_dataij.beginRows(); i <= m_dataij.lastIdxRows(); ++i)
-     {
-       if (Arithmetic<int>::isFinite(m_dataij(i,j)))
-         count[m_dataij(i,j)]++;
-     }
-     int l; count.maxElt(l);
-     return l;
-  }
-};
-/** @ingroup hidden
- *  Implementation of the safeValue method. Speciualization for Categorical_pk_ models
- */
-template<class Data>
-struct SafeValueImpl<Clust::Categorical_pk_, Data>
-{
-  // type of the data
-  typedef typename Data::Type Type;
-
-  /** @return a safe value for the jth variable
-   *  @param m_dataij the matrix with the data
-   *  @param j index of the column with the safe value needed
-   **/
-  static Type run(Data const& m_dataij, int j)
-  {
-     int lmin = m_dataij.col(j).safe().minElt(), lmax = m_dataij.col(j).safe().maxElt();
-     Array2DVector<int> count(Range(lmin, lmax, 0), 0);
-     for (int i= m_dataij.beginRows(); i <= m_dataij.lastIdxRows(); ++i)
+     for (int i= m_dataij.beginRows(); i < m_dataij.endRows(); ++i)
      {
        if (Arithmetic<int>::isFinite(m_dataij(i,j)))
          count[m_dataij(i,j)]++;
@@ -147,7 +106,7 @@ struct SafeValueImpl<Clust::Categorical_pk_, Data>
  * @tparam Id is any identifier of a concrete model deriving from the
  * interface class STK::IMixtureModel.
  */
-template<int Id, class Data>
+template<Clust::MixtureClass Id, class Data>
 class DataManager : public IDataManager
 {
   public:
@@ -158,7 +117,7 @@ class DataManager : public IDataManager
     /** default constructor. */
     inline DataManager(std::string const& idData) : IDataManager(idData), m_dataij_() {}
     /** copy constructor (Warning: will copy the data set)
-     *  @param data the DataManager to copy
+     *  @param manager the DataManager to copy
      **/
     DataManager( DataManager const& manager)
                : IDataManager(manager), m_dataij_(manager.m_dataij_)
@@ -207,8 +166,7 @@ class DataManager : public IDataManager
     **/
    Type safeValue( int j) const
    { return hidden::SafeValueImpl<Id, Data>::run(m_dataij_, j);}
-   /** get the (Real) missing values of a data set.
-    *  @param idData Id name of the data set attached to the mixture
+   /** get the missing values of a data set.
     *  @param data the array to return with the missing values
     **/
    template<typename Type_>

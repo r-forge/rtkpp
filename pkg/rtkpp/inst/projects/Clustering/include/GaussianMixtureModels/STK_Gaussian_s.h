@@ -99,18 +99,18 @@ class Gaussian_s : public DiagGaussianBase<Gaussian_s<Array> >
     {
       Base::initializeModel();
       sigma_ = 1.0;
-      for (int k= baseIdx; k <= components().lastIdx(); ++k)
+      for (int k= baseIdx; k < components().end(); ++k)
       { components()[k]->p_param()->p_sigma_ = &sigma_;}
     }
     /** Compute the inital weighted mean and the initial common variance. */
-    void initializeStep();
+    inline bool initializeStep() { return mStep();}
     /** Initialize randomly the parameters of the Gaussian mixture. The centers
      *  will be selected randomly among the data set and the standard-deviation
      *  will be set to 1.
      */
     void randomInit();
     /** Compute the weighted mean and the common variance. */
-    void mStep();
+    bool mStep();
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable()+1;}
@@ -118,23 +118,6 @@ class Gaussian_s : public DiagGaussianBase<Gaussian_s<Array> >
   protected:
     Real sigma_;
 };
-
-/* Compute the inital weighted mean and the initial common variance. */
-template<class Array>
-void Gaussian_s<Array>::initializeStep()
-{
-    this->initialMean();
-  Real variance = 0.0;
-  for (int k= baseIdx; k <= p_tik()->lastIdxCols(); ++k)
-  {
-    variance += ( p_tik()->col(k).transpose()
-                 *(*p_data() - (Const::Vector<Real>(p_data()->rows()) * p_param(k)->mean_)
-                  ).square()
-                ).sum();
-  }
-  if ((variance<=0)||Arithmetic<Real>::isNA(variance)) throw Clust::initializeStepFail_;
-  sigma_ = std::sqrt(variance/(this->nbSample()*this->nbVariable()));
-}
 
 /* Initialize randomly the parameters of the Gaussian mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation
@@ -149,20 +132,22 @@ void Gaussian_s<Array>::randomInit()
 
 /* Compute the weighted mean and the common variance. */
 template<class Array>
-void Gaussian_s<Array>::mStep()
+bool Gaussian_s<Array>::mStep()
 {
   // compute the means
-  this->updateMean();
+  if (!this->updateMean()) return false;
+  // compute the variance
   Real variance = 0.0;
-  for (int k= baseIdx; k <= p_tik()->lastIdxCols(); ++k)
+  for (int k= baseIdx; k < p_tik()->endCols(); ++k)
   {
     variance += ( p_tik()->col(k).transpose()
                  * (*p_data() - (Const::Vector<Real>(p_data()->rows()) * p_param(k)->mean_)
                    ).square()
                 ).sum();
   }
-  if ((variance<=0)||Arithmetic<Real>::isNA(variance)) throw Clust::mStepFail_;
+  if ((variance<=0) || !Arithmetic<Real>::isFinite(variance)) return false;
   sigma_ = std::sqrt(variance/(this->nbSample()*this->nbVariable()));
+  return true;
 }
 
 } // namespace STK

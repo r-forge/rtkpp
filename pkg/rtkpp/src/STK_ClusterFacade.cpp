@@ -33,9 +33,9 @@
  **/
 
 #include "RTKpp.h"
-#include "../projects/Clustering/include/STK_MixtureInit.h"
-#include "../projects/Clustering/include/STK_MixtureAlgo.h"
-#include "../projects/Clustering/include/STK_MixtureStrategy.h"
+#include "Clustering/include/STK_MixtureInit.h"
+#include "Clustering/include/STK_MixtureAlgo.h"
+#include "Clustering/include/STK_MixtureStrategy.h"
 
 namespace STK
 {

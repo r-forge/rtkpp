@@ -39,10 +39,10 @@ RTKPP_LIB_DIR = ./lib/
 
 # check if we are using symoblic paths
 ifneq ($(patsubst $(PROJECTS_DIR)STKernel/../%,%,$(wildcard $(PROJECTS_DIR)STKernel/../Rtk*)),$(patsubst $(PROJECTS_DIR)%,%,$(wildcard $(PROJECTS_DIR)Rtk*)))
-MAKEVARS = $(CURDIR)/makevars
+MAKEVARS = $(CURDIR)/$(RELATIVEMAKEVARS)
 BIN_DIR = $(CURDIR)/bin/
 else
-MAKEVARS = ../../../makevars
+MAKEVARS = ../../../$(RELATIVEMAKEVARS)
 BIN_DIR = ../../../bin/
 endif
 

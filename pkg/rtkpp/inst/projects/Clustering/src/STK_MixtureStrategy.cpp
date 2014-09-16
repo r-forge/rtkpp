@@ -155,7 +155,6 @@ bool XemStrategy::run()
   stk_cout << _T("-------------------------------\n")
            << _T("try number = ") << iTry << _T("\n");
 #endif
-      p_currentBestModel->initializeStep();
       // find best of the shortModel and save it in p_currentBestModel
       for (int iShortRun = 0; iShortRun < p_param_->nbShortRun_; ++iShortRun)
       {
@@ -236,18 +235,16 @@ bool FullStrategy::run()
   stk_cout << _T("-------------------------------\n")
            << _T("iTry = ") << iTry << _T("\n");
 #endif
+      // initialize the model with default values
       p_bestShortModel->initializeStep();
       // in case nbShortRun_==0: initialize directly p_bestShortModel
       if (p_param_->nbShortRun_ == 0)
-      {
-        p_currentModel->initializeStep();
-        initStep(p_currentModel, p_bestShortModel);
-      }
+      { initStep(p_currentModel, p_bestShortModel);}
       else
       {
         for (int iShort=0; iShort < p_param_->nbShortRun_; ++iShort)
         {
-          p_currentModel->initializeStep();
+          // (re)-initialize current best model
           p_currentBestModel->initializeStep();
           // perform nbInitRun_ initialization step and get the best result
           // in p_currentBestModel
@@ -319,7 +316,6 @@ void FullStrategy::initStep(IMixtureComposer*& p_currentModel, IMixtureComposer*
   // and select the best model
   for (int iInitRun=0; iInitRun < p_param_->nbInitRun_; iInitRun++)
   {
-    p_currentModel->initializeStep();
     if (p_init_->run()) // Save only if we have a success
     {
       // if we get a better result, swap it with currentBestModel

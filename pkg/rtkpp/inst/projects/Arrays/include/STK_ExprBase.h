@@ -184,10 +184,12 @@ class ExprBase : public ITContainer<Derived, hidden::Traits<Derived>::structure_
     inline Type const norm2() const;
     /** @return the infinite norm of this*/
     inline Type const normInf() const;
-    /** @return the mean of all the elements of this using a Visitor*/
+    /** @return the mean of all the elements of this*/
     inline Type const mean() const;
-    /** @return the variance of all the elements of this using a Visitor*/
+    /** @return the variance of all the elements of this*/
     inline Type const variance() const;
+    /** @return the variance with given mean of all the elements of this*/
+    inline Type const variance(Type const mean) const;
 
     /** @return the weighted sum of all the elements of this using a Visitor
      *  @note will only work with row-vectors or col-vectors
@@ -214,6 +216,9 @@ class ExprBase : public ITContainer<Derived, hidden::Traits<Derived>::structure_
      **/
     template<typename Rhs>
     inline Type const wvariance(ExprBase<Rhs> const& weights) const;
+    /** @return the variance with given mean of all the elements of this*/
+    template<typename Rhs>
+    inline Type const wvariance(Type const wmean, ExprBase<Rhs> const& weights) const;
 
     /** @return the weighted sum of all the elements of this using a Visitor
      *  @note will only work with row-vectors or col-vectors

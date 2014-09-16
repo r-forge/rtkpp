@@ -114,13 +114,13 @@ setClass(
 
 
 #-----------------------------------------------------------------------
-#' Create an instance of the [\code{\linkS4class{ClusterInit}}] class using new/initialize.
+#' Initialize an instance of a rtkpp class.
 #'
-#' Initialization method. Used internally in the `rtkpp' package.
+#' Initialization method of the [\code{\linkS4class{ClusterInit}}] class.
+#' Used internally in the `rtkpp' package.
 #'
-# @seealso \code{\link{initialize}}
+#' @rdname initialize-methods
 #' @keywords internal
-# @rdname initialize-methods
 #'
 setMethod(
   f="initialize",

@@ -93,3 +93,24 @@ NULL
 #'   show(algo)
 NULL
 
+#-----------------------------------------------------------------------
+#' Produce summary of a rtkpp class. 
+#'
+#' @param object any cluster model deriving from a \code{\linkS4class{IClusterModel}} object.
+#' @param ... further arguments passed to or from other methods
+#'
+#' @return NULL. Summaries to standard out.
+#'
+#' @name summary
+#' @docType methods
+#' @rdname summary-methods
+#' @exportMethod summary
+#'
+#' @seealso \code{\link{summary}}
+#' @examples
+#'   data(geyser)
+#'   model <- clusterDiagGaussian(geyser,3)
+#'   summary(model)
+#'
+NULL
+

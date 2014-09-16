@@ -64,8 +64,7 @@ struct MixtureTraits< Categorical_pk<_Array> >
  *  the most general diagonal Categorical model and have a density function of the
  *  form
  * \f[
- *  f(\mathbf{x}|\theta) = \sum_{k=1}^K p_k \prod_{j=1}^d
- *   .
+ *  P(\mathbf{x}=(l_1,\ldots,l_d)|\theta) = \sum_{k=1}^K p_k \prod_{j=1}^d p_{kl_j}.
  * \f]
  **/
 template<class Array>
@@ -94,13 +93,13 @@ class Categorical_pk : public CategoricalBase<Categorical_pk<Array> >
     /** destructor */
     inline ~Categorical_pk() {}
     /** Compute the inital weighted mean and the initial common variances. */
-    void initializeStep();
+    bool initializeStep();
     /** Initialize randomly the parameters of the Categorical mixture.
      *  Probabilities will be choosen uniformly.
      */
     void randomInit();
     /** Compute the weighted proportions of each class. */
-    void mStep();
+    bool mStep();
     /** get the parameters of the model
      *  @param params An Array2D with the parameters of the model
      **/
@@ -112,8 +111,8 @@ class Categorical_pk : public CategoricalBase<Categorical_pk<Array> >
 
 /** Initialize the parameters using mStep. */
 template<class Array>
-void Categorical_pk<Array>::initializeStep()
-{}
+bool Categorical_pk<Array>::initializeStep()
+{ return mStep();}
 
 /* Initialize randomly the parameters of the Categorical mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation
@@ -122,7 +121,7 @@ void Categorical_pk<Array>::initializeStep()
 template<class Array>
 void Categorical_pk<Array>::randomInit()
 {
-  for (int k = baseIdx; k <= p_tik()->lastIdxCols(); ++k)
+  for (int k = baseIdx; k < p_tik()->endCols(); ++k)
   {
     p_param(k)->proba_.randUnif();
     p_param(k)->proba_ /= p_param(k)->proba_.sum();
@@ -131,19 +130,20 @@ void Categorical_pk<Array>::randomInit()
 
 /* Compute the weighted mean and the common variance. */
 template<class Array>
-void Categorical_pk<Array>::mStep()
+bool Categorical_pk<Array>::mStep()
 {
-  for (int k = baseIdx; k <= p_tik()->lastIdxCols(); ++k)
+  for (int k = baseIdx; k < p_tik()->endCols(); ++k)
   {
-    for (int j = p_data()->beginCols(); j <= p_data()->lastIdxCols(); ++j)
+    for (int j = p_data()->beginCols(); j < p_data()->endCols(); ++j)
     {
-      for (int i = p_tik()->beginRows(); i <= p_tik()->lastIdxRows(); ++i)
-      {
-        p_param(k)->proba_[(*p_data())(i, j)] += (*p_tik())(i, k);
-      }
+      for (int i = p_tik()->beginRows(); i < p_tik()->endRows(); ++i)
+      { p_param(k)->proba_[(*p_data())(i, j)] += (*p_tik())(i, k);}
     }
-    p_param(k)->proba_ /=  p_param(k)->proba_.sum();
+    Real sum = p_param(k)->proba_.sum();
+    if (sum<=0.) return false;
+    p_param(k)->proba_ /= sum;
   }
+  return true;
 }
 
 /** get the parameters of the model
@@ -176,7 +176,7 @@ void Categorical_pk<Array>::getParameters(Array2D<Real>& params) const
 //  params.resize(nbModalities * nbClust, p_data()->cols());
 //  for (int k = 0; k <= nbClust; ++k)
 //  {
-//    for (int j = p_data()->beginCols(); j <= p_data()->lastIdxCols(); ++j)
+//    for (int j = p_data()->beginCols(); j < p_data()->endCols(); ++j)
 //    {
 //      for (int l = 0; l < nbModalities; ++l)
 //      {

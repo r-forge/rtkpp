@@ -39,7 +39,12 @@ the ith individual to belong to kth cluster.}
 
 \item{\code{criterion}}{Real given the value of the AIC or BIC criterion.}
 
+\item{\code{nbFreeParameter}}{Integer given the number of free parameters of the model.}
+
 \item{\code{modelName}}{mixture model name.}
+
+\item{\code{strategy}}{the instance of the [\code{\linkS4class{ClusterStrategy}}] used in the
+estimation process of the mixture.}
 }}
 \examples{
 getSlots("IClusterModel")

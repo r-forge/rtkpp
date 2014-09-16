@@ -3,24 +3,32 @@
 \name{rtkpp}
 \alias{rtkpp}
 \alias{rtkpp-package}
-\title{rtkpp is a R/stk++ bridge package based on the existing STK++ library.}
+\title{rtkpp is a R/stk++ bridge}
 \description{
-This package contains the header files for the STK++ template
-library. The typical usage is to install this package and list it in
+This package contains the header files for the STK++ library.
+The typical usage is to install this package and list it in
 the \env{LinkingTo: } line in the \file{DESCRIPTION} file of
 other packages.
 }
 \details{
 As described at the STK++ project's home page, \url{http://www.stkpp.org},
 STK++ is a versatile, fast, reliable and elegant collection of C++ classes
-for statistics, clustering, linear algebra, arrays (with  Eigen),
+for statistics, clustering, linear algebra, arrays (with an Eigen-like API),
 regression, dimension reduction, etc. Some functionalities provided by the
-library are available in the R environment.
+library are available in the R environment as R functions.
+
+The available functionalities are:
+\enumerate{
+   \item the clusterDiagGaussian method allowing to discover, group structures in
+multivariate data sets using diagonal Gaussian multidimensional models (8 models).
+   \item the clusterGamma method allowing to discover, group structures in
+multivariate data sets using gamma multidimensional models (24 models).
+ }
 
 \tabular{ll}{
   Package: \tab rtkpp\cr
   Type: \tab Package\cr
-  Version: \tab 2.0.1\cr
+  Version: \tab 0.8.1\cr
   Date: \tab 2014-07-05\cr
   License: \tab GPL for the rtkpp side, LGPL for the stkpp side  + file LICENSE\cr
   LazyLoad: \tab yes\cr

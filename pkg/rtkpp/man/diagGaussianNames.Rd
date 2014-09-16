@@ -2,32 +2,10 @@
 \name{diagGaussianNames}
 \alias{diagGaussianNames}
 \alias{validDiagGaussianNames}
-\title{diagGaussianNames: get the names of the diagonal Gaussian models}
-\usage{
-diagGaussianNames(prop = "all", varianceVariables = "all",
-  varianceClusters = "all")
+\alias{validGammaNames}
+\title{diagGaussianNames: Build a vector of Gaussian model names.
 
-validDiagGaussianNames(names)
-}
-\arguments{
-\item{prop}{A character string equal to "equal", "free" or "all". Default is "all".}
-
-\item{varianceVariables}{A character string equal to "equal", "free" or "all". Default is "all".}
-
-\item{varianceClusters}{A character string equal to "equal", "free" or "all". Default is "all".}
-
-\item{names}{a vector of character}
-}
-\value{
-A vector of character with the models names.
-}
-\description{
-Build a vector of diagonal Gaussian model names.
-
-check if a vector of diagonal Gaussian model name comply
-}
-\details{
-In a diagonal Gaussian model, we assume that the variance
+In a Gaussian model, we assume that the variance
 matrices are diagonal in each cluster. This gives rise to 8 models:
 \enumerate{
  \item {The proportions can be equal or free.}
@@ -37,16 +15,65 @@ matrices are diagonal in each cluster. This gives rise to 8 models:
 
 The model names are summarized in the following array:
 \tabular{llll}{
-    Model Name      \tab Prop. \tab Variance of the variables \tab Variance of the clusters \cr
-    gaussian_p_sjk  \tab Equal \tab Free  \tab Free  \cr
-    gaussian_p_sj   \tab Equal \tab Free  \tab Equal \cr
-    gaussian_p_sk   \tab Equal \tab Equal \tab Free  \cr
-    gaussian_p_s    \tab Equal \tab Equal \tab Equal \cr
-    gaussian_pk_sjk \tab Free  \tab Free  \tab Free  \cr
-    gaussian_pk_sj  \tab Free  \tab Free  \tab Equal \cr
-    gaussian_pk_sk  \tab Free  \tab Equal \tab Free  \cr
-    gaussian_pk_s   \tab Free  \tab Equal \tab Equal \cr
+ Model Name      \tab Proportions \tab Variances in variables \tab Variances in clusters \cr
+ gaussian_p_sjk  \tab Equal \tab Free                  \tab Free  \cr
+ gaussian_p_sj   \tab Equal \tab Free                  \tab Equal \cr
+ gaussian_p_sk   \tab Equal \tab Equal                 \tab Free  \cr
+ gaussian_p_s    \tab Equal \tab Equal                \tab Equal \cr
+ gaussian_pk_sjk \tab Free  \tab Free                 \tab Free  \cr
+ gaussian_pk_sj  \tab Free  \tab Free                 \tab Equal \cr
+ gaussian_pk_sk  \tab Free  \tab Equal                \tab Free  \cr
+ gaussian_pk_s   \tab Free  \tab Equal                \tab Equal \cr
+}}
+\usage{
+diagGaussianNames(prop = "all", varInCluster = "all",
+  varBetweenCluster = "all")
+
+validDiagGaussianNames(names)
+
+validGammaNames(names)
 }
+\arguments{
+\item{prop}{A character string equal to "equal", "free" or "all". Default is "all".}
+
+\item{varInCluster}{A character string equal to "equal", "free" or "all". Default is "all".}
+
+\item{varBetweenCluster}{A character string equal to "equal", "free" or "all". Default is "all".}
+
+\item{names}{a vector of character}
+
+\item{names}{a vector of character}
+}
+\value{
+A vector of character with the models names.
+}
+\description{
+diagGaussianNames: Build a vector of Gaussian model names.
+
+In a Gaussian model, we assume that the variance
+matrices are diagonal in each cluster. This gives rise to 8 models:
+\enumerate{
+ \item {The proportions can be equal or free.}
+ \item {The variances can be equal or free for all the variables.}
+ \item {The variances can be equal or free for all the clusters.}
+}
+
+The model names are summarized in the following array:
+\tabular{llll}{
+ Model Name      \tab Proportions \tab Variances in variables \tab Variances in clusters \cr
+ gaussian_p_sjk  \tab Equal \tab Free                  \tab Free  \cr
+ gaussian_p_sj   \tab Equal \tab Free                  \tab Equal \cr
+ gaussian_p_sk   \tab Equal \tab Equal                 \tab Free  \cr
+ gaussian_p_s    \tab Equal \tab Equal                \tab Equal \cr
+ gaussian_pk_sjk \tab Free  \tab Free                 \tab Free  \cr
+ gaussian_pk_sj  \tab Free  \tab Free                 \tab Equal \cr
+ gaussian_pk_sk  \tab Free  \tab Equal                \tab Free  \cr
+ gaussian_pk_s   \tab Free  \tab Equal                \tab Equal \cr
+}
+
+check if a vector of diagonal Gaussian model name comply
+
+check if a vector of gamma model name comply
 }
 \examples{
 diagGaussianNames()

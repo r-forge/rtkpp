@@ -94,33 +94,18 @@ class Gaussian_sk : public DiagGaussianBase<Gaussian_sk<Array> >
     /** destructor */
     inline ~Gaussian_sk() {}
     /** Compute the inital weighted mean and the initial common variances. */
-    void initializeStep();
+    inline bool initializeStep() { return mStep();}
     /** Initialize randomly the parameters of the Gaussian mixture. The centers
      *  will be selected randomly among the data set and the standard-deviations
      *  will be set to 1.
      */
     void randomInit();
     /** Compute the weighted mean and the common variance. */
-    void mStep();
+    bool mStep();
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable() + this->nbCluster();}
 };
-
-/** Initialize the parameters using mStep. */
-template<class Array>
-void Gaussian_sk<Array>::initializeStep()
-{ this->initialMean();
-  for (int k= baseIdx; k <= p_tik()->lastIdxCols(); ++k)
-  {
-    p_param(k)->sigma_
-    = std::sqrt( (p_tik()->col(k).transpose()
-                *(*p_data() - (Const::Vector<Real>(p_data()->rows()) * p_param(k)->mean_)).square()).sum()
-        /(this->nbVariable()*p_tik()->col(k).sum())
-       );
-    if (p_param(k)->sigma_ <= 0.) throw Clust::initializeStepFail_;
-  }
-}
 
 /* Initialize randomly the parameters of the Gaussian mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation
@@ -130,17 +115,18 @@ template<class Array>
 void Gaussian_sk<Array>::randomInit()
 {
   this->randomMean();
-  for (int k= baseIdx; k <= components().lastIdx(); ++k)
+  for (int k= baseIdx; k < components().end(); ++k)
   { p_param(k)->sigma_ = 1.;}
 }
 
 /* Compute the weighted mean and the common variance. */
 template<class Array>
-void Gaussian_sk<Array>::mStep()
+bool Gaussian_sk<Array>::mStep()
 {
   // compute the means
-  this->updateMean();
-  for (int k= baseIdx; k <= p_tik()->lastIdxCols(); ++k)
+  if (!this->updateMean()) return false;
+  // compute the variance
+  for (int k= baseIdx; k < p_tik()->endCols(); ++k)
   {
     p_param(k)->sigma_
     = sqrt( ( p_tik()->col(k).transpose()
@@ -149,8 +135,9 @@ void Gaussian_sk<Array>::mStep()
             ).sum()
            /(p_data()->sizeCols()*p_tik()->col(k).sum())
           );
-    if (p_param(k)->sigma_ <= 0.) throw Clust::mStepFail_;
+    if (p_param(k)->sigma_ <= 0.) return false;
   }
+  return true;
 }
 
 } // namespace STK

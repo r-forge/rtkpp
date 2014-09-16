@@ -117,6 +117,34 @@ String exceptionToString( exceptions const& type)
 }
 
 /* @ingroup Clustering
+ *  convert a Mixture to a MixtureClass.
+ *  @param type the type of Mixture
+ *  @return the MixtureClass associated to this Mixture.
+ **/
+MixtureClass MixtureToMixtureClass( Mixture const& type)
+{
+  if (type == Gamma_ajk_bjk_) return Gamma_;
+  if (type == Gamma_ajk_bk_) return Gamma_;
+  if (type == Gamma_ajk_bj_) return Gamma_;
+  if (type == Gamma_ajk_b_) return Gamma_;
+  if (type == Gamma_ak_bjk_) return Gamma_;
+  if (type == Gamma_ak_bk_) return Gamma_;
+  if (type == Gamma_ak_bj_) return Gamma_;
+  if (type == Gamma_ak_b_) return Gamma_;
+  if (type == Gamma_aj_bjk_) return Gamma_;
+  if (type == Gamma_aj_bk_) return Gamma_;
+  if (type == Gamma_a_bjk_) return Gamma_;
+  if (type == Gamma_a_bk_) return Gamma_;
+  if (type == Gaussian_sjk_) return Gaussian_;
+  if (type == Gaussian_sk_) return Gaussian_;
+  if (type == Gaussian_sj_) return Gaussian_;
+  if (type == Gaussian_s_) return Gaussian_;
+  if (type == Categorical_pjk_) return Categorical_;
+  if (type == Categorical_pk_) return Categorical_;
+  return unknown_mixture_class_;
+}
+
+/* @ingroup Clustering
  *  convert a String to an Mixture.
  *  @param type the String we want to convert
  *  @return the Mixture represented by the String @c type. if the string
@@ -125,7 +153,17 @@ String exceptionToString( exceptions const& type)
 Mixture stringToMixture( std::string const& type)
 {
   if (toUpperString(type) == toUpperString(_T("Gamma_ajk_bjk"))) return Gamma_ajk_bjk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_ajk_bk"))) return Gamma_ajk_bk_;
   if (toUpperString(type) == toUpperString(_T("Gamma_ajk_bj"))) return Gamma_ajk_bj_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_ajk_b"))) return Gamma_ajk_b_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_ak_bjk"))) return Gamma_ak_bjk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_ak_bk"))) return Gamma_ak_bk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_ak_bj"))) return Gamma_ak_bj_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_ak_b"))) return Gamma_ak_b_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_aj_bjk"))) return Gamma_aj_bjk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_aj_bk"))) return Gamma_aj_bk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_a_bjk"))) return Gamma_a_bjk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_a_bk"))) return Gamma_a_bk_;
   if (toUpperString(type) == toUpperString(_T("Gaussian_sjk"))) return Gaussian_sjk_;
   if (toUpperString(type) == toUpperString(_T("Gaussian_sk"))) return Gaussian_sk_;
   if (toUpperString(type) == toUpperString(_T("Gaussian_sj"))) return Gaussian_sj_;
@@ -144,7 +182,17 @@ Mixture stringToMixture( std::string const& type, bool& freeProp)
 {
   freeProp = false;
   if (toUpperString(type) == toUpperString(_T("Gamma_p_ajk_bjk"))) return Gamma_ajk_bjk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_p_ajk_bk"))) return Gamma_ajk_bk_;
   if (toUpperString(type) == toUpperString(_T("Gamma_p_ajk_bj"))) return Gamma_ajk_bj_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_p_ajk_b"))) return Gamma_ajk_b_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_p_ak_bjk"))) return Gamma_ak_bjk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_p_ak_bk"))) return Gamma_ak_bk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_p_ak_bj"))) return Gamma_ak_bj_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_p_ak_b"))) return Gamma_ak_b_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_p_aj_bjk"))) return Gamma_aj_bjk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_p_aj_bk"))) return Gamma_aj_bk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_p_a_bjk"))) return Gamma_a_bjk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_p_a_bk"))) return Gamma_a_bk_;
   if (toUpperString(type) == toUpperString(_T("Gaussian_p_sjk"))) return Gaussian_sjk_;
   if (toUpperString(type) == toUpperString(_T("Gaussian_p_sk"))) return Gaussian_sk_;
   if (toUpperString(type) == toUpperString(_T("Gaussian_p_sj"))) return Gaussian_sj_;
@@ -153,7 +201,17 @@ Mixture stringToMixture( std::string const& type, bool& freeProp)
   if (toUpperString(type) == toUpperString(_T("Categorical_p_pk"))) return Categorical_pk_;
   freeProp = true;
   if (toUpperString(type) == toUpperString(_T("Gamma_pk_ajk_bjk"))) return Gamma_ajk_bjk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_pk_ajk_bk"))) return Gamma_ajk_bk_;
   if (toUpperString(type) == toUpperString(_T("Gamma_pk_ajk_bj"))) return Gamma_ajk_bj_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_pk_ajk_b"))) return Gamma_ajk_b_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_pk_ak_bjk"))) return Gamma_ak_bjk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_pk_ak_bk"))) return Gamma_ak_bk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_pk_ak_bj"))) return Gamma_ak_bj_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_pk_ak_b"))) return Gamma_ak_b_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_pk_aj_bjk"))) return Gamma_aj_bjk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_pk_aj_bk"))) return Gamma_aj_bk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_pk_a_bjk"))) return Gamma_a_bjk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_pk_a_bk"))) return Gamma_a_bk_;
   if (toUpperString(type) == toUpperString(_T("Gaussian_pk_sjk"))) return Gaussian_sjk_;
   if (toUpperString(type) == toUpperString(_T("Gaussian_pk_sk"))) return Gaussian_sk_;
   if (toUpperString(type) == toUpperString(_T("Gaussian_pk_sj"))) return Gaussian_sj_;
@@ -171,13 +229,78 @@ Mixture stringToMixture( std::string const& type, bool& freeProp)
 std::string mixtureToString( Mixture const& type)
 {
   if (type == Gamma_ajk_bjk_) return String(_T("Gamma_ajk_bjk"));
+  if (type == Gamma_ajk_bk_) return String(_T("Gamma_ajk_bk"));
   if (type == Gamma_ajk_bj_) return String(_T("Gamma_ajk_bj"));
+  if (type == Gamma_ajk_b_) return String(_T("Gamma_ajk_b"));
+  if (type == Gamma_ak_bjk_) return String(_T("Gamma_ak_bjk"));
+  if (type == Gamma_ak_bk_) return String(_T("Gamma_ak_bk"));
+  if (type == Gamma_ak_bj_) return String(_T("Gamma_ak_bj"));
+  if (type == Gamma_ak_b_) return String(_T("Gamma_ak_b"));
+  if (type == Gamma_aj_bjk_) return String(_T("Gamma_aj_bjk"));
+  if (type == Gamma_aj_bk_) return String(_T("Gamma_aj_bk"));
+  if (type == Gamma_a_bjk_) return String(_T("Gamma_a_bjk"));
+  if (type == Gamma_a_bk_) return String(_T("Gamma_a_bk"));
   if (type == Gaussian_sjk_) return String(_T("Gaussian_sjk"));
   if (type == Gaussian_sk_) return String(_T("Gaussian_sk"));
   if (type == Gaussian_sj_) return String(_T("Gaussian_sj"));
   if (type == Gaussian_s_) return String(_T("Gaussian_s"));
   if (type == Categorical_pjk_) return String(_T("Categorical_pjk"));
   if (type == Categorical_pk_) return String(_T("Categorical_pk"));
+  return String(_T("unknown"));
+}
+
+/* @ingroup Clustering
+ *  convert a Mixture to a string specifying if the model is with free
+ *  proportions.
+ *  @sa stringToMixture
+ *  @param type the Mixture we want to convert
+ *  @param freeProp @c true if the model have free proportions, @c false otherwise.
+ *  @return the string represented by the Mixture @c type.
+ **/
+std::string mixtureToString(Mixture type, bool freeProp)
+{
+  if (freeProp == false)
+  {
+    if (type == Gamma_ajk_bjk_) return String(_T("Gamma_p_ajk_bjk"));
+    if (type == Gamma_ajk_bk_) return String(_T("Gamma_p_ajk_bk"));
+    if (type == Gamma_ajk_bj_) return String(_T("Gamma_p_ajk_bj"));
+    if (type == Gamma_ajk_b_) return String(_T("Gamma_p_ajk_b"));
+    if (type == Gamma_ak_bjk_) return String(_T("Gamma_p_ak_bjk"));
+    if (type == Gamma_ak_bk_) return String(_T("Gamma_p_ak_bk"));
+    if (type == Gamma_ak_bj_) return String(_T("Gamma_p_ak_bj"));
+    if (type == Gamma_ak_b_) return String(_T("Gamma_p_ak_b"));
+    if (type == Gamma_aj_bjk_) return String(_T("Gamma_p_aj_bjk"));
+    if (type == Gamma_aj_bk_) return String(_T("Gamma_p_aj_bk"));
+    if (type == Gamma_a_bjk_) return String(_T("Gamma_p_a_bjk"));
+    if (type == Gamma_a_bk_) return String(_T("Gamma_p_a_bk"));
+    if (type == Gaussian_sjk_) return String(_T("Gaussian_p_sjk"));
+    if (type == Gaussian_sk_) return String(_T("Gaussian_p_sk"));
+    if (type == Gaussian_sj_) return String(_T("Gaussian_p_sj"));
+    if (type == Gaussian_s_) return String(_T("Gaussian_p_s"));
+    if (type == Categorical_pjk_) return String(_T("Categorical_p_pjk"));
+    if (type == Categorical_pk_) return String(_T("Categorical_p_pk"));
+  }
+  else
+  {
+    if (type == Gamma_ajk_bjk_) return String(_T("Gamma_pk_ajk_bjk"));
+    if (type == Gamma_ajk_bk_) return String(_T("Gamma_pk_ajk_bk"));
+    if (type == Gamma_ajk_bj_) return String(_T("Gamma_pk_ajk_bj"));
+    if (type == Gamma_ajk_b_) return String(_T("Gamma_pk_ajk_b"));
+    if (type == Gamma_ak_bjk_) return String(_T("Gamma_pk_ak_bjk"));
+    if (type == Gamma_ak_bk_) return String(_T("Gamma_pk_ak_bk"));
+    if (type == Gamma_ak_bj_) return String(_T("Gamma_pk_ak_bj"));
+    if (type == Gamma_ak_b_) return String(_T("Gamma_pk_ak_b"));
+    if (type == Gamma_aj_bjk_) return String(_T("Gamma_pk_aj_bjk"));
+    if (type == Gamma_aj_bk_) return String(_T("Gamma_pk_aj_bk"));
+    if (type == Gamma_a_bjk_) return String(_T("Gamma_pk_a_bjk"));
+    if (type == Gamma_a_bk_) return String(_T("Gamma_pk_a_bk"));
+    if (type == Gaussian_sjk_) return String(_T("Gaussian_pk_sjk"));
+    if (type == Gaussian_sk_) return String(_T("Gaussian_pk_sk"));
+    if (type == Gaussian_sj_) return String(_T("Gaussian_pk_sj"));
+    if (type == Gaussian_s_) return String(_T("Gaussian_pk_s"));
+    if (type == Categorical_pjk_) return String(_T("Categorical_pk_pjk"));
+    if (type == Categorical_pk_) return String(_T("Categorical_pk_pk"));
+  }
   return String(_T("unknown"));
 }
 

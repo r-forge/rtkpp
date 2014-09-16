@@ -75,7 +75,7 @@ class DiagGaussianBase : public IMixtureModel<Derived >
     Real impute(int i, int j) const
     {
       Real sum = 0.;
-      for (int k= baseIdx; k <= p_tik()->lastIdxCols(); ++k)
+      for (int k= baseIdx; k < p_tik()->endCols(); ++k)
       { sum += p_tik()->elt(i,k) * p_param(k)->mean(j);}
       return sum;
     }
@@ -96,7 +96,7 @@ class DiagGaussianBase : public IMixtureModel<Derived >
 
       for (int k= 0; k < nbClust; ++k)
       {
-        for (int j=  p_data()->beginCols();  j <= p_data()->lastIdxCols(); ++j)
+        for (int j=  p_data()->beginCols();  j < p_data()->endCols(); ++j)
         {
           params(2*k+  baseIdx, j) = p_param(k+baseIdx)->mean(j);
           params(2*k+1+baseIdx, j) = p_param(k+baseIdx)->sigma(j);
@@ -107,7 +107,7 @@ class DiagGaussianBase : public IMixtureModel<Derived >
     void writeParameters(ostream& os) const
     {
       Array2DPoint<Real> sigma(p_data()->cols());
-      for (int k= baseIdx; k <= components().lastIdx(); ++k)
+      for (int k= baseIdx; k < components().end(); ++k)
       {
         // store sigma values in an array for a nice output
         for (int j= sigma.begin();  j <= sigma.lastIdx(); ++j)
@@ -123,16 +123,14 @@ class DiagGaussianBase : public IMixtureModel<Derived >
      *  of the data set.
      **/
     void randomMean();
-    /** compute the initial weighted mean of a Gaussian mixture. */
-    void initialMean();
     /** compute the weighted mean of a Gaussian mixture. */
-    void updateMean();
+    bool updateMean();
 };
 
 template<class Derived>
 void DiagGaussianBase<Derived>::randomMean()
 {
-  for (int k= baseIdx; k <= p_tik()->lastIdxCols(); ++k)
+  for (int k= baseIdx; k < p_tik()->endCols(); ++k)
   {
     // random number in [0, size[
     int i = p_data()->beginRows() + std::floor(Law::Uniform::rand(0.,1.)*this->nbSample());
@@ -141,26 +139,17 @@ void DiagGaussianBase<Derived>::randomMean()
 }
 
 template<class Derived>
-void DiagGaussianBase<Derived>::initialMean()
+bool DiagGaussianBase<Derived>::updateMean()
 {
-  for (int k= baseIdx; k <= p_tik()->lastIdxCols(); ++k)
+  for (int k= baseIdx; k < p_tik()->endCols(); ++k)
   {
     ColVector tik(p_tik()->col(k), true); // create a reference
-    p_param(k)->mean_ = Stat::mean(*p_data(), p_tik()->col(k));
-    if (p_param(k)->mean_.nbAvailableValues() != p_param(k)->mean_.size()) throw Clust::initializeStepFail_;
+    p_param(k)->mean_.move(Stat::mean(*p_data(), tik));
+    if (p_param(k)->mean_.nbAvailableValues() != p_param(k)->mean_.size()) return false;
   }
+  return true;
 }
 
-template<class Derived>
-void DiagGaussianBase<Derived>::updateMean()
-{
-  for (int k= baseIdx; k <= p_tik()->lastIdxCols(); ++k)
-  {
-    ColVector tik(p_tik()->col(k), true); // create a reference
-    p_param(k)->mean_ = Stat::mean(*p_data(), tik);
-    if (p_param(k)->mean_.nbAvailableValues() != p_param(k)->mean_.size()) throw Clust::mStepFail_;
-  }
-}
 } // namespace STK
 
 #endif /* STK_DIAGGAUSSIANBASE_H */

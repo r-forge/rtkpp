@@ -57,16 +57,18 @@ class IMixture;
  * The density \e f is called the component of the model. The parameters
  * \f$\boldsymbol{\lambda}^l_k, \, k=1,\ldots K \f$ are the cluster specific parameters
  * and the parameters \f$ \boldsymbol{\alpha}^l \f$ are the shared parameters.
- * */
+ *
+ * The MixtureComposer class offer some
+ **/
 class MixtureComposer : public IMixtureComposer
 {
   public:
     typedef std::vector<IMixture*>::const_iterator ConstMixtIterator;
     typedef std::vector<IMixture*>::iterator MixtIterator;
     /** Constructor.
-     * @param nbCluster,nbSample,nbVariable number of clusters, samples and Variables
+     *  @param nbCluster,nbSample number of clusters and samples.
      */
-    MixtureComposer( int nbSample, int nbVariable, int nbCluster);
+    MixtureComposer( int nbSample, int nbCluster);
     /** copy constructor.
      *  @param composer the composer to copy
      */
@@ -86,13 +88,6 @@ class MixtureComposer : public IMixtureComposer
     virtual MixtureComposer* create() const;
     /** Create a clone of the current model, with mixtures parameters preserved. */
     virtual MixtureComposer* clone() const;
-
-    /** initialize randomly the parameters of the components of the model */
-    virtual void randomInit();
-    /** Compute the proportions and the model parameters given the current tik
-     *  mixture parameters.
-     **/
-    virtual void mStep();
     /** @return the value of the probability of the i-th sample in the k-th component.
      *  @param i index of the sample
      *  @param k index of the component
@@ -104,15 +99,23 @@ class MixtureComposer : public IMixtureComposer
      *  lookup on the mixtures and sum the nbFreeParameter.
      **/
     virtual int computeNbFreeParameters() const;
+    /** @brief compute the number of variables of the model.
+     *  lookup on the mixtures and sum the nbFreeParameter.
+     **/
+    int computeNbVariables() const;
+
+    /** initialize randomly the parameters of the components of the model */
+    virtual void randomInit();
+    /** Compute the proportions and the model parameters given the current tik
+     *  mixture parameters.
+     **/
+    virtual void mStep();
     /**@brief This step can be used by developer to initialize any thing which
      * is not the model. It will be called before running the estimation
-     * algorithm. In this class, the @c initializeSterp method
-     *  - set the number of free parameters using the pure virtual function @¢ computeNbFreeParameters()
-     *  - Compute the
+     * algorithm. In this class, the @c initializeStep method
+     *  - Set the arrays tik_, prop_, zi_ to default values
      *  - call the initializeStep() of all the mixtures,
-     *  First initialization of the parameters of the model.
      *  This method is called in order to initialize the parameters.
-     *
      **/
     virtual void initializeStep();
     /** @brief Impute the missing values.
@@ -130,17 +133,20 @@ class MixtureComposer : public IMixtureComposer
      *  be called only once after we finish running the estimation algorithm.
      **/
     virtual void finalizeStep();
-    /** @return the likelihood of the i-th sample.
-     *  @param i index of the sample
-     **/
-    Real likelihood(int i) const;
     /** @brief register a mixture to the composer.
      *  When a mixture is registered, the composer:
      *  - assign composer pointer (itself) to the mixture
      *  - add it to v_mixtures_
+     *  - update the number of variables
      * @param p_mixture a pointer on the mixture
      **/
     void registerMixture(IMixture* p_mixture);
+    /** @brief release a mixture from the composer.
+     *  When a mixture is released, the composer remove it from v_mixtures_.
+     *  @note the end-user is responsible of the release of the mixture itself.
+     *  @param idData the Id of the mixture
+     **/
+    void releaseMixture(String const& idData);
     /** Utility method allowing to create all the mixtures using the DataHandler
      *  info of the manager.
      **/
@@ -168,7 +174,30 @@ class MixtureComposer : public IMixtureComposer
     void createMixture(MixtureManager& manager, String const& idData)
     {
       IMixture* p_mixture = manager.createMixture( idData, nbCluster());
+#ifdef STK_MIXTURE_DEBUG
+      if (!p_mixture)
+      { stk_cout << _T("In MixtureComposer::createMixture(manager,")<< idData << _T(") failed.\n");}
+#endif
       if (p_mixture) registerMixture(p_mixture);
+    }
+    /** Utility method allowing to release completely a mixture with its data set.
+     *  The MixtureManager will find and release the associated data set.
+     *  @param manager the manager with the responsibility of the release.
+     *  @param idData the id name of the data to modelize.
+     **/
+    template<class MixtureManager>
+    void releaseMixture(MixtureManager& manager, String const& idData)
+    {
+      IMixture* p_mixture = getMixture(idData);
+#ifdef STK_MIXTURE_DEBUG
+      if (!p_mixture)
+      { stk_cout << _T("In MixtureComposer::releaseMixture(manager,")<< idData << _T(") failed.\n");}
+#endif
+      if (p_mixture)
+      {
+        releaseMixture(idData);
+        manager.releaseMixture( idData);
+      }
     }
     /** Utility method allowing to get the parameters of a specific mixture.
      *  @param manager the manager with the responsibility of the parameters
@@ -208,15 +237,13 @@ class MixtureComposerFixedProp : public MixtureComposer
 {
   public:
     /** Constructor.
-     * @param nbCluster,nbSample,nbVariable number of clusters, samples and Variables
+     * @param nbCluster,nbSample number of clusters and samples
      */
-    inline MixtureComposerFixedProp( int nbSample, int nbVariable, int nbCluster)
-                                   : MixtureComposer( nbSample, nbVariable, nbCluster) {}
+    MixtureComposerFixedProp( int nbSample, int nbCluster);
     /** copy constructor.
      *  @param model the model to copy
      */
-    inline MixtureComposerFixedProp( MixtureComposer const& model)
-                                   : MixtureComposer(model) {}
+    inline MixtureComposerFixedProp( MixtureComposer const& model);
     /** destructor */
     inline virtual ~MixtureComposerFixedProp() {}
     /** Create a composer, but reinitialize the mixtures parameters. */

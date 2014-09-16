@@ -65,14 +65,15 @@ class IDataManager
     inline virtual ~IDataManager() {}
     /** return the Id of the mixture */
     inline std::string const& idData() const { return idData_;}
-    /** getter. @return a the number of variables (the number of columns of the data)  */
+    /** getter. @return the number of variables (the number of columns of the data)  */
     inline int nbVariable() const { return nbVariable_;}
     /** getter. @return the coordinates of the missing values in the data set */
     inline std::vector<std::pair<int,int> > const& v_missing() const { return v_missing_;}
-    /** number of variables in the data set */
-    int nbVariable_;
     /** Convenient function to use in order to initialize v_missing_ and the data set. */
     inline void initialize() { findMissing(); removeMissing(); }
+
+    /** number of variables in the data set */
+    int nbVariable_;
 
   protected:
     /** vector with the coordinates of the missing values */

@@ -27,13 +27,7 @@
 #
 #-----------------------------------------------------------------------
 # Macro definitions
-ifeq ($(MAKEVARS),)
-	include ../../../$(RELATIVEMAKEVARS)
-else
-	include $(MAKEVARS)
-endif
-
-ifneq ($(wildcard makevars.local),)
+ifneq ($(wildcard ./makevars.local),) 
 	include makevars.local
 endif
 
@@ -41,11 +35,6 @@ endif
 # Paths
 INC_DIR = ../include/
 PROJECTS_DIR = ../..
-
-# fallback to default if BIN_DIR does not exists (window hack) 
-ifeq ($(wildcard $(BIN_DIR)),)
-BIN_DIR = ../../../bin/
-endif
 
 #-----------------------------------------------------------------------
 # header files

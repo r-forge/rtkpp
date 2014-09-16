@@ -96,7 +96,7 @@ class IDataHandler
     /** write the info on os */
     void writeInfo(ostream& os) const;
 
-  private:
+  protected:
     /** Store the informations  of the mixtures in the form (idData, idModel) with
      * - idData: an arbitrary idData for data.
      * - idModel: a string which represent a (statistical) model.

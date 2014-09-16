@@ -3,6 +3,7 @@ export(clusterAlgo
       ,clusterStrategy
       ,diagGaussianNames
       ,clusterDiagGaussian
+      ,clusterGamma
       )
 
 export(CxxFlags,
@@ -14,13 +15,14 @@ exportClasses(ClusterAlgo
              ,ClusterStrategy
              ,IClusterModel
              ,ClusterCategoricalModel
-             ,ClusterDiagGaussianModel
-             ,ClusterGammaModel
+             ,ClusterDiagGaussian
+             ,ClusterGamma
              )
 
 exportMethods(print)
 exportMethods(plot)
 exportMethods(show)
+exportMethods(summary)
 exportPattern("^[[:alpha:]]+")
 
 import(Rcpp)

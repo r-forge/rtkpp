@@ -22,6 +22,9 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
+#' @include ClusterStrategy.R
+NULL
+
 #' Interface Class [\code{\linkS4class{IClusterModel}}] for Cluster models.
 #'
 #' This class encapsulate the common parameters of all the Cluster models.
@@ -45,7 +48,10 @@
 #' @slot missings   \code{\link{matrix}} of two columns with the indexes (i,j) of the missing values.
 #' @slot lnLikelihood Real given the ln-liklihood of the Cluster model.
 #' @slot criterion Real given the value of the AIC or BIC criterion.
+#' @slot nbFreeParameter Integer given the number of free parameters of the model.
 #' @slot modelName mixture model name.
+#' @slot strategy  the instance of the [\code{\linkS4class{ClusterStrategy}}] used in the
+#' estimation process of the mixture.
 #'
 #' @examples
 #'   getSlots("IClusterModel")
@@ -67,7 +73,9 @@ setClass(
                 , missings = "matrix"
                 , lnLikelihood = "numeric"
                 , criterion = "numeric"
+                , nbFreeParameter = "numeric"
                 , modelName = "character"
+                , strategy = "ClusterStrategy"
                 , "VIRTUAL"
                 ),
   prototype=list( data = matrix(nrow=0,ncol=0)
@@ -79,38 +87,50 @@ setClass(
                 , missings = matrix(nrow=0, ncol=2)
                 , lnLikelihood = -Inf
                 , criterion = -Inf
+                , nbFreeParameter = 0
                 , modelName = character(1)
-  ),
+                , strategy = clusterStrategy()
+                ),
   # validity function
   validity=function(object)
   {
     nbSample  = nrow(object@data)
     nbCluster = object@nbCluster
-    # check nbCluster dimensions
+    # check nbCluster
     if (round(nbCluster)!=object@nbCluster)
     {stop("nbCluster must be an integer.")}
     if( nbCluster < 2 )
     {  stop("nbCluster must be greater than 1.")}
+    # check pk
     if (length(object@pk) != nbCluster)
     {stop("pk must have length nbCluster.")}
+    # check tik
     if (ncol(object@tik) != nbCluster)
     {stop("tik must have nbCluster columns.")}
     if (nrow(object@tik) != nbSample)
     {stop("tik must have nbSample rows.")}
+    # check fi
     if (length(object@fi) != nbSample)
     {stop("fi must have nbSample size.")}
+    # check zi
     if (length(object@zi) != nbSample)
     {stop("zi must have nbSample size.")}
+    # check nbFreeParameter
+    if (round(object@nbFreeParameter)!=object@nbFreeParameter)
+    {stop("nbFreeParameter must be an integer.")}
     return(TRUE)
   }
 )
 
 #-----------------------------------------------------------------------
-#' Initialize an instance of the [\code{\linkS4class{IClusterModel}}] class.
+#' Initialize an instance of a rtkpp class.
 #'
-#' Initialization method. Used internally in the `rtkpp' package.
+#' Initialization method of the [\code{\linkS4class{IClusterModel}}] class.
+#' Used internally in the `rtkpp' package.
 #'
+#' @rdname initialize-methods
 #' @keywords internal
+#'
 setMethod(
     f="initialize",
     signature=c("IClusterModel"),
@@ -132,161 +152,9 @@ setMethod(
       .Object@tik <- matrix(1/nbCluster, nbSample, nbCluster)
       .Object@fi  <- rep(0, nbSample)
       .Object@zi  <- as.integer(rep(1, nbSample))
-      # validate
-      # validObject(.Object) will be called at the end of the intialization process
-      return(.Object)
-    }
-)
-
-
-#-----------------------------------------------------------------------
-#' Definition of the [\code{\linkS4class{ClusterGammaModel}}] class
-#'
-#' This class defines a gamma mixture Model. Inherits from the
-#'[\code{\linkS4class{IClusterModel}}] class. A gamma mixture model is
-#' a mixture model of the form
-#'
-#' \deqn{
-#'   f({x}|\boldsymbol{\theta}) \\
-#'   =\sum_{k=1}^K p_k \prod_{j=1}^d \gamma(x_j;a_{jk},b_{jk}) \\
-#'    \quad {x} \in {R}^d.
-#' }
-#'
-#' @slot ajk  Matrix with the shape of the jth variable in the kth cluster.
-#' @slot bjk  Matrix with the scale of the jth variable in the kth cluster.
-#'
-#' @examples
-#'   getSlots("ClusterGammaModel")
-#'   data(geyser)
-#'   new("ClusterGammaModel", data=geyser)
-#'
-#' @author Serge Iovleff
-#'
-#' @name ClusterGammaModel
-#' @rdname ClusterGammaModel-class
-#' @aliases ClusterGammaModel-class
-#' @exportClass ClusterGammaModel
-#'
-setClass(
-    Class="ClusterGammaModel",
-    representation( ajk = "matrix", bjk = "matrix"),
-    contains=c("IClusterModel"),
-    prototype=list( ajk = matrix(nrow=0,ncol=0)
-                  , bjk = matrix(nrow=0,ncol=0)
-                  ),
-    validity=function(object)
-    {
-      if (ncol(object@ajk)!=object@nbCluster)
-      {stop("ajk must have nbCluster columns.")}
-      if (nrow(object@ajk)!=ncol(object@data))
-      {stop("ajk must have nbVariable rows.")}
-      if (ncol(object@bjk)!=object@nbCluster)
-      {stop("bjk must have nbCluster columns.")}
-      if (nrow(object@bjk)!=ncol(object@data))
-      {stop("bjk must have nbVariable rows.")}
-      if (!(object@modelName %in% c("gamma_ajk_bjk", "gamma_ajk_bj")))
-      {stop("Invalid Gamma model name.")}
-      return(TRUE)
-    }
-)
-
-#-----------------------------------------------------------------------
-#' Initialize an instance of the [\code{\linkS4class{ClusterGammaModel}}] class.
-#'
-#' Initialization method. Used internally in the `rtkpp' package.
-#'
-#' @keywords internal
-setMethod(
-    f="initialize",
-    signature=c("ClusterGammaModel"),
-    definition=function(.Object, data, nbCluster=2, modelName="gamma_ajk_bjk")
-    {
-      .Object <- callNextMethod(.Object, data, nbCluster, modelName)
-      # for modelName
-      if(missing(modelName)) {.Object@modelName<-"gamma_ajk_bjk"}
-      else  {.Object@modelName<-modelName}
-      # resize
-      nbVariable <- ncol(.Object@data)
-      .Object@ajk <- matrix(0, nbVariable, nbCluster)
-      .Object@bjk <- matrix(1, nbVariable, nbCluster)
-      # validate
-      validObject(.Object)
-      return(.Object)
-    }
-)
-
-#-----------------------------------------------------------------------
-#' Definition of the [\code{\linkS4class{ClusterCategoricalModel}}] class
-#'
-#' This class defines a categorical mixture Model. Inherits from the
-#'[\code{\linkS4class{IClusterModel}}] class. A categorical mixture model is
-#' a mixture model of the form
-#'
-#' \deqn{
-#'   f({x}|\boldsymbol{\theta}) \\
-#'   =\sum_{k=1}^K p_k \prod_{j=1}^d \mathcal{M}(x_j;p_{jk},1) \\
-#'    \quad {x} \in \{1,\ldots,L\}^d.
-#' }
-#'
-#' @slot pljk  Array with the probability of the jth variable in the kth cluster
-#' to be l.
-#'
-#' @examples
-#'   getSlots("ClusterCategoricalModel")
-#'   data(geyser)
-#'   new("ClusterCategoricalModel", data=geyser)
-#'
-#' @author Serge Iovleff
-#'
-#' @name ClusterCategoricalModel-class
-#' @rdname ClusterCategoricalModel-class
-#' @aliases ClusterCategoricalModel-class
-#' @exportClass ClusterCategoricalModel
-#'
-setClass(
-    Class="ClusterCategoricalModel",
-    representation( pljk = "array"),
-    contains=c("IClusterModel"),
-    prototype=list( pljk = array(dim=c(0,0,0))),
-    validity=function(object)
-    {
-      dims <- dim(object@pljk)
-      nbVariable <- ncol(object@data)
-
-      if (dims[3]!=object@nbCluster)
-      {stop("Third dimension in pljk must be nbCluster.")}
-      if (dims[2]!=ncol(object@data))
-      {stop("Second dimension in pljk must be nbVariable.")}
-      if (!(object@modelName %in% c("categorical_pjk", "categorical_pk")))
-      {stop("Invalid Categorical model name.")}
-      return(TRUE)
-    }
-)
-
-#-----------------------------------------------------------------------
-#' Initialize an instance of the [\code{\linkS4class{ClusterCategoricalModel}}] class.
-#'
-#' Initialization method. Used internally in the `rtkpp' package.
-#'
-#' @keywords internal
-setMethod(
-    f="initialize",
-    signature=c("ClusterCategoricalModel"),
-    definition=function(.Object, data, nbCluster=2, modelName="categorical_pjk")
-    {
-      .Object <- callNextMethod(.Object, data, nbCluster, modelName)
-      # for modelName
-      if(missing(modelName)) {.Object@modelName<-"categorical_pjk"}
-      else  {.Object@modelName<-modelName}
-      # resize
-      nbVariable <- ncol(.Object@data)
-      # get number of modalities
-      if ( is.factor(data) ) { nbModalities <- nlevels(data)}
-      else {  nbModalities <- nlevels(factor(.Object@data))}
-      nbVariable <- ncol(.Object@data)
-      .Object@pljk <- array(data = 1/nbModalities,dim=c(nbModalities,nbVariable,.Object@nbCluster))
-      # validate
-      validObject(.Object)
+      .Object@strategy <- clusterStrategy()
+      # validObject(.Object) will be called at the end of the initialization process
+      # in the derived classes
       return(.Object)
     }
 )
@@ -296,7 +164,6 @@ setMethod(
 # @docType methods
 #' @rdname extract-methods
 #' @aliases [,IClusterModel-method
-#'
 setMethod(
     f="[",
     signature(x = "IClusterModel"),
@@ -340,15 +207,40 @@ setMethod(
 #-----------------------------------------------------------------------
 #' @rdname print-methods
 #' @aliases print print,IClusterModel-method
-#'
 setMethod(
     f="show",
     signature=c("IClusterModel"),
     function(object)
     {
+      if(length(object@data)!=0)
+      {
+        nrowShow <- min(10,nrow(object@data))
+        ncolShow <- min(10,ncol(object@data))
+        cat("* data (limited to 10 samples and 10 variables) =\n")
+        print(format(object@data[1:nrowShow,1:ncolShow]),quote=FALSE)
+      }
+      cat("* ... ...\n")
       cat("* nbCluster    = ", object@nbCluster, "\n")
       cat("* lnLikelihood = ", object@lnLikelihood,"\n")
       cat("* criterion    = ", object@criterion, "\n")
       cat("* model name   = ", object@modelName, "\n")
+    }
+)
+
+#-----------------------------------------------------------------------
+#' @rdname summary-methods
+#' @aliases summary summary,IClusterModel-method
+setMethod(
+    f="summary",
+    signature=c("IClusterModel"),
+    function(object,...)
+    {
+      cat("* nbSample       = ", nrow(object@data), "\n")
+      cat("* nbVariable     = ", ncol(object@data), "\n")
+      cat("* nbCluster      = ", object@nbCluster, "\n")
+      cat("* lnLikelihood   = ", object@lnLikelihood,"\n")
+      cat("* criterion      = ", object@criterion, "\n")
+      cat("* nbFreeParameter= ", object@nbFreeParameter, "\n")
+      cat("* model name     = ", object@modelName, "\n")
     }
 )

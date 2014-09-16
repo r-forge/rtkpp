@@ -40,19 +40,19 @@ getSlots("ClusterCategoricalModel")
 
 
 cleanEx()
-nameEx("ClusterDiagGaussianModel-class")
-### * ClusterDiagGaussianModel-class
+nameEx("ClusterDiagGaussian-class")
+### * ClusterDiagGaussian-class
 
 flush(stderr()); flush(stdout())
 
-### Name: ClusterDiagGaussianModel
-### Title: Definition of the ['ClusterDiagGaussianModel'] class
-### Aliases: ClusterDiagGaussianModel ClusterDiagGaussianModel-class
+### Name: ClusterDiagGaussian
+### Title: Definition of the ['ClusterDiagGaussian'] class
+### Aliases: ClusterDiagGaussian ClusterDiagGaussian-class
 
 ### ** Examples
 
-getSlots("ClusterDiagGaussianModel")
-  new("ClusterDiagGaussianModel", data=iris[1:4])
+getSlots("ClusterDiagGaussian")
+  new("ClusterDiagGaussian", data=iris[1:4])
 
 
 

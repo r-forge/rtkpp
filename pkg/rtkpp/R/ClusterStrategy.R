@@ -22,6 +22,10 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
+#' @include ClusterInit.R
+NULL
+
+#-----------------------------------------------------------------------
 #' Create an instance of [\code{\linkS4class{ClusterStrategy}}] class
 #'
 #' A strategy is a multistage empirical process for finding a
@@ -44,7 +48,7 @@
 #' This process can be repeated at least \code{nbTry} times. If all the tries failed,
 #' an empty model is returned.
 #'
-#' @param nbInit Integer defining the number of initialization to try. Default value: 5.
+#' @param nbInit Integer defining the number of initialization to try. Default value: 3.
 #' @param initMethod Character string with the initialisation method.
 #' @param initAlgo Character string with the algorithm to use in the initialization stage.
 #' Default value: "SEM"
@@ -77,13 +81,13 @@
 #' @examples
 #'    clusterStrategy()
 #'    clusterStrategy(longRunAlgo= "CEM", nbLongIteration=100)
-#'    clusterStrategy(nbTry = 3, nbInit= 1, shortRunAlgo= "SEM", nbShortIteration=100)
+#'    clusterStrategy(nbTry = 1, nbInit= 1, shortRunAlgo= "SEM", nbShortIteration=100)
 #'
 #' @return a [\code{\linkS4class{ClusterStrategy}}] object
 #' @author Serge Iovleff
 #' @export
 clusterStrategy <- function( nbTry =1
-                           , nbInit= 5, initMethod="random", initAlgo= "SEM", nbInitIteration=20, initEpsilon=0.01
+                           , nbInit= 3, initMethod="random", initAlgo= "SEM", nbInitIteration=20, initEpsilon=0.01
                            , nbShortRun= 5, shortRunAlgo= "EM", nbShortIteration=100, shortEpsilon=1e-04
                            , longRunAlgo= "EM", nbLongIteration=1000, longEpsilon=1e-07
                            )
@@ -128,7 +132,7 @@ clusterStrategy <- function( nbTry =1
 setClass(
     Class="ClusterStrategy",
     slots=c( nbTry = "numeric", nbShortRun = "numeric", initMethod = "ClusterInit", shortAlgo="ClusterAlgo", longAlgo="ClusterAlgo" ),
-    prototype=list(  nbTry = 5, nbShortRun=5, initMethod = clusterInit(), shortAlgo=clusterAlgo("EM",100,1e-04), longAlgo=clusterAlgo("EM",1000,1e-07)),
+    prototype=list(  nbTry = 1, nbShortRun=5, initMethod = clusterInit(), shortAlgo=clusterAlgo("EM",100,1e-04), longAlgo=clusterAlgo("EM",1000,1e-07)),
     # validity function
     validity=function(object)
     {
@@ -150,13 +154,13 @@ setClass(
 
 
 #-----------------------------------------------------------------------
-#' Create an instance of the [\code{\linkS4class{ClusterStrategy}}] class using new/initialize.
+#' Initialize an instance of a rtkpp class.
 #'
-#' Initialization method. Used internally in the `rtkpp' package.
+#' Initialization method of the [\code{\linkS4class{ClusterStrategy}}] class.
+#' Used internally in the `rtkpp' package.
 #'
-# @seealso \code{\link{initialize}}
 #' @keywords internal
-# @rdname initialize-methods
+#' @rdname initialize-methods
 #'
 setMethod(
   f="initialize",
@@ -164,7 +168,7 @@ setMethod(
   definition=function(.Object, nbTry, nbShortRun, initMethod, shortAlgo, longAlgo)
   {
     # for nbtry
-    if(missing(nbTry)) {.Object@nbTry<-5}
+    if(missing(nbTry)) {.Object@nbTry<-1}
     else  {.Object@nbTry<-nbTry}
     # for nbtry
     if(missing(nbShortRun)) {.Object@nbShortRun<-5}

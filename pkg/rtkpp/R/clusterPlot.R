@@ -26,7 +26,7 @@
 ##############################
 # Adapted from Rmixmod package
 ##############################
-# x is a clas deriving from IClusterModel
+# x is a class deriving from IClusterModel
 # y is a list of variable
 # ddensity : the density to plot on the histograms
 .clusterPlot <- function(model, y, ddensity,...)
@@ -55,7 +55,10 @@
   par(cex = .75)                        # decreasing font size
   nbCol = length(y)                     # size of the matrix screen
   split.screen(c(nbCol, nbCol))         # create layout matrix screens
-  col=model@zi+1; pch=model@zi;         # colors and labels
+  col = model@zi+2;                       # color for each group
+  col[model@missings[,1]] = 1             # black color for missing values
+  pch = rep(1, length.out = length(col)); # circles
+  pch[model@missings[,1]] = 3;            # + for missing faues
   # create histograms on the diagonal
   for ( i in 1:nbCol )
   {
@@ -64,9 +67,7 @@
     density<-matrix(nrow=model@nbCluster, ncol=length(xValues))
     # loop over the clusters to generate densities
     for( k in 1:model@nbCluster )
-    {
-      density[k,]<- ddensity(xValues, y[i], k, model)
-    }
+    {  density[k,]<- ddensity(xValues, y[i], k, model);}
     # generate mixture density
     mixture<-apply(density,2,sum)
     if (is.numeric(y)) { xlab=colnames(model@data)[y[i]];}

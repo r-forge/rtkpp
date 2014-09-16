@@ -77,10 +77,6 @@ bool StrategyFacade::run()
   bool flag = false;
   if (p_strategy_)
   {
-    if (p_model_->state() == Clust::modelCreated_)
-    {
-      p_model_->initializeStep();
-    }
     if (p_strategy_->run())
     { flag = true;
 #ifdef STK_MIXTURE_VERBOSE

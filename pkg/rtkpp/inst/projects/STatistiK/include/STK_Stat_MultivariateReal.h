@@ -254,7 +254,7 @@ class Multivariate<Array, Real> : public IRunnerUnsupervised< Array, typename Ar
  *  \f]
  *  @param V variable
  *  @param cov the computed covariance
- *  @param unbiased @c true if we want an unbiased estimator of the variance,
+ *  @param unbiased @c true if we want an unbiased estimate of the variance,
  *  @c false otherwise (default is @c false)
  **/
 template < class Array >
@@ -282,7 +282,7 @@ void covariance( Array const& V, MatrixSquare & cov, bool unbiased = false)
  *  @param V the variable
  *  @param W the weights
  *  @param cov the computed covariance
- *  @param unbiased @c true if we want an unbiased estimator of the variance,
+ *  @param unbiased @c true if we want an unbiased estimate of the variance,
  *  @c false otherwise (default is @c false)
  **/
 template <class Array, class WColVector >

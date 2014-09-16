@@ -38,14 +38,24 @@
 
 #include "../STK_IMixture.h"
 
+#include "../GammaMixtureModels/STK_Gamma_ajk_bjk.h"
+#include "../GammaMixtureModels/STK_Gamma_ajk_bk.h"
+#include "../GammaMixtureModels/STK_Gamma_ajk_bj.h"
+#include "../GammaMixtureModels/STK_Gamma_ajk_b.h"
+#include "../GammaMixtureModels/STK_Gamma_ak_bjk.h"
+#include "../GammaMixtureModels/STK_Gamma_ak_bk.h"
+#include "../GammaMixtureModels/STK_Gamma_ak_bj.h"
+#include "../GammaMixtureModels/STK_Gamma_ak_b.h"
+#include "../GammaMixtureModels/STK_Gamma_aj_bjk.h"
+#include "../GammaMixtureModels/STK_Gamma_aj_bk.h"
+#include "../GammaMixtureModels/STK_Gamma_a_bjk.h"
+#include "../GammaMixtureModels/STK_Gamma_a_bk.h"
+#include "../GaussianMixtureModels/STK_Gaussian_sjk.h"
+#include "../GaussianMixtureModels/STK_Gaussian_sk.h"
+#include "../GaussianMixtureModels/STK_Gaussian_sj.h"
+#include "../GaussianMixtureModels/STK_Gaussian_s.h"
 #include "../CategoricalMixtureModels/STK_Categorical_pjk.h"
 #include "../CategoricalMixtureModels/STK_Categorical_pk.h"
-#include "../GammaMixtureModels/STK_Gamma_ajk_bjk.h"
-#include "../GammaMixtureModels/STK_Gamma_ajk_bj.h"
-#include "../GaussianMixtureModels/STK_Gaussian_sjk.h"
-#include "../GaussianMixtureModels/STK_Gaussian_sj.h"
-#include "../GaussianMixtureModels/STK_Gaussian_sk.h"
-#include "../GaussianMixtureModels/STK_Gaussian_s.h"
 
 #include "../STK_DataManager.h"
 
@@ -67,7 +77,7 @@ struct MixtureBridgeTraits<Clust::Categorical_pjk_, Data>
   /** Type of the Mixture model */
   typedef Categorical_pjk<Data> Mixture;
   /** Type of the DataManager */
-  typedef DataManager<Clust::Categorical_pjk_, Data> DataBridge;
+  typedef DataManager<Clust::Categorical_, Data> DataBridge;
 };
 /** @ingroup hidden
  *  Partial specialization of the MixtureBridgeTraits for the Categorical_pk model
@@ -78,10 +88,10 @@ struct MixtureBridgeTraits<Clust::Categorical_pk_, Data>
   /** Type of the mixture model */
   typedef Categorical_pk<Data> Mixture;
   /** Type of the DataManager */
-  typedef DataManager<Clust::Categorical_pk_, Data> DataBridge;
+  typedef DataManager<Clust::Categorical_, Data> DataBridge;
 };
 /** @ingroup hidden
- *  Partial  specialization of the MixtureBridgeTraits for the Gamma_ajk_bj_ model
+ *  Partial  specialization of the MixtureBridgeTraits for the Gamma_ajk_bjk_ model
  **/
 template<class Data>
 struct MixtureBridgeTraits<Clust::Gamma_ajk_bjk_, Data>
@@ -89,7 +99,18 @@ struct MixtureBridgeTraits<Clust::Gamma_ajk_bjk_, Data>
   /** Type of the mixture model */
   typedef Gamma_ajk_bjk<Data> Mixture;
   /** Type of the DataManager */
-  typedef DataManager<Clust::Gamma_ajk_bjk_, Data> DataBridge;
+  typedef DataManager<Clust::Gamma_, Data> DataBridge;
+};
+/** @ingroup hidden
+ *  Partial  specialization of the MixtureBridgeTraits for the Gamma_ajk_bk_ model
+ **/
+template<class Data>
+struct MixtureBridgeTraits<Clust::Gamma_ajk_bk_, Data>
+{
+  /** Type of the mixture model */
+  typedef Gamma_ajk_bk<Data> Mixture;
+  /** Type of the DataManager */
+  typedef DataManager<Clust::Gamma_, Data> DataBridge;
 };
 /** @ingroup hidden
  *  Partial  specialization of the MixtureBridgeTraits for the Gamma_ajk_bj_ model
@@ -100,7 +121,106 @@ struct MixtureBridgeTraits<Clust::Gamma_ajk_bj_, Data>
   /** Type of the mixture model */
   typedef Gamma_ajk_bj<Data> Mixture;
   /** Type of the DataManager */
-  typedef DataManager<Clust::Gamma_ajk_bj_, Data> DataBridge;
+  typedef DataManager<Clust::Gamma_, Data> DataBridge;
+};
+/** @ingroup hidden
+ *  Partial  specialization of the MixtureBridgeTraits for the Gamma_ajk_b_ model
+ **/
+template<class Data>
+struct MixtureBridgeTraits<Clust::Gamma_ajk_b_, Data>
+{
+  /** Type of the mixture model */
+  typedef Gamma_ajk_b<Data> Mixture;
+  /** Type of the DataManager */
+  typedef DataManager<Clust::Gamma_, Data> DataBridge;
+};
+/** @ingroup hidden
+ *  Partial  specialization of the MixtureBridgeTraits for the Gamma_ak_bjk_ model
+ **/
+template<class Data>
+struct MixtureBridgeTraits<Clust::Gamma_ak_bjk_, Data>
+{
+  /** Type of the mixture model */
+  typedef Gamma_ak_bjk<Data> Mixture;
+  /** Type of the DataManager */
+  typedef DataManager<Clust::Gamma_, Data> DataBridge;
+};
+/** @ingroup hidden
+ *  Partial  specialization of the MixtureBridgeTraits for the Gamma_ak_bk_ model
+ **/
+template<class Data>
+struct MixtureBridgeTraits<Clust::Gamma_ak_bk_, Data>
+{
+  /** Type of the mixture model */
+  typedef Gamma_ak_bk<Data> Mixture;
+  /** Type of the DataManager */
+  typedef DataManager<Clust::Gamma_, Data> DataBridge;
+};
+/** @ingroup hidden
+ *  Partial  specialization of the MixtureBridgeTraits for the Gamma_ak_bj_ model
+ **/
+template<class Data>
+struct MixtureBridgeTraits<Clust::Gamma_ak_bj_, Data>
+{
+  /** Type of the mixture model */
+  typedef Gamma_ak_bj<Data> Mixture;
+  /** Type of the DataManager */
+  typedef DataManager<Clust::Gamma_, Data> DataBridge;
+};
+/** @ingroup hidden
+ *  Partial  specialization of the MixtureBridgeTraits for the Gamma_ak_b_ model
+ **/
+template<class Data>
+struct MixtureBridgeTraits<Clust::Gamma_ak_b_, Data>
+{
+  /** Type of the mixture model */
+  typedef Gamma_ak_b<Data> Mixture;
+  /** Type of the DataManager */
+  typedef DataManager<Clust::Gamma_, Data> DataBridge;
+};
+/** @ingroup hidden
+ *  Partial  specialization of the MixtureBridgeTraits for the Gamma_aj_bjk_ model
+ **/
+template<class Data>
+struct MixtureBridgeTraits<Clust::Gamma_aj_bjk_, Data>
+{
+  /** Type of the mixture model */
+  typedef Gamma_aj_bjk<Data> Mixture;
+  /** Type of the DataManager */
+  typedef DataManager<Clust::Gamma_, Data> DataBridge;
+};
+/** @ingroup hidden
+ *  Partial  specialization of the MixtureBridgeTraits for the Gamma_aj_bk_ model
+ **/
+template<class Data>
+struct MixtureBridgeTraits<Clust::Gamma_aj_bk_, Data>
+{
+  /** Type of the mixture model */
+  typedef Gamma_aj_bk<Data> Mixture;
+  /** Type of the DataManager */
+  typedef DataManager<Clust::Gamma_, Data> DataBridge;
+};
+/** @ingroup hidden
+ *  Partial  specialization of the MixtureBridgeTraits for the Gamma_a_bjk_ model
+ **/
+template<class Data>
+struct MixtureBridgeTraits<Clust::Gamma_a_bjk_, Data>
+{
+  /** Type of the mixture model */
+  typedef Gamma_a_bjk<Data> Mixture;
+  /** Type of the DataManager */
+  typedef DataManager<Clust::Gamma_, Data> DataBridge;
+};
+/** @ingroup hidden
+ *  Partial  specialization of the MixtureBridgeTraits for the Gamma_a_bk_ model
+ **/
+template<class Data>
+struct MixtureBridgeTraits<Clust::Gamma_a_bk_, Data>
+{
+  /** Type of the mixture model */
+  typedef Gamma_a_bk<Data> Mixture;
+  /** Type of the DataManager */
+  typedef DataManager<Clust::Gamma_, Data> DataBridge;
 };
 /** @ingroup hidden
  *  Partial specialization of the MixtureBridgeTraits for the Gaussian_sjk model
@@ -111,7 +231,7 @@ struct MixtureBridgeTraits<Clust::Gaussian_sjk_, Data>
   /** Type of the mixture model */
   typedef Gaussian_sjk<Data> Mixture;
   /** Type of the DataManager */
-  typedef DataManager<Clust::Gaussian_sjk_, Data> DataBridge;
+  typedef DataManager<Clust::Gaussian_, Data> DataBridge;
 };
 /** @ingroup hidden
  *  Partial specialization of the MixtureBridgeTraits for the Gaussian_sk model
@@ -122,7 +242,7 @@ struct MixtureBridgeTraits<Clust::Gaussian_sk_, Data>
   /** Type of the mixture model */
   typedef Gaussian_sk<Data> Mixture;
   /** Type of the DataManager */
-  typedef DataManager<Clust::Gaussian_sk_, Data> DataBridge;
+  typedef DataManager<Clust::Gaussian_, Data> DataBridge;
 };
 /** @ingroup hidden
  *  Partial specialization of the MixtureBridgeTraits for the Gaussian_sj model
@@ -133,7 +253,7 @@ struct MixtureBridgeTraits<Clust::Gaussian_sj_, Data>
   /** Type of the mixture model */
   typedef Gaussian_sj<Data> Mixture;
   /** Type of the DataManager */
-  typedef DataManager<Clust::Gaussian_sj_, Data> DataBridge;
+  typedef DataManager<Clust::Gaussian_, Data> DataBridge;
 };
 /** @ingroup hidden
  *  Partial specialization of the MixtureBridgeTraits for the Gaussian_s model
@@ -144,14 +264,9 @@ struct MixtureBridgeTraits<Clust::Gaussian_s_, Data>
   /** Type of the mixture model */
   typedef Gaussian_s<Data> Mixture;
   /** Type of the DataManager */
-  typedef DataManager<Clust::Gaussian_s_, Data> DataBridge;
+  typedef DataManager<Clust::Gaussian_, Data> DataBridge;
 };
 
-} // namespace hidden
-
-
-namespace hidden
-{
 /** @ingroup hidden
  *  Initialize mixture, default implementation */
 template<int Id, class Data>
@@ -201,11 +316,6 @@ struct InitializeMixtureImpl<Clust::Categorical_pk_, Data>
 
 } // namespace hidden
 
-} /* namespace STK */
-
-namespace STK
-{
-
 /** @ingroup Clustering
  *  @brief Templated implementation of the IMixture interface allowing
  *  to bridge a stk++ mixture with the composer.
@@ -219,6 +329,8 @@ class MixtureBridge: public IMixture
   public:
     // type of Mixture
     typedef typename hidden::MixtureBridgeTraits<Id, Data>::Mixture Mixture;
+    // type of Mixture
+    typedef typename hidden::MixtureBridgeTraits<Id, Data>::DataBridge DataBridge;
     // parameters type to get
     typedef typename Clust::MixtureTraits<Mixture>::Param Param;
 
@@ -227,7 +339,7 @@ class MixtureBridge: public IMixture
      *  @param idData id name of the mixture model
      *  @param nbCluster number of cluster
      **/
-    MixtureBridge( DataManager<Id, Data>* p_data, std::string const& idData, int nbCluster)
+    MixtureBridge( DataBridge* p_data, std::string const& idData, int nbCluster)
                  : IMixture( idData, nbCluster)
                  , mixture_( nbCluster)
                  , p_data_(p_data)
@@ -270,7 +382,7 @@ class MixtureBridge: public IMixture
       if (!p_composer())
         STKRUNTIME_ERROR_NO_ARG(MixtureBridge::initializeStep,composer is not set);
       mixture_.setMixtureParameters( p_pk(), p_tik(), p_zi());
-      mixture_.initializeStep();
+      if (!mixture_.initializeStep()) throw Clust::initializeStepFail_;
     }
      /** This function must be defined to return the component probability (PDF)
      *  for corresponding sample i and cluster k.
@@ -282,7 +394,8 @@ class MixtureBridge: public IMixture
     /** This function is equivalent to Mstep and must be defined to update
      * parameters.
      */
-    virtual void paramUpdateStep() { mixture_.mStep();}
+    virtual void paramUpdateStep()
+    { if (!mixture_.mStep()) throw Clust::mStepFail_;}
     /** @brief This function should be used in order to initialize randomly the
      *  parameters of the mixture.
      */
@@ -345,13 +458,8 @@ class MixtureBridge: public IMixture
     /** The Mixture to bridge with the composer */
     Mixture mixture_;
     /** Bridge for the data */
-    DataManager<Id, Data>* p_data_;
+    DataBridge* p_data_;
 };
-
-} // namespace STK
-
-namespace STK
-{
 
 } // namespace STK
 

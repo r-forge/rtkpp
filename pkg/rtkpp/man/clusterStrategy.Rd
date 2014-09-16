@@ -3,14 +3,14 @@
 \alias{clusterStrategy}
 \title{Create an instance of [\code{\linkS4class{ClusterStrategy}}] class}
 \usage{
-clusterStrategy(nbTry = 1, nbInit = 5, initMethod = "random",
+clusterStrategy(nbTry = 1, nbInit = 3, initMethod = "random",
   initAlgo = "SEM", nbInitIteration = 20, initEpsilon = 0.01,
   nbShortRun = 5, shortRunAlgo = "EM", nbShortIteration = 100,
   shortEpsilon = 1e-04, longRunAlgo = "EM", nbLongIteration = 1000,
   longEpsilon = 1e-07)
 }
 \arguments{
-\item{nbInit}{Integer defining the number of initialization to try. Default value: 5.}
+\item{nbInit}{Integer defining the number of initialization to try. Default value: 3.}
 
 \item{initMethod}{Character string with the initialisation method.}
 
@@ -77,7 +77,7 @@ an empty model is returned.
 \examples{
 clusterStrategy()
    clusterStrategy(longRunAlgo= "CEM", nbLongIteration=100)
-   clusterStrategy(nbTry = 3, nbInit= 1, shortRunAlgo= "SEM", nbShortIteration=100)
+   clusterStrategy(nbTry = 1, nbInit= 1, shortRunAlgo= "SEM", nbShortIteration=100)
 }
 \author{
 Serge Iovleff

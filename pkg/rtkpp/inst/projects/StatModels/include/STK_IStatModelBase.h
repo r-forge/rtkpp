@@ -93,7 +93,8 @@ class IStatModelBase
     /** set the number of free parameters of the model
      *  @param nbFreeParameter number of free parameters of the model
      * */
-    inline void setNbFreeParameter( int nbFreeParameter) { nbFreeParameter_ = nbFreeParameter;}
+    inline void setNbFreeParameter( int nbFreeParameter)
+    { nbFreeParameter_ = nbFreeParameter;}
     /** set the number of samples of the model
      *  @param nbSample number of samples of the model
      * */

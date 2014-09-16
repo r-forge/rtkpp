@@ -44,23 +44,39 @@
 namespace STK
 {
 IMixtureComposer::IMixtureComposer( int nbSample, int nbVariable, int nbCluster)
-                                          : IStatModelBase(nbSample, nbVariable)
-                                          , nbCluster_(nbCluster)
-                                          , prop_(nbCluster), tik_(nbSample, nbCluster), zi_(nbSample)
-                                          , state_(Clust::modelCreated_)
+                                  : IStatModelBase(nbSample, nbVariable)
+                                  , nbCluster_(nbCluster)
+                                  , prop_(nbCluster), tik_(nbSample, nbCluster), zi_(nbSample)
+                                  , state_(Clust::modelCreated_)
 {  intializeMixtureParameters(); }
 
 /* copy constructor */
 IMixtureComposer::IMixtureComposer( IMixtureComposer const& model)
-                                          : IStatModelBase(model)
-                                          , nbCluster_(model.nbCluster_)
-                                          , prop_(model.prop_)
-                                          , tik_(model.tik_)
-                                          , zi_(model.zi_)
-                                          , state_(model.state_)
+                                  : IStatModelBase(model)
+                                  , nbCluster_(model.nbCluster_)
+                                  , prop_(model.prop_)
+                                  , tik_(model.tik_)
+                                  , zi_(model.zi_)
+                                  , state_(model.state_)
 {}
 /* destructor */
 IMixtureComposer::~IMixtureComposer() {}
+
+/* @brief Initialize the model before at its first use.
+ *  This function can be overloaded in derived class for initialization of
+ *  the specific model parameters. It should be called prior to any used of
+ *  the class.
+ *  @sa IMixture,MixtureBridge,MixtureComposer
+ **/
+void IMixtureComposer::initializeStep()
+{
+  // initialize IStatModelBase
+  initialize(nbSample(), nbVariable());
+  // initialize IMixtureComposer
+  intializeMixtureParameters();
+  // compute proportions
+  pStep();
+}
 
 /* initialize randomly the labels zi of the model */
 void IMixtureComposer::randomClassInit()
@@ -68,13 +84,14 @@ void IMixtureComposer::randomClassInit()
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Entering IMixtureComposer::randomClassInit()\n");
 #endif
-  prop_ = 1./Real(nbCluster_);
+  initializeStep();
   Law::Categorical law(prop_);
-  for (int i = zi_.begin(); i<= zi_.lastIdx(); ++i)
+  for (int i = zi_.begin(); i< zi_.end(); ++i)
   { zi_.elt(i) = law.rand();}
   cStep();
-  initializeStep();
   eStep();
+  // model intialized
+  setState(Clust::modelInitialized_);
 }
 
 /* initialize randomly the posterior probabilities tik of the model */
@@ -83,9 +100,9 @@ void IMixtureComposer::randomFuzzyInit()
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Entering IMixtureComposer::randomFuzzyInit()\n");
 #endif
-  prop_ = 1./Real(nbCluster_);
+  initializeStep();
   RandBase generator;
-  for (int i = tik_.beginRows(); i<= tik_.lastIdxRows(); ++i)
+  for (int i = tik_.beginRows(); i < tik_.endRows(); ++i)
   {
     // create a reference on the i-th row
     Array2DPoint<Real> tikRowi(tik_.row(i), true);
@@ -93,15 +110,16 @@ void IMixtureComposer::randomFuzzyInit()
     tikRowi = tikRowi * prop_;
     tikRowi /= tikRowi.sum();
   }
-  initializeStep();
   eStep();
+  // model intialized
+  setState(Clust::modelInitialized_);
 }
 
 /* cStep */
 int IMixtureComposer::cStep()
 {
   tik_ = 0.;
-  for (int i=tik_.beginRows(); i<= tik_.lastIdxRows(); i++)
+  for (int i=tik_.beginRows(); i < tik_.endRows(); i++)
   { tik_.elt(i, zi_[i]) = 1.;}
   // count the minimal number of individuals in a class
   return (Stat::sum(tik_).minElt());
@@ -111,18 +129,18 @@ int IMixtureComposer::cStep()
 int IMixtureComposer::sStep()
 {
   // simulate zi
-  for (int i = zi_.begin(); i<= zi_.lastIdx(); ++i)
+  for (int i = zi_.begin(); i< zi_.end(); ++i)
   { zi_.elt(i) = Law::Categorical::rand(tik_.row(i));}
   return cStep();
 }
-/* compute Tik, default implementation. */
+/* compute tik, default implementation. */
 void IMixtureComposer::eStep()
 {
   Real sum = 0.;
-  for (int i = tik_.beginRows(); i<= tik_.lastIdxRows(); ++i)
+  for (int i = tik_.beginRows(); i < tik_.endRows(); ++i)
   {
     Array2DPoint<Real> lnComp(tik_.cols());
-    for (int k=tik_.beginCols(); k<= tik_.lastIdxCols(); k++)
+    for (int k=tik_.beginCols(); k< tik_.endCols(); k++)
     { lnComp[k] = lnComponentProbability(i,k);}
     int kmax;
     Real max = lnComp.maxElt(kmax);
@@ -136,6 +154,27 @@ void IMixtureComposer::eStep()
   }
   setLnLikelihood(sum);
 }
+
+/* @return the computed likelihood of the i-th sample.
+ *  @param i index of the sample
+ **/
+Real IMixtureComposer::computeLnLikelihood(int i) const
+{
+  Real res = 0.0;
+  for (int k = pk().begin(); k< pk().end(); ++k)
+  { res += std::log(pk()[k]) + lnComponentProbability(i, k);}
+  return res;
+}
+
+/* @return the computed log-likelihood. */
+Real IMixtureComposer::computeLnLikelihood() const
+{
+  Real res = 0.0;
+  for (int i = tik().beginRows(); i< tik().endRows(); ++i)
+  { res += computeLnLikelihood(i);}
+  return res;
+}
+
 /* estimate the proportions and the parameters of the components of the
  *  model given the current tik/zi mixture parameters values.
  **/
@@ -144,14 +183,14 @@ void IMixtureComposer::mStep()
   /* implement specific parameters estimation in concrete class. */
 }
 
-/* Compute prop using the ML estimator, default implementation. */
+/* Compute prop using the ML estimate, default implementation. */
 void IMixtureComposer::pStep()
 { prop_ = Stat::mean(tik_);}
 
-/* Compute Zi using the Map estimator, default implementation. */
+/* Compute Zi using the Map estimate, default implementation. */
 void IMixtureComposer::mapStep()
 {
-  for (int i = zi_.begin(); i<= zi_.lastIdx(); ++i)
+  for (int i = zi_.begin(); i< zi_.end(); ++i)
   {
     int k;
     tik_.row(i).maxElt(k);

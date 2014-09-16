@@ -3,18 +3,22 @@
 \name{show,ClusterAlgo-method}
 \alias{show}
 \alias{show,ClusterAlgo-method}
-\alias{show,ClusterDiagGaussianModel-method}
+\alias{show,ClusterDiagGaussian-method}
+\alias{show,ClusterGamma-method}
 \alias{show,ClusterInit-method}
 \alias{show,ClusterStrategy-method}
+\alias{show-ClusterGamma,ClusterGamma,ClusterGamma-method}
 \alias{show-algo,ClusterAlgo-method}
-\alias{show-diagGaussian,ClusterDiagGaussianModel,ClusterDiagGaussianModel-method}
+\alias{show-diagGaussian,ClusterDiagGaussian,ClusterDiagGaussian-method}
 \alias{show-init,ClusterInit,ClusterInit-method}
 \alias{show-strategy,ClusterStrategy-method}
 \title{Show description of a rtkpp class to standard output.}
 \usage{
 \S4method{show}{ClusterAlgo}(object)
 
-\S4method{show}{ClusterDiagGaussianModel}(object)
+\S4method{show}{ClusterDiagGaussian}(object)
+
+\S4method{show}{ClusterGamma}(object)
 
 \S4method{show}{ClusterInit}(object)
 

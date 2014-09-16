@@ -22,9 +22,9 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
-#' Build a vector of diagonal Gaussian model names.
+#' @title diagGaussianNames: Build a vector of Gaussian model names.
 #'
-#' In a diagonal Gaussian model, we assume that the variance
+#' In a Gaussian model, we assume that the variance
 #' matrices are diagonal in each cluster. This gives rise to 8 models:
 #' \enumerate{
 #'  \item {The proportions can be equal or free.}
@@ -34,22 +34,20 @@
 #'
 #' The model names are summarized in the following array:
 #' \tabular{llll}{
-#'     Model Name      \tab Prop. \tab Variance of the variables \tab Variance of the clusters \cr
-#'     gaussian_p_sjk  \tab Equal \tab Free  \tab Free  \cr
-#'     gaussian_p_sj   \tab Equal \tab Free  \tab Equal \cr
-#'     gaussian_p_sk   \tab Equal \tab Equal \tab Free  \cr
-#'     gaussian_p_s    \tab Equal \tab Equal \tab Equal \cr
-#'     gaussian_pk_sjk \tab Free  \tab Free  \tab Free  \cr
-#'     gaussian_pk_sj  \tab Free  \tab Free  \tab Equal \cr
-#'     gaussian_pk_sk  \tab Free  \tab Equal \tab Free  \cr
-#'     gaussian_pk_s   \tab Free  \tab Equal \tab Equal \cr
+#'  Model Name      \tab Proportions \tab Variances in variables \tab Variances in clusters \cr
+#'  gaussian_p_sjk  \tab Equal \tab Free                  \tab Free  \cr
+#'  gaussian_p_sj   \tab Equal \tab Free                  \tab Equal \cr
+#'  gaussian_p_sk   \tab Equal \tab Equal                 \tab Free  \cr
+#'  gaussian_p_s    \tab Equal \tab Equal                \tab Equal \cr
+#'  gaussian_pk_sjk \tab Free  \tab Free                 \tab Free  \cr
+#'  gaussian_pk_sj  \tab Free  \tab Free                 \tab Equal \cr
+#'  gaussian_pk_sk  \tab Free  \tab Equal                \tab Free  \cr
+#'  gaussian_pk_s   \tab Free  \tab Equal                \tab Equal \cr
 #' }
 #'
-#' @title diagGaussianNames: get the names of the diagonal Gaussian models
-#'
 #' @param prop A character string equal to "equal", "free" or "all". Default is "all".
-#' @param varianceVariables A character string equal to "equal", "free" or "all". Default is "all".
-#' @param varianceClusters A character string equal to "equal", "free" or "all". Default is "all".
+#' @param varInCluster A character string equal to "equal", "free" or "all". Default is "all".
+#' @param varBetweenCluster A character string equal to "equal", "free" or "all". Default is "all".
 #'
 #' @return A vector of character with the models names.
 #' @examples
@@ -58,31 +56,31 @@
 #'
 #' @rdname diagGaussianNames
 #' @export
-diagGaussianNames <- function(prop = "all", varianceVariables="all", varianceClusters = "all")
+diagGaussianNames <- function(prop = "all", varInCluster="all", varBetweenCluster = "all")
 {
   if(sum(prop %in% c("equal","free","all")) != 1)
   { stop("prop is not valid. See ?diagGaussianNames for the list of prop.")}
-  if(sum(varianceVariables %in% c("equal","free","all")) != 1)
-  { stop("varianceVariables is not valid. See ?diagGaussianNames for the list of varianceVariables.")}
-  if(sum(varianceClusters %in% c("equal","free","all")) != 1)
-  { stop("varianceClusters is not valid. See ?diagGaussianNames for the list of varianceClusters.")}
+  if(sum(varInCluster %in% c("equal","free","all")) != 1)
+  { stop("varInCluster is not valid. See ?diagGaussianNames for the list of varInCluster.")}
+  if(sum(varBetweenCluster %in% c("equal","free","all")) != 1)
+  { stop("varBetweenCluster is not valid. See ?diagGaussianNames for the list of varBetweenCluster.")}
 
   all = c( "gaussian_pk_sjk", "gaussian_pk_sj", "gaussian_pk_sk", "gaussian_pk_s"
          , "gaussian_p_sjk", "gaussian_p_sj", "gaussian_p_sk", "gaussian_p_s")
   propFree = c( "gaussian_pk_sjk", "gaussian_pk_sj", "gaussian_pk_sk", "gaussian_pk_s")
   propEqual = c( "gaussian_p_sjk", "gaussian_p_sj", "gaussian_p_sk", "gaussian_p_s")
-  varVarFree = c( "gaussian_pk_sjk", "gaussian_pk_sj", "gaussian_p_sjk", "gaussian_p_sj")
-  varVarEqual = c( "gaussian_pk_sk", "gaussian_pk_s", "gaussian_p_sk", "gaussian_p_s")
-  varClustFree = c( "gaussian_pk_sjk", "gaussian_pk_sk", "gaussian_p_sjk", "gaussian_p_sk")
-  varClustEqual = c( "gaussian_pk_sj", "gaussian_pk_s", "gaussian_p_sj", "gaussian_p_s")
+  varJFree = c( "gaussian_pk_sjk", "gaussian_pk_sj", "gaussian_p_sjk", "gaussian_p_sj")
+  varJEqual = c( "gaussian_pk_sk", "gaussian_pk_s", "gaussian_p_sk", "gaussian_p_s")
+  varKFree = c( "gaussian_pk_sjk", "gaussian_pk_sk", "gaussian_p_sjk", "gaussian_p_sk")
+  varKEqual = c( "gaussian_pk_sj", "gaussian_pk_s", "gaussian_p_sj", "gaussian_p_s")
 
   res = all;
   if (prop == "free")  { res = intersect(res, propFree);}
   if (prop == "equal") { res = intersect(res, propEqual);}
-  if (varianceVariables =="free")  { res = intersect(res, varVarFree);}
-  if (varianceVariables == "equal") { res = intersect(res, varVarEqual);}
-  if (varianceClusters =="free")  { res = intersect(res, varClustFree);}
-  if (varianceClusters =="equal") { res = intersect(res, varClustEqual);}
+  if (varInCluster =="free")  { res = intersect(res, varJFree);}
+  if (varInCluster == "equal") { res = intersect(res, varJEqual);}
+  if (varBetweenCluster =="free")  { res = intersect(res, varKFree);}
+  if (varBetweenCluster =="equal") { res = intersect(res, varKEqual);}
 
   res
 }
@@ -102,3 +100,171 @@ validDiagGaussianNames <- function(names)
   {  if ( sum(names[i] %in% all) != 1 ) { return(FALSE);}}
   return(TRUE)
 }
+
+#-----------------------------------------------------------------------
+#' @title gammaNames: Build a vector of gamma model names.
+#'
+#' In a gamma model, we can assume that the shapes are equal in each/all
+#' cluster(s) or not. We can also assume that the scales are equal in each/all
+#' cluster(s) or not.
+#' 
+#' Some configuration are impossibles. If the shapes are equal between all the
+#' clusters, then the scales cannot be equal between all the clusters. Conversely
+#' if the scales are equal between all the cluster, then the shapes cannot be equal
+#' between all the clusters.
+#' 
+#' This gives rise to 24 models:
+#' \enumerate{
+#'  \item {The proportions can be equal or free.}
+#'  \item {The shapes can be equal or free in each clusters.}
+#'  \item {The shapes can be equal or free between all clusters.}
+#'  \item {The scales can be equal or free for each clusters.}
+#'  \item {The scales can be equal or free between all clusters.}
+#' }
+#'
+#' The model names are summarized in the following array:
+#' \tabular{lllll}{
+#'          &  ajk                &  ak            &  aj            &  a \\
+#'bjk       & gamma_*_ajk_bjk     & gamma_*_ak_bjk & gamma_*_aj_bjk & gamma_*_a_bjk \\
+#'bk        & gamma_*_ajk_bk      & gamma_*_ak_bk  & gamma_*_aj_bk  & gamma_*_a_bk \\
+#'bj        & gamma_*_ajk_bj      & gamma_*_ak_bj  & NA             & NA  \\
+#'b         & gamma_*_ajk_b       & gamma_*_ak_b   & NA             & NA \\
+#'}
+#'
+#' @param prop A character string equal to "equal", "free" or "all". Default is "all".
+#' @param shapeInCluster A character string equal to "equal", "free" or "all". Default is "all".
+#' @param shapeBetweenCluster A character string equal to "equal", "free" or "all". Default is "free".
+#' @param scaleInCluster A character string equal to "equal", "free" or "all". Default is "all".
+#' @param scaleBetweenCluster A character string equal to "equal", "free" or "all". Default is "all".
+#'
+#' @return A vector of character with the models names.
+#' @examples
+#' gammaNames()
+#' gammaNames("all", "equal", "free", "free", "equal") # same as c("gamma_p_ak_bj", "gamma_pk_ak_bj")
+#'
+#' @rdname gammaNames
+#' @export
+gammaNames <- function(prop = "all", shapeInCluster="all", shapeBetweenCluster="free"
+                                   , scaleInCluster= "all", scaleBetweenCluster="all")
+{
+  if(sum(prop %in% c("equal","free","all")) != 1)
+  { stop("prop is not valid. See ?gammaNames for the list of prop.")}
+  if(sum(shapeInCluster %in% c("equal","free","all")) != 1)
+  { stop("shapeInCluster is not valid. See ?gammaNames for the list of shapeInCluster.")}
+  if(sum(shapeBetweenCluster %in% c("equal","free","all")) != 1)
+  { stop("shapeBetweenCluster is not valid. See ?gammaNames for the list of shapeBetweenCluster.")}
+  if(sum(scaleInCluster %in% c("equal","free","all")) != 1)
+  { stop("scaleInCluster is not valid. See ?gammaNames for the list of scaleInCluster.")}
+  if(sum(scaleBetweenCluster %in% c("equal","free","all")) != 1)
+  { stop("scaleBetweenCluster is not valid. See ?gammaNames for the list of scaleBetweenCluster.")}
+  
+  all = c( "gamma_p_ajk_bjk",  "gamma_p_ajk_bk",  "gamma_p_ajk_bj",  "gamma_p_ajk_b"
+         , "gamma_p_ak_bjk",  "gamma_p_ak_bk",  "gamma_p_ak_bj",  "gamma_p_ak_b"
+         , "gamma_p_aj_bjk", "gamma_p_aj_bk"
+         , "gamma_p_a_bjk", "gamma_p_a_bk"
+         , "gamma_pk_ajk_bjk", "gamma_pk_ajk_bk", "gamma_pk_ajk_bj", "gamma_pk_ajk_b"
+         , "gamma_pk_ak_bjk", "gamma_pk_ak_bk", "gamma_pk_ak_bj", "gamma_pk_ak_b"
+         , "gamma_pk_aj_bjk", "gamma_pk_aj_bk"
+         , "gamma_pk_a_bjk", "gamma_pk_a_bk"
+         )
+  propFree = c( "gamma_pk_ajk_bjk", "gamma_pk_ajk_bk", "gamma_pk_ajk_bj", "gamma_pk_ajk_b"
+              , "gamma_pk_ak_bjk", "gamma_pk_ak_bk", "gamma_pk_ak_bj", "gamma_pk_ak_b"
+              , "gamma_pk_aj_bjk", "gamma_pk_aj_bk"
+              , "gamma_pk_a_bjk", "gamma_pk_a_bk"
+              )
+  propEqual =c( "gamma_p_ajk_bjk",  "gamma_p_ajk_bk",  "gamma_p_ajk_bj",  "gamma_p_ajk_b"
+              , "gamma_p_ak_bjk",  "gamma_p_ak_bk",  "gamma_p_ak_bj",  "gamma_p_ak_b"
+              , "gamma_p_aj_bjk", "gamma_p_aj_bk"
+              , "gamma_p_a_bjk", "gamma_p_a_bk"
+              )
+  shapeJFree = c( "gamma_p_ajk_bjk",  "gamma_p_ajk_bk",  "gamma_p_ajk_bj",  "gamma_p_ajk_b"
+                , "gamma_p_aj_bjk",   "gamma_p_aj_bk"
+                , "gamma_pk_ajk_bjk", "gamma_pk_ajk_bk", "gamma_pk_ajk_bj", "gamma_pk_ajk_b"
+                , "gamma_pk_aj_bjk",  "gamma_pk_aj_bk"
+                )
+  shapeJEqual = c( "gamma_p_ak_bjk", "gamma_p_ak_bk",  "gamma_p_ak_bj",  "gamma_p_ak_b"
+                 , "gamma_p_a_bjk",  "gamma_p_a_bk"
+                 , "gamma_pk_ak_bjk","gamma_pk_ak_bk",  "gamma_pk_ak_bj",  "gamma_pk_ak_b"
+                 , "gamma_pk_a_bjk", "gamma_pk_a_bk"
+                 )
+  shapeKFree = c( "gamma_p_ajk_bjk", "gamma_p_ajk_bk",  "gamma_p_ajk_bj",  "gamma_p_ajk_b"
+                , "gamma_p_ak_bjk",  "gamma_p_ak_bk",   "gamma_p_ak_bj",   "gamma_p_ak_b"
+                , "gamma_pk_ajk_bjk","gamma_pk_ajk_bk", "gamma_pk_ajk_bj", "gamma_pk_ajk_b"
+                , "gamma_pk_ak_bjk", "gamma_pk_ak_bk",  "gamma_pk_ak_bj",  "gamma_pk_ak_b"
+                )
+  shapeKEqual = c( "gamma_p_aj_bjk",  "gamma_p_aj_bk"
+                 , "gamma_p_a_bjk",   "gamma_p_a_bk"
+                 , "gamma_pk_aj_bjk", "gamma_pk_aj_bk"
+                 , "gamma_pk_a_bjk",  "gamma_pk_a_bk"
+                 )
+   scaleJFree = c( "gamma_p_ajk_bjk",  "gamma_p_ajk_bj"
+                 , "gamma_p_ak_bjk",  "gamma_p_ak_bj"
+                 , "gamma_p_aj_bjk"
+                 , "gamma_p_a_bjk"
+                 , "gamma_pk_ajk_bjk", "gamma_pk_ajk_bj"
+                 , "gamma_pk_ak_bjk", "gamma_pk_ak_bj"
+                 , "gamma_pk_aj_bjk"
+                 , "gamma_pk_a_bjk"
+                 )
+   scaleJEqual = c( "gamma_p_ajk_bk", "gamma_p_ajk_b"
+                  , "gamma_p_ak_bk", "gamma_p_ak_b"
+                  , "gamma_p_aj_bk"
+                  , "gamma_p_a_bk"
+                  , "gamma_pk_ajk_bk", "gamma_pk_ajk_b"
+                  , "gamma_pk_ak_bk", "gamma_pk_ak_b"
+                  , "gamma_pk_aj_bk"
+                  , "gamma_pk_a_bk"
+           )
+   scaleKFree = c( "gamma_p_ajk_bjk",  "gamma_p_ajk_bk"
+                 , "gamma_p_ak_bjk",  "gamma_p_ak_bk"
+                 , "gamma_p_aj_bjk", "gamma_p_aj_bk"
+                 , "gamma_p_a_bjk", "gamma_p_a_bk"
+                 , "gamma_pk_ajk_bjk", "gamma_pk_ajk_bk"
+                 , "gamma_pk_ak_bjk", "gamma_pk_ak_bk"
+                 , "gamma_pk_aj_bjk", "gamma_pk_aj_bk"
+                 , "gamma_pk_a_bjk", "gamma_pk_a_bk"
+                 )
+   scaleKEqual = c( "gamma_p_ajk_bj",  "gamma_p_ajk_b"
+                  , "gamma_p_ak_bj",  "gamma_p_ak_b"
+                  , "gamma_pk_ajk_bj", "gamma_pk_ajk_b"
+                  , "gamma_pk_ak_bj", "gamma_pk_ak_b"
+                  )
+  
+  res = all;
+  if (prop == "free")  { res = intersect(res, propFree);}
+  if (prop == "equal") { res = intersect(res, propEqual);}
+  if (shapeInCluster =="free")   { res = intersect(res, shapeJFree);}
+  if (shapeInCluster == "equal") { res = intersect(res, shapeJEqual);}
+  if (shapeBetweenCluster =="free")  { res = intersect(res, shapeKFree);}
+  if (shapeBetweenCluster =="equal") { res = intersect(res, shapeKEqual);}
+  if (scaleInCluster =="free")   { res = intersect(res, scaleJFree);}
+  if (scaleInCluster == "equal") { res = intersect(res, scaleJEqual);}
+  if (scaleBetweenCluster =="free")  { res = intersect(res, scaleKFree);}
+  if (scaleBetweenCluster =="equal") { res = intersect(res, scaleKEqual);}
+  
+  res
+}
+
+#' check if a vector of gamma model name comply
+#' @param names a vector of character
+#' @rdname diagGaussianNames
+#' @keywords internal
+validGammaNames <- function(names)
+{
+  nb = length(names)
+  if ( nb == 0 ) { return(FALSE);}
+  
+  all = c( "gamma_p_ajk_bjk", "gamma_p_ajk_bk", "gamma_p_ajk_bj", "gamma_p_ajk_b"
+         , "gamma_p_ak_bjk",  "gamma_p_ak_bk",  "gamma_p_ak_bj",  "gamma_p_ak_b"
+         , "gamma_p_aj_bjk",  "gamma_p_aj_bk"
+         , "gamma_p_a_bjk",   "gamma_p_a_bk"
+         , "gamma_pk_ajk_bjk", "gamma_pk_ajk_bk", "gamma_pk_ajk_bj", "gamma_pk_ajk_b"
+         , "gamma_pk_ak_bjk",  "gamma_pk_ak_bk",  "gamma_pk_ak_bj",  "gamma_pk_ak_b"
+         , "gamma_pk_aj_bjk",  "gamma_pk_aj_bk"
+         , "gamma_pk_a_bjk",   "gamma_pk_a_bk"
+         )
+  for (i in 1:nb)
+  {  if ( sum(names[i] %in% all) != 1 ) { return(FALSE);}}
+  return(TRUE)
+}
+

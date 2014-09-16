@@ -43,20 +43,6 @@
 
 namespace STK
 {
-/** @ingroup Clustering
- *  Main class for the maximization step implementation and for
- *  the random initialization of the parameters.
- *
- *  The MixtureModelImpl struct can be specialized for any
- *  models deriving from the IMixtureModel. Typically, it can be used
- *  for implementing the following method
- *  @code
- *    static void mStep(Array1D< Component* >& components, Array2D<Real> const* p_tik);
- *  @endcode
- **/
-template<class Array, class Parameter>
-struct MixtureModelImpl;
-
 namespace Clust
 {
 /** Main class for the mixtures traits policy.
@@ -89,7 +75,7 @@ class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBa
     IMixtureModel( int nbCluster)
                  : IMixtureModelBase(nbCluster), p_dataij_(0), components_(nbCluster, 0)
     {
-      for (int k= components_.begin(); k <= components_.lastIdx(); ++k)
+      for (int k= components_.begin(); k < components_.end(); ++k)
       { components_[k] = new Component();}
     }
     /** copy constructor.
@@ -103,7 +89,7 @@ class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBa
                  , p_dataij_(model.p_dataij_)
                  , components_(model.components_)
     {
-      for (int k= components_.begin(); k <= components_.lastIdx(); ++k)
+      for (int k= components_.begin(); k < components_.end(); ++k)
       { components_[k] = model.components_[k]->clone();}
     }
 
@@ -111,7 +97,7 @@ class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBa
     /** destructor */
     ~IMixtureModel()
     {
-      for (int k= components_.begin(); k <= components_.lastIdx(); ++k)
+      for (int k= components_.begin(); k < components_.end(); ++k)
       { if (components_[k]) delete components_[k];}
     }
     /** create pattern.  */
@@ -139,7 +125,7 @@ class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBa
       this->setNbSample(p_dataij_->sizeRows());
       this->setNbVariable(p_dataij_->sizeCols());
       // initialize the parameters
-      for (int k= components_.begin(); k <= components_.lastIdx(); ++k)
+      for (int k= components_.begin(); k < components_.end(); ++k)
       { components_[k]->p_param()->resize(p_dataij_->cols());}
     }
     /** set a new data set.

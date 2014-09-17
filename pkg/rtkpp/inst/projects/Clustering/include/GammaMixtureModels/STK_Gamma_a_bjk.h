@@ -152,7 +152,7 @@ template<class Array>
 bool Gamma_a_bjk<Array>::mStep()
 {
   if (!this->moments()) { return false;}
-  // estimate a and b
+  // estimate a
   Real y =0.0, x0 = 0.0, x1 = shape_;
   for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
   {
@@ -174,21 +174,22 @@ bool Gamma_a_bjk<Array>::mStep()
   if (!Arithmetic<Real>::isFinite(a))
   {
 #ifdef STK_MIXTURE_DEBUG
-        stk_cout << "ML estimation failed in Gamma_a_bjk::mStep()\n";
-        stk_cout << "x0 =" << x0 << _T("\n";);
-        stk_cout << "f(x0) =" << f(x0) << _T("\n";);
-        stk_cout << "x1 =" << x1 << _T("\n";);
-        stk_cout << "f(x1) =" << f(x1) << _T("\n";);
+    stk_cout << "ML estimation failed in Gamma_a_bjk::mStep()\n";
+    stk_cout << "x0 =" << x0 << _T("\n";);
+    stk_cout << "f(x0) =" << f(x0) << _T("\n";);
+    stk_cout << "x1 =" << x1 << _T("\n";);
+    stk_cout << "f(x1) =" << f(x1) << _T("\n";);
 #endif
-      a = x0; // use moment estimate
-    }
-    // set values
-    shape_ = a;
-    for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
-    {
-      for (int k= baseIdx; k < p_tik()->endCols(); ++k)
-      { p_param(k)->scale_[j] = p_param(k)->mean_[j]/a;}
-    }
+    a = x0; // use moment estimate
+  }
+  // set values
+  shape_ = a;
+  // estimate bjk
+  for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
+  {
+    for (int k= baseIdx; k < p_tik()->endCols(); ++k)
+    { p_param(k)->scale_[j] = p_param(k)->mean_[j]/a;}
+  }
   return true;
 }
 

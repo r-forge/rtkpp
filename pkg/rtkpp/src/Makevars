@@ -25,7 +25,7 @@ LIB_STKPP_A = libSTKpp.a
 STKPP_DIR = ../inst
 STKPP_LIB = ../inst/lib/$(LIB_STKPP_A)
 
-STK_FLAGS = -ansi -pedantic -Wall -Wno-long-long
+STK_FLAGS = -Wno-long-long
 ## -march=native -funroll-loops ## optimisation does not work under window
 
 ## Use the R_HOME indirection to support installations of multiple R version
@@ -48,4 +48,5 @@ $(SHLIB): pkglib
 
 pkglib:
 	($(MAKE) -C $(STKPP_DIR))
-	(cd $(STKPP_DIR)) ## && $(MAKE) clean_obj)
+	(cd $(STKPP_DIR)) && $(MAKE) clean_obj)
+	

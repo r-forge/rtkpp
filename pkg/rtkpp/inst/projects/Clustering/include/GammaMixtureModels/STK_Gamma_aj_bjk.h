@@ -164,11 +164,11 @@ bool Gamma_aj_bjk<Array>::mStep()
     for (int k= baseIdx; k < p_tik()->endCols(); ++k)
     {
       Real mean = meanjk(j,k);
-      y      += p_param(k)->tk_ * (p_param(k)->meanLog_[j]-std::log(mean));
+      y  += p_param(k)->tk_ * (p_param(k)->meanLog_[j]-std::log(mean));
       x0 += p_param(k)->tk_ * (mean*mean/variancejk(j,k));
     }
     // constant, moment estimate and oldest value
-    y /= this->nbSample();
+    y  /= this->nbSample();
     x0 /= this->nbSample();
     Real x1 = shape_[j];
     if ((x0 <=0.) || (Arithmetic<Real>::isNA(x0))) return false;
@@ -189,8 +189,9 @@ bool Gamma_aj_bjk<Array>::mStep()
     }
     // set values
     shape_[j] = a;
+    // update bjk
     for (int k= baseIdx; k < p_tik()->endCols(); ++k)
-    { p_param(k)->scale_[j] = p_param(k)->mean_[j]/a;}
+    { p_param(k)->scale_[j] = meanjk(j, k)/a;}
   }
   return true;
 }

@@ -228,10 +228,8 @@ Real GammaBase<Derived>::qValue() const
     for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)
     {
       Real shape = p_param(k)->shape(j), scale = p_param(k)->scale(j);
-      sumjk += shape * p_param(k)->meanLog_[j]
-            - p_param(k)->mean_[j]/scale
-            - STK::Funct::gammaLn(shape)
-            - shape * std::log(scale);
+      sumjk += shape * (p_param(k)->meanLog_[j] -std::log(scale))
+              - p_param(k)->mean_[j]/scale - STK::Funct::gammaLn(shape);
     }
     value += p_param(k)->tk_ * sumjk;
   }

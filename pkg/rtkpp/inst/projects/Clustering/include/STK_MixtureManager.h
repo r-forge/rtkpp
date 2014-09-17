@@ -73,27 +73,27 @@ class MixtureManager
     typedef DataManager<Clust::Gamma_, DataReal> DataManagerGamma;
     typedef DataManager<Clust::Gaussian_, DataReal> DataManagerGaussian;
     typedef DataManager<Clust::Categorical_, DataInt> DataManagerCategorical;
-    // All mixture bridges
+    // All Gamma bridges
     typedef MixtureBridge<Clust::Gamma_ajk_bjk_, DataReal> MixtureBridge_ajk_bjk;
-    typedef MixtureBridge<Clust::Gamma_ajk_bk_, DataReal> MixtureBridge_ajk_bk;
-    typedef MixtureBridge<Clust::Gamma_ajk_bj_, DataReal> MixtureBridge_ajk_bj;
-    typedef MixtureBridge<Clust::Gamma_ajk_b_, DataReal> MixtureBridge_ajk_b;
-    typedef MixtureBridge<Clust::Gamma_ak_bjk_, DataReal> MixtureBridge_ak_bjk;
-    typedef MixtureBridge<Clust::Gamma_ak_bk_, DataReal> MixtureBridge_ak_bk;
-    typedef MixtureBridge<Clust::Gamma_ak_bj_, DataReal> MixtureBridge_ak_bj;
-    typedef MixtureBridge<Clust::Gamma_ak_b_, DataReal> MixtureBridge_ak_b;
-    typedef MixtureBridge<Clust::Gamma_aj_bjk_, DataReal> MixtureBridge_aj_bjk;
-    typedef MixtureBridge<Clust::Gamma_aj_bk_, DataReal> MixtureBridge_aj_bk;
-    typedef MixtureBridge<Clust::Gamma_a_bjk_, DataReal> MixtureBridge_a_bjk;
-    typedef MixtureBridge<Clust::Gamma_a_bk_, DataReal> MixtureBridge_a_bk;
-
+    typedef MixtureBridge<Clust::Gamma_ajk_bk_,  DataReal> MixtureBridge_ajk_bk;
+    typedef MixtureBridge<Clust::Gamma_ajk_bj_,  DataReal> MixtureBridge_ajk_bj;
+    typedef MixtureBridge<Clust::Gamma_ajk_b_,   DataReal> MixtureBridge_ajk_b;
+    typedef MixtureBridge<Clust::Gamma_ak_bjk_,  DataReal> MixtureBridge_ak_bjk;
+    typedef MixtureBridge<Clust::Gamma_ak_bk_,   DataReal> MixtureBridge_ak_bk;
+    typedef MixtureBridge<Clust::Gamma_ak_bj_,   DataReal> MixtureBridge_ak_bj;
+    typedef MixtureBridge<Clust::Gamma_ak_b_,    DataReal> MixtureBridge_ak_b;
+    typedef MixtureBridge<Clust::Gamma_aj_bjk_,  DataReal> MixtureBridge_aj_bjk;
+    typedef MixtureBridge<Clust::Gamma_aj_bk_,   DataReal> MixtureBridge_aj_bk;
+    typedef MixtureBridge<Clust::Gamma_a_bjk_,   DataReal> MixtureBridge_a_bjk;
+    typedef MixtureBridge<Clust::Gamma_a_bk_,    DataReal> MixtureBridge_a_bk;
+    // All Gaussian bridges
     typedef MixtureBridge<Clust::Gaussian_sjk_, DataReal> MixtureBridge_sjk;
-    typedef MixtureBridge<Clust::Gaussian_sj_, DataReal> MixtureBridge_sj;
-    typedef MixtureBridge<Clust::Gaussian_sk_, DataReal> MixtureBridge_sk;
-    typedef MixtureBridge<Clust::Gaussian_s_, DataReal> MixtureBridge_s;
-
+    typedef MixtureBridge<Clust::Gaussian_sj_,  DataReal> MixtureBridge_sj;
+    typedef MixtureBridge<Clust::Gaussian_sk_,  DataReal> MixtureBridge_sk;
+    typedef MixtureBridge<Clust::Gaussian_s_,   DataReal> MixtureBridge_s;
+    // All Categorical bridges
     typedef MixtureBridge<Clust::Categorical_pjk_, DataInt> MixtureBridge_pjk;
-    typedef MixtureBridge<Clust::Categorical_pk_, DataInt> MixtureBridge_pk;
+    typedef MixtureBridge<Clust::Categorical_pk_,  DataInt> MixtureBridge_pk;
 
     /** Default constructor, need an instance of a DataHandler.  */
     MixtureManager(DataHandler const& handler) : handler_(handler) {}
@@ -123,7 +123,6 @@ class MixtureManager
 #endif
       return Clust::stringToMixture(idModelName);
     }
-
     /** Utility function allowing to create and register all the stk++ mixtures
      *  defined in the handler.
      *  @param composer the composer claiming the mixtures
@@ -201,6 +200,13 @@ class MixtureManager
         // gamma_aj_bk_ model
         case Clust::Gamma_aj_bk_:
         { STK_CREATE_MIXTURE(DataManagerGamma, MixtureBridge_aj_bk)}
+        // gamma_aj_bjk_ model
+        case Clust::Gamma_a_bjk_:
+        { STK_CREATE_MIXTURE(DataManagerGamma, MixtureBridge_a_bjk)}
+        break;
+        // gamma_aj_bk_ model
+        case Clust::Gamma_a_bk_:
+        { STK_CREATE_MIXTURE(DataManagerGamma, MixtureBridge_a_bk)}
         // Gaussian_sjk_ model
         case Clust::Gaussian_sjk_:
         { STK_CREATE_MIXTURE(DataManagerGaussian, MixtureBridge_sjk)}

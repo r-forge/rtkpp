@@ -36,8 +36,10 @@
 #define STK_GAMMA_AJ_BK_H
 
 #include "STK_GammaBase.h"
-
 #include "../../../STatistiK/include/STK_Law_Exponential.h"
+
+#define MAXITER 400
+#define TOL 1e-8
 
 namespace STK
 {
@@ -123,7 +125,7 @@ class Gamma_aj_bk : public GammaBase< Gamma_aj_bk<Array> >
     { return(this->nbCluster()+this->nbVariable());}
 
   protected:
-    /** common scale */
+    /** common shape */
     Array2DPoint<Real> shape_;
 };
 
@@ -134,28 +136,20 @@ class Gamma_aj_bk : public GammaBase< Gamma_aj_bk<Array> >
 template<class Array>
 void Gamma_aj_bk<Array>::randomInit()
 {
-    // simulates ak
+  // simulate aj
+  for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
+  {
+    Real value= 0.;
     for (int k= baseIdx; k < components().end(); ++k)
     {
-      Real value= 0.;
-      for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
-      {
-        Real mean = meanjk(j,k), variance = variancejk(j,k);
-        value += variance/mean;
-      }
-      p_param(k)->scale_ = Law::Exponential::rand(value/this->nbVariable());
+      Real mean = meanjk(j,k), variance = variancejk(j,k);
+      value += p_param(k)->tk_ * mean*mean/variance;
     }
-    // simulate bj
-    for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
-    {
-      Real value= 0.;
-      for (int k= baseIdx; k < components().end(); ++k)
-      {
-        Real mean = meanjk(j,k), variance = variancejk(j,k);
-        value += p_param(k)->tk_ * mean*mean/variance;
-      }
-      shape_[j] = Law::Exponential::rand(value/this->nbSample());
-    }
+    shape_[j] = Law::Exponential::rand(value/this->nbSample());
+  }
+  // simulates bk
+  for (int k= baseIdx; k < components().end(); ++k)
+  { p_param(k)->scale_ = Law::Exponential::rand(this->variancek(k)/this->meank(k));}
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Gamma_aj_bk<Array>::randomInit done\n");
   this->writeParameters(stk_cout);
@@ -167,10 +161,75 @@ template<class Array>
 bool Gamma_aj_bk<Array>::mStep()
 {
   if (!this->moments()) { return false;}
+  // start estimations of the ajk and bj
+  Real qvalue = this->qValue();
+  // enter iterative algorithm
+  int iter;
+  for(iter = 0; iter<MAXITER; ++iter)
+  {
+    // compute aj
+    for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)
+    {
+      // moment estimate and oldest value
+      Real y = 0, x0 = 0;
+      for (int k= baseIdx; k < p_tik()->endCols(); ++k)
+      {
+        Real mean = meanjk(j,k), variance = variancejk(j,k);
+        y  += p_param(k)->tk_ * (p_param(k)->meanLog_[j] - std::log(p_param(k)->scale_));
+        x0 += p_param(k)->tk_ * mean*mean/variance;
+      }
+      y /= this->nbSample();
+      x0/= this->nbSample();
+      Real x1 = shape_[j];
+      if ((x0 <=0.) || !Arithmetic<Real>::isFinite(x0)) return false;
+      // compute shape
+      hidden::invPsi f(y);
+      Real a =  Algo::findZero(f, x0, x1, TOL);
+
+      if (!Arithmetic<Real>::isFinite(a))
+      {
+        shape_[j] = x0; // use moment estimate
+#ifdef STK_MIXTURE_DEBUG
+        stk_cout << _T("ML estimation failed in Gamma_ajk_bj::mStep()\n");
+        stk_cout << "x0 =" << x0 << _T("\n";);
+        stk_cout << "f(x0) =" << f(x0) << _T("\n";);
+        stk_cout << "x1 =" << x1 << _T("\n";);
+        stk_cout << "f(x1) =" << f(x1) << _T("\n";);
+#endif
+      }
+      else { shape_[j] = a;}
+      // compute bk
+      Real sum = shape_.sum();
+      for (int k= baseIdx; k < p_tik()->endCols(); ++k)
+      { // update bk
+        p_param(k)->scale_ = p_param(k)->mean_.sum()/sum;
+      }
+    }
+  // check convergence
+    Real value = this->qValue();
+#ifdef STK_MIXTURE_VERBOSE
+  if (value < qvalue)
+  {
+    stk_cout << _T("In Gamma_aj_bk::mStep(): mStep diverge\n");
+    stk_cout << _T("New value =") << value << _T(", qvalue =") << qvalue << _T("\n");
+  }
+#endif
+    if ((value - qvalue) < TOL) break;
+    qvalue = value;
+  }
+#ifdef STK_MIXTURE_VERBOSE
+  if (iter == MAXITER)
+  {
+    stk_cout << _T("In Gamma_aj_bk::mStep(): mStep did not converge\n");
+    stk_cout << _T("qvalue =") << qvalue << _T("\n");
+  }
+#endif
   return true;
 }
 
 }  // namespace STK
 
+#undef MAXITER
+#undef TOL
 
 #endif /* STK_GAMMA_AJ_BK_H */

@@ -29,7 +29,7 @@ NULL
 #-----------------------------------------------------------------------
 #' Create an instance of the [\code{\linkS4class{ClusterGamma}}] class
 #'
-#' This function computes the optimal diagonal Gaussian mixture model according
+#' This function computes the optimal gamma mixture model according
 #' to the [\code{criterion}] among the list of model given in [\code{modelNames}]
 #' and the number of clusters given in [\code{nbCluster}], using the strategy specified in [\code{strategy}].
 #'
@@ -37,8 +37,8 @@ NULL
 #' and columns correspond to variables. If the data set contains NA values, they
 #' will be estimated during the estimation process.
 #' @param nbCluster  [\code{\link{vector}}] listing the number of clusters to test.
-#' @param modelNames [\code{\link{vector}}] of models names to run. By default all diagonal
-#' Gaussian models are estimated.
+#' @param modelNames [\code{\link{vector}}] of models names to run. By default all
+#' gamma models with free shape are estimated.
 #' @param strategy a [\code{\linkS4class{ClusterStrategy}}] object containing
 #' the strategy to run. clusterStrategy() method by default.
 #' @param criterion character defining the criterion to select the best model.
@@ -54,7 +54,7 @@ NULL
 #' x[round(runif(5,1,nrow(geyser))), 2] <- NA
 #'
 #' ## use graphics functions
-#' model <- clusterGamma(data=x, nbCluster=2:3, modelNames = c("gamma_pk_ajk_bjk"))
+#' model <- clusterGamma(data=x, nbCluster=2:3)
 #' 
 #' \dontrun{
 #' plot(model)
@@ -69,7 +69,7 @@ NULL
 #' @author Serge Iovleff
 #' @export
 #'
-clusterGamma <- function(data, nbCluster=2, modelNames=NULL, strategy=clusterStrategy(), criterion="BIC")
+clusterGamma <- function(data, nbCluster=2, modelNames= gammaNames(), strategy=clusterStrategy(), criterion="BIC")
 {
   # check nbCluster
   nbClusterModel = length(nbCluster);
@@ -257,11 +257,10 @@ setMethod(
 #' @param ... further arguments passed to or from other methods
 #'
 #' @importFrom graphics plot
-#' @name plot
-#' @aliases plot plot,ClusterGamma-method
+#' @aliases plot-ClusterGamma,ClusterGamma-method
 #' @docType methods
 #' @rdname plot-Gamma-method
-#' @exportMethod plot
+#' @export
 #'
 #' @seealso \code{\link{plot}}
 #' @examples

@@ -40,6 +40,9 @@
 namespace STK
 {
 
+void IMixtureAlgo::setModel(IMixtureComposer* p_model)
+{ p_model_ = p_model; threshold_ = 0.03*p_model->nbSample();}
+
 /* run the CEM allgorithm */
 bool CEMAlgo::run()
 {
@@ -53,7 +56,7 @@ bool CEMAlgo::run()
     Real currentLnLikelihood =  p_model_->lnLikelihood();
     for (int iter = 0; iter < nbIterMax_; iter++)
     {
-      if (!p_model_->cStep())
+      if (p_model_->cStep()<threshold_)
       {
         msg_error_ = STKERROR_NO_ARG(CEMAlgo::run,No more individuals in a class);
         return false;
@@ -61,7 +64,11 @@ bool CEMAlgo::run()
       p_model_->pStep();
       p_model_->imputationStep();
       p_model_->mStep();
-      p_model_->eStep();
+      if (p_model_->eStep()<threshold_)
+      {
+        msg_error_ = STKERROR_NO_ARG(CEMAlgo::run,Not enough individuals in a class);
+        return false;
+      }
       Real lnLikelihood = p_model_->lnLikelihood();
       if (std::abs(lnLikelihood - currentLnLikelihood) < epsilon_)
       {
@@ -102,7 +109,11 @@ bool EMAlgo::run()
       p_model_->pStep();
       p_model_->imputationStep();
       p_model_->mStep();
-      p_model_->eStep();
+      if (p_model_->eStep()<threshold_)
+      {
+        msg_error_ = STKERROR_NO_ARG(EMAlgo::run,Not enough individuals in a class);
+        return false;
+      }
       Real lnLikelihood = p_model_->lnLikelihood();
       // no abs as the likelihood should increase
       if ( (lnLikelihood - currentLnLikelihood) < epsilon_)
@@ -139,15 +150,19 @@ bool SEMAlgo::run()
   {
     for (int iter = 0; iter < this->nbIterMax_; ++iter)
     {
-      if (!p_model_->sStep())
+      if (p_model_->sStep()<threshold_)
       {
-        msg_error_ = STKERROR_NO_ARG(SEMAlgo::run,No more individuals in a class);
+        msg_error_ = STKERROR_NO_ARG(SEMAlgo::run,Not enough individuals in a class);
         return false;
       }
       p_model_->pStep();
       p_model_->samplingStep();
       p_model_->mStep();
-      p_model_->eStep();
+      if (p_model_->eStep()<threshold_)
+      {
+        msg_error_ = STKERROR_NO_ARG(SEMAlgo::run,Not enough individuals in a class);
+        return false;
+      }
     }
   }
   catch (Clust::exceptions const& error)

@@ -58,11 +58,14 @@ class IMixtureAlgo : public IRunnerBase
 {
   protected:
     /** default constructor */
-    inline IMixtureAlgo() : IRunnerBase(), p_model_(0), nbIterMax_(0), epsilon_(0.) {}
+    inline IMixtureAlgo() : IRunnerBase(), p_model_(0), nbIterMax_(0), epsilon_(0.), threshold_(1.) {}
     /** Copy constructor.
      *  @param algo the algorithm to copy */
     inline IMixtureAlgo( IMixtureAlgo const& algo) : IRunnerBase(algo)
-                       , p_model_(algo.p_model_), nbIterMax_(algo.nbIterMax_), epsilon_(algo.epsilon_)
+                       , p_model_(algo.p_model_)
+                       , nbIterMax_(algo.nbIterMax_)
+                       , epsilon_(algo.epsilon_)
+                       , threshold_(algo.threshold_)
     {}
 
   public:
@@ -72,12 +75,14 @@ class IMixtureAlgo : public IRunnerBase
     inline int nbIterMax() const { return nbIterMax_; }
     /** @return the epsilon of the algorithm */
     inline int epsilon() const { return epsilon_; }
-    /** set a new model */
-    inline void setModel(IMixtureComposer* p_model) { p_model_ = p_model; }
+    /** set a new model. Default threshold_ is 3 percent of the samples. */
+    void setModel(IMixtureComposer* p_model);
     /** set the maximal number of iterations */
     inline void setNbIterMax(int nbIterMax) { nbIterMax_ = nbIterMax; }
     /** set the tolerance value */
     inline void setEpsilon(Real epsilon) { epsilon_ = epsilon; }
+    /** set the tolerance value */
+    inline void setThreshold(Real threshold) { threshold_ = threshold; }
 
   protected:
     /** pointer on the mixture model */
@@ -86,6 +91,10 @@ class IMixtureAlgo : public IRunnerBase
     int nbIterMax_;
     /** tolerance of the algorithm. */
     Real epsilon_;
+    /** Minimal number of individuals. If the expected number of individuals
+     *  is under this number, the algorithm will stop and return false.
+     **/
+    Real threshold_;
 };
 
 /** @ingroup Clustering

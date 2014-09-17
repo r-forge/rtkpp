@@ -38,6 +38,7 @@
 
 #include <vector>
 #include "STK_IMixtureComposer.h"
+#include "STK_IMixtureManager.h"
 
 namespace STK
 {
@@ -141,64 +142,31 @@ class MixtureComposer : public IMixtureComposer
      * @param p_mixture a pointer on the mixture
      **/
     void registerMixture(IMixture* p_mixture);
-    /** @brief release a mixture from the composer.
-     *  When a mixture is released, the composer remove it from v_mixtures_.
-     *  @note the end-user is responsible of the release of the mixture itself.
-     *  @param idData the Id of the mixture
-     **/
-    void releaseMixture(String const& idData);
-    /** Utility method allowing to create all the mixtures using the DataHandler
-     *  info of the manager.
-     **/
-    template<class MixtureManager>
-    void createMixtures(MixtureManager& manager)
-    { manager.createMixtures(*this, nbCluster());}
-    /** Utility method allowing to create a specific mixture and register it.
-     *  @param manager the manager with the responsibility of the creation
-     *  @param idModel the id of the mixture we want to create
-     *  @param idData the id name of the data
-     **/
-    template<class MixtureManager>
-    void createMixture(MixtureManager& manager, Clust::Mixture idModel, String const& idData)
-    {
-      IMixture* p_mixture = manager.createMixture(idModel, idData, nbCluster());
-      if (p_mixture) registerMixture(p_mixture);
-    }
     /** Utility method allowing to create a mixture with a given data set
      *  and register it. The Mixture Manager will find the associated model
      *  to use with this data set.
      *  @param manager the manager with the responsibility of the creation.
      *  @param idData the id name of the data to modelize.
      **/
-    template<class MixtureManager>
-    void createMixture(MixtureManager& manager, String const& idData)
-    {
-      IMixture* p_mixture = manager.createMixture( idData, nbCluster());
-#ifdef STK_MIXTURE_DEBUG
-      if (!p_mixture)
-      { stk_cout << _T("In MixtureComposer::createMixture(manager,")<< idData << _T(") failed.\n");}
-#endif
-      if (p_mixture) registerMixture(p_mixture);
-    }
+    void createMixture(IMixtureManager& manager, String const& idData);
+    /** Utility method allowing to create all the mixtures using the DataHandler
+     *  info of the manager.
+     **/
+    void createMixtures(IMixtureManager& manager);
+    /** @brief release a mixture from the composer.
+     *  When a mixture is released, the composer remove it from v_mixtures_.
+     *  @note the data set associated with the mixture is still in the manager
+     *  list of data set.
+     *  @param idData the Id of the mixture
+     **/
+    void releaseMixture(String const& idData);
     /** Utility method allowing to release completely a mixture with its data set.
      *  The MixtureManager will find and release the associated data set.
      *  @param manager the manager with the responsibility of the release.
      *  @param idData the id name of the data to modelize.
      **/
-    template<class MixtureManager>
-    void releaseMixture(MixtureManager& manager, String const& idData)
-    {
-      IMixture* p_mixture = getMixture(idData);
-#ifdef STK_MIXTURE_DEBUG
-      if (!p_mixture)
-      { stk_cout << _T("In MixtureComposer::releaseMixture(manager,")<< idData << _T(") failed.\n");}
-#endif
-      if (p_mixture)
-      {
-        releaseMixture(idData);
-        manager.releaseMixture( idData);
-      }
-    }
+    void releaseMixture(IMixtureManager& manager, String const& idData);
+
     /** Utility method allowing to get the parameters of a specific mixture.
      *  @param manager the manager with the responsibility of the parameters
      *  @param idData the Id of the data we want the parameters

@@ -225,8 +225,9 @@ class IMixtureComposer : public IStatModelBase
     int sStep();
     /** compute the zi, the lnLikelihood of the current estimates
      *  and the next value of the tik.
+     *  @return the minimal value of tk
      **/
-    void eStep();
+    Real eStep();
     /** Compute zi using the Map estimate. */
     void mapStep();
 
@@ -237,10 +238,14 @@ class IMixtureComposer : public IStatModelBase
     CArrayPoint<Real> prop_;
     /** The tik probabilities */
     Array2D<Real> tik_;
-    /** The zik class label */
+    /** The sum of the columns of tik_ */
+    Array2DPoint<Real> tk_;
+    /** The zi class label */
     CArrayVector<int> zi_;
     /** Create the mixture model parameters. */
     void intializeMixtureParameters();
+    /** generate random tik_ */
+    void randomFuzzyTik();
 
   private:
     /** state of the model*/

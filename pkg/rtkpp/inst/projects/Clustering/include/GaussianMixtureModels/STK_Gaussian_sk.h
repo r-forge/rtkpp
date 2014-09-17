@@ -65,7 +65,7 @@ struct MixtureTraits< Gaussian_sk<_Array> >
  *  form
  * \f[
  *  f(\mathbf{x}|\theta) = \sum_{k=1}^K p_k \prod_{j=1}^d
- *    \frac{1}{\sqrt{2\pi}\sigma^j_{k}} \exp\left\{-\frac{(x^j-\mu^j_k)^2}{2(\sigma^j_{k})^2}\right\}.
+ *    \frac{1}{\sqrt{2\pi}\sigma_{k}} \exp\left\{-\frac{(x^j-\mu^j_k)^2}{2(\sigma_{k})^2}\right\}.
  * \f]
  **/
 template<class Array>

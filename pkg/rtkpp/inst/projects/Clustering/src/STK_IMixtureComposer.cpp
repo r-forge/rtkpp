@@ -46,7 +46,7 @@ namespace STK
 IMixtureComposer::IMixtureComposer( int nbSample, int nbVariable, int nbCluster)
                                   : IStatModelBase(nbSample, nbVariable)
                                   , nbCluster_(nbCluster)
-                                  , prop_(nbCluster), tik_(nbSample, nbCluster), zi_(nbSample)
+                                  , prop_(nbCluster), tik_(nbSample, nbCluster), tk_(nbCluster), zi_(nbSample)
                                   , state_(Clust::modelCreated_)
 {  intializeMixtureParameters(); }
 
@@ -101,15 +101,7 @@ void IMixtureComposer::randomFuzzyInit()
   stk_cout << _T("Entering IMixtureComposer::randomFuzzyInit()\n");
 #endif
   initializeStep();
-  RandBase generator;
-  for (int i = tik_.beginRows(); i < tik_.endRows(); ++i)
-  {
-    // create a reference on the i-th row
-    Array2DPoint<Real> tikRowi(tik_.row(i), true);
-    generator.randUnif(tikRowi);
-    tikRowi = tikRowi * prop_;
-    tikRowi /= tikRowi.sum();
-  }
+  randomFuzzyTik();
   eStep();
   // model intialized
   setState(Clust::modelInitialized_);
@@ -121,8 +113,9 @@ int IMixtureComposer::cStep()
   tik_ = 0.;
   for (int i=tik_.beginRows(); i < tik_.endRows(); i++)
   { tik_.elt(i, zi_[i]) = 1.;}
-  // count the minimal number of individuals in a class
-  return (Stat::sum(tik_).minElt());
+  // count the number of individuals in each class
+  tk_.move(Stat::sum(tik_));
+  return tk_.minElt();
 }
 
 /* simulate zi  */
@@ -134,9 +127,9 @@ int IMixtureComposer::sStep()
   return cStep();
 }
 /* compute tik, default implementation. */
-void IMixtureComposer::eStep()
+Real IMixtureComposer::eStep()
 {
-  Real sum = 0.;
+  Real sum = 0.; tk_ =0;
   for (int i = tik_.beginRows(); i < tik_.endRows(); ++i)
   {
     Array2DPoint<Real> lnComp(tik_.cols());
@@ -149,10 +142,13 @@ void IMixtureComposer::eStep()
     Real sum2 =  (lnComp -= max).exp().dot(prop_);
     // compute likelihood of each sample for each component
     tik_.row(i) = (prop_ * lnComp.exp())/sum2;
+    // count the expected number of individuals in each class
+    tk_ += tik_.row(i);
     // compute lnLikelihood
     sum += max + std::log(sum2);
   }
   setLnLikelihood(sum);
+  return tk_.minElt();
 }
 
 /* @return the computed likelihood of the i-th sample.
@@ -201,11 +197,27 @@ void IMixtureComposer::mapStep()
 /* Create the parameters of the  mixture model. */
 void IMixtureComposer::intializeMixtureParameters()
 {
-  prop_ = 1./(Real)nbCluster_;
-  tik_  = 1./(Real)nbCluster_;
+  prop_ = 1./nbCluster_;
+  tik_  = 1./nbCluster_;
   zi_   = baseIdx;
+  tik_  = Real(nbSample())/nbCluster_;
 }
 
+/* generate random tik_ */
+void IMixtureComposer::randomFuzzyTik()
+{
+  RandBase generator;
+  tk_ =0;
+  for (int i = tik_.beginRows(); i < tik_.endRows(); ++i)
+  {
+    // create a reference on the i-th row
+    Array2DPoint<Real> tikRowi(tik_.row(i), true);
+    generator.randUnif(tikRowi);
+    tikRowi = tikRowi * prop_;
+    tikRowi /= tikRowi.sum();
+    tk_ += tikRowi;
+  }
+}
 
 } // namespace STK
 

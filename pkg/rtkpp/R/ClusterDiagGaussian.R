@@ -162,7 +162,7 @@ setClass(
 #-----------------------------------------------------------------------
 #' Initialize an instance of a rtkpp class.
 #'
-#' Initialization method of the [\code{\linkS4class{ClusterGaussian}}] class.
+#' Initialization method of the [\code{\linkS4class{ClusterDiagGaussian}}] class.
 #' Used internally in the `rtkpp' package.
 #'
 #' @rdname initialize-methods
@@ -253,11 +253,10 @@ setMethod(
 #' @param ... further arguments passed to or from other methods
 #'
 #' @importFrom graphics plot
-#' @name plot
-#' @aliases plot plot,ClusterDiagGaussian-method
+#' @aliases plot-ClusterDiagGaussian,ClusterDiagGaussian-method
 #' @docType methods
 #' @rdname plot-DiagGaussian-method
-#' @exportMethod plot
+#' @export
 #'
 #' @seealso \code{\link{plot}}
 #' @examples

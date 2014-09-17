@@ -147,7 +147,7 @@ struct XemStrategyParam
 };
 
 /** @ingroup Clustering
- *  A FullStrategy is based on the following paradigm:
+ *  A XemStrategy is based on the following paradigm:
  *  - perform nbShortRun of the shortAlgo with a small number of iterations and
  *   a high tolerance,
  *  - pick the best model obtained,
@@ -188,7 +188,7 @@ class XemStrategy: public IMixtureStrategy
  **/
 struct FullStrategyParam
 {  /** Constructor. Set default values */
-    inline FullStrategyParam() : nbShortRun_(0), p_shortAlgo_(0) , p_longAlgo_(0)
+    inline FullStrategyParam() : nbInitRun_(1), nbShortRun_(0), p_shortAlgo_(0) , p_longAlgo_(0)
     {}
     /** destructor */
     virtual ~FullStrategyParam();

@@ -31,7 +31,7 @@
 /** @file Clustering.h
  *  @brief This file include all the header files of the project Clustering.
  *
- *  @defgroup Clustering Generative clustering
+ *  @defgroup Clustering Clustering using generative models
  *  @brief The project Clustering proposes classes for modeling and estimating
  *  generative mixture model.
  *

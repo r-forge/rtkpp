@@ -39,7 +39,7 @@ Used internally in the `rtkpp' package.
 Initialization method of the [\code{\linkS4class{ClusterCategoricalModel}}] class.
 Used internally in the `rtkpp' package.
 
-Initialization method of the [\code{\linkS4class{ClusterGaussian}}] class.
+Initialization method of the [\code{\linkS4class{ClusterDiagGaussian}}] class.
 Used internally in the `rtkpp' package.
 
 Initialization method of the [\code{\linkS4class{ClusterGamma}}] class.

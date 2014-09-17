@@ -112,11 +112,12 @@ namespace STK
          is.clear(); is.seekg(pos);
          // Try to read a NA value, in all case value is a NA object
          Char* buffer = new Char[stringNaSize+1];
-         //is.width(stringNaSize+1);
-         is >> std::skipws >> buffer;
-         // if we don't get a NA String, rewind stream
-         if (!(stringNa.compare(buffer) == 0))
+
+         if (is.get(buffer,stringNaSize+1).fail())
          { is.clear(); is.seekg(pos); is.setstate(std::ios::failbit);}
+         else if (!(stringNa.compare(buffer) == 0))
+              { is.clear(); is.seekg(pos); is.setstate(std::ios::failbit);}
+
          delete[] buffer;
        }
        return is;

@@ -134,14 +134,15 @@ Real IMixtureComposer::eStep()
   {
     Array2DPoint<Real> lnComp(tik_.cols());
     for (int k=tik_.beginCols(); k< tik_.endCols(); k++)
-    { lnComp[k] = lnComponentProbability(i,k);}
+    { lnComp[k] = std::log(prop_[k])+lnComponentProbability(i,k);}
     int kmax;
     Real max = lnComp.maxElt(kmax);
-    zi_.elt(i) = kmax;
-    // compute sum_k pk exp{lnCom_k - lnComp_kmax}
-    Real sum2 =  (lnComp -= max).exp().dot(prop_);
+    // set zi_
+    zi_[i] = kmax;
+    // compute sum_k p_k exp{lnCom_k - lnComp_kmax}
+    Real sum2 =  (lnComp - max).exp().sum();
     // compute likelihood of each sample for each component
-    tik_.row(i) = (prop_ * lnComp.exp())/sum2;
+    tik_.row(i) = (lnComp - max).exp()/sum2;
     // count the expected number of individuals in each class
     tk_ += tik_.row(i);
     // compute lnLikelihood
@@ -156,10 +157,14 @@ Real IMixtureComposer::eStep()
  **/
 Real IMixtureComposer::computeLnLikelihood(int i) const
 {
-  Real res = 0.0;
-  for (int k = pk().begin(); k< pk().end(); ++k)
-  { res += std::log(pk()[k]) + lnComponentProbability(i, k);}
-  return res;
+  // get maximal value
+  CArrayPoint<Real> lnComp(prop_.size());
+  for (int k = prop_.begin(); k< prop_.end(); ++k)
+  { lnComp[k] = std::log(prop_[k]) + lnComponentProbability(i, k);}
+  int kmax;
+  Real lnCompMax = lnComp.maxElt(kmax);
+  // compute result
+  return std::log((lnComp-lnCompMax).exp().sum())+lnCompMax;
 }
 
 /* @return the computed log-likelihood. */

@@ -35,8 +35,6 @@
 #ifndef STK_CARRAYNUMBER_H
 #define STK_CARRAYNUMBER_H
 
-#include "STKernel/include/STK_Constants.h"
-
 #include "STK_ICArray.h"
 #include "STK_Display.h"
 

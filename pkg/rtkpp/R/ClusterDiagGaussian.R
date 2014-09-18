@@ -255,7 +255,7 @@ setMethod(
 #' @importFrom graphics plot
 #' @aliases plot-ClusterDiagGaussian,ClusterDiagGaussian-method
 #' @docType methods
-#' @rdname plot-DiagGaussian-method
+#' @rdname plot-ClusterDiagGaussian-method
 #' @export
 #'
 #' @seealso \code{\link{plot}}

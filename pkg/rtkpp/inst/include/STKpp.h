@@ -57,21 +57,24 @@
       is a multi-platform toolkit written in C++ for creating fast and
       easy to use Statistics and/or data mining console programs.
   <br>
-      In a medium term, STK++ will offer a complete set of template
-      and not-template classes in C++, STK++ will be suitable for
-      projects ranging from small one-off projects to complete data
-      mining application suites.
+    <a href="http://www.stkpp.org/"> STK++ </a> is a versatile, fast, reliable
+    and elegant collection of C++ classes for statistics, clustering, linear
+    algebra, arrays (with an Eigen-like API), regression, dimension reduction, etc.
+    Some functionalities provided by the library are available in the R
+    environment as R functions. The library offers a dense set of (mostly)
+    template classes in C++ and is suitable for projects ranging from small
+    one-off projects to complete data mining application suites.
   </p>
-  <p> All STK++ programs are free software; you can redistribute them
-      and/or modify them under the terms of the
+  <p> All <a href="http://www.stkpp.org/"> STK++ </a> programs are free software;
+      you can redistribute them and/or modify them under the terms of the
       <a href="http://www.fsf.org/copyleft/lgpl.html">
       GNU Lesser (Library) General Public License</a>
       as published by the <a href="http://www.fsf.org">
       Free Software Foundation</a>.
   </p>
-  <p> The licensing terms for STK++, the GNU LGPL, allow it to be
-      used by all developers, including those developing proprietary
-      software, without any license fees or royalties.
+  <p> The licensing terms for <a href="http://www.stkpp.org/"> STK++ </a>, the
+      GNU LGPL, allow it to be used by all developers, including those developing
+      proprietary software, without any license fees or royalties.
   </p>
 
   <p> The STK++ team use the <a href="http://www.eclipse.org/"> eclipse</a>

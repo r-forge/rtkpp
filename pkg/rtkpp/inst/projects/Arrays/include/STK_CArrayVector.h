@@ -35,8 +35,6 @@
 #ifndef STK_CARRAYVECTOR_H
 #define STK_CARRAYVECTOR_H
 
-#include "STKernel/include/STK_Constants.h"
-
 #include "STK_ICArray.h"
 
 namespace STK

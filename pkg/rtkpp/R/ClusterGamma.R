@@ -259,7 +259,7 @@ setMethod(
 #' @importFrom graphics plot
 #' @aliases plot-ClusterGamma,ClusterGamma-method
 #' @docType methods
-#' @rdname plot-Gamma-method
+#' @rdname plot-ClusterGamma-method
 #' @export
 #'
 #' @seealso \code{\link{plot}}

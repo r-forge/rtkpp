@@ -61,18 +61,33 @@
 #ifndef CLUSTERING_H
 #define CLUSTERING_H
 
-#include "../projects/Clustering/include/STK_MixtureFacade.h"
-
 
 #include "../projects/Clustering/include/GammaMixtureModels/STK_Gamma_ajk_bjk.h"
+#include "../projects/Clustering/include/GammaMixtureModels/STK_Gamma_ajk_bk.h"
 #include "../projects/Clustering/include/GammaMixtureModels/STK_Gamma_ajk_bj.h"
+#include "../projects/Clustering/include/GammaMixtureModels/STK_Gamma_ajk_b.h"
+#include "../projects/Clustering/include/GammaMixtureModels/STK_Gamma_ak_bjk.h"
+#include "../projects/Clustering/include/GammaMixtureModels/STK_Gamma_ak_bk.h"
+#include "../projects/Clustering/include/GammaMixtureModels/STK_Gamma_ak_bj.h"
+#include "../projects/Clustering/include/GammaMixtureModels/STK_Gamma_ak_b.h"
+#include "../projects/Clustering/include/GammaMixtureModels/STK_Gamma_aj_bjk.h"
+#include "../projects/Clustering/include/GammaMixtureModels/STK_Gamma_aj_bk.h"
+#include "../projects/Clustering/include/GammaMixtureModels/STK_Gamma_a_bjk.h"
+#include "../projects/Clustering/include/GammaMixtureModels/STK_Gamma_a_bk.h"
 
-#include "../projects/Clustering/include/GaussianMixtureModels/STK_Gaussian_s.h"
 #include "../projects/Clustering/include/GaussianMixtureModels/STK_Gaussian_sjk.h"
+#include "../projects/Clustering/include/GaussianMixtureModels/STK_Gaussian_sk.h"
+#include "../projects/Clustering/include/GaussianMixtureModels/STK_Gaussian_sj.h"
+#include "../projects/Clustering/include/GaussianMixtureModels/STK_Gaussian_s.h"
 
 #include "../projects/Clustering/include/CategoricalMixtureModels/STK_Categorical_pjk.h"
 #include "../projects/Clustering/include/CategoricalMixtureModels/STK_Categorical_pk.h"
 
+#include "../projects/Clustering/include/STK_MixtureInit.h"
+#include "../projects/Clustering/include/STK_MixtureAlgo.h"
+#include "../projects/Clustering/include/STK_MixtureStrategy.h"
+#include "../projects/Clustering/include/STK_MixtureComposer.h"
+#include "../projects/Clustering/include/STK_MixtureFacade.h"
 #include "../projects/Clustering/include/STK_MixtureManager.h"
 
 #endif // CLUSTERING_H

@@ -132,6 +132,7 @@ Real IMixtureComposer::eStep()
   Real sum = 0.; tk_ =0;
   for (int i = tik_.beginRows(); i < tik_.endRows(); ++i)
   {
+    // get maximal element of ln(x_i,\theta_k) + ln(p_k)
     Array2DPoint<Real> lnComp(tik_.cols());
     for (int k=tik_.beginCols(); k< tik_.endCols(); k++)
     { lnComp[k] = std::log(prop_[k])+lnComponentProbability(i,k);}
@@ -140,9 +141,9 @@ Real IMixtureComposer::eStep()
     // set zi_
     zi_[i] = kmax;
     // compute sum_k p_k exp{lnCom_k - lnComp_kmax}
-    Real sum2 =  (lnComp - max).exp().sum();
-    // compute likelihood of each sample for each component
-    tik_.row(i) = (lnComp - max).exp()/sum2;
+    tik_.row(i) = (lnComp - max).exp();
+    Real sum2 = tik_.row(i).sum();
+    tik_.row(i) /= sum2;
     // count the expected number of individuals in each class
     tk_ += tik_.row(i);
     // compute lnLikelihood

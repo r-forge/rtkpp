@@ -79,9 +79,8 @@ class CategoricalBase : public IMixtureModel<Derived >
     int sample(int i, int j) const;
     /** Initialize the model. Resize the array of probabilities for each
      *  component.*/
-    void initializeModel()
+    void initializeModelImpl()
     {
-      Base::initializeModel();
       // resize vectors of probabilities
       for(int k=baseIdx; k<= components().lastIdx(); ++k)
       { p_param(k)->initializeParameters(modalities_);}

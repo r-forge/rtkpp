@@ -21,7 +21,7 @@ A diagonal gaussian model is a mixture model of the form:
 \describe{
 \item{\code{mean}}{Matrix with the mean of the jth variable in the kth cluster.}
 
-\item{\code{sigma2}}{Matrix with the variance of the jth variable in the kth cluster.}
+\item{\code{sigma}}{Matrix with the standard deviation of the jth variable in the kth cluster.}
 }}
 \examples{
 getSlots("ClusterDiagGaussian")

@@ -275,7 +275,7 @@ struct InitializeMixtureImpl
   typedef typename MixtureBridgeTraits<Id, Data>::Mixture Mixture;
   typedef typename MixtureBridgeTraits<Id, Data>::DataBridge DataBridge;
   static void run( Mixture& mixture, DataBridge* p_data)
-  { mixture.setData(p_data->m_dataij()); mixture.initializeModel();}
+  { mixture.setData(p_data->m_dataij());}
 };
 
 /** @ingroup hidden
@@ -288,11 +288,10 @@ struct InitializeMixtureImpl<Clust::Categorical_pjk_, Data>
   typedef typename MixtureBridgeTraits<Clust::Categorical_pjk_, Data>::DataBridge DataBridge;
   static void run( Mixture& mixture, DataBridge* p_data)
   {
-    mixture.setData(p_data->m_dataij());
     int min = p_data->m_dataij().minElt();
     int max = p_data->m_dataij().maxElt();
     mixture.setModalities(Range(min, max, 0));
-    mixture.initializeModel();
+    mixture.setData(p_data->m_dataij());
   }
 };
 
@@ -306,11 +305,10 @@ struct InitializeMixtureImpl<Clust::Categorical_pk_, Data>
   typedef typename MixtureBridgeTraits<Clust::Categorical_pk_, Data>::DataBridge DataBridge;
   static void run( Mixture& mixture, DataBridge* p_data)
   {
-    mixture.setData(p_data->m_dataij());
     int min = p_data->m_dataij().minElt();
     int max = p_data->m_dataij().maxElt();
     mixture.setModalities(Range(min, max, 0));
-    mixture.initializeModel();
+    mixture.setData(p_data->m_dataij());
   }
 };
 
@@ -349,7 +347,7 @@ class MixtureBridge: public IMixture
                  : IMixture(mixture)
                  , mixture_(mixture.mixture_)
                  , p_data_(mixture.p_data_)
-    {  mixture_.setData(p_data_->m_dataij()); mixture_.initializeModel();}
+    {  mixture_.setData(p_data_->m_dataij());}
     /** This is a standard clone function in usual sense. It must be defined to
      *  provide new object of your class with values of various parameters
      *  equal to the values of calling object. In other words, this is
@@ -368,7 +366,6 @@ class MixtureBridge: public IMixture
       p_bridge->p_data_ = p_data_;
       // Bug Fix: set the correct data set
       p_bridge->mixture_.setData(p_bridge->p_data_->m_dataij());
-      p_bridge->mixture_.initializeModel();
       return p_bridge;
     }
     /** @brief Initialize the mixture model before its use by the composer.

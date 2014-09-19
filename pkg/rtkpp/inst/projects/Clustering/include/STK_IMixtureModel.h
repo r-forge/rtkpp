@@ -90,7 +90,7 @@ class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBa
                  , components_(model.components_)
     {
       for (int k= components_.begin(); k < components_.end(); ++k)
-      { components_[k] = model.components_[k]->clone();}
+      { components_[k] = model.components_[k]->clone(); }
     }
 
   public:
@@ -98,7 +98,7 @@ class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBa
     ~IMixtureModel()
     {
       for (int k= components_.begin(); k < components_.end(); ++k)
-      { if (components_[k]) delete components_[k];}
+      { delete components_[k];}
     }
     /** create pattern.  */
     inline IMixtureModel* create() const { return new Derived(this->nbCluster());}
@@ -110,12 +110,32 @@ class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBa
     inline Component const* components(int k) const { return components_[k];}
     /** @return a constant reference on the k-th parameter */
     inline Parameters const* p_param(int k) const { return components_[k]->p_param();}
+    /** Set a new data set and initialize the model.
+     *  @param data the data set to set*/
+    void setData(Array const& data)
+    {
+      p_dataij_ = &data;
+      initializeModel();
+    }
+    /** default implementation of initializeModelImpl */
+    void initializeModelImpl() {}
+    /** @return the value of the probability of the i-th sample in the k-th component.
+     *  @param i,k indexes of the sample and of the component
+     **/
+    inline Real lnComponentProbability(int i, int k)
+    { return components_[k]->computeLnLikelihood(p_dataij_->row(i));}
+
+  protected:
     /** @brief Initialize the model before its first use.
-     *  This function can be overloaded in derived class for initialization of
-     *  the specific model parameters. It should be called prior to any used of
-     *  the class. In this interface, the @c initializeModel() method
+     * This function will be called when the data is set.
+     * In this interface, the @c initializeModel() method
      *  - set the number of samples and variables of the mixture model
      *  - resize the parameters of each component with the range of the variables
+     *  - call the derived class implemented method
+     * @code
+     *   initializeModelImpl()
+     * @endcode
+     * for initialization of the specific model parameters if needed.
      **/
     void initializeModel()
     {
@@ -127,22 +147,9 @@ class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBa
       // initialize the parameters
       for (int k= components_.begin(); k < components_.end(); ++k)
       { components_[k]->p_param()->resize(p_dataij_->cols());}
+      // call specific model initialization stuff
+      this->asDerived().initializeModelImpl();
     }
-    /** set a new data set.
-     *  @param data the data set to set*/
-    void setData(Array const& data)
-    {
-      p_dataij_ = &data;
-      this->setNbSample(p_dataij_->sizeRows());
-      this->setNbVariable(p_dataij_->sizeCols());
-    }
-    /** @return the value of the probability of the i-th sample in the k-th component.
-     *  @param i,k indexes of the sample and of the component
-     **/
-    inline Real lnComponentProbability(int i, int k)
-    { return components_[k]->computeLnLikelihood(p_dataij_->row(i));}
-
-  protected:
     /** @return the array with the components */
     inline Array1D<Component*>& components() { return components_;}
     /** @return a pointer on the k-th parameter */

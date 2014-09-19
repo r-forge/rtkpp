@@ -9,8 +9,8 @@ In a Gaussian model, we assume that the variance
 matrices are diagonal in each cluster. This gives rise to 8 models:
 \enumerate{
  \item {The proportions can be equal or free.}
- \item {The variances can be equal or free for all the variables.}
- \item {The variances can be equal or free for all the clusters.}
+ \item {The standard deviations can be equal or free for all the variables.}
+ \item {The standard deviations can be equal or free for all the clusters.}
 }
 
 The model names are summarized in the following array:
@@ -26,8 +26,8 @@ The model names are summarized in the following array:
  gaussian_pk_s   \tab Free  \tab Equal                \tab Equal \cr
 }}
 \usage{
-diagGaussianNames(prop = "all", varInCluster = "all",
-  varBetweenCluster = "all")
+diagGaussianNames(prop = "all", sdInCluster = "all",
+  sdBetweenCluster = "all")
 
 validDiagGaussianNames(names)
 
@@ -36,9 +36,9 @@ validGammaNames(names)
 \arguments{
 \item{prop}{A character string equal to "equal", "free" or "all". Default is "all".}
 
-\item{varInCluster}{A character string equal to "equal", "free" or "all". Default is "all".}
+\item{sdInCluster}{A character string equal to "equal", "free" or "all". Default is "all".}
 
-\item{varBetweenCluster}{A character string equal to "equal", "free" or "all". Default is "all".}
+\item{sdBetweenCluster}{A character string equal to "equal", "free" or "all". Default is "all".}
 
 \item{names}{a vector of character}
 
@@ -54,8 +54,8 @@ In a Gaussian model, we assume that the variance
 matrices are diagonal in each cluster. This gives rise to 8 models:
 \enumerate{
  \item {The proportions can be equal or free.}
- \item {The variances can be equal or free for all the variables.}
- \item {The variances can be equal or free for all the clusters.}
+ \item {The standard deviations can be equal or free for all the variables.}
+ \item {The standard deviations can be equal or free for all the clusters.}
 }
 
 The model names are summarized in the following array:

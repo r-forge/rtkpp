@@ -93,7 +93,7 @@ class Gaussian_sjk : public DiagGaussianBase<Gaussian_sjk<Array> >
     Gaussian_sjk( Gaussian_sjk const& model) : Base(model) {}
     /** destructor */
     ~Gaussian_sjk() {}
-    /** Compute the initial weighted means and the initial weighted variances
+    /** Compute the initial weighted means and the initial weighted standard deviations
      *  of the mixture */
     inline bool initializeStep() { return mStep();}
     /** Initialize randomly the parameters of the Gaussian mixture. The centers
@@ -101,7 +101,7 @@ class Gaussian_sjk : public DiagGaussianBase<Gaussian_sjk<Array> >
      *  will be set to 1.
      */
     void randomInit();
-    /** Compute the weighted mean and the common variance. */
+    /** Compute the weighted mean and the common standard deviation. */
     bool mStep();
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
@@ -120,13 +120,13 @@ void Gaussian_sjk<Array>::randomInit()
   { p_param(k)->sigma_ = 1.;}
 }
 
-/* Compute the weighted means and the weighted variances. */
+/* Compute the weighted means and the weighted standard deviations. */
 template<class Array>
 bool Gaussian_sjk<Array>::mStep()
 {
   // compute the means
   if (!this->updateMean()) return false;
-  // compute the variance
+  // compute the standard deviation
   for (int k= baseIdx; k < p_tik()->endCols(); ++k)
   {
     ColVector tik(p_tik()->col(k), true); // create a reference

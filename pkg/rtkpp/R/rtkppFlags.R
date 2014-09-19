@@ -53,7 +53,7 @@
 # @keywords internal
 .rtkppLdFlags <- function()
 {
-  path <- rtkpp.system.file( "lib" )
+  path <- .rtkpp.system.file( "lib" )
   if (.Platform$OS.type=="windows") { path <- .asBuildPath(path) }
   paste(path, "/libSTKpp.a", sep="")
 }

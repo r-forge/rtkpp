@@ -2,7 +2,7 @@
 \docType{methods}
 \name{plot,ClusterDiagGaussian-method}
 \alias{plot,ClusterDiagGaussian-method}
-\alias{plot-ClusterDiagGaussian,ClusterDiagGaussian-method}
+\alias{plot-ClusterDiagGaussian}
 \title{Plotting of a class [\code{\linkS4class{ClusterDiagGaussian}}]}
 \usage{
 \S4method{plot}{ClusterDiagGaussian}(x, y, ...)

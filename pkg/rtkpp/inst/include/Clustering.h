@@ -90,4 +90,6 @@
 #include "../projects/Clustering/include/STK_MixtureFacade.h"
 #include "../projects/Clustering/include/STK_MixtureManager.h"
 
+#include "../projects/Clustering/include/STK_ICLCriterion.h"
+
 #endif // CLUSTERING_H

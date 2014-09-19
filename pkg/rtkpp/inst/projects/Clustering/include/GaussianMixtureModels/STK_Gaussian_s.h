@@ -90,32 +90,30 @@ class Gaussian_s : public DiagGaussianBase<Gaussian_s<Array> >
     /** destructor */
     inline ~Gaussian_s() {}
     /** Initialize the component of the model.
-     *  This function have to be called prior to any used of the class.
-     *  In this interface, the @c initializeModel() method call the base
-     *  class IMixtureModel::initializeModel() and for all the
-     *  components initialize the shared parameter sigma_.
+     *  In this interface, the @c initializeModelImpl()
+     *  initialize the shared parameter @c sigma_ for all the components .
      **/
-    void initializeModel()
+    void initializeModelImpl()
     {
-      Base::initializeModel();
       sigma_ = 1.0;
       for (int k= baseIdx; k < components().end(); ++k)
       { components()[k]->p_param()->p_sigma_ = &sigma_;}
     }
-    /** Compute the inital weighted mean and the initial common variance. */
+    /** Compute the inital weighted mean and the initial common standard deviation. */
     inline bool initializeStep() { return mStep();}
     /** Initialize randomly the parameters of the Gaussian mixture. The centers
      *  will be selected randomly among the data set and the standard-deviation
      *  will be set to 1.
      */
     void randomInit();
-    /** Compute the weighted mean and the common variance. */
+    /** Compute the weighted mean and the common standard deviation. */
     bool mStep();
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable()+1;}
 
   protected:
+    /** Common standard deviation */
     Real sigma_;
 };
 
@@ -130,13 +128,13 @@ void Gaussian_s<Array>::randomInit()
   sigma_ = 1.;
 }
 
-/* Compute the weighted mean and the common variance. */
+/* Compute the weighted mean and the common standard deviation. */
 template<class Array>
 bool Gaussian_s<Array>::mStep()
 {
   // compute the means
   if (!this->updateMean()) return false;
-  // compute the variance
+  // compute the standard deviation
   Real variance = 0.0;
   for (int k= baseIdx; k < p_tik()->endCols(); ++k)
   {

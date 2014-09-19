@@ -28,8 +28,8 @@
 #' matrices are diagonal in each cluster. This gives rise to 8 models:
 #' \enumerate{
 #'  \item {The proportions can be equal or free.}
-#'  \item {The variances can be equal or free for all the variables.}
-#'  \item {The variances can be equal or free for all the clusters.}
+#'  \item {The standard deviations can be equal or free for all the variables.}
+#'  \item {The standard deviations can be equal or free for all the clusters.}
 #' }
 #'
 #' The model names are summarized in the following array:
@@ -46,8 +46,8 @@
 #' }
 #'
 #' @param prop A character string equal to "equal", "free" or "all". Default is "all".
-#' @param varInCluster A character string equal to "equal", "free" or "all". Default is "all".
-#' @param varBetweenCluster A character string equal to "equal", "free" or "all". Default is "all".
+#' @param sdInCluster A character string equal to "equal", "free" or "all". Default is "all".
+#' @param sdBetweenCluster A character string equal to "equal", "free" or "all". Default is "all".
 #'
 #' @return A vector of character with the models names.
 #' @examples
@@ -56,14 +56,14 @@
 #'
 #' @rdname diagGaussianNames
 #' @export
-diagGaussianNames <- function(prop = "all", varInCluster="all", varBetweenCluster = "all")
+diagGaussianNames <- function(prop = "all", sdInCluster="all", sdBetweenCluster = "all")
 {
   if(sum(prop %in% c("equal","free","all")) != 1)
   { stop("prop is not valid. See ?diagGaussianNames for the list of prop.")}
-  if(sum(varInCluster %in% c("equal","free","all")) != 1)
-  { stop("varInCluster is not valid. See ?diagGaussianNames for the list of varInCluster.")}
-  if(sum(varBetweenCluster %in% c("equal","free","all")) != 1)
-  { stop("varBetweenCluster is not valid. See ?diagGaussianNames for the list of varBetweenCluster.")}
+  if(sum(sdInCluster %in% c("equal","free","all")) != 1)
+  { stop("sdInCluster is not valid. See ?diagGaussianNames for the list of sdInCluster.")}
+  if(sum(sdBetweenCluster %in% c("equal","free","all")) != 1)
+  { stop("sdBetweenCluster is not valid. See ?diagGaussianNames for the list of sdBetweenCluster.")}
 
   all = c( "gaussian_pk_sjk", "gaussian_pk_sj", "gaussian_pk_sk", "gaussian_pk_s"
          , "gaussian_p_sjk", "gaussian_p_sj", "gaussian_p_sk", "gaussian_p_s")
@@ -77,10 +77,10 @@ diagGaussianNames <- function(prop = "all", varInCluster="all", varBetweenCluste
   res = all;
   if (prop == "free")  { res = intersect(res, propFree);}
   if (prop == "equal") { res = intersect(res, propEqual);}
-  if (varInCluster =="free")  { res = intersect(res, varJFree);}
-  if (varInCluster == "equal") { res = intersect(res, varJEqual);}
-  if (varBetweenCluster =="free")  { res = intersect(res, varKFree);}
-  if (varBetweenCluster =="equal") { res = intersect(res, varKEqual);}
+  if (sdInCluster =="free")  { res = intersect(res, varJFree);}
+  if (sdInCluster == "equal") { res = intersect(res, varJEqual);}
+  if (sdBetweenCluster =="free")  { res = intersect(res, varKFree);}
+  if (sdBetweenCluster =="equal") { res = intersect(res, varKEqual);}
 
   res
 }

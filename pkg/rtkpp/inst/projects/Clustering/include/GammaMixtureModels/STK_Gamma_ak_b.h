@@ -100,14 +100,11 @@ class Gamma_ak_b : public GammaBase<Gamma_ak_b<Array> >
     /** destructor */
     inline ~Gamma_ak_b() {}
     /** Initialize the component of the model.
-     *  This function have to be called prior to any used of the class.
-     *  In this interface, the @c initializeModel() method call the base
-     *  class IMixtureModel::initializeModel() and for all the
-     *  components create the parameters.
+     *  In this interface, the scale_ parameter is shared between all the
+     *  components.
      **/
-    void initializeModel()
+    void initializeModelImpl()
     {
-      Base::initializeModel();
       scale_ = 1.;
       for (int k= baseIdx; k < components().end(); ++k)
       { p_param(k)->p_scale_ = &scale_;}

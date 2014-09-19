@@ -93,14 +93,14 @@ class Gaussian_sk : public DiagGaussianBase<Gaussian_sk<Array> >
     inline Gaussian_sk( Gaussian_sk const& model) : Base(model) {}
     /** destructor */
     inline ~Gaussian_sk() {}
-    /** Compute the inital weighted mean and the initial common variances. */
+    /** Compute the inital weighted mean and the initial common standard deviations. */
     inline bool initializeStep() { return mStep();}
     /** Initialize randomly the parameters of the Gaussian mixture. The centers
      *  will be selected randomly among the data set and the standard-deviations
      *  will be set to 1.
      */
     void randomInit();
-    /** Compute the weighted mean and the common variance. */
+    /** Compute the weighted mean and the common standard deviation. */
     bool mStep();
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
@@ -119,13 +119,13 @@ void Gaussian_sk<Array>::randomInit()
   { p_param(k)->sigma_ = 1.;}
 }
 
-/* Compute the weighted mean and the common variance. */
+/* Compute the weighted mean and the common standard deviation. */
 template<class Array>
 bool Gaussian_sk<Array>::mStep()
 {
   // compute the means
   if (!this->updateMean()) return false;
-  // compute the variance
+  // compute the standard deviation
   for (int k= baseIdx; k < p_tik()->endCols(); ++k)
   {
     p_param(k)->sigma_

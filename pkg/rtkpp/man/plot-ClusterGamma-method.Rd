@@ -2,7 +2,7 @@
 \docType{methods}
 \name{plot,ClusterGamma-method}
 \alias{plot,ClusterGamma-method}
-\alias{plot-ClusterGamma,ClusterGamma-method}
+\alias{plot-ClusterGamma}
 \title{Plotting of a class [\code{\linkS4class{ClusterGamma}}]}
 \usage{
 \S4method{plot}{ClusterGamma}(x, y, ...)

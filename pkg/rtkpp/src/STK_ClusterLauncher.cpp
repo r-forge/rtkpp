@@ -83,7 +83,7 @@ bool ClusterLauncher::run()
   s4_model_.slot("tik")          = wrap(p_composer_->tik());
   s4_model_.slot("zi")           = wrap(p_composer_->zi());
   NumericVector fi = s4_model_.slot("fi");
-  for (int i=0; i< fi.length(); ++i) { fi[i] = p_composer_->computeLikelihood(i);}
+  for (int i=0; i< fi.length(); ++i) { fi[i] = p_composer_->computeLnLikelihood(i);}
   // get specific parameters
   getParameters();
   return true;
@@ -119,15 +119,15 @@ void ClusterLauncher::getDiagGaussianParameters()
   // get dimensions
   int K = params.sizeRows()/2, nbVariable = params.sizeCols();
   // get results
-  Array2D<Real> mean(K, nbVariable), sigma2(K, nbVariable);
+  Array2D<Real> mean(K, nbVariable), sigma(K, nbVariable);
   for (int k=0; k<K; ++k)
   {
     mean.row(k)   = params.row(2*k);
-    sigma2.row(k) = params.row(2*k+1);
+    sigma.row(k) = params.row(2*k+1);
   }
   // save results in s4_model
   s4_model_.slot("mean")   = wrap(mean);
-  s4_model_.slot("sigma2") = wrap(sigma2);
+  s4_model_.slot("sigma") = wrap(sigma);
 }
 
 /* get the gamma parameters */
@@ -216,7 +216,7 @@ Real ClusterLauncher::selectBestModel()
       // create facade and strategy
       ClusterFacade facade(p_current);
       facade.createFullStrategy(s4_strategy_);
-      // run estimation
+      // run estimation and get results if possible
       if (facade.run())
       {
         // compute criterion and update model if necessary

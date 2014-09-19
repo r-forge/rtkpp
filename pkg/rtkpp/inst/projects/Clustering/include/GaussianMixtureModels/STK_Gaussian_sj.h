@@ -91,33 +91,31 @@ class Gaussian_sj : public DiagGaussianBase<Gaussian_sj<Array> >
     /** destructor */
     inline ~Gaussian_sj() {}
     /** Initialize the component of the model.
-     *  This function have to be called prior to any used of the class.
-     *  In this interface, the @c initializeModel() method call the base
-     *  class IMixtureModel::initializeModel() and for all the
-     *  components initialize the shared parameter sigma_.
+     *  This function initialize the shared parameter sigma_  for all the
+     *  components.
      **/
-    void initializeModel()
+    void initializeModelImpl()
     {
-      Base::initializeModel();
       sigma_.resize(this->nbVariable());
       sigma_ = 1.;
       for (int k= baseIdx; k < components().end(); ++k)
       { p_param(k)->p_sigma_ = &sigma_;}
     }
-    /** Compute the inital weighted mean and the initial common variance. */
+    /** Compute the inital weighted mean and the initial common standard deviation. */
     inline bool initializeStep() { return mStep();}
     /** Initialize randomly the parameters of the Gaussian mixture. The centers
      *  will be selected randomly among the data set and the standard-deviation
      *  will be set to 1.
      */
     void randomInit();
-    /** Compute the weighted mean and the common variance. */
+    /** Compute the weighted mean and the common standard deviation. */
     bool mStep();
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable()+this->nbVariable();}
 
   protected:
+    /** Common standard deviation */
     Array2DPoint<Real> sigma_;
 };
 
@@ -133,13 +131,13 @@ void Gaussian_sj<Array>::randomInit()
   sigma_ = 1.;
 }
 
-/* Compute the weighted mean and the common variance. */
+/* Compute the weighted mean and the common standard deviation. */
 template<class Array>
 bool Gaussian_sj<Array>::mStep()
 {
   // compute the means
   if (!this->updateMean()) return false;
-  // compute the variance
+  // compute the standard deviation
   Array2DPoint<Real> variance(p_data()->cols(), 0.);
   for (int k= baseIdx; k < components().end(); ++k)
   {

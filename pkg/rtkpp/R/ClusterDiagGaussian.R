@@ -105,7 +105,7 @@ clusterDiagGaussian <- function(data, nbCluster=2, modelNames=NULL, strategy=clu
 
   # set names
   colnames(model@mean)   <- colnames(model@data)
-  colnames(model@sigma2) <- colnames(model@data)
+  colnames(model@sigma) <- colnames(model@data)
   if (resFlag != 1) {cat("WARNING: An error occur during the clustering process")}
   model
 }
@@ -123,7 +123,7 @@ clusterDiagGaussian <- function(data, nbCluster=2, modelNames=NULL, strategy=clu
 #' }
 #'
 #' @slot mean  Matrix with the mean of the jth variable in the kth cluster.
-#' @slot sigma2  Matrix with the variance of the jth variable in the kth cluster.
+#' @slot sigma  Matrix with the standard deviation of the jth variable in the kth cluster.
 #' @seealso [\code{\linkS4class{IClusterModel}}] class
 #'
 #' @examples
@@ -140,19 +140,19 @@ clusterDiagGaussian <- function(data, nbCluster=2, modelNames=NULL, strategy=clu
 #'
 setClass(
     Class="ClusterDiagGaussian",
-    representation( mean = "matrix", sigma2 = "matrix"),
+    representation( mean = "matrix", sigma = "matrix"),
     contains=c("IClusterModel"),
-    prototype=list( mean   = matrix(nrow=0,ncol=0), sigma2 = matrix(nrow=0,ncol=0) ),
+    prototype=list( mean   = matrix(nrow=0,ncol=0), sigma = matrix(nrow=0,ncol=0) ),
     validity=function(object)
     {
       if (nrow(object@mean)!=object@nbCluster)
       {stop("mean must have nbCluster rows.")}
       if (ncol(object@mean)!=ncol(object@data))
       {stop("mean must have nbVariable columns.")}
-      if (nrow(object@sigma2)!=object@nbCluster)
-      {stop("sigma2 must have nbCluster rows.")}
-      if (ncol(object@sigma2)!=ncol(object@data))
-      {stop("sigma2 must have nbVariable columns.")}
+      if (nrow(object@sigma)!=object@nbCluster)
+      {stop("sigma must have nbCluster rows.")}
+      if (ncol(object@sigma)!=ncol(object@data))
+      {stop("sigma must have nbVariable columns.")}
       if (!validDiagGaussianNames(object@modelName))
       {stop("Invalid Gaussian model name.")}
       return(TRUE)
@@ -179,7 +179,7 @@ setMethod(
       if(missing(modelName)) {.Object@modelName<-"gaussian_pk_sjk"}
       else  {.Object@modelName<-modelName}
       .Object@mean <- matrix(0, nbCluster, nbVariable)
-      .Object@sigma2 <- matrix(1, nbCluster, nbVariable)
+      .Object@sigma <- matrix(1, nbCluster, nbVariable)
       # validate
       validObject(.Object)
       return(.Object)
@@ -201,7 +201,7 @@ setMethod(
       cat("*** Cluster: ",k,"\n")
       cat("* Proportion = ", format(x@pk[k]), "\n")
       cat("* Means      = ", format(x@mean[k,]), "\n")
-      cat("* Variances  = ", format(x@sigma2[k,]), "\n")
+      cat("* Variances  = ", format(x@sigma[k,]), "\n")
       cat("****************************************\n")
     }
   }
@@ -222,7 +222,7 @@ setMethod(
         cat("*** Cluster: ",k,"\n")
         cat("* Proportion = ", format(object@pk[k]), "\n")
         cat("* Means      = ", format(object@mean[k,]), "\n")
-        cat("* Variances  = ", format(object@sigma2[k,]), "\n")
+        cat("* Variances  = ", format(object@sigma[k,]), "\n")
         cat("****************************************\n")
       }
     }
@@ -253,7 +253,8 @@ setMethod(
 #' @param ... further arguments passed to or from other methods
 #'
 #' @importFrom graphics plot
-#' @aliases plot-ClusterDiagGaussian,ClusterDiagGaussian-method
+#' @aliases plot-ClusterDiagGaussian
+#ClusterDiagGaussian-method
 #' @docType methods
 #' @rdname plot-ClusterDiagGaussian-method
 #' @export
@@ -281,4 +282,4 @@ setMethod(
 # wrapper of dnorm
 # x a vector with the point
 .dGauss <- function(x, j, k, model)
-{ dnorm(x, (model@mean)[k, j] , sqrt((model@sigma2)[k, j]))}
+{ dnorm(x, (model@mean)[k, j] , sqrt((model@sigma)[k, j]))}

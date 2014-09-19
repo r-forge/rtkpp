@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2013  Serge Iovleff
+/*     Copyright (C) 2004-2014  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -24,20 +24,32 @@
 
 /*
  * Project:  stkpp::Clustering
- * created on: 17 nov. 2013
+ * created on: 19 sept. 2014
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
 
-/** @file STK_Bridges.h
- *  @brief In this file we summarize the bridges of the Clustering project.
+/** @file STK_ICLCriterion.cpp
+ *  @brief In this file we implement the run method of the ICLCriterion class.
  **/
 
+#include "../include/STK_ICLCriterion.h"
 
-#ifndef STK_BRIDGES_H
-#define STK_BRIDGES_H
+namespace STK
+{
 
-#include "STK_GammaBridges.h"
-#include "STK_GaussianBridges.h"
-#include "STK_CategoricalBridges.h"
+/* implementation of the virtual method run */
+bool ICLCriterion::run()
+{
+  if (!p_composer_)
+  { msg_error_ = STKERROR_NO_ARG(BICCriterion::run,p_model_ is not set);
+    return false;
+  }
+  value_  = - 2.*p_composer_->lnLikelihood()
+            + p_composer_->nbFreeParameter()*p_composer_->lnNbSample()
+           -  2.*(p_composer_->tik()*p_composer_->tik().safe(1e-15).log()).sum();
+  return true;
+}
 
-#endif /* STK_BRIDGES_H */
+} // namespace STK
+
+

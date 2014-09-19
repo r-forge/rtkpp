@@ -95,14 +95,11 @@ class Gamma_aj_bjk : public GammaBase< Gamma_aj_bjk<Array> >
     /** destructor */
     inline ~Gamma_aj_bjk() {}
     /** Initialize the component of the model.
-     *  This function have to be called prior to any used of the class.
-     *  In this interface, the @c initializeModel() method call the base
-     *  class IMixtureModel::initializeModel() and for all the
-     *  components create the parameters.
+     *  In this interface, the shape_ parameter is shared between all the
+     *  components.
      **/
-    void initializeModel()
+    void initializeModelImpl()
     {
-      Base::initializeModel();
       shape_.resize(p_data()->cols());
       shape_ = 1.;
       for (int k= baseIdx; k < components().end(); ++k)
@@ -123,7 +120,7 @@ class Gamma_aj_bjk : public GammaBase< Gamma_aj_bjk<Array> >
     { return this->nbCluster()*this->nbVariable()+this->nbVariable();}
 
   protected:
-    /** common scale */
+    /** common shape */
     Array2DPoint<Real> shape_;
 };
 

@@ -257,7 +257,8 @@ setMethod(
 #' @param ... further arguments passed to or from other methods
 #'
 #' @importFrom graphics plot
-#' @aliases plot-ClusterGamma,ClusterGamma-method
+#' @aliases plot-ClusterGamma
+#ClusterGamma-method
 #' @docType methods
 #' @rdname plot-ClusterGamma-method
 #' @export

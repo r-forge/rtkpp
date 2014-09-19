@@ -195,6 +195,7 @@ Real ClusterLauncher::selectBestModel()
   ICriterion* p_criterion =0;
   if (critName_ == "BIC") { p_criterion = new BICCriterion();}
   if (critName_ == "AIC") { p_criterion = new AICCriterion();}
+  if (critName_ == "ICL") { p_criterion = new ICLCriterion();}
 
   // start the estimation process, should end with the best model according to
   // the criteria

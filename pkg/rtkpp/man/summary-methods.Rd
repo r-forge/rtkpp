@@ -2,12 +2,15 @@
 \docType{methods}
 \name{summary,ClusterDiagGaussian-method}
 \alias{summary}
+\alias{summary,ClusterCategorical-method}
 \alias{summary,ClusterDiagGaussian-method}
 \alias{summary,ClusterGamma-method}
 \alias{summary,IClusterModel-method}
 \alias{summary,MixmodResults-method}
 \title{Produce summary of a rtkpp class.}
 \usage{
+\S4method{summary}{ClusterDiagGaussian}(object, ...)
+
 \S4method{summary}{ClusterDiagGaussian}(object, ...)
 
 \S4method{summary}{ClusterGamma}(object, ...)

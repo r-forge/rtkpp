@@ -14,7 +14,7 @@ exportClasses(ClusterAlgo
              ,ClusterInit
              ,ClusterStrategy
              ,IClusterModel
-             ,ClusterCategoricalModel
+             ,ClusterCategorical
              ,ClusterDiagGaussian
              ,ClusterGamma
              )

@@ -43,7 +43,7 @@ NULL
 #' the strategy to run. clusterStrategy() method by default.
 #' @param criterion character defining the criterion to select the best model.
 #' The best model is the one with the lowest criterion value.
-#' Possible values: "BIC", "AIC". Default is "BIC".
+#' Possible values: "BIC", "AIC", "ICL". Default is "ICL".
 #'
 #' @examples
 #' ## A quantitative example with the famous geyser data set
@@ -69,7 +69,7 @@ NULL
 #' @author Serge Iovleff
 #' @export
 #'
-clusterGamma <- function(data, nbCluster=2, modelNames= gammaNames(), strategy=clusterStrategy(), criterion="BIC")
+clusterGamma <- function(data, nbCluster=2, modelNames= gammaNames(), strategy=clusterStrategy(), criterion="ICL")
 {
   # check nbCluster
   nbClusterModel = length(nbCluster);
@@ -78,7 +78,7 @@ clusterGamma <- function(data, nbCluster=2, modelNames= gammaNames(), strategy=c
   if (nbClusterMin < 2) { stop("The number of clusters must be greater or equal to 2")}
   
   # check criterion
-  if(sum(criterion %in% c("BIC","AIC")) != 1)
+  if(sum(criterion %in% c("BIC","AIC","ICL")) != 1)
   { stop("criterion is not valid. See ?clusterGamma for the list of valid criterion")}
   
   # check data

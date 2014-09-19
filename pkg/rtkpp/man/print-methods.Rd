@@ -3,6 +3,7 @@
 \name{print,ClusterAlgo-method}
 \alias{print}
 \alias{print,ClusterAlgo-method}
+\alias{print,ClusterCategorical-method}
 \alias{print,ClusterDiagGaussian-method}
 \alias{print,ClusterGamma-method}
 \alias{print,ClusterInit-method}
@@ -15,6 +16,8 @@
 \title{Print a rtkpp class to standard output.}
 \usage{
 \S4method{print}{ClusterAlgo}(x, ...)
+
+\S4method{print}{ClusterCategorical}(x, ...)
 
 \S4method{print}{ClusterDiagGaussian}(x, ...)
 

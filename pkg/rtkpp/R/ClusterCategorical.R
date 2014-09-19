@@ -26,7 +26,92 @@
 NULL
 
 #-----------------------------------------------------------------------
-#' Definition of the [\code{\linkS4class{ClusterCategoricalModel}}] class
+#' Create an instance of the [\code{\linkS4class{ClusterCategorical}}] class
+#'
+#' This function computes the optimal diagonal Gaussian mixture model according
+#' to the [\code{criterion}] among the list of model given in [\code{modelNames}]
+#' and the number of clusters given in [\code{nbCluster}], using the strategy specified in [\code{strategy}].
+#'
+#' @param data frame or matrix containing the data. Rows correspond to observations
+#' and columns correspond to variables. If the data set contains NA values, they
+#' will be estimated during the estimation process.
+#' @param nbCluster  [\code{\link{vector}}] listing the number of clusters to test.
+#' @param modelNames [\code{\link{vector}}] of models names to run. By default all diagonal
+#' Gaussian models are estimated.
+#' @param strategy a [\code{\linkS4class{ClusterStrategy}}] object containing
+#' the strategy to run. clusterStrategy() method by default.
+#' @param criterion character defining the criterion to select the best model.
+#' The best model is the one with the lowest criterion value.
+#' Possible values: "BIC", "AIC", "ICL". Default is "ICL".
+#'
+#' @examples
+#' ## A quantitative example with the famous geyser data set
+#' data(geyser)
+#' ## add 10 missing values
+#' x = geyser;
+#' x[round(runif(5,1,nrow(geyser))), 1] <- NA
+#' x[round(runif(5,1,nrow(geyser))), 2] <- NA
+#' ## with default values
+#' model <- clusterDiagGaussian(data=x, nbCluster=2:3)
+#'
+#' ## use graphics functions
+#' \dontrun{
+#' plot(model)
+#' }
+#'
+#' ## get summary
+#' summary(model)
+#' ## print model
+#' print(model)
+#'
+#' @return An instance of the [\code{\linkS4class{ClusterCategorical}}] class.
+#' @author Serge Iovleff
+#' @export
+#'
+ClusterCategorical <- function(data, nbCluster=2, modelNames=NULL, strategy=clusterStrategy(), criterion="ICL")
+{
+  # check nbCluster
+  nbClusterModel = length(nbCluster);
+  nbClusterMin = min(nbCluster);
+  nbClusterMax = max(nbCluster);
+  if (nbClusterMin < 2) { stop("The number of clusters must be greater or equal to 2")}
+  
+  # check criterion
+  if(sum(criterion %in% c("BIC","AIC", "ICL")) != 1)
+  { stop("criterion is not valid. See ?clusterDiagGaussian for the list of valid criterion")}
+  
+  # check data
+  data = as.matrix(data)
+  if (nrow(data) <= 3*nbClusterMax) {stop("There is not enough individuals (rows) in the data set")}
+  if (ncol(data) < 1) {stop("Error: empty data set")}
+  
+  # check modelNames
+  if (is.null(modelNames)) { modelNames = diagGaussianNames()}
+  if (!validDiagGaussianNames(modelNames))
+  { stop("modelNames is not valid. See ?diagGaussianNames for the list of valid model names")}
+  
+  # check strategy
+  if(class(strategy)[1] != "ClusterStrategy")
+  {stop("strategy is not a Cluster Stategy class (must be an instance of the class ClusterStrategy).")}
+  validObject(strategy);
+  
+  # Create model
+  model = new("ClusterDiagGaussian", data)
+  model@missings = which(is.na(data), arr.ind=TRUE);
+  model@strategy = strategy;
+  
+  # start estimation of the models
+  #resFlag = .Call("clusterMixture", model, nbCluster, modelNames, strategy, criterion, PACKAGE="rtkpp")
+  resFlag = FALSE
+  # set names
+  colnames(model@mean)   <- colnames(model@data)
+  colnames(model@sigma) <- colnames(model@data)
+  if (resFlag != 1) {cat("WARNING: An error occur during the clustering process")}
+  model
+}
+
+#-----------------------------------------------------------------------
+#' Definition of the [\code{\linkS4class{ClusterCategorical}}] class
 #'
 #' This class defines a categorical mixture Model. Inherits from the
 #'[\code{\linkS4class{IClusterModel}}] class. A categorical mixture model is
@@ -38,35 +123,35 @@ NULL
 #'    \quad {x} \in \{1,\ldots,L\}^d.
 #' }
 #'
-#' @slot pljk  Array with the probability of the jth variable in the kth cluster
+#' @slot pkjl  Array with the probability of the jth variable in the kth cluster
 #' to be l.
 #'
 #' @examples
-#'   getSlots("ClusterCategoricalModel")
+#'   getSlots("ClusterCategorical")
 #'   data(geyser)
-#'   new("ClusterCategoricalModel", data=geyser)
+#'   new("ClusterCategorical", data=geyser)
 #'
 #' @author Serge Iovleff
 #'
-#' @name ClusterCategoricalModel-class
-#' @rdname ClusterCategoricalModel-class
-#' @aliases ClusterCategoricalModel-class
-#' @exportClass ClusterCategoricalModel
+#' @name ClusterCategorical-class
+#' @rdname ClusterCategorical-class
+#' @aliases ClusterCategorical-class
+#' @exportClass ClusterCategorical
 #'
 setClass(
-    Class="ClusterCategoricalModel",
-    representation( pljk = "array"),
+    Class="ClusterCategorical",
+    representation( pkjl = "array"),
     contains=c("IClusterModel"),
-    prototype=list( pljk = array(dim=c(0,0,0))),
+    prototype=list( pkjl = array(dim=c(0,0,0))),
     validity=function(object)
     {
-      dims <- dim(object@pljk)
+      dims <- dim(object@pkjl)
       nbVariable <- ncol(object@data)
 
       if (dims[3]!=object@nbCluster)
-      {stop("Third dimension in pljk must be nbCluster.")}
+      {stop("Third dimension in pkjl must be nbCluster.")}
       if (dims[2]!=ncol(object@data))
-      {stop("Second dimension in pljk must be nbVariable.")}
+      {stop("Second dimension in pkjl must be nbVariable.")}
       if (!(object@modelName %in% c("categorical_pjk", "categorical_pk")))
       {stop("Invalid Categorical model name.")}
       return(TRUE)
@@ -76,29 +161,85 @@ setClass(
 #-----------------------------------------------------------------------
 #' Initialize an instance of a rtkpp class.
 #'
-#' Initialization method of the [\code{\linkS4class{ClusterCategoricalModel}}] class.
+#' Initialization method of the [\code{\linkS4class{ClusterCategorical}}] class.
 #' Used internally in the `rtkpp' package.
 #'
 #' @rdname initialize-methods
 #' @keywords internal
 setMethod(
     f="initialize",
-    signature=c("ClusterCategoricalModel"),
+    signature=c("ClusterCategorical"),
     definition=function(.Object, data, nbCluster=2, modelName="categorical_pjk")
     {
       .Object <- callNextMethod(.Object, data, nbCluster, modelName)
       # for modelName
       if(missing(modelName)) {.Object@modelName<-"categorical_pjk"}
-      else  {.Object@modelName<-modelName}
-      # resize
-      nbVariable <- ncol(.Object@data)
+      else                   {.Object@modelName<-modelName}
       # get number of modalities
       if ( is.factor(data) ) { nbModalities <- nlevels(data)}
-      else {  nbModalities <- nlevels(factor(.Object@data))}
+      else                   { nbModalities <- nlevels(factor(.Object@data))}
+      # resize
       nbVariable <- ncol(.Object@data)
-      .Object@pljk <- array(data = 1/nbModalities,dim=c(nbModalities,nbVariable,.Object@nbCluster))
+      nbCluster  <- .Object@nbCluster
+      .Object@pkjl <- array(data = 1/nbModalities, dim=c(nbModalities,nbVariable,.Object@nbCluster))
       # validate
       validObject(.Object)
       return(.Object)
     }
 )
+
+#' @rdname print-methods
+#' @aliases print print,ClusterCategorical-method
+#'
+setMethod(
+    f="print",
+    signature=c("ClusterCategorical"),
+    function(x,...){
+      cat("****************************************\n")
+      callNextMethod()
+      cat("****************************************\n")
+      for(k in 1:length(x@pk))
+      {
+        cat("*** Cluster: ",k,"\n")
+        cat("* Proportion = ", format(x@pk[k]), "\n")
+        cat("* probabilities = ", format(x@pkjl[k,]), "\n")
+        cat("****************************************\n")
+      }
+    }
+)
+
+#' @rdname show-methods
+#' @aliases show-ClusterCategorical,ClusterCategorical,ClusterCategorical-method
+setMethod(
+    f="show",
+    signature=c("ClusterDiagGaussian"),
+    function(object)
+    {
+      cat("****************************************\n")
+      callNextMethod()
+      cat("****************************************\n")
+      for(k in 1:length(object@pk))
+      {
+        cat("*** Cluster: ",k,"\n")
+        cat("* Proportion = ", format(object@pk[k]), "\n")
+        cat("* probabilities = ", format(x@pkjl[k,]), "\n")
+        cat("****************************************\n")
+      }
+    }
+)
+
+#' @rdname summary-methods
+#' @aliases summary summary,ClusterCategorical-method
+#'
+setMethod(
+    f="summary",
+    signature=c("ClusterDiagGaussian"),
+    function(object, ...)
+    {
+      cat("**************************************************************\n")
+      callNextMethod()
+      cat("* nbModalities = ", format(dim(object@pkjl)[3]), "\n")
+      cat("**************************************************************\n")
+    }
+)
+

@@ -47,7 +47,7 @@ NULL
 #' @slot zi        Vector of integer of size n  with the attributed class label of the individuals.
 #' @slot missings   \code{\link{matrix}} of two columns with the indexes (i,j) of the missing values.
 #' @slot lnLikelihood Real given the ln-liklihood of the Cluster model.
-#' @slot criterion Real given the value of the AIC or BIC criterion.
+#' @slot criterion Real given the value of the AIC, BIC or ICL criterion.
 #' @slot nbFreeParameter Integer given the number of free parameters of the model.
 #' @slot modelName mixture model name.
 #' @slot strategy  the instance of the [\code{\linkS4class{ClusterStrategy}}] used in the

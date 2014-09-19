@@ -50,7 +50,7 @@ namespace STK
  *  where \f$ L \f$ represents the likelihood of the observations and \f$ D_K \f$
  *  the number of free parameters of the model.
  **/
-class ICLCriterion : protected ICriterion
+class ICLCriterion : public ICriterion
 {
   public:
     /** Default Constructor. */

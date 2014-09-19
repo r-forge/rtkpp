@@ -64,6 +64,7 @@
 #'
 #' @useDynLib rtkpp
 NULL
+
 #' Quantitative data: Old Faithful Geyser
 #'
 #' The file geyser.rda contains 272 observations from the Old Faithful Geyser
@@ -100,3 +101,109 @@ NULL
 #' @examples
 #'   data(geyser)
 NULL
+
+#' Qualitative data: Survival of passengers on the Titanic
+#' 
+#' For each person on board the fatal maiden voyage of the ocean liner Titanic,
+#' this dataset records: sex, age [adult/child], economic status [first/second/third class, or crew]
+#' and whether or not that person survived. There are no missing values.
+#'
+#' The sinking of the Titanic is a famous event, and new books are still being
+#' published about it. Many well-known facts-from the proportions of first-class
+#' passengers to the "women and children first" policy, and the fact that that
+#' policy was not entirely successful in saving the women and children in the
+#' third class-are reflected in the survival rates for various classes of passenger.
+#'
+#' These data were originally collected by the British Board of Trade in their
+#' investigation of the sinking. Note that there is not complete agreement among
+#' primary sources as to the exact numbers on board, rescued, or lost.
+#'
+#' Due in particular to the very successful film "Titanic", the last years saw
+#' a rise in public interest in the Titanic. Very detailed data about the
+#' passengers is now available on the Internet, at sites such as
+#' "Encyclopedia Titanica" (\url{http://www.rmplc.co.uk/eduweb/sites/phind}).
+#'
+#' @format A data frame with 2201 observations on the following 4 variables.
+#'
+#' \describe{
+#'   \item{\code{Class}}{0 = crew, 1 = first, 2 = second, 3 = third, which denote the economic status of the subject}
+#'   \item{\code{Age}}{1 = adult, 0 = child, which denote if the subject is an adult or a child}
+#'   \item{\code{Sex}}{1 = male, 0 = female, which denote the sex of the subject}
+#'   \item{\code{Survived}}{1 = yes, 0 = no, which denote if the subject lived through the fatal maiden voyage of the ocean liner Titanic} 
+#' }
+#'
+#' @source 
+#' The source provides a data set recording class, sex, age, and survival status
+#' for each person on board of the Titanic, and is based on data originally
+#' collected by the British Board of Trade and reprinted in:
+#' British Board of Trade (1990), "Report on the Loss of the Titanic (S.S.)".
+#'  British Board of Trade Inquiry Report (reprint).  Gloucester, UK: Allan Sutton Publishing.
+#'
+#' @name titanic
+#' @docType data
+#' @keywords datasets
+#' 
+#' @examples
+#'   data(titanic)
+NULL
+
+#' Qualitative data : morphological description of birds
+#' 
+#' The dataset contains details on the morphology of birds (puffins). Each
+#' individual (bird) is described by 6 qualitative variables. One variable for
+#' the gender and 5 variables giving a morphological description of the birds.
+#' There is 69 puffins divided in 2 sub-classes: lherminieri (34) and subalaris (35).
+#'
+#' @format A data frame with 69 observations on the following 5 variables.
+#'
+#' \describe{
+#'   \item{\code{gender}}{a numeric vector defining the gender (2 modalities, male or female).}
+#'   \item{\code{eyebrow}}{a numeric vector describing the eyebrow stripe (4 modalities).}
+#'   \item{\code{collar}}{a numeric vector describing the collar (5 modalities).}
+#'   \item{\code{sub-caudal}}{a numeric vector describing the sub-caudal (5 modalities).}
+#'   \item{\code{border}}{a numeric vector describing the border (3 modalities).}
+#' }
+#'
+#' @source
+#' Bretagnolle, V., 2007. Personal communication, source: Museum.
+#'
+#' @name birds
+#' @docType data
+#' @keywords datasets
+#' 
+#' @examples
+#'   data(birds)
+NULL
+
+
+#' Qualitative data : Car Evaluation
+#' 
+#' Car Evaluation Database was derived from a simple hierarchical decision model
+#' originally developed for the demonstration of DEX, M. Bohanec, V. Rajkovic:
+#' Expert system for decision making.
+#'
+#' @format A data frame with 1728 observations on the following 6 variables.
+#'
+#' \describe{
+#'   \item{\code{buying}}{the buying price (4 modalities: vhigh, high, med, low).}
+#'   \item{\code{maint}}{the price of the maintenance (4 modalities: vhigh, high, med, low).}
+#'   \item{\code{doors}}{the number of doors (4 modalities: 2, 3, 4, 5more).}
+#'   \item{\code{persons}}{the capacity in terms of persons to carry (3 modalities: 2, 4, more).}
+#'   \item{\code{lug_boot}}{the size of luggage boot  (3 modalities: small, med, big).}
+#'   \item{\code{safety}}{the estimated safety of the car (3 modalities: low, med, high).}
+#'   \item{\code{acceptability}}{the car acceptability (4 modalities: unacc, acc, good, vgood).}
+#' }
+#'
+#' @source
+#' Creator: Marko Bohanec 
+#' Donors: Marko Bohanec & Blaz Zupan
+#' http://archive.ics.uci.edu/ml/datasets/Car+Evaluation
+#'
+#' @name car
+#' @docType data
+#' @keywords datasets
+#' 
+#' @examples
+#'   data(car)
+NULL
+

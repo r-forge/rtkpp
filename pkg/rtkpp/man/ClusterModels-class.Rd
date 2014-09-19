@@ -37,7 +37,7 @@ the ith individual to belong to kth cluster.}
 
 \item{\code{lnLikelihood}}{Real given the ln-liklihood of the Cluster model.}
 
-\item{\code{criterion}}{Real given the value of the AIC or BIC criterion.}
+\item{\code{criterion}}{Real given the value of the AIC, BIC or ICL criterion.}
 
 \item{\code{nbFreeParameter}}{Integer given the number of free parameters of the model.}
 

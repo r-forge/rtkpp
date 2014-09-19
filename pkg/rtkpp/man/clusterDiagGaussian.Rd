@@ -4,7 +4,7 @@
 \title{Create an instance of the [\code{\linkS4class{ClusterDiagGaussian}}] class}
 \usage{
 clusterDiagGaussian(data, nbCluster = 2, modelNames = NULL,
-  strategy = clusterStrategy(), criterion = "BIC")
+  strategy = clusterStrategy(), criterion = "ICL")
 }
 \arguments{
 \item{data}{frame or matrix containing the data. Rows correspond to observations
@@ -21,7 +21,7 @@ the strategy to run. clusterStrategy() method by default.}
 
 \item{criterion}{character defining the criterion to select the best model.
 The best model is the one with the lowest criterion value.
-Possible values: "BIC", "AIC". Default is "BIC".}
+Possible values: "BIC", "AIC", "ICL". Default is "ICL".}
 }
 \value{
 An instance of the [\code{\linkS4class{ClusterDiagGaussian}}] class.

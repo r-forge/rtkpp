@@ -42,7 +42,7 @@ NULL
 #' the strategy to run. clusterStrategy() method by default.
 #' @param criterion character defining the criterion to select the best model.
 #' The best model is the one with the lowest criterion value.
-#' Possible values: "BIC", "AIC". Default is "BIC".
+#' Possible values: "BIC", "AIC", "ICL". Default is "ICL".
 #'
 #' @examples
 #' ## A quantitative example with the famous geyser data set
@@ -68,7 +68,7 @@ NULL
 #' @author Serge Iovleff
 #' @export
 #'
-clusterDiagGaussian <- function(data, nbCluster=2, modelNames=NULL, strategy=clusterStrategy(), criterion="BIC")
+clusterDiagGaussian <- function(data, nbCluster=2, modelNames=NULL, strategy=clusterStrategy(), criterion="ICL")
 {
   # check nbCluster
   nbClusterModel = length(nbCluster);
@@ -77,7 +77,7 @@ clusterDiagGaussian <- function(data, nbCluster=2, modelNames=NULL, strategy=clu
   if (nbClusterMin < 2) { stop("The number of clusters must be greater or equal to 2")}
 
   # check criterion
-  if(sum(criterion %in% c("BIC","AIC")) != 1)
+  if(sum(criterion %in% c("BIC","AIC", "ICL")) != 1)
   { stop("criterion is not valid. See ?clusterDiagGaussian for the list of valid criterion")}
 
   # check data
@@ -208,7 +208,7 @@ setMethod(
 )
 
 #' @rdname show-methods
-#' @aliases show-diagGaussian,ClusterDiagGaussian,ClusterDiagGaussian-method
+#' @aliases show-ClusterDiagGaussian,ClusterDiagGaussian,ClusterDiagGaussian-method
 setMethod(
     f="show",
     signature=c("ClusterDiagGaussian"),

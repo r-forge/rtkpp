@@ -2,7 +2,7 @@
 \docType{methods}
 \name{initialize,ClusterAlgo-method}
 \alias{initialize,ClusterAlgo-method}
-\alias{initialize,ClusterCategoricalModel-method}
+\alias{initialize,ClusterCategorical-method}
 \alias{initialize,ClusterDiagGaussian-method}
 \alias{initialize,ClusterGamma-method}
 \alias{initialize,ClusterInit-method}
@@ -12,7 +12,7 @@
 \usage{
 \S4method{initialize}{ClusterAlgo}(.Object, algo, nbIteration, epsilon)
 
-\S4method{initialize}{ClusterCategoricalModel}(.Object, data, nbCluster = 2,
+\S4method{initialize}{ClusterCategorical}(.Object, data, nbCluster = 2,
   modelName = "categorical_pjk")
 
 \S4method{initialize}{ClusterDiagGaussian}(.Object, data, nbCluster = 2,
@@ -36,7 +36,7 @@
 Initialization method of the [\code{\linkS4class{ClusterAlgo}}] class.
 Used internally in the `rtkpp' package.
 
-Initialization method of the [\code{\linkS4class{ClusterCategoricalModel}}] class.
+Initialization method of the [\code{\linkS4class{ClusterCategorical}}] class.
 Used internally in the `rtkpp' package.
 
 Initialization method of the [\code{\linkS4class{ClusterDiagGaussian}}] class.

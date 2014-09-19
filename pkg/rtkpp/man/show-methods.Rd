@@ -7,14 +7,17 @@
 \alias{show,ClusterGamma-method}
 \alias{show,ClusterInit-method}
 \alias{show,ClusterStrategy-method}
+\alias{show-ClusterCategorical,ClusterCategorical,ClusterCategorical-method}
+\alias{show-ClusterDiagGaussian,ClusterDiagGaussian,ClusterDiagGaussian-method}
 \alias{show-ClusterGamma,ClusterGamma,ClusterGamma-method}
 \alias{show-algo,ClusterAlgo-method}
-\alias{show-diagGaussian,ClusterDiagGaussian,ClusterDiagGaussian-method}
 \alias{show-init,ClusterInit,ClusterInit-method}
 \alias{show-strategy,ClusterStrategy-method}
 \title{Show description of a rtkpp class to standard output.}
 \usage{
 \S4method{show}{ClusterAlgo}(object)
+
+\S4method{show}{ClusterDiagGaussian}(object)
 
 \S4method{show}{ClusterDiagGaussian}(object)
 

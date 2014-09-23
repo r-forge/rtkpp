@@ -46,8 +46,7 @@ class IMixture;
 
 /** @ingroup Clustering
  *  @brief A mixture manager is a factory class for injection dependency in the
- *  stk++ derived class of the IMixture interface
- *  (aka: the MixtureBridge<Id> classes).
+ *  stk++ derived class of the IMixtureComposer.
  *
  *  It handles all the creation and initialization stuff needed by the
  *  mixture models of the stkpp library.
@@ -114,7 +113,7 @@ class IMixtureManager
      *  @param idData Id name of the data
      *  @param nbCluster number of cluster of the model
      **/
-    virtual IMixture* createConcreteMixture(Clust::Mixture idModel, String const& idData, int nbCluster) =0;
+    virtual IMixture* createMixtureImpl(Clust::Mixture idModel, String const& idData, int nbCluster) =0;
     /** A pointer on the concrete instance of the data handler */
     IDataHandler const* const p_handler_;
     /** vector of pointers to the data components */

@@ -87,9 +87,8 @@
 #include "../projects/Clustering/include/STK_MixtureAlgo.h"
 #include "../projects/Clustering/include/STK_MixtureStrategy.h"
 #include "../projects/Clustering/include/STK_MixtureComposer.h"
+#include "../projects/Clustering/include/STK_MixtureCriterion.h"
 #include "../projects/Clustering/include/STK_MixtureFacade.h"
 #include "../projects/Clustering/include/STK_MixtureManager.h"
-
-#include "../projects/Clustering/include/STK_ICLCriterion.h"
 
 #endif // CLUSTERING_H

@@ -271,13 +271,6 @@ static Real serie_up( Real const& a, Real const& b, Real x, bool xm1, int n)
   }
   // return result
   return dbinom(a+l, b, x, xm1) *(sum2/a0 + sum1);
-
-//  stk_cout << _T("bt =") << dbinom(a, b, x, xm1) << _T(" serie =") << sum/a << " res =" << dbinom(a, b, x, xm1)*sum/a<< "\n";
-//  stk_cout << _T("n =") << n << _T(", l =") << l << "\n";
-//  Real sum = 1.;
-//  for (int k=n-2; k>=0; --k)  { sum = 1. + sum *x0*(s+k)/(a+k+1);}
-//  stk_cout << _T("bt_l =") << dbinom(a+l, b, x, xm1) << _T(" serie_l =") << (sum2/a0 + sum1) << " res=" << dbinom(a+l, b, x, xm1) *(sum2/a0 + sum1)<< "\n";
-//  return dbinom(a, b, x, xm1) *sum/a;
 }
 
 /** @ingroup Analysis

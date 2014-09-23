@@ -184,9 +184,9 @@ void GammaBase<Derived>::writeParameters(ostream& os) const
         shape[j] = p_param(k)->shape(j);
         scale[j] = p_param(k)->scale(j);
       }
-      stk_cout << _T("---> Component ") << k << _T("\n");
-      stk_cout << _T("shape = ") << shape;
-      stk_cout << _T("scale = ") << scale;
+      os << _T("---> Component ") << k << _T("\n");
+      os << _T("shape = ") << shape;
+      os << _T("scale = ") << scale;
     }
 }
 

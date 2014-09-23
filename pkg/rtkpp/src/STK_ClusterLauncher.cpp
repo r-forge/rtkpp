@@ -65,14 +65,13 @@ ClusterLauncher::~ClusterLauncher() { if (p_composer_) delete p_composer_;}
 /* run the estimation */
 bool ClusterLauncher::run()
 {
-  Real criter = selectBestModel();
+  Real criter;
+  criter = selectBestModel();
   if (criter == Arithmetic<Real>::max() || !Arithmetic<Real>::isFinite(criter))
     return false;
   // copy common part
-  //stk_cout << idData_ << "\n";
   std::string idModelName;
   handler_.getIdModel( idData_, idModelName);
-  //stk_cout << idModelName << "\n";
   idMixtureModel_ = Clust::stringToMixture(idModelName);
   s4_model_.slot("criterion")    = criter;
   s4_model_.slot("modelName")    = mixtureToString(idMixtureModel_, isFreeProp_);
@@ -82,7 +81,7 @@ bool ClusterLauncher::run()
   s4_model_.slot("pk")           = wrap(p_composer_->pk());
   s4_model_.slot("tik")          = wrap(p_composer_->tik());
   s4_model_.slot("zi")           = wrap(p_composer_->zi());
-  NumericVector fi = s4_model_.slot("fi");
+  NumericVector fi = s4_model_.slot("lnFi");
   for (int i=0; i< fi.length(); ++i) { fi[i] = p_composer_->computeLnLikelihood(i);}
   // get specific parameters
   getParameters();
@@ -93,7 +92,6 @@ bool ClusterLauncher::run()
 void ClusterLauncher::getParameters()
 {
   Clust::MixtureClass mixtClass = Clust::MixtureToMixtureClass(idMixtureModel_);
-//  stk_cout << Clust::mixtureToString(idMixtureModel_) << "\n";
   switch (mixtClass)
   {
     case Clust::Gaussian_:
@@ -156,18 +154,9 @@ void ClusterLauncher::getCategoricalParameters()
   // get parameters
   Array2D<Real> params;
   static_cast<MixtureComposer*>(p_composer_)->getParameters(manager_,idData_, params);
-  // get dimensions
-  int K = params.sizeRows()/2, nbVariable = params.sizeCols();
-  // get results
-  Array2D<Real> shape(K, nbVariable), scale(K, nbVariable);
-  for (int k=0; k<K; ++k)
-  {
-    shape.row(k) = params.row(2*k);
-    scale.row(k) = params.row(2*k+1);
-  }
+  params.shift(0,0);
   // save results in s4_model
-  s4_model_.slot("shape") = wrap(shape);
-  s4_model_.slot("scale") = wrap(scale);
+  s4_model_.slot("plkj") = wrap(params);
 }
 
 /* select best model*/
@@ -176,71 +165,81 @@ Real ClusterLauncher::selectBestModel()
   // wrap data matrix with Rcpp and wrap Rcpp matrix with stk++ matrix
   NumericMatrix m_data = s4_model_.slot("data");
   RcppMatrix<double> data(m_data);
+
   int nbSample   = m_data.rows();
-
-  // check if a model is free prop or not and add data to handler (no copy)
-  Array1D<bool> v_free;
-  for (int l= 0; l <v_modelNames_.size() ; ++l)
-  {
-    std::string idData = "model" + typeToString<int>(l);
-    std::string idModel(as<std::string>(v_modelNames_[l]));
-    // transform R models names to stk++ models names
-    // check have been done on the R side so.... Let's go
-    bool freeProp;
-    Clust::Mixture model = Clust::stringToMixture(idModel, freeProp);
-    handler_.addData(m_data, idData, Clust::mixtureToString(model));
-    v_free.push_back(freeProp);
-  }
-  // create criterion
-  ICriterion* p_criterion =0;
-  if (critName_ == "BIC") { p_criterion = new BICCriterion();}
-  if (critName_ == "AIC") { p_criterion = new AICCriterion();}
-  if (critName_ == "ICL") { p_criterion = new ICLCriterion();}
-
-  // start the estimation process, should end with the best model according to
-  // the criteria
   IMixtureComposer* p_current =0;
-  p_composer_ = 0;
-  Real criter = Arithmetic<Real>::max();
-  for (int k=0; k <v_nbCluster_.length(); ++k)
+  IMixtureCriterion* p_criterion =0;
+
+  try
   {
-    int K = v_nbCluster_[k];
-    for (int l=0; l <v_modelNames_.size(); ++l)
+    // check if a model is free prop or not and add data to handler (no copy)
+    Array1D<bool> v_free;
+    for (int l= 0; l <v_modelNames_.size() ; ++l)
     {
-      // create composer
-      if (v_free[l]) { p_current = new MixtureComposer(nbSample, K);}
-      else           { p_current = new MixtureComposerFixedProp(nbSample, K);}
-      // create current mixture and register it
       std::string idData = "model" + typeToString<int>(l);
-      static_cast<MixtureComposer*>(p_current)->createMixture(manager_, idData);
-
-      // create facade and strategy
-      ClusterFacade facade(p_current);
-      facade.createFullStrategy(s4_strategy_);
-      // run estimation and get results if possible
-      if (facade.run())
-      {
-        // compute criterion and update model if necessary
-        p_criterion->setModel(p_current);
-        if (!p_criterion->run()) { delete p_current; p_current = 0;}
-        else if (criter > p_criterion->value())
-        {
-          if (p_composer_) { std::swap(p_current, p_composer_);}
-          else             { p_composer_ = p_current; p_current = 0;}
-          idData_     = idData;
-          isFreeProp_ = v_free[l];
-          criter = p_criterion->value();
-        }
-      }
-      // release current composer
-      if (p_current) { delete p_current; p_current = 0;}
+      std::string idModel(as<std::string>(v_modelNames_[l]));
+      // transform R models names to stk++ models names
+      // check have been done on the R side so.... Let's go
+      bool freeProp;
+      Clust::Mixture model = Clust::stringToMixture(idModel, freeProp);
+      handler_.addData(m_data, idData, Clust::mixtureToString(model));
+      v_free.push_back(freeProp);
     }
-  }
-  // release
-  delete p_criterion;
-  return criter;
-}
+    // create criterion
+    if (critName_ == "BIC") { p_criterion = new BICMixtureCriterion();}
+    if (critName_ == "AIC") { p_criterion = new AICMixtureCriterion();}
+    if (critName_ == "ICL") { p_criterion = new ICLMixtureCriterion();}
 
+    // start the estimation process, should end with the best model according to
+    // the criteria
+    p_composer_ = 0;
+    Real criter = Arithmetic<Real>::max();
+    for (int k=0; k <v_nbCluster_.length(); ++k)
+    {
+      int K = v_nbCluster_[k];
+      for (int l=0; l <v_modelNames_.size(); ++l)
+      {
+        // create composer
+        if (v_free[l]) { p_current = new MixtureComposer(nbSample, K);}
+        else           { p_current = new MixtureComposerFixedProp(nbSample, K);}
+        // create current mixture and register it
+        std::string idData = "model" + typeToString<int>(l);
+        static_cast<MixtureComposer*>(p_current)->createMixture(manager_, idData);
+
+        // create facade and strategy
+        ClusterFacade facade(p_current);
+        facade.createFullStrategy(s4_strategy_);
+        // run estimation and get results if possible
+        if (facade.run())
+        {
+          // compute criterion and update model if necessary
+          p_criterion->setModel(p_current);
+          if (!p_criterion->run()) { delete p_current; p_current = 0;}
+          else if (criter > p_criterion->value())
+          {
+            if (p_composer_) { std::swap(p_current, p_composer_);}
+            else             { p_composer_ = p_current; p_current = 0;}
+            idData_     = idData;
+            isFreeProp_ = v_free[l];
+            criter = p_criterion->value();
+          }
+        }
+        // release current composer
+        if (p_current) { delete p_current; p_current = 0;}
+      }
+    }
+    // release
+    delete p_criterion;
+    return criter;
+  } catch (Exception const& e)
+  {
+    if (p_current) delete p_current;
+    if (p_criterion) delete p_criterion;
+    ::Rf_error(e.error().c_str()) ;
+  }
+  // failed
+  return Arithmetic<Real>::max();
+}
 
 }  // namespace STK
 

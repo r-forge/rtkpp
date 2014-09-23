@@ -114,7 +114,7 @@ typedef char Char;
 template<>
 struct Arithmetic<Char> : public std::numeric_limits<Char>
 {
-  /** Adding a Non Avalaible (NA) special number.
+  /** Adding a Non Available (NA) special number.
    *  @return the 0 character
    **/
   static Char NA() throw() { return static_cast<Char>(0); }
@@ -123,7 +123,7 @@ struct Arithmetic<Char> : public std::numeric_limits<Char>
    **/
   static const bool hasNA = false;
 
-  /** Test if x is a Non Avalaible (NA) Char.
+  /** Test if x is a Non Available (NA) Char.
    *  @param x the Char to test.
    *  @return always @c false as the Char type does not have NA value.
    **/

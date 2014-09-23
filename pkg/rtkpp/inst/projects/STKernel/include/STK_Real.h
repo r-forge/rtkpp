@@ -40,8 +40,7 @@
 #include "STK_String.h"
 
 #ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
-#include "STK_RcppTraits.h"
+#include "Rtkpp/include/STK_RcppTraits.h"
 #endif
 
 namespace STK
@@ -90,22 +89,14 @@ struct Arithmetic<Real> : public std::numeric_limits<Real>
 #endif
   /** True if the type has a representation for a "Not Available."    */
   static const bool hasNA = true;
-  /** @return a Non Avalaible (NA) special number using the quiet_NaN method. */
-#ifdef IS_RTKPP_LIB
-  static inline Real NA() throw()  { return Rcpp::traits::get_na<Rtype_>();}
-#else
+  /** @return a Non Available (NA) special number using the quiet_NaN method. */
   static inline Real NA() throw() { return std::numeric_limits<Real>::quiet_NaN();}
   /** We are using the quiet_NaN representation for NA numbers. */
   static const bool has_quiet_NaN = false;
-#endif
-  /** Test if x is a Non Avalaible (NA) special number.
+  /** Test if x is a Non Available (NA) special number.
    *  @param x the Integer number to test.
    **/
-#ifdef IS_RTKPP_LIB
-  static inline bool isNA(Real const& x) throw() { return Rcpp::traits::is_na<Rtype_>(x);}
-#else
   static inline bool isNA(Real const& x) throw() { return !(x==x);}
-#endif
   /** @return @c true if x is  infinite.
    *  @param x the Real to test.
    **/
@@ -145,12 +136,14 @@ struct Arithmetic<const Real>
   };
   /** True if the type has a representation for a "Not Available."    */
   static const bool hasNA = true;
-  /** @return a Non Avalaible (NA) special number using the quiet_NaN method. */
-  static inline Real NA() throw()  { return Rcpp::traits::get_na<Rtype_>();}
-  /** Test if x is a Non Avalaible (NA) special number.
+  /** @return a Non Available (NA) special number using the quiet_NaN method. */
+  static inline Real NA() throw() { return std::numeric_limits<Real>::quiet_NaN();}
+  /** We are using the quiet_NaN representation for NA numbers. */
+  static const bool has_quiet_NaN = false;
+  /** Test if x is a Non Available (NA) special number.
    *  @param x the Integer number to test.
    **/
-  static inline bool isNA(Real const& x) throw() { return Rcpp::traits::is_na<Rtype_>(x);}
+  static inline bool isNA(Real const& x) throw() { return !(x==x);}
   /** @return @c true if x is  infinite.
    *  @param x the Real to test.
    **/
@@ -173,7 +166,9 @@ struct IdTypeImpl<const Real>
   /** Give the IdType of the type Real.*/
   static IdType returnType() { return(real_);}
 };
-#endif
+
+#endif // IS_RTKPP_LIB
+
 /** @ingroup Base
  *  @brief Convert a String to a Real.
  *  @param str the String we want to convert

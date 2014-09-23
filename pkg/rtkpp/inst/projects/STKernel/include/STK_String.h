@@ -61,11 +61,11 @@ typedef std::basic_string<Char> String;
 template<>
 struct Arithmetic<String> : public std::numeric_limits<String>
 {
-  /** Adding a Non Avalaible (NA) special String (the empty String) */
+  /** Adding a Non Available (NA) special String (the empty String) */
   static String NA() throw() { return String();}
   /** True if the type has a representation for a "Not Available." */
   static const bool hasNA = true;
-  /** Test if x is a Non Avalaible (NA) String.
+  /** Test if x is a Non Available (NA) String.
    *  @param x the String to test.
    *  @return @c true if @c x is a NA String, @c false otherwise
    **/

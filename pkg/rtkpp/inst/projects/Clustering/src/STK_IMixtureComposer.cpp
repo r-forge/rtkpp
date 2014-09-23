@@ -177,6 +177,16 @@ Real IMixtureComposer::computeLnLikelihood() const
   return res;
 }
 
+/* @return the computed ICL criteria. */
+Real IMixtureComposer::computeICL() const
+{
+  Real res = 0.0;
+  for (int j = tik().beginCols(); j< tik().endCols(); ++j)
+  { res += (tik_.col(j) * (tik_.col(j)+1e-15).log()).sum();}
+
+  return (- 2. * lnLikelihood() + nbFreeParameter() * lnNbSample() - 2. * res);
+}
+
 /* estimate the proportions and the parameters of the components of the
  *  model given the current tik/zi mixture parameters values.
  **/

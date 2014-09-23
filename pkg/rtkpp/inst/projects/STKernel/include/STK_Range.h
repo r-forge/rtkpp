@@ -390,11 +390,11 @@ class TRange
 template<int Size_>
 struct Arithmetic< TRange<Size_> > : public std::numeric_limits< TRange<Size_> >
 {
-  /** Adding a Non Avalaible (NA) special number. */
+  /** Adding a Non Available (NA) special number. */
   static inline  TRange<Size_> NA() throw() { return TRange<Size_>(UnknownSize);}
   /** True if the type has a representation for a "Not Available". */
   static const bool hasNA = true;
-  /** Test if x is a Non Avalaible (NA) special number
+  /** Test if x is a Non Available (NA) special number
    *  @param x the Binary number to test.
    **/
   static inline bool isNA(TRange<Size_> const& x) throw()

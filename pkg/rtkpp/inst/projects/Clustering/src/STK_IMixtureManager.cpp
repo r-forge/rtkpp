@@ -79,7 +79,7 @@ void IMixtureManager::createMixtures(MixtureComposer& composer, int nbCluster)
   for (typename InfoMap::const_iterator it=p_handler_->info().begin(); it!=p_handler_->info().end(); ++it)
   {
     Clust::Mixture idModel = Clust::stringToMixture(it->second);
-    IMixture* p_mixture = createConcreteMixture(idModel, it->first, nbCluster);
+    IMixture* p_mixture = createMixtureImpl(idModel, it->first, nbCluster);
     if (p_mixture) composer.registerMixture(p_mixture);
   }
 }
@@ -94,7 +94,7 @@ IMixture* IMixtureManager::createMixture(String const& idData, int nbCluster)
   std::string idModelName;
   if (!p_handler_->getIdModel( idData, idModelName)) { return 0;};
   Clust::Mixture idModel = Clust::stringToMixture(idModelName);
-  return createConcreteMixture( idModel, idData, nbCluster);
+  return createMixtureImpl( idModel, idData, nbCluster);
 }
 /* @brief register a data manager to the IMixtureManager.
  *  For each mixture created and registered, a data manager is created

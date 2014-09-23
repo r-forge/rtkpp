@@ -150,6 +150,8 @@ class IMixtureComposer : public IStatModelBase
     { return std::exp(computeLnLikelihood(i));}
     /** @return the computed log-likelihood. */
     Real computeLnLikelihood() const;
+    /** @return the computed ICL criteria. */
+    Real computeICL() const;
 
     /** set the state of the model : should be used by any strategy*/
     inline void setState(Clust::modelState state) { state_ = state;}

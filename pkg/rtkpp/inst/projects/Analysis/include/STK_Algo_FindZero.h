@@ -177,7 +177,6 @@ Real BrentMethod( IFunction<Function> const& f, Real const& x0, Real const& x1, 
       s = a * fb * fbkm1 / dab / dac
         + b * fa * fbkm1 / -dab / dbc
         + bkm1 * fa * fb / dac / dbc;
-      //stk_cout << _T("iter = ") << iter<<_T(". Quadratic. s=")<< s << _T("\n");
     }
     else // secante method
     { s = b - fb * (b - a) / (fb - fa);}
@@ -190,7 +189,6 @@ Real BrentMethod( IFunction<Function> const& f, Real const& x0, Real const& x1, 
        )
     {
        s = (a + b) / 2.;
-       //stk_cout << _T("iter = ") << iter<<_T(". Dichotomy. s=")<< s << _T("\n");
        mflag = true;
     }
     else { mflag = false;}

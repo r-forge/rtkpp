@@ -29,7 +29,7 @@ If the original data set had NA values, they have been estimated in the estimati
 \item{\code{tik}}{Matrix of size \eqn{n \times K} with the posterior probability of
 the ith individual to belong to kth cluster.}
 
-\item{\code{fi}}{Vector of size n with the likelihood of the ith individuals.}
+\item{\code{lnFi}}{Vector of size n with the log-likelihood of the ith individuals.}
 
 \item{\code{zi}}{Vector of integer of size n  with the attributed class label of the individuals.}
 

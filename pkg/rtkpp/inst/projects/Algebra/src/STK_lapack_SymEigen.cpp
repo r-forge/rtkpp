@@ -83,7 +83,6 @@ bool SymEigen::run()
 #ifdef STK_ALGEBRA_VERY_VERBOSE
   stk_cout << _T("Enter in SymEigen::run\n");
 #endif
-  stk_cout << "\n";
   /* set default behavior */
   Real absTol = 0.0; // let Lapack chose the correct tolerance
   // get optimal size necessary for work

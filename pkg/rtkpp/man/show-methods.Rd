@@ -3,6 +3,7 @@
 \name{show,ClusterAlgo-method}
 \alias{show}
 \alias{show,ClusterAlgo-method}
+\alias{show,ClusterCategorical-method}
 \alias{show,ClusterDiagGaussian-method}
 \alias{show,ClusterGamma-method}
 \alias{show,ClusterInit-method}
@@ -17,7 +18,7 @@
 \usage{
 \S4method{show}{ClusterAlgo}(object)
 
-\S4method{show}{ClusterDiagGaussian}(object)
+\S4method{show}{ClusterCategorical}(object)
 
 \S4method{show}{ClusterDiagGaussian}(object)
 

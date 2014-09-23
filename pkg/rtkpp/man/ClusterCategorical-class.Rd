@@ -18,13 +18,16 @@ a mixture model of the form
 \section{Slots}{
 
 \describe{
-\item{\code{pkjl}}{Array with the probability of the jth variable in the kth cluster
+\item{\code{plkj}}{Array with the probability of the jth variable in the kth cluster
 to be l.}
+
+\item{\code{nbModalities}}{Integer with the (maximal) number of modalities of the categorical
+data.}
 }}
 \examples{
 getSlots("ClusterCategorical")
-  data(geyser)
-  new("ClusterCategorical", data=geyser)
+  data(birds)
+  new("ClusterCategorical", data=birds)
 }
 \author{
 Serge Iovleff

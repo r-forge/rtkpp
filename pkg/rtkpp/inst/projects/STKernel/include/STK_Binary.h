@@ -59,11 +59,11 @@ enum Binary
  template<>
  struct Arithmetic<Binary> : public std::numeric_limits<Binary>
  {
-   /** Adding a Non Avalaible (NA) special number. */
+   /** Adding a Non Available (NA) special number. */
    static inline Binary NA() throw() { return binaryNA_;}
    /** True if the type has a representation for a "Not Available". */
    static const bool hasNA = true;
-   /** Test if x is a Non Avalaible (NA) special number
+   /** Test if x is a Non Available (NA) special number
     *  @param x the Binary number to test.
     **/
    static inline bool isNA(const Binary& x) throw() { return (x==binaryNA_);}

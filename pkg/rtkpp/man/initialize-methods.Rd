@@ -13,7 +13,7 @@
 \S4method{initialize}{ClusterAlgo}(.Object, algo, nbIteration, epsilon)
 
 \S4method{initialize}{ClusterCategorical}(.Object, data, nbCluster = 2,
-  modelName = "categorical_pjk")
+  modelName = "categorical_pk_pjk")
 
 \S4method{initialize}{ClusterDiagGaussian}(.Object, data, nbCluster = 2,
   modelName = "gaussian_pk_sjk")

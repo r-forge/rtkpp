@@ -95,7 +95,8 @@ class ClusterLauncher
     Clust::Mixture idMixtureModel_;
     /** Is the best model with free proportions ? */
     bool isFreeProp_;
-    /** Select the best model among the modelNames and nbCluster given.
+    /** For Quantitative variables.
+     *  Select the best model among the modelNames and nbCluster given.
      *  @return the value of the best criteria.
      **/
     Real selectBestModel();

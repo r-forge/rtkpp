@@ -96,16 +96,16 @@ void MixtureComposer::mStep()
 
 void MixtureComposer::writeParameters(std::ostream& os) const
 {
-  stk_cout << _T("Composer nbSample = ") << this->nbSample() << std::endl;
-  stk_cout << _T("Composer nbVariable = ") << this->nbVariable() << std::endl;
-  stk_cout << _T("Composer nbCluster = ") << this->nbCluster() << std::endl;
-  stk_cout << _T("Composer nbFreeParameter = ") << this->nbFreeParameter() << std::endl;
-  stk_cout << _T("Composer lnLikelihood = ") << lnLikelihood() << std::endl;
-  stk_cout << _T("Composer proportions = ") << *(this->p_pk()) << std::endl;
+  os << _T("Composer nbSample = ") << this->nbSample() << std::endl;
+  os << _T("Composer nbVariable = ") << this->nbVariable() << std::endl;
+  os << _T("Composer nbCluster = ") << this->nbCluster() << std::endl;
+  os << _T("Composer nbFreeParameter = ") << this->nbFreeParameter() << std::endl;
+  os << _T("Composer lnLikelihood = ") << lnLikelihood() << std::endl;
+  os << _T("Composer proportions = ") << *(this->p_pk()) << std::endl;
 
   for (ConstMixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
   {
-    stk_cout << _T("Parameters of the mixture: ") << (*it)->idName() << _T("\n");
+    os << _T("Parameters of the mixture: ") << (*it)->idName() << _T("\n");
     (*it)->writeParameters(os);
   }
 }

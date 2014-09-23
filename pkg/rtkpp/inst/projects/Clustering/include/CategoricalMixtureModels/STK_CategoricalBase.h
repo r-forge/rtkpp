@@ -77,6 +77,10 @@ class CategoricalBase : public IMixtureModel<Derived >
     /** @return a simulated value for the jth variable of the ith sample
      * @param i,j indexes of the data to simulate*/
     int sample(int i, int j) const;
+    /** get the parameters of the model in an array of size (K * L) * d.
+     *  @param params the parameters of the model
+     **/
+    void getParameters(Array2D<Real>& params) const;
     /** Initialize the model. Resize the array of probabilities for each
      *  component.*/
     void initializeModelImpl()
@@ -92,13 +96,11 @@ class CategoricalBase : public IMixtureModel<Derived >
       for (int k= baseIdx; k < components().end(); ++k)
       {
         // store proba values in an array for a nice output
-        for (int j= baseIdx;  j <= proba.lastIdxCols(); ++j)
+        for (int j= baseIdx;  j < proba.endCols(); ++j)
         {
-          for (int l= modalities_.begin(); l <= modalities_.lastIdx(); ++l)
+          for (int l= modalities_.begin(); l < modalities_.end(); ++l)
           { proba(l, j) = p_param(k)->proba(j,l);}
         }
-        stk_cout << _T("---> Component ") << k << _T("\n");
-        stk_cout << _T("Probabilities =\n")<< proba;
       }
     }
     /** Set the range of the modalities
@@ -118,15 +120,14 @@ int CategoricalBase<Derived>::impute(int i, int j) const
   int lmax = modalities_.begin();
   Real pmax = -Arithmetic<Real>::max();
   // compute for each modality the pondered probability of occurrence
-  for (int l=modalities_.begin(); l<= modalities_.lastIdx(); ++l)
+  for (int l=modalities_.begin(); l< modalities_.end(); ++l)
   {
     Real proba = 0.;
-    for (int k= p_pk()->begin(); k <= p_pk()->lastIdx(); ++k)
+    for (int k= p_pk()->begin(); k < p_pk()->end(); ++k)
     { proba += p_tik()->elt(i,k) * p_param(k)->proba(j, l);}
 
     if (pmax < proba) { pmax = proba; lmax = l;}
   }
-  //Stat::sumByRow(proba(j) * ptik()->row(i)).maxElt(lmax);
   return lmax;
 }
 
@@ -139,6 +140,27 @@ int CategoricalBase<Derived>::sample(int i, int j) const
   // sample from conditional probability
   return Law::Categorical::rand(p_param(k)->proba(j));
 }
+
+/** get the parameters of the model
+ *  @param params the parameters of the model
+ **/
+template<class Derived>
+void CategoricalBase<Derived>::getParameters(Array2D<Real>& params) const
+{
+  int nbCluster    = this->nbCluster();
+  int nbModalities = modalities_.size();
+
+  params.resize(nbModalities * nbCluster, p_data()->cols());
+  for (int j = p_data()->beginCols(); j < p_data()->endCols(); ++j)
+  {
+    for (int k = 0; k < nbCluster; ++k)
+    {
+      for (int l = 0; l < nbModalities; ++l)
+      { params(baseIdx + k * nbModalities + l, j) = p_param(baseIdx + k)->proba(j, modalities_.begin() + l);}
+    }
+  }
+}
+
 
 } // namespace STK
 

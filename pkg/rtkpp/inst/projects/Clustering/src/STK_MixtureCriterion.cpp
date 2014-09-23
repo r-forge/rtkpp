@@ -28,25 +28,45 @@
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
 
-/** @file STK_ICLCriterion.cpp
- *  @brief In this file we implement the run method of the ICLCriterion class.
+/** @file STK_MixtureCriterion.cpp
+ *  @brief In this file we implement the run method of the MixtureCriterion classes.
  **/
 
-#include "../include/STK_ICLCriterion.h"
+#include "../include/STK_MixtureCriterion.h"
 
 namespace STK
 {
 
-/* implementation of the virtual method run */
-bool ICLCriterion::run()
+//* Compute AIC Criterion */
+bool AICMixtureCriterion::run()
 {
   if (!p_composer_)
-  { msg_error_ = STKERROR_NO_ARG(BICCriterion::run,p_model_ is not set);
+  { msg_error_ = STKERROR_NO_ARG(AICMixtureCriterion::run,p_composer_ is not set);
     return false;
   }
-  value_  = - 2.*p_composer_->lnLikelihood()
-            + p_composer_->nbFreeParameter()*p_composer_->lnNbSample()
-           -  2.*(p_composer_->tik()*p_composer_->tik().safe(1e-15).log()).sum();
+  value_  = p_composer_->computeAIC();
+  return true;
+}
+
+//* Compute BIC Criterion */
+bool BICMixtureCriterion::run()
+{
+  if (!p_composer_)
+  { msg_error_ = STKERROR_NO_ARG(BICMixtureCriterion::run,p_composer_ is not set);
+    return false;
+  }
+  value_  = p_composer_->computeBIC();
+  return true;
+}
+
+/* implementation of the virtual method run */
+bool ICLMixtureCriterion::run()
+{
+  if (!p_composer_)
+  { msg_error_ = STKERROR_NO_ARG(ICLMixtureCriterion::run,p_composer_ is not set);
+    return false;
+  }
+  value_  = p_composer_->computeICL();
   return true;
 }
 

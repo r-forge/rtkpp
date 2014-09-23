@@ -157,11 +157,11 @@ NULL
 #' @format A data frame with 69 observations on the following 5 variables.
 #'
 #' \describe{
-#'   \item{\code{gender}}{a numeric vector defining the gender (2 modalities, male or female).}
-#'   \item{\code{eyebrow}}{a numeric vector describing the eyebrow stripe (4 modalities).}
-#'   \item{\code{collar}}{a numeric vector describing the collar (5 modalities).}
-#'   \item{\code{sub-caudal}}{a numeric vector describing the sub-caudal (5 modalities).}
-#'   \item{\code{border}}{a numeric vector describing the border (3 modalities).}
+#'   \item{\code{gender}}{a character vector defining the gender (2 modalities, male or female).}
+#'   \item{\code{eyebrow}}{a character vector describing the eyebrow stripe (4 modalities).}
+#'   \item{\code{collar}}{a character vector describing the collar (5 modalities).}
+#'   \item{\code{sub-caudal}}{a character vector describing the sub-caudal (5 modalities).}
+#'   \item{\code{border}}{a character vector describing the border (3 modalities).}
 #' }
 #'
 #' @source

@@ -64,11 +64,11 @@ template<typename Type> struct IdTypeImpl;
 template<>
 struct Arithmetic<Sign> : public std::numeric_limits<Sign>
 {
-   /** Adding a Non Avalaible (NA) special number. */
+   /** Adding a Non Available (NA) special number. */
    static Sign NA() throw() { return signNA_;}
    /** True if the type has a representation for a "Not Available". */
    static const bool hasNA = true;
-   /** Test if x is a Non Avalaible (NA) special number.
+   /** Test if x is a Non Available (NA) special number.
     *  @param x the Sign number to test.
     **/
    static bool isNA(const Sign& x) throw() { return (x==signNA_);}

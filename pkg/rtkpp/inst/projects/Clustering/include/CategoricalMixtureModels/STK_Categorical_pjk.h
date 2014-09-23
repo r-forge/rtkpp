@@ -102,16 +102,12 @@ class Categorical_pjk : public CategoricalBase<Categorical_pjk<Array> >
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable()*(this->modalities_.size()-1);}
-    /** get the parameters of the model
-     *  @param params the parameters of the model
-     **/
-    void getParameters(Array2D<Real>& params) const;
 };
 
 /* Initialize the parameters using mStep. */
 template<class Array>
 bool Categorical_pjk<Array>::initializeStep()
-{  return mStep();}
+{ return mStep();}
 
 /* Initialize randomly the parameters of the Categorical mixture.
  */
@@ -137,6 +133,7 @@ bool Categorical_pjk<Array>::mStep()
   {
     for (int j = p_data()->beginCols(); j < p_data()->endCols(); ++j)
     {
+      p_param(k)->proba_[j] = 0.;
       for (int i = p_tik()->beginRows(); i < p_tik()->endRows(); ++i)
       { p_param(k)->proba_[j][(*p_data())(i, j)] += (*p_tik())(i, k);}
       // normalize the probabilities
@@ -146,28 +143,6 @@ bool Categorical_pjk<Array>::mStep()
     }
   }
   return true;
-}
-
-/** get the parameters of the model
- *  @param params the parameters of the model
- **/
-template<class Array>
-void Categorical_pjk<Array>::getParameters(Array2D<Real>& params) const
-{
-    int nbClust = this->nbCluster();
-    int nbModalities = this->modalities_.size();
-
-    params.resize(nbModalities * nbClust, p_data()->cols());
-    for (int k = 0; k < nbClust; ++k)
-    {
-      for (int j = p_data()->beginCols(); j < p_data()->endCols(); ++j)
-      {
-        for (int l = 0; l < nbModalities; ++l)
-        {
-          params(k * nbModalities + l + baseIdx, j) = p_param(k)->proba(j, baseIdx + l);
-        }
-      }
-    }
 }
 
 } // namespace STK

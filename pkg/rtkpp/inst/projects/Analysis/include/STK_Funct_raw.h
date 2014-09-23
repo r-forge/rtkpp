@@ -53,7 +53,7 @@ namespace Funct
 Real psi_raw(Real x);
 
 /** @ingroup Analysis
- *  @brief Compute the error fonction erf(a)
+ *  @brief Compute the error function erf(a)
  */
 Real erf_raw(Real const& a);
 

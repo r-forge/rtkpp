@@ -100,10 +100,6 @@ class Categorical_pk : public CategoricalBase<Categorical_pk<Array> >
     void randomInit();
     /** Compute the weighted proportions of each class. */
     bool mStep();
-    /** get the parameters of the model
-     *  @param params An Array2D with the parameters of the model
-     **/
-    void getParameters(Array2D<Real>& params) const;
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*(this->modalities_.size()-1);}
@@ -134,6 +130,7 @@ bool Categorical_pk<Array>::mStep()
 {
   for (int k = baseIdx; k < p_tik()->endCols(); ++k)
   {
+    p_param(k)->proba_ = 0.;
     for (int j = p_data()->beginCols(); j < p_data()->endCols(); ++j)
     {
       for (int i = p_tik()->beginRows(); i < p_tik()->endRows(); ++i)
@@ -144,46 +141,6 @@ bool Categorical_pk<Array>::mStep()
     p_param(k)->proba_ /= sum;
   }
   return true;
-}
-
-/** get the parameters of the model
- *  @param params the parameters of the model
- **/
-template<class Array>
-void Categorical_pk<Array>::getParameters(Array2D<Real>& params) const
-{
-    int nbClust = this->nbCluster();
-    int nbModalities = this->modalities_.size();
-
-    params.resize(nbModalities * nbClust, p_data()->cols());
-    for (int k = 0; k < nbClust; ++k)
-    {
-      for (int j = p_data()->beginCols(); j < p_data()->endCols(); ++j)
-      {
-        for (int l = 0; l < nbModalities; ++l)
-        {
-          params(k * nbModalities + l + baseIdx, j) = p_param(k)->proba(j, baseIdx + l);
-        }
-      }
-    }
-
-//  for (int k = baseIdx; k < p_tik()->endCols(); ++k)
-//    params.pushBackRows(p_param(k)->proba_*Const::Point<Real>(this->nbCluster()));
-//  int firstId = params.beginRows();
-//  int nbClust = this->nbCluster();
-//  int nbModalities = modalities_.size();
-//
-//  params.resize(nbModalities * nbClust, p_data()->cols());
-//  for (int k = 0; k <= nbClust; ++k)
-//  {
-//    for (int j = p_data()->beginCols(); j < p_data()->endCols(); ++j)
-//    {
-//      for (int l = 0; l < nbModalities; ++l)
-//      {
-//        params(k * nbModalities + l + firstId, j) = p_param(k)->proba(j, l);
-//      }
-//    }
-//  }
 }
 
 } // namespace STK

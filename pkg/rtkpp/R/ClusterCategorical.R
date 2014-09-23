@@ -28,16 +28,17 @@ NULL
 #-----------------------------------------------------------------------
 #' Create an instance of the [\code{\linkS4class{ClusterCategorical}}] class
 #'
-#' This function computes the optimal diagonal Gaussian mixture model according
+#' This function computes the optimal Categorical mixture model according
 #' to the [\code{criterion}] among the list of model given in [\code{modelNames}]
-#' and the number of clusters given in [\code{nbCluster}], using the strategy specified in [\code{strategy}].
+#' and the number of clusters given in [\code{nbCluster}], using the strategy
+#' specified in [\code{strategy}].
 #'
 #' @param data frame or matrix containing the data. Rows correspond to observations
 #' and columns correspond to variables. If the data set contains NA values, they
 #' will be estimated during the estimation process.
 #' @param nbCluster  [\code{\link{vector}}] listing the number of clusters to test.
-#' @param modelNames [\code{\link{vector}}] of models names to run. By default all diagonal
-#' Gaussian models are estimated.
+#' @param modelNames [\code{\link{vector}}] of models names to run. By default
+#' all categorical models are estimated.
 #' @param strategy a [\code{\linkS4class{ClusterStrategy}}] object containing
 #' the strategy to run. clusterStrategy() method by default.
 #' @param criterion character defining the criterion to select the best model.
@@ -45,14 +46,14 @@ NULL
 #' Possible values: "BIC", "AIC", "ICL". Default is "ICL".
 #'
 #' @examples
-#' ## A quantitative example with the famous geyser data set
-#' data(geyser)
+#' ## A quantitative example with the birds data set
+#' data(birds)
 #' ## add 10 missing values
-#' x = geyser;
-#' x[round(runif(5,1,nrow(geyser))), 1] <- NA
-#' x[round(runif(5,1,nrow(geyser))), 2] <- NA
+#' x = birds;
+#' x[round(runif(5,1,nrow(birds))), 2] <- NA
+#' x[round(runif(5,1,nrow(birds))), 4] <- NA
 #' ## with default values
-#' model <- clusterDiagGaussian(data=x, nbCluster=2:3)
+#' model <- clusterCategorical(data=x, nbCluster=2:3)
 #'
 #' ## use graphics functions
 #' \dontrun{
@@ -61,52 +62,49 @@ NULL
 #'
 #' ## get summary
 #' summary(model)
-#' ## print model
-#' print(model)
 #'
 #' @return An instance of the [\code{\linkS4class{ClusterCategorical}}] class.
 #' @author Serge Iovleff
 #' @export
 #'
-ClusterCategorical <- function(data, nbCluster=2, modelNames=NULL, strategy=clusterStrategy(), criterion="ICL")
+clusterCategorical <- function(data, nbCluster=2, modelNames=NULL, strategy=clusterStrategy(), criterion="ICL")
 {
   # check nbCluster
   nbClusterModel = length(nbCluster);
-  nbClusterMin = min(nbCluster);
-  nbClusterMax = max(nbCluster);
-  if (nbClusterMin < 2) { stop("The number of clusters must be greater or equal to 2")}
-  
+  nbClusterMin   = min(nbCluster);
+  nbClusterMax   = max(nbCluster);
+  if (nbClusterMin < 2) { stop("The number of clusters must be greater or equal to 2\n")}
+
   # check criterion
   if(sum(criterion %in% c("BIC","AIC", "ICL")) != 1)
-  { stop("criterion is not valid. See ?clusterDiagGaussian for the list of valid criterion")}
-  
-  # check data
-  data = as.matrix(data)
-  if (nrow(data) <= 3*nbClusterMax) {stop("There is not enough individuals (rows) in the data set")}
-  if (ncol(data) < 1) {stop("Error: empty data set")}
-  
+  { stop("criterion is not valid. See ?clusterCategorical for the list of valid criterion\n")}
+
+  # get data
+  data <- as.matrix(data);
+  if (nrow(data) <= 3*nbClusterMax) {stop("There is not enough individuals (rows) in the data set\n")}
+  if (ncol(data) <= 1) {stop("Error: empty data set or not enough columns (must be greater than 1 for Categorical variables)\n")}
+
   # check modelNames
-  if (is.null(modelNames)) { modelNames = diagGaussianNames()}
-  if (!validDiagGaussianNames(modelNames))
-  { stop("modelNames is not valid. See ?diagGaussianNames for the list of valid model names")}
-  
+  if (is.null(modelNames)) { modelNames = c( "categorical_pk_pjk", "categorical_p_pjk")}
+  if (!validCategoricalNames(modelNames))
+  { stop("modelNames is not valid. See ?CategoricalNames for the list of valid model names\n")}
+
   # check strategy
   if(class(strategy)[1] != "ClusterStrategy")
-  {stop("strategy is not a Cluster Stategy class (must be an instance of the class ClusterStrategy).")}
+  {stop("strategy is not a Cluster Stategy class (must be an instance of the class ClusterStrategy).\n")}
   validObject(strategy);
-  
+
   # Create model
-  model = new("ClusterDiagGaussian", data)
+  model = new("ClusterCategorical", data)
   model@missings = which(is.na(data), arr.ind=TRUE);
   model@strategy = strategy;
-  
+
   # start estimation of the models
-  #resFlag = .Call("clusterMixture", model, nbCluster, modelNames, strategy, criterion, PACKAGE="rtkpp")
-  resFlag = FALSE
+  resFlag = .Call("clusterMixture", model, nbCluster, modelNames, strategy, criterion, PACKAGE="rtkpp")
   # set names
-  colnames(model@mean)   <- colnames(model@data)
-  colnames(model@sigma) <- colnames(model@data)
-  if (resFlag != 1) {cat("WARNING: An error occur during the clustering process")}
+  # dimnames(model@plkj) <- list(NULL, colnames(model@data), NULL)
+  if (resFlag != 1) {cat("WARNING: An error occur during the clustering process\n")}
+  else { dim(model@plkj) <- c(model@nbModalities, model@nbCluster, ncol(data)) } # should be done on the C++ side
   model
 }
 
@@ -123,13 +121,15 @@ ClusterCategorical <- function(data, nbCluster=2, modelNames=NULL, strategy=clus
 #'    \quad {x} \in \{1,\ldots,L\}^d.
 #' }
 #'
-#' @slot pkjl  Array with the probability of the jth variable in the kth cluster
+#' @slot plkj  Array with the probability of the jth variable in the kth cluster
 #' to be l.
+#' @slot nbModalities Integer with the (maximal) number of modalities of the categorical
+#' data.
 #'
 #' @examples
 #'   getSlots("ClusterCategorical")
-#'   data(geyser)
-#'   new("ClusterCategorical", data=geyser)
+#'   data(birds)
+#'   new("ClusterCategorical", data=birds)
 #'
 #' @author Serge Iovleff
 #'
@@ -140,19 +140,22 @@ ClusterCategorical <- function(data, nbCluster=2, modelNames=NULL, strategy=clus
 #'
 setClass(
     Class="ClusterCategorical",
-    representation( pkjl = "array"),
+    representation( plkj = "array", nbModalities = "numeric"),
     contains=c("IClusterModel"),
-    prototype=list( pkjl = array(dim=c(0,0,0))),
+    prototype=list( plkj = array(dim=c(0,0,0)), nbModalities = 0),
     validity=function(object)
     {
-      dims <- dim(object@pkjl)
-      nbVariable <- ncol(object@data)
+      dims <- dim(object@plkj)
 
-      if (dims[3]!=object@nbCluster)
-      {stop("Third dimension in pkjl must be nbCluster.")}
-      if (dims[2]!=ncol(object@data))
-      {stop("Second dimension in pkjl must be nbVariable.")}
-      if (!(object@modelName %in% c("categorical_pjk", "categorical_pk")))
+      if (round(object@nbModalities)!=object@nbModalities)
+      {stop("nbModalities must be an integer.")}
+      if (dims[1]!=object@nbModalities)
+      {stop("First dimension in plkj must be nbModalities.")}
+      if (dims[2]!=object@nbCluster)
+      {stop("Second dimension in plkj must be nbCluster.")}
+      if (dims[3]!=ncol(object@data))
+      {stop("Second dimension in plkj must be nbCluster.")}
+      if (!validCategoricalNames(object@modelName))
       {stop("Invalid Categorical model name.")}
       return(TRUE)
     }
@@ -169,19 +172,26 @@ setClass(
 setMethod(
     f="initialize",
     signature=c("ClusterCategorical"),
-    definition=function(.Object, data, nbCluster=2, modelName="categorical_pjk")
+    definition=function(.Object, data, nbCluster=2, modelName="categorical_pk_pjk")
     {
+      # prepare data and compute number of modalities
+      data = as.data.frame(data)
+      nbModalities = 0;
+      for ( j in 1:ncol(data) )
+      {
+        nbModalities <- max(nbModalities, nlevels(factor(data[,j])))
+        data[,j] <- as.integer(factor(data[,j]))
+      }
+      .Object@nbModalities = nbModalities;
+      # initialize base class
       .Object <- callNextMethod(.Object, data, nbCluster, modelName)
       # for modelName
-      if(missing(modelName)) {.Object@modelName<-"categorical_pjk"}
+      if(missing(modelName)) {.Object@modelName<-"categorical_pk_pjk"}
       else                   {.Object@modelName<-modelName}
-      # get number of modalities
-      if ( is.factor(data) ) { nbModalities <- nlevels(data)}
-      else                   { nbModalities <- nlevels(factor(.Object@data))}
       # resize
       nbVariable <- ncol(.Object@data)
       nbCluster  <- .Object@nbCluster
-      .Object@pkjl <- array(data = 1/nbModalities, dim=c(nbModalities,nbVariable,.Object@nbCluster))
+      .Object@plkj <- array(data = 1/nbModalities, dim=c(nbModalities,nbCluster,nbVariable))
       # validate
       validObject(.Object)
       return(.Object)
@@ -202,7 +212,7 @@ setMethod(
       {
         cat("*** Cluster: ",k,"\n")
         cat("* Proportion = ", format(x@pk[k]), "\n")
-        cat("* probabilities = ", format(x@pkjl[k,]), "\n")
+        cat("* probabilities = \n"); print(x@plkj[,k,])
         cat("****************************************\n")
       }
     }
@@ -212,7 +222,7 @@ setMethod(
 #' @aliases show-ClusterCategorical,ClusterCategorical,ClusterCategorical-method
 setMethod(
     f="show",
-    signature=c("ClusterDiagGaussian"),
+    signature=c("ClusterCategorical"),
     function(object)
     {
       cat("****************************************\n")
@@ -222,7 +232,7 @@ setMethod(
       {
         cat("*** Cluster: ",k,"\n")
         cat("* Proportion = ", format(object@pk[k]), "\n")
-        cat("* probabilities = ", format(x@pkjl[k,]), "\n")
+        cat("* probabilities = \n"); print(object@plkj[,k,]);
         cat("****************************************\n")
       }
     }
@@ -233,12 +243,12 @@ setMethod(
 #'
 setMethod(
     f="summary",
-    signature=c("ClusterDiagGaussian"),
+    signature=c("ClusterCategorical"),
     function(object, ...)
     {
       cat("**************************************************************\n")
       callNextMethod()
-      cat("* nbModalities = ", format(dim(object@pkjl)[3]), "\n")
+      cat("* nbModalities   = ", format(object@nbModalities), "\n")
       cat("**************************************************************\n")
     }
 )

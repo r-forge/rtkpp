@@ -120,8 +120,7 @@ class DataManager : public IDataManager
      *  @param manager the DataManager to copy
      **/
     DataManager( DataManager const& manager)
-               : IDataManager(manager), m_dataij_(manager.m_dataij_)
-    {}
+               : IDataManager(manager), m_dataij_(manager.m_dataij_) {}
     /** getter. @return a constant reference on the data set */
     Data const& m_dataij() const { return m_dataij_;}
     /** data set (public) */

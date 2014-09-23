@@ -204,7 +204,7 @@ class MixtureManager : public IMixtureManager
      *  @param idData Id name of the data
      *  @param nbCluster number of cluster of the model
      **/
-    virtual IMixture* createConcreteMixture(Clust::Mixture idModel, String const& idData, int nbCluster)
+    virtual IMixture* createMixtureImpl(Clust::Mixture idModel, String const& idData, int nbCluster)
     {
       switch (idModel)
       {

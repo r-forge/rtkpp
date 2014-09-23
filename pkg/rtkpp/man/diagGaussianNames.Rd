@@ -71,9 +71,9 @@ The model names are summarized in the following array:
  gaussian_pk_s   \tab Free  \tab Equal                \tab Equal \cr
 }
 
-check if a vector of diagonal Gaussian model name comply
+check if a vector of diagonal Gaussian model name is correct.
 
-check if a vector of gamma model name comply
+check if a vector of gamma model name is correct.
 }
 \examples{
 diagGaussianNames()

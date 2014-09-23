@@ -55,15 +55,18 @@ class ICriterion : public IRunnerBase
     /** Constructor.
      *  @param p_model a pointer on the current model
      **/
-    inline ICriterion( IStatModelBase* const p_model) : p_model_(p_model), value_(Arithmetic<Real>::NA()){}
+    inline ICriterion( IStatModelBase const* p_model)
+                     : p_model_(p_model), value_(Arithmetic<Real>::NA()){}
     /** Constructor.
      *  @param model the current model
      **/
-    inline ICriterion( IStatModelBase const& model) : p_model_(&model), value_(Arithmetic<Real>::NA()) {}
+    inline ICriterion( IStatModelBase const& model)
+                     : p_model_(&model), value_(Arithmetic<Real>::NA()) {}
     /** copy Constructor.
      *  @param criterion the criterion to copy
      **/
-    inline ICriterion( ICriterion const& criterion) : p_model_(criterion.p_model_), value_(criterion.value_) {}
+    inline ICriterion( ICriterion const& criterion)
+                     : p_model_(criterion.p_model_), value_(criterion.value_) {}
 
   public:
     /** Destructor */
@@ -71,9 +74,9 @@ class ICriterion : public IRunnerBase
     /** @return The value of the criterion */
     inline Real const& value() const { return value_;}
     /** @param p_model a pointer on the current model to set */
-     inline void setModel( IStatModelBase* const p_model) { p_model_ = p_model;}
+    void setModel( IStatModelBase const* p_model);
     /** @param model the current model to set */
-     inline void setModel( IStatModelBase const& model) { p_model_ = &model;}
+    void setModel( IStatModelBase const& model);
 
   protected:
     /** The current statistical model to use*/

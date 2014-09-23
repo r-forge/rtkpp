@@ -88,6 +88,12 @@ class IStatModelBase
     { return (Arithmetic<Real>::isFinite(lnLikelihood_)) ? std::exp((Real)lnLikelihood_) : 0.;}
     /** @return the total number of free parameters */
     inline int nbFreeParameter() const { return nbFreeParameter_;}
+    /** @return the computed ICL criteria. */
+    inline Real computeBIC() const
+    { return (- 2. * lnLikelihood() + nbFreeParameter() * lnNbSample());}
+    /** @return the computed ICL criteria. */
+    inline Real computeAIC() const
+    { return (2.*(-lnLikelihood()+nbFreeParameter()));}
 
   protected:
     /** set the number of free parameters of the model

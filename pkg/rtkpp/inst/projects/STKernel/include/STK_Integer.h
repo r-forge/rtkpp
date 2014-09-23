@@ -41,11 +41,7 @@
 
 // for building
 #ifdef IS_RTKPP_LIB
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
-#include "STK_RcppTraits.h"
-#endif
-
+#include "Rtkpp/include/STK_RcppTraits.h"
 #endif
 
 namespace STK
@@ -75,25 +71,16 @@ struct Arithmetic<Integer>  : public std::numeric_limits<Integer>
 #endif
   /** True if the type has a representation for a "Not Available". */
   static const bool hasNA = true;
-  /** Adding a Non Avalaible (NA) special number. */
-#ifdef RTKP_LIB
-  static inline Integer NA() throw()  { return Rcpp::traits::get_na<Rtype_>();}
-#else
-  static inline Integer NA() throw()
-  { return std::numeric_limits<Integer>::max();}
-  /** We are using the maximal value of the Integer Type for NA values. */
-  static inline Integer max() throw()
-  { return std::numeric_limits<Integer>::max() -1; }
-#endif
-  /** Test if x is a Non Avalaible (NA) special number.
+  /** Adding a Non Available (NA) special number. */
+  static inline Integer NA() throw() { return std::numeric_limits<Integer>::min();}
+  /** Test if x is a Non Available (NA) special number.
    *  @param x the Integer number to test.
    **/
-#ifdef RTKP_LIB
-  static bool isNA(Integer const& x) throw() { return Rcpp::traits::is_na<Rtype_>(x);}
-#else
   static inline bool isNA(Integer const& x) throw()
-  { return (x==std::numeric_limits<Integer>::max());}
-#endif
+  { return (x==std::numeric_limits<Integer>::min());}
+  /** We are using the maximal value (positive or negative) of the Integer
+    * type for NA values. */
+  static inline Integer min() throw() { return std::numeric_limits<Integer>::min() +1; }
   /** @return @c true if x is  infinite : always false for Integer.
    *  @param x the Integer number to test.
    **/
@@ -116,7 +103,7 @@ struct IdTypeImpl<Integer>
 
 #ifdef IS_RTKPP_LIB
 /** @ingroup Arithmetic
- *  @brief Specialization for Integer (long).
+ *  @brief Specialization for const Integer (long).
  *
  *  We are using the largest element of the underlying
  *  Type for representing NA (not available) discrete numbers.
@@ -126,16 +113,20 @@ struct Arithmetic<const Integer>
 {
   enum
   {
-    Rtype_ = hidden::RcppTraits<Integer>::Rtype_
+    Rtype_ = hidden::RcppTraits<const Integer>::Rtype_
   };
   /** True if the type has a representation for a "Not Available". */
   static const bool hasNA = true;
-  /** Adding a Non Avalaible (NA) special number. */
-  static inline Integer NA() throw()  { return Rcpp::traits::get_na<Rtype_>();}
-  /** Test if x is a Non Avalaible (NA) special number.
+  /** Adding a Non Available (NA) special number. */
+  static inline Integer NA() throw() { return std::numeric_limits<Integer>::min();}
+  /** Test if x is a Non Available (NA) special number.
    *  @param x the Integer number to test.
    **/
-  static bool isNA(Integer const& x) throw() { return Rcpp::traits::is_na<Rtype_>(x);}
+  static inline bool isNA(Integer const& x) throw()
+  { return (x==std::numeric_limits<Integer>::min());}
+  /** We are using the maximal value (positive or negative) of the Integer
+    * type for NA values. */
+  static inline Integer min() throw() { return std::numeric_limits<Integer>::min() +1; }
   /** @return @c true if x is  infinite : always false for Integer.
    *  @param x the Integer number to test.
    **/
@@ -155,7 +146,9 @@ struct IdTypeImpl<const Integer>
   /** Give the IdType of the type Integer. */
   static inline IdType returnType() { return(integer_);}
 };
-#endif
+
+#endif /* IS_RTKPP_LIB */
+
 /** @ingroup Base
  *  @brief Convert a String to an Integer.
  *  @param str the String we want to convert

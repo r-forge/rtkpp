@@ -38,6 +38,11 @@
 
 namespace STK
 {
+/* @param p_model a pointer on the current model to set */
+void ICriterion::setModel( IStatModelBase const* p_model) { p_model_ = p_model;}
+/* @param model the current model to set */
+void ICriterion::setModel( IStatModelBase const& model) { p_model_ = &model;}
+
 //* Compute AIC Criterion */
 bool AICCriterion::run()
 {
@@ -45,8 +50,7 @@ bool AICCriterion::run()
   { msg_error_ = STKERROR_NO_ARG(AICCriterion::run,p_model_ is not set);
     return false;
   }
-  // AIC criteria
-  value_  = 2.*(-p_model_->lnLikelihood()+p_model_->nbFreeParameter());
+  value_ = p_model_->computeAIC();
   return true;
 }
 
@@ -57,7 +61,7 @@ bool BICCriterion::run()
   { msg_error_ = STKERROR_NO_ARG(BICCriterion::run,p_model_ is not set);
     return false;
   }
-    value_  = (-2.*p_model_->lnLikelihood())+(p_model_->nbFreeParameter()*p_model_->lnNbSample());
+  value_  = p_model_->computeBIC();
   return true;
 }
 

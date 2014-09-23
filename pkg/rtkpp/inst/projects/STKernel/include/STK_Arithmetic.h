@@ -199,7 +199,7 @@ struct Arithmetic : public std::numeric_limits<Type>
 {
   /** True if the type has a representation for a "Not Available."    */
   static const bool hasNA = false;
-  /** Adding a Non Avalaible (NA) special number
+  /** Adding a Non Available (NA) special number
    * @return the NA value of the type @c Type
    **/
   static inline Type NA() throw() { return static_cast<Type>(0);}

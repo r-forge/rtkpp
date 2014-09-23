@@ -71,8 +71,8 @@ void StrategyFacade::createFullStrategy( Clust::initType init, int nbTryInInit, 
 bool StrategyFacade::run()
 {
 #ifdef STK_MIXTURE_VERBOSE
-  stk_cout << _T("-----------------------------------------------\n");
-  stk_cout << _T("Entering StrategyFacade::run()\n");
+  stk_cout << _T("-----------------------------------------------\n")
+           << _T("Entering StrategyFacade::run()\n");
 #endif
   bool flag = false;
   if (p_strategy_)
@@ -81,15 +81,15 @@ bool StrategyFacade::run()
     { flag = true;
 #ifdef STK_MIXTURE_VERBOSE
       stk_cout << _T("StrategyFacade:run() terminated with success. p_model->lnLikelihood() =")
-               << p_model_->lnLikelihood() << _T("\n");
-      stk_cout << _T("-----------------------------------------------\n");
+               << p_model_->lnLikelihood() << _T("\n")
+               << _T("-----------------------------------------------\n");
 #endif
     }
 #ifdef STK_MIXTURE_VERBOSE
     else
     {
-      stk_cout << _T("StrategyFacade:run() terminated without success.\n");
-      stk_cout << _T("-----------------------------------------------\n");
+      stk_cout << _T("StrategyFacade:run() terminated without success.\n")
+               << _T("------------------------------------------------\n");
     }
 #endif
     p_model_->finalizeStep();

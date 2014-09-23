@@ -43,7 +43,7 @@ NULL
 #' @slot pk        Vector of size K with the proportions of each mixture.
 #' @slot tik       Matrix of size \eqn{n \times K} with the posterior probability of
 #' the ith individual to belong to kth cluster.
-#' @slot fi        Vector of size n with the likelihood of the ith individuals.
+#' @slot lnFi        Vector of size n with the log-likelihood of the ith individuals.
 #' @slot zi        Vector of integer of size n  with the attributed class label of the individuals.
 #' @slot missings   \code{\link{matrix}} of two columns with the indexes (i,j) of the missing values.
 #' @slot lnLikelihood Real given the ln-liklihood of the Cluster model.
@@ -68,7 +68,7 @@ setClass(
                 , nbCluster = "numeric"
                 , pk = "numeric"
                 , tik = "matrix"
-                , fi = "numeric"
+                , lnFi = "numeric"
                 , zi = "integer"
                 , missings = "matrix"
                 , lnLikelihood = "numeric"
@@ -82,7 +82,7 @@ setClass(
                 , nbCluster = 0
                 , pk = vector("numeric")
                 , tik = matrix(nrow=0, ncol=0)
-                , fi  = vector("numeric")
+                , lnFi  = vector("numeric")
                 , zi  = vector("integer")
                 , missings = matrix(nrow=0, ncol=2)
                 , lnLikelihood = -Inf
@@ -109,8 +109,8 @@ setClass(
     {stop("tik must have nbCluster columns.")}
     if (nrow(object@tik) != nbSample)
     {stop("tik must have nbSample rows.")}
-    # check fi
-    if (length(object@fi) != nbSample)
+    # check lnFi
+    if (length(object@lnFi) != nbSample)
     {stop("fi must have nbSample size.")}
     # check zi
     if (length(object@zi) != nbSample)
@@ -150,7 +150,7 @@ setMethod(
       nbVariable  <- ncol(.Object@data)
       .Object@pk  <- rep(1/.Object@nbCluster, nbCluster)
       .Object@tik <- matrix(1/nbCluster, nbSample, nbCluster)
-      .Object@fi  <- rep(0, nbSample)
+      .Object@lnFi  <- rep(0, nbSample)
       .Object@zi  <- as.integer(rep(1, nbSample))
       .Object@strategy <- clusterStrategy()
       # validObject(.Object) will be called at the end of the initialization process
@@ -174,7 +174,7 @@ setMethod(
             "nbCluster"={return(x@nbCluster)},
             "pk"={return(x@pk)},
             "tik"={return(x@tik)},
-            "fi"={return(x@fi)},
+            "lnFi"={return(x@lnFi)},
             "zi"={return(x@zi)},
             "missing"={return(x@missing)},
             "lnLikelihood"={return(x@lnLikelihood)},

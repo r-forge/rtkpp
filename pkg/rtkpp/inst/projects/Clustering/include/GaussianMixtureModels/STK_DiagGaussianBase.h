@@ -112,9 +112,9 @@ class DiagGaussianBase : public IMixtureModel<Derived >
         // store sigma values in an array for a nice output
         for (int j= sigma.begin();  j <= sigma.lastIdx(); ++j)
         { sigma[j] = p_param(k)->sigma(j);}
-        stk_cout << _T("---> Component ") << k << _T("\n");
-        stk_cout << _T("mean = ") << p_param(k)->mean_;
-        stk_cout << _T("sigma = ")<< sigma;
+        os << _T("---> Component ") << k << _T("\n");
+        os << _T("mean = ") << p_param(k)->mean_;
+        os << _T("sigma = ")<< sigma;
       }
     }
 

@@ -73,7 +73,7 @@
 #include "../projects/Analysis/include/STK_Const_Math.h"
 
 // namespace Funct
-// usual fonctions
+// usual functions
 #include "../projects/Analysis/include/STK_Funct_util.h"
 // raw functions for poisson function
 #include "../projects/Analysis/include/STK_Funct_poisson_raw.h"

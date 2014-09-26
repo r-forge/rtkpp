@@ -254,7 +254,6 @@ setMethod(
 #'
 #' @importFrom graphics plot
 #' @aliases plot-ClusterDiagGaussian
-#ClusterDiagGaussian-method
 #' @docType methods
 #' @rdname plot-ClusterDiagGaussian-method
 #' @export
@@ -282,4 +281,4 @@ setMethod(
 # wrapper of dnorm
 # x a vector with the point
 .dGauss <- function(x, j, k, model)
-{ dnorm(x, (model@mean)[k, j] , sqrt((model@sigma)[k, j]))}
+{ dnorm(x, (model@mean)[k, j] , (model@sigma)[k, j])}

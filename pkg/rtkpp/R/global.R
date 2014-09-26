@@ -30,7 +30,8 @@
 #' @param drop For matrices and arrays.  If TRUE the result is coerced to the lowest
 #' possible dimension (see the examples).  This only works for extracting elements,
 #' not for the replacement.  See drop for further details.
-#'
+#' @param value	typically an array-like R object of a similar class as the element
+#' of x we want to replace.
 #' @name [
 #' @aliases Extract
 #' @docType methods

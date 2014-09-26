@@ -253,3 +253,78 @@ setMethod(
     }
 )
 
+#' Plotting of a class [\code{\linkS4class{ClusterCategorical}}]
+#'
+#' Plotting data from a [\code{\linkS4class{ClusterCategorical}}] object
+#' using the estimated parameters and partition.
+#'
+#' @param x an object of class [\code{\linkS4class{ClusterCategorical}}]
+#' @param y a number between 1 and K-1.
+#' @param ... further arguments passed to or from other methods
+#'
+#' @importFrom graphics plot
+#' @aliases plot-ClusterCategorical
+#' @docType methods
+#' @rdname plot-ClusterCategorical-method
+#' @export
+#'
+#' @seealso \code{\link{plot}}
+#' @examples
+#'   ## the car data set
+#'   data(car)
+#'   model <- clusterCategorical(car,3)
+#' \dontrun{
+#'   plot(model)
+#'   }
+#'
+setMethod(
+    f="plot",
+    signature=c("ClusterCategorical"),
+    function(x, y, ...)
+    {
+      # total number of cluster in the data set
+      nbCluster = ncol(x@tik);
+      # check y, no y => display all dimensions
+      if (missing(y)) { y=1:(nbCluster-1); }
+      else
+      { if (round(y)!=y) {stop("y must be an integer.")}
+        if (y>nbCluster-1)
+        stop("y should not be greater than K-1")
+        y <- 1:y
+      }
+      print(y)
+      # get representation
+      Y=.visut(x@tik, nbCluster);
+      # Compute gaussian statistics
+      mean <- matrix(0, nrow = x@nbCluster, ncol =ncol(Y))
+      sigma <- matrix(1, nrow = x@nbCluster, ncol =ncol(Y))
+      for (k in 1:nbCluster)
+      {
+        wcov = cov.wt(Y, x@tik[,k], method = "ML");
+        mean[k,]  = wcov$center;
+        sigma[k,] = sqrt(diag(wcov$cov))
+      }
+      # create gaussian model
+      gauss<-new("ClusterDiagGaussian", Y, nbCluster = x@nbCluster)
+      gauss@mean = mean
+      gauss@sigma= sigma
+      gauss@pk   = x@pk
+      gauss@tik  = x@tik
+      gauss@lnFi = x@lnFi
+      gauss@zi   = x@zi
+      gauss@missings     = x@missings
+      gauss@lnLikelihood = x@lnLikelihood
+      gauss@criterion    = x@criterion
+      gauss@nbFreeParameter = x@nbFreeParameter
+      gauss@strategy        = x@strategy
+      .clusterPlot(gauss, y, .dGauss,...);
+    }
+)
+
+# get logisitic representation
+.visut <- function(t, gp)
+{ m <- min(t[,gp]);
+  if (m==0) t[,gp] = t[,gp] + 1e-30;
+  return(scale(log(sweep(t,1,t[,gp],FUN="/")+ 1e-30), center=TRUE, scale=FALSE)[,-gp])
+}
+

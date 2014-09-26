@@ -235,8 +235,6 @@ bool FullStrategy::run()
   stk_cout << _T("-------------------------------\n")
            << _T("iTry = ") << iTry << _T("\n");
 #endif
-      // initialize the model with default values
-      p_bestShortModel->initializeStep();
       // in case nbShortRun_==0: initialize directly p_bestShortModel
       if (p_param_->nbShortRun_ == 0)
       { initStep(p_currentModel, p_bestShortModel);}
@@ -244,8 +242,6 @@ bool FullStrategy::run()
       {
         for (int iShort=0; iShort < p_param_->nbShortRun_; ++iShort)
         {
-          // (re)-initialize current best model
-          p_currentBestModel->initializeStep();
           // perform nbInitRun_ initialization step and get the best result
           // in p_currentBestModel
           initStep(p_currentModel, p_currentBestModel);
@@ -288,7 +284,7 @@ bool FullStrategy::run()
     msg_error_ = e.error();
     return false;
   }
-  if (p_model_->lnLikelihood() == -STK::Arithmetic<Real>::max())
+  if (p_model_->lnLikelihood() == -STK::Arithmetic<Real>::infinity())
   {
     msg_error_ = STKERROR_NO_ARG(In FullStrategy::run,All trials failed);
     return false;

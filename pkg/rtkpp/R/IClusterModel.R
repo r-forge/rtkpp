@@ -205,8 +205,8 @@ setMethod(
 )
 
 #-----------------------------------------------------------------------
-#' @rdname print-methods
-#' @aliases print print,IClusterModel-method
+#' @rdname show-methods
+#' @aliases show show,IClusterModel-method
 setMethod(
     f="show",
     signature=c("IClusterModel"),

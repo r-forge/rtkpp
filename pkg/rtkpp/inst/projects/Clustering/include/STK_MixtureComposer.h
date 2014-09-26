@@ -99,7 +99,7 @@ class MixtureComposer : public IMixtureComposer
     /** @brief compute the number of free parameters of the model.
      *  lookup on the mixtures and sum the nbFreeParameter.
      **/
-    virtual int computeNbFreeParameters() const;
+    int computeNbFreeParameters() const;
     /** @brief compute the number of variables of the model.
      *  lookup on the mixtures and sum the nbFreeParameter.
      **/
@@ -218,8 +218,6 @@ class MixtureComposerFixedProp : public MixtureComposer
     virtual MixtureComposerFixedProp* create() const;
     /** Create a clone of the current model, with mixtures parameters preserved. */
     virtual MixtureComposerFixedProp* clone() const;
-    /** @return the number of free parameters of the mixture */
-    int computeNbFreeParameters() const;
     /** overloading of the computePropotions() method.
      * Let them initialized to 1/K. */
     virtual void pStep();

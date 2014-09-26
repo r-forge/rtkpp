@@ -133,6 +133,8 @@ class Gamma_aj_bk : public GammaBase< Gamma_aj_bk<Array> >
 template<class Array>
 void Gamma_aj_bk<Array>::randomInit()
 {
+    // compute moments
+    this->moments();
   // simulate aj
   for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
   {

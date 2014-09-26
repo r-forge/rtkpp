@@ -23,7 +23,7 @@
 LIB_STKPP_A = libSTKpp.a
 
 STKPP_DIR = ../inst
-STKPP_LIB = $(STKPP_DIR)/libs/$(LIB_STKPP_A)
+STKPP_LIB = $(STKPP_DIR)/lib/$(LIB_STKPP_A)
 
 STK_FLAGS = -Wno-long-long
 ## -march=native -funroll-loops ## optimisation does not work under window

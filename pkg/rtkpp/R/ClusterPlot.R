@@ -51,14 +51,12 @@
   # get old par
   op <- par(no.readonly = TRUE) # the whole list of settable par's.
   # cluster parameters
-  par(mar = rep(2.5,4))                 # changing marging
-  par(cex = .75)                        # decreasing font size
-  nbCol = length(y)                     # size of the matrix screen
-  split.screen(c(nbCol, nbCol))         # create layout matrix screens
+  par(mar = rep(2.5,4), cex = .75, oma = c(0, 0, 3, 0))        # margin and font size
+  nbCol = length(y)                       # size of the matrix screen
+  split.screen(c(nbCol, nbCol))           # create layout matrix screens
   col = model@zi+2;                       # color for each group
-  col[model@missings[,1]] = 1             # black color for missing values
   pch = rep(1, length.out = length(col)); # circles
-  pch[model@missings[,1]] = 3;            # + for missing faues
+  pch[model@missings[,1]] = 3;            # + for missing values
   # create histograms on the diagonal
   for ( i in 1:nbCol )
   {
@@ -72,6 +70,7 @@
     mixture<-apply(density,2,sum)
     if (is.numeric(y)) { xlab=colnames(model@data)[y[i]];}
     else               { xlab= y[i];}
+    # TODO: check if xlab is empty
     main=paste("Histogram of",xlab)
     h<-hist(model@data[,y[i]], xlab=xlab, main=main, ...)
     # add on the histogram the estimated densities
@@ -94,10 +93,11 @@
         screen(j+((i-1)*nbCol)) # screen(i,j)
         if (is.numeric(y)) {ylab=colnames(model@data)[y[j]];}
         else {ylab= y[j];}
-        plot(model@data[,y[i]], model@data[,y[j]], col=col, pch=pch, xlab=xlab, ylab=ylab, ...)
+        plot(model@data[,y[j]], model@data[,y[i]], col=col, pch=pch, xlab=xlab, ylab=ylab, ...)
       }
     }
   }
+  mtext("Visualisation using latent logistic representation", outer = TRUE, cex = 1.5)
   close.screen(all.screens = TRUE)
   # restore plotting parameters
   par(op)

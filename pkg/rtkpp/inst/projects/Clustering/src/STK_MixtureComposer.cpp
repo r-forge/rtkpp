@@ -96,12 +96,12 @@ void MixtureComposer::mStep()
 
 void MixtureComposer::writeParameters(std::ostream& os) const
 {
-  os << _T("Composer nbSample = ") << this->nbSample() << std::endl;
-  os << _T("Composer nbVariable = ") << this->nbVariable() << std::endl;
-  os << _T("Composer nbCluster = ") << this->nbCluster() << std::endl;
-  os << _T("Composer nbFreeParameter = ") << this->nbFreeParameter() << std::endl;
+  os << _T("Composer nbSample = ") << nbSample() << std::endl;
+  os << _T("Composer nbVariable = ") << nbVariable() << std::endl;
+  os << _T("Composer nbCluster = ") << nbCluster() << std::endl;
+  os << _T("Composer nbFreeParameter = ") << nbFreeParameter() << std::endl;
   os << _T("Composer lnLikelihood = ") << lnLikelihood() << std::endl;
-  os << _T("Composer proportions = ") << *(this->p_pk()) << std::endl;
+  os << _T("Composer proportions = ") << *(p_pk()) << std::endl;
 
   for (ConstMixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
   {
@@ -119,9 +119,6 @@ void MixtureComposer::initializeStep()
   // initialize registered mixtures
   for (MixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
   { (*it)->initializeStep();}
-  // compute number of free parameters and of variables
-  setNbFreeParameter(computeNbFreeParameters());
-  setNbVariable(computeNbVariables());
 }
 
 void MixtureComposer::randomInit()
@@ -193,8 +190,8 @@ void MixtureComposer::registerMixture(IMixture* p_mixture)
   p_mixture->setMixtureComposer(this);
   v_mixtures_.push_back(p_mixture);
   // update nbVariables and NbFreeParameters
-  setNbVariable(this->nbVariable()+p_mixture->nbVariable());
-  setNbFreeParameter(this->nbFreeParameter()+p_mixture->nbFreeParameter());
+  setNbVariable(nbVariable()+p_mixture->nbVariable());
+  setNbFreeParameter(nbFreeParameter()+p_mixture->nbFreeParameter());
 }
 
 /* @brief Create the composer using existing data handler and ingredients.
@@ -238,8 +235,8 @@ void MixtureComposer::releaseMixture( String const& idData)
     if ((*it)->idName() == idData)
     {
       // update nbVariable and nbFreeParameters
-       setNbVariable(this->nbVariable()-(*it)->nbVariable());
-       setNbFreeParameter(this->nbFreeParameter()-(*it)->nbFreeParameter());
+       setNbVariable(nbVariable()-(*it)->nbVariable());
+       setNbFreeParameter(nbFreeParameter()-(*it)->nbFreeParameter());
        // remove mixture
        delete (*it);
        v_mixtures_.erase(it);
@@ -299,7 +296,7 @@ void MixtureComposer::releaseMixture(IMixtureManager& manager, String const& idD
  */
 MixtureComposerFixedProp::MixtureComposerFixedProp( int nbSample, int nbCluster)
                                                   : MixtureComposer( nbSample, nbCluster)
-{ setNbFreeParameter(0);}
+{ setNbFreeParameter(0); /* remove the count of the pk parameters */}
 
 /* copy constructor.
  *  @param model the model to copy
@@ -312,19 +309,15 @@ MixtureComposerFixedProp* MixtureComposerFixedProp::create() const
 {
   MixtureComposerFixedProp* p_composer = new MixtureComposerFixedProp(nbSample(), nbCluster());
   p_composer->createComposer(v_mixtures());
-  p_composer->setNbFreeParameter(p_composer->nbFreeParameter()-this->nbCluster()+1);
+  /* remove the count of the pk parameters */
+  p_composer->setNbFreeParameter(p_composer->nbFreeParameter()-(nbCluster()-1));
   return p_composer;
 }
 /* Create a clone of the current model, with ingredients parameters preserved. */
 MixtureComposerFixedProp* MixtureComposerFixedProp::clone() const
 { return new MixtureComposerFixedProp(*this);}
 
-// implement computeNbFreeParameters
-int MixtureComposerFixedProp::computeNbFreeParameters() const
-{ return MixtureComposer::computeNbFreeParameters()-nbCluster()+1;}
-
-
-/* overloading of the computePropotions() method.
+/* overloading of the computeProportions() method.
  * Let them initialized to 1/K. */
 void MixtureComposerFixedProp::pStep() {}
 

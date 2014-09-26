@@ -116,6 +116,8 @@ class Gamma_ak_bjk : public GammaBase< Gamma_ak_bjk<Array> >
 template<class Array>
 void Gamma_ak_bjk<Array>::randomInit()
 {
+    // compute moments
+    this->moments();
   for (int k= baseIdx; k < components().end(); ++k)
   {
     Real value = 0.0;

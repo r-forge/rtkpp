@@ -131,6 +131,8 @@ class Gamma_aj_bjk : public GammaBase< Gamma_aj_bjk<Array> >
 template<class Array>
 void Gamma_aj_bjk<Array>::randomInit()
 {
+    // compute moments
+    this->moments();
   for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
   {
     // random scale for each cluster

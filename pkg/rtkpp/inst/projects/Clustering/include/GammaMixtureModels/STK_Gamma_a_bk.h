@@ -126,6 +126,8 @@ class Gamma_a_bk : public GammaBase< Gamma_a_bk<Array> >
 template<class Array>
 void Gamma_a_bk<Array>::randomInit()
 {
+    // compute moments
+    this->moments();
   // generate scales
   Real value = 0.0;
   for (int k= baseIdx; k < components().end(); ++k)

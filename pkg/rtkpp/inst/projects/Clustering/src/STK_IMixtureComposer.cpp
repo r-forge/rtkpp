@@ -70,10 +70,10 @@ IMixtureComposer::~IMixtureComposer() {}
  **/
 void IMixtureComposer::initializeStep()
 {
-  // initialize IStatModelBase
-  initialize(nbSample(), nbVariable());
-  // initialize IMixtureComposer
+  // (re)initialize the parameters tik, zi etc.
   intializeMixtureParameters();
+  // (re)initialize the likelihood (others parameters are not modified)
+  setLnLikelihood(-Arithmetic<Real>::infinity());
   // compute proportions
   pStep();
 }

@@ -35,7 +35,7 @@ include $(RELATIVEMAKEVARS)
 # main directories
 PROJECTS_DIR  = ./projects/
 RTKPP_BIN_DIR = ./bin/
-RTKPP_LIB_DIR = ./libs/
+RTKPP_LIB_DIR = ./lib/
 
 # check if we are using symoblic paths
 ifneq ($(patsubst $(PROJECTS_DIR)STKernel/../%,%,$(wildcard $(PROJECTS_DIR)STKernel/../Rtk*)),$(patsubst $(PROJECTS_DIR)%,%,$(wildcard $(PROJECTS_DIR)Rtk*)))

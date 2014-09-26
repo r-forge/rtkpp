@@ -55,7 +55,7 @@ NULL
 #'
 #' ## use graphics functions
 #' model <- clusterGamma(data=x, nbCluster=2:3)
-#' 
+#'
 #' \dontrun{
 #' plot(model)
 #' }
@@ -76,34 +76,34 @@ clusterGamma <- function(data, nbCluster=2, modelNames= gammaNames(), strategy=c
   nbClusterMin = min(nbCluster);
   nbClusterMax = max(nbCluster);
   if (nbClusterMin < 2) { stop("The number of clusters must be greater or equal to 2")}
-  
+
   # check criterion
   if(sum(criterion %in% c("BIC","AIC","ICL")) != 1)
   { stop("criterion is not valid. See ?clusterGamma for the list of valid criterion")}
-  
+
   # check data
   data = as.matrix(data)
   if (nrow(data) <= 3*nbClusterMax) {stop("There is not enough individuals (rows) in the data set")}
   if (ncol(data) < 1) {stop("Error: empty data set")}
-  
+
   # check modelNames
   if (is.null(modelNames)) { modelNames = gammaNames()}
   if (!validGammaNames(modelNames))
   { stop("modelNames is not valid. See ?gammaNames for the list of valid model names")}
-  
+
   # check strategy
   if(class(strategy)[1] != "ClusterStrategy")
   {stop("strategy is not a Cluster Stategy class (must be an instance of the class ClusterStrategy).")}
   validObject(strategy);
-  
+
   # Create model
   model = new("ClusterGamma", data)
   model@missings = which(is.na(data), arr.ind=TRUE);
   model@strategy = strategy;
-  
+
   # start estimation of the models
   resFlag = .Call("clusterMixture", model, nbCluster, modelNames, strategy, criterion, PACKAGE="rtkpp")
-  
+
   # set names
   colnames(model@shape)   <- colnames(model@data)
   colnames(model@scale) <- colnames(model@data)
@@ -125,7 +125,7 @@ clusterGamma <- function(data, nbCluster=2, modelNames= gammaNames(), strategy=c
 #' @slot shape  Matrix with the shape of the jth variable in the kth cluster.
 #' @slot scale  Matrix with the scale of the jth variable in the kth cluster.
 #' @seealso [\code{\linkS4class{IClusterModel}}] class
-#' 
+#'
 #' @examples
 #'   getSlots("ClusterGamma")
 #'   data(geyser)
@@ -151,12 +151,12 @@ setClass(
       {stop("shape must have nbVariable columns.")}
       if (nrow(object@shape)!=object@nbCluster)
       {stop("shape must have nbVariable rows.")}
-      
+
       if (ncol(object@scale)!=ncol(object@data))
       {stop("scale must have nbVariable columns.")}
       if (nrow(object@scale)!=object@nbCluster)
       {stop("scale must have nbCluster rows.")}
-      
+
       if (!validGammaNames(object@modelName))
       {stop("Invalid Gamma model name.")}
       return(TRUE)
@@ -273,7 +273,6 @@ setMethod(
 #'   plot(model, c(1,3))
 #'   plot(model, c("Sepal.Length","Sepal.Width"))
 #'   }
-
 #'
 setMethod(
     f="plot",

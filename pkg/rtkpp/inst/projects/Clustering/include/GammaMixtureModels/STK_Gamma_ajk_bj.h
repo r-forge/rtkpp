@@ -136,6 +136,8 @@ class Gamma_ajk_bj : public GammaBase<Gamma_ajk_bj<Array> >
 template<class Array>
 void Gamma_ajk_bj<Array>::randomInit()
 {
+    // compute moments
+    this->moments();
   for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
   {
     Real value =0.;

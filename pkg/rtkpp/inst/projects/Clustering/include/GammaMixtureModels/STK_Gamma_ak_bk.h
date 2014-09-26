@@ -117,6 +117,8 @@ class Gamma_ak_bk : public GammaBase< Gamma_ak_bk<Array> >
 template<class Array>
 void Gamma_ak_bk<Array>::randomInit()
 {
+    // compute moments
+    this->moments();
   for (int k= baseIdx; k < components().end(); ++k)
   {
     Real mean = this->meank(k), variance = this->variancek(k);

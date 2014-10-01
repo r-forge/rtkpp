@@ -37,10 +37,6 @@
 #ifndef STK_ARRAYBASEASSIGN_H
 #define STK_ARRAYBASEASSIGN_H
 
-#include <algorithm>
-#include "STK_Arrays_Util.h"
-#include "Sdk/include/STK_StaticAssert.h"
-
 // this macro will be true if the assignation is correct and false otherwise
 #define CORRECT_ASSIGN(dst,src) \
 ( (    ( dst==Arrays::array2D_ || dst==Arrays::square_) \

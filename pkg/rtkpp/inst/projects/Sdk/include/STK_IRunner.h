@@ -93,6 +93,83 @@ class IRunnerBase
 };
 
 /** @ingroup Sdk
+ *  @brief Abstract class for all running class based on a data set.
+ *
+ *  This Interface is an extension of the IrunnerBase class for runners
+ *  using a data set. The data set to use is not copied and a pointer on the
+ *  data set to used is stored internally.
+ *
+ *  The pure virtual method to implement is inherited from IRunnerBase
+ *  @code
+ *    bool run();
+ *  @endcode
+ *  and the virtual method that can be overloaded are
+ *  @code
+ *    void setData( Array const* p_data);
+ *    void update();
+ *  @endcode
+ *  The @c update() method is called when a new data set is set using the default
+ *  implementation of @c setData.
+ **/
+template < class Array>
+class IRunnerWithData : public IRunnerBase
+{
+  protected:
+    /** default constructor. */
+    inline IRunnerWithData() : p_data_(0) {}
+    /** constructor with a pointer on the constant data set
+     *  @param p_data pointer on the data set to run
+     **/
+    inline IRunnerWithData( Array const* const p_data) : p_data_(p_data) {}
+    /** constructor with a constant reference on the data set
+     *  @param data data set to run
+     **/
+    inline IRunnerWithData( Array const& data) : p_data_(&data) {}
+    /** copy constructor
+     *  @param runner the runner to copy
+     **/
+    inline IRunnerWithData( IRunnerWithData const& runner)
+                          : IRunnerBase(runner)
+                          , p_data_(runner.p_data_)
+    {}
+    /** destructor*/
+    inline ~IRunnerWithData() {}
+
+  public:
+    /** get the data set
+     * @return a constant reference on the data set.
+     **/
+    inline Array const* p_data() const { return p_data_;}
+    /** Set the data set. If the state of the derived runner change when a new
+     *  data set is set the user have to overload the udpate() method.
+     *  @param p_data A pointer on the data set to run
+     **/
+    inline virtual void setData( Array const* p_data)
+    {
+      p_data_ = p_data;
+      update();
+    }
+    /** Set the data set. If the state of the derived runner change when a new
+     *  data set is set the user have to overload the udpate() method.
+     *  @param data The data set to run
+     **/
+    inline virtual void setData( Array const& data)
+    {
+      p_data_ = &data;
+      update();
+    }
+
+  protected:
+    /** A pointer on the original data set. */
+    Array const* p_data_;
+    /** update the runner.
+     *  This virtual method will be called when the state of the runner will
+     *  change, i.e. when a new data set is set. By default do nothing.
+     **/
+    inline virtual void update() {}
+};
+
+/** @ingroup Sdk
  *  @brief Abstract class for all classes making unsupervised learning.
  *
  *  This Interface is designed for unsupervised learning purpose. In a

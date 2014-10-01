@@ -38,9 +38,14 @@
 #define STK_IGAUSSIANMODEL_H
 
 #include "STK_IStatModel.h"
-#include "STatistiK/include/STK_Stat_MultivariateReal.h"
 
+#include "Arrays/include/STK_Array2D.h"
 #include "Arrays/include/STK_Array2DSquare.h"
+#include "Arrays/include/STK_Array2DVector.h"
+#include "Arrays/include/STK_Array2DPoint.h"
+
+#include "STatistiK/include/STK_Stat_Functors.h"
+
 
 namespace STK
 {

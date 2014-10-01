@@ -36,14 +36,14 @@
 #ifndef STK_MATRIXUPPERTRIANGULAR_H
 #define STK_MATRIXUPPERTRIANGULAR_H
 
-
-
-#include "STK_Array2DVector.h"
-#include "STK_Array2DPoint.h"
+#include "STK_IArray2D.h"
 
 namespace STK
 {
+// forward declaration
 template<typename> class Array2DUpperTriangular;
+template<typename> class Array2DPoint;
+template<typename> class Array2DVector;
 
 /** @ingroup Arrays
   * @brief Specialization of the Array2D class for Type values.

@@ -37,7 +37,7 @@
 #define STK_CHAR_H
 
 #include <limits>
-#include "STK_enum.h"
+#include "STK_Base_Util.h"
 
 namespace STK
 {
@@ -152,7 +152,7 @@ struct IdTypeImpl<Char>
   /** Give the IdType of the variable.
    *  @return the IdType
    **/
-  static IdType returnType()  { return(character_);}
+  static Base::IdType returnType()  { return(Base::character_);}
 };
 
 

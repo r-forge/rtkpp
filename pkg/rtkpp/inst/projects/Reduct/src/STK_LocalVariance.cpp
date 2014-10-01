@@ -34,7 +34,7 @@
 
 #include "../include/STK_LocalVariance.h"
 
-#include "Algebra/include/STK_EigenvaluesSymmetric.h"
+#include "Algebra/include/STK_SymEigen.h"
 
 #include "STKernel/include/STK_String.h"
 
@@ -280,19 +280,18 @@ void LocalVariance::computeAxis()
   Range range(p_data_->beginCols(), std::min(dim_, p_data_->sizeCols()));
 
   // compute the eigenvalues decomposition of the local covariance
-  EigenvaluesSymmetric* decomp = new EigenvaluesSymmetric(localCovariance_);
+  SymEigen* decomp = new SymEigen(localCovariance_);
   decomp->run();
   // compute the generalized inverse of the local covariance
-  MatrixSquare* inv_local = decomp->ginv();
+  MatrixSquare inv_local;
+  decomp->ginv(inv_local);
   // we can safely remove the decomposition
   delete decomp;
   // compute the product
   MatrixSquare prod;
-  prod = (*inv_local) * covariance_;
-  // we can safely remove the inverse
-  delete inv_local;
+  prod = inv_local * covariance_;
   // compute the eigenvalues decomposition of the product
-  decomp = new EigenvaluesSymmetric(prod);
+  decomp = new SymEigen(prod);
   decomp->run();
 
   // save axis and index values
@@ -301,7 +300,7 @@ void LocalVariance::computeAxis()
   for (int j=range.begin(); j<=range.lastIdx(); j++)
   {
     axis_.col(j)   = decomp->rotation().col(j);
-    idx_values_[j] = decomp->eigenvalues()[j];
+    idx_values_[j] = decomp->eigenValues()[j];
   }
   // we can safely remove the decomposition
   delete decomp;

@@ -116,8 +116,16 @@ template<class Array>
 void Gaussian_sjk<Array>::randomInit()
 {
   this->randomMean();
-  for (int k= baseIdx; k < components().end(); ++k)
-  { p_param(k)->sigma_ = 1.;}
+  // compute the standard deviation
+  for (int k= baseIdx; k < p_tik()->endCols(); ++k)
+  {
+    ColVector tik(p_tik()->col(k), true); // create a reference
+    p_param(k)->sigma_ = Stat::varianceWithFixedMean(*p_data(), tik, p_param(k)->mean_, false).sqrt();
+  }
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("Gaussian_sjk<Array>::randomInit() done\n");
+  this->writeParameters(stk_cout);
+#endif
 }
 
 /* Compute the weighted means and the weighted standard deviations. */

@@ -63,14 +63,13 @@ AdditiveBSplineRegression::AdditiveBSplineRegression( Matrix const* p_y
 { }
 
 /* virtual destructor. */
-AdditiveBSplineRegression::~AdditiveBSplineRegression()
-{}
+AdditiveBSplineRegression::~AdditiveBSplineRegression() {}
 
 
 /* compute the coefficients of the BSpline basis. This method willl be
  * called in the base class @c IRegression::run()
  **/
-void AdditiveBSplineRegression::preRun()
+void AdditiveBSplineRegression::initializeStep()
 {
   coefs_.setData(p_x_, nbControlPoints_, degree_, position_);
   if (!coefs_.run())
@@ -83,15 +82,12 @@ void AdditiveBSplineRegression::regression()
   // compute X'X
   MatrixSquare prod;
   prod.move(multLeftTranspose(coefs_.coefficients()));
-
   // compute (X'X)^{-1}
   GinvSymmetric inv;
   inv(prod);
   // compute (X'X)^{-1}X'Y
   controlPoints_ = prod * (coefs_.coefficients().transpose() *p_y_->asDerived()) ;
 }
-
-
 
 /* compute the regression function. */
 void AdditiveBSplineRegression::regression(Vector const& weights)

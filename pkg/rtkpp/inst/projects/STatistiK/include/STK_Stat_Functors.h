@@ -542,10 +542,10 @@ struct VarianceSafeOp
 template<class Derived>
 struct VarianceWithFixedMeanOp
 {
-    typedef typename Derived::Type Type;
-    /** constructor */
-    inline VarianceWithFixedMeanOp( ExprBase<Derived> const&  V) :  V_(V.asDerived())
-    { STK_STATICASSERT_ONE_DIMENSION_ONLY(Derived);}
+  typedef typename Derived::Type Type;
+  /** constructor */
+  inline VarianceWithFixedMeanOp( ExprBase<Derived> const&  V) :  V_(V.asDerived())
+  { STK_STATICASSERT_ONE_DIMENSION_ONLY(Derived);}
   /** @return the variance of the variable V with fixed mean.
    *  \f[ \hat{\sigma^2} = \frac{1}{n} \sum_{i=1}^n (V(i) - \mu)^2. \f]
    *  using a compensated algorithm.
@@ -594,23 +594,22 @@ struct VarianceWithFixedMeanOp
       // no samples
       if (V_.empty()) { return Arithmetic<Type>::NA();}
       // sum the weighted samples
-      Type dev, sum = 0.0, var = 0.0, nweight = 0.0, nweight2 = 0.0;
+      Type dev1, sum = 0.0, var = 0.0, sumweights = 0.0, sum2weights = 0.0;
       for (int i=V_.begin(); i<V_.end(); i++)
       {
-        Type weight = w[i];
-        nweight    += weight;
-        nweight2   += weight * weight;
-        sum        += weight*(dev = V_[i]-mu); // deviation from the mean
-        var        += weight*(dev*dev);       // squared value
+        Real weight = std::abs(w[i]); // only positive weights
+        sumweights  += weight;
+        sum2weights += weight * weight;
+        sum         += weight * (dev1 = V_[i]-mu);  // deviation from the mean
+        var         += weight * (dev1*dev1);        // squared deviation
       }
       // compute the variance
       if (unbiased)
       {
-        return (nweight*nweight - nweight2 > 0.) ? (var - sum*sum/nweight)/(nweight - nweight2/nweight)
-                                                 : 0.;
-
+        return (sumweights) ? (var - sum*sum/sumweights)/(sumweights - sum2weights/sumweights)
+                            : 0.;
       }
-      return (nweight) ? (var - sum*sum)/(nweight) : 0.;
+      return (sumweights) ? (var - sum*sum/sumweights)/sumweights : 0.;
     }
   protected:
     Derived const& V_;

@@ -46,7 +46,6 @@
 #include "STK_Traits.h"
 #include "STK_Arrays_Util.h"
 
-
 namespace STK
 {
 

@@ -36,12 +36,17 @@
 #ifndef STK_ARRAY2DSQUARE_H
 #define STK_ARRAY2DSQUARE_H
 
-#include "STK_Array2D.h"
+#include "STK_IArray2D.h"
 
 namespace STK
 {
 
-template<class Type> class Array2DSquare;
+// forward declaration
+template< typename Type> class Array2DSquare;
+template< typename Type> class Array2D;
+template< typename Type> class Array2DPoint;
+template< typename Type> class Array2DVector;
+
 
 typedef Array2DSquare<Real> MatrixSquare;
 

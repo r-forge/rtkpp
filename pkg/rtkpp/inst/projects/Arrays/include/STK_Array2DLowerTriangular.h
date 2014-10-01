@@ -36,15 +36,14 @@
 #ifndef STK_MATRIXLOWERTRIANGULAR_H
 #define STK_MATRIXLOWERTRIANGULAR_H
 
-
-
-
-#include "STK_Array2DVector.h"
-#include "STK_Array2DPoint.h"
+#include "STK_IArray2D.h"
 
 namespace STK
 {
+// forward declaration
 template<typename> class Array2DLowerTriangular;
+template<typename> class Array2DPoint;
+template<typename> class Array2DVector;
 
 /** @ingroup Arrays
   * @brief Specialization of the Array2D class for lower triangular

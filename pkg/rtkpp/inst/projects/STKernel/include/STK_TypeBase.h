@@ -54,7 +54,6 @@
 #ifndef STK_TYPEBASE_H
 #define STK_TYPEBASE_H
 
-#include "STK_Char.h"
 #include "STK_String.h"
 
 #include "STK_Integer.h"

@@ -36,12 +36,7 @@
 #ifndef STK_LAPACK_SYMEIGEN_H
 #define STK_LAPACK_SYMEIGEN_H
 
-#include "STKernel/include/STK_Real.h"
-#include "Sdk/include/STK_IRunner.h"
-
-#include "Arrays/include/STK_Array2DSquare.h"
-#include "Arrays/include/STK_CArraySquare.h"
-#include "Arrays/include/STK_CArrayVector.h"
+#include "STK_ISymEigen.h"
 
 #ifdef STKUSELAPACK
 
@@ -73,77 +68,38 @@ namespace lapack
  *    @brief  SymEigen computes the eigenvalues and optionally the
  *    eigenvectors of a symmetric real matrix using the syevr Lapack routine.
  */
-class SymEigen : public IRunnerBase
+class SymEigen : public ISymEigen
 {
   public:
-    /** @brief Constructor.
-     *  @param data reference on a C-like symmetric square array
-     */
-    SymEigen( CArraySquareXX const& data);
+
     /** @brief Constructor
      *  @param data reference on a symmetric square expression
      */
     template<class Derived>
     SymEigen( ArrayBase<Derived> const& data)
-            : norm_(0.), rank_(0), det_(0.)
-            , range_(data.range()), data_()
-            , eigenVectors_(range_.size(), 0.)
-            , eigenValues_(range_.size(), 0.)
-            , SupporteigenVectors_(2*range_.size(), 0)
+            : ISymEigen(data), range_(data.range())
             , JOBZ('V'), RANGE('A'), UPLO('U')
             , VL(0.0), VU(0.0), IL(0), IU(0)
-            , nbEigenvalues_(range_.size())
-    {
-      data_ = data.asDerived();
-      data_.shift(0);
-      eigenVectors_.shift(0);
-      eigenValues_.shift(0);
-      SupporteigenVectors_.shift(0);
-    }
+    {}
     /** @brief copy constructor
      *  @param eigen the SymEigen to copy
      */
     SymEigen( SymEigen const& eigen);
     /** Destructor. */
-    virtual ~SymEigen();
+    inline virtual ~SymEigen() {}
     /** @brief clone pattern */
-    virtual SymEigen* clone() const;
+    inline virtual SymEigen* clone() const { return new SymEigen(*this);}
     /** @brief Run eigenvalues decomposition
      *  Launch SYEVR LAPACK routine to perform the eigenvalues decomposition.
      *  @return @c true if no error occur, @c false otherwise
      */
     bool run();
-    /** @return the trace norm of the matrix */
-    inline Real norm()  const { return norm_;}
-    /** @return the rank of the matrix */
-    inline int rank()  const { return rank_;}
-    /** @return the determinant of the Matrix */
-    inline Real det()  const { return det_;}
-    /**  @return the rotation matrix */
-    inline CArraySquareXX const& eigenVectors() const{ return eigenVectors_;}
-    /** @return the eigenvalues */
-    inline CVectorX const& eigenValues() const { return eigenValues_;}
 
   protected:
-    /** trace norm */
-    Real norm_;
-    /** rank */
-    Real rank_;
-    /** determinant */
-    Real det_;
     /** range of the original data set. The data_ array is shifted in order
-     *  to get a zero based array, so we need to conserve the origianl range
+     *  to get a zero based array, so we need to conserve the original range.
      **/
    Range range_;
-   /** array with the original data. Will be overwritten. */
-   CArraySquareXX data_;
-   /** Square matrix or the eigenvectors. */
-   CArraySquareXX eigenVectors_;
-   /** Array of the eigenvalues */
-   CVectorX eigenValues_;
-   /** Array for the support of the eigenvectors */
-   CArrayVector<int> SupporteigenVectors_;
-
     /** wrapper of the LAPACK SYEVR routine. Compute the eigenvalues of a symmetric
      *  square matrix.
      *
@@ -309,9 +265,8 @@ class SymEigen : public IRunnerBase
     char JOBZ, RANGE, UPLO;
     Real VL, VU;
     int IL, IU;
-    /** The  total number of eigenvalues found */
-    int nbEigenvalues_;
 };
+
 
 /** @} */
 

@@ -76,21 +76,18 @@ class AdditiveBSplineRegression : public IRegression<Matrix, Matrix, Vector>
     /** give the number of control points of the B-Spline curves.
      *  @return the number of control points of the B-Spline curves
      **/
-    inline int nbControlPoints() const
-    { return nbControlPoints_;}
+    inline int nbControlPoints() const { return nbControlPoints_;}
     /** give the control points.
      *  @return the control points of the B-Spline curves
      **/
-    inline Matrix const& controlPoints() const
-    { return controlPoints_; }
+    inline Matrix const& controlPoints() const { return controlPoints_; }
     /** give the computed coefficients of the B-Spline curves.
      *   This is a matrix of size (p_x_->range(), 0:lastControlPoints).
      *  @return the coefficients of the B-Spline curve
      **/
-    inline Matrix const& coefficients() const
-    { return coefs_.coefficients();}
+    inline Matrix const& coefficients() const { return coefs_.coefficients();}
 
-    /** @return The xxtrapolated values of y from the value @c x.
+    /** @return The extrapolated values of y from the value @c x.
      *  Given the data set @c x will compute the values \f$ y = \psi(x) \hat{\beta} \f$
      *  where \f$ \psi \f$ represents the B-spline basis functions and \f$ \hat{beta} \f$
      *  the estimated coefficients.
@@ -113,7 +110,7 @@ class AdditiveBSplineRegression : public IRegression<Matrix, Matrix, Vector>
     /** compute the coefficients of the BSpline basis. This method will be
      * called in the base class @c IRegression::run()
      **/
-    virtual void preRun();
+    virtual void initializeStep();
 
     /** compute the regression function. */
     virtual void regression();
@@ -126,7 +123,7 @@ class AdditiveBSplineRegression : public IRegression<Matrix, Matrix, Vector>
     /** Compute the number of parameter of the regression function.
      * @return the number of parameter of the regression function
      **/
-    inline virtual int computeNbParameter() const
+    inline virtual int computeNbFreeParameter() const
     { return controlPoints_.sizeCols() * controlPoints_.sizeRows(); }
 };
 

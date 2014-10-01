@@ -121,25 +121,25 @@ class BSplineRegression : public IRegression<Matrix, Vector, Vector>
     /** compute the coefficients of the BSpline basis. This method will be
      *  called in the base class @c IRegression::run()
      **/
-    inline virtual void preRun() {coefs_.run();}
+    inline virtual void initializeStep() {coefs_.run();}
 
     /** compute the regression function. This method will be
-     *  called in the base class @c IRegression::run() after preRun()
+     *  called in the base class @c IRegression::run() after initializeStep()
      **/
     virtual void regression();
     /** compute the regression function. This method will be
-     *  called in the base class @c IRegression::run(weights) after preRun()
+     *  called in the base class @c IRegression::run(weights) after initializeStep()
      *  @param weights the weights of the samples
      **/
     virtual void regression(Vector const& weights);
     /** Compute the predicted outputs by the regression function. This method
-     *  will be called in the base class @c IRegression::run() after preRun()
+     *  will be called in the base class @c IRegression::run() after initializeStep()
      **/
     virtual void prediction();
     /** Compute the number of parameter of the regression function.
      * @return the number of parameter of the regression function
      **/
-    inline virtual int computeNbParameter() const
+    inline virtual int computeNbFreeParameter() const
     { return controlPoints_.sizeCols() * controlPoints_.sizeRows(); }
 
 };

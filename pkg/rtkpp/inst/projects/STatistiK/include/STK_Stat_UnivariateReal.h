@@ -607,7 +607,7 @@ class Univariate<TContainer1D, Real>
       }
       mad_ /= sumweights_;
       uvar_ = (var_ - sum*sum/sumweights_)/(sumweights_ - sum2weights_/sumweights_);
-      var_  = (var_ - sum*sum)/(sumweights_);
+      var_  = (var_ - sum*sum/sumweights_)/sumweights_;
       std_  = sqrt((double)var_);
       ustd_ = sqrt((double)uvar_);
       // if there is variance

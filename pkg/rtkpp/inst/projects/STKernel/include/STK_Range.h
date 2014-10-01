@@ -391,14 +391,15 @@ template<int Size_>
 struct Arithmetic< TRange<Size_> > : public std::numeric_limits< TRange<Size_> >
 {
   /** Adding a Non Available (NA) special number. */
-  static inline  TRange<Size_> NA() throw() { return TRange<Size_>(UnknownSize);}
+  static inline  TRange<Size_> NA() throw()
+  { return TRange<Size_>(std::numeric_limits<int>::min(), std::numeric_limits<int>::min(), 0);}
   /** True if the type has a representation for a "Not Available". */
   static const bool hasNA = true;
   /** Test if x is a Non Available (NA) special number
    *  @param x the Binary number to test.
    **/
   static inline bool isNA(TRange<Size_> const& x) throw()
-  { return (x.size()==UnknownSize);}
+  { return (x.begin() == std::numeric_limits<int>::min());}
   /** test if x is  infinite.
    *  @param x the Binary number to test.
    **/
@@ -416,7 +417,7 @@ template<int Size_>
 struct IdTypeImpl< TRange<Size_> >
 {
   /** @return the IdType of the type TRange. */
-  static inline IdType returnType() { return(range_);}
+  static inline Base::IdType returnType() { return(Base::range_);}
 };
 
 

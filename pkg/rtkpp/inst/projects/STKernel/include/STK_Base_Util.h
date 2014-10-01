@@ -29,14 +29,20 @@
  *
  **/
 
-/** @file STK_enum.h
+/** @file STK_Base_Util.h
  *  @brief In this file we define the enum of the STKernel project.
+ *
+ *  @namespace STK::Base the namespace Base contain all the internal stuff needed
+ *  by the stk++ fundamental types.
  **/
 
-#ifndef STK_ENUM_H
-#define STK_ENUM_H
+#ifndef STK_BASE_UTIL_H
+#define STK_BASE_UTIL_H
 
 namespace STK
+{
+
+namespace Base
 {
 /** @ingroup RTTI
  *  @brief Id for the Type of a variable.
@@ -62,6 +68,8 @@ enum IdType
   unknown_ =__INT_MAX__  ///< Unknown type
 };
 
+} // namespace Base
+
 } // namespace STK
 
-#endif /* STK_ENUM_H */
+#endif /* STK_BASE_UTIL_H */

@@ -36,7 +36,6 @@
 #ifndef STK_ADDITIVEBSPLINECOEFFICIENTS_H
 #define STK_ADDITIVEBSPLINECOEFFICIENTS_H
 
-#include "Sdk/include/STK_IRunner.h"
 #include "STK_BSplineCoefficients.h"
 
 namespace STK

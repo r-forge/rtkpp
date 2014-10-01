@@ -41,8 +41,7 @@
 #include "Sdk/include/STK_Macros.h"
 
 #include "STK_Traits.h"
-
-#include "STKernel/include/STK_Range.h"
+#include "STK_Arrays_Util.h"
 
 namespace STK
 {

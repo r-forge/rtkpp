@@ -84,5 +84,8 @@
 /* constant Arrays */
 #include "../projects/Arrays/include/STK_Const_Arrays.h"
 
+/* display arrays and expressions */
+#include "../projects/Arrays/include/STK_Display.h"
+
 
 #endif  /* ARRAYS_H */

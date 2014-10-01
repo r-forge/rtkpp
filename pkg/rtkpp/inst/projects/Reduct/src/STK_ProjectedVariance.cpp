@@ -31,7 +31,7 @@
 
 #include "../include/STK_ProjectedVariance.h"
 #include "STatistiK/include/STK_Stat_MultivariateReal.h"
-#include "Algebra/include/STK_EigenvaluesSymmetric.h"
+#include "Algebra/include/STK_SymEigen.h"
 
 namespace STK
 {
@@ -82,7 +82,7 @@ void ProjectedVariance::maximizeCriteria(Vector const& weights)
 /* compute axis and index. */
 void ProjectedVariance::computeAxis()
 {
-  EigenvaluesSymmetric eigen(&covariance_);
+  SymEigen eigen(covariance_);
   eigen.run();
 
   // compute the number of axis
@@ -95,7 +95,7 @@ void ProjectedVariance::computeAxis()
   for (int j=begin_axis; j<=last_axis; j++)
   {
     axis_.col(j) = eigen.rotation().col(j);
-    idx_values_[j] = eigen.eigenvalues()[j];
+    idx_values_[j] = eigen.eigenValues()[j];
   }
 }
 

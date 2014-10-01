@@ -38,6 +38,7 @@
 
 #include "Sdk/include/STK_IRunner.h"
 #include "Arrays/include/STK_Array2D.h"
+#include "Arrays/include/STK_Array2DVector.h"
 
 namespace STK
 {

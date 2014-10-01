@@ -39,11 +39,12 @@
 
 #include <cmath>
 
-#include "../../../STKernel/include/STK_Real.h"
-#include "../../../Arrays/include/STK_Const_Arrays.h"
-#include "../../../Arrays/include/STK_Display.h"
-#include "../../../StatModels/include/STK_IMultiParameters.h"
-#include "../../../STatistiK/include/STK_Law_Gamma.h"
+#include "Arrays/include/STK_Const_Arrays.h"
+#include "Arrays/include/STK_Array2DPoint.h"
+#include "Arrays/include/STK_Display.h"
+
+#include "StatModels/include/STK_IMultiParameters.h"
+#include "STatistiK/include/STK_Law_Gamma.h"
 
 namespace STK
 {

@@ -105,7 +105,7 @@ namespace STK
        // get current file position
        std::ios::pos_type pos = is.tellg();
        // failed to read directly the Type value
-       if ((is >> p.x_).fail())
+       if ( (is >> p.x_).fail() )
        {
          p.x_ = Arithmetic<Type>::NA();
          // clear and reset position

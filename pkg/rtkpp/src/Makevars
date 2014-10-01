@@ -30,11 +30,11 @@ STK_FLAGS = -Wno-long-long
 
 ## Use the R_HOME indirection to support installations of multiple R version
 PKG_CXXFLAGS += `${R_HOME}/bin/Rscript -e "Rcpp:::CxxFlags()"` $(STK_FLAGS)
-PKG_LIBS     += `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` $(STKPP_LIB)
+PKG_LIBS     += `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"`  $(LAPACK_LIBS) $(STKPP_LIB)
 PKG_CPPFLAGS += -I../inst/projects/ -I../inst/include/ -DIS_RTKPP_LIB
 
 ## Define STK flags at this level
-STK_CXXFLAGS = $(PKG_CXXFLAGS) -DIS_RTKPP_LIB
+STK_CXXFLAGS = $(PKG_CXXFLAGS) -DIS_RTKPP_LIB  -DSTKUSELAPACK
 
 export
 

@@ -117,7 +117,7 @@ template<>
 struct IdTypeImpl<Real>
 {
   /** Give the IdType of the type Real.*/
-  static IdType returnType() { return(real_);}
+  static Base::IdType returnType() { return(Base::real_);}
 };
 
 #ifdef IS_RTKPP_LIB
@@ -164,7 +164,7 @@ template<>
 struct IdTypeImpl<const Real>
 {
   /** Give the IdType of the type Real.*/
-  static IdType returnType() { return(real_);}
+  static Base::IdType returnType() { return(Base::real_);}
 };
 
 #endif // IS_RTKPP_LIB

@@ -41,13 +41,14 @@
 #ifndef STK_IARRAY2DBASE_H
 #define STK_IARRAY2DBASE_H
 
-#include "STK_ExprBaseVisitor.h"
-#include "STK_ExprBaseDot.h"
+#include "STK_ArrayBase.h"
 #include "STK_ExprBaseProduct.h"
+#include "STK_ExprBaseDot.h"
+#include "STK_ExprBaseVisitor.h"
 
-#include "STK_ArrayBaseInitializer.h"
 #include "STK_ArrayBaseApplier.h"
 #include "STK_ArrayBaseAssign.h"
+#include "STK_ArrayBaseInitializer.h"
 
 #include "STK_Array1D.h"
 

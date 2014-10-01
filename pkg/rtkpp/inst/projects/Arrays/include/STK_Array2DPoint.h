@@ -36,7 +36,7 @@
 #ifndef STK_ARRAY2DPOINT_H
 #define STK_ARRAY2DPOINT_H
 
-#include "STK_Display.h"
+#include "STK_IArray2D.h"
 
 namespace STK
 {

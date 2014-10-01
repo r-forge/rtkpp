@@ -289,7 +289,17 @@ class CAllocatorBase : public ITContainer2D<Derived>
     { this->asDerived().resize1Impl(size);
       return this->asDerived();
     }
-  protected:
+    /** Swapping the pos1 column and the pos2 column.
+     *  @param pos1 position of the first col
+     *  @param pos2 position of the second col
+     **/
+    void swapCols(int pos1, int pos2)
+    {
+      for (int i=this->beginRowsImpl(); i< this->endRowsImpl(); ++i)
+      { std::swap(this->asDerived().elt2Impl(i, pos1),this->asDerived().elt2Impl(i, pos2));}
+    }
+
+    protected:
     /** index of the data set */
     int idx_;
     /** set index of the data. */

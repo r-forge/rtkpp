@@ -34,7 +34,9 @@
 #include "Arrays/include/STK_Array2DUpperTriangular.h"
 #include "Arrays/include/STK_Array2D_Functors.h"
 
+#ifdef STK_AAMODELS_VERBOSE
 #include "Arrays/include/STK_Display.h"
+#endif
 
 #include "Algebra/include/STK_GramSchmidt.h"
 

@@ -91,7 +91,7 @@ template<>
 struct IdTypeImpl<String>
 {
   /** @return the IdType string_ */
-  static IdType returnType() { return(string_);}
+  static Base::IdType returnType() { return(Base::string_);}
 };
 /** @ingroup Base
   * @brief Set a new value to the na String representation and modify
@@ -137,10 +137,12 @@ namespace STK
  *  @return @c true if the conversion succeed, @c false otherwise
  **/
 template <class Type>
-bool stringToType( Type  &t, String const& s
+bool stringToType( Type &t, String const& s
                  , std::ios_base& (*f)(std::ios_base&) = std::dec
                  )
-{ return (istringstream(s) >> f >>  Proxy<Type>(t)).fail();}
+{ istringstream iss(s);
+  return !( iss >> f >> Proxy<Type>(t)).fail();
+}
 
 /** @ingroup Base
  *  @brief convert a String to Type without error check

@@ -61,11 +61,13 @@ template<class Derived, class Rhs> struct  ProductReturnType;
 template<class Derived> class  ArrayInitializer;
 } // namespace STK
 
+#include "STK_ITContainer2D.h"
+
 #include "STKernel/include/STK_Functors.h"
 
 #include "Arrays/include/products/STK_ProductOperators.h"
-
 #include "Arrays/include/operators/STK_TransposeOperator.h"
+#include "Arrays/include/operators/STK_DiagOperator.h"
 #include "Arrays/include/operators/STK_UnaryOperators.h"
 #include "Arrays/include/operators/STK_BinaryOperators.h"
 #include "Arrays/include/operators/STK_DotOperators.h"
@@ -348,6 +350,10 @@ class ExprBase : public ITContainer<Derived, hidden::Traits<Derived>::structure_
     /** @return the transposed expression of this. */
     inline TransposeOperator<Derived> transpose() const
     { return TransposeOperator<Derived> (this->asDerived());}
+
+    /** @return the diagonal expression of this. */
+    inline DiagOperator<Derived> diag() const
+    { return DiagOperator<Derived> (this->asDerived());}
 
     /** @return the j-th column of this. */
     inline ColOperator<Derived> col(int j) const

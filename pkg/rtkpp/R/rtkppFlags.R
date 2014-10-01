@@ -45,7 +45,7 @@
   paste("-I", path1, " -I", path2, if (cpp11) " -std=c++11 " else "", sep="")
 }
 
-# Provide linker flags -- i.e. /path/to/libSTKpp.a.
+# Provide linker flags -- i.e. /path/to/rtkpp.so
 ###########################
 # Adapted from Rcpp package
 ###########################
@@ -53,16 +53,21 @@
 # @keywords internal
 .rtkppLdFlags <- function()
 {
-  path <- .rtkpp.system.file( "lib" )
-  if (.Platform$OS.type=="windows") { path <- .asBuildPath(path) }
-  paste(path, "/libSTKpp.a", sep="")
+  path <- .rtkpp.system.file( "libs" )
+  if (.Platform$OS.type=="windows")
+  { path <- .asBuildPath(path)
+    paste(path, "/rtkpp.dll", sep="")
+  }
+  else
+  { paste(path, "/rtkpp.so", sep="")}
+  path
 }
 
 #' CxxFlags defaults for the rtkpp
 #' @rdname rtkppFlags
 #' @keywords internal
 CxxFlags <- function(cpp11=FALSE) { cat(.rtkppCxxFlags(cpp11=cpp11)) }
-#' LdFlags defaults
+#' LdFlags defaults for the rtkpp package
 #' @rdname rtkppFlags
 #' @keywords internal
 LdFlags <- function() { cat(.rtkppLdFlags()) }

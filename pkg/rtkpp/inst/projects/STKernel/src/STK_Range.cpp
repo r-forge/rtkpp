@@ -56,24 +56,16 @@ istream& operator>> (istream& is, Range& I)
   String str;
   // get first number
   std::getline(is, str, _T(':'));
+  if (!stringToType(I.begin_, str))
+  {
+    I = Arithmetic<Range>::NA();
+    is.seekg(pos); is.setstate(std::ios::failbit);
+    return is;
+  }
   // check if the istream is exhausted
   if (is.eof())
   {
-    int last;
-    if (!stringToType(last, str))
-    { I = Arithmetic<Range>::NA();
-      is.seekg(pos); is.setstate(std::ios::failbit);
-      return is;
-    }
-    // otherwise
-    I.begin_ = last;
-    I.end_   = last+1;
-    return is;
-  }
-  // otherwise we encounter a ":"
-  if (!stringToType(I.begin_, str))
-  { I = Arithmetic<Range>::NA();
-    is.seekg(pos); is.setstate(std::ios::failbit);
+    I.end_ = I.begin_+1;
     return is;
   }
   // skip the current char ":"
@@ -85,10 +77,8 @@ istream& operator>> (istream& is, Range& I)
     is.seekg(pos); is.setstate(std::ios::failbit);
     return is;
   }
-  else
-  {
-    I.end_ =last+1;
-  }
+  else { I.end_ =last+1;}
+  // ok
   return is;
 }
 

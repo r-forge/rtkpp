@@ -98,7 +98,7 @@ template<>
 struct IdTypeImpl<Integer>
 {
   /** Give the IdType of the type Integer. */
-  static inline IdType returnType() { return(integer_);}
+  static inline Base::IdType returnType() { return(Base::integer_);}
 };
 
 #ifdef IS_RTKPP_LIB
@@ -144,7 +144,7 @@ template<>
 struct IdTypeImpl<const Integer>
 {
   /** Give the IdType of the type Integer. */
-  static inline IdType returnType() { return(integer_);}
+  static inline Base::IdType returnType() { return(Base::integer_);}
 };
 
 #endif /* IS_RTKPP_LIB */

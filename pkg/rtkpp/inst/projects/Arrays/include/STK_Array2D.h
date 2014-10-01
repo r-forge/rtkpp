@@ -34,12 +34,15 @@
 #ifndef STK_ARRAY2D_H
 #define STK_ARRAY2D_H
 
-#include "STK_Array2DVector.h"
-#include "STK_Array2DPoint.h"
+#include "STK_IArray2D.h"
 
 namespace STK
 {
-template<typename> class Array2D;
+// forward declaration
+template< typename Type> class Array2D;
+template< typename Type> class Array2DPoint;
+template< typename Type> class Array2DVector;
+
 /** @ingroup Arrays
   * @brief Specialization of the Array2D class for Real values.
   *

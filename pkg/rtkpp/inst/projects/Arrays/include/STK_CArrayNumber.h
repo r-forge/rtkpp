@@ -36,7 +36,6 @@
 #define STK_CARRAYNUMBER_H
 
 #include "STK_ICArray.h"
-#include "STK_Display.h"
 
 namespace STK
 {

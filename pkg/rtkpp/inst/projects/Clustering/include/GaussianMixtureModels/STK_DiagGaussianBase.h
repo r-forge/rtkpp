@@ -130,11 +130,17 @@ class DiagGaussianBase : public IMixtureModel<Derived >
 template<class Derived>
 void DiagGaussianBase<Derived>::randomMean()
 {
-  for (int k= baseIdx; k < p_tik()->endCols(); ++k)
+  // indexes array
+  Array2DVector<int> indexes(p_data()->rows());
+  for(int i=p_data()->beginRows(); i< p_data()->endRows(); ++i) { indexes[i] = i;}
+  // sample without repetition
+  for (int  k= 0, last = indexes.lastIdx(); k < p_tik()->sizeCols(); ++k, --last)
   {
     // random number in [0, size[
-    int i = p_data()->beginRows() + std::floor(Law::Uniform::rand(0.,1.)*this->nbSample());
-    p_param(k)->mean_.copy(p_data()->row(i));
+    int i = indexes.begin() + std::floor(Law::Uniform::rand(0., this->nbSample()-k));
+    p_param(baseIdx + k)->mean_.copy(p_data()->row(indexes[i]));
+    // exchange
+    indexes.swap(i, last);
   }
 }
 
@@ -143,9 +149,8 @@ bool DiagGaussianBase<Derived>::updateMean()
 {
   for (int k= baseIdx; k < p_tik()->endCols(); ++k)
   {
-    ColVector tik(p_tik()->col(k), true); // create a reference
-    p_param(k)->mean_.move(Stat::mean(*p_data(), tik));
-    if (p_param(k)->mean_.nbAvailableValues() != p_param(k)->mean_.size()) return false;
+    for (int j=p_data()->beginCols(); j< p_data()->endCols(); ++j)
+    { p_param(k)->mean_[j] = p_data()->col(j).wmean(p_tik()->col(k));}
   }
   return true;
 }

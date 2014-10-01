@@ -84,7 +84,7 @@ template<>
 struct IdTypeImpl<Binary>
 {
   /** @return the IdType of the type Binary. */
-  static inline IdType returnType() { return(binary_);}
+  static inline Base::IdType returnType() { return(Base::binary_);}
 };
 /** @ingroup stream
  *  @brief Overloading of the ostream << for the type Binary.

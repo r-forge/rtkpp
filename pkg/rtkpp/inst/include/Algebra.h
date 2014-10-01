@@ -45,7 +45,7 @@
  *    @li The Qr decomposition of an arbitrary matrix of Real, @sa Qr
  *    @li The svd decomposition of an arbitrary matrix of real, @sa Svd
  *    @li An Eigenvalue decomposition for symmetric (square) matrices and a
- *    generalized inverse method for such matrices, @sa EigenvaluesSymmetric.
+ *    generalized inverse method for such matrices, @sa SymEigen.
  *
  * It propose also some set of method for performing
  * @li Givens rotation on a matrix
@@ -53,7 +53,7 @@
  * @li Householder rotation of a Matrix.
  *
  * @note these classes will be abandonned soon and replaced by lapack wrappers.
- * They can only be used (except @sa EigenvaluesSymmetric) with 1-based
+ * They can only be used (except @sa SymEigen) with 1-based
  * arrays.
  **/
 
@@ -72,7 +72,7 @@
 /* The Algebra classes. */
 #include "../projects/Algebra/include/STK_Qr.h"
 #include "../projects/Algebra/include/STK_Svd.h"
-#include "../projects/Algebra/include/STK_EigenvaluesSymmetric.h"
+#include "../projects/Algebra/include/STK_SymEigen.h"
 #include "../projects/Algebra/include/STK_GinvSymmetric.h"
 
 // the lapack classes

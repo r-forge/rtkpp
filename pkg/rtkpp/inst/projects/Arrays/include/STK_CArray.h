@@ -36,7 +36,6 @@
 #define STK_CARRAY_H
 
 #include "STK_ICArray.h"
-#include "STK_Display.h"
 
 namespace STK
 {

@@ -40,6 +40,7 @@
 #ifndef STK_DENSEARRAYBASE_H
 #define STK_DENSEARRAYBASE_H
 
+#include "STK_ArrayBase.h"
 #include "STK_ExprBaseVisitor.h"
 #include "STK_ExprBaseDot.h"
 #include "STK_ExprBaseProduct.h"
@@ -202,6 +203,25 @@ class ICArray : public ArrayBase<Derived>
 
     /** @return the transposed CArray. */
     inline Transposed transpose() const { return Transposed(allocator_.transpose());}
+    /** swap two elements: only for vectors an points. */
+    inline void swap(int i, int  j) { std::swap(this->elt(i), this->elt(j)); }
+    /** Swapping the pos1 column and the pos2 column.
+     *  @param pos1 position of the first col
+     *  @param pos2 position of the second col
+     **/
+    void swapCols(int pos1, int pos2)
+    {
+      if (this->beginCols() > pos1)
+      { STKOUT_OF_RANGE_2ARG(ICArray::swapCols,pos1, pos2,beginCols() >pos1);}
+      if (this->lastIdxCols() < pos1)
+      { STKOUT_OF_RANGE_2ARG(ICArray::swapCols,pos1, pos2,lastIdxCols() <pos1);}
+      if (this->beginCols() > pos2)
+      { STKOUT_OF_RANGE_2ARG(ICArray::swapCols,pos1, pos2,beginCols() >pos2);}
+      if (this->lastIdxCols() < pos2)
+      { STKOUT_OF_RANGE_2ARG(ICArray::swapCols,pos1, pos2,lastIdxCols() <pos2);}
+      // swap allocator
+      allocator_.swapCols(pos1, pos2);
+    }
     /** exchange this with T.
      *  @param T the container to exchange with this
      **/

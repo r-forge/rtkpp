@@ -38,9 +38,11 @@
 
 #include "StatModels/include/STK_IStatModelBase.h"
 #include "STK_Clust_Util.h"
+
 #include "Arrays/include/STK_CArrayPoint.h"
 #include "Arrays/include/STK_CArrayVector.h"
 #include "Arrays/include/STK_Array2D.h"
+#include "Arrays/include/STK_Array2DPoint.h"
 
 namespace STK
 {

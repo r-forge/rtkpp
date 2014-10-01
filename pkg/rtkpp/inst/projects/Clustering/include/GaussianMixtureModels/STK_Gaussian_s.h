@@ -125,7 +125,18 @@ template<class Array>
 void Gaussian_s<Array>::randomInit()
 {
   this->randomMean();
-  sigma_ = 1.;
+  // compute the standard deviation
+  Real variance = 0.0;
+  for (int k= baseIdx; k < p_tik()->endCols(); ++k)
+  {
+    variance += ( p_tik()->col(k).transpose()
+                 * (*p_data() - (Const::Vector<Real>(p_data()->rows()) * p_param(k)->mean_)
+                   ).square()
+                ).sum();
+  }
+  sigma_ = ((variance<=0) || !Arithmetic<Real>::isFinite(variance))
+           ? 1.
+           : std::sqrt(variance/(this->nbSample()*this->nbVariable()));
 }
 
 /* Compute the weighted mean and the common standard deviation. */

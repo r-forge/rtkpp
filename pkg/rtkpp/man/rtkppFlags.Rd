@@ -11,7 +11,7 @@ LdFlags()
 \description{
 CxxFlags defaults for the rtkpp
 
-LdFlags defaults
+LdFlags defaults for the rtkpp package
 }
 \keyword{internal}
 

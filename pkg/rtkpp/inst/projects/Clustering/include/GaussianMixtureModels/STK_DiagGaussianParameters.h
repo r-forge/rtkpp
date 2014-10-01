@@ -39,10 +39,12 @@
 
 #include <cmath>
 
-#include "../../../Arrays/include/STK_Const_Arrays.h"
-#include "../../../Arrays/include/STK_Display.h"
-#include "../../../StatModels/include/STK_IMultiParameters.h"
-#include "../../../STatistiK/include/STK_Law_Normal.h"
+#include "Arrays/include/STK_Const_Arrays.h"
+#include "Arrays/include/STK_Array2DPoint.h"
+#include "Arrays/include/STK_Display.h"
+
+#include "StatModels/include/STK_IMultiParameters.h"
+#include "STatistiK/include/STK_Law_Normal.h"
 
 namespace STK
 {

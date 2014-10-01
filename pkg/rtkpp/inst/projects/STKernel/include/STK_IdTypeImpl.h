@@ -58,7 +58,7 @@ template<typename TYPE>
 struct IdTypeImpl
 {
   /**@return the IdType of the variable (unknown by default). */
-  static IdType returnType() { return(unknown_);}
+  static Base::IdType returnType() { return(Base::unknown_);}
 };
 
 } // namespace STK

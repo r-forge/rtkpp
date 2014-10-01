@@ -37,8 +37,8 @@
 #include "../include/STK_GaussianModel.h"
 
 #include "STatistiK/include/STK_Stat_BivariateRealReal.h"
-
 #include "STatistiK/include/STK_Law_MultiNormal.h"
+#include "STatistiK/include/STK_Stat_MultivariateReal.h"
 
 namespace STK
 {
@@ -101,5 +101,14 @@ bool GaussianModel::run(Vector const& weights)
   // everything ok
   return true;
 }
+
+/** compute the empirical covariance matrix. */
+void GaussianModel::compCovariance()
+{ Stat::covariance(*p_data_,cov_);}
+/** compute the empirical weighted covariance matrix.
+ * @param weights the weights of the samples
+ **/
+void GaussianModel::compWeightedCovariance(Matrix::Col const& weights)
+{ Stat::covariance(*p_data_, weights, cov_);}
 
 } // namespace STK

@@ -128,7 +128,17 @@ void Gaussian_sj<Array>::randomInit()
 {
   // compute the initial mean
   this->randomMean();
-  sigma_ = 1.;
+  // compute the standard deviation
+  Array2DPoint<Real> variance(p_data()->cols(), 0.);
+  for (int k= baseIdx; k < components().end(); ++k)
+  {
+    variance += p_tik()->col(k).transpose()
+               *(*p_data() - (Const::Vector<Real>(p_data()->rows()) * p_param(k)->mean_)
+                ).square()
+                ;
+  }
+  // compute the standard deviation
+  sigma_ = (variance /= this->nbSample()).sqrt();
 }
 
 /* Compute the weighted mean and the common standard deviation. */

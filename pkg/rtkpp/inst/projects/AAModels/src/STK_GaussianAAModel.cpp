@@ -115,7 +115,7 @@ void GaussianAAModel::computeModelParameters()
 void GaussianAAModel::computeNbFreeParameters()
 {
   // get number of free parameters
-  setNbFreeParameter(p_regressor_->nbParameter() + dim() * (dim()+1)/2 + 1);
+  setNbFreeParameter(p_regressor_->nbFreeParameter() + dim() * (dim()+1)/2 + 1);
 }
 
 /* compute the ln-likelihood of the model */
@@ -126,7 +126,7 @@ void GaussianAAModel::computeProjectedLnLikelihood()
 #endif
 
   // range of the column to use
-  Range cols = Range(dim())+(p_reduced_->beginCols()-1);
+  Range cols = Range(p_reduced_->beginCols(), dim());
 
   // create a reference with the first columns of the reduced data
   Matrix reducedData(*p_reduced_, p_reduced_->rows(), cols);

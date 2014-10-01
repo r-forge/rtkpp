@@ -33,7 +33,6 @@
  **/
 
 #include "../include/STK_DataHandler.h"
-#include "Arrays/include/STK_Display.h"
 
 namespace STK
 {

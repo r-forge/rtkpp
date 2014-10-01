@@ -39,7 +39,7 @@
 #define STK_ITMULTILAW_H
 
 #include "STKernel/include/STK_Real.h"
-#include "Arrays/include/STK_Array2DPoint.h"
+#include "Arrays/include/STK_Array1D.h"
 #include "STK_Law_ILawBase.h"
 
 namespace STK
@@ -117,7 +117,7 @@ class JointProbability: public IMultiLaw<RowVector>
     /** destructor */
     virtual ~JointProbability() {}
     /** @return the array with the marginals laws */
-    Array2DPoint<Law> const& JointLaw() const { return jointLaw_;}
+    Array1D<Law> const& JointLaw() const { return jointLaw_;}
 
     /** @return the jth marginal law */
     Law const& law(int const& j) const { return jointLaw_[j];}
@@ -164,7 +164,7 @@ class JointProbability: public IMultiLaw<RowVector>
     }
   protected:
     /** Array with the marginal laws */
-    Array2DPoint<Law> jointLaw_;
+    Array1D<Law> jointLaw_;
 };
 
 

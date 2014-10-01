@@ -36,7 +36,9 @@
 #ifndef STK_IAAMODEL_H
 #define STK_IAAMODEL_H
 
-#include "Arrays/include/STK_Array2DSquare.h"
+#include "Arrays/include/STK_Array2D.h"
+#include "Arrays/include/STK_Array2DPoint.h"
+#include "Arrays/include/STK_Array2DVector.h"
 
 namespace STK
 {

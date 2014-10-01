@@ -81,7 +81,7 @@ class MultidimRegression : public IRegression<Matrix, Matrix, Vector>
     /** Compute the number of parameter of the regression function.
      * @return the number of parameter of the regression function
      **/
-    inline virtual int computeNbParameter() const
+    inline virtual int computeNbFreeParameter() const
     { return coefs_.sizeCols() * coefs_.sizeRows(); }
 };
 

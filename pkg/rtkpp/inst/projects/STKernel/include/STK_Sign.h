@@ -91,7 +91,7 @@ template<>
 struct IdTypeImpl<Sign>
 {
   /** Give the IdType of the type Sign. */
-  static IdType returnType() { return(sign_);}
+  static Base::IdType returnType() { return(Base::sign_);}
 };
 
 /** @ingroup stream

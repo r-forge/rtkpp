@@ -38,7 +38,6 @@
 #define STK_GAUSSIANMODEL_H
 
 #include "STK_IGaussianModel.h"
-#include "../../../include/Arrays.h"
 
 namespace STK
 {
@@ -77,13 +76,11 @@ class GaussianModel : public IGaussianModel<Matrix>
     /** Matrix of the empirical covaiance */
     MatrixSquare cov_;
     /** compute the empirical covariance matrix. */
-    virtual inline void compCovariance()
-    { Stat::covariance(*p_data_,cov_);}
+    virtual void compCovariance();
     /** compute the empirical weighted covariance matrix.
      * @param weights the weights of the samples
      **/
-    virtual inline void compWeightedCovariance(Matrix::Col const& weights)
-    { Stat::covariance(*p_data_, weights, cov_);}
+    virtual void compWeightedCovariance(Matrix::Col const& weights);
 };
 
 } // namespace STK

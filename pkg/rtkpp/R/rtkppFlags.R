@@ -25,6 +25,15 @@
 # Some part of the code below is an adaptation of the code from the
 # Rcpp package.
 #-----------------------------------------------------------------------
+#' CxxFlags defaults for the rtkpp
+#' @rdname rtkppFlags
+#' @keywords internal
+CxxFlags <- function(cpp11=FALSE) { cat(.rtkppCxxFlags(cpp11=cpp11)) }
+#' LdFlags defaults for the rtkpp package
+#' @rdname rtkppFlags
+#' @keywords internal
+LdFlags <- function() { cat(.rtkppLdFlags()) }
+
 # make sure system.file returns an absolute path
 ###########################
 # Adapted from Rcpp package
@@ -53,24 +62,13 @@
 # @keywords internal
 .rtkppLdFlags <- function()
 {
-  path <- .rtkpp.system.file( "libs" )
-  if (.Platform$OS.type=="windows")
-  { path <- .asBuildPath(path)
-    paste(path, "/rtkpp.dll", sep="")
+  if (nzchar(.Platform$r_arch))
+  {	## eg amd64, ia64, mips
+    path <- .rtkpp.system.file("libs",.Platform$r_arch)
   }
-  else
-  { paste(path, "/rtkpp.so", sep="")}
-  path
+  else { path <- .rtkpp.system.file("libs") }
+  paste("-L", path, " -lrtkpp", sep="")
 }
-
-#' CxxFlags defaults for the rtkpp
-#' @rdname rtkppFlags
-#' @keywords internal
-CxxFlags <- function(cpp11=FALSE) { cat(.rtkppCxxFlags(cpp11=cpp11)) }
-#' LdFlags defaults for the rtkpp package
-#' @rdname rtkppFlags
-#' @keywords internal
-LdFlags <- function() { cat(.rtkppLdFlags()) }
 
 # Transform a path for passing to the build system on the command line.
 # Leave paths alone for posix. For Windows, mirror the behavior of the

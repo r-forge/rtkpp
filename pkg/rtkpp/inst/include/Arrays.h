@@ -30,12 +30,11 @@
  **/
 
 /** @file Arrays.h
- *  @brief This file include all the other header files of the
- *  project Arays.
+ *  @brief This file include all the other header files of the project Arrays.
  **/
 
 /**
- * @defgroup Arrays Concrete implementation of the TContainer Interfaces
+ * @defgroup Arrays Arrays and Expressions
  * @brief The Arrays project provides two kinds of arrays for storing
  * in a two entries arrays (matrices) numeric data.
  *
@@ -43,14 +42,14 @@
  * templated by the Type of numeric value you want to use. Some predefined type
  * have been defined for the Real type case.
  *
- * There is two kind of container that have been defined and implemented in the
+ * There is two kind of containers that have been defined and implemented in the
  * STK++ project:
  * @li the old set of arrays: Array2D, Array2DVector (column oriented vectors),
  * Array2DPoint (row oriented vector), Array2DUpperTriangular,
  * Array2DLowerTriangular, Array2DDiagonal.
  * @li the new set of Arrays: CArray
  *
- * The storing scheme of the CArray allowq to use them as C-like array
+ * The storing scheme of the CArray allows to use them as C-like array
  * (as its name indicates) and thus to interface them to well known library
  * like Lapack.
  **/

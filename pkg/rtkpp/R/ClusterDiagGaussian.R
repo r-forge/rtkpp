@@ -52,7 +52,7 @@ NULL
 #' x[round(runif(5,1,nrow(geyser))), 1] <- NA
 #' x[round(runif(5,1,nrow(geyser))), 2] <- NA
 #' ## with default values
-#' model <- clusterDiagGaussian(data=x, nbCluster=2:3)
+#' model <- clusterDiagGaussian(data=x, nbCluster=2:3, strategy = fastClusterStrategy())
 #'
 #' ## use graphics functions
 #' \dontrun{
@@ -262,7 +262,7 @@ setMethod(
 #' @examples
 #'   ## the famous iris data set
 #'   data(iris)
-#'   model <- clusterDiagGaussian(iris[1:4],3)
+#'   model <- clusterDiagGaussian(iris[1:4], 3, strategy = fastClusterStrategy())
 #' \dontrun{
 #'   plot(model)
 #'   plot(model, c(1,3))

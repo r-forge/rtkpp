@@ -22,7 +22,7 @@ using the estimated parameters and partition.
 \examples{
 ## the famous iris data set
   data(iris)
-  model <- clusterDiagGaussian(iris[1:4],3)
+  model <- clusterDiagGaussian(iris[1:4], 3, strategy = fastClusterStrategy())
 \dontrun{
   plot(model)
   plot(model, c(1,3))

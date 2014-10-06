@@ -49,7 +49,7 @@ NULL
 #' an empty model is returned.
 #'
 #' @param nbInit Integer defining the number of initialization to try. Default value: 3.
-#' @param initMethod Character string with the initialisation method.
+#' @param initMethod Character string with the initialization method. Default is "random".
 #' @param initAlgo Character string with the algorithm to use in the initialization stage.
 #' Default value: "SEM"
 #' @param nbInitIteration Integer defining the maximal number of iterations in initialization algorithm
@@ -100,6 +100,26 @@ clusterStrategy <- function( nbTry =1
   longAlgo = clusterAlgo(longRunAlgo, nbLongIteration, longEpsilon);
   # create strategy
   new("ClusterStrategy", nbTry =nbTry, nbShortRun =nbShortRun, initMethod =initMethod, shortAlgo =shortAlgo, longAlgo =longAlgo);
+}
+
+#-----------------------------------------------------------------------
+#' @description 
+#' \code{fastClusterStrategy()} create an instance of [\code{\linkS4class{ClusterStrategy}}] for impatient user.
+#' @examples
+#'    fastClusterStrategy()
+#'
+#' @rdname clusterStrategy
+#' @export
+fastClusterStrategy <- function()
+{
+  # create init
+  initMethod = clusterInit("class", 3, "SEM", 5, 0.01);
+  # create shortAlgo
+  shortAlgo = clusterAlgo("CEM", 10, 0.001);
+  # create longAlgo
+  longAlgo = clusterAlgo("EM", 100, 1e-07);
+  # create strategy
+  new("ClusterStrategy", nbTry= 1, nbShortRun= 2, initMethod= initMethod, shortAlgo= shortAlgo, longAlgo= longAlgo);
 }
 
 #-----------------------------------------------------------------------

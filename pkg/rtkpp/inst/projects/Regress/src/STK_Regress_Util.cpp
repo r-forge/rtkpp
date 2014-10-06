@@ -48,7 +48,7 @@ namespace Regress
  *  @return the TypeRegression represented by the String @c type. if the string
  *  does not match any known name, the @c unknown_ type is returned.
  **/
-TypeRegression StringToTypeRegression( String const& type)
+TypeRegression stringToTypeRegression( String const& type)
 {
   if (toUpperString(type) == toUpperString(_T("unknown"))) return unknown_;
   if (toUpperString(type) == toUpperString(_T("linear")))  return linear_;

@@ -35,7 +35,7 @@
  *  @brief In this file we define the main constant and method needed when
  *  importing data.
  *
- *  @namespace STK::import The import namespace contains the constants and
+ *  @namespace STK::Import The import namespace contains the constants and
  *  global functions used in the DManager project when importing data in STK
  *  containers.
  **/
@@ -74,13 +74,13 @@ namespace Import
    *  @return the TypeImport represented by the String @c type. if the string
    *  does not match any known name, the @c unknown_ type is returned.
    **/
-  TypeImport StringToTypeImport( String const& type);
+  TypeImport stringToTypeImport( String const& type);
 
   /** convert a TypeImport to a String.
    *  @param type the type of import we want to use
    *  @return the string associated to this type.
    **/
-  String TypeImportToString( TypeImport const& type);
+  String typeImportToString( TypeImport const& type);
 }
 
 }

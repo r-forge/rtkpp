@@ -44,7 +44,7 @@ namespace STK
 namespace Model
 {
 
-TypeCriterion StringToTypeCriterion(const String & type)
+TypeCriterion stringToTypeCriterion(const String & type)
 {
   if (toUpperString(type) == toUpperString(_T("AIC")))
     return aic_;
@@ -56,7 +56,7 @@ TypeCriterion StringToTypeCriterion(const String & type)
 }
 
 
-String TypeCriterionToString(const TypeCriterion & type)
+String typeCriterionToString(const TypeCriterion & type)
 {
   switch (type)
   {

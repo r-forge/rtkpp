@@ -32,6 +32,9 @@
 /** @file STK_Clust_Util.h
  *  @brief In this file we define the enum, constants and utilities functions
  *  of the Clustering project.
+ *
+ *  @namespace Clust The namespace Clust enclose all the enum and utilities functions
+ *  needed by the Clustering project.
  **/
 
 

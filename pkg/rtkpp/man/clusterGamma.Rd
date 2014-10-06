@@ -40,7 +40,7 @@ x[round(runif(5,1,nrow(geyser))), 1] <- NA
 x[round(runif(5,1,nrow(geyser))), 2] <- NA
 
 ## use graphics functions
-model <- clusterGamma(data=x, nbCluster=2:3)
+model <- clusterGamma(data=x, nbCluster=2:3, strategy = fastClusterStrategy())
 
 \dontrun{
 plot(model)

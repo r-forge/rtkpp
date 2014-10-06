@@ -28,7 +28,7 @@
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
 
-/** @file STK_Law_Exponential.h
+/** @file STK_Law_Exponential.cpp
  *  @brief In this file we implement the exponential law.
  **/
 

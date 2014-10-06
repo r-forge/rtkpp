@@ -29,7 +29,9 @@
  **/
 
 /** @file STK_lapack_SymEigen.h
- *  @brief In this file .
+ *  @brief In this file we define the enclosing class of the syevr lapck routine.
+ *
+ *  @namespace STK::lapack namespace enclosing the wrappers of the lapack routines.
  **/
 
 

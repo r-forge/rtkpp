@@ -33,6 +33,9 @@
 /** @file STK_Model_Util.h
  *  @brief In this file we define the constant and utilities methods used in
  *  the project Model.
+ *
+ *  @namespace Model namespace enclosing thye enum and utilities function of the
+ *  StatModel project.
  **/
 
 #ifndef STK_MODEL_UTIL_H
@@ -63,14 +66,14 @@ enum TypeCriterion
  *  @return the TypeCriterion represented by the String @c type. if the string
  *  does not match any known name, the @c unknown_ type is returned.
  **/
-TypeCriterion StringToTypeCriterion( String const& type);
+TypeCriterion stringToTypeCriterion( String const& type);
 
 /** @ingroup StatModels
  *  convert a TypeCriterion to a String.
  *  @param type the type of criterion we want to convert
  *  @return the string associated to this type.
  **/
-String TypeCriterionToString( TypeCriterion const& type);
+String typeCriterionToString( TypeCriterion const& type);
 
 
 } // namespace Model

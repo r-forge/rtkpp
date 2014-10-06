@@ -25,16 +25,16 @@ LIB_STKPP_A = libSTKpp.a
 STKPP_DIR = ../inst
 STKPP_LIB = $(STKPP_DIR)/lib/$(LIB_STKPP_A)
 
-STK_FLAGS = -Wno-long-long
+# STK_FLAGS = -Wno-long-long
 ## -march=native -funroll-loops ## optimisation does not work under window
 
 ## Use the R_HOME indirection to support installations of multiple R version
 PKG_CXXFLAGS += `${R_HOME}/bin/Rscript -e "Rcpp:::CxxFlags()"` $(STK_FLAGS)
-PKG_LIBS     += `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"`  $(LAPACK_LIBS) $(STKPP_LIB)
 PKG_CPPFLAGS += -I../inst/projects/ -I../inst/include/ -DIS_RTKPP_LIB
+PKG_LIBS     += `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` $(LAPACK_LIBS) $(FLIBS) $(STKPP_LIB)
 
 ## Define STK flags at this level
-STK_CXXFLAGS = $(PKG_CXXFLAGS) -DIS_RTKPP_LIB  -DSTKUSELAPACK
+STK_CXXFLAGS = $(PKG_CXXFLAGS) -DIS_RTKPP_LIB -DSTKUSELAPACK
 
 export
 

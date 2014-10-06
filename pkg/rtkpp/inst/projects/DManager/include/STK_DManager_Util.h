@@ -94,7 +94,7 @@ enum TypeDataFile
  *  @return the TypeDataFile represented by the String @c type. if the string
  *  does not match any known name, the @c unknown_ type is returned.
  **/
-TypeDataFile StringToTypeDataFile( String const& type);
+TypeDataFile stringToTypeDataFile( String const& type);
 
 /** @ingroup DManager
  *  convert a TypeDataFile to a String.

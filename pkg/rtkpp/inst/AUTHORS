@@ -3,10 +3,16 @@ Authors of STK++.
 STK++ Team
 ----------
 The Statistical ToolKit Project is developped by:
-Serge Iovleff      <serge.iovleff AT stkpp.org>
+Serge Iovleff      <serge DOT iovl... AT stkpp DOT org>
+Quentin Grimonprez <Quentin DOT Grim... AT inria DOT fr>
+Parmeet Bhatia     <bhatia DOT parm... AT gmail DOT com>
+Vincent Kubicki     <Vincent DOT Kubi... AT gmail DOT com>
 
 The first version of the CMakeLists.txt files have been released by Rémi Lebret
-<Remi.Lebret AT gmail.com>
+<Remi DOT Leb... AT gmail DOT com>
+
+The first version of the Clustering project have been written by Parmeet Bhatia
+
 
 Mersenne Twister
 ----------------

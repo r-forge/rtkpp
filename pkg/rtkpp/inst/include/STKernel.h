@@ -31,18 +31,13 @@
 /** @file STKernel.h
  *  @brief This file include all the header files of the project STKernel.
  *
- **/
-
-/**
  * @defgroup STKernel Kernel tools
  * @brief The STKernel project is the low-level core library that forms the
  * basis of the project. It provides data class handling for C++.
  * It contains the sub-projects:
  * - @ref Base
  * - @ref Functors
- **/
-
-/**
+ *
  *  @ingroup STKernel
  *  @defgroup Base Fundamental data types
  *  @brief In this subproject we define the fundamental types.
@@ -66,11 +61,16 @@
  * </ul>
  **/
 
-/**
- *  @ingroup STKernel
+/** @ingroup STKernel
  *  @defgroup Functors Functors
  *  In the Functors subproject, we implement the main functors that can be used
  *  throughout the STK++ project, especially in the Arrays project.
+ **/
+
+/** @ingroup STKernel
+ *  @namespace STK::Base
+ *  @brief the namespace Base contain all the internal stuff needed by the STK++
+ *  fundamental types.
  **/
 
 #ifndef STKERNEL_H

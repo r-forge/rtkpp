@@ -449,7 +449,7 @@ class IArray1D  : public ITContainer1D<Derived>
       // Nothing to do for ref
       if (this->isRef()) return;
       // free allocated memory
-      this->freeData();
+      this->free();
       // set capacity to default
       this->setCapacity();
       // set range of the Cols to default

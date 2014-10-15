@@ -79,7 +79,7 @@ struct Traits< ExprWrapper<WrappedExpr> >
  * @tparam WrappedExpr the equivalent expression wrapped
  *
  * This class represents a matrix or vector expression mapping an existing
- * expression. It can be used to let stk++ interface without any overhead with
+ * expression. It can be used to let STK++ interface without any overhead with
  * non-stk expressions, such as templated expression from other libraries.
  *
  * The pseudo virtual function to implement by the wrapped expression
@@ -204,7 +204,7 @@ struct Traits< ArrayWrapper<WrappedArray> >
  * @tparam WrappedArray the equivalent array wrapped
  *
  * This class represents a matrix or vector wrapping an existing array of data.
- * It can be used to let stk++ interface without any overhead with non-stk data
+ * It can be used to let STK++ interface without any overhead with non-stk data
  * structures, such as plain C arrays or structures from other libraries.
  **/
 template<class WrappedArray>

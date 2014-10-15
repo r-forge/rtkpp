@@ -49,7 +49,7 @@ namespace STK
  enum Sign
  { negative_ =-1, ///< negative sign
    positive_ = 1, ///< positive sign
-   signNA_ = __INT_MAX__  ///< Not Available value
+   signNA_ = INT_MIN  ///< Not Available value
  };
 
 // forward declaration

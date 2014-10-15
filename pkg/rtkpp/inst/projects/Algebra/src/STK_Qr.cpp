@@ -36,17 +36,16 @@
 #include "../include/STK_Qr.h"
 
 #include "Arrays/include/STK_Array2DPoint.h"
-#include "Arrays/include/STK_Array2D_Functors.h"
+//#include "Arrays/include/STK_Array2D_Functors.h"
 
 #include "../include/STK_Householder.h"
 #include "../include/STK_Givens.h"
 
-namespace STK
-{
+#ifdef STK_ALGEBRA_DEBUG
+#include "../../Arrays/include/STK_Display.h"
 
-#ifdef STK_DEBUG
 template< class Container2D >
-void print(Container2D const& A, String const& name)
+void print(Container2D const& A, STK::String const& name)
 {
   stk_cout << "print: " << name << _T("\n";);
   stk_cout << name << _T(".isRef() =")        << A.isRef()  << _T("\n");
@@ -61,30 +60,23 @@ void print(Container2D const& A, String const& name)
 }
 #endif
 
+namespace STK
+{
+
 /* Constructor */
-Qr::Qr( Matrix const& A, bool ref)
-      : Q_(A, ref)      // Creating Q
-      , R_()            // Creating R
+Qr::Qr( Matrix const& A, bool ref) : Q_(A, ref), R_(), compq_(false)
 { run();}
 
-/* Computing the QR decomposition of the matrix Q_.                   */
+/* Computing the QR decomposition of the matrix Q_. */
 void Qr::run()
 {
   if (Q_.empty())     // if the container is empty
   {
-    ncolr_ =0;
-    ncolq_ =0;
-    nrowq_ =0;
-    compq_  = true;  // Q_ is computed
+    compq_ = true;  // Q_ is computed
     return;
   }
-
-  Q_.shift(1,1);      // translate the beg to 1
-  ncolr_ = Q_.sizeCols(); // Number of cols of R
-  ncolq_ = Q_.sizeCols(); // Number of column of Q
-  nrowq_ = Q_.sizeRows(); // Number of rows of Q
-  compq_  = false;    // Q_ is not computed
-  // compute QR decomposition
+  // translate the beg to 1
+  Q_.shift(1,1);
   qr();
 }
 
@@ -92,45 +84,17 @@ void Qr::run()
 /* Computation of the QR decomposition */
 void Qr::qr()
 {
-  int niter = std::min(nrowq_,ncolr_);   // number of iterations
-  R_.resize(Range(1,nrowq_), Range(1,ncolr_));
-  R_ = 0.0;                   // initialize to 0.0
-
-  /* Main loop. */
-  for (int iter=1, iter1=2; iter<=niter; iter++, iter1++)
-  { 
-    // A ref on the row iter of the matrix R_
-    Point  Rrow0(R_, Range(iter, ncolr_, 0), iter);
-    // A ref on the row iter of the matrix Q_
-    Point  Qrow0(Q_, Range(iter, ncolq_, 0), iter);
-    // A ref on the column iter of the matrix Q_. Householder vector
-    Vector u(Q_, Range(iter, nrowq_, 0), iter);
-    // compute the Householder vector of the current column
-    Rrow0[iter] = house<Vector>(u);
-    // get beta
-    Real beta = u.front();
-    if (beta)
-    {
-      // ref on the essential part of the Householder vector
-      Vector v(u, Range(iter1, nrowq_, 0));
-      // Apply Householder to next cols
-      for (int j=iter1; j<=ncolr_; j++)
-      {
-        // Auxiliary data
-        Real aux;
-        // a ref on the jth column of Q_
-        Vector z(Q_, Range(iter1, nrowq_, 0), j);
-        // save the  current row of R_
-        Rrow0[j] = Qrow0[j] + (aux = ( Qrow0[j] + dot<Vector, Vector>(v, z)) * beta);
-        // update the next cols of Q_ 
-        z += v * aux;
-      }
-    }
-    else
-    {
-      // just copy the row iter in R_
-      for (int j=iter1; j<=ncolr_; j++) { Rrow0[j] = Qrow0[j];}
-    }
+  R_.resize(Q_.rows(), Q_.cols());
+  R_ = 0.0;
+  // start left householder reflections
+  Range r(Q_.rows()), c(Q_.cols());
+  for(int j = R_.beginRows(); (j < R_.endRows()) && (j < Q_.endCols()) ; ++j)
+  {
+    Vector u(Q_, r, j);    // get a reference on the j-th column in the range r
+    R_(j, j) = house(u);   // compute the housolder vector
+    leftHouseholder(Q_(r, c.incFirst(1)), u); // apply-it to the remaining part of Q_
+    r.incFirst(1);
+    R_.row(j, c).copy(Q_.row(j, c)); // copy current row in R_
   }
 }
 
@@ -138,61 +102,56 @@ void Qr::qr()
 /* Computation of Q. */
 void Qr::compQ()
 {
+#ifdef STK_ALGEBRA_VERBOSE
+  stk_cout << _T("Entering Qr::compQ(). compq_ =") << compq_ << _T("\n");
+#endif
   // if Q_ is computed yet
   if (compq_) return;
   // number of non zero cols of Q_  
-  int ncol  = std::min(nrowq_, ncolq_);
-  // Q_ is square
-  if (nrowq_ < ncolq_)
-  { Q_.popBackCols(ncolq_-nrowq_);}
-  else
-  { 
-    Q_.pushBackCols(nrowq_-ncolq_);
-    Q_.col(Range(ncol+1,nrowq_, 0) ) = 0.0;
-  }
-  // the number of col_ is equal to the number of row
-  ncolq_ = nrowq_;
-  // compute added column
-  for (int iter=ncolq_; iter> ncol; --iter) { Q_(iter, iter) = 1.0;}
-  // compute other columns
-  for (int iter=ncol, iter1=ncol+1; iter>=1; iter--, iter1--)
+  int ncol  = std::min(Q_.sizeRows(), Q_.sizeCols()), lastCol;
+  // add or remove the column
+  if (ncol < Q_.sizeCols())
   {
+    Q_.popBackCols(Q_.sizeCols() - ncol);
+    lastCol = Q_.lastIdxCols();
+  }
+  else
+  {
+    lastCol = Q_.lastIdxCols();
+    stk_cout << "ncol = " << ncol << " lastCol = " << lastCol << "\n";
+    if (ncol < Q_.sizeRows())
+    {
+      Q_.pushBackCols(Q_.sizeRows() -ncol);
+      // Initialize added columns
+      Q_.col( _R( lastCol+1, Q_.lastIdxCols()) ).setValue(0);
+      for (int i=lastCol+1; i< Q_.endCols(); ++i) { Q_(i, i) = 1.0;}
+    }
+  }
+  // compute other columns
+  for (int iter=lastCol, iter1= lastCol +1; iter>=Q_.beginCols(); iter--, iter1--)
+  {
+    // get current householder vector
+    Vector u(Q_, _R(iter, Q_.lastIdxRows()), iter);
+    // Apply Householder vector to the right of the matrix
+    leftHouseholder( Q_( _R(iter, Q_.lastIdxRows()), _R(iter1, Q_.lastIdxCols())), u);
     // Get beta and test
     Real beta = Q_(iter,iter);
-    if (beta)
-    {
-      // ref of the row iter
-      Point P(Q_, Range(iter,ncolq_, 0), iter);
-      // ref of the column iter
-      Vector X(Q_, Range(iter1,nrowq_, 0), iter);
-      // Update the cols from iter+1 to ncol
-      for (int j=iter1; j<=ncolq_; j++)
-      { Real aux;
-        Vector Y(Q_, Range(iter1,nrowq_, 0), j); // ref on the column j
-        // Q_(iter, j) = beta * X'Y
-        P[j] = (aux = dot<Vector, Vector>( X, Y) * beta);
-        // Q^j += aux * Q^iter
-        Y += X * aux;
-      }
-      P[iter] = 1.0 + beta;
-      // Q^iter *= beta
-      X *= beta;
-    }
-    else // Q^iter = identity
-    {
-      Q_(iter, iter) = 1.0;
-      Q_(Range(iter1,nrowq_, 0), iter) = 0.0;
-    }
     // update the column iter
-    Q_(Range(1,iter-1, 0), iter) = 0.0;
+    Q_(iter,iter) = 1.0 + beta;
+    Q_(_R(iter1, Q_.lastIdxRows()), iter ) *= beta;
+    // update the column iter
+    Q_( Range(1,iter-1, 0), iter) = 0.0;
   }
   // Q_ is now computed
   compq_ = true;
+#ifdef  STK_ALGEBRA_VERBOSE
+  stk_cout << _T("Terminating Qr::compQ(). compq_ =") << compq_ << _T("\n");
+#endif
 }
 
 
-/* Destructeur de la classe Qr */
-Qr::~Qr() { ;}
+/* Destructor */
+Qr::~Qr() {}
 
 /* clear Q_ and R_. */
 void Qr::clear()
@@ -205,12 +164,7 @@ void Qr::clear()
 /* Operator = : overwrite the Qr with S. */
 Qr& Qr::operator=(const Qr& S)
 {
-  ncolr_ = S.ncolr_;       //< Number of cols of R actually computed
-  ncolq_ = S.ncolq_;       //< Number of cols used by Q
-  nrowq_ = S.nrowq_;       //< Number of rows used by Q
-    
   compq_ = S.compq_;       //< Is Q computed ?
-
   Q_ = S.Q_;               //< Matrix V
   R_ = S.R_;               //< Singular values
 
@@ -224,7 +178,6 @@ void Qr::popBackCols(int const& n)
 {
   // delete n cols
   R_.popBackCols(n);
-  ncolr_ -= n;
 }
 
 void Qr::eraseCol(int const& pos)
@@ -257,14 +210,13 @@ void Qr::eraseCol(int const& pos)
   }
   // erase the column pos
   R_.eraseCols(pos);
-  ncolr_--;
   
   // update the range of the remaining cols of the container
   R_.update(Range(pos, std::min(R_.lastIdxRows(), R_.lastIdxCols()), 0));
 }
 
 
-/* Adding the last column and update the QR decomposition.               */    
+/* Adding the last column and update the QR decomposition. */
 void Qr::pushBackCol(Vector const& T)
 {
   // check conditions
@@ -273,32 +225,26 @@ void Qr::pushBackCol(Vector const& T)
   // if Q_ is not computed yet
   if (!compq_) compQ();
   // Adding a column to R
-  R_.pushBackCols();
-  ncolr_++;
+  int lastColR = R_.endCols();
   // Create an auxiliary container
-  Vector Rncolr(Q_.cols());
-  // Multipliate T by Q'and put the result in Rncolr
-  for (int j=Q_.beginCols(); j<=Q_.lastIdxCols(); j++)
-    Rncolr[j] = dot(Q_.col(j), T);
+  Vector Rncolr = Q_.transpose() * T; // Rncolr of size Q_.cols()
   // update Q_
-  for (int iter = ncolq_-1, iter1 = ncolq_; iter>=ncolr_; iter--, iter1--)
+  for (int iter = Q_.lastIdxCols()-1, iter1 = Q_.lastIdxCols(); iter>=lastColR; iter--, iter1--)
   { 
-    Real sinus, cosinus, y = Rncolr[iter], z = Rncolr[iter1] ;
-    // compute the Givens rotition
-    Rncolr[iter]  = compGivens(y, z, cosinus, sinus);
+    Real sinus, cosinus;
+    // compute the Givens rotation
+    Rncolr[iter] = compGivens( Rncolr[iter], Rncolr[iter1], cosinus, sinus);
     // apply Givens rotation if necessary
     if (sinus)
-    {
-      // Update the cols of Q_
-      rightGivens(Q_, iter, iter1, cosinus, sinus);
-    }
+    { rightGivens(Q_, iter, iter1, cosinus, sinus);}
   }
   // update R_
-  R_.col(ncolr_) = Rncolr.sub(R_.rangeRowsInCol(ncolr_));
+  R_.pushBackCols();
+  R_.col(lastColR).copy(Rncolr.sub(R_.rangeRowsInCol(lastColR)));
 }
 
 
-/* Adding the jth column and update the QR decomposition.               */
+/* Adding the jth column and update the QR decomposition.   */
 void Qr::insertCol(Vector const& T, int const& pos)
 {
   if (pos < R_.beginCols())
@@ -311,30 +257,26 @@ void Qr::insertCol(Vector const& T, int const& pos)
   if (!compq_) compQ();
   // Adding a column to R
   R_.insertCols(pos);
-  ncolr_++;
   // update the range of the remaining cols of R_
-  R_.update(Range(pos+1, std::min(R_.lastIdxRows(), R_.lastIdxCols()), 0));
-  for (int i=pos+1; i<= std::min(R_.lastIdxRows(), R_.lastIdxCols()); ++i) R_(i,i) = 0.0;
-  // A ref on the last column of R_
-  Vector Rpos(Q_.cols());
-  // Multipliate T by Q'. we cannot use mult as we are using ncolq_ columns.
-  for (int j=Q_.beginCols(); j<=Q_.lastIdxCols(); j++)
-    Rpos[j] = dot(Q_.col(j), T);
+  R_.update( _R(pos+1, std::min(R_.lastIdxRows(), R_.lastIdxCols())) );
+  for (int i=pos+1; i< std::min(R_.endRows(), R_.endCols()); ++i) R_(i,i) = 0.0;
+
+  Vector Rpos =  Q_.transpose() * T;
   // Zeroed the unwanted elements
-  for (int iter= ncolq_-1, iter1= ncolq_; iter>=pos; iter--, iter1--)
+  for (int iter= Q_.lastIdxCols(), iterm1= Q_.lastIdxCols()-1; iter>pos; iterm1--, iter--)
   { 
-    Real sinus, cosinus, y = Rpos[iter], z = Rpos[iter1] ;
+    Real sinus, cosinus;
     // compute the Givens rotation
-    Rpos[iter]  = compGivens(y, z, cosinus, sinus);
+    Rpos[iterm1]  = compGivens(Rpos[iterm1], Rpos[iter], cosinus, sinus);
     // apply Givens rotation if necessary
     if (sinus)
     {
       // create a reference on the sub-Matrix
-      MatrixUpperTriangular Rsub(R_.col(Range(iter1, R_.lastIdxCols(), 0)), true);
-      // Update the next rows (iter1:ncolr_) of R_
-      leftGivens( Rsub, iter, iter1, cosinus, sinus);
+      MatrixUpperTriangular Rsub(R_.col(_R(iter, R_.lastIdxCols())), true);
+      // Update the next rows (iter:ncolr_) of R_
+      leftGivens( Rsub, iterm1, iter, cosinus, sinus);
       // Update the cols of Q_
-      rightGivens(Q_, iter, iter1, cosinus, sinus);
+      rightGivens(Q_, iterm1, iter, cosinus, sinus);
     }
   }
   // update R_

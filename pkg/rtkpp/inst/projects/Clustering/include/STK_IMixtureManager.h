@@ -46,7 +46,7 @@ class IMixture;
 
 /** @ingroup Clustering
  *  @brief A mixture manager is a factory class for injection dependency in the
- *  stk++ derived class of the IMixtureComposer.
+ *  STK++ derived class of the IMixtureComposer.
  *
  *  It handles all the creation and initialization stuff needed by the
  *  mixture models of the stkpp library.
@@ -76,7 +76,7 @@ class IMixtureManager
      *  otherwise.
      **/
     IMixture* createMixture(String const& idData, int nbCluster);
-    /** Utility function allowing to create and register all the stk++ mixtures
+    /** Utility function allowing to create and register all the STK++ mixtures
      *  defined in the handler.
      *  @param composer the composer claiming the mixtures
      *  @param nbCluster the number of clusters

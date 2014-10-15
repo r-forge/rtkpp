@@ -31,13 +31,12 @@
 
 /** @file STK_Base_Util.h
  *  @brief In this file we define the enum of the STKernel project.
- *
- *  @namespace STK::Base the namespace Base contain all the internal stuff needed
- *  by the stk++ fundamental types.
  **/
 
 #ifndef STK_BASE_UTIL_H
 #define STK_BASE_UTIL_H
+
+#include <climits>
 
 namespace STK
 {
@@ -65,7 +64,7 @@ enum IdType
   sign_,       ///< Sign type {-1, 1}
   string_,      ///< String type
   range_,
-  unknown_ =__INT_MAX__  ///< Unknown type
+  unknown_ = INT_MIN  ///< Unknown type
 };
 
 } // namespace Base

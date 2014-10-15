@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-#     Copyright (C) 2004-2013  Serge Iovleff
+#     Copyright (C) 2012-2014  Inria
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
-#' rtkpp is a R/stk++ bridge
+#' rtkpp is a R/STK++ bridge
 #'
 #' This package contains the header files for the STK++ library.
 #' The typical usage is to install this package and list it in
@@ -56,7 +56,7 @@
 #' @name rtkpp
 #' @aliases rtkpp
 #' @docType package
-#' @keywords stk++, stkpp
+#' @keywords STK++, stkpp
 #' @import Rcpp
 #'
 #' @author

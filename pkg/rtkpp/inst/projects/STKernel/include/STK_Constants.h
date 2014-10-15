@@ -36,7 +36,6 @@
 #ifndef STK_CONSTANTS_H
 #define STK_CONSTANTS_H
 
-//#include "STK_Integer.h"
 #include "STK_String.h"
 
 #ifndef STKBASEARRAYS
@@ -49,7 +48,7 @@
 namespace STK
 {
 /** @ingroup STKernel
- *  This value represents the base index of the containers created in stk++.
+ *  This value represents the base index of the containers created in STK++.
  **/
 const int baseIdx = STKBASEARRAYS;
 
@@ -58,7 +57,7 @@ const int baseIdx = STKBASEARRAYS;
  *  instead the value is stored in some runtime variable. This is the same value
  *  that the value used for representing NA Integers when Integer is int.
  **/
-const int UnknownSize = __INT_MAX__;
+const int UnknownSize = INT_MAX;
 //const int UnknownSize = STK::Arithmetic<int>::NA();
 
 /** @ingroup STKernel

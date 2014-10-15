@@ -124,7 +124,7 @@ class Array2DSquare : public IArray2D< Array2DSquare<Type> >
      *  @param v initial value of the container
      **/
     Array2DSquare( Range const& I, Type const& v): Base(I, I)
-    { this->setValue(v);}
+    { LowBase::setValue(v);}
     /** Copy constructor.
      *  @param T the container to copy
      *  @param ref true if T is wrapped
@@ -135,6 +135,12 @@ class Array2DSquare : public IArray2D< Array2DSquare<Type> >
      *  @param I range of the container to wrap
      **/
     Array2DSquare( Array2DSquare const& T, Range const& I) : Base(T, I, I) {}
+    /** Copy constructor using an expression.
+     *  @param T the container to wrap
+     **/
+    template<class OtherDerived>
+    Array2DSquare( ExprBase<OtherDerived> const& T): Base()
+    { LowBase::operator=(T);}
     /** destructor. */
     ~Array2DSquare() {}
     /** New beginning index for the object.
@@ -195,7 +201,7 @@ class Array2DSquare : public IArray2D< Array2DSquare<Type> >
     /** set the container to a constant value.
      *  @param v the value to set
      **/
-    inline Array2DSquare& operator=(Type const& v) { this->setValue(v); return *this;}
+    inline Array2DSquare& operator=(Type const& v) { return LowBase::setValue(v);}
 };
 
 } // namespace STK

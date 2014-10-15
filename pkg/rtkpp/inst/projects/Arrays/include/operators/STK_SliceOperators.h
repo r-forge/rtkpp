@@ -337,14 +337,22 @@ class SubOperator<Lhs, Arrays::vector_ > : public ExprBase< SubOperator< Lhs> >,
       storage_   = hidden::Traits< SubOperator<Lhs> >::storage_
     };
     /** Constructor */
-    inline SubOperator( Lhs const& lhs, Range const& I) : Base(), lhs_(lhs), I_(I) {}
+    inline SubOperator( Lhs const& lhs, Range const& I) : Base(), lhs_(lhs), rows_(I) {}
     /**  @return the range of the rows */
-    inline Range const rows() const { return I_;}
+    inline Range const rows() const { return rows_;}
+    /** @return the first row index of the sub expression */
+    inline int const beginRowsImpl() const { return rows_.begin();}
+    /** @return the ending row index of the sub expression */
+    inline int const endRowsImpl() const { return rows_.end();}
+    /** @return the number of rows of the sub expression */
+    inline int const sizeRowsImpl() const { return rows_.size();}
     /** @return the range of the Columns */
     inline Range const cols() const { return lhs_.cols();}
-    /** @return the number of rows of the transposed expression */
-    inline int const sizeRowsImpl() const { return lhs_.sizeCols();}
-    /** @return the number of columns of the transposed expression */
+    /** @return the first column index of the sub expression */
+    inline int const beginColsImpl() const { return lhs_.begin();}
+    /** @return the ending column index of the sub expression */
+    inline int const endColsImpl() const { return lhs_.end();}
+    /** @return the number of columns of the sub expression */
     inline int const sizeColsImpl() const { return 1;}
 
     /** @return the left hand side expression */
@@ -360,7 +368,7 @@ class SubOperator<Lhs, Arrays::vector_ > : public ExprBase< SubOperator< Lhs> >,
 
   protected:
     Lhs const& lhs_;
-    Range I_;
+    Range rows_;
 };
 
 /** @ingroup Arrays
@@ -393,15 +401,23 @@ class SubOperator<Lhs, Arrays::point_ > : public ExprBase< SubOperator< Lhs> >, 
       storage_   = hidden::Traits< SubOperator<Lhs> >::storage_
     };
     /** Constructor */
-    inline SubOperator( Lhs const& lhs, Range const& I) : Base(), lhs_(lhs), I_(I) {}
+    inline SubOperator( Lhs const& lhs, Range const& I) : Base(), lhs_(lhs), cols_(I) {}
     /**  @return the range of the rows */
     inline Range const rows() const { return lhs_.rows();}
-    /** @return the range of the Columns */
-    inline Range const cols() const { return I_;}
+    /** @return the first row index of the sub expression */
+    inline int const beginRowsImpl() const { return lhs_.begin();}
+    /** @return the ending row index of the sub expression */
+    inline int const endRowsImpl() const { return lhs_.end();}
     /** @return the number of rows */
     inline int const sizeRowsImpl() const { return 1;}
+    /** @return the range of the Columns */
+    inline Range const cols() const { return cols_;}
+    /** @return the first column index of the sub expression */
+    inline int const beginColsImpl() const { return cols_.begin();}
+    /** @return the ending column index of the sub expression */
+    inline int const endColsImpl() const { return cols_.end();}
     /** @return the number of columns */
-    inline int const sizeColsImpl() const { return lhs_.sizeCols();}
+    inline int const sizeColsImpl() const { return cols_.size();}
 
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_; }
@@ -416,7 +432,7 @@ class SubOperator<Lhs, Arrays::point_ > : public ExprBase< SubOperator< Lhs> >, 
 
   protected:
     Lhs const& lhs_;
-    Range I_;
+    Range cols_;
 };
 
 } // namespace STK

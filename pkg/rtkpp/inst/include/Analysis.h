@@ -38,13 +38,7 @@
  *  It provide generic algorithms and the usual mathematical constants.
  **/
 
-/**
- * @ingroup Analysis
- * @namespace STK::Const
- * @brief This is the namespace enclosing the usual mathematical constants
- **/
-/**
- * @ingroup Analysis
+/** @ingroup Analysis
  * @namespace STK::Funct
  * @brief The namespace Funct enclose all usual and special functions.
  * The namespace Funct is the domain space of the special function
@@ -52,6 +46,7 @@
  * incomplete beta function... It include also some useful raw
  * functions like log1p...
  **/
+
 /**
  * @ingroup Analysis
  * @namespace STK::Algo
@@ -60,6 +55,7 @@
  * used in order to compute series, continued fractions, zero of functions
  * and so on.
  **/
+
 
 #ifndef ANALYSIS_H
 #define ANALYSIS_H

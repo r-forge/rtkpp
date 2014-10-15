@@ -128,7 +128,7 @@ class Array2DUpperTriangular : public IArray2D< Array2DUpperTriangular<Type> >
      **/
     Array2DUpperTriangular( Range const& I, Range const& J, Type const& v)
                           : Base(I, J)
-    { this->setValue(v);}
+    { LowBase::setValue(v);}
     /** Copy constructor
      *  @param T the container to copy
      *  @param ref true if T is wrapped
@@ -149,6 +149,12 @@ class Array2DUpperTriangular : public IArray2D< Array2DUpperTriangular<Type> >
      **/
     Array2DUpperTriangular( Type** q, Range const& I, Range const& J)
                           : Base(q, I, J) {}
+    /** Copy constructor using an expression.
+     *  @param T the container to wrap
+     **/
+    template<class OtherDerived>
+    Array2DUpperTriangular( ExprBase<OtherDerived> const& T): Base()
+    { LowBase::operator=(T);}
     /** destructor. */
     ~Array2DUpperTriangular() {}
     /** operator = : overwrite the CArray with the Right hand side T.
@@ -161,7 +167,7 @@ class Array2DUpperTriangular : public IArray2D< Array2DUpperTriangular<Type> >
     Array2DUpperTriangular& operator=(const Array2DUpperTriangular &T)
     { return LowBase::assign(T);}
     /** Operator = : overwrite with a constant value. */
-    inline Array2DUpperTriangular& operator=(Type const& v) { this->setValue(v); return *this;}
+    inline Array2DUpperTriangular& operator=(Type const& v) { return LowBase::setValue(v);}
 };
 
 } // namespace STK

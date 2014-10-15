@@ -49,7 +49,7 @@ namespace STK
 enum Binary
 { zero_ =0, ///< 0 value
   one_  =1, ///< 1 value
-  binaryNA_=__INT_MAX__ ///< Not Available value
+  binaryNA_=INT_MIN ///< Not Available value
 };
 
  /** @ingroup Arithmetic

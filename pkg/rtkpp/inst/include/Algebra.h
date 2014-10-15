@@ -33,14 +33,13 @@
  *  @brief This file include all the header files of the project Algebra.
  **/
 
-/**
- *  @defgroup Algebra Algebra
+/** @defgroup Algebra Algebra
  *  @brief The Algebra project provides structures, tools and methods of the
  *  usual algebra techniques.
  *
  * The Algebra project propose some set of templated function for computing
  * dot product,  weighted dot product, vector norm, weighted vector norm
- * and so on... It propose three linear algebra methods for the Matrix
+ * and so on... It proposes three linear algebra methods for the Matrix
  * and the MatrixSquare classes:
  *    @li The Qr decomposition of an arbitrary matrix of Real, @sa Qr
  *    @li The svd decomposition of an arbitrary matrix of real, @sa Svd
@@ -52,9 +51,13 @@
  * @li GramScmidt orthogonalization of the column of a Matrix
  * @li Householder rotation of a Matrix.
  *
- * @note these classes will be abandonned soon and replaced by lapack wrappers.
- * They can only be used (except @sa SymEigen) with 1-based
- * arrays.
+ * @note these classes will be abandoned soon and replaced by lapack wrappers.
+ * They can only be used (except @sa SymEigen) with 1-based arrays.
+ **/
+
+/** @ingroup Algebra
+ *  @namespace STK::lapack
+ *  @brief namespace enclosing the wrappers of the lapack routines.
  **/
 
 

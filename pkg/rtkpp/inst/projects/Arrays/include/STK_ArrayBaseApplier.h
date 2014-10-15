@@ -65,10 +65,11 @@ void ArrayBase<Derived>::apply(Visitor& visitor)
  */
 /* @brief Set the value to all the Allocator */
 template<typename Derived>
-void ArrayBase<Derived>::setValue(Type const& value)
+Derived& ArrayBase<Derived>::setValue(Type const& value)
 {
   hidden::ValueVisitor<Type> visitor(value);
   apply(visitor);
+  return this->asDerived();
 }
 
 /* @brief Set the value one to all the Array */

@@ -149,7 +149,7 @@ class CArray: public ICArray < CArray<Type, SizeRows_, SizeCols_, Orient_> >
      *  @param sizeRows size of the rows
      *  @param sizeCols size of the columns
      **/
-    inline CArray( int const& sizeRows, int const& sizeCols) : Base(sizeRows, sizeCols) {}
+    inline CArray( int const& sizeRows, int const& sizeCols): Base(sizeRows, sizeCols) {}
     /** constructor with rbeg, rend, cbeg and cend specified,
      *  initialization with a constant.
      *  @param sizeRows size of the rows
@@ -163,7 +163,7 @@ class CArray: public ICArray < CArray<Type, SizeRows_, SizeCols_, Orient_> >
      *  @param T the container to copy
      *  @param ref true if T is wrapped
      **/
-    inline CArray( CArray const& T, bool ref=false) : Base(T, ref) {}
+    inline CArray( CArray const& T, bool ref=false): Base(T, ref) {}
     /** wrapper constructor for 0 based C-Array.
      *  @param q pointer on the array
      *  @param nbRow number of rows
@@ -174,13 +174,18 @@ class CArray: public ICArray < CArray<Type, SizeRows_, SizeCols_, Orient_> >
      *  @param allocator the allocator to wrap
      **/
     template<class OtherAllocator>
-    inline CArray( OtherAllocator const& allocator) : Base(allocator) {}
+    inline CArray( CAllocatorBase<OtherAllocator> const& allocator): Base(allocator.asDerived()) {}
+    /** Copy constructor using an expression.
+     *  @param T the container to wrap
+     **/
+    template<class OtherDerived>
+    CArray( ExprBase<OtherDerived> const& T): Base() { LowBase::operator=(T);}
     /** destructor. */
     inline ~CArray() {}
     /** operator= : set the container to a constant value.
      *  @param v the value to set
      **/
-    inline CArray& operator=(Type const& v) { this->setValue(v); return *this;}
+    inline CArray& operator=(Type const& v) { return LowBase::setValue(v);}
     /** operator = : overwrite this with the Right hand side rhs.
      *  @param rhs the container to copy
      **/

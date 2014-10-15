@@ -118,7 +118,7 @@ template<> struct r_sexptype_traits<unsigned short>{ enum{ rtype = INTSXP } ; } 
 
 /** @ingroup hidden
  * Indicates the storage type associated with a SEXP type
- * for example: RcppTraits<int>::Rtype_ is a INTSXP
+ * for example: RcppTraits<int>::rtype is a INTSXP
  * The default is VECSXP.
  */
 template<typename Type> struct RcppTraits
@@ -161,7 +161,6 @@ template<typename Type> struct RcppTraits
 #undef RAWSXP
 #undef S4SXP
 
-/* used for detecting PROTECT issues in memory.c */
 #undef NEWSXP
 #undef FREESXP
 

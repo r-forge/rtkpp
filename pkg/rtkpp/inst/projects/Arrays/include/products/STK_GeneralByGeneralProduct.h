@@ -23,7 +23,7 @@
 */
 
 /*
- * Project:  stkpp::
+ * Project:  stkpp::Arrays
  * created on: 30 déc. 2012
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
@@ -59,8 +59,7 @@ struct MultCoefImpl
   }
   /** dot product. general by vector */
   static void dot( Lhs const& lhs, ITContainer<Rhs, Arrays::vector_> const& rhs
-                 , ITContainer<Result, Arrays::vector_>& res
-                 , int iRow)
+                 , ITContainer2D<Result>& res, int iRow)
   {
     res.elt(iRow) = Type(0);
     Range const dotRange = Range::inf(lhs.rangeColsInRow(iRow), rhs.range());
@@ -69,13 +68,11 @@ struct MultCoefImpl
   }
   /** dot product. general by vector */
   static void dot( ITContainer<Lhs, Arrays::point_> const& lhs
-                 , Rhs const& rhs
-                 , ITContainer<Result, Arrays::point_>& res
-                 , int jCol)
+                 , Rhs const& rhs, ITContainer2D<Result>& res, int jCol)
   {
     res.elt(jCol) = Type(0);
     Range const dotRange = Range::inf(rhs.rangeRowsInCol(jCol), lhs.range());
-    for (int k=dotRange.begin(); k< dotRange.lastIdx(); ++k)
+    for (int k=dotRange.begin(); k< dotRange.end(); ++k)
       res.elt(jCol) += lhs.elt(k) * rhs.elt(k, jCol);
   }
   /** multiplication with one sized vectors */
@@ -93,7 +90,7 @@ struct MultCoefImpl
     for (int i=lhs.beginRows(); i< lhs.endRows(); ++i)
       for (int j=rhs.beginCols(); j< rhs.endCols(); ++j)
         res.elt(i,j) += lhs.elt(i, lhsCol  ) * rhs.elt(rhsRow,   j)
-                  + lhs.elt(i, lhsCol+1) * rhs.elt(rhsRow+1, j);
+                      + lhs.elt(i, lhsCol+1) * rhs.elt(rhsRow+1, j);
   }
   /** multiplication with three sized vectors */
   static void mult3( Lhs const& lhs, Rhs const& rhs, Result& res
@@ -102,8 +99,8 @@ struct MultCoefImpl
     for (int i=lhs.beginRows(); i< lhs.endRows(); ++i)
       for (int j=rhs.beginCols(); j< rhs.endCols(); ++j)
         res.elt(i,j) += lhs.elt(i, lhsCol  ) * rhs.elt(rhsRow, j)
-                  + lhs.elt(i, lhsCol+1) * rhs.elt(rhsRow+1, j)
-                  + lhs.elt(i, lhsCol+2) * rhs.elt(rhsRow+2, j);
+                      + lhs.elt(i, lhsCol+1) * rhs.elt(rhsRow+1, j)
+                      + lhs.elt(i, lhsCol+2) * rhs.elt(rhsRow+2, j);
   }
   /** multiplication with one sized vectors */
   static void multVec1( Lhs const& lhs, Rhs const& rhs, Result& res
@@ -114,20 +111,20 @@ struct MultCoefImpl
   }
   /** multiplication with two sized vectors */
   static void multVec2( Lhs const& lhs, Rhs const& rhs, Result& res
-                   , int lhsCol, int rhsRow)
+                      , int lhsCol, int rhsRow)
   {
     for (int i=lhs.beginRows(); i< lhs.endRows(); ++i)
       res.elt(i) += lhs.elt(i, lhsCol) * rhs.elt(rhsRow)
-              + lhs.elt(i, lhsCol+1) * rhs.elt(rhsRow+1);
+                  + lhs.elt(i, lhsCol+1) * rhs.elt(rhsRow+1);
   }
   /** multiplication with three sized vectors */
   static void multVec3( Lhs const& lhs, Rhs const& rhs, Result& res
-                   , int lhsCol, int rhsRow)
+                      , int lhsCol, int rhsRow)
   {
     for (int i=lhs.beginRows(); i< lhs.endRows(); ++i)
       res.elt(i) += lhs.elt(i, lhsCol) * rhs.elt(rhsRow)
-              + lhs.elt(i, lhsCol+1) * rhs.elt(rhsRow+1)
-              + lhs.elt(i, lhsCol+2) * rhs.elt(rhsRow+2);
+                  + lhs.elt(i, lhsCol+1) * rhs.elt(rhsRow+1)
+                  + lhs.elt(i, lhsCol+2) * rhs.elt(rhsRow+2);
   }
   /** multiplication with one sized vectors */
   static void multPoint1( Lhs const& lhs, Rhs const& rhs, Result& res
@@ -142,16 +139,16 @@ struct MultCoefImpl
   {
     for (int j=rhs.beginCols(); j< rhs.endCols(); ++j)
       res.elt(j) += lhs.elt(lhsCol) * rhs.elt(rhsRow, j)
-              + lhs.elt(lhsCol+1) * rhs.elt(rhsRow+1, j);
+                  + lhs.elt(lhsCol+1) * rhs.elt(rhsRow+1, j);
   }
   /** multiplication with three sized vectors */
   static void multPoint3( Lhs const& lhs, Rhs const& rhs, Result& res
-                   , int lhsCol, int rhsRow)
+                        , int lhsCol, int rhsRow)
   {
     for (int j=rhs.beginCols(); j< rhs.endCols(); ++j)
       res.elt(j) += lhs.elt(lhsCol) * rhs.elt(rhsRow, j)
-              + lhs.elt(lhsCol+1) * rhs.elt(rhsRow+1, j)
-              + lhs.elt(lhsCol+2) * rhs.elt(rhsRow+2, j);
+                  + lhs.elt(lhsCol+1) * rhs.elt(rhsRow+1, j)
+                  + lhs.elt(lhsCol+2) * rhs.elt(rhsRow+2, j);
   }
 };
 

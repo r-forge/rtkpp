@@ -148,16 +148,16 @@ class DataManager : public IDataManager
    virtual void removeMissing()
    {
      Type value = Type();
-     int j, old_j = UnknownSize;
+     int j, old_j = Arithmetic<int>::NA();
      for(ConstIterator it = v_missing_.begin(); it!= v_missing_.end(); ++it)
      {
         j = it->second; // get column
         if (j != old_j)
         {
-          old_j =j;
+          old_j = j;
           value = safeValue(j);
         }
-        m_dataij_(it->first, it->second) = value;
+        m_dataij_(it->first, j) = value;
       }
    }
    /** @return a safe value for the jth variable

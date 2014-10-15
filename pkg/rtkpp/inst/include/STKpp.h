@@ -36,28 +36,19 @@
 #ifndef STKPP_H
 #define STKPP_H
 
-/** @namespace STK
- *  @brief STK means the Statistical ToolKit.
+/** @mainpage The Statistical ToolKit Project
+ *  <p align="center">
+ *  <img height="175" alt="" border="0"
+ *       src="http://www.stkpp.org/images/logo_stkpp.png"
+ *       alt="STK++ Logo">
+ *  </p>
  *
- *  The namespace STK is the main domain space of the Statistical
- *  ToolKit project (STK++). All methods and classes are enclosed
- *  in this namespace.
- **/
-/**
- *  \mainpage The Statistical ToolKit Project
-  <p align="center">
-   <img height="175" alt=""
-        border="0"
-        src="http://www.stkpp.org/images/logo_stkpp.png"
-        alt="STK++ Logo">
-  </p>
-
-\section Presentation
-  <p> <a href="http://www.stkpp.org/"> STK++ </a>
-      is a multi-platform toolkit written in C++ for creating fast and
-      easy to use Statistics and/or data mining console programs.
-  <br>
-    <a href="http://www.stkpp.org/"> STK++ </a> is a versatile, fast, reliable
+ * @section Presentation
+ * <p> <a href="http://www.stkpp.org/"> STK++ </a>
+ *     is a multi-platform toolkit written in C++ for creating fast and
+ *     easy to use Statistics and/or data mining console programs.
+ * <br>
+ * <a href="http://www.stkpp.org/"> STK++ </a> is a versatile, fast, reliable
     and elegant collection of C++ classes for statistics, clustering, linear
     algebra, arrays (with an Eigen-like API), regression, dimension reduction, etc.
     Some functionalities provided by the library are available in the R
@@ -88,7 +79,7 @@
            border="0"
            alt="eclipse Logo">
   </p>
-  \section Projects
+  @section Projects
   <p> The STK++ project is divided in different projects, each of them
   being (eventually) divided into subproject:
   - @subpage STKernel  "STKernel: Kernel tools"
@@ -105,10 +96,27 @@
   - @subpage AAModels  "AAModels: Auto-Associative Models"
   </p>
 
-  \section Tutorials
+  @section Tutorials
   <p> Various @ref PageTutorials explain the use of the arrays classes and
   how to develop a statistical application.
   </p>
+ **/
+
+/** @namespace STK
+ *  @brief The namespace STK is the main domain space of the Statistical
+ *  ToolKit project. All methods and classes are (and have to be) enclosed
+ *  in this namespace.
+ **/
+
+/** @namespace STK::Const
+ *  @brief namespace enclosing the usual mathematical constants
+ * and the constant arrays or structures.
+ **/
+
+/** @defgroup hidden Hidden implementation details
+ *  @namespace STK::hidden The hidden namespace enclose the classes and methods
+ *  which are used internally by the STK++ classes. They are hidden to the
+ *  end-user of theses classes.
 **/
 
 // STKernel project

@@ -34,7 +34,6 @@ endif
 #-----------------------------------------------------------------------
 # Paths
 INC_DIR = ../include/
-PROJECTS_DIR = ../..
 
 #-----------------------------------------------------------------------
 # Targets
@@ -54,9 +53,13 @@ CPP_OBJS = $(CPP_SRCS:%.cpp=$(BIN_DIR)%.o)
 
 #-----------------------------------------------------------------------
 # Compilation rules
-$(BIN_DIR)%.o: $(INC_DIR)%.h makefile
+$(BIN_DIR)%.o: $(CXX_INCS) makefile
 $(BIN_DIR)%.o: %.cpp
-	$(CXX) $(CXXFLAGS) $(CXXPICFLAGS)  $(STK_CXXFLAGS) -I$(PROJECTS_DIR) $< -c -o $@
+	$(CXX) $(CXXFLAGS) $(CXXPICFLAGS) $(STK_CXXFLAGS) -I$(PROJECTS_DIR) $< -c -o $@
+
+#-----------------------------------------------------------------------
+# Targets
+all: obj
 
 #-----------------------------------------------------------------------
 # creating objects files

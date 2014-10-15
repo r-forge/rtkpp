@@ -42,6 +42,7 @@
 #define STK_IARRAY2DBASE_H
 
 #include "STK_ArrayBase.h"
+
 #include "STK_ExprBaseProduct.h"
 #include "STK_ExprBaseDot.h"
 #include "STK_ExprBaseVisitor.h"
@@ -73,14 +74,18 @@ namespace STK
  * array: for exemple @c TYPE*, @c Array1D<TYPE>*, @c DBACCESS*....
  * @tparam Derived is the name of the class that implements @c IArray2DBase.
  **/
-template < class PTRCOL, class Derived>
-class IArray2DBase : public ITArrayBase<Derived>
+template < class PTRCOL, class Derived
+         , int SizeRow_ = hidden::Traits<Derived>::sizeRows_
+         , int SizeCol_ = hidden::Traits<Derived>::sizeCols_>
+class IArray2DBase :  protected IContainer2D<SizeRow_, SizeCol_>, public ArrayBase<Derived>
 {
   public:
-    /** Type for the Base reference Class. */
+    /** Type for the IContainer2D base Class. */
+    typedef IContainer2D<SizeRow_, SizeCol_ > Base2D;
+    /** Type for the Base Class. */
     typedef AllocatorBase<PTRCOL> Allocator;
     /** type of the Base Container Class. */
-    typedef ITArrayBase<Derived> Base;
+    typedef ArrayBase<Derived> Base;
 
     typedef typename hidden::Traits<Derived>::Type Type;
     typedef typename hidden::Traits<Derived>::Row RowVector;
@@ -89,9 +94,18 @@ class IArray2DBase : public ITArrayBase<Derived>
     typedef typename hidden::Traits<Derived>::SubCol SubColVector;
     typedef typename hidden::Traits<Derived>::SubArray SubArray;
 
+    enum
+    {
+      structure_ = hidden::Traits<Derived>::structure_,
+      orient_    = hidden::Traits<Derived>::orient_,
+      sizeRows_  = hidden::Traits<Derived>::sizeRows_,
+      sizeCols_  = hidden::Traits<Derived>::sizeCols_,
+      storage_   = hidden::Traits<Derived>::storage_
+    };
+
   protected:
     /** Default constructor */
-    IArray2DBase(): Base()
+    IArray2DBase(): Base2D(), Base()
                   , allocator_()
                   , capacityCols_()
                   , rangeCols_()
@@ -102,7 +116,7 @@ class IArray2DBase : public ITArrayBase<Derived>
      *  @param J range of the columns
      **/
     IArray2DBase( Range const& I, Range const& J)
-                : Base(I, J)
+                : Base2D(I, J), Base()
                 , allocator_()
                 , capacityCols_()
                 , rangeCols_()
@@ -115,7 +129,7 @@ class IArray2DBase : public ITArrayBase<Derived>
      *  @param ref true if we wrap T
      **/
     IArray2DBase( IArray2DBase const& T, bool ref =false)
-                : Base(T)
+                : Base2D(T), Base()
                 , allocator_(T.allocator_, ref)
                 , capacityCols_(T.capacityCols_)
                 , rangeCols_(T.rangeCols_)
@@ -128,7 +142,7 @@ class IArray2DBase : public ITArrayBase<Derived>
      **/
     template<class Rhs>
     IArray2DBase( IArray2DBase<PTRCOL, Rhs> const& T, Range const& I, Range const& J)
-                : Base(I, J)
+                : Base2D(I, J), Base()
                 , allocator_(T.allocator(), true)
                 , capacityCols_(T.capacityCols(), J)
                 , rangeCols_(J)
@@ -145,7 +159,7 @@ class IArray2DBase : public ITArrayBase<Derived>
      *  @param J range of the columns to wrap
      **/
     IArray2DBase( PTRCOL* q, Range const& I, Range const& J)
-                : Base(I, J)
+                : Base2D(I, J), Base()
                 , allocator_(q, J, true)
                 , capacityCols_(J, I.size())
                 , rangeCols_(J, I)
@@ -157,6 +171,36 @@ class IArray2DBase : public ITArrayBase<Derived>
     ~IArray2DBase() {}
 
   public:
+    /** @return the Vertical range */
+    inline Range rows() const { return Base2D::rows();}
+    /** @return the index of the first row */
+    inline int beginRowsImpl() const { return Base2D::beginRowsImpl();}
+    /** @return the ending index of the rows */
+    inline int endRowsImpl() const { return Base2D::endRowsImpl();}
+    /** @return the number of rows */
+    inline int sizeRowsImpl() const { return Base2D::sizeRowsImpl();}
+
+    /**@return the Horizontal range */
+    inline Range cols() const { return Base2D::cols();}
+    /** @return the index of the first column */
+    inline int beginColsImpl() const { return Base2D::beginColsImpl();}
+    /**  @return the ending index of columns */
+    inline int endColsImpl() const { return Base2D::endColsImpl();}
+    /** @return the number of columns */
+    inline int sizeColsImpl() const { return Base2D ::sizeColsImpl();}
+
+    /** @return the index of the first column */
+    inline int firstIdxCols() const { return Base2D::firstIdxCols();}
+    /**  @return the index of the last column */
+    inline int lastIdxCols() const { return Base2D::lastIdxCols();}
+    /** @return the index of the first row */
+    inline int firstIdxRows() const { return Base2D::firstIdxRows();}
+    /** @return the index of the last row */
+    inline int lastIdxRows() const { return Base2D::lastIdxRows();}
+
+    /**  @return @c true if the container is empty, @c false otherwise */
+    inline bool empty() const { return Base2D::empty();}
+
     /** @return a constant pointer on the j-th column of the container
      *  @param j the index of the column
      **/
@@ -286,7 +330,7 @@ class IArray2DBase : public ITArrayBase<Derived>
         // translate rangeCols_
         rangeCols_.shift(cbeg);
         // adjust dimensions
-        Base::shiftbeginCols(cbeg);
+        Base2D::shiftbeginCols(cbeg);
       }
     }
     /** Swapping the pos1 column and the pos2 column.
@@ -318,7 +362,7 @@ class IArray2DBase : public ITArrayBase<Derived>
       // swap AllocatorBase part
       allocator_.exchange(T.allocator_);
       // swap IContainer2D part
-      Base::exchange(T);
+      Base2D::exchange(T);
       // swap this part
       std::swap(this->capacityHo_, T.capacityHo_);
       capacityCols_.exchange(T.capacityCols_);
@@ -364,7 +408,7 @@ class IArray2DBase : public ITArrayBase<Derived>
       // copy data from other
       for (int j=first; j<= last; j++) { copyColumn(Tref, j, j);}
       // delete and set view on the data
-      Tref.allocator().freeData();
+      Tref.allocator().free();
       Tref.allocator().setPtrData(allocator_.p_data(), allocator_.rangeData(), true);
     }
     /** Append the vector @c other to @c this without copying the data
@@ -554,7 +598,7 @@ class IArray2DBase : public ITArrayBase<Derived>
       // Nothing to do for reference
       if (this->isRef()) return;
       // free memory allocated in AllocatorBase
-      allocator_.freeData();
+      allocator_.free();
       // set capacity size to default
       this->setCapacityHo();
       // set range of the columns to default

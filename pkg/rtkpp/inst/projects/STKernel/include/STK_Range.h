@@ -38,6 +38,9 @@
 
 #include "STK_Constants.h"
 
+/** Utility macro that can be used in a similar way that first:last */
+#define _R(first,last) Range(first, last, 0)
+
 namespace STK
 {
 // forward declaration

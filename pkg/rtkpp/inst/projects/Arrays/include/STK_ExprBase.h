@@ -57,20 +57,19 @@
 namespace STK
 {
 template<class Derived> class ExprBase;
+template<class Derived> class ArrayBase;
 template<class Derived, class Rhs> struct  ProductReturnType;
 template<class Derived> class  ArrayInitializer;
 } // namespace STK
 
-#include "STK_ITContainer2D.h"
-
 #include "STKernel/include/STK_Functors.h"
 
-#include "Arrays/include/products/STK_ProductOperators.h"
-#include "Arrays/include/operators/STK_TransposeOperator.h"
-#include "Arrays/include/operators/STK_DiagOperator.h"
-#include "Arrays/include/operators/STK_UnaryOperators.h"
-#include "Arrays/include/operators/STK_BinaryOperators.h"
-#include "Arrays/include/operators/STK_DotOperators.h"
+#include "products/STK_ProductOperators.h"
+#include "operators/STK_TransposeOperator.h"
+#include "operators/STK_DiagOperator.h"
+#include "operators/STK_UnaryOperators.h"
+#include "operators/STK_BinaryOperators.h"
+#include "operators/STK_DotOperators.h"
 
 namespace STK
 {

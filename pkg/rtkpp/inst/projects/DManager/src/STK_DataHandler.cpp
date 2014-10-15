@@ -38,11 +38,38 @@ namespace STK
 {
 
 /* read a data file and its companion description file. */
+bool DataHandler::readDataFromCsvFile( std::string const& datafile
+                                          , std::string const& idData
+                                          , std::string const& idModel)
+{
+  ReadWriteCsv data(datafile);
+  // no names to read in the first line
+  data.setWithNames(withNames_);
+  // read the data set
+  if (!data.read())
+  {
+    stk_cerr << _T("An error occur when reading the data file.\nWhat: ")
+             << data.error();
+    return false;
+  }
+  // add descriptor
+  Variable<std::string> desc(2);
+  desc[baseIdx] = idModel ; desc[baseIdx+1] = idData;
+  // store data and descriptors
+  if (!addInfo(idData, idModel)) return false;
+  data_ += data;
+  // store descriptor : this is the same for all the columns added
+  for (int j=data.beginCols(); j< data.endCols(); ++j)
+  { descriptor_.push_back(desc);}
+  return true;
+}
+
+/* read a data file and its companion description file. */
 bool DataHandler::readDataFromCsvFile(std::string const& datafile, std::string descriptorfile)
 {
   ReadWriteCsv rwdata(datafile);
   // no names to read in the first line
-  rwdata.setWithNames(false);
+  rwdata.setWithNames(withNames_);
   // read the data set
   if (!rwdata.read())
   {
@@ -78,7 +105,7 @@ bool DataHandler::readDataFromCsvFile(std::string const& datafile, std::string d
   }
   // parse descriptor file
   int firstRow = rwdesc.beginRows();
-  for (int j=rwdesc.beginCols(); j<= rwdesc.lastIdxCols(); j++)
+  for (int j=rwdesc.beginCols(); j< rwdesc.endCols(); j++)
   {
     std::string idModel = rwdesc.at(j).at(firstRow);
     std::string idData = rwdesc.at(j).at(firstRow+1);

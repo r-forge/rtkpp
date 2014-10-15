@@ -29,7 +29,7 @@
  **/
 
 /** @file STK_Global.h
- *  @brief In this file we define the global variables of the stk++ library.
+ *  @brief In this file we define the global variables of the STK++ library.
  **/
 
 

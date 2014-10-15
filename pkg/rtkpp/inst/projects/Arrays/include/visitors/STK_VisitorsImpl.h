@@ -122,7 +122,7 @@ struct VisitorArrayImpl< Visitor, Derived, Orient_, SizeRows_, UnknownSize>
   {
     VisitorArrayImpl<Visitor, Derived, Orient_, SizeRows_ -1, UnknownSize>::apply(array, visitor);
     for(int j = array.beginCols(); j < array.endCols(); ++j)
-      visitor(array.elt(baseIdx, j));
+      visitor(array.elt(Idx(SizeRows_), j));
   }
 };
 
@@ -272,12 +272,12 @@ struct VisitorUnrollCol
   inline static void run( Derived const& matrix, Visitor& visitor)
   {
     VisitorUnrollCol<Visitor, Derived, SizeRows_-1, SizeCols_>::run(matrix, visitor);
-    visitor(matrix.elt(baseIdx, Idx(SizeCols_)), baseIdx, Idx(SizeCols_));
+    visitor(matrix.elt(Idx(SizeRows_), Idx(SizeCols_)), Idx(SizeRows_), Idx(SizeCols_));
   }
   inline static void apply( Derived& matrix, Visitor& visitor)
   {
     VisitorUnrollCol<Visitor, Derived, SizeRows_-1, SizeCols_>::apply(matrix, visitor);
-    visitor(matrix.elt(baseIdx, Idx(SizeCols_)));
+    visitor(matrix.elt(Idx(SizeRows_), Idx(SizeCols_)));
   }
 };
 
@@ -326,9 +326,9 @@ template<typename Visitor, typename Derived>
 struct VisitorVectorImpl<Visitor, Derived, UnknownSize>
 {
   inline static void run( Derived const& vect, Visitor& visitor)
-  { for(int i = vect.begin(); i <= vect.lastIdx(); ++i) visitor(vect.elt(i), i, vect.colIdx());}
+  { for(int i = vect.begin(); i < vect.end(); ++i) visitor(vect.elt(i), i, vect.colIdx());}
   inline static void apply( Derived& array, Visitor& applier)
-  { for(int i = array.begin(); i <= array.lastIdx(); ++i) applier(array.elt(i));}
+  { for(int i = array.begin(); i < array.end(); ++i) applier(array.elt(i));}
 };
 
 /** @ingroup hidden
@@ -366,9 +366,9 @@ template<typename Visitor, typename Derived>
 struct VisitorPointImpl<Visitor, Derived, UnknownSize>
 {
   inline static void run( Derived const& row, Visitor& visitor)
-  { for(int j = row.begin(); j <= row.lastIdx(); ++j) visitor(row.elt(j), row.rowIdx(),j);}
+  { for(int j = row.begin(); j < row.end(); ++j) visitor(row.elt(j), row.rowIdx(),j);}
   inline static void apply( Derived& row, Visitor& visitor)
-  { for(int j = row.begin(); j <= row.lastIdx(); ++j) visitor(row.elt(j));}
+  { for(int j = row.begin(); j < row.end(); ++j) visitor(row.elt(j));}
 };
 
 

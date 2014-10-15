@@ -33,9 +33,6 @@
 /** @file STK_Model_Util.h
  *  @brief In this file we define the constant and utilities methods used in
  *  the project Model.
- *
- *  @namespace Model namespace enclosing thye enum and utilities function of the
- *  StatModel project.
  **/
 
 #ifndef STK_MODEL_UTIL_H

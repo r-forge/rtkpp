@@ -71,7 +71,7 @@ class DataHandler : public IDataHandler
   public:
     typedef IDataHandler::InfoMap InfoMap;
     /** default constructor */
-    inline DataHandler() : IDataHandler()
+    inline DataHandler() : IDataHandler(), withNames_(false)
     { data_.setWithNames(false); descriptor_.setWithNames(false);}
     /** destructor */
     inline virtual ~DataHandler() {}
@@ -85,8 +85,18 @@ class DataHandler : public IDataHandler
     /** get the whole descriptor set */
     inline ReadWriteCsv const& descriptor() const { return descriptor_;}
 
+    /** set withNames flag */
+    inline void setWithNames(bool withNames) { withNames_ = withNames;}
     /** read a data file and its companion description file. */
     bool readDataFromCsvFile(std::string const& datafile, std::string descriptorfile);
+    /** @brief read a data set from an Array2D.
+     * read a data file
+     * @param datafile the data file to get
+     * @param idData the id of the data
+     * @param idModel an id identifying the model to use with the data set
+     **/
+    bool readDataFromCsvFile(std::string const& datafile, std::string const& idData, std::string const& idModel);
+
     /** @brief read a data set from an Array2D.
      * This method should be essentially used:
      * - for testing some statistical method as the data  will be converted in a
@@ -114,6 +124,8 @@ class DataHandler : public IDataHandler
     std::vector<int> colIndex(std::string const& idData) const;
 
   private:
+    /** first line with names ?*/
+    bool withNames_;
     /** data files */
     ReadWriteCsv data_;
     /** descriptor files with two rows. On the first row we get the idModel,

@@ -209,6 +209,15 @@ class CAllocatorBase : public ITContainer2D<Derived>
     typedef typename hidden::Traits<Derived>::SubVector SubVector;
     typedef typename hidden::Traits<Derived>::Transposed Transposed;
 
+    enum
+    {
+      structure_ = hidden::Traits<Derived>::structure_,
+      orient_    = hidden::Traits<Derived>::orient_,
+      sizeRows_  = hidden::Traits<Derived>::sizeRows_,
+      sizeCols_  = hidden::Traits<Derived>::sizeCols_,
+      storage_   = hidden::Traits<Derived>::storage_
+    };
+
     /** @return the index of the allocator*/
     inline int idx() const { return idx_;}
     /** Access to the ith row of the Allocator.
@@ -216,27 +225,27 @@ class CAllocatorBase : public ITContainer2D<Derived>
      *  @return a reference on the ith row
      **/
     inline RowVector row(int const& i) const
-    { return  RowVector(this->asDerived(), Range(i,1), this->cols(), idx_);}
+    { return RowVector(this->asDerived(), Range(i,1), this->cols(), idx_);}
     /** Access to the row (i,J) of the Allocator.
      *  @param i index of the row
      *  @param J range of the columns
      *  @return a reference on the ith row
      **/
     inline SubRowVector row(int const& i, Range const& J) const
-    { return  SubRowVector(this->asDerived(), Range(i,1), J, idx_);}
+    { return SubRowVector(this->asDerived(), Range(i,1), J, idx_);}
     /** Access to the jth column of the Allocator.
      *  @param j index of the column
      *  @return a reference on the jth column
      **/
     inline ColVector col(int const& j) const
-    { return  ColVector(this->asDerived(), this->rows(), Range(j,1), idx_);}
+    { return ColVector(this->asDerived(), this->rows(), Range(j,1), idx_);}
     /** Access to the column (I,j) of the Allocator.
      *  @param I range of the rows
      *  @param j index of the column
      *  @return a reference on the jth column
      **/
     inline SubColVector col(Range const& I, int const& j) const
-    { return  SubColVector(this->asDerived(), I, Range(j,1), idx_);}
+    { return SubColVector(this->asDerived(), I, Range(j,1), idx_);}
     /** Access to the sub-part (I,J) of the Allocator.
      *  @param I range of the rows
      *  @param J range of the columns
@@ -249,7 +258,10 @@ class CAllocatorBase : public ITContainer2D<Derived>
      *  @return a reference on a sub-part of the Allocaor
      **/
     inline SubVector sub(Range const& I) const
-    { return this->asDerived().sub1Impl(I);}
+    {
+      STK_STATICASSERT_ONE_DIMENSION_ONLY(Derived)
+      return this->asDerived().sub1Impl(I);
+    }
     /** transpose the Allocator.
      *  @return a transposed allocator
      **/
@@ -755,7 +767,7 @@ class CAllocator<Type, Structure_, UnknownSize, UnknownSize, Orient_>
      if ((sizeRows <= 0)||(sizeCols<=0))
      {
        // free any allocated memory if this is not a reference
-       this->freeData();
+       this->free();
        // set Range values and null pointer
        this->setPtrData(0, this->prod(sizeRows, sizeCols), false);
        this->setRanges(sizeRows, sizeCols);
@@ -858,7 +870,7 @@ class CAllocator<Type, Structure_, SizeRows_, UnknownSize, Orient_>
       if (sizeCols<=0)
       {
         // free any allocated memory if it is not a reference
-        this->freeData();
+        this->free();
         // set Range values and null pointer
         this->setPtrData(0, this->prod(SizeRows_, sizeCols), false);
         this->setRanges(SizeRows_, sizeCols);
@@ -958,7 +970,7 @@ class CAllocator<Type, Structure_, UnknownSize, SizeCols_, Orient_>
       if (sizeRows <= 0)
       {
         // free any allocated memory if it is not a reference
-        this->freeData();
+        this->free();
         // set Range values and null pointer
         this->setPtrData(0, this->prod(sizeRows, SizeCols_), false);
         this->setRanges(sizeRows, SizeCols_);

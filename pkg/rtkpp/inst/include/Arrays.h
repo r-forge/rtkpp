@@ -34,7 +34,7 @@
  **/
 
 /**
- * @defgroup Arrays Arrays and Expressions
+ * @defgroup Arrays Templated Arrays and (meta-templated) Expressions
  * @brief The Arrays project provides two kinds of arrays for storing
  * in a two entries arrays (matrices) numeric data.
  *
@@ -44,14 +44,22 @@
  *
  * There is two kind of containers that have been defined and implemented in the
  * STK++ project:
- * @li the old set of arrays: Array2D, Array2DVector (column oriented vectors),
- * Array2DPoint (row oriented vector), Array2DUpperTriangular,
- * Array2DLowerTriangular, Array2DDiagonal.
- * @li the new set of Arrays: CArray
+ * @li the set of arrays: Array2D, Array2DSquare, Array2DVector (column oriented
+ * vectors), Array2DPoint (row oriented vector), Array2DUpperTriangular,
+ * Array2DLowerTriangular, Array2DDiagonal allowing to modify, resize, add,
+ * remove rows/columns in a very flexible way.
+ * @li and the set of Arrays: CArray, CArrayPoint, CarrayVector that can be used
+ * as C-like containers (as theirs names indicate).
  *
- * The storing scheme of the CArray allows to use them as C-like array
- * (as its name indicates) and thus to interface them to well known library
- * like Lapack.
+ * Moreover a Meta-template mechanism for optimization of complex expressions
+ * at compile time is available. It is possible to mix any kind of array in such
+ * expression.
+ **/
+
+/** @ingroup Arrays
+ *  @namespace STK::Arrays
+ *  @brief the namespace Arrays contain the enum and utilities method used by
+ *  the containers classes.
  **/
 
 #ifndef ARRAYS_H

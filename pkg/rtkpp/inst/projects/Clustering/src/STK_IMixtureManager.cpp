@@ -69,14 +69,14 @@ Clust::Mixture IMixtureManager::getIdModel( String const& idData) const
 #endif
   return Clust::stringToMixture(idModelName);
 }
-/* Utility function allowing to create and register all the stk++ mixtures
+/* Utility function allowing to create and register all the STK++ mixtures
  *  defined in the handler.
  *  @param composer the composer claiming the mixtures
  *  @param nbCluster the number of clusters
  **/
 void IMixtureManager::createMixtures(MixtureComposer& composer, int nbCluster)
 {
-  for (typename InfoMap::const_iterator it=p_handler_->info().begin(); it!=p_handler_->info().end(); ++it)
+  for (InfoMap::const_iterator it=p_handler_->info().begin(); it!=p_handler_->info().end(); ++it)
   {
     Clust::Mixture idModel = Clust::stringToMixture(it->second);
     IMixture* p_mixture = createMixtureImpl(idModel, it->first, nbCluster);

@@ -28,25 +28,39 @@
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
 
-/** @file clusterMixture.cpp
- *  @brief In this file we launch the computation for estimating a mixture model.
+/** @file Rcpp_as.h
+ *  @brief In this file we create the  .
  **/
 
+#ifndef RCPP_AS_H
+#define RCPP_AS_H
 
-#include "RTKpp.h"
-
-using namespace STK;
-
-/** @param model ClusterDiagModel S4 class
- *  @param nbCluster a vector with the number of clusters to test
- */
-RcppExport SEXP clusterMixture( SEXP model, SEXP nbCluster, SEXP modelNames, SEXP strategy, SEXP r_critName )
+namespace Rcpp
 {
-  BEGIN_RCPP
-  // create a launcher
-  ClusterLauncher launcher(model, nbCluster, modelNames, strategy, r_critName);
-  // return result
-  return Rcpp::wrap(launcher.run());
 
-  END_RCPP
-}
+namespace traits
+{
+/* support for Rcpp::as */
+template<typename Type>
+class Exporter< STK::RcppMatrix<Type> >
+{
+  private:
+    enum
+    {
+      Rtype_ = STK::hidden::RcppTraits<Type>::Rtype_
+    };
+    Rcpp::Matrix<Rtype_> mat;
+
+  public:
+    Exporter(SEXP x) : mat(x)
+    {
+      if (TYPEOF(x) != Rtype_) ::Rf_error("Wrong R type for mapped matrix");
+    }
+    STK::RcppMatrix<Type> get() {return STK::RcppMatrix<Type>(mat);}
+} ;
+
+} // namespace traits
+
+} // namespace Rcpp
+
+#endif // RCPP_AS_H

@@ -33,22 +33,25 @@ include $(RELATIVEMAKEVARS)
 
 #-----------------------------------------------------------------------
 # main directories
-PROJECTS_DIR  = ./projects/
-RTKPP_BIN_DIR = ./bin/
-RTKPP_LIB_DIR = ./lib/
+RTKPP_PROJECTS_DIR  = projects/
+RTKPP_BIN_DIR = bin/
+RTKPP_LIB_DIR = lib/
 
 # check if we are using symoblic paths
-ifneq ($(patsubst $(PROJECTS_DIR)STKernel/../%,%,$(wildcard $(PROJECTS_DIR)STKernel/../Rtk*)),$(patsubst $(PROJECTS_DIR)%,%,$(wildcard $(PROJECTS_DIR)Rtk*)))
-MAKEVARS = $(CURDIR)/$(RELATIVEMAKEVARS)
-BIN_DIR = $(CURDIR)/bin/
+ifneq ($(patsubst $(RTKPP_PROJECTS_DIR)STKernel/../%,%,$(wildcard $(RTKPP_PROJECTS_DIR)STKernel/../*)),$(patsubst $(RTKPP_PROJECTS_DIR)%,%,$(wildcard $(RTKPP_PROJECTS_DIR)*)))
+MAKEVARS     = $(CURDIR)/$(RELATIVEMAKEVARS)
+PROJECTS_DIR = $(CURDIR)/$(RTKPP_PROJECTS_DIR)
+BIN_DIR      = $(CURDIR)/$(RTKPP_BIN_DIR)
 else
-MAKEVARS = ../../../$(RELATIVEMAKEVARS)
-BIN_DIR = ../../../bin/
+MAKEVARS     = ../../../$(RELATIVEMAKEVARS)
+PROJECTS_DIR = ../../../$(RTKPP_PROJECTS_DIR)
+BIN_DIR      = ../../../$(RTKPP_BIN_DIR)
 endif
 
 export RELATIVEMAKEVARS
 export MAKEVARS
 export BIN_DIR
+export PROJECTS_DIR
 
 #-----------------------------------------------------------------------
 # library name
@@ -59,27 +62,29 @@ all: echo lib
 
 # use to debug
 echo:
+	@echo $(MAKEVARS)
 	@echo $(BIN_DIR)
-	@echo $(patsubst $(PROJECTS_DIR)STKernel/../%,%,$(wildcard $(PROJECTS_DIR)STKernel/../Rtk*))
-	@echo $(patsubst $(PROJECTS_DIR)%,%,$(wildcard $(PROJECTS_DIR)Rtk*))
+	@echo $(PROJECTS_DIR)
+	@echo $(patsubst $(RTKPP_PROJECTS_DIR)STKernel/../%,%,$(wildcard $(RTKPP_PROJECTS_DIR)STKernel/../*))
+	@echo $(patsubst $(RTKPP_PROJECTS_DIR)%,%,$(wildcard $(RTKPP_PROJECTS_DIR)*))
 	@echo $(CXXFLAGS)
 	@echo $(CXXPICFLAGS)
 	@echo $(STK_CXXFLAGS)
 
 #-----------------------------------------------------------------------
 # projects paths
-STKERNEL_DIR  = $(PROJECTS_DIR)STKernel/
-SDK_DIR       = $(PROJECTS_DIR)Sdk/
-ARRAYS_DIR    = $(PROJECTS_DIR)Arrays/
-DMANAGER_DIR  = $(PROJECTS_DIR)DManager/
-CLUSTERING_DIR= $(PROJECTS_DIR)Clustering/
-ALGEBRA_DIR   = $(PROJECTS_DIR)Algebra/
-ANALYSIS_DIR  = $(PROJECTS_DIR)Analysis/
-STATISTIK_DIR = $(PROJECTS_DIR)STatistiK/
-STATMODELS_DIR= $(PROJECTS_DIR)StatModels/
-AAMODELS_DIR  = $(PROJECTS_DIR)AAModels/
-REGRESS_DIR   = $(PROJECTS_DIR)Regress/
-REDUCT_DIR    = $(PROJECTS_DIR)Reduct/
+STKERNEL_DIR  = $(RTKPP_PROJECTS_DIR)STKernel/
+SDK_DIR       = $(RTKPP_PROJECTS_DIR)Sdk/
+ARRAYS_DIR    = $(RTKPP_PROJECTS_DIR)Arrays/
+DMANAGER_DIR  = $(RTKPP_PROJECTS_DIR)DManager/
+CLUSTERING_DIR= $(RTKPP_PROJECTS_DIR)Clustering/
+ALGEBRA_DIR   = $(RTKPP_PROJECTS_DIR)Algebra/
+ANALYSIS_DIR  = $(RTKPP_PROJECTS_DIR)Analysis/
+STATISTIK_DIR = $(RTKPP_PROJECTS_DIR)STatistiK/
+STATMODELS_DIR= $(RTKPP_PROJECTS_DIR)StatModels/
+AAMODELS_DIR  = $(RTKPP_PROJECTS_DIR)AAModels/
+REGRESS_DIR   = $(RTKPP_PROJECTS_DIR)Regress/
+REDUCT_DIR    = $(RTKPP_PROJECTS_DIR)Reduct/
 
 SRC_STKERNEL_DIR  = $(STKERNEL_DIR)src/
 SRC_SDK_DIR       = $(SDK_DIR)src/

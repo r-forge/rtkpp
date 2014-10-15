@@ -113,40 +113,43 @@ class CArrayPoint : public ICArray < CArrayPoint<Type, SizeCols_, Orient_> >
     };
 
     /** Default constructor. */
-    inline CArrayPoint() : Base() {}
+    inline CArrayPoint(): Base() {}
     /** constructor with specified dimension.
      *  @param sizeCols range of the columns
      **/
-    inline CArrayPoint( int const& sizeCols) : Base(1, sizeCols) {}
+    inline CArrayPoint( int const& sizeCols): Base(1, sizeCols) {}
     /** constructor with rbeg, rend, cbeg and cend specified,
      *  initialization with a constant.
      *  @param sizeCols range of the columns
      *  @param v initial value of the container
      **/
-    inline CArrayPoint( int const& sizeCols, Type const& v) : Base(1, sizeCols, v) {}
+    inline CArrayPoint( int const& sizeCols, Type const& v): Base(1, sizeCols, v) {}
     /** Copy constructor
      *  @param T the container to copy
      *  @param ref true if T is wrapped
      **/
-    inline CArrayPoint( const CArrayPoint &T, bool ref=false) : Base(T, ref) {}
+    inline CArrayPoint( const CArrayPoint &T, bool ref=false): Base(T, ref) {}
     /** wrapper constructor for 0 based C-Array.
      *  @param q pointer on the array
      *  @param nbCol number of columns
      **/
-    inline CArrayPoint( Type* const& q, int nbCol): Base(q, 1, nbCol)
-    {}
-
+    inline CArrayPoint( Type* const& q, int nbCol): Base(q, 1, nbCol) {}
     /** constructor by reference.
      *  @param allocator the allocator to wrap
      **/
     template<class OtherAllocator>
-    inline CArrayPoint( OtherAllocator const& allocator) : Base(allocator) {}
+    inline CArrayPoint( CAllocatorBase<OtherAllocator> const& allocator): Base(allocator.asDerived()) {}
+    /** Copy constructor using an expression.
+     *  @param T the container to wrap
+     **/
+    template<class OtherDerived>
+    CArrayPoint( ExprBase<OtherDerived> const& T): Base() { LowBase::operator=(T);}
     /** destructor. */
     inline ~CArrayPoint() {}
     /** operator= : set the container to a constant value.
      *  @param v the value to set
      **/
-    inline CArrayPoint& operator=(Type const& v) { this->setValue(v); return *this;}
+    inline CArrayPoint& operator=(Type const& v) { return LowBase::setValue(v);}
     /** operator = : overwrite the CArray with the Right hand side T.
      *  @param T the container to copy
      **/

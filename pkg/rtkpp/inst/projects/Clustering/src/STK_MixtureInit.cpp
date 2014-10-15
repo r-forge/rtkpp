@@ -65,16 +65,25 @@ bool RandomInit::run()
            << _T("Entering RandomInit::run()\n");
 #endif
   bool result = false;
-  for (int iTry= 0; iTry < this->nbTry_; ++iTry)
+  for (int iTry= 0; iTry < nbTry_; ++iTry)
   {
      try
      {
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("p_model_->randomInit() starting.\n");
+#endif
        p_model_->randomInit();
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("p_model_->randomInit() terminated.\n");
+#endif
        if (runInitAlgo()) { result = true; break;}
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("runInitAlgo() failed\n");
+#endif
      }
      catch (Clust::exceptions const& error)
      {
-#ifdef STK_MIXTURE_VERY_VERBOSE
+#ifdef STK_MIXTURE_VERBOSE
   stk_cout << _T("In RandomInit::run(), try number") << iTry << " generate an exception.\n";
 #endif
      }
@@ -133,7 +142,7 @@ bool FuzzyInit::run()
            << _T("Entering FuzzyInit::run()\n");
 #endif
   bool result = false;
-  for (int iTry= 0; iTry < this->nbTry_; ++iTry)
+  for (int iTry= 0; iTry < nbTry_; ++iTry)
   {
     try
     {

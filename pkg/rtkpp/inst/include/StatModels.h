@@ -52,6 +52,11 @@
  *  of this set are likely to be the true one.
  **/
 
+/**  @ingroup StatModels
+ *  @namespace Model namespace enclosing the enum and utilities functions of the
+ *  StatModel project.
+ **/
+
 #ifndef STATMODELS_H
 #define STATMODELS_H
 

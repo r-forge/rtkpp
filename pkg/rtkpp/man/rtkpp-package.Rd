@@ -3,7 +3,7 @@
 \name{rtkpp}
 \alias{rtkpp}
 \alias{rtkpp-package}
-\title{rtkpp is a R/stk++ bridge}
+\title{rtkpp is a R/STK++ bridge}
 \description{
 This package contains the header files for the STK++ library.
 The typical usage is to install this package and list it in
@@ -37,6 +37,6 @@ multivariate data sets using gamma multidimensional models (24 models).
 \author{
 Author: Serge Iovleff \email{contact@stkpp.org}
 }
-\keyword{stk++,}
+\keyword{STK++,}
 \keyword{stkpp}
 

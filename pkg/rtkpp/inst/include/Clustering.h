@@ -58,6 +58,12 @@
  *  procedures involve such steps.
  **/
 
+/**  @ingroup Clustering
+ *  @namespace STK::Clust
+ *  @brief The namespace Clust enclose all the enum and utilities functions
+ *  needed by the Clustering project.
+ **/
+
 #ifndef CLUSTERING_H
 #define CLUSTERING_H
 

@@ -131,7 +131,7 @@ class CArrayNumber <Type, 1, 1, Orient_>
     /** operator= : set the container to a constant value.
      *  @param v the value to set
      **/
-    inline CArrayNumber& operator=(Type const& v) { this->setValue(v); return *this;}
+    inline CArrayNumber& operator=(Type const& v) { return LowBase::setValue(v);}
     /** operator = : overwrite the CArrayNumber with the Right hand side T.
      *  @param T the container to copy
      **/

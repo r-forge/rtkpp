@@ -29,8 +29,7 @@
  **/
 
 /** @file STK_IQr.h
- *  @brief In this file we define the IQr class (for a
- * symmetric matrix).
+ *  @brief In this file we define the IQr class (for a general matrix).
  **/
  
 #ifndef STK_ISYMEIGEN_H
@@ -39,49 +38,100 @@
 #include "STKernel/include/STK_Real.h"
 #include "Sdk/include/STK_IRunner.h"
 
-#include "Arrays/include/STK_CArraySquare.h"
-#include "Arrays/include/STK_CArrayVector.h"
-#include "Arrays/include/STK_CArrayPoint.h"
+#include "Arrays/include/STK_CArray.h"
+#include "Arrays/include/STK_Array2D.h"
+#include "Arrays/include/STK_Array2DVector.h"
+#include "Arrays/include/STK_Array2DUpperTriangular.h"
+
 
 namespace STK
 {
 /** @ingroup Algebra
  *  @brief The class IQr is an interface class for the method
- *  computing the eigenvalue Decomposition of a symmetric Matrix.
+ *  computing the QR Decomposition of a Matrix.
  * 
- *  The decomposition of a symmetric matrix require
- *  - Input:  A symmetric matrix A of size (n,n)
+ *  The QR decomposition of a matrix require
+ *  - Input:  A matrix of size M-by-N
  *  - Output:
- *     -# P Matrix of size (n,n).
- *     -# D Vector of dimension n
- *     -# \f$ A = PDP' \f$
- *  The matrix A can be copied or overwritten by the class.
- *
- *  The 2-norm (operator norm) of the matrix is given. if the 2-norm is less
- *  than the arithmetic precision of the type @c Real, the rank is not full.
- *  Thus the user can be faced with a deficient rank matrix and with a norm
- *  very small (i.e. not exactly 0.0).
+ *     -# Q Matrix of size M-by-N.
+ *     -# R Upper Triangular matrix of dimension min(M,N)-by-N
+ *     -# \f$ A = QR \f$
  **/
-class IQr : public IRunnerWithData<CArraySquareXX>
+class IQr : public IRunnerBase
 {
-  public:
-    typedef IRunnerWithData<CArraySquareXX> Base;
+  protected:
+    typedef IRunnerBase Base;
     /** @brief Constructor
-     *  @param data reference on a symmetric square expression
+     *  @param data reference on a matrix expression
+     *  @param ref do we use data as reference for Q_ ?
+     */
+    IQr( Array2D<Real> const& data, bool ref = false): Base(), Q_(data, ref), compq_(false)
+    {}
+    /** @brief Constructor
+     *  @param data reference on a matrix expression
      */
     template<class Derived>
-    IQr( ExprBase<Derived> const& data)
-             : Base(data_)
-             , norm_(0.), rank_(0), det_(0.)
-             , data_()
-             , eigenVectors_()
-             , eigenValues_(data.size(), 0.)
-             , SupportEigenVectors_(2*data.size(), 0)
+    IQr( ExprBase<Derived> const& data) : Base(), compq_(false)
     {
-      STK_STATICASSERT(Derived::structure_==(int)Arrays::square_,YOU_HAVE_TO_USE_A_SQUARE_MATRIX_IN_THIS_METHOD)
-      data_         = data.asDerived();
-      eigenVectors_ = data_.asDerived();
+//      STK_STATICASSERT_TWO_DIMENSIONS_ONLY(Derived)
+      Q_ = data.asDerived();
     }
+
+  public :
+    /** Operator = : overwrite the Qr with S. */
+    IQr& operator=(IQr const& S);
+    /** Is Q computed ?
+     *  @return @c true if Q_ is computed, @c false otherwise
+     */
+    inline bool isCompQ() const { return compq_;}
+    /** give the matrix Q of the QR decomposition.
+     * @return the matrix Q of the QR decomposition
+     **/
+    inline Matrix const& Q() const  { return Q_;}
+    /** give the matrix R of the QR decomposition.
+     * @return the matrix R of the QR decomposition
+     **/
+    inline MatrixUpperTriangular const& R() const { return R_;}
+    /** Compute Q (to use after run). After the run process, Q_ store
+     *  the householder vector in its column. Call compQ, if you want to
+     *  obtain Q in its true form.
+     *  Without effect if (compq_ == true)
+     **/
+    void compQ();
+    /** Delete the n last columns and update the QR decomposition.
+     *  @param n number of column to delete
+     **/
+    void popBackCols(int n =1);
+    /** Delete the column pos and update the QR decomposition.
+     *  @param pos the position of the column to delete
+     **/
+    void eraseCol(int pos);
+    /** Add a column with value T and update th QR decomposition.
+     *  @param T the column to add
+     **/
+    template<class Vector>
+    void pushBackCol(Vector const& T);
+    /** Add a column with value T at the position pos and update the QR
+     *  decomposition.
+     *  @param T the column to insert
+     *  @param pos the position of the column to insert
+     **/
+    template<class Vector>
+    void insertCol(Vector const& T, int pos);
+
+    /* TODO : Delete the ith row and update the QR decomposition :
+     *  default is the last row.
+     **/
+    //Qr& popBackRows();
+    //Qr& eraseRows(int i);
+
+    /* TODO : Add a row with value T and update th QR decomposition :
+     *  default is the last row.
+     **/
+    //Qr& pushBackRows(const Array2DPoint<double> &T);
+    //Qr& insertRows(const Array2DPoint<double> &T, int i);
+
+  public:
     /** Copy constructor.
      *  @param eigen the EigenValue to copy
      **/
@@ -94,74 +144,94 @@ class IQr : public IRunnerWithData<CArraySquareXX>
      *  @return a reference on this
      **/
     IQr& operator=( IQr const& eigen);
-    /** @return the trace norm of the matrix */
-    inline Real norm()  const { return norm_;}
-    /** @return the rank of the matrix */
-    inline int rank()  const { return rank_;}
-    /** @return the determinant of the Matrix */
-    inline Real det()  const { return det_;}
-    /**  @return the rotation matrix */
-    inline CArraySquareXX const& rotation() const{ return eigenVectors_;}
-    /**  @return the rotation matrix */
-    inline CArraySquareXX const& eigenVectors() const{ return eigenVectors_;}
-    /** @return the eigenvalues */
-    inline CVectorX const& eigenValues() const { return eigenValues_;}
-    /** Compute the generalized inverse of the symmetric matrix and put
-     *  the result in res.
-     *  @param res the generalized inverse of the Matrix.
-     */
-    template<class ArraySquare>
-    void ginv(ArraySquare& res)
-    {
-      STK_STATICASSERT(ArraySquare::structure_==(int)Arrays::square_,YOU_HAVE_TO_USE_A_SQUARE_MATRIX_IN_THIS_METHOD)
-      // create pseudo inverse matrix
-      res.resize(eigenVectors_.range());
-      res = 0;
-      // compute tolerance
-      Real tol = Arithmetic<Real>::epsilon() * norm_;
-      // compute PDP'
-      for (int k = eigenVectors_.begin(); k< eigenVectors_.end(); k++)
-      {
-        Real value = eigenValues_[k];
-        if (std::abs(value) > tol)
-        {
-          res += (eigenVectors_.col(k) * eigenVectors_.col(k).transpose())/value;
-        }
-      }
-    }
     /** overloading of setData.
      * @param data the data set to set.
      **/
     template<class Derived>
     void setData( ExprBase<Derived> const& data)
-    { data_ = data.asDerived();
-      norm_ = 0.; rank_ = 0; det_ = 0.;
-      eigenVectors_ = data_;
-      eigenValues_.resize(data.range());
-      SupportEigenVectors_.resize(2*data.size());
-    }
+    { Q_ = data.asDerived(); compq_ = false;}
 
-  protected:
-    /** trace norm */
-    Real norm_;
-    /** rank */
-    int rank_;
-    /** determinant */
-    Real det_;
-   /** array with the original data. Will be overwritten. */
-   CArraySquareXX data_;
-   /** Square matrix or the eigenvectors. */
-   CArraySquareXX eigenVectors_;
-   /** Array of the eigenvalues */
-   CVectorX eigenValues_;
-   /** Array for the support of the eigenvectors */
-   CArrayVector<int> SupportEigenVectors_;
-   /** finalize the computation by computing the rank, the trace norm and the
-    * determinant of the matrix.
-    **/
-   void finalizeStep();
+  protected :
+    /** Q Matrix of the QR decomposition */
+    Matrix Q_;
+    /** R Matrix of th QR decomposition */
+    MatrixUpperTriangular R_;
+    /// is Q computed ?
+    bool compq_;
 };
 
+/* Adding the last column and update the QR decomposition. */
+template<class Vector>
+void IQr::pushBackCol(Vector const& T)
+{
+  STK_STATICASSERT(Vector::structure_==(int)Arrays::vector_||Vector::structure_==(int)Arrays::point_,YOU_HAVE_TO_USE_A_VECTOR_OR_POINT_IN_THIS_METHOD)
+  // check conditions
+  if (T.range() != Q_.rows())
+  { STKRUNTIME_ERROR_NO_ARG(IQr::pushBackCol,T.range() != Q_.rows());}
+  // if Q_ is not computed yet
+  if (!compq_) compQ();
+  // Adding a column to R
+  int lastColR = R_.endCols();
+  // Create an auxiliary container
+  Array2DVector<Real> Rncolr = Q_.transpose() * T; // Rncolr of size Q_.cols()
+  // update Q_
+  for (int iter = Q_.lastIdxCols()-1, iter1 = Q_.lastIdxCols(); iter>=lastColR; iter--, iter1--)
+  {
+    Real sinus, cosinus;
+    // compute the Givens rotation
+    Rncolr[iter] = compGivens( Rncolr[iter], Rncolr[iter1], cosinus, sinus);
+    // apply Givens rotation if necessary
+    if (sinus) { rightGivens(Q_, iter, iter1, cosinus, sinus);}
+  }
+  // update R_
+  R_.pushBackCols();
+  R_.col(lastColR).copy(Rncolr.sub(R_.rangeRowsInCol(lastColR)));
+}
+
+
+/* Add a column with value T at the position pos and update the QR
+ *  decomposition.
+ *  @param T the column to insert
+ *  @param pos the position of the column to insert
+ **/
+template<class Vector>
+void IQr::insertCol(Vector const& T, int pos)
+{
+  if (pos < R_.beginCols())
+  { STKOUT_OF_RANGE_1ARG(Qr::insertCol,pos,pos<R_.beginCols());}
+  if (R_.lastIdxCols() < pos)
+  { STKOUT_OF_RANGE_1ARG(Qr::insertCol,pos,pos<R_.lastIdxCols()<pos);}
+  if (T.range() != Q_.rows())
+  { STKRUNTIME_ERROR_1ARG(Qr::insertCol,pos,T.range() != Q_.rows());}
+  // if Q_ is not computed yet
+  if (!compq_) compQ();
+  // Adding a column to R
+  R_.insertCols(pos);
+  // update the range of the remaining cols of R_
+  R_.update( _R(pos+1, std::min(R_.lastIdxRows(), R_.lastIdxCols())) );
+  for (int i=pos+1; i< std::min(R_.endRows(), R_.endCols()); ++i) { R_(i,i) = 0.0;}
+  // add column
+  Array2DVector<Real> Rpos =  Q_.transpose() * T;
+  for (int iter= Q_.lastIdxCols(), iterm1= Q_.lastIdxCols()-1; iter>pos; iterm1--, iter--)
+  {
+    Real sinus, cosinus;
+    // compute the Givens rotation
+    Rpos[iterm1]  = compGivens(Rpos[iterm1], Rpos[iter], cosinus, sinus);
+    // apply Givens rotation if necessary
+    if (sinus)
+    {
+      // create a reference on the sub-Matrix
+      MatrixUpperTriangular Rsub(R_.col(Range(iter, R_.lastIdxCols(), 0)), true);
+      // Update the next rows (iter:ncolr_) of R_
+      leftGivens( Rsub, iterm1, iter, cosinus, sinus);
+      // Update the cols of Q_
+      rightGivens(Q_, iterm1, iter, cosinus, sinus);
+    }
+  }
+  // update R_
+  R_.col(pos) = Rpos.sub(R_.rangeRowsInCol(pos));
+  R_.update(pos);
+}
 
 } // namespace STK
 

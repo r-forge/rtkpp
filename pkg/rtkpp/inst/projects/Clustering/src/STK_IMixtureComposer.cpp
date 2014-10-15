@@ -97,7 +97,7 @@ void IMixtureComposer::randomClassInit()
 /* initialize randomly the posterior probabilities tik of the model */
 void IMixtureComposer::randomFuzzyInit()
 {
-#ifdef STK_MIXTURE_VERY_VERBOSE
+#ifdef STK_MIXTURE_VERBOSE
   stk_cout << _T("Entering IMixtureComposer::randomFuzzyInit()\n");
 #endif
   initializeStep();
@@ -129,6 +129,9 @@ int IMixtureComposer::sStep()
 /* compute tik, default implementation. */
 Real IMixtureComposer::eStep()
 {
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("Entering IMixtureComposer::eStep()\n");
+#endif
   Real sum = 0.; tk_ =0;
   for (int i = tik_.beginRows(); i < tik_.endRows(); ++i)
   {
@@ -150,6 +153,9 @@ Real IMixtureComposer::eStep()
     sum += max + std::log(sum2);
   }
   setLnLikelihood(sum);
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("Terminating IMixtureComposer::eStep()\n");
+#endif
   return tk_.minElt();
 }
 

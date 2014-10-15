@@ -74,7 +74,7 @@ class IDataHandler
      *  are modeled by the model with model "idModel".
      *  @param idData can be any string given by the user for identifying data.
      *  @param idModel represent the idModel of a given model (can be defined
-     *  inside or outside stk++).
+     *  inside or outside STK++).
      *
      *  @note If the pair (idData, idModel) already exists then addInfo will do nothing.
      *  @return @c false if there exists already an idData matched with an other

@@ -121,7 +121,7 @@ class Array2DPoint : public IArray2D< Array2DPoint<Type> >
      *  @param v initial value of the container
      **/
     Array2DPoint( Range const& J, Type const& v) : Base(Range(1), J)
-    { this->setValue(v);}
+    { LowBase::setValue(v);}
     /** Copy constructor
      *  @param T the container to copy
      *  @param ref true if this is a wrapper of T
@@ -144,6 +144,12 @@ class Array2DPoint : public IArray2D< Array2DPoint<Type> >
     Array2DPoint( IArray2D<OtherArray> const& T, Range const& J, int row)
                 : Base(T, Range(row, 1), J)
     {}
+    /** Copy constructor using an expression.
+     *  @param T the container to wrap
+     **/
+    template<class OtherDerived>
+    Array2DPoint( ExprBase<OtherDerived> const& T): Base(Range(1), Range())
+    { LowBase::operator=(T);}
     /** constructor by reference, ref_=1.
      *  @param p_data a pointer on the data to wrap
      *  @param J the range of the data to wrap
@@ -200,7 +206,7 @@ class Array2DPoint : public IArray2D< Array2DPoint<Type> >
     /** set the container to a constant value.
      *  @param v the value to set
      **/
-    inline Array2DPoint& operator=(Type const& v) { this->setValue(v); return *this;}
+    inline Array2DPoint& operator=(Type const& v) { return LowBase::setValue(v);}
 };
 
 } // namespace STK

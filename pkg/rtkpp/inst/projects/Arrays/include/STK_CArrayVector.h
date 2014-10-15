@@ -133,19 +133,23 @@ class CArrayVector : public ICArray < CArrayVector<Type, SizeRows_, Orient_> >
      *  @param q pointer on the array
      *  @param nbRow number of rows
      **/
-    inline CArrayVector( Type* const& q, int nbRow): Base(q, nbRow, 1)
-    {}
+    inline CArrayVector( Type* const& q, int nbRow): Base(q, nbRow, 1) {}
     /** constructor by reference.
      *  @param allocator the allocator to wrap
      **/
     template<class OtherAllocator>
-    inline CArrayVector( OtherAllocator const& allocator) : Base(allocator) {}
+    inline CArrayVector( CAllocatorBase<OtherAllocator> const& allocator): Base(allocator.asDerived()) {}
+    /** Copy constructor using an expression.
+     *  @param T the container to wrap
+     **/
+    template<class OtherDerived>
+    CArrayVector( ExprBase<OtherDerived> const& T): Base() { LowBase::operator=(T);}
     /** destructor. */
     inline ~CArrayVector() {}
     /** operator= : set the container to a constant value.
      *  @param v the value to set
      **/
-    inline CArrayVector& operator=(Type const& v) { this->setValue(v); return *this;}
+    inline CArrayVector& operator=(Type const& v) { return LowBase::setValue(v);}
     /** operator = : overwrite the CArray with the Right hand side T.
      *  @param T the container to copy
      **/

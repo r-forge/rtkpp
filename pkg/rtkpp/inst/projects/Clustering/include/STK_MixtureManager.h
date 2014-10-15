@@ -51,7 +51,7 @@ namespace STK
 {
 /** @ingroup Clustering
  *  @brief A mixture manager is a factory class for injection dependency in the
- *  stk++ derived class of the IMixture interface
+ *  STK++ derived class of the IMixture interface
  *  (aka: the MixtureBridge<Id> classes).
  *
  *  It handles all the creation and initialization stuff needed by the
@@ -282,7 +282,7 @@ class MixtureManager : public IMixtureManager
           return 0; // 0 if idModel is not implemented
           break;
       }
-      return 0; // 0 if idModel is not a stk++ model
+      return 0; // 0 if idModel is not a STK++ model
     }
     /** pointer to the dataHandler */
     DataHandler const* const p_handler_;

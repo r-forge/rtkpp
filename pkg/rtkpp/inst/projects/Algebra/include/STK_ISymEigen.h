@@ -62,16 +62,16 @@ namespace STK
  *  Thus the user can be faced with a deficient rank matrix and with a norm
  *  very small (i.e. not exactly 0.0).
  **/
-class ISymEigen : public IRunnerWithData<CArraySquareXX>
+class ISymEigen : public IRunnerBase
 {
   public:
-    typedef IRunnerWithData<CArraySquareXX> Base;
+    typedef IRunnerBase Base;
     /** @brief Constructor
      *  @param data reference on a symmetric square expression
      */
     template<class Derived>
     ISymEigen( ExprBase<Derived> const& data)
-             : Base(data_)
+             : Base()
              , norm_(0.), rank_(0), det_(0.)
              , data_()
              , eigenVectors_()

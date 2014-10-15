@@ -41,6 +41,7 @@
 #define STK_DENSEARRAYBASE_H
 
 #include "STK_ArrayBase.h"
+
 #include "STK_ExprBaseVisitor.h"
 #include "STK_ExprBaseDot.h"
 #include "STK_ExprBaseProduct.h"
@@ -178,28 +179,26 @@ class ICArray : public ArrayBase<Derived>
     inline Type* p_data() { return allocator_.p_data();}
 
     // general arrays
-    inline Type& elt2Impl( int const& i, int const& j)
-    { return allocator_.elt(i, j);}
-    inline Type const elt2Impl( int const& i, int const& j) const
-    { return allocator_.elt(i, j);}
-
-    inline Row row(int const& i) const { return  Row( allocator_.row(i));}
-    inline SubRow row(int const& i, Range const& J) const { return SubRow( allocator_.row( i, J));}
-
-    inline Col col(int const& j) const { return  Col( allocator_.col(j));}
-    inline SubCol col(Range const& I, int const& j) const { return SubCol( allocator_.col( I, j));}
-
-    inline SubArray sub(Range const& I, Range const& J) const { return SubArray(allocator_.sub(I, J));}
+    inline Type& elt2Impl( int i, int j) { return allocator_.elt(i, j);}
+    inline Type const elt2Impl( int i, int j) const { return allocator_.elt(i, j);}
 
     // vectors and points
-    inline Type& elt1Impl( int const& j) { return allocator_.elt(j);}
-    inline Type const elt1Impl( int const& j) const { return allocator_.elt(j);}
+    inline Type& elt1Impl( int j) { return allocator_.elt(j);}
+    inline Type const elt1Impl( int j) const { return allocator_.elt(j);}
 
     // numbers
     inline Type& elt0Impl() { return allocator_.elt();}
     inline Type const elt0Impl() const { return allocator_.elt();}
 
-    inline SubVector sub( Range const& J) const { return SubVector( allocator_.sub(J));}
+    inline Row rowImpl(int i) const { return  Row( allocator_.row(i));}
+    inline SubRow rowImpl(int i, Range const& J) const { return SubRow( allocator_.row( i, J));}
+
+    inline Col colImpl(int j) const { return  Col( allocator_.col(j));}
+    inline SubCol colImpl(Range const& I, int j) const { return SubCol( allocator_.col( I, j));}
+
+    inline SubArray subImpl(Range const& I, Range const& J) const { return SubArray(allocator_.sub(I, J));}
+
+    inline SubVector subImpl( Range const& J) const { return SubVector( allocator_.sub(J));}
 
     /** @return the transposed CArray. */
     inline Transposed transpose() const { return Transposed(allocator_.transpose());}

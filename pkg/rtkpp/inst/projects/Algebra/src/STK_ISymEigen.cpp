@@ -57,7 +57,6 @@ ISymEigen::ISymEigen( ISymEigen const& eigen)
  **/
 ISymEigen& ISymEigen::operator=( ISymEigen const& eigen)
 {
-  p_data_ = eigen.p_data_;
   norm_   = eigen.norm_;     // norm of the matrix
   rank_   = eigen.rank_;     // rank of the matrix
   det_    = eigen.det_;      // determinant of the matrix

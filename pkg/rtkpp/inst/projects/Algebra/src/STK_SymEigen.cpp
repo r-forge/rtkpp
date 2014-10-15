@@ -34,10 +34,9 @@
  **/
 
 
+#include "../include/STK_SymEigen.h"
 #include "../include/STK_Householder.h"
 #include "../include/STK_Givens.h"
-
-#include "../include/STK_SymEigen.h"
 
 
 #ifdef STK_ALGEBRA_VERBOSE

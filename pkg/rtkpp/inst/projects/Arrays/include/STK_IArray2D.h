@@ -137,59 +137,60 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
     /** @return  many elements.
      *  @param J Range of the elements
      **/
-    inline SubVector sub(Range const& J) const
+    inline SubVector subImpl(Range const& J) const
     { return SubVector(this->asDerived(), J);}
     /** access to a part of a column.
      *  @param I range of the rows
      *  @param j index of the col
      *  @return a reference in the range I of the column j of this
      **/
-    inline SubCol col(Range const& I, int j) const
+    inline SubCol colImpl(Range const& I, int j) const
     { return SubCol( this->asDerived(), Range::inf(I, this->asDerived().rangeRowsInCol(j)), j);}
     /** access to a part of a column.
      *  @param j index of the column
      *  @return a reference in the range I of the column j of this
      **/
-    inline Col col( int j) const
+    inline Col colImpl( int j) const
     { return Col( this->asDerived(), this->asDerived().rangeRowsInCol(j), j);}
     /** access to a part of a row.
      *  @param i index of the row
      *  @param J range of the columns
      *  @return a reference of the row i.
      **/
-    inline SubRow row(int i, Range const& J) const
+    inline SubRow rowImpl(int i, Range const& J) const
     { return SubRow( this->asDerived(), Range::inf(J, this->asDerived().rangeColsInRow(i)), i);}
     /** access to a part of a row.
      *  @param i index of the row
      *  @return a reference of the row i.
      **/
-    inline Row row( int i) const
+    inline Row rowImpl( int i) const
     { return Row( this->asDerived(), this->asDerived().rangeColsInRow(i), i);}
     /** access to many columns.
      *  @param J range of the index of the cols
      *  @return a 2D container containing the Container in the Horizontal range @c J
      **/
-    inline SubArray col(Range const& J) const { return sub(this->rows(), J);}
+    inline SubArray colImpl(Range const& J) const { return subImpl(this->rows(), J);}
     /** access to many rows.
      *  @param I range of the index of the rows
      *  @return a 2D container containing the Container in the vertical range @c I
      **/
-    inline SubArray row(Range const& I) const { return sub(I, this->cols());}
+    inline SubArray rowImpl(Range const& I) const { return subImpl(I, this->cols());}
     /** access to a sub-array.
      *  @param I range of the rows
      *  @param J range of the columns
      **/
-    inline SubArray sub(Range const& I, Range const& J) const
+    inline SubArray subImpl(Range const& I, Range const& J) const
     { return SubArray(this->asDerived(), I, J);}
 
     /** set a value to the whole container */
-    void setValue(Type const& v)
+    Derived& setValue(Type const& v)
     {
       for (int j=this->beginCols(); j<=this->lastIdxCols(); j++)
       {
         Type* p(this->data(j));
         for (int i=this->rangeCols_[j].begin(); i<this->rangeCols_[j].end(); i++) p[i]= v;
       }
+      return this->asDerived();
     }
     /** move T to this.
      *  @note : T is not modified but just set as a reference of the data it was responsible.

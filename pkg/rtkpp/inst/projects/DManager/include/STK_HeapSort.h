@@ -37,7 +37,7 @@
 #ifndef STK_HEAPSORT_H
 #define STK_HEAPSORT_H
 
-#include "Arrays/include/STK_ITContainer2D.h"
+#include "Arrays/include/STK_ArrayBase.h"
 
 namespace STK
 {
@@ -47,7 +47,7 @@ namespace STK
  *  @param T the container to sort
  **/
 template<class Vector>
-void heapSort( ITContainer<Vector>& T)
+void heapSort( ArrayBase<Vector>& T)
 {
   typedef typename hidden::Traits<Vector>::Type Type;
   // number of elements
@@ -118,7 +118,7 @@ void heapSort( ITContainer<Vector>& T)
  *  @param Tsort the container with the result
  **/
 template< class Vector>
-void heapSort( ITContainer<Vector> const& T, Vector& Tsort)
+void heapSort( ArrayBase<Vector> const& T, Vector& Tsort)
 {
   typedef typename Vector::Type Type;
   // copy T in Tsort
@@ -192,7 +192,7 @@ void heapSort( ITContainer<Vector> const& T, Vector& Tsort)
  *  @param T the container to sort
  **/
 template< class Vector, class VectorInt>
-void heapSort( ITContainer< VectorInt> & I, ITContainer<Vector> const& T)
+void heapSort( ArrayBase< VectorInt> & I, ArrayBase<Vector> const& T)
 {
   typedef typename hidden::Traits<Vector>::Type Type;
 
@@ -280,7 +280,7 @@ void heapSort( ITContainer< VectorInt> & I, ITContainer<Vector> const& T)
  *  @param T the container to sort
  **/
 template<class Vector, class VectorInt>
-void applySort1D( ITContainer<Vector>& T, ITContainer<VectorInt> const& I)
+void applySort1D( ArrayBase<Vector>& T, ArrayBase<VectorInt> const& I)
 {
 #ifdef STK_DEBUG
   if (I.range() != T.range())
@@ -299,7 +299,7 @@ void applySort1D( ITContainer<Vector>& T, ITContainer<VectorInt> const& I)
  *  @param T the container to sort
  **/
 template < class Array, class VectorInt>
-void applySort2D( Array& T, ITContainer< VectorInt> const& I)
+void applySort2D( Array& T, ArrayBase< VectorInt> const& I)
 {
 #ifdef STK_DEBUG
   if (I.range() != T.rows())

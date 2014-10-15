@@ -140,13 +140,13 @@ class Array2D : public IArray2D< Array2D<Type> >
      *  @param v initial value of the container
      **/
     Array2D( Range const& I, Range const& J, Type const& v) : Base(I, J)
-    { this->setValue(v);}
+    { LowBase::setValue(v);}
     /** Copy constructor
      *  @param T the container to copy
      *  @param ref true if T is wrapped
      **/
-    Array2D( const Array2D &T, bool ref=false) : Base(T, ref) {}
-    /** constructor by reference, ref_=1.
+    Array2D( Array2D const& T, bool ref=false) : Base(T, ref) {}
+    /** Copy constructor by reference, ref_=1.
      *  @param T the container to wrap
      *  @param I range of the Rows to wrap
      *  @param J range of the Cols to wrap
@@ -154,6 +154,12 @@ class Array2D : public IArray2D< Array2D<Type> >
     template<class OtherArray>
     Array2D( IArray2D<OtherArray> const& T, Range const& I, Range const& J)
            : Base(T, I, J) {}
+    /** Copy constructor using an expression.
+     *  @param T the container to wrap
+     **/
+    template<class OtherDerived>
+    Array2D( ExprBase<OtherDerived> const& T): Base()
+    { LowBase::operator=(T);}
     /** Wrapper constructor Contruct a reference container.
      *  @param q pointer on the data
      *  @param I range of the  Rows to wrap
@@ -170,11 +176,11 @@ class Array2D : public IArray2D< Array2D<Type> >
     /** overwrite the Array2D with T.
      *  @param T the container to copy
      **/
-    inline Array2D& operator=(const Array2D &T) { return LowBase::assign(T);}
+    inline Array2D& operator=( Array2D const& T) { return LowBase::assign(T);}
     /** set the container to a constant value.
      *  @param v the value to set
      **/
-    inline Array2D& operator=(Type const& v) { this->setValue(v); return *this;}
+    inline Array2D& operator=(Type const& v) { return LowBase::setValue(v);}
     /** Swapping the pos1 row and the pos2 row.
      *  @param pos1 position of the first row
      *  @param pos2 position of the second row

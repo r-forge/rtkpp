@@ -1,8 +1,8 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2013  Serge Iovleff
+/*     Copyright (C) 2004-2013  Inria
 
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as
+    it under the terms of the GNU General Public License as
     published by the Free Software Foundation; either version 2 of the
     License, or (at your option) any later version.
 
@@ -11,7 +11,7 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
+    You should have received a copy of the GNU General Public
     License along with this program; if not, write to the
     Free Software Foundation, Inc.,
     59 Temple Place,
@@ -162,7 +162,7 @@ void ClusterLauncher::getCategoricalParameters()
 /* select best model*/
 Real ClusterLauncher::selectBestModel()
 {
-  // wrap data matrix with Rcpp and wrap Rcpp matrix with stk++ matrix
+  // wrap data matrix with Rcpp and wrap Rcpp matrix with STK++ matrix
   NumericMatrix m_data = s4_model_.slot("data");
   RcppMatrix<double> data(m_data);
 
@@ -178,7 +178,7 @@ Real ClusterLauncher::selectBestModel()
     {
       std::string idData = "model" + typeToString<int>(l);
       std::string idModel(as<std::string>(v_modelNames_[l]));
-      // transform R models names to stk++ models names
+      // transform R models names to STK++ models names
       // check have been done on the R side so.... Let's go
       bool freeProp;
       Clust::Mixture model = Clust::stringToMixture(idModel, freeProp);

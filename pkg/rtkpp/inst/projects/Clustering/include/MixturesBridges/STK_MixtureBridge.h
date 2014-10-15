@@ -288,9 +288,16 @@ struct InitializeMixtureImpl<Clust::Categorical_pjk_, Data>
   typedef typename MixtureBridgeTraits<Clust::Categorical_pjk_, Data>::DataBridge DataBridge;
   static void run( Mixture& mixture, DataBridge* p_data)
   {
+#ifdef STK_MIXTURE_VERBOSE
+     stk_cout << _T("InitializeMixtureImpl<Clust::Categorical_, Data>::run(mixture, p_data)\n");
+#endif
     int min = p_data->m_dataij().minElt();
     int max = p_data->m_dataij().maxElt();
-    mixture.setModalities(Range(min, max, 0));
+#ifdef STK_MIXTURE_VERBOSE
+     stk_cout << _T("In InitializeMixtureImpl<Clust::Categorical_, Data>\n");
+     stk_cout << _T("Range = ") << _R(min, max) << _T("\n");
+#endif
+    mixture.setModalities(_R(min, max));
     mixture.setData(p_data->m_dataij());
   }
 };
@@ -316,7 +323,7 @@ struct InitializeMixtureImpl<Clust::Categorical_pk_, Data>
 
 /** @ingroup Clustering
  *  @brief Templated implementation of the IMixture interface allowing
- *  to bridge a stk++ mixture with the composer.
+ *  to bridge a STK++ mixture with the composer.
  *
  * @tparam Id is any identifier of a concrete model deriving from the
  * interface STK::IMixtureModel class.

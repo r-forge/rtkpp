@@ -59,10 +59,16 @@ namespace hidden
 template<typename Type_>
 struct Traits< RcppMatrix<Type_> >
 {
+  private:
+    class Void {};
   public:
     typedef Type_ Type;
     typedef RowOperator< RcppMatrix<Type_> > Row;
+    typedef RowOperator< RcppMatrix<Type_> > SubRow;
     typedef ColOperator< RcppMatrix<Type_> > Col;
+    typedef ColOperator< RcppMatrix<Type_> > SubCol;
+    typedef Void SubVector;
+    typedef Void SubArray;
 
     enum
     {
@@ -83,12 +89,16 @@ class RcppMatrix : public ArrayBase< RcppMatrix<Type_> >
     typedef typename hidden::Traits<RcppMatrix >::Type Type;
     typedef typename hidden::Traits<RcppMatrix >::Row Row;
     typedef typename hidden::Traits<RcppMatrix >::Col Col;
+    typedef typename hidden::Traits<RcppMatrix >::SubRow SubRow;
+    typedef typename hidden::Traits<RcppMatrix >::SubCol SubCol;
     enum
     {
       Rtype_ = hidden::RcppTraits<Type_>::Rtype_
     };
     /** Default Constructor. */
     inline RcppMatrix() : matrix_() {}
+    /** Constructor with SEXP. */
+    inline RcppMatrix(SEXP robj) : matrix_(robj) {}
     /** Constructor */
     inline RcppMatrix( Rcpp::Matrix<Rtype_> matrix) : matrix_(matrix) {}
     /** set Matrix .
@@ -117,7 +127,11 @@ class RcppMatrix : public ArrayBase< RcppMatrix<Type_> >
     /** @return the number of columns */
     inline int sizeColsImpl() const { return matrix_.cols();}
 
-    /** @return a constant reference on element (i,j) of the 2D container
+    /** @return the j-th column of this. */
+    inline Col colImpl(int j) const { return Col(this->asDerived(), j);}
+    /** @return the i-th row of this. */
+    inline Row rowImpl(int i) const { return Row(this->asDerived(), i);}
+   /** @return a constant reference on element (i,j) of the 2D container
      *  @param i, j indexes of the row and of the column
      **/
     inline Type const elt2Impl(int i, int j) const { return (matrix_(i,j));}

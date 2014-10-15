@@ -123,11 +123,27 @@ void MixtureComposer::initializeStep()
 
 void MixtureComposer::randomInit()
 {
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("-------------------------------\n")
+           << _T("Entering MixtureComposer::RandomInit()\n");
+#endif
   initializeStep();
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("initializeStep() done\n");
+#endif
   randomFuzzyTik();
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("randomFuzzyTik() done\n");
+#endif
   for (MixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
   { (*it)->randomInit();}
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("randomInit() done\n");
+#endif
   eStep();
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("eStep() done\n");
+#endif
   // model intialized
   setState(Clust::modelInitialized_);
 }

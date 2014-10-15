@@ -151,18 +151,18 @@ class CArraySquare
     /** constructor with specified dimension.
      *  @param size range of the columns
      **/
-    inline CArraySquare( int const& size) : Base(size, size) {}
+    inline CArraySquare( int const& size): Base(size, size) {}
     /** constructor with rbeg, rend, cbeg and cend specified,
      *  initialization with a constant.
      *  @param size range of the columns
      *  @param v initial value of the container
      **/
-    inline CArraySquare( int const& size, Type const& v) : Base(size, size, v) {}
+    inline CArraySquare( int const& size, Type const& v): Base(size, size, v) {}
     /** Copy constructor
      *  @param T the container to copy
      *  @param ref true if T is wrapped
      **/
-    inline CArraySquare( CArraySquare const& T, bool ref=false) : Base(T, ref) {}
+    inline CArraySquare( CArraySquare const& T, bool ref=false): Base(T, ref) {}
     /** wrapper constructor for 0 based C-Array.
      *  @param q pointer on the array
      *  @param size number of rows/columns
@@ -172,13 +172,19 @@ class CArraySquare
      *  @param allocator the allocator to wrap
      **/
     template<class OtherAllocator>
-    inline CArraySquare( OtherAllocator const& allocator) : Base(allocator) {}
+    inline CArraySquare( CAllocatorBase<OtherAllocator> const& allocator): Base(allocator.asDerived()) {}
+    /** Copy constructor using an expression.
+     *  @param T the container to wrap
+     **/
+    template<class OtherDerived>
+    CArraySquare( ExprBase<OtherDerived> const& T): Base()
+    { LowBase::operator=(T);}
     /** destructor. */
     inline ~CArraySquare() {}
     /** operator= : set the container to a constant value.
      *  @param v the value to set
      **/
-    inline CArraySquare& operator=(Type const& v) { this->setValue(v); return *this;}
+    inline CArraySquare& operator=(Type const& v) { return LowBase::setValue(v);}
     /** operator = : overwrite the CArray with the Right hand side T.
      *  @param T the container to copy
      **/

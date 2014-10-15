@@ -59,10 +59,16 @@ namespace hidden
 template<typename Type_>
 struct Traits< RcppVector<Type_> >
 {
+  private:
+    class Void {};
   public:
     typedef Type_ Type;
     typedef RowOperator< RcppVector<Type_> > Row;
     typedef ColOperator< RcppVector<Type_> > Col;
+    typedef RowOperator< RcppMatrix<Type_> > SubRow;
+    typedef ColOperator< RcppMatrix<Type_> > SubCol;
+    typedef SubOperator< RcppMatrix<Type_> > SubVector;
+    typedef Void SubArray;
 
     enum
     {
@@ -83,6 +89,9 @@ class RcppVector : public ArrayBase< RcppVector<Type_> >
     typedef typename hidden::Traits<RcppVector >::Type Type;
     typedef typename hidden::Traits<RcppVector >::Row Row;
     typedef typename hidden::Traits<RcppVector >::Col Col;
+    typedef typename hidden::Traits<RcppVector >::SubRow SubRow;
+    typedef typename hidden::Traits<RcppVector >::SubCol SubCol;
+    typedef typename hidden::Traits<RcppVector >::SubVector SubVector;
 
     enum
     {
@@ -90,6 +99,8 @@ class RcppVector : public ArrayBase< RcppVector<Type_> >
     };
     /** Constructor */
     inline RcppVector(Rcpp::Vector<Rtype_> vector) : vector_(vector) {}
+    /** Constructor with SEXP. */
+    inline RcppVector(SEXP robj) : vector_(robj) {}
     /** set Vector .
      *  @param vector the Rcpp matrix to wrap
      *  @note cannot be passed as const& due to a bug from the (old versions of) Rcpp side
@@ -114,6 +125,12 @@ class RcppVector : public ArrayBase< RcppVector<Type_> >
     /** @return the number of columns */
     inline int sizeColsImpl() const { return 1;}
 
+    /** @return the j-th column of this. */
+    inline Col colImpl(int j) const { return Col(this->asDerived(), j);}
+    /** @return the i-th row of this. */
+    inline Row rowImpl(int i) const { return Row(this->asDerived(), i);}
+    /** @return the i-th row of this. */
+    inline SubVector sub(Range I) const { return SubVector(this->asDerived(), I);}
     /** @return the ith element of the operator
      *  @param i index of the ith element
      **/

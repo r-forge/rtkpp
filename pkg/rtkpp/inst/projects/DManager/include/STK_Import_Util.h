@@ -34,10 +34,6 @@
 /** @file STK_Import_Util.h
  *  @brief In this file we define the main constant and method needed when
  *  importing data.
- *
- *  @namespace STK::Import The import namespace contains the constants and
- *  global functions used in the DManager project when importing data in STK
- *  containers.
  **/
 
 #ifndef STK_IMPORT_UTIL_H

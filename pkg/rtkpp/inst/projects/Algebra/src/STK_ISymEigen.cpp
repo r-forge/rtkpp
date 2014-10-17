@@ -39,13 +39,23 @@
 namespace STK
 {
 
+/* @brief Constructor
+ *  @param data reference on a symmetric square matrix
+ *  @param ref @c true if we overwrite the data set, @c false otherwise
+ */
+ISymEigen::ISymEigen( CArraySquareXX const& data, bool ref)
+         : Base()
+         , norm_(0.), rank_(0), det_(0.)
+         , eigenVectors_(data, ref)
+         , eigenValues_(data.size(), 0.)
+         , SupportEigenVectors_(2*data.size(), 0)
+{}
 /* Copy constructor.
  *  @param S the EigenValue to copy
  **/
 ISymEigen::ISymEigen( ISymEigen const& eigen)
                     : Base(eigen)
                     , norm_(eigen.norm_), rank_(eigen.rank_), det_(eigen.det_)
-                    , data_(eigen.data_)
                     , eigenVectors_(eigen.eigenVectors_)
                     , eigenValues_(eigen.eigenValues_)
                     , SupportEigenVectors_(eigen.SupportEigenVectors_)
@@ -60,7 +70,6 @@ ISymEigen& ISymEigen::operator=( ISymEigen const& eigen)
   norm_   = eigen.norm_;     // norm of the matrix
   rank_   = eigen.rank_;     // rank of the matrix
   det_    = eigen.det_;      // determinant of the matrix
-  data_   = eigen.data_;
   eigenVectors_ = eigen.eigenVectors_;
   eigenValues_  = eigen.eigenValues_;
   SupportEigenVectors_ = eigen.SupportEigenVectors_;

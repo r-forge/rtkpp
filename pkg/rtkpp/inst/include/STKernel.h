@@ -30,15 +30,17 @@
 
 /** @file STKernel.h
  *  @brief This file include all the header files of the project STKernel.
- *
- * @defgroup STKernel Kernel tools
- * @brief The STKernel project is the low-level core library that forms the
- * basis of the project. It provides data class handling for C++.
- * It contains the sub-projects:
- * - @ref Base
- * - @ref Functors
- *
- *  @ingroup STKernel
+ **/
+
+/** @defgroup STKernel Kernel tools
+ *  @brief The STKernel project is the low-level core library that forms the
+ *  basis of the project. It provides data class handling for C++.
+ *  It contains the sub-projects:
+ *  - @ref Base
+ *  - @ref Functors
+ **/
+
+/** @ingroup STKernel
  *  @defgroup Base Fundamental data types
  *  @brief In this subproject we define the fundamental types.
  *  The Base subproject is composed of
@@ -65,6 +67,38 @@
  *  @defgroup Functors Functors
  *  In the Functors subproject, we implement the main functors that can be used
  *  throughout the STK++ project, especially in the Arrays project.
+ **/
+
+/** @ingroup Base
+ *  @defgroup Arithmetic Arithmetic properties.
+ *
+ *  These classes extend the @c numeric_limits C++ struct. They
+ *  allow to handle in a transparent way a possible
+ *  Not Available (NA) value in the data.
+ **/
+
+/** @ingroup Base
+ *  @defgroup RTTI Runtime Type Identification.
+ *
+ *  These classes allow to handle the Runtime type identification (RTTI)
+ *  problem and are useful when working with heterogeneous data.
+ **/
+
+/** @ingroup Base
+ *  @defgroup iostream I/O stream declarations
+ *
+ *  Nearly all of the I/O classes are parameterized on the type of
+ *  characters they read and write (The major exception is ios_base at
+ *  the top of the hierarchy).
+ *
+ *  For ease of use, all of the basic_* I/O-related
+ *  classes are given typedef names in the namespace STK. For example:
+ *
+ *  @code
+ *     typedef basic_ifstream<Char>  ifstream;
+ *  @endcode
+ *  These declarations in the STK namespace would be very useful if you
+ *  modify the built-in type representation of Char (say wchar_t).
  **/
 
 /** @ingroup STKernel

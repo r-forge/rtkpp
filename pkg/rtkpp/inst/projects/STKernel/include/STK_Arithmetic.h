@@ -42,15 +42,6 @@
 
 namespace STK
 {
-/** @ingroup Base
- *  @defgroup Arithmetic Arithmetic properties.
- *
- *
- *  These classes extend the @c numeric_limits C++ struct. They
- *  allow to handle in a transparent way a possible
- *  Not Available (NA) value in the data.
- **/
-
 /** @ingroup Arithmetic
   *  @brief Arithmetic properties of STK fundamental types.
   *
@@ -69,7 +60,7 @@ namespace STK
   *
   *  The class arithmetic<Type> inherit from @c std::numeric_limits<Type>
   *  whom which we give hereafter the definition.
-    \code
+    @code
     template<typename _Tp>
     struct numeric_limits
     {
@@ -191,7 +182,7 @@ namespace STK
       //  value.
       static _Tp denorm_min() throw() { return static_cast<_Tp>(0); }
   };
-  \endcode
+  @endcode
   *
   **/
 template<class Type>

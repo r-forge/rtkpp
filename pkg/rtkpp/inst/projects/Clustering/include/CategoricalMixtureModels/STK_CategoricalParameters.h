@@ -122,7 +122,11 @@ class Categorical_pjkParameters: public CategoricalParametersBase<Categorical_pj
     /** print the parameters.
      *  @param os the output stream for the parameters
      **/
-    inline void printImpl(ostream &os) { os << proba_ << _T("\n");}
+    inline void printImpl(ostream &os)
+    {
+      for(int j=proba_.begin(); j< proba_.end(); j++)
+      { os << proba_[j] << _T("\n");}
+    }
     /** Array of the probabilities */
     Array1D< Array2DVector<Real> > proba_;
     /** utility function allowing to resize the probability vector with a
@@ -169,14 +173,14 @@ class Categorical_pkParameters: public CategoricalParametersBase<Categorical_pkP
      *  @param os the output stream for the parameters
      **/
     inline void printImpl(ostream &os) { os << proba_ << _T("\n");}
-    /** probabilities of each modalities */
-    Array2DVector<Real> proba_;
     /** utility function allowing to resize the probability vector with a
      *  given Range for the modalities.
      *  @param rangeMod the range of modalities of the categorical distribution
      **/
     inline void initializeParameters(Range const& rangeMod)
     { proba_.resize(rangeMod); proba_ = 1./rangeMod.size();}
+    /** probabilities of each modalities */
+    Array2DVector<Real> proba_;
 };
 
 } // namespace STK

@@ -61,6 +61,11 @@ namespace STK
 class SymEigen : public ISymEigen
 {
   public:
+    /** @brief Constructor
+     *  @param data reference on a symmetric square matrix
+     *  @param ref @c true if we overwrite the data set, @c false otherwise
+     */
+    SymEigen( CArraySquareXX const& data, bool ref =false);
     /** constructor.
      *  @param data A reference on the symmetric matrix to decompose.
      **/

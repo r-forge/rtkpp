@@ -44,10 +44,10 @@ extern "C"
 {
 #ifdef STKREALAREFLOAT
 /** LAPACK routine in float to compute the QR decomposition */
-extern void sgeqrf_( int*, int *, float *, int *, float*, float *, int *);
+extern void sgeqrf_(int* M, int* N, float* A, int* LDA, float* TAU, float* WORK, int* LWORK, int* INFO );
 #else
 /** LAPACK routine in double to compute the QR decomposition */
-extern void dgeqrf_(int*, int *, double *, int *, double*, double *, int *);
+extern void dgeqrf_(int* M, int* N, double* A, int* LDA, double* TAU, double* WORK, int* LWORK, int* INFO );
 #endif
 }
 
@@ -67,33 +67,33 @@ namespace lapack
 class Qr : public IQr
 {
   public:
+    /** Default constructor.
+     *  @param data the matrix to decompose
+     *  @param ref true if we overwrite A
+     **/
+    Qr( Matrix const&  data, bool ref = false);
     /** @brief Constructor
      *  @param data reference on a matrix expression
      */
     template<class Derived>
-    Qr( ArrayBase<Derived> const& data)
-      : IQr(data), rangeRows_(data.rows()), rangeCols_(data.cols())
-    {}
-    /** @brief copy constructor
-     *  @param qr the Qr to copy
-     */
-    Qr( Qr const& qr);
-    /** Destructor. */
-    inline virtual ~Qr() {}
+    Qr( ArrayBase<Derived> const& data) : IQr(data){}
+    /** Copy constructor.
+     *  @param decomp the decomposition  to copy
+     **/
+    Qr( Qr const& decomp);
+    /** virtual destructor */
+    virtual ~Qr();
     /** @brief clone pattern */
     inline virtual Qr* clone() const { return new Qr(*this);}
+    /** Operator = : overwrite the Qr with decomp. */
+    Qr& operator=(Qr const& decomp);
     /** @brief Run qr decomposition
      *  Launch geqrf LAPACK routine to perform the qr decomposition.
      *  @return @c true if no error occur, @c false otherwise
      */
-    bool run();
+    virtual bool run();
 
   protected:
-    /** range of the rows and columns of the original data set. The data_ array
-     *  is shifted in order to get a zero based array, so we need to conserve
-     *  the original range.
-     **/
-    Range rangeRows_, rangeCols_;
     /** wrapper of the LAPACK DGEQRF routine. Compute the Qr decomposition
      *  of a matrix.
      *

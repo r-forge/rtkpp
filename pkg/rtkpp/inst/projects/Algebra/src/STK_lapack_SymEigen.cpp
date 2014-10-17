@@ -43,13 +43,23 @@ namespace STK
 namespace lapack
 {
 
+/** @brief Constructor
+ *  @param data reference on a symmetric square matrix
+ *  @param ref @c true if we overwrite the data set, @c false otherwise
+ */
+SymEigen::SymEigen( CArraySquareXX const& data, bool ref)
+                  : ISymEigen(data, ref), range_(data.range())
+                  , JOBZ_('V'), RANGE_('A'), UPLO_('U')
+                  , VL_(0.0), VU_(0.0), IL_(0), IU_(0)
+                  , data_(data)
+{ data_.shift(0);}
 /** @brief copy constructor
  *  @param eigen the SymEigen to copy
  */
-SymEigen ::SymEigen( SymEigen const& eigen)
+SymEigen::SymEigen( SymEigen const& eigen)
                    : ISymEigen(eigen)
-                   , JOBZ(eigen.JOBZ), RANGE(eigen.RANGE), UPLO(eigen.UPLO)
-                   , VL(eigen.VL), VU(eigen.VU), IL(eigen.IL), IU(eigen.IU)
+                   , JOBZ_(eigen.JOBZ_), RANGE_(eigen.RANGE_), UPLO_(eigen.UPLO_)
+                   , VL_(eigen.VL_), VU_(eigen.VU_), IL_(eigen.IL_), IU_(eigen.IU_)
  {}
 
 /* @brief Run eigen decomposition
@@ -62,7 +72,6 @@ bool SymEigen::run()
   stk_cout << _T("Enter in SymEigen::run\n");
 #endif
   // shift data sets
-  data_.shift(0);
   eigenVectors_.shift(0);
   eigenValues_.shift(0);
   SupportEigenVectors_.shift(0);
@@ -79,11 +88,11 @@ bool SymEigen::run()
   stk_cout << _T("Data dimensions: ") << data_.rows() << " " << data_.cols() << "\n";
   stk_cout << _T("eigenValues_ dimensions: ") << eigenValues_.rows() << " " << eigenValues_.cols() << "\n";
   stk_cout << _T("eigenVectors_ dimensions: ") << eigenVectors_.rows() << " " << eigenVectors_.cols() << "\n";
-  stk_cout << _T("Options: ") << JOBZ << " " << RANGE << " " << UPLO << "\n";
+  stk_cout << _T("Options: ") << JOBZ_ << " " << RANGE_ << " " << UPLO_ << "\n";
 #endif
-  info = syevr( JOBZ, RANGE, UPLO
+  info = syevr( JOBZ_, RANGE_, UPLO_
               , range_.size(), data_.p_data(), range_.size()
-              , VL, VU, IL, IU
+              , VL_, VU_, IL_, IU_
               , absTol, &rank_,  eigenValues_.p_data()
               , eigenVectors_.p_data(), range_.size(), SupportEigenVectors_.p_data()
               , &work, lwork, &iwork, liwork);
@@ -107,9 +116,9 @@ bool SymEigen::run()
   int* p_iwork = new int[liwork];
 
   // Call SYEVR with the optimal block size
-  info = syevr( JOBZ, RANGE, UPLO
+  info = syevr( JOBZ_, RANGE_, UPLO_
               , range_.size(), data_.p_data(), range_.size()
-              , VL, VU, IL, IU
+              , VL_, VU_, IL_, IU_
               , absTol, &rank_, eigenValues_.p_data()
               , eigenVectors_.p_data(), range_.size(), SupportEigenVectors_.p_data()
               , p_work, lwork, p_iwork, liwork);
@@ -123,7 +132,7 @@ bool SymEigen::run()
   eigenValues_.shift(range_.begin());
   SupportEigenVectors_.shift(range_.begin());
   this->finalizeStep();
-  // return the result of the compulation
+  // return the result of the computation
   if (!info) return true;
   if (info>0)
   { msg_error_ = STKERROR_NO_ARG(SymEigen ::run,internal error);
@@ -143,7 +152,7 @@ int SymEigen::syevr( char jobz, char range, char uplo
                    , Real *work, int lwork, int *iwork, int liwork
                    )
 {
-  int info = 1;
+  int info = 0;
 #ifdef STKUSELAPACK
 #ifdef STKREALAREFLOAT
   ssyevr_(&jobz, &range, &uplo, &n, a, &lda, &vl, &vu, &il,

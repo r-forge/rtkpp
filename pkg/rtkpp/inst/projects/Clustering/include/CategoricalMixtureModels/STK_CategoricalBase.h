@@ -85,8 +85,18 @@ class CategoricalBase : public IMixtureModel<Derived >
      *  component.*/
     void initializeModelImpl()
     {
+      nbModalities_.resize(p_data()->cols());
+      int amin = Arithmetic<int>::max(), amax = Arithmetic<Real>::min();
+      for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
+      {
+        int min = p_data()->col(j).minElt(), max = p_data()->col(j).maxElt();
+        amin = std::min(amin, min); amax = std::max(amax, max);
+        nbModalities_[j] = max-min+1;
+      }
+      // set range of the modalities
+      modalities_ = _R(amin, amax);
       // resize vectors of probabilities
-      for(int k=baseIdx; k<= components().lastIdx(); ++k)
+      for(int k=baseIdx; k< components().end(); ++k)
       { p_param(k)->initializeParameters(modalities_);}
     }
     /** Write the parameters on the output stream os */
@@ -101,14 +111,14 @@ class CategoricalBase : public IMixtureModel<Derived >
           for (int l= modalities_.begin(); l < modalities_.end(); ++l)
           { proba(l, j) = p_param(k)->proba(j,l);}
         }
+        os << _T("---> Component ") << k << _T("\n");
+        os << _T("probabilities =\n") << proba  << _T("\n");
       }
     }
-    /** Set the range of the modalities
-     *  @param modalities the range of the modalities
-     **/
-    inline void setModalities( Range const& modalities) { modalities_ = modalities;}
 
   protected:
+    /** Array with the number of modalities of each columns of the data set */
+    Array2DPoint<int> nbModalities_;
     /** range of the modalities */
     Range modalities_;
 };

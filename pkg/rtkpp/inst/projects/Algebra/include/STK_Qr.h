@@ -36,9 +36,7 @@
 #ifndef STK_QR_H
 #define STK_QR_H
 
-#include "Arrays/include/STK_Array2D.h"
-#include "Arrays/include/STK_Array2DVector.h"
-#include "Arrays/include/STK_Array2DUpperTriangular.h"
+#include "STK_IQr.h"
 
 namespace STK
 {
@@ -51,7 +49,7 @@ namespace STK
  *    -# Q  matrix (nrow,ncol) with the Housholder vectors in the min(nrow, ncol) first columns.
  *    -# R  matrix (nrow,ncol) upper triangular.
  */
-class Qr
+class Qr: public IQr
 {
   public :
     /** Default constructor.
@@ -59,74 +57,18 @@ class Qr
      *  @param ref true if we overwrite A
      **/
     Qr( Matrix const&  A, bool ref = false);
-
+    /** Copy constructor.
+     *  @param decomp the decomposition  to copy
+     **/
+    Qr( Qr const& decomp);
     /** virtual destructor */
     virtual ~Qr();
-
-    /** Operator = : overwrite the Qr with S. */
-    Qr& operator=(const Qr &S);
-    /** Is Q computed ?
-     *  @return @c true if Q_ is computed, @c false otherwise
-     */
-    inline bool isCompQ() const { return compq_;}
-    /** give the matrix Q of the QR decomposition.
-     * @return the matrix Q of the QR decomposition
-     **/
-    inline Matrix const& Q() const  { return Q_;}
-    /** give the matrix R of the QR decomposition.
-     * @return the matrix R of the QR decomposition
-     **/
-    inline MatrixUpperTriangular const& R() const { return R_;}
-    /** clear Q_ and R_. */
-    void clear();
+    /** clone pattern */
+    inline virtual Qr* clone() const { return new Qr(*this);}
+    /** Operator = : overwrite the Qr with decomp. */
+    Qr& operator=(Qr const& decomp);
     /** Compute the QR decomposition. **/
-    void run();
-    /** Compute Q (to use after run). After the run process, Q_ store
-     *  the householder vector in its column. Call compQ, if you want to
-     *  obtain Q in its true form.
-     *  Without effect if (compq_ == true)
-     **/
-    void compQ();
-    /** Delete the n last columns and update the QR decomposition.
-     *  @param n number of column to delete
-     **/    
-    void popBackCols(int const& n =1);
-    /** Delete the column pos and update the QR decomposition.
-     *  @param pos the position of the column to delete
-     **/    
-    void eraseCol(int const& pos);
-
-    /** Add a column with value T and update th QR decomposition.
-     *  @param T the column to add
-     **/
-    void pushBackCol(Vector const& T);
-
-    /** Add a column with value T at the position pos and update the QR
-     *  decomposition.
-     *  @param T the column to insert
-     *  @param pos the position of the column to insert
-     **/
-    void insertCol(Vector const& T, int const& pos);
-
-    /* TODO : Delete the ith row and update the QR decomposition :
-     *  default is the last row.
-     **/    
-    //Qr& popBackRows();
-    //Qr& eraseRows(int i);
-
-    /* TODO : Add a row with value T and update th QR decomposition :
-     *  default is the last column position.
-     **/
-    //Qr& pushBackRows(const Array2DPoint<double> &T);
-    //Qr& insertRows(const Array2DPoint<double> &T, int i);
-
-  protected :
-    /** Q Matrix of the QR decomposition */
-    Matrix Q_;
-    /** R Matrix of th QR decomposition */
-    MatrixUpperTriangular R_;
-    /// is Q computed ?
-    bool compq_;
+    virtual bool run();
 
   private:
   /** Compute the qr decoposition of the matrix Q_ */

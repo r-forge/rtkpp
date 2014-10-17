@@ -101,7 +101,7 @@ class Categorical_pjk : public CategoricalBase<Categorical_pjk<Array> >
     bool mStep();
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
-    { return this->nbCluster()*this->nbVariable()*(this->modalities_.size()-1);}
+    { return this->nbCluster()*((this->nbModalities_-1).sum());}
 };
 
 /* Initialize the parameters using mStep. */

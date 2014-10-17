@@ -67,20 +67,25 @@ class ISymEigen : public IRunnerBase
   public:
     typedef IRunnerBase Base;
     /** @brief Constructor
+     *  The original data set can be overwritten by the eigenvectors if it is
+     *  stored in a CArraySquareXX. Observe that in this case the base index have
+     *  to be 0 otherwise.
+     *  @param data reference on a symmetric square matrix
+     *  @param ref @c true if we overwrite the data set, @c false otherwise
+     */
+    ISymEigen( CArraySquareXX const& data, bool ref =false);
+    /** @brief Templated constructor
      *  @param data reference on a symmetric square expression
      */
     template<class Derived>
     ISymEigen( ExprBase<Derived> const& data)
              : Base()
              , norm_(0.), rank_(0), det_(0.)
-             , data_()
-             , eigenVectors_()
+             , eigenVectors_(data.asDerived())
              , eigenValues_(data.size(), 0.)
              , SupportEigenVectors_(2*data.size(), 0)
     {
       STK_STATICASSERT(Derived::structure_==(int)Arrays::square_,YOU_HAVE_TO_USE_A_SQUARE_MATRIX_IN_THIS_METHOD)
-      data_         = data.asDerived();
-      eigenVectors_ = data_.asDerived();
     }
     /** Copy constructor.
      *  @param eigen the EigenValue to copy
@@ -134,9 +139,9 @@ class ISymEigen : public IRunnerBase
      **/
     template<class Derived>
     void setData( ExprBase<Derived> const& data)
-    { data_ = data.asDerived();
+    {
       norm_ = 0.; rank_ = 0; det_ = 0.;
-      eigenVectors_ = data_;
+      eigenVectors_ = data;
       eigenValues_.resize(data.range());
       SupportEigenVectors_.resize(2*data.size());
     }
@@ -148,8 +153,6 @@ class ISymEigen : public IRunnerBase
     int rank_;
     /** determinant */
     Real det_;
-   /** array with the original data. Will be overwritten. */
-   CArraySquareXX data_;
    /** Square matrix or the eigenvectors. */
    CArraySquareXX eigenVectors_;
    /** Array of the eigenvalues */

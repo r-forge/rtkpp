@@ -94,7 +94,7 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
       {
         // initialize the Cols and Rows
         initializeCols(T.cols());
-        for (int j=T.beginCols(); j<=T.lastIdxCols(); j++)
+        for (int j=T.beginCols(); j<T.endCols(); j++)
         { copyColumnForward(T, j, j);}
       }
     }
@@ -185,7 +185,7 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
     /** set a value to the whole container */
     Derived& setValue(Type const& v)
     {
-      for (int j=this->beginCols(); j<=this->lastIdxCols(); j++)
+      for (int j=this->beginCols(); j<this->endCols(); j++)
       {
         Type* p(this->data(j));
         for (int i=this->rangeCols_[j].begin(); i<this->rangeCols_[j].end(); i++) p[i]= v;
@@ -293,7 +293,7 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
       // translate rows_()
       Base::shiftFirstIdxRows(rbeg);
       // For all cols, move begin
-      for (int j=this->beginCols(); j<=this->lastIdxCols(); j++)
+      for (int j=this->beginCols(); j<this->endCols(); j++)
       { shiftCol(j, this->rangeCols_[j].begin()+rinc);}
     }
     /** Add n Rows to the container.
@@ -319,7 +319,7 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
         // update the range of the rows
         this->incLastIdxRows(n);
         // allocate new Rows for each Col
-        for (int j=this->beginCols(); j<=this->lastIdxCols(); j++)
+        for (int j=this->beginCols(); j<this->endCols(); j++)
         {
           // compute range from the leaf
           Range range(this->asDerived().rangeRowsInCol(j));
@@ -358,12 +358,12 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
       { STKRUNTIME_ERROR_2ARG(IArray2D::insertRows,pos,n,cannot operate on reference);}
       if (this->beginRows() > pos)
       { STKOUT_OF_RANGE_2ARG(IArray2D::insertRows,pos,n,beginRows() > pos);}
-      if (this->lastIdxRows()+1 < pos)
-      { STKOUT_OF_RANGE_2ARG(IArray2D::insertRows,pos,n,lastIdxRows()+1 < pos);}
+      if (this->endRows() < pos)
+      { STKOUT_OF_RANGE_2ARG(IArray2D::insertRows,pos,n,endRows() < pos);}
       // update the range of the rows
       this->incLastIdxRows(n);
       // allocate new Rows for each Col
-      for (int j=this->beginCols(); j<=this->lastIdxCols(); j++)
+      for (int j=this->beginCols(); j<this->endCols(); j++)
       {
         // check position
         if ( (pos >= this->rangeCols_[j].begin())
@@ -386,8 +386,8 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
       { STKOUT_OF_RANGE_1ARG(IArray2D::popBackRows,n,sizeRows() < n);}
       this->decLastIdxRows(n);
       // decrease range of each Col
-      for (int j=this->beginCols(); j<=this->lastIdxCols(); j++)
-        eraseRowsToCol(j, this->lastIdxRows()+1, n);
+      for (int j= this->beginCols(); j< this->endCols(); j++)
+        eraseRowsToCol(j, this->endRows(), n);
     }
 
     /** Delete n Rows at the pos index to the container.
@@ -408,7 +408,7 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
       if (this->lastIdxRows() < pos+n-1)
       { STKOUT_OF_RANGE_2ARG(IArray2D::eraseRows,pos,n,lastIdxRows() < pos+n-1);}
       // update each Col
-      for (int j=this->beginCols(); j<=this->lastIdxCols(); j++)
+      for (int j=this->beginCols(); j<this->endCols(); j++)
         eraseRowsToCol(j, pos, n);
       // update dimensions
       this->decLastIdxRows(n);
@@ -446,8 +446,8 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
       { STKRUNTIME_ERROR_2ARG(IArray2D::insertCols,pos,n,cannot operate on reference);}
       if (this->beginCols() > pos)
       { STKOUT_OF_RANGE_2ARG(IArray2D::insertCols,pos,n,beginCols() > pos);}
-      if (this->lastIdxCols()+1 < pos)
-      { STKOUT_OF_RANGE_2ARG(IArray2D::insertCols,pos,n,lastIdxCols()+1 < pos);}
+      if (this->endCols() < pos)
+      { STKOUT_OF_RANGE_2ARG(IArray2D::insertCols,pos,n,endCols() < pos);}
       // compute horizontal range of the container after insertion
       Range range_ho(this->cols());
       range_ho.incLast(n);
@@ -538,7 +538,7 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
       // update cols_
       this->decLastIdxCols(n);
       // shift Cols
-      for (int k=pos; k<=this->lastIdxCols(); k++)
+      for (int k=pos; k<this->endCols(); k++)
         this->data(k) = this->data(k+n);
       // update this->capacityCols_
       this->capacityCols_.erase(pos, n);
@@ -554,9 +554,9 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
     {
       if (this->beginCols() > J.begin())
       { STKOUT_OF_RANGE_1ARG(IArray2D::update,J,beginCols() > J.begin());}
-      if (this->lastIdxCols() < J.lastIdx())
-      { STKOUT_OF_RANGE_1ARG(IArray2D::update,J,lastIdxCols() < J.last);}
-      for ( int icol = J.begin(); icol <= J.lastIdx() ; ++icol)
+      if (this->endCols() < J.end())
+      { STKOUT_OF_RANGE_1ARG(IArray2D::update,J,endCols() < J.end());}
+      for ( int icol = J.begin(); icol < J.end() ; ++icol)
       { update(icol);}
     }
 
@@ -588,7 +588,7 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
       {
         if (src.beginCols()>this->beginCols())
         {
-          for ( int jSrc=src.beginCols(), jDst=this->beginCols(); jSrc<=src.lastIdxCols(); jDst++, jSrc++)
+          for ( int jSrc=src.beginCols(), jDst=this->beginCols(); jSrc<src.endCols(); jDst++, jSrc++)
           { this->copyColumnForward(src, jDst, jSrc);}
           return this->asDerived();
         }
@@ -599,7 +599,7 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
       // src.beginRows()<this->beginRows()
       if (src.beginCols()>=this->beginCols())
       {
-        for ( int jSrc=src.beginCols(), jDst=this->beginCols(); jSrc<=src.lastIdxCols(); jDst++, jSrc++)
+        for ( int jSrc=src.beginCols(), jDst=this->beginCols(); jSrc<src.endCols(); jDst++, jSrc++)
         { this->copyColumnBackward(src, jDst, jSrc);}
         return this->asDerived();
       }
@@ -645,9 +645,9 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
       // if the container is not empty we add the column and copy other inside
      int size = other.cols().size(), first = this->lastIdxCols()+1;
       pushBackCols(size);
-      for (int j0= first, j1= other.beginCols(); j1 <= other.lastIdxCols(); ++j0, ++j1)
+      for (int j0= first, j1= other.beginCols(); j1 < other.endCols(); ++j0, ++j1)
       {
-        for (int i=other.beginRows(); i<=other.lastIdxRows(); i++)
+        for (int i=other.beginRows(); i<other.endRows(); i++)
           (*this)(i, j0) = other(i,j1);
       }
     }
@@ -671,7 +671,7 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
       // if the container is not empty we add the column and copy other inside
       int size = other.cols().size(), first = this->lastIdxCols()+1;
       pushBackCols(size);
-      for (int i=other.begin(); i<=other.lastIdx(); i++)
+      for (int i=other.begin(); i<other.end(); i++)
         (*this)(i, first) = other[i];
     }
     /** set other at the end of this (concatenate). Perform a copy of the
@@ -694,7 +694,7 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
       // add nbRow to existing rows
       int nbRow = other.sizeRows();
       pushBackRows(nbRow);
-      for (int j=this->beginCols(); j<= this->lastIdxCols(); ++j)
+      for (int j=this->beginCols(); j< this->endCols(); ++j)
       {
         // start from the end in order to avoid
         for (int i=this->lastIdxRows(), iOther= other.lastIdxRows(); iOther>=other.beginRows(); --i, --iOther)
@@ -733,9 +733,9 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
       // set the ranges
       if (this->beginCols() > J.begin())
       { STKOUT_OF_RANGE_1ARG(IArray2D::initializeCols,J,beginCols() > J.begin());}
-      if (this->lastIdxCols() < J.lastIdx())
-      { STKOUT_OF_RANGE_1ARG(IArray2D::initializeCols,J,lastIdxCols() < J.last);}
-      for (int j=J.begin(); j<=J.lastIdx(); j++)
+      if (this->endCols() < J.end())
+      { STKOUT_OF_RANGE_1ARG(IArray2D::initializeCols,J,endCols() < J.end());}
+      for (int j=J.begin(); j<J.end(); j++)
       {
         try
         {
@@ -747,7 +747,7 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
           // free each column allocated
           for (int k=J.begin(); k<j; k++) this->freeCol(k);
           // put default for the other Cols
-          for (int k=j; k<=J.lastIdx(); k++) this->data(k) = 0;
+          for (int k=j; k<J.end(); k++) this->data(k) = 0;
           // and throw an exception
           throw error;
         }
@@ -819,9 +819,9 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
     {
       if (this->beginCols() > J.begin())
       { STKOUT_OF_RANGE_1ARG(IArray2D::freeCols,J,beginCols() > J.begin());}
-      if (this->lastIdxCols() < J.lastIdx())
-      { STKOUT_OF_RANGE_1ARG(IArray2D::freeCols,J,lastIdxCols() < J.last);}
-      for (int j=J.begin(); j<=J.lastIdx(); j++) { this->freeCol(j);}
+      if (this->endCols() < J.end())
+      { STKOUT_OF_RANGE_1ARG(IArray2D::freeCols,J,endCols() < J.end());}
+      for (int j=J.begin(); j<J.end(); j++) { this->freeCol(j);}
     }
     /** @brief Internal method for memory deallocation.
      *  @param col the number of the column to free
@@ -945,7 +945,7 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
         // ger ptr on the new col
         Type* p_newCol(this->data(col));
         // copy Elts
-        for (int k=oldRange.begin(); k<=oldRange.lastIdx(); k++) p_newCol[k] = p_oldCol[k];
+        for (int k=oldRange.begin(); k<oldRange.end(); k++) p_newCol[k] = p_oldCol[k];
         // if there is allocated memory, liberate it
         if (p_oldCol)
         {
@@ -978,7 +978,7 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
       if (rangeDel == this->rangeCols_[col]) { freeCol(col); return;}
       // shift data, rangeDel is inside the rang of the column
       Type* p_col(this->data(col));
-      for ( int k=rangeDel.begin(), k1=rangeDel.lastIdx()+1; k1<=this->rangeCols_[col].lastIdx(); k++, k1++)
+      for ( int k=rangeDel.begin(), k1=rangeDel.end(); k1<this->rangeCols_[col].end(); k++, k1++)
       {  p_col[k]   = p_col[k1];}
       // update size of the range
       this->rangeCols_[col].decLast(rangeDel.size());

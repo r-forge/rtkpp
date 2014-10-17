@@ -274,49 +274,13 @@ struct InitializeMixtureImpl
 {
   typedef typename MixtureBridgeTraits<Id, Data>::Mixture Mixture;
   typedef typename MixtureBridgeTraits<Id, Data>::DataBridge DataBridge;
+
+  // call to IMixtureModel::setData will trigger a call to IMixtureModel::initializeModel
+  // and call the specialization initializeModelImpl.
+  // Thus it seems that at this level there is no more needs for
+  // specialization of this template.
   static void run( Mixture& mixture, DataBridge* p_data)
   { mixture.setData(p_data->m_dataij());}
-};
-
-/** @ingroup hidden
- *  Initialize mixture, specialization for Categorical_pjk_ models
- **/
-template<class Data>
-struct InitializeMixtureImpl<Clust::Categorical_pjk_, Data>
-{
-  typedef typename MixtureBridgeTraits<Clust::Categorical_pjk_, Data>::Mixture Mixture;
-  typedef typename MixtureBridgeTraits<Clust::Categorical_pjk_, Data>::DataBridge DataBridge;
-  static void run( Mixture& mixture, DataBridge* p_data)
-  {
-#ifdef STK_MIXTURE_VERBOSE
-     stk_cout << _T("InitializeMixtureImpl<Clust::Categorical_, Data>::run(mixture, p_data)\n");
-#endif
-    int min = p_data->m_dataij().minElt();
-    int max = p_data->m_dataij().maxElt();
-#ifdef STK_MIXTURE_VERBOSE
-     stk_cout << _T("In InitializeMixtureImpl<Clust::Categorical_, Data>\n");
-     stk_cout << _T("Range = ") << _R(min, max) << _T("\n");
-#endif
-    mixture.setModalities(_R(min, max));
-    mixture.setData(p_data->m_dataij());
-  }
-};
-
-/** @ingroup hidden
- *  Initialize mixture, specialization for Categorical_pk_ models
- **/
-template<class Data>
-struct InitializeMixtureImpl<Clust::Categorical_pk_, Data>
-{
-  typedef typename MixtureBridgeTraits<Clust::Categorical_pk_, Data>::Mixture Mixture;
-  typedef typename MixtureBridgeTraits<Clust::Categorical_pk_, Data>::DataBridge DataBridge;
-  static void run( Mixture& mixture, DataBridge* p_data)
-  {
-    int min = p_data->m_dataij().minElt();
-    int max = p_data->m_dataij().maxElt();
-    mixture.setModalities(Range(min, max, 0));
-    mixture.setData(p_data->m_dataij());
-  }
 };
 
 } // namespace hidden

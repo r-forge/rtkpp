@@ -41,13 +41,6 @@
 
 namespace STK
 {
-/** @ingroup Base
- *  @defgroup RTTI Runtime Type Identification.
- *
- *  These classes allow to handle the Runtime type identification (RTTI)
- *  problem and are useful when working with heterogeneous data.
- **/
-
 /** @ingroup RTTI
  *  @brief Implementation of the return type.
  *

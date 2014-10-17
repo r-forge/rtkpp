@@ -71,11 +71,7 @@ namespace STK
  * @param cosinus the cosinus of the Givens rotation (output)
  * @param sinus the sinus of the Givens rotation rotation (output)
  **/
-Real compGivens( Real const& y
-               , Real const& z
-               , Real& cosinus
-               , Real& sinus
-               );
+Real compGivens( Real const& y, Real const& z, Real& cosinus, Real& sinus);
 
 /** @ingroup Algebra
  *  @brief Apply Givens rotation.
@@ -88,26 +84,20 @@ Real compGivens( Real const& y
  * @see http://en.wikipedia.org/wiki/Givens_rotation
  * 
  * @param M the Container to multiply
- * @param col1 the first col
- * @param col2 the second col
- * @param cosinus the cosinus of the givens rotation
- * @param sinus the sinus of the givens rotation
+ * @param j1,j2 the first and second columns
+ * @param cosinus,sinus the cosinus and sinus of the givens rotation
  **/
 template < class TContainer2D>
-void rightGivens( ArrayBase<TContainer2D>& M
-                , int const& col1
-                , int const& col2
-                , Real const& cosinus
-                , Real const& sinus
+void rightGivens( ArrayBase<TContainer2D>& M, int j1, int j2
+                , Real const& cosinus, Real const& sinus
                 )
 {
-  const int first = M.beginRows(), end = M.endRows();
   // Apply givens rotation
-  for (int i = first; i < end; i++)
+  for (int i = M.beginRows(); i < M.endRows(); i++)
   {
-    const Real aux1 = M.asDerived()(i, col1), aux2 = M.asDerived()(i, col2);
-    M.asDerived()(i, col1) = cosinus * aux1 + sinus * aux2;
-    M.asDerived()(i, col2) = cosinus * aux2 - sinus * aux1;
+    const Real aux1 = M.elt(i, j1), aux2 = M.elt(i, j2);
+    M.elt(i, j1) = cosinus * aux1 + sinus * aux2;
+    M.elt(i, j2) = cosinus * aux2 - sinus * aux1;
   }
 }
 
@@ -122,26 +112,20 @@ void rightGivens( ArrayBase<TContainer2D>& M
  * @see http://en.wikipedia.org/wiki/Givens_rotation
  * 
  * @param M the matix to multiply
- * @param row1 the first row
- * @param row2 the second row
- * @param cosinus the cosinus of the givens rotation
- * @param sinus the sinus of the givens rotation
+ * @param i1,i2 the first and second rows
+ * @param cosinus,sinus the cosinus and sinus of the givens rotation
  **/
 template < class TContainer2D>
-void leftGivens( ArrayBase<TContainer2D>& M
-               , int const& row1
-               , int const& row2
-               , Real const& cosinus
-               , Real const& sinus
+void leftGivens( ArrayBase<TContainer2D>& M, int i1, int i2
+               , Real const& cosinus, Real const& sinus
                )
 {
-  const int first = M.beginCols(), end = M.endCols();
   // apply left Givens rotation
-  for (int j = first; j< end; j++)
+  for (int j = M.beginCols(); j< M.endCols(); j++)
   {
-    const Real aux1 = M.asDerived()(row1, j), aux2 = M.asDerived()(row2, j);
-    M.asDerived()(row1, j) = cosinus * aux1 + sinus * aux2;
-    M.asDerived()(row2, j) = cosinus * aux2 - sinus * aux1;
+    const Real aux1 = M.elt(i1, j), aux2 = M.elt(i2, j);
+    M.elt(i1, j) = cosinus * aux1 + sinus * aux2;
+    M.elt(i2, j) = cosinus * aux2 - sinus * aux1;
   }
 }
 

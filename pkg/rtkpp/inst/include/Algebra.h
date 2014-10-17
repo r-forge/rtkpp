@@ -81,6 +81,7 @@
 // the lapack classes
 #ifdef STKUSELAPACK
 #include "../projects/Algebra/include/STK_lapack_SymEigen.h"
+#include "../projects/Algebra/include/STK_lapack_Qr.h"
 #endif
 #endif /*Algebra_H*/
 

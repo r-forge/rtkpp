@@ -47,6 +47,16 @@
 
 namespace STK
 {
+/* @brief Constructor
+ *  @param data reference on a symmetric square matrix
+ *  @param ref @c true if we overwrite the data set, @c false otherwise
+ */
+SymEigen::SymEigen( CArraySquareXX const& data, bool ref)
+         : ISymEigen(data, ref)
+         , begin_(data.begin())
+         , last_(data.lastIdx())
+{}
+
 /* Copy constructor */
 SymEigen::SymEigen( SymEigen const& S)
                   : ISymEigen(S)
@@ -78,7 +88,6 @@ bool SymEigen::run()
   try
   {
     // copy data
-    eigenVectors_ = data_;
     eigenValues_.resize(eigenVectors_.range());
     begin_ = eigenVectors_.begin();
     last_ = eigenVectors_.lastIdx();
@@ -117,7 +126,7 @@ bool SymEigen::run()
 
 /* tridiagonalisation of the symetric matrix eigenVectors_. Only the lower
  * part of eigenVectors_ used. eigenVectors_ is overwritten with the Householder vectors.
- * eigenValues_ contains the diagonal. F_ contains the subdiagonal.
+ * eigenValues_ contains the diagonal.
  **/
 void SymEigen::tridiagonalize()
 {
@@ -129,67 +138,60 @@ void SymEigen::tridiagonalize()
   Range range2(Range(begin_+2, last_, 0));
   // Bidiagonalisation of eigenVectors_
   // loop on the cols and rows
-  for ( int iter=begin_, iter1=begin_+1, iter2=begin_+2
-      ; iter<last_
-      ; iter++, iter1++, iter2++, range1.incFirst(1), range2.incFirst(1)
+  for ( int i=begin_, i1=begin_+1, i2=begin_+2; i<last_
+      ; i++, i1++, i2++, range1.incFirst(1), range2.incFirst(1)
       )
   {
     // ref on the current column iter in the range iter1:last_
-    CArraySquareXX::Col v(eigenVectors_.col(range1, iter));
-    // Compute Householder Vector and get subdiagonal element
-    F_[iter] = house<CArraySquareXX::Col>(v);
+    CArraySquareXX::Col v(eigenVectors_.col(range1, i));
+    // Compute Householder vector and get sub-diagonal element
+    F_[i] = house(v);
     // Save diagonal element
-    eigenValues_[iter] = eigenVectors_(iter,iter);
+    eigenValues_[i] = eigenVectors_(i,i);
     // get beta
     Real beta = v.front();
     if (beta)
     {
       // ref on the current column iter1 in the range iter1:last_
-      CArraySquareXX::Col M1(eigenVectors_.col(range1, iter1));
+      CArraySquareXX::Col M1(eigenVectors_.col(range1, i1));
       // aux1 will contain <v,p>
       Real aux1 = 0.0;
       // apply left and right Householder to eigenVectors_
       // compute D(iter1:last_) = p and aux1 = <p,v>
       // Computation of p_iter1 = beta * eigenVectors_ v using the lower part of eigenVectors_
       // save p_iter1 in the unused part of eigenValues_ and compute p'v
-      aux1 += (eigenValues_[iter1] = beta*(M1[iter1] + M1.sub(range2).dot(v.sub(range2)))) /* *1.0 */;
+      aux1 += (eigenValues_[i1] = beta*(M1[i1] + M1.sub(range2).dot(v.sub(range2)))) /* *1.0 */;
       // other cols
-      for (int i=iter2; i<=last_; i++)
+      for (int k=i2; k<=last_; k++)
       {
         // Computation of p_i = beta * eigenVectors_ v using the lower part of eigenVectors_
         // save p_i in the unusued part of eigenValues_ and compute p'v
-        Real aux = M1[i] /* *1.0 */;
-        for (int j=iter2; j<=i;    j++)  { aux += eigenVectors_(i,j)*v[j];}
-        for (int j=i+1;   j<=last_; j++) { aux += eigenVectors_(j,i)*v[j];}
+        Real aux = M1[k] /* *1.0 */;
+        for (int j=i2;  j<=k;     j++) { aux += eigenVectors_(k,j)*v[j];}
+        for (int j=k+1; j<=last_; j++) { aux += eigenVectors_(j,k)*v[j];}
         // save p_i in the unusued part of eigenValues_ and compute p'v
-        aux1 += (eigenValues_[i] = beta*aux) * v[i];
-        //aux1 += ( eigenValues_[i] = beta* (M1[i] + eigenVectors_.row(i,Range(iter2,i,0)).dot(v.sub(Range(iter2,i,0)))
-        //                               + eigenVectors_.col(Range(i+1,last_,0),i).dot(v.sub(Range(i+1,last_,0)))
-        //                        )
-        //        ) * v[i];
+        aux1 += (eigenValues_[k] = beta*aux) * v[k];
       }
       // update diagonal element M_ii+= 2 v_i * q_i = 2* q_i (i=iter1)
       // aux = q_iter1 and aux1 = beta*<p,v>/2 (we don't save aux in eigenValues_)
-      Real aux = (eigenValues_[iter1] + (aux1 *= (beta/2.0)));
-      M1[iter1] += 2.0*aux;
+      Real aux = (eigenValues_[i1] + (aux1 *= (beta/2.0)));
+      M1[i1] += 2.0*aux;
       // update lower part: all rows
       // compute q_i and update the lower part of eigenVectors_
-      for (int i=iter2; i<=last_; i++)
+      for (int k=i2; k<=last_; k++)
       {
         // get q_i and save it in eigenValues_i=q_i = p_i + <p,v> * beta * v_i/2
-        eigenValues_[i] += aux1 * v[i];
+        eigenValues_[k] += aux1 * v[k];
         // Compute eigenVectors_ + u q' + q u',
         // update the row i, begin_ element
-        M1[i] += eigenValues_[i] /* *1.0 */+ v[i] * aux;
+        M1[k] += eigenValues_[k] /* *1.0 */+ v[k] * aux;
         // update the row i: all cols under the diagonal
-//        eigenVectors_.row(i, Range(iter2,i,0)) += (v.sub(Range(iter2,i,0)) * eigenValues_[i]
-//                                     + v[i] * eigenValues_.sub(Range(iter2,i,0)));
-        for (int j=iter2; j<=i; j++)
-          eigenVectors_(i,j) += v[j] * eigenValues_[i] + v[i] * eigenValues_[j];
+        for (int j=i2; j<=k; j++)
+          eigenVectors_(k,j) += v[j] * eigenValues_[k] + v[k] * eigenValues_[j];
       }
     }
   }
-  // Last col: F[last_] = 0.0;
+  // Last col
   eigenValues_[last_] = eigenVectors_(last_,last_);
 }
 

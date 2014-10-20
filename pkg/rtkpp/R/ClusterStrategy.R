@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-#     Copyright (C) 2012-2014  Inria
+#     Copyright (C) 2012-2014  Serge Iovleff, University Lille 1, Inria
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as
@@ -104,13 +104,13 @@ clusterStrategy <- function( nbTry =1
 
 #-----------------------------------------------------------------------
 #' @description 
-#' \code{fastClusterStrategy()} create an instance of [\code{\linkS4class{ClusterStrategy}}] for impatient user.
+#' \code{clusterFastStrategy()} create an instance of [\code{\linkS4class{ClusterStrategy}}] for impatient user.
 #' @examples
-#'    fastClusterStrategy()
+#'    clusterFastStrategy()
 #'
 #' @rdname clusterStrategy
 #' @export
-fastClusterStrategy <- function()
+clusterFastStrategy <- function()
 {
   # create init
   initMethod = clusterInit("class", 3, "SEM", 5, 0.01);

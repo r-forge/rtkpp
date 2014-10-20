@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-#     Copyright (C) 2012-2014  Inria
+#     Copyright (C) 2012-2014  Serge Iovleff, University Lille 1, Inria
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as
@@ -52,7 +52,7 @@ NULL
 #' x[round(runif(5,1,nrow(geyser))), 1] <- NA
 #' x[round(runif(5,1,nrow(geyser))), 2] <- NA
 #' ## with default values
-#' model <- clusterDiagGaussian(data=x, nbCluster=2:3, strategy = fastClusterStrategy())
+#' model <- clusterDiagGaussian(data=x, nbCluster=2:3, strategy = clusterFastStrategy())
 #'
 #' ## use graphics functions
 #' \dontrun{
@@ -262,7 +262,7 @@ setMethod(
 #' @examples
 #'   ## the famous iris data set
 #'   data(iris)
-#'   model <- clusterDiagGaussian(iris[1:4], 3, strategy = fastClusterStrategy())
+#'   model <- clusterDiagGaussian(iris[1:4], 3, strategy = clusterFastStrategy())
 #' \dontrun{
 #'   plot(model)
 #'   plot(model, c(1,3))

@@ -22,7 +22,7 @@ using the estimated parameters and partition.
 \examples{
 ## for quantitative case
   data(iris)
-  model <- clusterGamma(iris[1:4], 3, strategy = fastClusterStrategy())
+  model <- clusterGamma(iris[1:4], 3, strategy = clusterFastStrategy())
 \dontrun{
   plot(model)
   plot(model, c(1,3))

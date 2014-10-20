@@ -21,7 +21,7 @@ using the estimated parameters and partition.
 \examples{
 ## the car data set
   data(car)
-  model <- clusterCategorical(car, 3, strategy = fastClusterStrategy())
+  model <- clusterCategorical(car, 3, strategy = clusterFastStrategy())
 \dontrun{
   plot(model)
   }

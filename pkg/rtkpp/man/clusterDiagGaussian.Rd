@@ -39,7 +39,7 @@ x = geyser;
 x[round(runif(5,1,nrow(geyser))), 1] <- NA
 x[round(runif(5,1,nrow(geyser))), 2] <- NA
 ## with default values
-model <- clusterDiagGaussian(data=x, nbCluster=2:3, strategy = fastClusterStrategy())
+model <- clusterDiagGaussian(data=x, nbCluster=2:3, strategy = clusterFastStrategy())
 
 ## use graphics functions
 \dontrun{

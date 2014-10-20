@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-#     Copyright (C) 2012-2014  Inria
+#     Copyright (C) 2014  Serge Iovleff, University Lille 1, Inria
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as
@@ -22,8 +22,22 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
-# Some part of the code below is an adaptation of the code from the
-# Rcpp package.
+# Copyright (C) 2009 - 2013 Dirk Eddelbuettel and Romain Francois
+#
+# This file is part of Rcpp.
+#
+# Rcpp is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# Rcpp is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rcpp.  If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------
 #' CxxFlags defaults for the rtkpp
 #' @rdname rtkppFlags
@@ -67,7 +81,10 @@ LdFlags <- function() { cat(.rtkppLdFlags()) }
     path <- .rtkpp.system.file("libs",.Platform$r_arch)
   }
   else { path <- .rtkpp.system.file("libs") }
-  paste("-L", path, " -lrtkpp", sep="")
+  if (.Platform$OS.type == "windows")
+  { paste("-L", path, " -l:rtkpp.dll", sep="") }
+  else
+  { paste("-L", path, " -l:rtkpp.so", sep="")}
 }
 
 # Transform a path for passing to the build system on the command line.

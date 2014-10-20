@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-#     Copyright (C) 2012-2014  Inria
+#     Copyright (C) 2012-2014  Serge Iovleff, University Lille 1, Inria
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as
@@ -54,7 +54,7 @@ NULL
 #' x[round(runif(5,1,nrow(geyser))), 2] <- NA
 #'
 #' ## use graphics functions
-#' model <- clusterGamma(data=x, nbCluster=2:3, strategy = fastClusterStrategy())
+#' model <- clusterGamma(data=x, nbCluster=2:3, strategy = clusterFastStrategy())
 #'
 #' \dontrun{
 #' plot(model)
@@ -267,7 +267,7 @@ setMethod(
 #' @examples
 #'   ## for quantitative case
 #'   data(iris)
-#'   model <- clusterGamma(iris[1:4], 3, strategy = fastClusterStrategy())
+#'   model <- clusterGamma(iris[1:4], 3, strategy = clusterFastStrategy())
 #' \dontrun{
 #'   plot(model)
 #'   plot(model, c(1,3))

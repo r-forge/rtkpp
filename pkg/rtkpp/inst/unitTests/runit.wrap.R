@@ -24,6 +24,19 @@
 #-----------------------------------------------------------------------
 # test wrap, as and NA values (mostly of myself, should be enhanced...)
 #
+# This file cannot be set in the tests directory:
+#
+# Error in compileCode(f, code, language = language, verbose = verbose) : 
+#  Compilation ERROR, function(s)/method(s) not created! Error in file(filename, "r", encoding = encoding) : 
+#  cannot open the connection
+# Calls: local ... eval.parent -> eval -> eval -> eval -> eval -> source -> file
+# In addition: Warning message:
+# In file(filename, "r", encoding = encoding) :
+#  cannot open file 'startup.Rs': No such file or directory
+# Execution halted
+# Calls: cxxfunction -> compileCode
+# Execution halted
+#
 if (require("inline"))
 {
 #library(rtkpp)

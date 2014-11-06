@@ -132,7 +132,7 @@ Real IMixtureComposer::eStep()
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Entering IMixtureComposer::eStep()\n");
 #endif
-  Real sum = 0.; tk_ =0;
+  Real sum = 0.; tk_ =0.;
   for (int i = tik_.beginRows(); i < tik_.endRows(); ++i)
   {
     // get maximal element of ln(x_i,\theta_k) + ln(p_k)
@@ -221,15 +221,15 @@ void IMixtureComposer::intializeMixtureParameters()
 {
   prop_ = 1./nbCluster_;
   tik_  = 1./nbCluster_;
+  tk_   = Real(nbSample())/nbCluster_;
   zi_   = baseIdx;
-  tik_  = Real(nbSample())/nbCluster_;
 }
 
 /* generate random tik_ */
 void IMixtureComposer::randomFuzzyTik()
 {
   RandBase generator;
-  tk_ =0;
+  tk_ = 0.;
   for (int i = tik_.beginRows(); i < tik_.endRows(); ++i)
   {
     // create a reference on the i-th row

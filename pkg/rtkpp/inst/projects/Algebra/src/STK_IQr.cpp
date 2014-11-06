@@ -105,19 +105,16 @@ void IQr::compQ()
     }
   }
   // compute other columns
-  for (int i=lastCol, i1= lastCol +1; i>=Q_.beginCols(); i--, i1--)
+  for (int i=lastCol; i>=Q_.beginCols(); i--)
   {
-    //stk_cout << _T("i= ") << i << ", Q_ =\n"<< Q_ << "\n";
     // get current householder vector
     Vector u(Q_, _R(i, Q_.lastIdxRows()), i);
     // Apply Householder vector to the right of the matrix
-    leftHouseholder( Q_( _R(i, Q_.lastIdxRows()), _R(i1, Q_.lastIdxCols())), u);
-    // Get beta
-    Real beta = Q_(i,i);
-    // update the column i
-    Q_( _R(Q_.beginRows(),i-1) , i) = 0.0;     //     0:(i-1)
-    Q_(i,i) += 1.0;                            //     i:i
-    Q_( _R(i1, Q_.lastIdxRows()), i ) *= beta; // (i+1):M
+    leftHouseholder( Q_( _R(i, Q_.lastIdxRows()), _R(i+1, Q_.lastIdxCols())), u);
+    // update the ith column
+    Q_( _R(Q_.beginRows(),i-1)   , i ) = 0.0;   //     0:(i-1)
+    Q_( _R(i+1, Q_.lastIdxRows()), i ) *= Q_(i,i); // (i+1):M
+    Q_( i                        , i ) += 1.0;  //     i:i
     // update the column i
   }
   // Q_ is now computed

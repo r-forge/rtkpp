@@ -6,7 +6,6 @@
 \alias{[,ClusterAlgo-method}
 \alias{[,ClusterInit-method}
 \alias{[,ClusterStrategy-method}
-\alias{[,IClusterModel-method}
 \alias{[<-,ClusterAlgo-method}
 \alias{[<-,ClusterInit-method}
 \alias{[<-,ClusterStrategy-method}
@@ -23,8 +22,6 @@
 \S4method{[}{ClusterStrategy}(x, i, j, drop)
 
 \S4method{[}{ClusterStrategy}(x, i, j) <- value
-
-\S4method{[}{IClusterModel}(x, i, j, drop)
 }
 \arguments{
 \item{x}{object from which to extract element(s) or in which to replace element(s).}

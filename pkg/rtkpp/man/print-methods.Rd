@@ -4,11 +4,13 @@
 \alias{print}
 \alias{print,ClusterAlgo-method}
 \alias{print,ClusterCategorical-method}
+\alias{print,ClusterComponent-method}
 \alias{print,ClusterDiagGaussian-method}
 \alias{print,ClusterGamma-method}
+\alias{print,ClusterHeterogeneous-method}
 \alias{print,ClusterInit-method}
 \alias{print,ClusterStrategy-method}
-\alias{print,IClusterModel-method}
+\alias{print,IClusterModelBase-method}
 \alias{print-algo,ClusterAlgo-method}
 \alias{print-init,ClusterInit,ClusterInit-method}
 \alias{print-strategy,ClusterStrategy-method}
@@ -22,11 +24,15 @@
 
 \S4method{print}{ClusterGamma}(x, ...)
 
+\S4method{print}{ClusterHeterogeneous}(x, ...)
+
 \S4method{print}{ClusterInit}(x, ...)
 
 \S4method{print}{ClusterStrategy}(x, ...)
 
-\S4method{print}{IClusterModel}(x, ...)
+\S4method{print}{IClusterModelBase}(x, ...)
+
+\S4method{print}{ClusterComponent}(x, ...)
 }
 \arguments{
 \item{x}{a rtkpp object: a \code{\linkS4class{ClusterStrategy}},

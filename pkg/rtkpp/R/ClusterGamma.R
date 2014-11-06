@@ -66,13 +66,13 @@ NULL
 #' ## print model
 #' print(model)
 #' ## get estimated missing values
-#' model["data"][model["missings"]]
+#' missingValues(model)
 #'
 #' @return An instance of the [\code{\linkS4class{ClusterGamma}}] class.
 #' @author Serge Iovleff
 #' @export
 #'
-clusterGamma <- function(data, nbCluster=2, modelNames= gammaNames(), strategy=clusterStrategy(), criterion="ICL")
+clusterGamma <- function(data, nbCluster=2, modelNames= gammaNames(), strategy=clusterFastStrategy(), criterion="ICL")
 {
   # check nbCluster
   nbClusterModel = length(nbCluster);
@@ -101,23 +101,86 @@ clusterGamma <- function(data, nbCluster=2, modelNames= gammaNames(), strategy=c
 
   # Create model
   model = new("ClusterGamma", data)
-  model@missings = which(is.na(data), arr.ind=TRUE);
+  model@component@missing = which(is.na(data), arr.ind=TRUE);
   model@strategy = strategy;
 
   # start estimation of the models
   resFlag = .Call("clusterMixture", model, nbCluster, modelNames, strategy, criterion, PACKAGE="rtkpp")
 
   # set names
-  colnames(model@shape)   <- colnames(model@data)
-  colnames(model@scale) <- colnames(model@data)
+  colnames(model@component@shape) <- colnames(model@component@data)
+  colnames(model@component@scale) <- colnames(model@component@data)
   if (resFlag != 1) {cat("WARNING: An error occur during the clustering process")}
   model
 }
 
 #-----------------------------------------------------------------------
+#' Definition of the [\code{\linkS4class{ClusterGammaComponent}}] class
+#'
+#' This class defines a gamma component of a mixture Model.
+#'
+#' @slot shape  Matrix with the shape of the jth variable in the kth cluster.
+#' @slot scale  Matrix with the scale of the jth variable in the kth cluster.
+#' @seealso [\code{\linkS4class{ClusterComponent}}] class
+#'
+#' @examples
+#' getSlots("ClusterGammaComponent")
+#'
+#' @author Serge Iovleff
+#'
+#' @name ClusterGammaComponent
+#' @rdname ClusterComponent-class
+#' @aliases ClusterGammaComponent-class
+#' @exportClass ClusterGammaComponent
+#'
+setClass(
+    Class="ClusterGammaComponent",
+    representation( shape = "matrix", scale = "matrix"),
+    contains=c("ClusterComponent"),
+    prototype=list( shape = matrix(nrow=0,ncol=0), scale = matrix(nrow=0,ncol=0) ),
+    validity=function(object)
+    {
+      if (ncol(object@shape)!=ncol(object@data))
+      {stop("shape must have nbVariable columns.")}
+      if (ncol(object@scale)!=ncol(object@data))
+      {stop("scale must have nbVariable columns.")}
+      if (!validGammaNames(object@modelName))
+      {stop("Invalid Gaussian model name.")}
+      return(TRUE)
+    }
+)
+#' Initialize an instance of a rtkpp class.
+#'
+#' Initialization method of the [\code{\linkS4class{ClusterGammaComponent}}] class.
+#' Used internally in the `rtkpp' package.
+#'
+#' @rdname initialize-methods
+#' @keywords internal
+setMethod(
+    f="initialize",
+    signature=c("ClusterGammaComponent"),
+    definition=function(.Object, data, nbCluster=2, modelName="gamma_pk_ajk_bjk")
+    {
+      # for data
+      if(missing(data)) {stop("data is mandatory.")}
+      # check model name
+      if (!validGammaNames(modelName)) { stop("modelName is invalid");}
+      # call base class
+      .Object <- callNextMethod(.Object, data, modelName)
+      # create slots
+      nbVariable = ncol(.Object@data);
+      .Object@shape = matrix(1., nrow=nbCluster, ncol=nbVariable);
+      .Object@scale = matrix(1., nrow=nbCluster, ncol=nbVariable);
+      # validate
+      validObject(.Object)
+      return(.Object)
+    }
+)
+
+#-----------------------------------------------------------------------
 #' Definition of the [\code{\linkS4class{ClusterGamma}}] class
 #'
-#' This class inherits from the [\code{\linkS4class{IClusterModel}}] class.
+#' This class inherits from the [\code{\linkS4class{IClusterModelBase}}] class.
 #' A gamma mixture model is a mixture model of the form:
 #' \deqn{
 #'   f({x}|\boldsymbol{\theta}) \\
@@ -125,9 +188,9 @@ clusterGamma <- function(data, nbCluster=2, modelNames= gammaNames(), strategy=c
 #'    \quad {x} \in {R}^d.
 #' }
 #'
-#' @slot shape  Matrix with the shape of the jth variable in the kth cluster.
-#' @slot scale  Matrix with the scale of the jth variable in the kth cluster.
-#' @seealso [\code{\linkS4class{IClusterModel}}] class
+#' @slot component  A [\code{\linkS4class{ClusterGammaComponent}}] with the
+#' shape and the scale of the component mixture model.
+#' @seealso [\code{\linkS4class{IClusterModelBase}}] class
 #'
 #' @examples
 #'   getSlots("ClusterGamma")
@@ -143,24 +206,21 @@ clusterGamma <- function(data, nbCluster=2, modelNames= gammaNames(), strategy=c
 #'
 setClass(
     Class="ClusterGamma",
-    representation( shape = "matrix", scale = "matrix"),
-    contains=c("IClusterModel"),
-    prototype=list( shape = matrix(nrow=0,ncol=0)
-                  , scale = matrix(nrow=0,ncol=0)
-                  ),
+    representation( component = "ClusterGammaComponent"),
+    contains=c("IClusterModelBase"),
     validity=function(object)
     {
-      if (ncol(object@shape)!=ncol(object@data))
+      if (ncol(object@component@shape)!=ncol(object@component@data))
       {stop("shape must have nbVariable columns.")}
-      if (nrow(object@shape)!=object@nbCluster)
+      if (nrow(object@component@shape)!=object@nbCluster)
       {stop("shape must have nbVariable rows.")}
 
-      if (ncol(object@scale)!=ncol(object@data))
+      if (ncol(object@component@scale)!=ncol(object@component@data))
       {stop("scale must have nbVariable columns.")}
-      if (nrow(object@scale)!=object@nbCluster)
+      if (nrow(object@component@scale)!=object@nbCluster)
       {stop("scale must have nbCluster rows.")}
 
-      if (!validGammaNames(object@modelName))
+      if (!validGammaNames(object@component@modelName))
       {stop("Invalid Gamma model name.")}
       return(TRUE)
     }
@@ -179,14 +239,8 @@ setMethod(
     signature=c("ClusterGamma"),
     definition=function(.Object, data, nbCluster=2, modelName="gamma_pk_ajk_bjk")
     {
-      .Object <- callNextMethod(.Object, data, nbCluster, modelName)
-      # resize
-      nbVariable <- ncol(.Object@data)
-      # for modelName
-      if(missing(modelName)) {.Object@modelName<-"gamma_pk_ajk_bjk"}
-      else  {.Object@modelName<-modelName}
-      .Object@shape <- matrix(1, nbCluster, nbVariable)
-      .Object@scale <- matrix(1, nbCluster, nbVariable)
+      .Object@component = new("ClusterGammaComponent", data, nbCluster, modelName);
+      .Object <- callNextMethod(.Object, nrow(.Object@component@data), nbCluster);
       # validate
       validObject(.Object)
       return(.Object)
@@ -201,14 +255,15 @@ setMethod(
   signature=c("ClusterGamma"),
   function(x,...){
     cat("****************************************\n")
-    callNextMethod()
+    callNextMethod();
+    print(x@component);
     cat("****************************************\n")
     for(k in 1:length(x@pk))
     {
       cat("*** Cluster: ",k,"\n")
       cat("* Proportion = ", format(x@pk[k]), "\n")
-      cat("* Shapes     = ", format(x@shape[k,]), "\n")
-      cat("* Scales     = ", format(x@scale[k,]), "\n")
+      cat("* Shapes     = ", format(x@component@shape[k,]), "\n")
+      cat("* Scales     = ", format(x@component@scale[k,]), "\n")
       cat("****************************************\n")
     }
   }
@@ -217,36 +272,38 @@ setMethod(
 #' @rdname show-methods
 #' @aliases show-ClusterGamma,ClusterGamma,ClusterGamma-method
 setMethod(
-    f="show",
-    signature=c("ClusterGamma"),
-    function(object)
+  f="show",
+  signature=c("ClusterGamma"),
+  function(object)
+  {
+    cat("****************************************\n")
+    callNextMethod();
+    show(object@component);
+    cat("****************************************\n")
+    for(k in 1:length(object@pk))
     {
+      cat("*** Cluster: ",k,"\n")
+      cat("* Proportion = ", format(object@pk[k]), "\n")
+      cat("* Shapes     = ", format(object@component@shape[k,]), "\n")
+      cat("* Scales     = ", format(object@component@scale[k,]), "\n")
       cat("****************************************\n")
-      callNextMethod()
-      cat("****************************************\n")
-      for(k in 1:length(object@pk))
-      {
-        cat("*** Cluster: ",k,"\n")
-        cat("* Proportion = ", format(object@pk[k]), "\n")
-        cat("* Shapes     = ", format(object@shape[k,]), "\n")
-        cat("* Scales     = ", format(object@scale[k,]), "\n")
-        cat("****************************************\n")
-      }
     }
+  }
 )
 
 #' @rdname summary-methods
 #' @aliases summary summary,MixmodResults-method
 #'
 setMethod(
-    f="summary",
-    signature=c("ClusterGamma"),
-    function(object, ...)
-    {
-      cat("**************************************************************\n")
-      callNextMethod()
-      cat("**************************************************************\n")
-    }
+  f="summary",
+  signature=c("ClusterGamma"),
+  function(object, ...)
+  {
+    cat("**************************************************************\n")
+    callNextMethod()
+    summary(object@component);
+    cat("**************************************************************\n")
+  }
 )
 
 #' Plotting of a class [\code{\linkS4class{ClusterGamma}}]
@@ -256,7 +313,7 @@ setMethod(
 #'
 #' @param x an object of class [\code{\linkS4class{ClusterGamma}}]
 #' @param y a list of variables to plot (subset). Variables names or indices.
-#' If missing all the variables are represented.
+#' If missingValues all the variables are represented.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @importFrom graphics plot
@@ -289,4 +346,4 @@ setMethod(
 # wrapper of dnorm
 # x a vector with the point
 .dGamma <- function(x, j, k, model)
-{ dgamma(x, shape = (model@shape)[k, j] , scale = (model@scale)[k, j])}
+{ dgamma(x, shape = (model@component@shape)[k, j] , scale = (model@component@scale)[k, j])}

@@ -33,7 +33,8 @@
  *  @brief In this file we implement the class MixtureComposer.
  **/
 
-#include "../include/STK_IMixture.h"
+// will include MixtureComposer.h
+#include "../include/STK_MixtureComposer.h"
 #include "Arrays/include/STK_Display.h"
 
 namespace STK
@@ -101,11 +102,11 @@ void MixtureComposer::writeParameters(std::ostream& os) const
   os << _T("Composer nbCluster = ") << nbCluster() << std::endl;
   os << _T("Composer nbFreeParameter = ") << nbFreeParameter() << std::endl;
   os << _T("Composer lnLikelihood = ") << lnLikelihood() << std::endl;
-  os << _T("Composer proportions = ") << *(p_pk()) << std::endl;
+  os << _T("Composer proportions = ") << *(p_pk());
 
   for (ConstMixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
   {
-    os << _T("Parameters of the mixture: ") << (*it)->idName() << _T("\n");
+    os << _T("\nParameters of the mixture: ") << (*it)->idName() << _T("\n");
     (*it)->writeParameters(os);
   }
 }
@@ -303,7 +304,7 @@ void MixtureComposer::releaseMixture(IMixtureManager& manager, String const& idD
   if (p_mixture)
   {
     releaseMixture(idData);
-    manager.releaseDataManager( idData);
+    manager.releaseMixtureData( idData);
   }
 }
 

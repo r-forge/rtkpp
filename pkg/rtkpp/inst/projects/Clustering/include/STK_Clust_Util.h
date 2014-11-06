@@ -90,7 +90,8 @@ enum algoType
 {
   emAlgo_ = 0,
   cemAlgo_ = 1,
-  semAlgo_ = 2
+  semAlgo_ = 2,
+  semiSemAlgo_ = 3
 };
 
 /** @ingroup Clustering
@@ -199,7 +200,7 @@ enum Mixture
  *  @param type the type of Mixture
  *  @return the MixtureClass associated to this Mixture.
  **/
-MixtureClass MixtureToMixtureClass( Mixture const& type);
+MixtureClass mixtureToMixtureClass( Mixture const& type);
 
 /** @ingroup Clustering
  *  Convert a String to a Mixture. The recognized strings are

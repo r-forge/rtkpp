@@ -8,13 +8,13 @@ data(iris)
 gauss_model <- clusterDiagGaussian(iris[1:4], nbCluster = 2:8, modelNames = diagGaussianNames()
               , strategy = clusterStrategy(nbTry = 3, nbInit = 5), criterion = "ICL")
 
-data<-gauss_model@data
+data<-gauss_model@component@data
 nbSample <- nrow(data)
 nbVariable <- ncol(data)
 nbCluster <- gauss_model@nbCluster
 prop <- gauss_model@pk
-mean <- gauss_model@mean
-sigma <- gauss_model@sigma
+mean <- gauss_model@component@mean
+sigma <- gauss_model@component@sigma
 
 f <-vector(length=nbSample)
 lnComp <- vector(length=nbCluster)

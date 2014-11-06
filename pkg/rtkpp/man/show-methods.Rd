@@ -4,14 +4,18 @@
 \alias{show}
 \alias{show,ClusterAlgo-method}
 \alias{show,ClusterCategorical-method}
+\alias{show,ClusterComponent-method}
 \alias{show,ClusterDiagGaussian-method}
 \alias{show,ClusterGamma-method}
+\alias{show,ClusterHeterogeneous-method}
 \alias{show,ClusterInit-method}
 \alias{show,ClusterStrategy-method}
-\alias{show,IClusterModel-method}
+\alias{show,IClusterModelBase-method}
 \alias{show-ClusterCategorical,ClusterCategorical,ClusterCategorical-method}
+\alias{show-ClusterComponent,ClusterComponent,ClusterComponent-method}
 \alias{show-ClusterDiagGaussian,ClusterDiagGaussian,ClusterDiagGaussian-method}
 \alias{show-ClusterGamma,ClusterGamma,ClusterGamma-method}
+\alias{show-ClusterHeterogeneous,ClusterHeterogeneous,ClusterHeterogeneous-method}
 \alias{show-algo,ClusterAlgo-method}
 \alias{show-init,ClusterInit,ClusterInit-method}
 \alias{show-strategy,ClusterStrategy-method}
@@ -25,11 +29,15 @@
 
 \S4method{show}{ClusterGamma}(object)
 
+\S4method{show}{ClusterHeterogeneous}(object)
+
 \S4method{show}{ClusterInit}(object)
 
 \S4method{show}{ClusterStrategy}(object)
 
-\S4method{show}{IClusterModel}(object)
+\S4method{show}{IClusterModelBase}(object)
+
+\S4method{show}{ClusterComponent}(object)
 }
 \arguments{
 \item{object}{a rtkpp object: a \code{\linkS4class{ClusterStrategy}},

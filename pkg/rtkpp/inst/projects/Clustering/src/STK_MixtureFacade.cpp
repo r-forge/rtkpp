@@ -92,6 +92,7 @@ bool StrategyFacade::run()
                << _T("------------------------------------------------\n");
     }
 #endif
+    p_model_->imputationStep();
     p_model_->finalizeStep();
   }
   return flag;

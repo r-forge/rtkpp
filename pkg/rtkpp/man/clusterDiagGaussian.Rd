@@ -4,7 +4,7 @@
 \title{Create an instance of the [\code{\linkS4class{ClusterDiagGaussian}}] class}
 \usage{
 clusterDiagGaussian(data, nbCluster = 2, modelNames = diagGaussianNames(),
-  strategy = clusterStrategy(), criterion = "ICL")
+  strategy = clusterFastStrategy(), criterion = "ICL")
 }
 \arguments{
 \item{data}{frame or matrix containing the data. Rows correspond to observations
@@ -52,7 +52,7 @@ summary(model)
 ## print model
 print(model)
 ## get estimated missing values
-model["data"][model["missings"]]
+missingValues(model)
 }
 \author{
 Serge Iovleff

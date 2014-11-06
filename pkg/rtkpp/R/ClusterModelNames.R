@@ -268,9 +268,58 @@ validGammaNames <- function(names)
   return(TRUE)
 }
 
+#' Build a vector of Categorical model names.
+#'
+#' In a Categorical model, we can build 4 models:
+#' \enumerate{
+#'  \item {The proportions can be equal or free.}
+#'  \item {The probabilities can be equal or free for all the variables.}
+#' }
+#'
+#' The model names are summarized in the following array:
+#' \tabular{lll}{
+#'  Model Name         \tab Proportions \tab Probabilities between variables  \cr
+#'  categorical_p_pjk  \tab Equal       \tab Free                             \cr
+#'  categorical_p_pk   \tab Equal       \tab Equal                            \cr
+#'  categorical_pk_pjk \tab Free        \tab Free                             \cr
+#'  categorical_pk_pk  \tab Free        \tab Equal                            \cr
+#' }
+#'
+#' @param prop A character string equal to "equal", "free" or "all". Default is "all".
+#' @param probabilities A character string equal to "equal", "free" or "all". Default is "all".
+#'
+#' @return A vector of character with the model names.
+#' @examples
+#' categoricalNames()
+#' categoricalNames("all", "equal") # same as c( "categorical_pk_pk", "categorical_p_pk")
+#'
+#' @rdname categoricalNames
+#' @export
+categoricalNames <- function(prop = "all", probabilities="all")
+{
+  if(sum(prop %in% c("equal","free","all")) != 1)
+  { stop("prop is not valid. See ?categoricalNames for the list of prop.")}
+  if(sum(probabilities %in% c("equal","free","all")) != 1)
+  { stop("probabilities is not valid. See ?categoricalNames for the list of probabilities.")}
+  
+  all = c( "categorical_pk_pjk", "categorical_pk_pk", "categorical_p_pjk", "categorical_p_sk")
+  propFree  = c( "categorical_pk_pjk", "categorical_pk_pk")
+  propEqual = c( "categorical_p_pjk", "categorical_p_pk")
+  probFree  = c( "categorical_pk_pjk", "categorical_p_pjk")
+  probEqual = c( "categorical_pk_pk", "categorical_p_pk")
+  
+  res = all;
+  if (prop == "free")  { res = intersect(res, propFree);}
+  if (prop == "equal") { res = intersect(res, propEqual);}
+  if (probabilities =="free")  { res = intersect(res, probFree);}
+  if (probabilities =="equal") { res = intersect(res, probEqual);}
+  
+  res
+}
+
 #' check if a vector of Categorical model name is correct.
 #' @param names a vector of character
-#' @rdname CategoricalNames
+#' @rdname categoricalNames
 #' @keywords internal
 validCategoricalNames <- function(names)
 {
@@ -279,7 +328,7 @@ validCategoricalNames <- function(names)
 
   all = c( "categorical_pk_pjk", "categorical_p_pjk",  "categorical_pk_pk", "categorical_p_pk")
   for (i in 1:nb)
-  {?  if ( sum(names[i] %in% all) != 1 ) { return(FALSE);}}
+  {  if ( sum(names[i] %in% all) != 1 ) { return(FALSE);}}
   return(TRUE)
 }
 

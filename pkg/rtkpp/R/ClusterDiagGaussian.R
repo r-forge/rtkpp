@@ -65,13 +65,13 @@ NULL
 #' ## print model
 #' print(model)
 #' ## get estimated missing values
-#' model["data"][model["missings"]]
+#' missingValues(model)
 #'
 #' @return An instance of the [\code{\linkS4class{ClusterDiagGaussian}}] class.
 #' @author Serge Iovleff
 #' @export
 #'
-clusterDiagGaussian <- function(data, nbCluster=2, modelNames=diagGaussianNames(), strategy=clusterStrategy(), criterion="ICL")
+clusterDiagGaussian <- function(data, nbCluster=2, modelNames=diagGaussianNames(), strategy=clusterFastStrategy(), criterion="ICL")
 {
   # check nbCluster
   nbClusterModel = length(nbCluster);
@@ -94,42 +94,98 @@ clusterDiagGaussian <- function(data, nbCluster=2, modelNames=diagGaussianNames(
 
   # check strategy
   if(class(strategy)[1] != "ClusterStrategy")
-  {stop("strategy is not a Cluster Stategy class (must be an instance of the class ClusterStrategy).")}
+  {stop("strategy is not a Cluster Strategy class (must be an instance of the class ClusterStrategy).")}
   validObject(strategy);
 
   # Create model
   model = new("ClusterDiagGaussian", data)
-  model@missings = which(is.na(data), arr.ind=TRUE);
+  model@component@missing = which(is.na(data), arr.ind=TRUE);
   model@strategy = strategy;
   # start estimation of the models
   ResFlag <- FALSE;
-  res1Flag <- FALSE;
-  if (nbClusterMin == 1)
-  {
-    model = .diagGaussianNoCluster(model);
-    res1Flag <- TRUE;
-    ind <- which(nbCluster == 1, arr.ind = TRUE);
-    nbCluster <- nbCluster[-ind];
-  }
   if (length(nbCluster) >0)
   {
     resFlag = .Call("clusterMixture", model, nbCluster, modelNames, strategy, criterion, PACKAGE="rtkpp");
   }
   # set names
-  if (resFlag != TRUE && res1Flag != TRUE) {cat("WARNING: An error occur during the clustering process");}
+  if (resFlag != TRUE ) {cat("WARNING: An error occur during the clustering process");}
   else
   {
-    colnames(model@mean)  <- colnames(model@data);
-    colnames(model@sigma) <- colnames(model@data);
+    colnames(model@component@mean)  <- colnames(model@component@data);
+    colnames(model@component@sigma) <- colnames(model@component@data);
   }
   model
 }
 
+#-----------------------------------------------------------------------
+#' Definition of the [\code{\linkS4class{ClusterDiagGaussianComponent}}] class
+#'
+#' This class defines a diagonal Gaussian component of a mixture Model.
+#'
+#' @slot mean  Matrix with the mean of the jth variable in the kth cluster.
+#' @slot sigma  Matrix with the standard deviation of the jth variable in the kth cluster.
+#' @seealso [\code{\linkS4class{ClusterComponent}}] class
+#'
+#' @examples
+#' getSlots("ClusterDiagGaussianComponent")
+#'
+#' @author Serge Iovleff
+#'
+#' @name ClusterDiagGaussianComponent
+#' @rdname ClusterComponent-class
+#' @aliases ClusterDiagGaussianComponent-class
+#' @exportClass ClusterDiagGaussianComponent
+#'
+setClass(
+  Class="ClusterDiagGaussianComponent",
+  representation( mean = "matrix", sigma = "matrix"),
+  contains=c("ClusterComponent"),
+  prototype=list( mean = matrix(nrow=0,ncol=0), sigma = matrix(nrow=0,ncol=0) ),
+  validity=function(object)
+  {
+    if (ncol(object@mean)!=ncol(object@data))
+    {stop("mean must have nbVariable columns.")}
+    if (ncol(object@sigma)!=ncol(object@data))
+    {stop("sigma must have nbVariable columns.")}
+    if (!validDiagGaussianNames(object@modelName))
+    {stop("Invalid Gaussian model name.")}
+    return(TRUE)
+  }
+)
+#' Initialize an instance of a rtkpp class.
+#'
+#' Initialization method of the [\code{\linkS4class{ClusterDiagGaussianComponent}}] class.
+#' Used internally in the `rtkpp' package.
+#'
+#' @rdname initialize-methods
+#' @keywords internal
+setMethod(
+    f="initialize",
+    signature=c("ClusterDiagGaussianComponent"),
+    definition=function(.Object, data, nbCluster=2, modelName="gaussian_pk_sjk")
+    {
+      # for data
+      if(missing(data)) {stop("data is mandatory.")}
+      # check model name
+      if (!validDiagGaussianNames(modelName)) { stop("modelName is invalid");}
+      # call base class initialize
+      .Object <- callNextMethod(.Object, data, modelName)
+      # create slots
+      nbVariable = ncol(.Object@data);
+      .Object@mean  = matrix(0., nrow=nbCluster, ncol=nbVariable);
+      .Object@sigma = matrix(1., nrow=nbCluster, ncol=nbVariable);
+      # validate
+      validObject(.Object)
+      return(.Object)
+    }
+)
+
+#-----------------------------------------------------------------------
 #' Definition of the [\code{\linkS4class{ClusterDiagGaussian}}] class
 #'
 #' This class defines a diagonal Gaussian mixture Model.
 #'
-#' This class inherits from the [\code{\linkS4class{IClusterModel}}] class.
+#' This class inherits from the [\code{\linkS4class{IClusterModelBase}}] class.
 #' A diagonal gaussian model is a mixture model of the form:
 #' \deqn{
 #'   f({x}|\boldsymbol{\theta})
@@ -137,9 +193,9 @@ clusterDiagGaussian <- function(data, nbCluster=2, modelNames=diagGaussianNames(
 #'    \quad x \in {R}^d.
 #' }
 #'
-#' @slot mean  Matrix with the mean of the jth variable in the kth cluster.
-#' @slot sigma  Matrix with the standard deviation of the jth variable in the kth cluster.
-#' @seealso [\code{\linkS4class{IClusterModel}}] class
+#' @slot component  A [\code{\linkS4class{ClusterDiagGaussianComponent}}] with the
+#' mean and standard deviation of the diagonal mixture model.
+#' @seealso [\code{\linkS4class{IClusterModelBase}}] class
 #'
 #' @examples
 #' getSlots("ClusterDiagGaussian")
@@ -155,20 +211,19 @@ clusterDiagGaussian <- function(data, nbCluster=2, modelNames=diagGaussianNames(
 #'
 setClass(
     Class="ClusterDiagGaussian",
-    representation( mean = "matrix", sigma = "matrix"),
-    contains=c("IClusterModel"),
-    prototype=list( mean   = matrix(nrow=0,ncol=0), sigma = matrix(nrow=0,ncol=0) ),
+    representation( component = "ClusterDiagGaussianComponent"),
+    contains=c("IClusterModelBase"),
     validity=function(object)
     {
-      if (nrow(object@mean)!=object@nbCluster)
+      if (nrow(object@component@mean)!=object@nbCluster)
       {stop("mean must have nbCluster rows.")}
-      if (ncol(object@mean)!=ncol(object@data))
+      if (ncol(object@component@mean)!=ncol(object@component@data))
       {stop("mean must have nbVariable columns.")}
-      if (nrow(object@sigma)!=object@nbCluster)
+      if (nrow(object@component@sigma)!=object@nbCluster)
       {stop("sigma must have nbCluster rows.")}
-      if (ncol(object@sigma)!=ncol(object@data))
+      if (ncol(object@component@sigma)!=ncol(object@component@data))
       {stop("sigma must have nbVariable columns.")}
-      if (!validDiagGaussianNames(object@modelName))
+      if (!validDiagGaussianNames(object@component@modelName))
       {stop("Invalid Gaussian model name.")}
       return(TRUE)
     }
@@ -187,14 +242,8 @@ setMethod(
     signature=c("ClusterDiagGaussian"),
     definition=function(.Object, data, nbCluster=2, modelName="gaussian_pk_sjk")
     {
-      .Object <- callNextMethod(.Object, data, nbCluster, modelName)
-      # resize
-      nbVariable <- ncol(.Object@data)
-      # for modelName
-      if(missing(modelName)) {.Object@modelName<-"gaussian_pk_sjk"}
-      else  {.Object@modelName<-modelName}
-      .Object@mean <- matrix(0, nbCluster, nbVariable)
-      .Object@sigma <- matrix(1, nbCluster, nbVariable)
+      .Object@component = new("ClusterDiagGaussianComponent", data, nbCluster, modelName);
+      .Object <- callNextMethod(.Object, nrow(.Object@component@data), nbCluster);
       # validate
       validObject(.Object)
       return(.Object)
@@ -209,14 +258,15 @@ setMethod(
   signature=c("ClusterDiagGaussian"),
   function(x,...){
     cat("****************************************\n")
-    callNextMethod()
+    callNextMethod();
+    print(x@component);
     cat("****************************************\n")
     for(k in 1:length(x@pk))
     {
       cat("*** Cluster: ",k,"\n")
       cat("* Proportion = ", format(x@pk[k]), "\n")
-      cat("* Mean(s)    = ", format(x@mean[k,]), "\n")
-      cat("* Sd(s)      = ", format(x@sigma[k,]), "\n")
+      cat("* Mean(s)    = ", format(x@component@mean[k,]), "\n")
+      cat("* Sd(s)      = ", format(x@component@sigma[k,]), "\n")
       cat("****************************************\n")
     }
   }
@@ -225,36 +275,38 @@ setMethod(
 #' @rdname show-methods
 #' @aliases show-ClusterDiagGaussian,ClusterDiagGaussian,ClusterDiagGaussian-method
 setMethod(
-    f="show",
-    signature=c("ClusterDiagGaussian"),
-    function(object)
+  f="show",
+  signature=c("ClusterDiagGaussian"),
+  function(object)
+  {
+    cat("****************************************\n")
+    callNextMethod();
+    show(object@component);
+    cat("****************************************\n")
+    for(k in 1:length(object@pk))
     {
+      cat("*** Cluster: ",k,"\n")
+      cat("* Proportion = ", format(object@pk[k]), "\n")
+      cat("* Means      = ", format(object@component@mean[k,]), "\n")
+      cat("* Variances  = ", format(object@component@sigma[k,]), "\n")
       cat("****************************************\n")
-      callNextMethod()
-      cat("****************************************\n")
-      for(k in 1:length(object@pk))
-      {
-        cat("*** Cluster: ",k,"\n")
-        cat("* Proportion = ", format(object@pk[k]), "\n")
-        cat("* Means      = ", format(object@mean[k,]), "\n")
-        cat("* Variances  = ", format(object@sigma[k,]), "\n")
-        cat("****************************************\n")
-      }
     }
+  }
 )
 
 #' @rdname summary-methods
 #' @aliases summary summary,ClusterDiagGaussian-method
 #'
 setMethod(
-    f="summary",
-    signature=c("ClusterDiagGaussian"),
-    function(object, ...)
-    {
-      cat("**************************************************************\n")
-      callNextMethod()
-      cat("**************************************************************\n")
-    }
+  f="summary",
+  signature=c("ClusterDiagGaussian"),
+  function(object, ...)
+  {
+    cat("**************************************************************\n")
+    callNextMethod()
+    summary(object@component);
+    cat("**************************************************************\n")
+  }
 )
 
 #' Plotting of a class [\code{\linkS4class{ClusterDiagGaussian}}]
@@ -296,24 +348,4 @@ setMethod(
 # wrapper of dnorm
 # x a vector with the point
 .dGauss <- function(x, j, k, model)
-{ dnorm(x, (model@mean)[k, j] , (model@sigma)[k, j])}
-
-# wrapper of dnorm
-# x a vector with the point
-.diagGaussianNoCluster <- function(model)
-{
-  nbSample   <- nrow(model@data);
-  nbVariable <- ncol(model@data);
-  model@mean  <- matrix(colMeans(model@data, na.rm = TRUE), nrow=1, ncol = nbVariable);
-  model@sigma <- matrix(apply(model@data, 2, na.rm = TRUE, sd), nrow=1, ncol = nbVariable);
-  model@nbCluster <- 1;
-  model@pk <- c(1);
-  model@tik <- matrix(1, nrow= nrow(model@data), ncol =1);
-  model@lnFi <- rowSums( t(apply(model@data, 1, mean=as.vector(model@mean), sd = as.vector(model@sigma), log = TRUE, dnorm)) );
-  model@zi <- as.integer(rep(1, nbVariable));
-  model@lnLikelihood <- sum(model@lnFi);
-  model@nbFreeParameter <- 2 * nbVariable;
-  model@criterion <- -2 * model@lnLikelihood + model@nbFreeParameter * log(nbSample);
-  model@modelName <- c("gaussian_pk_sjk");
-  model
-}
+{ dnorm(x, (model@component@mean)[k, j] , (model@component@sigma)[k, j])}

@@ -6,8 +6,10 @@ export(clusterAlgo
       ,validDiagGaussianNames
       ,gammaNames
       ,validGammaNames
+      ,categoricalNames
       ,validCategoricalNames
       ,clusterDiagGaussian
+      ,clusterHeterogeneous
       ,clusterGamma
       ,clusterCategorical
       )
@@ -19,7 +21,7 @@ export(CxxFlags,
 exportClasses(ClusterAlgo
              ,ClusterInit
              ,ClusterStrategy
-             ,IClusterModel
+             ,IClusterModelBase
              ,ClusterCategorical
              ,ClusterDiagGaussian
              ,ClusterGamma
@@ -29,6 +31,7 @@ exportMethods(print)
 exportMethods(plot)
 exportMethods(show)
 exportMethods(summary)
+exportMethods(missingValues)
 
 import(Rcpp)
 importFrom(methods,show)

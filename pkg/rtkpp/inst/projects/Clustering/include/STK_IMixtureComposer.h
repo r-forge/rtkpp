@@ -131,6 +131,8 @@ class IMixtureComposer : public IStatModelBase
     inline CArrayPoint<Real> const& pk() const { return prop_;};
     /** @return the tik probabilities */
     inline Array2D<Real> const& tik() const { return tik_;};
+    /** @return the estimated proportions of individuals  */
+    inline CArrayPoint<Real> const& tk() const { return tk_;};
     /** @return the zi class label */
     inline CArrayVector<int> const& zi() const { return zi_;};
 
@@ -243,7 +245,7 @@ class IMixtureComposer : public IStatModelBase
     /** The tik probabilities */
     Array2D<Real> tik_;
     /** The sum of the columns of tik_ */
-    Array2DPoint<Real> tk_;
+    CArrayPoint<Real> tk_;
     /** The zi class label */
     CArrayVector<int> zi_;
     /** Create the mixture model parameters. */

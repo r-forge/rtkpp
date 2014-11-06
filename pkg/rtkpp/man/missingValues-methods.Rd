@@ -3,17 +3,29 @@
 \name{missingValues}
 \alias{missingValues}
 \alias{missingValues,ClusterCategorical-method}
+\alias{missingValues,ClusterCategoricalComponent-method}
 \alias{missingValues,ClusterDiagGaussian-method}
+\alias{missingValues,ClusterDiagGaussianComponent-method}
 \alias{missingValues,ClusterGamma-method}
+\alias{missingValues,ClusterGammaComponent-method}
+\alias{missingValues,ClusterHeterogeneous-method}
 \title{Return the missing values of a component or a cluster class.}
 \usage{
 missingValues(x)
 
+\S4method{missingValues}{ClusterCategoricalComponent}(x)
+
 \S4method{missingValues}{ClusterCategorical}(x)
+
+\S4method{missingValues}{ClusterGammaComponent}(x)
 
 \S4method{missingValues}{ClusterGamma}(x)
 
+\S4method{missingValues}{ClusterDiagGaussianComponent}(x)
+
 \S4method{missingValues}{ClusterDiagGaussian}(x)
+
+\S4method{missingValues}{ClusterHeterogeneous}(x)
 }
 \arguments{
 \item{x}{an object that can return the extrapolated missing values}

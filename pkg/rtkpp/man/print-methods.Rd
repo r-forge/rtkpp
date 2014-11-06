@@ -4,9 +4,12 @@
 \alias{print}
 \alias{print,ClusterAlgo-method}
 \alias{print,ClusterCategorical-method}
+\alias{print,ClusterCategoricalComponent-method}
 \alias{print,ClusterComponent-method}
 \alias{print,ClusterDiagGaussian-method}
+\alias{print,ClusterDiagGaussianComponent-method}
 \alias{print,ClusterGamma-method}
+\alias{print,ClusterGammaComponent-method}
 \alias{print,ClusterHeterogeneous-method}
 \alias{print,ClusterInit-method}
 \alias{print,ClusterStrategy-method}
@@ -18,9 +21,15 @@
 \usage{
 \S4method{print}{ClusterAlgo}(x, ...)
 
+\S4method{print}{ClusterCategoricalComponent}(x, k, ...)
+
 \S4method{print}{ClusterCategorical}(x, ...)
 
+\S4method{print}{ClusterDiagGaussianComponent}(x, k, ...)
+
 \S4method{print}{ClusterDiagGaussian}(x, ...)
+
+\S4method{print}{ClusterGammaComponent}(x, k, ...)
 
 \S4method{print}{ClusterGamma}(x, ...)
 

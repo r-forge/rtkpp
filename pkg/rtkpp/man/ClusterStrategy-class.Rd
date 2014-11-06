@@ -27,7 +27,7 @@ to use during the short runs of the estimation method.}
 }}
 \examples{
 new("ClusterStrategy")
-  new("ClusterStrategy", shortAlgo=clusterAlgo("SEM",1000))
+  new("ClusterStrategy", shortAlgo=clusterAlgo("SEM",1000), longAlgo=clusterAlgo("SemiSEM",200,1e-07))
   getSlots("ClusterStrategy")
 }
 \author{

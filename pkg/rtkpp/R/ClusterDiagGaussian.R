@@ -99,7 +99,6 @@ clusterDiagGaussian <- function(data, nbCluster=2, modelNames=diagGaussianNames(
 
   # Create model
   model = new("ClusterDiagGaussian", data)
-  model@component@missing = which(is.na(data), arr.ind=TRUE);
   model@strategy = strategy;
   # start estimation of the models
   ResFlag <- FALSE;
@@ -180,6 +179,60 @@ setMethod(
     }
 )
 
+#' @rdname extract-methods
+#' @aliases [,ClusterDiagGaussianComponent-method
+setMethod(
+    f="[",
+    signature(x = "ClusterDiagGaussianComponent"),
+    definition=function(x, i, j, drop)
+    {
+      if ( missing(j) )
+      {
+        switch(EXPR=i,
+            "mean" ={return(x@mean)},
+            "sigma"={return(x@sigma)},
+            stop("This attribute doesn't exist !")
+        )
+      }
+      else
+      {
+        if (!is.numeric(j)) {stop("j must be an integer.")}
+        if (round(j)!=j)    {stop("j must be an integer.")}
+        switch(EXPR=i,
+            "mean" ={return(x@mean[j,])},
+            "sigma"={return(x@sigma[j,])},
+            stop("This attribute doesn't exist !")
+        )
+      }
+    }
+)
+
+#' @rdname print-methods
+#' @aliases print print,ClusterDiagGaussianComponent-method
+#'
+setMethod(
+  signature=c("ClusterDiagGaussianComponent"),
+  f="print",
+  function(x,k,...)
+  {
+    cat("* Means     = ", format(x@mean[k,]), "\n")
+    cat("* S.D.      = ", format(x@sigma[k,]), "\n")
+  }
+)
+
+#' @rdname show-methods
+#' @aliases show-ClusterDiagGaussianComponent,ClusterDiagGaussianComponent,ClusterDiagGaussianComponent-method
+setMethod(
+  f="show",
+  signature=c("ClusterDiagGaussianComponent"),
+  function(object)
+  {
+    cat("* Means     = ", format(object@mean), "\n")
+    cat("* S.D.      = ", format(object@sigma), "\n")
+  }
+)
+
+
 #-----------------------------------------------------------------------
 #' Definition of the [\code{\linkS4class{ClusterDiagGaussian}}] class
 #'
@@ -259,14 +312,12 @@ setMethod(
   function(x,...){
     cat("****************************************\n")
     callNextMethod();
-    print(x@component);
     cat("****************************************\n")
     for(k in 1:length(x@pk))
     {
       cat("*** Cluster: ",k,"\n")
       cat("* Proportion = ", format(x@pk[k]), "\n")
-      cat("* Mean(s)    = ", format(x@component@mean[k,]), "\n")
-      cat("* Sd(s)      = ", format(x@component@sigma[k,]), "\n")
+      print(x@component, k);
       cat("****************************************\n")
     }
   }
@@ -287,8 +338,7 @@ setMethod(
     {
       cat("*** Cluster: ",k,"\n")
       cat("* Proportion = ", format(object@pk[k]), "\n")
-      cat("* Means      = ", format(object@component@mean[k,]), "\n")
-      cat("* Variances  = ", format(object@component@sigma[k,]), "\n")
+      print(object@component, k);
       cat("****************************************\n")
     }
   }

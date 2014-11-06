@@ -4,6 +4,9 @@
 \alias{Extract}
 \alias{[}
 \alias{[,ClusterAlgo-method}
+\alias{[,ClusterCategoricalComponent-method}
+\alias{[,ClusterDiagGaussianComponent-method}
+\alias{[,ClusterGammaComponent-method}
 \alias{[,ClusterInit-method}
 \alias{[,ClusterStrategy-method}
 \alias{[<-,ClusterAlgo-method}
@@ -14,6 +17,12 @@
 \S4method{[}{ClusterAlgo}(x, i, j, drop)
 
 \S4method{[}{ClusterAlgo}(x, i, j) <- value
+
+\S4method{[}{ClusterCategoricalComponent}(x, i, j, drop)
+
+\S4method{[}{ClusterDiagGaussianComponent}(x, i, j, drop)
+
+\S4method{[}{ClusterGammaComponent}(x, i, j, drop)
 
 \S4method{[}{ClusterInit}(x, i, j, drop)
 

@@ -121,6 +121,11 @@ clusterHeterogeneous <- function(data, modelNames, nbCluster=2, strategy=cluster
   if (resFlag != TRUE) {cat("WARNING: An error occurs during the clustering process");}
   else
   {
+    for (i in 1:length(data))
+    {
+      if(validCategoricalNames(modelNames[i]))
+      { dim(model@ldata[[i]]@plkj) <- c(model@ldata[[i]]@nbModalities, model@nbCluster, ncol(model@ldata[[i]]@data))}
+    }
   }
   model
 }
@@ -203,11 +208,28 @@ setMethod(
   function(x,...){
     cat("****************************************\n")
     callNextMethod()
+    nbData <- length(x@ldata)
+    if(nbData>0)
+    {
+      for (l in 1:nbData)
+      {
+        cat("* model name = ", x@ldata[[l]]@modelName, "\n")
+        print(format(x@ldata[[l]]@data),quote=FALSE);
+      }
+    }
     cat("****************************************\n")
     for(k in 1:length(x@pk))
     {
       cat("*** Cluster: ",k,"\n")
       cat("* Proportion = ", format(x@pk[k]), "\n")
+      if(nbData>0)
+      {
+        for (l in 1:nbData)
+        {
+          cat("* model name = ", x@ldata[[l]]@modelName, "\n");
+          print(x@ldata[[l]],k);
+        }
+      }
       cat("****************************************\n")
     }
   }
@@ -240,7 +262,17 @@ setMethod(
       for(k in 1:length(object@pk))
       {
         cat("*** Cluster: ",k,"\n")
-        cat("* Proportion = ", format(object@pk[k]), "\n")
+        cat("* Proportion = ", format(object@pk[k]),"\n")
+        nbData <- length(object@ldata)
+        if(nbData>0)
+        {
+          for (l in 1:nbData)
+          {
+            cat("*\n")
+            cat("* model name = ", object@ldata[[l]]@modelName, "\n");
+            print(object@ldata[[l]], k);
+          }
+        }
         cat("****************************************\n")
       }
     }
@@ -292,34 +324,35 @@ setMethod(
       # total number of cluster in the data set
       nbCluster = ncol(x@tik);
       # check y, no y => display all dimensions
-      if (missingValues(y)) { y=1:(nbCluster-1); }
+      if (missing(y)) { y=1:(nbCluster-1); }
       else
       { if (round(y)!=y) {stop("y must be an integer.")}
         if (y>nbCluster-1)
           stop("y should not be greater than K-1")
         y <- 1:y
       }
-      print(y)
       # get representation
       Y=.visut(x@tik, nbCluster);
+      if (nbCluster == 2) { ndim = 1;}
+      else { ndim = ncol(Y);}
       # Compute gaussian statistics
-      mean <- matrix(0, nrow = x@nbCluster, ncol =ncol(Y))
-      sigma <- matrix(1, nrow = x@nbCluster, ncol =ncol(Y))
+      mean  <- matrix(0, nrow = x@nbCluster, ncol =ndim)
+      sigma <- matrix(1, nrow = x@nbCluster, ncol =ndim)
       for (k in 1:nbCluster)
       {
-        wcov = cov.wt(Y, x@tik[,k], method = "ML");
+        wcov = cov.wt(as.matrix(Y), x@tik[,k], method = "ML");
         mean[k,]  = wcov$center;
         sigma[k,] = sqrt(diag(wcov$cov))
       }
       # create gaussian model
       gauss<-new("ClusterDiagGaussian", Y, nbCluster = x@nbCluster)
-      gauss@mean = mean
-      gauss@sigma= sigma
+      gauss@component@mean = mean
+      gauss@component@sigma= sigma
       gauss@pk   = x@pk
       gauss@tik  = x@tik
       gauss@lnFi = x@lnFi
       gauss@zi   = x@zi
-      gauss@missing     = x@missing
+      #gauss@component@missing     = x@component@missing
       gauss@lnLikelihood = x@lnLikelihood
       gauss@criterion    = x@criterion
       gauss@nbFreeParameter = x@nbFreeParameter

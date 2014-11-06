@@ -35,7 +35,7 @@ NULL
 #' when using an EM algorithm. A ``try'' is composed of three stages
 #' \itemize{
 #'   \item \code{nbShortRun} short iterations of the initialization step and
-#'    of the \code{EM}, \code{CEM} or \code{SEM} algorithm.
+#'    of the \code{EM}, \code{CEM}, \code{SEM} or \code{SemiSEM} algorithm.
 #'   \item \code{nbInit} initializations using the \code{\link{clusterInit}}]
 #'   method.
 #'   \item A long run of the \code{EM}, \code{CEM} or \code{SEM} algorithm.
@@ -53,7 +53,7 @@ NULL
 #' @param initAlgo Character string with the algorithm to use in the initialization stage.
 #' Default value: "SEM"
 #' @param nbInitIteration Integer defining the maximal number of iterations in initialization algorithm
-#' if \code{initAlgo} = "EM or "CEM. This is the number of iterations if \code{initAlgo} = "SEM".
+#' if \code{initAlgo} = "EM", "CEM" or "SemiSEM". This is the number of iterations if \code{initAlgo} = "SEM".
 #' Default value: 20.
 #' @param initEpsilon Real defining the epsilon value for the algorithm.
 #' epsilon is not used by the \code{SEM} algorithm. Default value: 0.01.
@@ -63,7 +63,7 @@ NULL
 #' @param shortRunAlgo A character string with the algorithm to use in the short run stage
 #' Default value: "EM".
 #' @param nbShortIteration Integer defining the maximal number of iterations in the short runs
-#' if \code{shortRunAlgo} = "EM or "CEM, or the number of iterations if \code{shortRunAlgo} = "SEM".
+#' if \code{shortRunAlgo} = "EM", "CEM" or "semiSEM", or the number of iterations if \code{shortRunAlgo} = "SEM".
 #' Default value: 100.
 #' @param shortEpsilon Real defining the epsilon value for the algorithm.
 #' epsilon is not used by the \code{SEM} algorithm. Default value: 1e-04.
@@ -71,7 +71,7 @@ NULL
 #' @param longRunAlgo A character string with the algorithm to use in the long run stage
 #' Default value: "EM".
 #' @param nbLongIteration  Integer defining the maximal number of iterations in the short runs
-#' if \code{shortRunAlgo} = "EM or "CEM, or the number of iterations if \code{shortRunAlgo} = "SEM".
+#' if \code{shortRunAlgo} = "EM", "CEM" or "SemiSEM", or the number of iterations if \code{shortRunAlgo} = "SEM".
 #' Default value: 1000.
 #' @param longEpsilon Real defining the epsilon value for the algorithm.
 #' epsilon is not used by the \code{SEM} algorithm. Default value: 1e-07.
@@ -140,7 +140,7 @@ clusterFastStrategy <- function()
 #'
 #' @examples
 #'   new("ClusterStrategy")
-#'   new("ClusterStrategy", shortAlgo=clusterAlgo("SEM",1000))
+#'   new("ClusterStrategy", shortAlgo=clusterAlgo("SEM",1000), longAlgo=clusterAlgo("SemiSEM",200,1e-07))
 #'   getSlots("ClusterStrategy")
 #'
 #' @author Serge Iovleff

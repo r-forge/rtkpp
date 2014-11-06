@@ -101,7 +101,6 @@ clusterGamma <- function(data, nbCluster=2, modelNames= gammaNames(), strategy=c
 
   # Create model
   model = new("ClusterGamma", data)
-  model@component@missing = which(is.na(data), arr.ind=TRUE);
   model@strategy = strategy;
 
   # start estimation of the models
@@ -175,6 +174,59 @@ setMethod(
       validObject(.Object)
       return(.Object)
     }
+)
+
+#' @rdname extract-methods
+#' @aliases [,ClusterGammaComponent-method
+setMethod(
+  f="[",
+  signature(x = "ClusterGammaComponent"),
+  definition=function(x, i, j, drop)
+  {
+    if ( missing(j) )
+    {
+      switch(EXPR=i,
+             "shape"={return(x@shape)},
+             "scale"={return(x@scale)},
+             stop("This attribute doesn't exist !")
+            )
+    }
+    else
+    {
+      if (!is.numeric(j)) {stop("j must be an integer.")}
+      if (round(j)!=j)    {stop("j must be an integer.")}
+      switch(EXPR=i,
+             "shape"={return(x@shape[j,])},
+             "scale"={return(x@scale[j,])},
+             stop("This attribute doesn't exist !")
+            )
+    }
+  }
+)
+
+#' @rdname print-methods
+#' @aliases print print,ClusterGammaComponent-method
+#'
+setMethod(
+  f="print",
+  signature=c("ClusterGammaComponent"),
+  function(x,k,...)
+  {
+    cat("* Shapes     = ", format(x@shape[k,]), "\n")
+    cat("* Scales     = ", format(x@scale[k,]), "\n")
+  }
+)
+
+#' @rdname show-methods
+#' @aliases show-ClusterGammaComponent,ClusterGammaComponent,ClusterGammaComponent-method
+setMethod(
+  f="show",
+  signature=c("ClusterGammaComponent"),
+  function(object)
+  {
+    cat("* Shapes     = ", format(object@shape), "\n")
+    cat("* Scales     = ", format(object@scale), "\n")
+  }
 )
 
 #-----------------------------------------------------------------------
@@ -256,14 +308,12 @@ setMethod(
   function(x,...){
     cat("****************************************\n")
     callNextMethod();
-    print(x@component);
     cat("****************************************\n")
     for(k in 1:length(x@pk))
     {
-      cat("*** Cluster: ",k,"\n")
-      cat("* Proportion = ", format(x@pk[k]), "\n")
-      cat("* Shapes     = ", format(x@component@shape[k,]), "\n")
-      cat("* Scales     = ", format(x@component@scale[k,]), "\n")
+      cat("*** Cluster: ",k,"\n");
+      cat("* Proportion = ", format(x@pk[k]), "\n");
+      print(x@component, k);
       cat("****************************************\n")
     }
   }
@@ -284,8 +334,7 @@ setMethod(
     {
       cat("*** Cluster: ",k,"\n")
       cat("* Proportion = ", format(object@pk[k]), "\n")
-      cat("* Shapes     = ", format(object@component@shape[k,]), "\n")
-      cat("* Scales     = ", format(object@component@scale[k,]), "\n")
+      print(object@component, k);
       cat("****************************************\n")
     }
   }

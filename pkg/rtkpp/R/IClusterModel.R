@@ -178,12 +178,12 @@ setMethod(
   signature=c("IClusterModelBase"),
   function(x,...)
   {
-    cat("* nbSample        = ", x@nbSample, "\n")
-    cat("* nbCluster       = ", x@nbCluster, "\n")
-    cat("* lnLikelihood    = ", x@lnLikelihood,"\n")
-    cat("* nbFreeParameter = ", x@lnLikelihood,"\n")
-    cat("* criterion       = ", x@criterion, "\n")
-    cat("* zi              =\n")
+    cat("* nbSample       = ", x@nbSample, "\n")
+    cat("* nbCluster      = ", x@nbCluster, "\n")
+    cat("* lnLikelihood   = ", x@lnLikelihood,"\n")
+    cat("* nbFreeParameter= ", x@nbFreeParameter,"\n")
+    cat("* criterion      = ", x@criterion, "\n")
+    cat("* zi             =\n")
     print(x@zi)
   }
 )
@@ -195,10 +195,11 @@ setMethod(
   signature=c("IClusterModelBase"),
   function(object)
   {
-    cat("* nbSample     = ", object@nbSample, "\n")
-    cat("* nbCluster    = ", object@nbCluster, "\n")
-    cat("* lnLikelihood = ", object@lnLikelihood,"\n")
-    cat("* criterion    = ", object@criterion, "\n")
+    cat("* nbSample       = ", object@nbSample, "\n")
+    cat("* nbCluster      = ", object@nbCluster, "\n")
+    cat("* lnLikelihood   = ", object@lnLikelihood,"\n")
+    cat("* nbFreeParameter= ", object@nbFreeParameter,"\n")
+    cat("* criterion      = ", object@criterion, "\n")
   }
 )
 
@@ -212,8 +213,8 @@ setMethod(
     cat("* nbSample       = ", object@nbSample, "\n")
     cat("* nbCluster      = ", object@nbCluster, "\n")
     cat("* lnLikelihood   = ", object@lnLikelihood,"\n")
-    cat("* criterion      = ", object@criterion, "\n")
     cat("* nbFreeParameter= ", object@nbFreeParameter, "\n")
+    cat("* criterion      = ", object@criterion, "\n")
   }
 )
 
@@ -267,7 +268,7 @@ setMethod(
       if(missing(modelName)) {stop("modelName is mandatory.")}
       # fill data missing and modelName
       .Object@data      <- as.matrix(data);
-      .Object@missing  <- which(is.na(.Object@data), arr.ind=TRUE);
+      .Object@missing   <- which(is.na(.Object@data), arr.ind=TRUE);
       .Object@modelName <- modelName;
       # validObject(.Object) will be called in base class
       return(.Object)

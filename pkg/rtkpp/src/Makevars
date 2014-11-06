@@ -45,5 +45,5 @@ all: $(SHLIB)
 $(SHLIB): pkglib
 
 pkglib:
-	($(MAKE) -j -l2 -C $(STKPP_DIR))
+	($(MAKE) -C $(STKPP_DIR))
 	(cd $(STKPP_DIR) && $(MAKE) clean_obj)

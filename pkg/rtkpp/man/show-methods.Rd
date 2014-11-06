@@ -4,17 +4,23 @@
 \alias{show}
 \alias{show,ClusterAlgo-method}
 \alias{show,ClusterCategorical-method}
+\alias{show,ClusterCategoricalComponent-method}
 \alias{show,ClusterComponent-method}
 \alias{show,ClusterDiagGaussian-method}
+\alias{show,ClusterDiagGaussianComponent-method}
 \alias{show,ClusterGamma-method}
+\alias{show,ClusterGammaComponent-method}
 \alias{show,ClusterHeterogeneous-method}
 \alias{show,ClusterInit-method}
 \alias{show,ClusterStrategy-method}
 \alias{show,IClusterModelBase-method}
 \alias{show-ClusterCategorical,ClusterCategorical,ClusterCategorical-method}
+\alias{show-ClusterCategoricalComponent,ClusterCategoricalComponent,ClusterCategoricalComponent-method}
 \alias{show-ClusterComponent,ClusterComponent,ClusterComponent-method}
 \alias{show-ClusterDiagGaussian,ClusterDiagGaussian,ClusterDiagGaussian-method}
+\alias{show-ClusterDiagGaussianComponent,ClusterDiagGaussianComponent,ClusterDiagGaussianComponent-method}
 \alias{show-ClusterGamma,ClusterGamma,ClusterGamma-method}
+\alias{show-ClusterGammaComponent,ClusterGammaComponent,ClusterGammaComponent-method}
 \alias{show-ClusterHeterogeneous,ClusterHeterogeneous,ClusterHeterogeneous-method}
 \alias{show-algo,ClusterAlgo-method}
 \alias{show-init,ClusterInit,ClusterInit-method}
@@ -23,9 +29,15 @@
 \usage{
 \S4method{show}{ClusterAlgo}(object)
 
+\S4method{show}{ClusterCategoricalComponent}(object)
+
 \S4method{show}{ClusterCategorical}(object)
 
+\S4method{show}{ClusterDiagGaussianComponent}(object)
+
 \S4method{show}{ClusterDiagGaussian}(object)
+
+\S4method{show}{ClusterGammaComponent}(object)
 
 \S4method{show}{ClusterGamma}(object)
 

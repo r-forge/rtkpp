@@ -97,18 +97,20 @@ enum algoType
 /** @ingroup Clustering
  *  Convert a String to an algoType. The recognized strings are
  * <table>
- * <tr> <th> Algorithm   </th></tr>
- * <tr> <td> "emAlgo"    </td></tr>
- * <tr> <td> "cemAlgo"   </td></tr>
- * <tr> <td> "semAlgo"   </td></tr>
- * <tr> <td> "em"        </td></tr>
- * <tr> <td> "cem"       </td></tr>
- * <tr> <td> "sem"       </td></tr>
+ * <tr> <th> Algorithm     </th></tr>
+ * <tr> <td> "emAlgo"      </td></tr>
+ * <tr> <td> "cemAlgo"     </td></tr>
+ * <tr> <td> "semAlgo"     </td></tr>
+ * <tr> <td> "semiSemAlgo" </td></tr>
+ * <tr> <td> "em"          </td></tr>
+ * <tr> <td> "cem"         </td></tr>
+ * <tr> <td> "sem"         </td></tr>
+ * <tr> <td> "semiSem"         </td></tr>
  * </table>
  *  @param type the type of algorithm wanted
  *  @return the algoType corresponding (default is emAlgo)
- *  @note if the string is not found in the list above,the type Clust::emAlgo_
- *  is returned.
+ *  @note The capitalized letters have no effect and if the string is not found
+ *  in the list above,the type Clust::emAlgo_ is returned.
  **/
 algoType stringToAlgo( std::string const& type);
 

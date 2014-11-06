@@ -280,32 +280,56 @@ NULL
 NULL
 
 #' @rdname missingValues-methods
+#' @aliases missingValues,ClusterCategoricalComponent-method
+setMethod(
+    "missingValues",
+    c("ClusterCategoricalComponent"),
+    function(x){ return(cbind(x@missing, x@data[x@missing]));}
+)
+#' @rdname missingValues-methods
 #' @aliases missingValues,ClusterCategorical-method
 setMethod(
     "missingValues",
     c("ClusterCategorical"),
-    function(x){
-      return(cbind(x@component@missing, x@component@data[x@component@missing]));
-    }
+    function(x){ return(missingValues(x@component));}
 )
 
+
+#' @rdname missingValues-methods
+#' @aliases missingValues,ClusterGammaComponent-method
+setMethod(
+    "missingValues",
+    c("ClusterGammaComponent"),
+    function(x){ return(cbind(x@missing, x@data[x@missing]));}
+)
 #' @rdname missingValues-methods
 #' @aliases missingValues,ClusterGamma-method
 setMethod(
-    "missingValues",
-    c("ClusterGamma"),
-    function(x){
-      return(cbind(x@component@missing, x@component@data[x@component@missing]));
-    }
+  "missingValues",
+  c("ClusterGamma"),
+  function(x){ return(missingValues(x@component));}
+)
+
+#' @rdname missingValues-methods
+#' @aliases missingValues,ClusterDiagGaussianComponent-method
+setMethod(
+  "missingValues",
+  c("ClusterDiagGaussianComponent"),
+  function(x){ return(cbind(x@missing, x@data[x@missing]));}
 )
 #' @rdname missingValues-methods
 #' @aliases missingValues,ClusterDiagGaussian-method
 setMethod(
-    "missingValues",
-    c("ClusterDiagGaussian"),
-    function(x){
-      return(cbind(x@component@missing, x@component@data[x@component@missing]));
-    }
+  "missingValues",
+  c("ClusterDiagGaussian"),
+  function(x){ return(missingValues(x@component));}
 )
 
+#' @rdname missingValues-methods
+#' @aliases missingValues,ClusterDiagGaussian-method
+setMethod(
+    "missingValues",
+    c("ClusterHeterogeneous"),
+    function(x){ return(matrix(nrow=0, ncol=2));}
+)
 

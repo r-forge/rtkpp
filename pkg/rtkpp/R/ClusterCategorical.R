@@ -100,7 +100,6 @@ clusterCategorical <- function(data, nbCluster=2, modelNames=c( "categorical_pk_
 
   # Create model
   model = new("ClusterCategorical", data)
-  model@component@missing = which(is.na(data), arr.ind=TRUE);
   model@strategy = strategy;
 
   # start estimation of the models
@@ -186,6 +185,56 @@ setMethod(
     }
 )
 
+#' @rdname extract-methods
+#' @aliases [,ClusterCategoricalComponent-method
+setMethod(
+    f="[",
+    signature(x = "ClusterCategoricalComponent"),
+    definition=function(x, i, j, drop)
+    {
+      if ( missing(j) )
+      {
+        switch(EXPR=i,
+            "plkj"={return(x@plkj)},
+            stop("This attribute doesn't exist !")
+        )
+      }
+      else
+      {
+        if (!is.numeric(j)) {stop("j must be an integer.")}
+        if (round(j)!=j)    {stop("j must be an integer.")}
+        switch(EXPR=i,
+            "plkj"={return(x@plkj[,j,])},
+            stop("This attribute doesn't exist !")
+        )
+      }
+    }
+)
+
+#' @rdname print-methods
+#' @aliases print print,ClusterCategoricalComponent-method
+setMethod(
+    f="print",
+    signature=c("ClusterCategoricalComponent"),
+    function(x,k,...)
+    {
+      cat("* probabilities = \n");
+      print(format(x@plkj[,k,]));
+    }
+)
+
+#' @rdname show-methods
+#' @aliases show-ClusterCategoricalComponent,ClusterCategoricalComponent,ClusterCategoricalComponent-method
+setMethod(
+    f="show",
+    signature=c("ClusterCategoricalComponent"),
+    function(object)
+    {
+      cat("* probabilities = \n");
+      print(format(object@plkj));
+    }
+)
+
 #-----------------------------------------------------------------------
 #' Definition of the [\code{\linkS4class{ClusterCategorical}}] class
 #'
@@ -265,12 +314,12 @@ setMethod(
   {
     cat("****************************************\n")
     callNextMethod();
-    print(x@component);
     cat("****************************************\n")
     for(k in 1:length(x@pk))
     {
       cat("*** Cluster: ",k,"\n")
-      cat("* Proportion = ", format(x@pk[k]), "\n")
+      cat("* Proportion = ", format(x@pk[k]), "\n");
+      print(x@component,k);
       cat("* probabilities = \n"); print(x@component@plkj[,k,])
       cat("****************************************\n")
     }
@@ -292,7 +341,7 @@ setMethod(
     {
       cat("*** Cluster: ",k,"\n")
       cat("* Proportion = ", format(object@pk[k]), "\n")
-      cat("* probabilities = \n"); print(object@component@plkj[,k,]);
+      print(object@component,k);
       cat("****************************************\n")
     }
   }

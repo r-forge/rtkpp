@@ -92,9 +92,11 @@ algoType stringToAlgo( std::string const& type)
   if (toUpperString(type) == toUpperString(_T("emAlgo"))) return emAlgo_;
   if (toUpperString(type) == toUpperString(_T("cemAlgo"))) return cemAlgo_;
   if (toUpperString(type) == toUpperString(_T("semAlgo"))) return semAlgo_;
+  if (toUpperString(type) == toUpperString(_T("semiSemAlgo"))) return semiSemAlgo_;
   if (toUpperString(type) == toUpperString(_T("em"))) return emAlgo_;
   if (toUpperString(type) == toUpperString(_T("cem"))) return cemAlgo_;
   if (toUpperString(type) == toUpperString(_T("sem"))) return semAlgo_;
+  if (toUpperString(type) == toUpperString(_T("semiSem"))) return semiSemAlgo_;
   return emAlgo_;
 }
 

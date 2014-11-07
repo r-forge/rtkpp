@@ -22,7 +22,7 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
-#' @include IClusterModel.R
+#' @include ClusterModelNames.R IClusterModel.R global.R
 NULL
 
 #-----------------------------------------------------------------------
@@ -139,7 +139,6 @@ setClass(
   Class="ClusterDiagGaussianComponent",
   representation( mean = "matrix", sigma = "matrix"),
   contains=c("ClusterComponent"),
-  prototype=list( mean = matrix(nrow=0,ncol=0), sigma = matrix(nrow=0,ncol=0) ),
   validity=function(object)
   {
     if (ncol(object@mean)!=ncol(object@data))
@@ -161,10 +160,10 @@ setClass(
 setMethod(
     f="initialize",
     signature=c("ClusterDiagGaussianComponent"),
-    definition=function(.Object, data, nbCluster=2, modelName="gaussian_pk_sjk")
+    definition=function(.Object, data=matrix(nrow=0, ncol=0), nbCluster=2, modelName="gaussian_pk_sjk")
     {
       # for data
-      if(missing(data)) {stop("data is mandatory.")}
+      if(missing(data)) {stop("data is mandatory in ClusterDiagGaussianComponent.")}
       # check model name
       if (!validDiagGaussianNames(modelName)) { stop("modelName is invalid");}
       # call base class initialize
@@ -263,26 +262,25 @@ setMethod(
 #' @exportClass ClusterDiagGaussian
 #'
 setClass(
-    Class="ClusterDiagGaussian",
-    representation( component = "ClusterDiagGaussianComponent"),
-    contains=c("IClusterModelBase"),
-    validity=function(object)
-    {
-      if (nrow(object@component@mean)!=object@nbCluster)
-      {stop("mean must have nbCluster rows.")}
-      if (ncol(object@component@mean)!=ncol(object@component@data))
-      {stop("mean must have nbVariable columns.")}
-      if (nrow(object@component@sigma)!=object@nbCluster)
-      {stop("sigma must have nbCluster rows.")}
-      if (ncol(object@component@sigma)!=ncol(object@component@data))
-      {stop("sigma must have nbVariable columns.")}
-      if (!validDiagGaussianNames(object@component@modelName))
-      {stop("Invalid Gaussian model name.")}
-      return(TRUE)
-    }
+  Class="ClusterDiagGaussian",
+  representation( component = "ClusterDiagGaussianComponent"),
+  contains=c("IClusterModelBase"),
+  validity=function(object)
+  {
+    if (nrow(object@component@mean)!=object@nbCluster)
+    {stop("mean must have nbCluster rows.")}
+    if (ncol(object@component@mean)!=ncol(object@component@data))
+    {stop("mean must have nbVariable columns.")}
+    if (nrow(object@component@sigma)!=object@nbCluster)
+    {stop("sigma must have nbCluster rows.")}
+    if (ncol(object@component@sigma)!=ncol(object@component@data))
+    {stop("sigma must have nbVariable columns.")}
+    if (!validDiagGaussianNames(object@component@modelName))
+    {stop("Invalid Gaussian model name.")}
+    return(TRUE)
+  }
 )
 
-#-----------------------------------------------------------------------
 #' Initialize an instance of a rtkpp class.
 #'
 #' Initialization method of the [\code{\linkS4class{ClusterDiagGaussian}}] class.
@@ -293,8 +291,11 @@ setClass(
 setMethod(
     f="initialize",
     signature=c("ClusterDiagGaussian"),
-    definition=function(.Object, data, nbCluster=2, modelName="gaussian_pk_sjk")
+    definition=function(.Object, data=matrix(nrow=0, ncol=0), nbCluster=2, modelName="gaussian_pk_sjk")
     {
+      # for data
+      if(missing(data)) {stop("data is mandatory in ClusterDiagGaussian.")}
+      # initialize component
       .Object@component = new("ClusterDiagGaussianComponent", data, nbCluster, modelName);
       .Object <- callNextMethod(.Object, nrow(.Object@component@data), nbCluster);
       # validate

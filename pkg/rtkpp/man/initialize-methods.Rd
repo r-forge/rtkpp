@@ -17,25 +17,27 @@
 \usage{
 \S4method{initialize}{ClusterAlgo}(.Object, algo, nbIteration, epsilon)
 
-\S4method{initialize}{ClusterCategoricalComponent}(.Object, data,
-  nbCluster = 2, modelName = "categorical_pk_pjk")
+\S4method{initialize}{ClusterCategoricalComponent}(.Object, data = matrix(nrow
+  = 0, ncol = 0), nbCluster = 2, modelName = "categorical_pk_pjk")
 
-\S4method{initialize}{ClusterCategorical}(.Object, data, nbCluster = 2,
-  modelName = "categorical_pk_pjk")
+\S4method{initialize}{ClusterCategorical}(.Object, data = matrix(nrow = 0,
+  ncol = 0), nbCluster = 2, modelName = "categorical_pk_pjk")
 
-\S4method{initialize}{ClusterDiagGaussianComponent}(.Object, data,
-  nbCluster = 2, modelName = "gaussian_pk_sjk")
-
-\S4method{initialize}{ClusterDiagGaussian}(.Object, data, nbCluster = 2,
+\S4method{initialize}{ClusterDiagGaussianComponent}(.Object,
+  data = matrix(nrow = 0, ncol = 0), nbCluster = 2,
   modelName = "gaussian_pk_sjk")
 
-\S4method{initialize}{ClusterGammaComponent}(.Object, data, nbCluster = 2,
-  modelName = "gamma_pk_ajk_bjk")
+\S4method{initialize}{ClusterDiagGaussian}(.Object, data = matrix(nrow = 0,
+  ncol = 0), nbCluster = 2, modelName = "gaussian_pk_sjk")
 
-\S4method{initialize}{ClusterGamma}(.Object, data, nbCluster = 2,
-  modelName = "gamma_pk_ajk_bjk")
+\S4method{initialize}{ClusterGammaComponent}(.Object, data = matrix(nrow = 0,
+  ncol = 0), nbCluster = 2, modelName = "gamma_pk_ajk_bjk")
 
-\S4method{initialize}{ClusterHeterogeneous}(.Object, ldata, nbCluster = 2)
+\S4method{initialize}{ClusterGamma}(.Object, data = matrix(nrow = 0, ncol =
+  0), nbCluster = 2, modelName = "gamma_pk_ajk_bjk")
+
+\S4method{initialize}{ClusterHeterogeneous}(.Object, ldata = list(),
+  nbCluster = 2)
 
 \S4method{initialize}{ClusterInit}(.Object, method = "random",
   nbInitRun = 5, algo = clusterAlgo("SEM", 20, 0))
@@ -43,7 +45,8 @@
 \S4method{initialize}{ClusterStrategy}(.Object, nbTry, nbShortRun, initMethod,
   shortAlgo, longAlgo)
 
-\S4method{initialize}{IClusterModelBase}(.Object, nbSample, nbCluster)
+\S4method{initialize}{IClusterModelBase}(.Object, nbSample = 0,
+  nbCluster = 0)
 
 \S4method{initialize}{ClusterComponent}(.Object, data, modelName)
 }

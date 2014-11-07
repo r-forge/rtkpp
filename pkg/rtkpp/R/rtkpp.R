@@ -328,8 +328,18 @@ setMethod(
 #' @rdname missingValues-methods
 #' @aliases missingValues,ClusterDiagGaussian-method
 setMethod(
-    "missingValues",
-    c("ClusterHeterogeneous"),
-    function(x){ return(matrix(nrow=0, ncol=2));}
+  "missingValues",
+  c("ClusterHeterogeneous"),
+  function(x)
+  {
+    res <- list();
+    nbData <- length(x@ldata)
+    if(nbData>0)
+    {
+      for (l in 1:nbData)
+      { res  <- c(x@ldata[[nbData-l+1]]@data, res);}
+    }
+    return(res)
+  }
 )
 

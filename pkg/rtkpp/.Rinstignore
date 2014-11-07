@@ -1,6 +1,6 @@
-lib
-bin
-templates
+lib/
+bin/
+templates/
 projects/AAModels/src
 projects/Algebra/src
 projects/Analysis/src

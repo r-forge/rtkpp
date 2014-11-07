@@ -22,8 +22,7 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
-#' @include IClusterModel.R
-#' @include clusterModelNames.R
+#' @include ClusterModelNames.R IClusterModel.R global.R
 NULL
 
 #-----------------------------------------------------------------------
@@ -136,7 +135,6 @@ setClass(
     Class="ClusterGammaComponent",
     representation( shape = "matrix", scale = "matrix"),
     contains=c("ClusterComponent"),
-    prototype=list( shape = matrix(nrow=0,ncol=0), scale = matrix(nrow=0,ncol=0) ),
     validity=function(object)
     {
       if (ncol(object@shape)!=ncol(object@data))
@@ -158,10 +156,10 @@ setClass(
 setMethod(
     f="initialize",
     signature=c("ClusterGammaComponent"),
-    definition=function(.Object, data, nbCluster=2, modelName="gamma_pk_ajk_bjk")
+    definition=function(.Object, data=matrix(nrow=0, ncol=0), nbCluster=2, modelName="gamma_pk_ajk_bjk")
     {
       # for data
-      if(missing(data)) {stop("data is mandatory.")}
+      if(missing(data)) {stop("data is mandatory in ClusterGammaComponent.")}
       # check model name
       if (!validGammaNames(modelName)) { stop("modelName is invalid");}
       # call base class
@@ -278,7 +276,6 @@ setClass(
     }
 )
 
-#-----------------------------------------------------------------------
 #' Initialize an instance of a rtkpp class.
 #'
 #' Initialization method of the [\code{\linkS4class{ClusterGamma}}] class.
@@ -289,8 +286,10 @@ setClass(
 setMethod(
     f="initialize",
     signature=c("ClusterGamma"),
-    definition=function(.Object, data, nbCluster=2, modelName="gamma_pk_ajk_bjk")
+    definition=function(.Object, data=matrix(nrow=0, ncol=0), nbCluster=2, modelName="gamma_pk_ajk_bjk")
     {
+      # for data
+      if(missing(data)) {stop("data is mandatory in ClusterGamma.")}
       .Object@component = new("ClusterGammaComponent", data, nbCluster, modelName);
       .Object <- callNextMethod(.Object, nrow(.Object@component@data), nbCluster);
       # validate

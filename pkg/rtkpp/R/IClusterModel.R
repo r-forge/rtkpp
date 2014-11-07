@@ -74,17 +74,6 @@ setClass(
                 , strategy = "ClusterStrategy"
                 , "VIRTUAL"
                 ),
-  prototype=list( nbSample = 0
-                , nbCluster = 0
-                , pk = vector("numeric")
-                , tik = matrix(nrow=0, ncol=0)
-                , lnFi  = vector("numeric")
-                , zi  = vector("integer")
-                , lnLikelihood = -Inf
-                , criterion = Inf
-                , nbFreeParameter = 0
-                , strategy = clusterStrategy()
-                ),
   # validity function
   validity=function(object)
   {
@@ -145,13 +134,13 @@ setClass(
 setMethod(
   f="initialize",
   signature=c("IClusterModelBase"),
-  definition=function(.Object, nbSample, nbCluster)
+  definition=function(.Object, nbSample=0, nbCluster=0)
   {
     # for nbSample
-    if(missing(nbSample)) { stop("nbSample is mandatory.")}
+    if(missing(nbSample)) { stop("nbSample is mandatory in IClusterModelBase.")}
     .Object@nbSample <- nbSample;
     # for nbCluster
-    if(missing(nbCluster)) { stop("nbCluster is mandatory.")}
+    if(missing(nbCluster)) { stop("nbCluster is mandatory in IClusterModelBase.")}
     .Object@nbCluster<-nbCluster
     # resize
     .Object@pk   <- rep(1/.Object@nbCluster, nbCluster)
@@ -184,7 +173,7 @@ setMethod(
     cat("* nbFreeParameter= ", x@nbFreeParameter,"\n")
     cat("* criterion      = ", x@criterion, "\n")
     cat("* zi             =\n")
-    print(x@zi)
+    print( format(x@zi), quote=FALSE)
   }
 )
 
@@ -239,16 +228,12 @@ setMethod(
 #'
 setClass(
   Class="ClusterComponent",
-  representation( data = "matrix"
-                , missing = "matrix"
-                , modelName = "character"
-                ),
-  prototype=list( data = matrix(nrow=0,ncol=0)
-                , missing = matrix(nrow=0,ncol=2)
-                , modelName=character(1)
-                ),
+  representation( data = "matrix", missing = "matrix", modelName = "character","VIRTUAL"),
   validity=function(object)
-  { return(TRUE);}
+  {
+    if (!is.matrix(data)) { stop("data must be a matrix in ClusterComponent");}
+    return(TRUE);
+  }
 )
 #' Initialize an instance of a rtkpp class.
 #'
@@ -258,21 +243,17 @@ setClass(
 #' @rdname initialize-methods
 #' @keywords internal
 setMethod(
-    f="initialize",
-    signature=c("ClusterComponent"),
-    definition=function(.Object, data, modelName)
-    {
-      # for data
-      if(missing(data)) {stop("data is mandatory.")}
-      # for modelName
-      if(missing(modelName)) {stop("modelName is mandatory.")}
-      # fill data missing and modelName
-      .Object@data      <- as.matrix(data);
-      .Object@missing   <- which(is.na(.Object@data), arr.ind=TRUE);
-      .Object@modelName <- modelName;
-      # validObject(.Object) will be called in base class
-      return(.Object)
-    }
+  f="initialize",
+  signature=c("ClusterComponent"),
+  definition=function(.Object, data, modelName)
+  {
+    # fill data missing and modelName
+    .Object@data      <- as.matrix(data);
+    .Object@missing   <- which(is.na(.Object@data), arr.ind=TRUE);
+    .Object@modelName <- modelName;
+    # validObject(.Object) will be called in base class
+    return(.Object)
+  }
 )
 #' @rdname print-methods
 #' @aliases print print,ClusterComponent-method

@@ -22,7 +22,7 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
-#' @include global.R IClusterModel.R
+#' @include ClusterModelNames.R IClusterModel.R global.R
 NULL
 
 #-----------------------------------------------------------------------
@@ -135,7 +135,6 @@ setClass(
   Class="ClusterCategoricalComponent",
   representation( plkj = "array", nbModalities = "numeric"),
   contains=c("ClusterComponent"),
-  prototype=list( plkj = array(dim=c(0,0,0)), nbModalities = 0 ),
   validity=function(object)
   {
     dims <- dim(object@plkj)
@@ -159,10 +158,10 @@ setClass(
 setMethod(
     f="initialize",
     signature=c("ClusterCategoricalComponent"),
-    definition=function(.Object, data, nbCluster=2, modelName="categorical_pk_pjk")
+    definition=function(.Object, data=matrix(nrow=0, ncol=0), nbCluster=2, modelName="categorical_pk_pjk")
     {
       # for data
-      if(missing(data)) {stop("data is mandatory.")}
+      if(missing(data)) {stop("data is mandatory in ClusterCategoricalComponent.")}
       # check model name
       if (!validCategoricalNames(modelName)) { stop("modelName is invalid");}
       # prepare data and compute number of modalities
@@ -219,7 +218,7 @@ setMethod(
     function(x,k,...)
     {
       cat("* probabilities = \n");
-      print(format(x@plkj[,k,]));
+      print(format(x@plkj[,k,]), quote=FALSE);
     }
 )
 
@@ -231,7 +230,7 @@ setMethod(
     function(object)
     {
       cat("* probabilities = \n");
-      print(format(object@plkj));
+      print(format(object@plkj), quote=FALSE);
     }
 )
 
@@ -294,8 +293,10 @@ setClass(
 setMethod(
     f="initialize",
     signature=c("ClusterCategorical"),
-    definition=function(.Object, data, nbCluster=2, modelName="categorical_pk_pjk")
+    definition=function(.Object, data=matrix(nrow=0, ncol=0), nbCluster=2, modelName="categorical_pk_pjk")
     {
+      # for data
+      if(missing(data)) {stop("data is mandatory in ClusterCategorical.")}
       .Object@component = new("ClusterCategoricalComponent", data, nbCluster, modelName);
       .Object <- callNextMethod(.Object, nrow(.Object@component@data), nbCluster);
       # validate
@@ -320,7 +321,7 @@ setMethod(
       cat("*** Cluster: ",k,"\n")
       cat("* Proportion = ", format(x@pk[k]), "\n");
       print(x@component,k);
-      cat("* probabilities = \n"); print(x@component@plkj[,k,])
+      cat("* probabilities = \n"); print(format(x@component@plkj[,k,]), quote=FALSE)
       cat("****************************************\n")
     }
   }

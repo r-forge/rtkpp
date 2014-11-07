@@ -36,9 +36,9 @@ NULL
 #' \itemize{
 #'   \item \code{nbShortRun} short iterations of the initialization step and
 #'    of the \code{EM}, \code{CEM}, \code{SEM} or \code{SemiSEM} algorithm.
-#'   \item \code{nbInit} initializations using the \code{\link{clusterInit}}]
+#'   \item \code{nbInit} initializations using the [\code{\link{clusterInit}}]
 #'   method.
-#'   \item A long run of the \code{EM}, \code{CEM} or \code{SEM} algorithm.
+#'   \item A long run of the \code{EM}, \code{CEM}, \code{SEM} or \code{SemiSEM} algorithm.
 #' }
 #' For exemple if \code{nbInit} is 5 and \code{nbShortRun} is also 5, there will be
 #' 5 packets of 5 models initialized. In each packet, the best model will be ameliorated using
@@ -49,14 +49,15 @@ NULL
 #' an empty model is returned.
 #'
 #' @param nbInit Integer defining the number of initialization to try. Default value: 3.
-#' @param initMethod Character string with the initialization method. Default is "random".
-#' @param initAlgo Character string with the algorithm to use in the initialization stage.
-#' Default value: "SEM"
+#' @param initMethod Character string with the initialization method, see [\code{\link{clusterInit}}]$
+#' for possible values. Default is "random".
+#' @param initAlgo Character string with the algorithm to use in the initialization stage,
+#' [\code{\link{clusterAlgo}}] for possible values. Default value: "SEM".
 #' @param nbInitIteration Integer defining the maximal number of iterations in initialization algorithm
 #' if \code{initAlgo} = "EM", "CEM" or "SemiSEM". This is the number of iterations if \code{initAlgo} = "SEM".
 #' Default value: 20.
 #' @param initEpsilon Real defining the epsilon value for the algorithm.
-#' epsilon is not used by the \code{SEM} algorithm. Default value: 0.01.
+#' \code{initEpsilon} is not used by the \code{SEM} algorithm. Default value: 0.01.
 #'
 #' @param nbShortRun Integer defining the number of short run to try
 #' (the strategy launch an initialization before each short run). Default value: 5.
@@ -129,7 +130,7 @@ clusterFastStrategy <- function()
 #' Cluster models.
 #'
 #'   @slot nbTry Integer defining the number of tries. Default value: 1.
-#'   @slot nbShortRun Integer definining the number of short run
+#'   @slot nbShortRun Integer defining the number of short run
 #'   (the strategy launch an initialization before each short run).
 #'   @slot initMethod A [\code{\linkS4class{ClusterInit}}] object defining the way to
 #'   initialize the estimation method.
@@ -172,8 +173,6 @@ setClass(
     }
 )
 
-
-#-----------------------------------------------------------------------
 #' Initialize an instance of a rtkpp class.
 #'
 #' Initialization method of the [\code{\linkS4class{ClusterStrategy}}] class.
@@ -208,9 +207,6 @@ setMethod(
   }
 )
 
-#-----------------------------------------------------------------------
-# @name print
-# @docType methods
 #' @aliases print print-strategy,ClusterStrategy-method
 #' @rdname print-methods
 setMethod(
@@ -242,9 +238,6 @@ setMethod(
   }
 )
 
-#-----------------------------------------------------------------------
-# @name show
-# @docType methods
 #' @rdname show-methods
 #' @aliases show show-strategy,ClusterStrategy-method
 setMethod(
@@ -276,9 +269,6 @@ setMethod(
   }
 )
 
-#-----------------------------------------------------------------------
-# @name [
-# @docType methods
 #' @rdname extract-methods
 #' @aliases [,ClusterStrategy-method
 #'

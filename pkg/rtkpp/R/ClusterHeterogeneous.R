@@ -22,8 +22,7 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
-#' @include IClusterModel.R
-#' @include ClusterModelNames.R
+#' @include  ClusterModelNames.R IClusterModel.R
 NULL
 
 #-----------------------------------------------------------------------
@@ -160,7 +159,6 @@ setClass(
     Class="ClusterHeterogeneous",
     representation( ldata = "list"),
     contains=c("IClusterModelBase"),
-    prototype=list( ldata = list()),
     validity=function(object)
     {
       nbData = length(object@ldata)
@@ -168,13 +166,12 @@ setClass(
       for (l in 1:nbData)
       {
         if (nrow(object@ldata[[1]]@data) != object@nbSample)
-        {stop("The data set must have the same number of individuals (number of rows).");}
+        {stop("All data sets must have the same number of individuals (number of rows).");}
       }
       return(TRUE)
     }
 )
 
-#-----------------------------------------------------------------------
 #' Initialize an instance of a rtkpp class.
 #'
 #' Initialization method of the [\code{\linkS4class{ClusterHeterogeneous}}] class.
@@ -185,8 +182,10 @@ setClass(
 setMethod(
     f="initialize",
     signature=c("ClusterHeterogeneous"),
-    definition=function(.Object, ldata, nbCluster=2)
+    definition=function(.Object, ldata =list(), nbCluster=2)
     {
+      # for data
+      if(missing(ldata)) {stop("ldata is mandatory in ClusterHeterogeneous.")}
       nbData = length(ldata)
       if (nbData == 0) {stop("At least on data set must be given.")}
       .Object@ldata <- ldata;
@@ -218,14 +217,14 @@ setMethod(
       }
     }
     cat("****************************************\n")
-    for(k in 1:length(x@pk))
+    if(nbData>0)
     {
-      cat("*** Cluster: ",k,"\n")
-      cat("* Proportion = ", format(x@pk[k]), "\n")
-      if(nbData>0)
+      for (l in 1:nbData)
       {
-        for (l in 1:nbData)
+        for(k in 1:length(x@pk))
         {
+          cat("*** Cluster: ",k,"\n")
+          cat("* Proportion = ", format(x@pk[k]), "\n")
           cat("* model name = ", x@ldata[[l]]@modelName, "\n");
           print(x@ldata[[l]],k);
         }
@@ -259,15 +258,14 @@ setMethod(
       cat("* ... ...\n")
 
       cat("****************************************\n")
-      for(k in 1:length(object@pk))
+      if(nbData>0)
       {
-        cat("*** Cluster: ",k,"\n")
-        cat("* Proportion = ", format(object@pk[k]),"\n")
-        nbData <- length(object@ldata)
-        if(nbData>0)
+        for (l in 1:nbData)
         {
-          for (l in 1:nbData)
+          for(k in 1:length(object@pk))
           {
+            cat("*** Cluster: ",k,"\n")
+            cat("* Proportion = ", format(object@pk[k]),"\n")
             cat("*\n")
             cat("* model name = ", object@ldata[[l]]@modelName, "\n");
             print(object@ldata[[l]], k);
@@ -280,7 +278,6 @@ setMethod(
 
 #' @rdname summary-methods
 #' @aliases summary summary,ClusterHeterogeneous-method
-#'
 setMethod(
     f="summary",
     signature=c("ClusterHeterogeneous"),

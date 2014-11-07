@@ -3,10 +3,10 @@ export(clusterAlgo
       ,clusterStrategy
       ,clusterFastStrategy
       ,diagGaussianNames
-      ,validDiagGaussianNames
       ,gammaNames
-      ,validGammaNames
       ,categoricalNames
+      ,validDiagGaussianNames
+      ,validGammaNames
       ,validCategoricalNames
       ,clusterDiagGaussian
       ,clusterHeterogeneous
@@ -22,9 +22,14 @@ exportClasses(ClusterAlgo
              ,ClusterInit
              ,ClusterStrategy
              ,IClusterModelBase
-             ,ClusterCategorical
              ,ClusterDiagGaussian
              ,ClusterGamma
+             ,ClusterCategorical
+             ,ClusterHeterogeneous
+             ,ClusterComponent
+             ,ClusterDiagGaussianComponent
+             ,ClusterGammaComponent
+             ,ClusterCategoricalComponent
              )
 
 exportMethods(print)

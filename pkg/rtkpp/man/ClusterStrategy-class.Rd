@@ -13,7 +13,7 @@ Cluster models.
 \describe{
 \item{\code{nbTry}}{Integer defining the number of tries. Default value: 1.}
 
-\item{\code{nbShortRun}}{Integer definining the number of short run
+\item{\code{nbShortRun}}{Integer defining the number of short run
 (the strategy launch an initialization before each short run).}
 
 \item{\code{initMethod}}{A [\code{\linkS4class{ClusterInit}}] object defining the way to

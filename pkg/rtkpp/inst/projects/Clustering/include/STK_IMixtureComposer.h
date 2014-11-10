@@ -209,7 +209,7 @@ class IMixtureComposer : public IStatModelBase
     /** @brief Finalize the estimation of the model.
      * The default behavior is "do nothing".
      **/
-    inline virtual void finalizeStep() {}
+    inline virtual void finalizeStep() { setState(Clust::modelFinalized_);}
 
     // not virtual
     /** Initialize randomly the labels zi of the model.

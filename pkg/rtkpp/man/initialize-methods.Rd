@@ -4,7 +4,6 @@
 \alias{initialize,ClusterAlgo-method}
 \alias{initialize,ClusterCategorical-method}
 \alias{initialize,ClusterCategoricalComponent-method}
-\alias{initialize,ClusterComponent-method}
 \alias{initialize,ClusterDiagGaussian-method}
 \alias{initialize,ClusterDiagGaussianComponent-method}
 \alias{initialize,ClusterGamma-method}
@@ -12,6 +11,7 @@
 \alias{initialize,ClusterHeterogeneous-method}
 \alias{initialize,ClusterInit-method}
 \alias{initialize,ClusterStrategy-method}
+\alias{initialize,IClusterComponent-method}
 \alias{initialize,IClusterModelBase-method}
 \title{Initialize an instance of a rtkpp class.}
 \usage{
@@ -48,7 +48,7 @@
 \S4method{initialize}{IClusterModelBase}(.Object, nbSample = 0,
   nbCluster = 0)
 
-\S4method{initialize}{ClusterComponent}(.Object, data, modelName)
+\S4method{initialize}{IClusterComponent}(.Object, data, modelName)
 }
 \description{
 Initialization method of the [\code{\linkS4class{ClusterAlgo}}] class.
@@ -84,7 +84,7 @@ Used internally in the `rtkpp' package.
 Initialization method of the [\code{\linkS4class{IClusterModelBase}}] class.
 Used internally in the `rtkpp' package.
 
-Initialization method of the [\code{\linkS4class{ClusterComponent}}] class.
+Initialization method of the [\code{\linkS4class{IClusterComponent}}] class.
 Used internally in the `rtkpp' package.
 }
 \keyword{internal}

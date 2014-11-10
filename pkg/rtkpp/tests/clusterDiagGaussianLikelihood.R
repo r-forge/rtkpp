@@ -5,7 +5,7 @@
 library(rtkpp)
 data(iris)
 
-gauss_model <- clusterDiagGaussian(iris[1:4], nbCluster = 2:8, modelNames = diagGaussianNames()
+gauss_model <- clusterDiagGaussian(iris[1:4], nbCluster = 2:8, modelNames = clusterDiagGaussianNames()
               , strategy = clusterStrategy(nbTry = 3, nbInit = 5), criterion = "ICL")
 
 data<-gauss_model@component@data

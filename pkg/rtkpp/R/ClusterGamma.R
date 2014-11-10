@@ -38,7 +38,7 @@ NULL
 #' @param nbCluster  [\code{\link{vector}}] listing the number of clusters to test.
 #' @param modelNames [\code{\link{vector}}] of model names to run. By default all
 #' gamma models with free shape are estimated.  All the model names are given by
-#' the method [\code{\link{gammaNames}}].
+#' the method [\code{\link{clusterGammaNames}}].
 #' @param strategy a [\code{\linkS4class{ClusterStrategy}}] object containing
 #' the strategy to run. clusterStrategy() method by default.
 #' @param criterion character defining the criterion to select the best model.
@@ -71,7 +71,7 @@ NULL
 #' @author Serge Iovleff
 #' @export
 #'
-clusterGamma <- function(data, nbCluster=2, modelNames= gammaNames(), strategy=clusterFastStrategy(), criterion="ICL")
+clusterGamma <- function(data, nbCluster=2, modelNames= clusterGammaNames(), strategy=clusterFastStrategy(), criterion="ICL")
 {
   # check nbCluster
   nbClusterModel = length(nbCluster);
@@ -89,9 +89,9 @@ clusterGamma <- function(data, nbCluster=2, modelNames= gammaNames(), strategy=c
   if (ncol(data) < 1) {stop("Error: empty data set")}
 
   # check modelNames
-  if (is.null(modelNames)) { modelNames = gammaNames()}
-  if (!validGammaNames(modelNames))
-  { stop("modelNames is not valid. See ?gammaNames for the list of valid model names")}
+  if (is.null(modelNames)) { modelNames = clusterGammaNames()}
+  if (!clusterValidGammaNames(modelNames))
+  { stop("modelNames is not valid. See ?clusterGammaNames for the list of valid model names")}
 
   # check strategy
   if(class(strategy)[1] != "ClusterStrategy")
@@ -119,7 +119,7 @@ clusterGamma <- function(data, nbCluster=2, modelNames= gammaNames(), strategy=c
 #'
 #' @slot shape  Matrix with the shape of the jth variable in the kth cluster.
 #' @slot scale  Matrix with the scale of the jth variable in the kth cluster.
-#' @seealso [\code{\linkS4class{ClusterComponent}}] class
+#' @seealso [\code{\linkS4class{IClusterComponent}}] class
 #'
 #' @examples
 #' getSlots("ClusterGammaComponent")
@@ -127,21 +127,21 @@ clusterGamma <- function(data, nbCluster=2, modelNames= gammaNames(), strategy=c
 #' @author Serge Iovleff
 #'
 #' @name ClusterGammaComponent
-#' @rdname ClusterComponent-class
+#' @rdname IClusterComponent-class
 #' @aliases ClusterGammaComponent-class
 #' @exportClass ClusterGammaComponent
 #'
 setClass(
     Class="ClusterGammaComponent",
     representation( shape = "matrix", scale = "matrix"),
-    contains=c("ClusterComponent"),
+    contains=c("IClusterComponent"),
     validity=function(object)
     {
       if (ncol(object@shape)!=ncol(object@data))
       {stop("shape must have nbVariable columns.")}
       if (ncol(object@scale)!=ncol(object@data))
       {stop("scale must have nbVariable columns.")}
-      if (!validGammaNames(object@modelName))
+      if (!clusterValidGammaNames(object@modelName))
       {stop("Invalid Gaussian model name.")}
       return(TRUE)
     }
@@ -161,7 +161,7 @@ setMethod(
       # for data
       if(missing(data)) {stop("data is mandatory in ClusterGammaComponent.")}
       # check model name
-      if (!validGammaNames(modelName)) { stop("modelName is invalid");}
+      if (!clusterValidGammaNames(modelName)) { stop("modelName is invalid");}
       # call base class
       .Object <- callNextMethod(.Object, data, modelName)
       # create slots
@@ -270,7 +270,7 @@ setClass(
       if (nrow(object@component@scale)!=object@nbCluster)
       {stop("scale must have nbCluster rows.")}
 
-      if (!validGammaNames(object@component@modelName))
+      if (!clusterValidGammaNames(object@component@modelName))
       {stop("Invalid Gamma model name.")}
       return(TRUE)
     }

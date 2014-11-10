@@ -89,17 +89,15 @@ bool ClusterFacade::run()
   bool flag = false;
   if (p_strategy_)
   {
-    if (p_model_->state() == Clust::modelCreated_)
+    // just check if the model is fresh or has been used
+    if (p_model_->state() == Clust::modelCreated_) { p_model_->initializeStep();}
+    if (p_strategy_->run())
     {
-#ifdef STK_MIXTURE_VERBOSE
-  stk_cout << _T("In ClusterFacade::run(), initializeStep()\n");
-#endif
-      p_model_->initializeStep();
-      p_model_->setState(Clust::modelInitialized_);
+      flag = true;
+      p_model_->imputationStep();
+      p_model_->finalizeStep();
     }
-    if (p_strategy_->run()) flag = true;
-    p_model_->finalizeStep();
-    p_model_->setState(Clust::modelFinalized_);
+    else { msg_error_ = p_strategy_->error();}
   }
   return flag;
 }

@@ -76,6 +76,7 @@ void IMixtureComposer::initializeStep()
   setLnLikelihood(-Arithmetic<Real>::infinity());
   // compute proportions
   pStep();
+  setState(Clust::modelInitialized_);
 }
 
 /* initialize randomly the labels zi of the model */
@@ -91,7 +92,7 @@ void IMixtureComposer::randomClassInit()
   cStep();
   eStep();
   // model intialized
-  setState(Clust::modelInitialized_);
+  setState(Clust::modelParamInitialized_);
 }
 
 /* initialize randomly the posterior probabilities tik of the model */
@@ -104,7 +105,7 @@ void IMixtureComposer::randomFuzzyInit()
   randomFuzzyTik();
   eStep();
   // model intialized
-  setState(Clust::modelInitialized_);
+  setState(Clust::modelParamInitialized_);
 }
 
 /* cStep */

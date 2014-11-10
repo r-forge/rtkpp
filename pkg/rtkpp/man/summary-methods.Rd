@@ -3,10 +3,10 @@
 \name{summary,ClusterCategorical-method}
 \alias{summary}
 \alias{summary,ClusterCategorical-method}
-\alias{summary,ClusterComponent-method}
 \alias{summary,ClusterDiagGaussian-method}
 \alias{summary,ClusterGamma-method}
 \alias{summary,ClusterHeterogeneous-method}
+\alias{summary,IClusterComponent-method}
 \alias{summary,IClusterModelBase-method}
 \alias{summary,MixmodResults-method}
 \title{Produce summary of a rtkpp class.}
@@ -21,7 +21,7 @@
 
 \S4method{summary}{IClusterModelBase}(object, ...)
 
-\S4method{summary}{ClusterComponent}(object, ...)
+\S4method{summary}{IClusterComponent}(object, ...)
 }
 \arguments{
 \item{object}{any cluster model deriving from a \code{\linkS4class{IClusterModelBase}} object.}

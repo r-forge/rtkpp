@@ -66,7 +66,7 @@ namespace STK
 {
 /** @ingroup Clustering
  *  @brief Templated implementation of the IMixture interface allowing
- *  to bridge a STK++ mixture with the composer.
+ *  to bridge a STK++ lernel mixture with the composer.
  *
  *  This class inherit from the interface IMixtureBridge.
  *

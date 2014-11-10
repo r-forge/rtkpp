@@ -38,7 +38,7 @@ NULL
 #' @param nbCluster  [\code{\link{vector}}] listing the number of clusters to test.
 #' @param modelNames [\code{\link{vector}}] of model names to run. By default all diagonal
 #' Gaussian models are estimated. All the model names are given by the method
-#' [\code{\link{diagGaussianNames}}].
+#' [\code{\link{clusterDiagGaussianNames}}].
 #' @param strategy a [\code{\linkS4class{ClusterStrategy}}] object containing
 #' the strategy to run. clusterStrategy() method by default.
 #' @param criterion character defining the criterion to select the best model.
@@ -71,7 +71,7 @@ NULL
 #' @author Serge Iovleff
 #' @export
 #'
-clusterDiagGaussian <- function(data, nbCluster=2, modelNames=diagGaussianNames(), strategy=clusterFastStrategy(), criterion="ICL")
+clusterDiagGaussian <- function(data, nbCluster=2, modelNames=clusterDiagGaussianNames(), strategy=clusterFastStrategy(), criterion="ICL")
 {
   # check nbCluster
   nbClusterModel = length(nbCluster);
@@ -89,8 +89,8 @@ clusterDiagGaussian <- function(data, nbCluster=2, modelNames=diagGaussianNames(
   if (ncol(data) < 1) {stop("Error: empty data set")}
 
   # check modelNames
-  if (!validDiagGaussianNames(modelNames))
-  { stop("modelNames is not valid. See ?diagGaussianNames for the list of valid model names")}
+  if (!clusterValidDiagGaussianNames(modelNames))
+  { stop("modelNames is not valid. See ?clusterDiagGaussianNames for the list of valid model names")}
 
   # check strategy
   if(class(strategy)[1] != "ClusterStrategy")
@@ -123,7 +123,7 @@ clusterDiagGaussian <- function(data, nbCluster=2, modelNames=diagGaussianNames(
 #'
 #' @slot mean  Matrix with the mean of the jth variable in the kth cluster.
 #' @slot sigma  Matrix with the standard deviation of the jth variable in the kth cluster.
-#' @seealso [\code{\linkS4class{ClusterComponent}}] class
+#' @seealso [\code{\linkS4class{IClusterComponent}}] class
 #'
 #' @examples
 #' getSlots("ClusterDiagGaussianComponent")
@@ -131,21 +131,21 @@ clusterDiagGaussian <- function(data, nbCluster=2, modelNames=diagGaussianNames(
 #' @author Serge Iovleff
 #'
 #' @name ClusterDiagGaussianComponent
-#' @rdname ClusterComponent-class
+#' @rdname IClusterComponent-class
 #' @aliases ClusterDiagGaussianComponent-class
 #' @exportClass ClusterDiagGaussianComponent
 #'
 setClass(
   Class="ClusterDiagGaussianComponent",
   representation( mean = "matrix", sigma = "matrix"),
-  contains=c("ClusterComponent"),
+  contains=c("IClusterComponent"),
   validity=function(object)
   {
     if (ncol(object@mean)!=ncol(object@data))
     {stop("mean must have nbVariable columns.")}
     if (ncol(object@sigma)!=ncol(object@data))
     {stop("sigma must have nbVariable columns.")}
-    if (!validDiagGaussianNames(object@modelName))
+    if (!clusterValidDiagGaussianNames(object@modelName))
     {stop("Invalid Gaussian model name.")}
     return(TRUE)
   }
@@ -165,7 +165,7 @@ setMethod(
       # for data
       if(missing(data)) {stop("data is mandatory in ClusterDiagGaussianComponent.")}
       # check model name
-      if (!validDiagGaussianNames(modelName)) { stop("modelName is invalid");}
+      if (!clusterValidDiagGaussianNames(modelName)) { stop("modelName is invalid");}
       # call base class initialize
       .Object <- callNextMethod(.Object, data, modelName)
       # create slots
@@ -275,7 +275,7 @@ setClass(
     {stop("sigma must have nbCluster rows.")}
     if (ncol(object@component@sigma)!=ncol(object@component@data))
     {stop("sigma must have nbVariable columns.")}
-    if (!validDiagGaussianNames(object@component@modelName))
+    if (!clusterValidDiagGaussianNames(object@component@modelName))
     {stop("Invalid Gaussian model name.")}
     return(TRUE)
   }

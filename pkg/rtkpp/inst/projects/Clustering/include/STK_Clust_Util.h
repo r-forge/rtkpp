@@ -152,10 +152,10 @@ String exceptionToString( exceptions const& type);
  **/
 enum modelState
 {
-  modelCreated_, ///< the model has been created but is not initialized
+  modelCreated_,     ///< the model has been created but is not initialized
   modelInitialized_, ///< the model is initialized, but its parameters are not initialized
-  initialization_, ///< The parameters of the model have been initialized
-  shortRun_,      ///< A short run has been done
+  modelParamInitialized_,   ///< The parameters of the model have been initialized
+  shortRun_,         ///< A short run has been done
   longRun_,   ///< a long run has been done
   modelFinalized_ ///< the model is finalized
 };

@@ -90,7 +90,7 @@ clusterCategorical <- function(data, nbCluster=2, modelNames=c( "categorical_pk_
 
   # check modelNames
   if (is.null(modelNames)) { modelNames = c( "categorical_pk_pjk", "categorical_p_pjk")}
-  if (!validCategoricalNames(modelNames))
+  if (!clusterValidCategoricalNames(modelNames))
   { stop("modelNames is not valid. See ?CategoricalNames for the list of valid model names\n")}
 
   # check strategy
@@ -119,7 +119,7 @@ clusterCategorical <- function(data, nbCluster=2, modelNames=c( "categorical_pk_
 #'
 #' @slot plkj Array with the probability of the jth variable in the kth cluster to be l.
 #' @slot nbModalities Integer with the (maximal) number of modalities of the categorical  data.
-#' @seealso [\code{\linkS4class{ClusterComponent}}] class
+#' @seealso [\code{\linkS4class{IClusterComponent}}] class
 #'
 #' @examples
 #' getSlots("ClusterCategoricalComponent")
@@ -127,14 +127,14 @@ clusterCategorical <- function(data, nbCluster=2, modelNames=c( "categorical_pk_
 #' @author Serge Iovleff
 #'
 #' @name ClusterCategoricalComponent
-#' @rdname ClusterComponent-class
+#' @rdname IClusterComponent-class
 #' @aliases ClusterCategoricalComponent-class
 #' @exportClass ClusterCategoricalComponent
 #'
 setClass(
   Class="ClusterCategoricalComponent",
   representation( plkj = "array", nbModalities = "numeric"),
-  contains=c("ClusterComponent"),
+  contains=c("IClusterComponent"),
   validity=function(object)
   {
     dims <- dim(object@plkj)
@@ -143,7 +143,7 @@ setClass(
     {stop("nbModalities must be an integer.")}
     if (dims[1]!=object@nbModalities)
     {stop("First dimension in plkj must be nbModalities.")}
-    if (!validCategoricalNames(object@modelName))
+    if (!clusterValidCategoricalNames(object@modelName))
     {stop("Invalid Categorical model name.")}
     return(TRUE)
   }
@@ -163,7 +163,7 @@ setMethod(
       # for data
       if(missing(data)) {stop("data is mandatory in ClusterCategoricalComponent.")}
       # check model name
-      if (!validCategoricalNames(modelName)) { stop("modelName is invalid");}
+      if (!clusterValidCategoricalNames(modelName)) { stop("modelName is invalid");}
       # prepare data and compute number of modalities
       data = as.data.frame(data)
       nbModalities = 0;
@@ -262,25 +262,25 @@ setMethod(
 #' @aliases ClusterCategorical-class
 #' @exportClass ClusterCategorical
 setClass(
-    Class="ClusterCategorical",
-    representation( component = "ClusterCategoricalComponent"),
-    contains=c("IClusterModelBase"),
-    validity=function(object)
-    {
-      dims <- dim(object@component@plkj)
+  Class="ClusterCategorical",
+  representation( component = "ClusterCategoricalComponent"),
+  contains=c("IClusterModelBase"),
+  validity=function(object)
+  {
+    dims <- dim(object@component@plkj)
 
-      if (round(object@component@nbModalities)!=object@component@nbModalities)
-      {stop("nbModalities must be an integer.")}
-      if (dims[1]!=object@component@nbModalities)
-      {stop("First dimension in plkj must be nbModalities.")}
-      if (dims[2]!=object@nbCluster)
-      {stop("Second dimension in plkj must be nbCluster.")}
-      if (dims[3]!=ncol(object@component@data))
-      {stop("Third dimension in plkj must be nbCluster.")}
-      if (!validCategoricalNames(object@component@modelName))
-      {stop("Invalid Categorical model name.")}
-      return(TRUE)
-    }
+    if (round(object@component@nbModalities)!=object@component@nbModalities)
+    {stop("nbModalities must be an integer.")}
+    if (dims[1]!=object@component@nbModalities)
+    {stop("First dimension in plkj must be nbModalities.")}
+    if (dims[2]!=object@nbCluster)
+    {stop("Second dimension in plkj must be nbCluster.")}
+    if (dims[3]!=ncol(object@component@data))
+    {stop("Third dimension in plkj must be nbCluster.")}
+    if (!clusterValidCategoricalNames(object@component@modelName))
+    {stop("Invalid Categorical model name.")}
+    return(TRUE)
+  }
 )
 
 #' Initialize an instance of a rtkpp class.

@@ -146,7 +146,7 @@ void MixtureComposer::randomInit()
   stk_cout << _T("eStep() done\n");
 #endif
   // model intialized
-  setState(Clust::modelInitialized_);
+  setState(Clust::modelParamInitialized_);
 }
 
 

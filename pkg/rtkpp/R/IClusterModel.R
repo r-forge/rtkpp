@@ -208,7 +208,7 @@ setMethod(
 )
 
 #-----------------------------------------------------------------------
-#' Definition of the [\code{\linkS4class{ClusterComponent}}] class
+#' Definition of the [\code{\linkS4class{IClusterComponent}}] class
 #'
 #' This class defines a component of a mixture Model
 #'
@@ -217,50 +217,52 @@ setMethod(
 #' @slot modelName model name associated with the data set
 #'
 #' @examples
-#' getSlots("ClusterComponent")
+#' getSlots("IClusterComponent")
 #'
 #' @author Serge Iovleff
 #'
-#' @name ClusterComponent
-#' @rdname ClusterComponent-class
-#' @aliases ClusterComponent-class
-#' @exportClass ClusterComponent
+#' @name IClusterComponent
+#' @rdname IClusterComponent-class
+#' @aliases IClusterComponent-class
+#' @exportClass IClusterComponent
 #'
 setClass(
-  Class="ClusterComponent",
+  Class="IClusterComponent",
   representation( data = "matrix", missing = "matrix", modelName = "character","VIRTUAL"),
   validity=function(object)
   {
-    if (!is.matrix(data)) { stop("data must be a matrix in ClusterComponent");}
+# called too soon when Component is part of an other S4 class
+#    if (!is.matrix(data)) { stop("data must be a matrix in IClusterComponent");}
+#    if (!is.matrix(missing)) { stop("missing must be a matrix in IClusterComponent");}
+#    if (!is.character(modelName)) { stop("modelName must be a character in IClusterComponent");}
     return(TRUE);
   }
 )
 #' Initialize an instance of a rtkpp class.
 #'
-#' Initialization method of the [\code{\linkS4class{ClusterComponent}}] class.
+#' Initialization method of the [\code{\linkS4class{IClusterComponent}}] class.
 #' Used internally in the `rtkpp' package.
 #'
 #' @rdname initialize-methods
 #' @keywords internal
 setMethod(
   f="initialize",
-  signature=c("ClusterComponent"),
+  signature=c("IClusterComponent"),
   definition=function(.Object, data, modelName)
   {
     # fill data missing and modelName
     .Object@data      <- as.matrix(data);
     .Object@missing   <- which(is.na(.Object@data), arr.ind=TRUE);
     .Object@modelName <- modelName;
-    # validObject(.Object) will be called in base class
     return(.Object)
   }
 )
 #' @rdname print-methods
-#' @aliases print print,ClusterComponent-method
+#' @aliases print print,IClusterComponent-method
 #'
 setMethod(
   f="print",
-  signature=c("ClusterComponent"),
+  signature=c("IClusterComponent"),
   function(x,...)
   {
     cat("* model name   =",x@modelName,"\n");
@@ -272,10 +274,10 @@ setMethod(
 )
 
 #' @rdname show-methods
-#' @aliases show-ClusterComponent,ClusterComponent,ClusterComponent-method
+#' @aliases show-IClusterComponent,IClusterComponent,IClusterComponent-method
 setMethod(
   f="show",
-  signature=c("ClusterComponent"),
+  signature=c("IClusterComponent"),
   function(object)
   {
     cat("* model name   =",object@modelName,"\n");
@@ -292,10 +294,10 @@ setMethod(
 )
 
 #' @rdname summary-methods
-#' @aliases summary summary,ClusterComponent-method
+#' @aliases summary summary,IClusterComponent-method
 setMethod(
   f="summary",
-  signature=c("ClusterComponent"),
+  signature=c("IClusterComponent"),
   function(object, ...)
   { cat("* model name     =",object@modelName,"\n");}
 )

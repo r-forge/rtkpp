@@ -19,7 +19,7 @@ A diagonal gaussian model is a mixture model of the form:
 \section{Slots}{
 
 \describe{
-\item{\code{ldata}}{a list of ClusterComponent.}
+\item{\code{ldata}}{a list of IClusterComponent.}
 }}
 \examples{
 getSlots("ClusterHeterogeneous")

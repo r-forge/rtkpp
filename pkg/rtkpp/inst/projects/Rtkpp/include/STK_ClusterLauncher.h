@@ -45,7 +45,7 @@ namespace STK
 /**The ClusterLauncher allow to create the strategy for estimating a mixture model
  * with less effort
  **/
-class ClusterLauncher
+class ClusterLauncher : public IRunnerBase
 {
   public:
     /** constructor.
@@ -59,7 +59,7 @@ class ClusterLauncher
      **/
     ClusterLauncher( SEXP model, SEXP nbCluster, SEXP strategy, SEXP critName );
     /** destructor. */
-    ~ClusterLauncher();
+    virtual ~ClusterLauncher();
     /** run the estimation */
     bool run();
     /** @return the model */

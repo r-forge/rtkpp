@@ -77,24 +77,31 @@ bool StrategyFacade::run()
   bool flag = false;
   if (p_strategy_)
   {
+    // just check if the model is fresh or is already
+    if (p_model_->state() == Clust::modelCreated_) { p_model_->initializeStep();}
     if (p_strategy_->run())
     { flag = true;
 #ifdef STK_MIXTURE_VERBOSE
-      stk_cout << _T("StrategyFacade:run() terminated with success. p_model->lnLikelihood() =")
+      stk_cout << _T("StrategyFacade:run() terminated with success.\n"
+                     "p_model->lnLikelihood() =")
                << p_model_->lnLikelihood() << _T("\n")
                << _T("-----------------------------------------------\n");
 #endif
     }
-#ifdef STK_MIXTURE_VERBOSE
     else
     {
+      msg_error_ = p_strategy_->error();
+#ifdef STK_MIXTURE_VERBOSE
       stk_cout << _T("StrategyFacade:run() terminated without success.\n")
+               << _T("error = ") << msg_error_ << _T("\n")
                << _T("------------------------------------------------\n");
-    }
 #endif
+    }
     p_model_->imputationStep();
     p_model_->finalizeStep();
   }
+  else
+  { msg_error_ = STKERROR_NO_ARG(MixtureFacade::run(),strategy is not set);}
   return flag;
 }
 

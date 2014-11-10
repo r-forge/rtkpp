@@ -3,12 +3,12 @@
 \name{ClusterCategoricalComponent}
 \alias{ClusterCategoricalComponent}
 \alias{ClusterCategoricalComponent-class}
-\alias{ClusterComponent}
-\alias{ClusterComponent-class}
 \alias{ClusterDiagGaussianComponent}
 \alias{ClusterDiagGaussianComponent-class}
 \alias{ClusterGammaComponent}
 \alias{ClusterGammaComponent-class}
+\alias{IClusterComponent}
+\alias{IClusterComponent-class}
 \title{Definition of the [\code{\linkS4class{ClusterCategoricalComponent}}] class}
 \description{
 This class defines a categorical component of a mixture Model.
@@ -44,7 +44,7 @@ This class defines a component of a mixture Model
 getSlots("ClusterCategoricalComponent")
 getSlots("ClusterDiagGaussianComponent")
 getSlots("ClusterGammaComponent")
-getSlots("ClusterComponent")
+getSlots("IClusterComponent")
 }
 \author{
 Serge Iovleff
@@ -56,10 +56,10 @@ Serge Iovleff
 Serge Iovleff
 }
 \seealso{
-[\code{\linkS4class{ClusterComponent}}] class
+[\code{\linkS4class{IClusterComponent}}] class
 
-[\code{\linkS4class{ClusterComponent}}] class
+[\code{\linkS4class{IClusterComponent}}] class
 
-[\code{\linkS4class{ClusterComponent}}] class
+[\code{\linkS4class{IClusterComponent}}] class
 }
 

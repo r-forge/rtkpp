@@ -92,15 +92,15 @@ clusterHeterogeneous <- function(data, modelNames, nbCluster=2, strategy=cluster
   ldata <- vector("list", length(data));
   for (i in 1:length(data))
   {
-    if(validCategoricalNames(modelNames[i]) )
+    if(clusterValidCategoricalNames(modelNames[i]) )
     { ldata[[i]] <- new("ClusterCategoricalComponent", data[[i]], nbClusterMin, modelNames[i]);}
     else
     {
-      if( validGammaNames(modelNames[i]) )
+      if( clusterValidGammaNames(modelNames[i]) )
       { ldata[[i]] <- new("ClusterGammaComponent", data[[i]], nbClusterMin, modelNames[i]);}
       else
       {
-        if( validDiagGaussianNames(modelNames[i]) )
+        if( clusterValidDiagGaussianNames(modelNames[i]) )
         { ldata[[i]] <- new("ClusterDiagGaussianComponent", data[[i]], nbClusterMin, modelNames[i]);}
         else
         stop("invalid model name");
@@ -122,7 +122,7 @@ clusterHeterogeneous <- function(data, modelNames, nbCluster=2, strategy=cluster
   {
     for (i in 1:length(data))
     {
-      if(validCategoricalNames(modelNames[i]))
+      if(clusterValidCategoricalNames(modelNames[i]))
       { dim(model@ldata[[i]]@plkj) <- c(model@ldata[[i]]@nbModalities, model@nbCluster, ncol(model@ldata[[i]]@data))}
     }
   }
@@ -142,7 +142,7 @@ clusterHeterogeneous <- function(data, modelNames, nbCluster=2, strategy=cluster
 #'    \quad x \in {R}^d.
 #' }
 #'
-#' @slot ldata  a list of ClusterComponent.
+#' @slot ldata  a list of IClusterComponent.
 #' @seealso [\code{\linkS4class{IClusterModelBase}}] class
 #'
 #' @examples

@@ -47,7 +47,8 @@ namespace STK
  * with less effort
  **/
 ClusterLauncher::ClusterLauncher( SEXP model, SEXP nbCluster, SEXP modelNames, SEXP strategy, SEXP critName )
-                                : s4_model_(model)
+                                : IRunnerBase()
+                                , s4_model_(model)
                                 , s4_strategy_(strategy)
                                 , v_nbCluster_(nbCluster)
                                 , v_modelNames_(modelNames)
@@ -62,7 +63,8 @@ ClusterLauncher::ClusterLauncher( SEXP model, SEXP nbCluster, SEXP modelNames, S
  * with less effort
  **/
 ClusterLauncher::ClusterLauncher( SEXP model, SEXP nbCluster, SEXP strategy, SEXP critName )
-                                : s4_model_(model)
+                                : IRunnerBase()
+                                , s4_model_(model)
                                 , s4_strategy_(strategy)
                                 , v_nbCluster_(nbCluster)
                                 , v_modelNames_()
@@ -78,18 +80,12 @@ ClusterLauncher::~ClusterLauncher() { if (p_composer_) delete p_composer_;}
 /* run the estimation */
 bool ClusterLauncher::run()
 {
+  // compute the best model
+  Real initCriter = s4_model_.slot("criterion");
   Real criter;
-  if (!isHeterogeneous_)
-  {
-    // compute the best model
-    criter = selectSingleBestModel();
-  }
-  else
-  {
-    // compute the best model
-    criter = selectHeteroBestModel();
-  }
-  if (criter == Arithmetic<Real>::max() || !Arithmetic<Real>::isFinite(criter)) return false;
+  if (!isHeterogeneous_) { criter = selectSingleBestModel();}
+  else                   { criter = selectHeteroBestModel();}
+  if (criter == initCriter || !Arithmetic<Real>::isFinite(criter)) return false;
   // get common part
   s4_model_.slot("criterion")    = criter;
   s4_model_.slot("nbCluster")    = p_composer_->nbCluster();
@@ -105,7 +101,7 @@ bool ClusterLauncher::run()
     fi[i] = p_composer_->computeLnLikelihood(i);
     zi[i] += (1 - baseIdx);  // set base 1 for the class labels
   }
-    return true;
+  return true;
 }
 
 /* get the parameters */
@@ -121,7 +117,7 @@ Real ClusterLauncher::selectSingleBestModel()
   RcppMatrix<double> data(m_data);
 
   int nbSample   = s4_model_.slot("nbSample");
-  IMixtureComposer* p_current =0;
+  IMixtureComposer*  p_current =0;
   IMixtureCriterion* p_criterion =0;
 
   try
@@ -133,7 +129,8 @@ Real ClusterLauncher::selectSingleBestModel()
 
     // start the estimation process, should end with the best model according to
     // the criteria
-    p_composer_ = 0;
+    ClusterFacade facade(p_current);
+    facade.createFullStrategy(s4_strategy_);
     for (int l=0; l <v_modelNames_.size(); ++l)
     {
       std::string idData = "model" + typeToString<int>(l);
@@ -155,9 +152,6 @@ Real ClusterLauncher::selectSingleBestModel()
         std::string idData = "model" + typeToString<int>(l);
         static_cast<MixtureComposer*>(p_current)->createMixture(manager_, idData);
 
-        // create facade and strategy
-        ClusterFacade facade(p_current);
-        facade.createFullStrategy(s4_strategy_);
         // run estimation and get results if possible
         if (facade.run())
         {
@@ -174,6 +168,8 @@ Real ClusterLauncher::selectSingleBestModel()
             criter = p_criterion->value();
           }
         }
+        else
+        { msg_error_ += facade.error();}
         // release current composer
         if (p_current) { delete p_current; p_current = 0;}
       }
@@ -198,14 +194,17 @@ Real ClusterLauncher::selectSingleBestModel()
 Real ClusterLauncher::selectHeteroBestModel()
 {
   // list of the component
-  Rcpp::List s4_list = s4_model_.slot("ldata");
-  Real criter    = s4_model_.slot("criterion");
-  int nbSample   = s4_model_.slot("nbSample");
+  Rcpp::List s4_list =s4_model_.slot("ldata");
+  Real criter =s4_model_.slot("criterion");
+  int nbSample =s4_model_.slot("nbSample");
   // main pointer
-  IMixtureComposer*  p_current =0;
+  IMixtureComposer* p_current =0;
   IMixtureCriterion* p_criterion =0;
   try
   {
+    // create facade and strategy
+    ClusterFacade facade(p_current);
+    facade.createFullStrategy(s4_strategy_);
     bool sameProp = true;
     // loop over the list of component and fil handler_
     for (int l=0; l <s4_list.size(); ++l)
@@ -236,9 +235,6 @@ Real ClusterLauncher::selectHeteroBestModel()
       else           { p_current = new MixtureComposerFixedProp(nbSample, K);}
       // create all mixtures
       static_cast<MixtureComposer*>(p_current)->createMixtures(manager_);
-      // create facade and strategy
-      ClusterFacade facade(p_current);
-      facade.createFullStrategy(s4_strategy_);
       // run estimation and get results if possible
       if (facade.run())
       {
@@ -251,6 +247,8 @@ Real ClusterLauncher::selectHeteroBestModel()
           else             { p_composer_ = p_current; p_current = 0;}
           criter = p_criterion->value();
         }
+        else
+        { msg_error_ += facade.error();}
       }
       // release current composer
       if (p_current) { delete p_current; p_current = 0;}

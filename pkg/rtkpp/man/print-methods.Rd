@@ -5,7 +5,6 @@
 \alias{print,ClusterAlgo-method}
 \alias{print,ClusterCategorical-method}
 \alias{print,ClusterCategoricalComponent-method}
-\alias{print,ClusterComponent-method}
 \alias{print,ClusterDiagGaussian-method}
 \alias{print,ClusterDiagGaussianComponent-method}
 \alias{print,ClusterGamma-method}
@@ -13,6 +12,7 @@
 \alias{print,ClusterHeterogeneous-method}
 \alias{print,ClusterInit-method}
 \alias{print,ClusterStrategy-method}
+\alias{print,IClusterComponent-method}
 \alias{print,IClusterModelBase-method}
 \alias{print-algo,ClusterAlgo-method}
 \alias{print-init,ClusterInit,ClusterInit-method}
@@ -41,7 +41,7 @@
 
 \S4method{print}{IClusterModelBase}(x, ...)
 
-\S4method{print}{ClusterComponent}(x, ...)
+\S4method{print}{IClusterComponent}(x, ...)
 }
 \arguments{
 \item{x}{a rtkpp object: a \code{\linkS4class{ClusterStrategy}},

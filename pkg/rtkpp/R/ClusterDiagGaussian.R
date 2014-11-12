@@ -108,11 +108,8 @@ clusterDiagGaussian <- function(data, nbCluster=2, modelNames=clusterDiagGaussia
   }
   # set names
   if (resFlag != TRUE ) {cat("WARNING: An error occur during the clustering process");}
-  else
-  {
-    colnames(model@component@mean)  <- colnames(model@component@data);
-    colnames(model@component@sigma) <- colnames(model@component@data);
-  }
+  colnames(model@component@mean)  <- colnames(model@component@data);
+  colnames(model@component@sigma) <- colnames(model@component@data);
   model
 }
 

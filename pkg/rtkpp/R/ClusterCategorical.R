@@ -107,8 +107,8 @@ clusterCategorical <- function(data, nbCluster=2, modelNames=c( "categorical_pk_
   # set names
   # dimnames(model@plkj) <- list(NULL, colnames(model@component@data), NULL) # not working
   # should be done on the C++ side
-  if (resFlag != 1) {cat("WARNING: An error occur during the clustering process\n")}
-  else { dim(model@component@plkj) <- c(model@component@nbModalities, model@nbCluster, ncol(data)) }
+  if (resFlag != 1) {cat("WARNING: An error occur during the clustering process\n");}
+  dim(model@component@plkj) <- c(model@component@nbModalities, model@nbCluster, ncol(data));
   model
 }
 

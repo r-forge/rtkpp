@@ -85,7 +85,6 @@ bool ClusterLauncher::run()
   Real criter;
   if (!isHeterogeneous_) { criter = selectSingleBestModel();}
   else                   { criter = selectHeteroBestModel();}
-  if (criter == initCriter || !Arithmetic<Real>::isFinite(criter)) return false;
   // get common part
   s4_model_.slot("criterion")    = criter;
   s4_model_.slot("nbCluster")    = p_composer_->nbCluster();
@@ -101,6 +100,7 @@ bool ClusterLauncher::run()
     fi[i] = p_composer_->computeLnLikelihood(i);
     zi[i] += (1 - baseIdx);  // set base 1 for the class labels
   }
+  if (criter == initCriter || !Arithmetic<Real>::isFinite(criter)) return false;
   return true;
 }
 

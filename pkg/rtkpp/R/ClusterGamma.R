@@ -106,9 +106,9 @@ clusterGamma <- function(data, nbCluster=2, modelNames= clusterGammaNames(), str
   resFlag = .Call("clusterMixture", model, nbCluster, modelNames, strategy, criterion, PACKAGE="rtkpp")
 
   # set names
+  if (resFlag != 1) {cat("WARNING: An error occur during the clustering process")}
   colnames(model@component@shape) <- colnames(model@component@data)
   colnames(model@component@scale) <- colnames(model@component@data)
-  if (resFlag != 1) {cat("WARNING: An error occur during the clustering process")}
   model
 }
 

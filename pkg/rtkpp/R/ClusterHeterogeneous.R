@@ -22,7 +22,7 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
-#' @include  ClusterModelNames.R IClusterModel.R
+#' @include  global.R ClusterModelNames.R IClusterModel.R
 NULL
 
 #-----------------------------------------------------------------------
@@ -118,13 +118,10 @@ clusterHeterogeneous <- function(data, modelNames, nbCluster=2, strategy=cluster
   }
   # set names
   if (resFlag != TRUE) {cat("WARNING: An error occurs during the clustering process");}
-  else
+  for (i in 1:length(data))
   {
-    for (i in 1:length(data))
-    {
-      if(clusterValidCategoricalNames(modelNames[i]))
-      { dim(model@ldata[[i]]@plkj) <- c(model@ldata[[i]]@nbModalities, model@nbCluster, ncol(model@ldata[[i]]@data))}
-    }
+    if(clusterValidCategoricalNames(modelNames[i]))
+    { dim(model@ldata[[i]]@plkj) <- c(model@ldata[[i]]@nbModalities, model@nbCluster, ncol(model@ldata[[i]]@data))}
   }
   model
 }

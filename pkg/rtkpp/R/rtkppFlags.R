@@ -78,13 +78,10 @@ LdFlags <- function() { cat(.rtkppLdFlags()) }
 {
   if (nzchar(.Platform$r_arch))
   {	## eg amd64, ia64, mips
-    path <- .rtkpp.system.file("libs",.Platform$r_arch)
+    path <- .rtkpp.system.file("lib",.Platform$r_arch)
   }
-  else { path <- .rtkpp.system.file("libs") }
-  if (.Platform$OS.type == "windows")
-  { paste("-L", path, " -l:rtkpp.dll", sep="") }
-  else
-  { paste("-L", path, " -l:rtkpp.so", sep="")}
+  else { path <- .rtkpp.system.file("lib") }
+  paste( path, "/libSTKpp.a", sep="") 
 }
 
 # Transform a path for passing to the build system on the command line.

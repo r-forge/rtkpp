@@ -210,6 +210,7 @@ setMethod(
     }
 )
 
+#' @param k the number of the cluster to print
 #' @rdname print-methods
 #' @aliases print print,ClusterCategoricalComponent-method
 setMethod(

@@ -138,12 +138,12 @@ analysis:
 	$(MAKE) -C $(SRC_ANALYSIS_DIR)
 statistik:
 	$(MAKE) -C $(SRC_STATISTIK_DIR)
+statmodel:
+	$(MAKE) -C $(SRC_STATMODELS_DIR)
 regress:
 	$(MAKE) -C $(SRC_REGRESS_DIR)
 reduct:
 	$(MAKE) -C $(SRC_REDUCT_DIR)
-statmodel:
-	$(MAKE) -C $(SRC_STATMODELS_DIR)
 aamodels:
 	$(MAKE) -C $(SRC_AAMODELS_DIR)
 
@@ -151,17 +151,17 @@ aamodels:
 # COMMENT or UNCOMMENT the projects you need for your package
 # all binaries you need
 obj: stkernel \
-     arrays \
      sdk \
+     arrays \
      dmanager \
      clustering \
      algebra \
      analysis \
      statistik \
-     statmodel \
-     regress \
-     reduct \
-     aamodels
+ #    statmodel \
+ #    regress \
+ #    reduct \
+ #    aamodels
 
 CPP_OBJS = \
   $(STKERNEL_OBJS) \
@@ -172,10 +172,10 @@ CPP_OBJS = \
   $(ALGEBRA_OBJS) \
   $(ANALYSIS_OBJS) \
   $(STATISTIK_OBJS) \
-  $(STATMODELS_OBJS) \
-  $(REGRESS_OBJS) \
-  $(REDUCT_OBJS) \
-  $(AAMODELS_OBJS)
+#  $(STATMODELS_OBJS) \
+#  $(REGRESS_OBJS) \
+#  $(REDUCT_OBJS) \
+#  $(AAMODELS_OBJS)
 
 #-----------------------------------------------------------------------
 # create the library adding the objects
@@ -195,17 +195,17 @@ clean_lib:
 
 clean_obj: \
   clean_stkernel \
-  clean_arrays \
   clean_sdk \
+  clean_arrays \
   clean_dmanager \
+  clean_clustering \
   clean_algebra \
   clean_analysis \
   clean_statistik \
-  clean_statmodel \
-  clean_clustering \
-  clean_aamodels \
-  clean_regress \
-  clean_reduct
+#  clean_statmodel \
+#  clean_regress \
+#  clean_reduct \
+#  clean_aamodels \
 
 clean_stkernel:
 	$(RM) $(STKERNEL_OBJS)

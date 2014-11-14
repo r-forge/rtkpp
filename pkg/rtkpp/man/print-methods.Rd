@@ -48,6 +48,8 @@
 a \code{\linkS4class{ClusterInit}} or a \code{\linkS4class{ClusterAlgo}}.}
 
 \item{...}{further arguments passed to or from other methods}
+
+\item{k}{the number of the cluster to print}
 }
 \value{
 NULL. Prints to standard out.

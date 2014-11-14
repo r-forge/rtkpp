@@ -140,7 +140,8 @@ clusterValidDiagGaussianNames <- function(names)
 #' @return A vector of character with the model names.
 #' @examples
 #' clusterGammaNames()
-#' clusterGammaNames("all", "equal", "free", "free", "equal") # same as c("gamma_p_ak_bj", "gamma_pk_ak_bj")
+#' ## same as c("gamma_p_ak_bj", "gamma_pk_ak_bj")
+#' clusterGammaNames("all", "equal", "free", "free", "equal")
 #'
 #' @rdname clusterGammaNames
 #' @export

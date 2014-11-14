@@ -59,7 +59,8 @@ b         & gamma_*_ajk_b       & gamma_*_ak_b   & NA             & NA \\
 }
 \examples{
 clusterGammaNames()
-clusterGammaNames("all", "equal", "free", "free", "equal") # same as c("gamma_p_ak_bj", "gamma_pk_ak_bj")
+## same as c("gamma_p_ak_bj", "gamma_pk_ak_bj")
+clusterGammaNames("all", "equal", "free", "free", "equal")
 }
 \keyword{internal}
 

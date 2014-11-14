@@ -207,9 +207,13 @@ class IMixtureComposer : public IStatModelBase
      */
     virtual void samplingStep() {};
     /** @brief Finalize the estimation of the model.
-     * The default behavior is "do nothing".
+     *  The default behavior is compute current lnLikelihood.
      **/
-    inline virtual void finalizeStep() { setState(Clust::modelFinalized_);}
+    inline virtual void finalizeStep()
+    {
+      setLnLikelihood(computeLnLikelihood());
+      setState(Clust::modelFinalized_);
+    }
 
     // not virtual
     /** Initialize randomly the labels zi of the model.

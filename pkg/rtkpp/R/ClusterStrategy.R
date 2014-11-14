@@ -141,7 +141,9 @@ clusterFastStrategy <- function()
 #'
 #' @examples
 #'   new("ClusterStrategy")
-#'   new("ClusterStrategy", shortAlgo=clusterAlgo("SEM",1000), longAlgo=clusterAlgo("SemiSEM",200,1e-07))
+#'   shortAlgo=clusterAlgo("SEM",1000)
+#'   longAlgo =clusterAlgo("SemiSEM",200,1e-07)
+#'   new("ClusterStrategy", shortAlgo=shortAlgo, longAlgo=longAlgo)
 #'   getSlots("ClusterStrategy")
 #'
 #' @author Serge Iovleff

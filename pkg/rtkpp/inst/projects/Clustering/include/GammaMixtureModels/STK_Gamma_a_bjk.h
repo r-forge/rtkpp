@@ -135,11 +135,11 @@ void Gamma_a_bjk<Array>::randomInit()
     for (int k= baseIdx; k < components().end(); ++k)
     {
       Real mean = meanjk(j,k), variance = variancejk(j,k);
-      p_param(k)->scale_[j] = Law::Exponential::rand(variance/mean);
+      p_param(k)->scale_[j] = Law::Exponential::rand((variance/mean)/this->nbCluster());
       value += p_param(k)->tk_ * (mean*mean/variance);
     }
   }
-  shape_ = Law::Exponential::rand(value/(this->nbSample()*this->nbVariable()));
+  shape_ = Law::Exponential::rand(value/(this->nbSample()*this->nbVariable()*this->nbCluster()));
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Gamma_a_bjk<Array>::randomInit() done\n");
   this->writeParameters(stk_cout);

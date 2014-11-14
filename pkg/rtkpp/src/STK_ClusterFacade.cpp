@@ -90,15 +90,11 @@ bool ClusterFacade::run()
   if (p_strategy_)
   {
     // just check if the model is fresh or has been used
-    if (p_model_->state() == Clust::modelCreated_) { p_model_->initializeStep();}
-    if (p_strategy_->run())
-    {
-      flag = true;
-      p_model_->imputationStep();
-      p_model_->finalizeStep();
-    }
+    if (p_strategy_->run()) { flag = true;}
     else { msg_error_ = p_strategy_->error();}
   }
+  p_model_->imputationStep();
+  p_model_->finalizeStep();
   return flag;
 }
 

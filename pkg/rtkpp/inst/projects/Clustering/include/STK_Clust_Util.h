@@ -152,12 +152,12 @@ String exceptionToString( exceptions const& type);
  **/
 enum modelState
 {
-  modelCreated_,     ///< the model has been created but is not initialized
-  modelInitialized_, ///< the model is initialized, but its parameters are not initialized
-  modelParamInitialized_,   ///< The parameters of the model have been initialized
-  shortRun_,         ///< A short run has been done
-  longRun_,   ///< a long run has been done
-  modelFinalized_ ///< the model is finalized
+  modelCreated_ =0,         ///< the model has been created but is not initialized
+  modelInitialized_ =1,     ///< the model is initialized, but its parameters are not initialized
+  modelParamInitialized_=2, ///< The parameters of the model have been initialized
+  shortRun_,                ///< A short run has been done
+  longRun_,                 ///< A long run has been done
+  modelFinalized_           ///< the model is finalized
 };
 
 /** @ingroup Clustering

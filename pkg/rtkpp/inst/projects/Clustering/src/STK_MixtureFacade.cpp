@@ -88,11 +88,11 @@ bool StrategyFacade::run()
                << _T("------------------------------------------------\n");
 #endif
     }
+    p_model_->imputationStep();
+    p_model_->finalizeStep();
   }
   else
   { msg_error_ = STKERROR_NO_ARG(MixtureFacade::run(),strategy is not set);}
-  p_model_->imputationStep();
-  p_model_->finalizeStep();
 #ifdef STK_MIXTURE_VERBOSE
   stk_cout << _T("StrategyFacade:run() terminated.\n"
                  "p_model->lnLikelihood() =")

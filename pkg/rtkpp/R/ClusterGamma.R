@@ -77,7 +77,7 @@ clusterGamma <- function(data, nbCluster=2, modelNames= clusterGammaNames(), str
   nbClusterModel = length(nbCluster);
   nbClusterMin = min(nbCluster);
   nbClusterMax = max(nbCluster);
-  if (nbClusterMin < 2) { stop("The number of clusters must be greater or equal to 2")}
+  if (nbClusterMin < 1) { stop("The number of clusters must be greater or equal to 1")}
 
   # check criterion
   if(sum(criterion %in% c("BIC","AIC","ICL")) != 1)

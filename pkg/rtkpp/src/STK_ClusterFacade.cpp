@@ -92,9 +92,11 @@ bool ClusterFacade::run()
     // just check if the model is fresh or has been used
     if (p_strategy_->run()) { flag = true;}
     else { msg_error_ = p_strategy_->error();}
+    p_model_->imputationStep();
+    p_model_->finalizeStep();
   }
-  p_model_->imputationStep();
-  p_model_->finalizeStep();
+  else
+  { msg_error_ = STKERROR_NO_ARG(MixtureFacade::run(),strategy is not set);}
   return flag;
 }
 

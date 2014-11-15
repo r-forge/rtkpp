@@ -50,4 +50,5 @@ $(SHLIB): pkglib
 
 pkglib:
 	-@if test ! -e $(STKPP_LIB__DIR)/$(R_ARCH); then mkdir -p $(STKPP_LIB_DIR)/$(R_ARCH); fi
+	($(MAKE) -C $(STKPP_DIR))
 	(cd $(STKPP_DIR) && $(MAKE) clean_obj)

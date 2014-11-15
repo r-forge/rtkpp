@@ -59,15 +59,15 @@ STKPP_LIB = $(RTKPP_LIB_DIR)$(LIB_STKPP_A)
 
 #-----------------------------------------------------------------------
 # Create the library. Build the objects of each projects and then add them
-.PHONY: all lib obj
-all: lib echo
+.PHONY: all lib obj echo
+all: echo lib
 lib: $(STKPP_LIB)
 
 # use to debug
 echo:
 	@echo $(BIN_DIR)
 	@echo $(PROJECTS_DIR)
-  @echo $(RTKPP_LIB_DIR)
+	@echo $(STKPP_LIB)
 	@echo $(patsubst $(RTKPP_PROJECTS_DIR)STKernel/../%,%,$(wildcard $(RTKPP_PROJECTS_DIR)STKernel/../*))
 	@echo $(patsubst $(RTKPP_PROJECTS_DIR)%,%,$(wildcard $(RTKPP_PROJECTS_DIR)*))
 	@echo $(CXXFLAGS)

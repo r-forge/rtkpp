@@ -35,7 +35,7 @@ include $(RELATIVEMAKEVARS)
 # main directories
 RTKPP_PROJECTS_DIR  = projects/
 RTKPP_BIN_DIR = bin/
-RTKPP_LIB_DIR = lib/
+RTKPP_LIB_DIR = lib/$(R_ARCH)/
 
 # check if we are using symoblic paths
 ifneq ($(patsubst $(RTKPP_PROJECTS_DIR)STKernel/../%,%,$(wildcard $(RTKPP_PROJECTS_DIR)STKernel/../*)),$(patsubst $(RTKPP_PROJECTS_DIR)%,%,$(wildcard $(RTKPP_PROJECTS_DIR)*)))
@@ -60,14 +60,14 @@ STKPP_LIB = $(RTKPP_LIB_DIR)$(LIB_STKPP_A)
 #-----------------------------------------------------------------------
 # Create the library. Build the objects of each projects and then add them
 .PHONY: all lib obj
-all: lib
+all: lib echo
 lib: $(STKPP_LIB)
 
 # use to debug
 echo:
-	@echo $(MAKEVARS)
 	@echo $(BIN_DIR)
 	@echo $(PROJECTS_DIR)
+  @echo $(R_ARCH)
 	@echo $(patsubst $(RTKPP_PROJECTS_DIR)STKernel/../%,%,$(wildcard $(RTKPP_PROJECTS_DIR)STKernel/../*))
 	@echo $(patsubst $(RTKPP_PROJECTS_DIR)%,%,$(wildcard $(RTKPP_PROJECTS_DIR)*))
 	@echo $(CXXFLAGS)
@@ -120,7 +120,7 @@ AAMODELS_OBJS  = $(patsubst $(SRC_AAMODELS_DIR)%.cpp, $(RTKPP_BIN_DIR)%.o, $(wil
 #-----------------------------------------------------------------------
 # rules for compiling each projects
 .PHONY: stkernel arrays sdk dmanager algebra analysis statistik statmodel
-.PHONY: regress reduct aamodels  
+.PHONY: regress reduct aamodels
 
 stkernel:
 	$(MAKE) -C $(SRC_STKERNEL_DIR)

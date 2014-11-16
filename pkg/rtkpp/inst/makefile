@@ -67,7 +67,7 @@ lib: $(STKPP_LIB)
 echo:
 	@echo $(BIN_DIR)
 	@echo $(PROJECTS_DIR)
-  @echo $(R_ARCH)
+	@echo $(R_ARCH)
 	@echo $(patsubst $(RTKPP_PROJECTS_DIR)STKernel/../%,%,$(wildcard $(RTKPP_PROJECTS_DIR)STKernel/../*))
 	@echo $(patsubst $(RTKPP_PROJECTS_DIR)%,%,$(wildcard $(RTKPP_PROJECTS_DIR)*))
 	@echo $(CXXFLAGS)

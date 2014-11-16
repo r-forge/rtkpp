@@ -57,7 +57,7 @@ class IMixtureAlgo : public IRunnerBase
 {
   protected:
     /** default constructor */
-    inline IMixtureAlgo() : IRunnerBase(), p_model_(0), nbIterMax_(0), epsilon_(0.), threshold_(1.) {}
+    inline IMixtureAlgo() : IRunnerBase(), p_model_(0), nbIterMax_(0), epsilon_(0.), threshold_(2.) {}
     /** Copy constructor.
      *  @param algo the algorithm to copy */
     inline IMixtureAlgo( IMixtureAlgo const& algo) : IRunnerBase(algo)
@@ -74,7 +74,7 @@ class IMixtureAlgo : public IRunnerBase
     inline int nbIterMax() const { return nbIterMax_; }
     /** @return the epsilon of the algorithm */
     inline int epsilon() const { return epsilon_; }
-    /** set a new model. Default threshold_ is 3 percent of the samples. */
+    /** set a new model. Default threshold_ is 2 samples. */
     void setModel(IMixtureComposer* p_model);
     /** set the maximal number of iterations */
     inline void setNbIterMax(int nbIterMax) { nbIterMax_ = nbIterMax; }

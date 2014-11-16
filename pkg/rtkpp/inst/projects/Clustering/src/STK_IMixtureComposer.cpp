@@ -48,7 +48,7 @@ IMixtureComposer::IMixtureComposer( int nbSample, int nbVariable, int nbCluster)
                                   , nbCluster_(nbCluster)
                                   , prop_(nbCluster), tik_(nbSample, nbCluster), tk_(nbCluster), zi_(nbSample)
                                   , state_(Clust::modelCreated_)
-{  intializeMixtureParameters(); }
+{ initializeMixtureParameters(); }
 
 /* copy constructor */
 IMixtureComposer::IMixtureComposer( IMixtureComposer const& model)
@@ -71,7 +71,7 @@ IMixtureComposer::~IMixtureComposer() {}
 void IMixtureComposer::initializeStep()
 {
   // (re)initialize the parameters tik, zi etc.
-  intializeMixtureParameters();
+  initializeMixtureParameters();
   // (re)initialize the likelihood (others parameters are not modified)
   setLnLikelihood(-Arithmetic<Real>::infinity());
   // compute proportions
@@ -85,7 +85,7 @@ void IMixtureComposer::randomClassInit()
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Entering IMixtureComposer::randomClassInit()\n");
 #endif
-  initializeStep();
+  if (state() < 2) { initializeStep();}
   Law::Categorical law(prop_);
   for (int i = zi_.begin(); i< zi_.end(); ++i)
   { zi_.elt(i) = law.rand();}
@@ -93,6 +93,9 @@ void IMixtureComposer::randomClassInit()
   eStep();
   // model intialized
   setState(Clust::modelParamInitialized_);
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("IMixtureComposer::randomClassInit() done\n");
+#endif
 }
 
 /* initialize randomly the posterior probabilities tik of the model */
@@ -101,11 +104,14 @@ void IMixtureComposer::randomFuzzyInit()
 #ifdef STK_MIXTURE_VERBOSE
   stk_cout << _T("Entering IMixtureComposer::randomFuzzyInit()\n");
 #endif
-  initializeStep();
+  if (state() < 2) { initializeStep();}
   randomFuzzyTik();
   eStep();
   // model intialized
   setState(Clust::modelParamInitialized_);
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("IMixtureComposer::randomFuzzyInit() done\n");
+#endif
 }
 
 /* cStep */
@@ -155,7 +161,7 @@ Real IMixtureComposer::eStep()
   }
   setLnLikelihood(sum);
 #ifdef STK_MIXTURE_VERY_VERBOSE
-  stk_cout << _T("Terminating IMixtureComposer::eStep()\n");
+  stk_cout << _T("IMixtureComposer::eStep() done\n");
 #endif
   return tk_.minElt();
 }
@@ -218,7 +224,7 @@ void IMixtureComposer::mapStep()
 }
 
 /* Create the parameters of the  mixture model. */
-void IMixtureComposer::intializeMixtureParameters()
+void IMixtureComposer::initializeMixtureParameters()
 {
   prop_ = 1./nbCluster_;
   tik_  = 1./nbCluster_;

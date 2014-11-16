@@ -72,7 +72,7 @@ namespace STK
  * be estimated using either an EM, SEM or CEM algorithm.
  * All mixture parameters are created using the method
  * @code
- *   void intializeMixtureParameters();
+ *   void initializeMixtureParameters();
  * @endcode
  * in the constructor. They can be accessed from the mixtures using constant
  * accessors.
@@ -253,7 +253,7 @@ class IMixtureComposer : public IStatModelBase
     /** The zi class label */
     CArrayVector<int> zi_;
     /** Create the mixture model parameters. */
-    void intializeMixtureParameters();
+    void initializeMixtureParameters();
     /** generate random tik_ */
     void randomFuzzyTik();
 

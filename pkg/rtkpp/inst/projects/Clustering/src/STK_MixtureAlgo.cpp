@@ -41,7 +41,7 @@ namespace STK
 {
 
 void IMixtureAlgo::setModel(IMixtureComposer* p_model)
-{ p_model_ = p_model; threshold_ = 0.03*p_model->nbSample();}
+{ p_model_ = p_model; threshold_ = 2;}
 
 /* run the CEM allgorithm */
 bool CEMAlgo::run()

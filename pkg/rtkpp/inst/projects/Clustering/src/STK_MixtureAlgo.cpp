@@ -39,9 +39,9 @@
 
 namespace STK
 {
-
+// threshold_ is set to this value in order to get stability on the results
 void IMixtureAlgo::setModel(IMixtureComposer* p_model)
-{ p_model_ = p_model; threshold_ = 2;}
+{ p_model_ = p_model; threshold_ = std::min(10., 0.03*p_model_->nbSample());}
 
 /* run the CEM allgorithm */
 bool CEMAlgo::run()

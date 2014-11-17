@@ -153,23 +153,18 @@ Real ClusterLauncher::selectSingleBestModel()
         static_cast<MixtureComposer*>(p_current)->createMixture(manager_, idData);
 
         // run estimation and get results if possible
-        if (facade.run())
+        if (!facade.run()) { msg_error_ += facade.error();}
+        // compute criterion and update model if necessary
+        p_criterion->setModel(p_current);
+        p_criterion->run();
+        if (criter > p_criterion->value())
         {
-          // compute criterion and update model if necessary
-          p_criterion->setModel(p_current);
-          if (!p_criterion->run()) { delete p_current; p_current = 0;}
-          else if (criter > p_criterion->value())
-          {
-            if (p_composer_) { std::swap(p_current, p_composer_);}
-            else             { p_composer_ = p_current; p_current = 0;}
-
-            s4_component.slot("modelName") = idModel;
-            idDataBestModel = idData;
-            criter = p_criterion->value();
-          }
+          if (p_composer_) { std::swap(p_current, p_composer_);}
+          else             { p_composer_ = p_current; p_current = 0;}
+          s4_component.slot("modelName") = idModel;
+          idDataBestModel = idData;
+          criter = p_criterion->value();
         }
-        else
-        { msg_error_ += facade.error();}
         // release current composer
         if (p_current) { delete p_current; p_current = 0;}
       }
@@ -236,19 +231,15 @@ Real ClusterLauncher::selectHeteroBestModel()
       // create all mixtures
       static_cast<MixtureComposer*>(p_current)->createMixtures(manager_);
       // run estimation and get results if possible
-      if (facade.run())
+      if (!facade.run()) { msg_error_ += facade.error();}
+      // compute criterion and update model if necessary
+      p_criterion->setModel(p_current);
+      p_criterion->run();
+      if (criter > p_criterion->value())
       {
-        // compute criterion and update model if necessary
-        p_criterion->setModel(p_current);
-        if (!p_criterion->run()) { delete p_current; p_current = 0;}
-        else if (criter > p_criterion->value())
-        {
-          if (p_composer_) { std::swap(p_current, p_composer_);}
-          else             { p_composer_ = p_current; p_current = 0;}
-          criter = p_criterion->value();
-        }
-        else
-        { msg_error_ += facade.error();}
+        if (p_composer_) { std::swap(p_current, p_composer_);}
+        else             { p_composer_ = p_current; p_current = 0;}
+        criter = p_criterion->value();
       }
       // release current composer
       if (p_current) { delete p_current; p_current = 0;}

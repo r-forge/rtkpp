@@ -168,11 +168,11 @@ setMethod(
       data           <- as.data.frame(data)
       .Object@levels <- vector("list", length(data));
       nbModalities <- 0;
-      for ( j in 1:ncol(data) )
+      for ( j in 1:length(data) )
       {
         nbModalities <- max(nbModalities, nlevels(factor(data[,j])))
+        .Object@levels[[j]] <- levels(factor(data[,j]))
         data[,j] <- as.integer(factor(data[,j]))
-        .Object@levels[j] <- levels(factor(data[,j]))
       }
       # initialize base class
       .Object <- callNextMethod(.Object, data, modelName);

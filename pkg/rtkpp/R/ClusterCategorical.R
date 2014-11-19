@@ -133,7 +133,7 @@ clusterCategorical <- function(data, nbCluster=2, modelNames=c( "categorical_pk_
 #'
 setClass(
   Class="ClusterCategoricalComponent",
-  representation( plkj = "array", nbModalities = "numeric"),
+  representation( plkj = "array", nbModalities = "numeric", levels = "list"),
   contains=c("IClusterComponent"),
   validity=function(object)
   {
@@ -165,12 +165,14 @@ setMethod(
       # check model name
       if (!clusterValidCategoricalNames(modelName)) { stop("modelName is invalid");}
       # prepare data and compute number of modalities
-      data = as.data.frame(data)
-      nbModalities = 0;
+      data           <- as.data.frame(data)
+      .Object@levels <- vector("list", length(data));
+      nbModalities <- 0;
       for ( j in 1:ncol(data) )
       {
         nbModalities <- max(nbModalities, nlevels(factor(data[,j])))
         data[,j] <- as.integer(factor(data[,j]))
+        .Object@levels[j] <- levels(factor(data[,j]))
       }
       # initialize base class
       .Object <- callNextMethod(.Object, data, modelName);
@@ -220,6 +222,8 @@ setMethod(
     {
       cat("* probabilities = \n");
       print(format(x@plkj[,k,]), quote=FALSE);
+      cat("* levels = \n");
+      print(format(x@levels), quote=FALSE);
     }
 )
 

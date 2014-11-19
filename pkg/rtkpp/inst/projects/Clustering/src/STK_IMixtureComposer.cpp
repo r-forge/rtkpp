@@ -48,6 +48,7 @@ IMixtureComposer::IMixtureComposer( int nbSample, int nbVariable, int nbCluster)
                                   , nbCluster_(nbCluster)
                                   , prop_(nbCluster), tik_(nbSample, nbCluster), tk_(nbCluster), zi_(nbSample)
                                   , state_(Clust::modelCreated_)
+                                  , lnComp_(nbCluster)
 { initializeMixtureParameters(); }
 
 /* copy constructor */
@@ -58,6 +59,7 @@ IMixtureComposer::IMixtureComposer( IMixtureComposer const& model)
                                   , tik_(model.tik_)
                                   , zi_(model.zi_)
                                   , state_(model.state_)
+                                  , lnComp_(model.lnComp_)
 {}
 /* destructor */
 IMixtureComposer::~IMixtureComposer() {}
@@ -143,19 +145,18 @@ Real IMixtureComposer::eStep()
   for (int i = tik_.beginRows(); i < tik_.endRows(); ++i)
   {
     // get maximal element of ln(x_i,\theta_k) + ln(p_k)
-    Array2DPoint<Real> lnComp(tik_.cols());
     for (int k=tik_.beginCols(); k< tik_.endCols(); k++)
-    { lnComp[k] = std::log(prop_[k])+lnComponentProbability(i,k);}
+    { lnComp_[k] = std::log(prop_[k])+lnComponentProbability(i,k);}
     int kmax;
-    Real max = lnComp.maxElt(kmax);
+    Real max = lnComp_.maxElt(kmax);
     // set zi_
     zi_[i] = kmax;
+    // create a reference on the i-th row
+    Array2DPoint<Real> tikRowi(tik_.row(i), true);
     // compute sum_k p_k exp{lnCom_k - lnComp_kmax}
-    tik_.row(i) = (lnComp - max).exp();
-    Real sum2 = tik_.row(i).sum();
-    tik_.row(i) /= sum2;
+    Real sum2 = (tikRowi = (lnComp_ - max).exp()).sum();
     // count the expected number of individuals in each class
-    tk_ += tik_.row(i);
+    tk_ += (tikRowi /= sum2);
     // compute lnLikelihood
     sum += max + std::log(sum2);
   }

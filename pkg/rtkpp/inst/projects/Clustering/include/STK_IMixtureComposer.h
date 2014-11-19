@@ -260,6 +260,8 @@ class IMixtureComposer : public IStatModelBase
   private:
     /** state of the model*/
     Clust::modelState state_;
+    /** Auxiliary array used in the eStep */
+    Array2DPoint<Real> lnComp_;
 };
 
 } // namespace STK

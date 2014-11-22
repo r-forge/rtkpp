@@ -132,7 +132,7 @@ class IMixtureComposer : public IStatModelBase
     /** @return the tik probabilities */
     inline Array2D<Real> const& tik() const { return tik_;};
     /** @return the estimated proportions of individuals  */
-    inline CArrayPoint<Real> const& tk() const { return tk_;};
+    inline Array2DPoint<Real> const& tk() const { return tk_;};
     /** @return the zi class label */
     inline CArrayVector<int> const& zi() const { return zi_;};
 
@@ -238,6 +238,11 @@ class IMixtureComposer : public IStatModelBase
      *  @return the minimal value of tk
      **/
     Real eStep();
+    /** compute one zi and the next value of the tik for i fixed
+     *  @param i the individual
+     *  @return the contribution of the individual i to the log-likelihood
+     **/
+    Real eStep(int i);
     /** Compute zi using the Map estimate. */
     void mapStep();
 
@@ -249,7 +254,7 @@ class IMixtureComposer : public IStatModelBase
     /** The tik probabilities */
     Array2D<Real> tik_;
     /** The sum of the columns of tik_ */
-    CArrayPoint<Real> tk_;
+    Array2DPoint<Real> tk_;
     /** The zi class label */
     CArrayVector<int> zi_;
     /** Create the mixture model parameters. */

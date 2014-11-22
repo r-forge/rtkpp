@@ -184,7 +184,7 @@ class IMixture
      *  of individuals from the framework.
      *  @return Pointer to proportions.
      */
-    CArrayPoint<Real> const& tk() const;
+    Array2DPoint<Real> const& tk() const;
     /** This function can be used in derived classes to get posterior probabilities from the framework.
      *  @return Pointer to tik.
      */

@@ -77,7 +77,7 @@ void AdditiveBSplineRegression::initializeStep()
 }
 
 /* compute the regression function. */
-void AdditiveBSplineRegression::regression()
+void AdditiveBSplineRegression::regressionStep()
 {
   // compute X'X
   MatrixSquare prod;
@@ -109,7 +109,7 @@ void AdditiveBSplineRegression::regression(Vector const& weights)
 }
 
 /* Compute the predicted outputs by the regression function. */
-void AdditiveBSplineRegression::prediction()
+void AdditiveBSplineRegression::predictionStep()
 {
   // remove existing predictions if any (should not be the case)
   if (!p_predicted_) p_predicted_ = new Matrix;

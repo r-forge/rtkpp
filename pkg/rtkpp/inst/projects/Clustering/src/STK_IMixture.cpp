@@ -73,7 +73,7 @@ CArrayPoint<Real> const& IMixture::pk() const { return p_composer_->pk();}
  *  of individuals from the framework.
  *  @return Pointer to proportions.
  */
-CArrayPoint<Real> const& IMixture::tk() const { return p_composer_->tk();}
+Array2DPoint<Real> const& IMixture::tk() const { return p_composer_->tk();}
 /* This function can be used in derived classes to get posterior probabilities from the framework.
  *  @return Pointer to tik.
  */

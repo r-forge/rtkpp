@@ -180,15 +180,15 @@ class ICArray : public ArrayBase<Derived>
 
     // general arrays
     inline Type& elt2Impl( int i, int j) { return allocator_.elt(i, j);}
-    inline Type const elt2Impl( int i, int j) const { return allocator_.elt(i, j);}
+    inline Type const& elt2Impl( int i, int j) const { return allocator_.elt(i, j);}
 
     // vectors and points
     inline Type& elt1Impl( int j) { return allocator_.elt(j);}
-    inline Type const elt1Impl( int j) const { return allocator_.elt(j);}
+    inline Type const& elt1Impl( int j) const { return allocator_.elt(j);}
 
     // numbers
     inline Type& elt0Impl() { return allocator_.elt();}
-    inline Type const elt0Impl() const { return allocator_.elt();}
+    inline Type const& elt0Impl() const { return allocator_.elt();}
 
     inline Row rowImpl(int i) const { return  Row( allocator_.row(i));}
     inline SubRow rowImpl(int i, Range const& J) const { return SubRow( allocator_.row( i, J));}

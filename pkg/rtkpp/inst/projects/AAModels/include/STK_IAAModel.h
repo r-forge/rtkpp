@@ -174,7 +174,7 @@ class IAAModel
     void reduction( Vector const& weights);
     /** compute the regression of the original data set and set the results in
      *  @c p_predicted and @c p_residuals. **/
-    void regression();
+    void regressionStep();
     /** compute the weighted regression  of the original data set using the
      *  reduced data set as predictor and set the results in @c p_predicted and
      *  @c p_residuals.

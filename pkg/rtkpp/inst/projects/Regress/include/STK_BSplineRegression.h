@@ -46,7 +46,6 @@ namespace STK
 
 /** @brief Compute a BSpline, multivalued, regression function using BSpline
  *  basis.
- *
  */
 class BSplineRegression : public IRegression<Matrix, Vector, Vector>
 {
@@ -114,7 +113,7 @@ class BSplineRegression : public IRegression<Matrix, Vector, Vector>
     /** method of position of the knots of the B-Spline curve */
     _Kposition position_;
     /** Coefficients of the regression matrix */
-    BSplineCoefficients coefs_;
+    BSplineCoefficients<Vector> coefs_;
     /** Estimated control points of the B-Spline curve */
     Matrix controlPoints_;
 
@@ -126,7 +125,7 @@ class BSplineRegression : public IRegression<Matrix, Vector, Vector>
     /** compute the regression function. This method will be
      *  called in the base class @c IRegression::run() after initializeStep()
      **/
-    virtual void regression();
+    virtual void regressionStep();
     /** compute the regression function. This method will be
      *  called in the base class @c IRegression::run(weights) after initializeStep()
      *  @param weights the weights of the samples
@@ -135,7 +134,7 @@ class BSplineRegression : public IRegression<Matrix, Vector, Vector>
     /** Compute the predicted outputs by the regression function. This method
      *  will be called in the base class @c IRegression::run() after initializeStep()
      **/
-    virtual void prediction();
+    virtual void predictionStep();
     /** Compute the number of parameter of the regression function.
      * @return the number of parameter of the regression function
      **/

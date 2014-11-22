@@ -484,7 +484,7 @@ class StructuredCAllocator<Derived, 1, 1, Orient_> : public OrientedCAllocator<D
     { row_ = T.row_; col_ = T.col_; return *this;}
   public:
     /** @return a constant reference on the element of the Allocator. */
-    inline Type const elt0Impl() const { return this->elt(row_, col_);}
+    inline Type const& elt0Impl() const { return this->elt(row_, col_);}
     /** @return a reference on the element of the Allocator. */
     inline Type& elt0Impl() { return this->elt(row_, col_);}
 
@@ -526,7 +526,7 @@ class StructuredCAllocator<Derived, 1, SizeCols_, Orient_> : public OrientedCAll
     /** @return a constant reference on the element (i,j) of the Allocator.
      *  @param j index of the column
      **/
-    inline Type const elt1Impl( int const& j) const
+    inline Type const& elt1Impl( int const& j) const
     { return this->elt(row_, j);}
     /** @return a reference on the element (i,j) of the Allocator.
      *  @param j index of the columns
@@ -582,7 +582,7 @@ class StructuredCAllocator<Derived, SizeRows_, 1, Orient_>
     /** @return a constant reference on the element (i,j) of the Allocator.
      *  @param i index of the row
      **/
-    inline Type const elt1Impl( int const& i) const
+    inline Type const& elt1Impl( int const& i) const
     { return this->elt(i, col_);}
     /** @return a reference on the element (i,j) of the Allocator.
      *  @param i index of the row

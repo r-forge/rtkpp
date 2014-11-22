@@ -797,7 +797,7 @@ class ITContainer2D : protected IContainer2D<SizeRow_, SizeCol_>
     /** @return a constant reference on element (i,j) of the 2D container
      *  @param i, j indexes of the row and of the column
      **/
-    inline Type const elt(int i, int j) const
+    inline Type const& elt(int i, int j) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (this->beginRows() > i)
@@ -822,7 +822,7 @@ class ITContainer2D : protected IContainer2D<SizeRow_, SizeCol_>
     /** @return the constant ith element
      *  @param i index of the ith element
      **/
-    inline Type const elt(int i) const
+    inline Type const& elt(int i) const
     {
       STK_STATICASSERT_ONE_DIMENSION_ONLY(Derived)
       return this->asDerived().elt1Impl(i);
@@ -834,7 +834,7 @@ class ITContainer2D : protected IContainer2D<SizeRow_, SizeCol_>
       return this->asDerived().elt0Impl();
     }
     /** @return a constant reference on the number */
-    inline Type const elt() const
+    inline Type const& elt() const
     {
       STK_STATICASSERT_ZERO_DIMENSION_ONLY(Derived)
       return this->asDerived().elt0Impl();

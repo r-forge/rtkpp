@@ -386,7 +386,7 @@ class PointByMatrixProduct : public ExprBase< PointByMatrixProduct<Lhs, Rhs> >
     /** @return the right hand side nested expression */
     inline Rhs const& result() const { return result_; }
     /** @return the ith element */
-    inline Type const elt1Impl(int i) const { return result_.elt(i);}
+    inline Type const& elt1Impl(int i) const { return result_.elt(i);}
 
   protected:
     Lhs const& lhs_;
@@ -979,8 +979,7 @@ struct Traits< MatrixByMatrixProduct < Lhs, Rhs> > : public ProductTraits<Lhs, R
 } // end namespace hidden
 
 // forward declaration
-template< typename Lhs, typename Rhs, int LhsStructure_ = Lhs::structure_, int RhsStructure_ = Rhs::structure_>
-class ProductBase;
+template< typename Lhs, typename Rhs> class ProductBase;
 
 template<typename Lhs, typename Rhs>
 class MatrixByMatrixProduct : public ProductBase< Lhs, Rhs >
@@ -1017,26 +1016,26 @@ class MatrixByMatrixProduct : public ProductBase< Lhs, Rhs >
       if (lhs.cols() != rhs.rows())
       { STKRUNTIME_ERROR_NO_ARG(MatrixByMatrixProduct, sizes mismatch for 2D array);}
       result_.shift(lhs_.beginRows(), rhs_.beginCols());
-      orient_ ? hidden::ProductImpl<Lhs, Rhs, Allocator>::runbp(lhs, rhs, result_)
-              : hidden::ProductImpl<Lhs, Rhs, Allocator>::runpb(lhs, rhs, result_);
+      orient_ ? hidden::ProductImpl<Lhs, Rhs, Allocator>::runpb(lhs, rhs, result_)
+              : hidden::ProductImpl<Lhs, Rhs, Allocator>::runbp(lhs, rhs, result_);
     }
     /**  @return the range of the rows */
-    inline Range const rows() const { return result_.rows();}
+    inline Range const rows() const { return lhs_.rows();}
     /** @return the first index of the rows */
-    inline int const beginRowsImpl() const { return(result_.beginRows());}
+    inline int const beginRowsImpl() const { return(lhs_.beginRows());}
     /** @return the ending index of the rows */
-    inline int const endRowsImpl() const { return(result_.endRows());}
+    inline int const endRowsImpl() const { return(lhs_.endRows());}
     /** @return the number of rows */
-    inline int const sizeRowsImpl() const { return result_.sizeRows();}
+    inline int const sizeRowsImpl() const { return(lhs_.sizeRows());}
 
     /** @return the range of the columns */
-    inline Range const cols() const { return result_.cols();}
+    inline Range const cols() const { return rhs_.cols();}
     /** @return the first index of the columns */
-    inline int const beginColsImpl() const { return(result_.beginCols());}
+    inline int const beginColsImpl() const { return(rhs_.beginCols());}
     /** @return the ending index of the columns */
-    inline int const endColsImpl() const { return(result_.endCols());}
+    inline int const endColsImpl() const { return(rhs_.endCols());}
     /** @return the number of columns */
-    inline int const sizeColsImpl() const { return result_.sizeCols();}
+    inline int const sizeColsImpl() const { return rhs_.sizeCols();}
 
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_; }
@@ -1056,7 +1055,7 @@ class MatrixByMatrixProduct : public ProductBase< Lhs, Rhs >
 /** @ingroup Arrays
   * @brief implement the access to the elements in the (2D) general case.
   **/
-template< typename Lhs, typename Rhs, int LhsStructure_, int RhsStructure_>
+template< typename Lhs, typename Rhs>
 class ProductBase : public ExprBase< MatrixByMatrixProduct<Lhs, Rhs> >
 {
   public:
@@ -1066,13 +1065,13 @@ class ProductBase : public ExprBase< MatrixByMatrixProduct<Lhs, Rhs> >
     /** constructor. */
     inline ProductBase() : Base() {}
     /** access to the element (i,j) */
-    inline Type const elt2Impl(int i, int j) const
+    inline Type const& elt2Impl(int i, int j) const
     { return this->asDerived().result().elt(i,j);}
     /** access to the element i */
-    inline Type const elt1Impl(int i) const
+    inline Type const& elt1Impl(int i) const
     { return this->asDerived().result().elt(i);}
     /** access to the element */
-    inline Type const elt0Impl() const
+    inline Type const& elt0Impl() const
     { return this->asDerived().result().elt();}
 };
 

@@ -38,9 +38,45 @@
 
 namespace STK
 {
+/* size of the block and panels used in the product algorithm */
+const int blockSize = 4;
+const int panelSize = 128;
+const int vectorSize = 256;
 
 namespace hidden
 {
+
+/** @ingroup hidden
+ *  this structure regroup all the methods using only pointers on the Type
+ **/
+template<typename Type>
+struct MultImpl
+{
+  /** multiplication : 1 sized vector */
+  static inline Type vec1(Type const* p_lhs, Type const* p_rhs)
+  { return(p_lhs[0] * p_rhs[0]);}
+  /** multiplication : 2 sized vector */
+  static inline Type vec2(Type const* p_lhs, Type const* p_rhs)
+  { return(p_lhs[0] * p_rhs[0] + p_lhs[1] * p_rhs[1]);}
+  /** multiplication : 3 sized vector */
+  static inline Type vec3(Type const* p_lhs, Type const* p_rhs)
+  { return(p_lhs[0] * p_rhs[0] + p_lhs[1] * p_rhs[1] + p_lhs[2] * p_rhs[2]);}
+  /** multiplication of two vectors */
+  static inline Type vectorByVector(Type const* p_lhs, Type const* p_rhs)
+  {
+    Type sum = Type(0);
+    for (int k=0; k< vectorSize; ++k) sum += p_lhs[k] * p_rhs[k];
+    return(sum);
+  }
+  /** multiplication of two vectors */
+  static inline Type vectorByVector(Type const* p_lhs, Type const* p_rhs, int vSize)
+  {
+    Type sum = Type(0);
+    for (int k=0; k< vSize; ++k) sum += p_lhs[k] * p_rhs[k];
+    return(sum);
+  }
+};
+
 /** @ingroup hidden
  *  Methods to use for C=AB with A a general matrix and B a vector.
  *  The structure bv contains only static methods and typedef and should normally
@@ -129,4 +165,4 @@ struct vb
 
 } // namespace STK
 
-#endif /* STK_GENERALBYVECTOR_H */
+#endif /* STK_GENERALBYVECTORPRODUCT_H */

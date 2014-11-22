@@ -154,7 +154,7 @@ class AdditiveBSplineCoefficients : public IRunnerBase
     /** Method used in order to position the knots. */
     Regress::KnotsPosition position_;
     /** Array with the knots and coefficients in each dimension. */
-    Array1D<BSplineCoefficients> coefs_;
+    Array1D<BSplineCoefficients<Vector> > coefs_;
     /** Matrix of the coefficients */
     Array2D<Real> coefficients_;
 };

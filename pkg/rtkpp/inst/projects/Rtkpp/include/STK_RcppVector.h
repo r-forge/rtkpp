@@ -134,7 +134,7 @@ class RcppVector : public ArrayBase< RcppVector<Type_> >
     /** @return the ith element of the operator
      *  @param i index of the ith element
      **/
-    inline Type const elt1Impl(int i) const { return (vector_[i]);}
+    inline Type const& elt1Impl(int i) const { return static_cast<Type const&>(vector_[i]);}
     /** overwrite the RcppMatrix with T, using Rcpp operator=.
      *  @param T the container to copy
      **/

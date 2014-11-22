@@ -216,10 +216,10 @@ void IAAModel::reduction( Vector const& weights)
 }
 
 /* compute the regression **/
-void IAAModel::regression()
+void IAAModel::regressionStep()
 {
   if (!p_regressor_)
-    throw runtime_error(_T("Error in IAAModel::regression(): "
+    throw runtime_error(_T("Error in IAAModel::regressionStep(): "
                            "regressor have not be set."));
   // compute regression
   p_regressor_->run();

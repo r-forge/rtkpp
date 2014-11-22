@@ -59,7 +59,7 @@ BSplineRegression::~BSplineRegression()
 {}
 
 /* compute the regression function. */
-void BSplineRegression::regression()
+void BSplineRegression::regressionStep()
 {
   // compute X'X
   MatrixSquare prod;
@@ -92,7 +92,7 @@ void BSplineRegression::regression(Vector const& weights)
 }
 
 /* Compute the predicted outputs by the regression function. */
-void BSplineRegression::prediction()
+void BSplineRegression::predictionStep()
 {
   // create predictions if it does not exist any
   if (!p_predicted_) p_predicted_ = new Matrix;

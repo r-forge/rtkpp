@@ -92,9 +92,9 @@ namespace STK
  *
  * In this interface, the pure virtual function to implement are
  * @code
- *   virtual void regression();
+ *   virtual void regressionStep();
  *   virtual void regression( WArray const& weights);
- *   virtual void prediction();
+ *   virtual void predictionStep();
  *   virtual int const& computeNbFreeParameter() const;
  *   virtual void extrapolate( XArray const& x, YArray& y) const;
  * @endcode
@@ -129,13 +129,13 @@ class IRegression
       // perform any initialization step needed before the regression step
       initializeStep();
       // compute the regression
-      regression();
+      regressionStep();
       // Compute the number of parameter of the regression function.
       nbFreeParameter_ = computeNbFreeParameter();
-      // predictions
-      prediction();
+      // compute predictions
+      predictionStep();
       // compute residuals
-      residuals();
+      residualsStep();
       // return the result of the computations
       return true;
     }
@@ -152,9 +152,11 @@ class IRegression
       // Compute the number of parameter of the regression function.
       nbFreeParameter_ = computeNbFreeParameter();
       // create container of the predicted value and compute prediction
-      prediction();
+      predictionStep();
       // create container of the residuals and compute them
-      residuals();
+      residualsStep();
+      // perform any post-operation needed before the regression step
+      finalizeStep();
       // return the result of the computations
       return true;
     }
@@ -208,17 +210,16 @@ class IRegression
      *  method. Default implementation is do nothing.
      */
     virtual void initializeStep() {}
-
+    /** @brief perform any computation needed after the call of the regression
+     *  method. Default implementation is do nothing.
+     */
+    virtual void finalizeStep() {}
     /** @brief Compute the residuals of the model.
      * The residuals of the model are computed by computing the difference
      * between the observed outputs and the predicted outputs of the model.
      */
-    inline void residuals()
-    {
-      if (p_residuals_) delete p_residuals_;
-       p_residuals_ =  p_y_->clone();
-      *p_residuals_ -= *p_predicted_;
-    }
+    inline void residualsStep()
+    { *p_residuals_ = *p_y_ - *p_predicted_;}
 
     /** Container of the output to regress. */
     YArray const* p_y_;
@@ -234,14 +235,14 @@ class IRegression
     int nbFreeParameter_;
 
     /** compute the regression function. */
-    virtual void regression() =0;
+    virtual void regressionStep() =0;
     /** compute the weighted regression function.
      * @param weights the weights of the samples
      **/
     virtual void regression(WArray const& weights) =0;
     /** Compute the predicted outputs by the regression function and store the
      * result in the p_predicted_ container. */
-    virtual void prediction() =0;
+    virtual void predictionStep() =0;
     /** Compute the number of parameter of the regression function.
      * @return the number of parameter of the regression function
      **/

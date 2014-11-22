@@ -50,7 +50,7 @@ MultidimRegression::~MultidimRegression()
 { }
 
 /* compute the regression function. */
-void MultidimRegression::regression()
+void MultidimRegression::regressionStep()
 {
   // compute X'X
   MatrixSquare prod;
@@ -87,7 +87,7 @@ void MultidimRegression::regression(Vector const& weights)
 }
 
 /* Compute the predicted outputs by the regression function. */
-void MultidimRegression::prediction()
+void MultidimRegression::predictionStep()
 {
   // remove existing predictions if any (should not be the case)
   if (!p_predicted_) p_predicted_ = new Matrix;

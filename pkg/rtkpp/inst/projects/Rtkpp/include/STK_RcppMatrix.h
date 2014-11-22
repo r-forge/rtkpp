@@ -134,7 +134,7 @@ class RcppMatrix : public ArrayBase< RcppMatrix<Type_> >
    /** @return a constant reference on element (i,j) of the 2D container
      *  @param i, j indexes of the row and of the column
      **/
-    inline Type const elt2Impl(int i, int j) const { return (matrix_(i,j));}
+    inline Type const& elt2Impl(int i, int j) const { return static_cast<Type const&>(matrix_(i,j));}
     /** @return a reference on the element (i,j) of the 2D container.
      *  @param i, j indexes of the row and of the column
      **/

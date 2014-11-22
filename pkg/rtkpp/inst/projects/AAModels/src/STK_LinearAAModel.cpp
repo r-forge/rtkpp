@@ -123,7 +123,7 @@ bool LinearAAModel::run()
     p_regressor_->setY(p_workData_);
     p_regressor_->setX(p_reduced_);
     // compute the regression function
-    regression();
+    regressionStep();
 #ifdef STK_AAMODELS_VERBOSE
     stk_cout << _T("In LinearAAModel::run(), regression done.\n");
 #endif

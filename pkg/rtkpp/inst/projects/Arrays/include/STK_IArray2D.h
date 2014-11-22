@@ -125,15 +125,13 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
      *  @param j index of the col
      *  @return a reference on the (i,j) element
      **/
-    inline Type& elt2Impl( int i, int j)
-    { return this->data(j)[i];}
+    inline Type& elt2Impl( int i, int j) { return this->data(j)[i];}
     /** access to one element const.
      *  @param i index of the row
      *  @param j index of the col
      *  @return a constant reference on the (i,j) element
      **/
-    inline Type const& elt2Impl( int i, int j) const
-    { return this->data(j)[i];}
+    inline Type const& elt2Impl( int i, int j) const { return this->data(j)[i];}
     /** @return  many elements.
      *  @param J Range of the elements
      **/
@@ -196,12 +194,13 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
      *  @note : T is not modified but just set as a reference of the data it was responsible.
      *  @param T the container to move.
      **/
-     void move(Derived const& T)
+     Derived& move(Derived const& T)
      {
-       if (this->asPtrDerived() == &T) return;
+       if (this->asPtrDerived() == &T) return this->asDerived();
        if (!this->isRef()) { freeCols(this->cols());}
        // move Base part
        Base::move(T);
+       return this->asDerived();
      }
     /** clear the object.
      *  This will free all allocated memory and reset all range to Range().

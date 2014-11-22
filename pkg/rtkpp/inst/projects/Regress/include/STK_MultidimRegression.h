@@ -71,13 +71,13 @@ class MultidimRegression : public IRegression<Matrix, Matrix, Vector>
 
   private:
     /** compute the regression function. */
-    virtual void regression();
+    virtual void regressionStep();
     /** compute the weighted regression function.
      * @param weights the weights of the samples
      **/
     virtual void regression(Vector const& weights);
     /** Compute the predicted outputs by the regression function. */
-    virtual void prediction();
+    virtual void predictionStep();
     /** Compute the number of parameter of the regression function.
      * @return the number of parameter of the regression function
      **/

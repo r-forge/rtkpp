@@ -142,29 +142,35 @@ Real IMixtureComposer::eStep()
   stk_cout << _T("Entering IMixtureComposer::eStep()\n");
 #endif
   Real sum = 0.; tk_ =0.;
-  for (int i = tik_.beginRows(); i < tik_.endRows(); ++i)
-  {
+  int i;
+#pragma omp parallel for reduction (+:sum)
+  for (i = tik_.beginRows(); i < tik_.endRows(); ++i)
+  { sum += eStep(i);}
+  // update ln-likelihood
+  setLnLikelihood(sum);
+  // compute proportions
+  tk_.move(Stat::sum(tik_))/nbSample();
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("IMixtureComposer::eStep() done\n");
+#endif
+  return tk_.minElt();
+}
+
+/* compute tik, default implementation. */
+Real IMixtureComposer::eStep(int i)
+{
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("Entering IMixtureComposer::eStep()\n");
+#endif
     // get maximal element of ln(x_i,\theta_k) + ln(p_k)
-    for (int k=tik_.beginCols(); k< tik_.endCols(); k++)
+    for (int k=baseIdx; k< tik_.endCols(); k++)
     { lnComp_[k] = std::log(prop_[k])+lnComponentProbability(i,k);}
     int kmax;
     Real max = lnComp_.maxElt(kmax);
     // set zi_
     zi_[i] = kmax;
-    // create a reference on the i-th row
-    Array2DPoint<Real> tikRowi(tik_.row(i), true);
-    // compute sum_k p_k exp{lnCom_k - lnComp_kmax}
-    Real sum2 = (tikRowi = (lnComp_ - max).exp()).sum();
-    // count the expected number of individuals in each class
-    tk_ += (tikRowi /= sum2);
-    // compute lnLikelihood
-    sum += max + std::log(sum2);
-  }
-  setLnLikelihood(sum);
-#ifdef STK_MIXTURE_VERY_VERBOSE
-  stk_cout << _T("IMixtureComposer::eStep() done\n");
-#endif
-  return tk_.minElt();
+    // return  max + sum_k p_k exp{lnCom_k - lnComp_kmax}
+   return max + std::log( (tik_.row(i) = (lnComp_ - max).exp()).sum() );
 }
 
 /* @return the computed likelihood of the i-th sample.

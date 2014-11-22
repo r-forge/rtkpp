@@ -33,14 +33,36 @@
  **/
 
 
-#ifndef STK_MATRIXBYMATRIXPRODUCT_H
-#define STK_MATRIXBYMATRIXPRODUCT_H
+#ifndef STK_GENERALBYGENERALPRODUCT_H
+#define STK_GENERALBYGENERALPRODUCT_H
 
 namespace STK
 {
 
 namespace hidden
 {
+/** @ingroup hidden
+ *  This structure encapsulate the data allocated for a panel.
+ **/
+template<class Type>
+struct Panel
+{
+  Type panel[blockSize*panelSize];
+  inline Type const& operator[](int i) const { return panel[i];}
+  inline Type& operator[](int i) { return panel[i];}
+};
+
+/** @ingroup hidden
+ *  This structure encapsulate the data allocated for a block.
+ **/
+template<class Type>
+struct Block
+{
+  Type block[blockSize*blockSize];
+  inline Type const& operator[](int i) const { return block[i];}
+  inline Type& operator[](int i) { return block[i];}
+};
+
 /** @ingroup hidden
  *  This structure regroup the methods to used after block multiplication in
  *  order to perform the product of the remaining rows and columns.
@@ -168,167 +190,178 @@ struct bp
    **/
   static void run(Lhs const& lhs, Rhs const& rhs, Result& res)
   {
+#ifdef STK_DEBUG
+     stk_cout << _T("Entering bp::run()\n");
+#endif
     // compute dimensions
     int nbInnerLoop = lhs.sizeCols()/blockSize; // = rhs.sizeRows()/blockSize;
-    int nbRowBlocks = lhs.sizeRows()/blockSize;
-    int nbColPanels = rhs.sizeCols()/panelSize;
+    int nbBlocks = lhs.sizeRows()/blockSize;
+    int nbPanels = rhs.sizeCols()/panelSize;
     // remaining sizes in the matrices
-    int pSize = rhs.sizeCols() - panelSize*nbColPanels;
-    int bSize = lhs.sizeRows() - blockSize*nbRowBlocks;
-    //
-    int tSize = lhs.sizeCols() -  blockSize*(lhs.sizeCols()/blockSize) ;
+    int pSize = rhs.sizeCols() - panelSize*nbPanels;
+    int bSize = lhs.sizeRows() - blockSize*nbBlocks;
+    int tSize = lhs.sizeCols() - blockSize*nbInnerLoop;
                // = rhs.sizeRows() -  rhs.sizeRows()/blockSize
-    // create block and panels
-    Type* p_block  = new Type[blockSize*blockSize];
-    Type* p_panel  = new Type[blockSize*panelSize];
-    Type* p_result  = new Type[blockSize*panelSize];
+    int iLastRow = lhs.beginRows() + nbBlocks * blockSize;
+    int jLastCol = rhs.beginCols() + nbPanels * panelSize;
+    int kLastPos = lhs.beginCols() + blockSize * nbInnerLoop;
+    // create panels and blocks
+    Panel<Type>* tabPanel = new Panel<Type>[nbPanels+1];
+    Block<Type>* tabBlock = new Block<Type>[nbBlocks+1];
     // start blocks by panel
-    for (int k = 0, iPos = lhs.beginCols(); k<nbInnerLoop; ++k, iPos+= blockSize)
+    for (int k = 0, kPos = lhs.beginCols(); k<nbInnerLoop; ++k, kPos+= blockSize)
     {
-      for (int i = 0, iRow = lhs.beginRows(); i<nbRowBlocks; ++i, iRow+=blockSize)
+      for (int i = 0, iRow = lhs.beginRows(); i<nbBlocks; ++i, iRow+=blockSize)
+      { arrayToBlock( lhs, tabBlock[i], iRow, kPos);}
+      arrayToBlock( lhs, tabBlock[nbBlocks], iLastRow, kPos, bSize);
+      for (int j = 0, jCol = rhs.beginCols(); j<nbPanels; ++j, jCol+=panelSize)
+      { arrayToPanel( rhs, tabPanel[j], kPos, jCol);}
+      arrayToPanel( rhs, tabPanel[nbPanels], kPos, jLastCol, pSize);
+      for (int i = 0, iRow = lhs.beginRows(); i<nbBlocks; ++i, iRow+=blockSize)
       {
-        // fixed block
-        arrayToBlock( lhs, p_block, iRow, iPos);
-        // move the panels
-        for (int j = 0, iCol = rhs.beginCols(); j<nbColPanels; ++j, iCol+=panelSize)
-        {
-          arrayToPanel( rhs, p_panel, iPos, iCol);
-          blockByPanel( p_block, p_panel, p_result, res, iRow, iCol);
-        } // j loop
-        int iCol = rhs.beginCols() + nbColPanels*panelSize;
-        // partial panel part : the panels have pSize columns
-        arrayToPanel( rhs, p_panel, iPos, iCol, pSize);
-        blockByPanel( p_block, p_panel, p_result, res, iRow, iCol, pSize);
-      } // i loop
-      int iRow = lhs.beginRows() + nbRowBlocks * blockSize;
-      // fixed partial block
-      arrayToBlock( lhs, p_block, iRow, iPos, bSize);
-      // move the panels : the panel for the result have bSize rows
-      for (int j = 0, iCol = rhs.beginCols(); j<nbColPanels; ++j, iCol+=panelSize)
-      {
-        arrayToPanel( rhs, p_panel, iPos, iCol);
-        blockByPanel( p_block, p_panel, p_result, res, iRow, iCol, panelSize, bSize);
-      } // j loop
-      // partial panel part : the panels have pSize columns
-      int iCol = rhs.beginCols() + nbColPanels * panelSize;
-      arrayToPanel( rhs, p_panel, iPos, iCol, pSize);
-      blockByPanel( p_block, p_panel, p_result, res, iRow, iCol, pSize, bSize);
-    } // k loop
-    delete[] p_block;
-    delete[] p_panel;
-    delete[] p_result;
-    int iPos = lhs.beginCols() + blockSize * nbInnerLoop;
+        for (int j = 0, jCol = rhs.beginCols(); j<nbPanels; ++j, jCol+=panelSize)
+        { blockByPanel( tabBlock[i], tabPanel[j], res, iRow, jCol);}
+        blockByPanel( tabBlock[i], tabPanel[nbPanels], res, iRow, jLastCol, pSize);
+      }
+      for (int j = 0, jCol = rhs.beginCols(); j<nbPanels; ++j, jCol+=panelSize)
+      { blockByPanel( tabBlock[nbBlocks], tabPanel[j], res, iLastRow, jCol, panelSize, bSize);}
+      blockByPanel( tabBlock[nbBlocks], tabPanel[nbPanels], res, iLastRow, jLastCol, pSize, bSize);
+    }
+    delete[] tabBlock;
+    delete[] tabPanel;
     // treat the remaining rows, columns
     switch (tSize)
     {
       case 1:
-        MultCoeff::mult1(lhs, rhs, res, iPos, iPos);
+        MultCoeff::mult1(lhs, rhs, res, kLastPos, kLastPos);
         break;
       case 2:
-        MultCoeff::mult2(lhs, rhs, res, iPos, iPos);
+        MultCoeff::mult2(lhs, rhs, res, kLastPos, kLastPos);
         break;
       case 3:
-        MultCoeff::mult3(lhs, rhs, res, iPos, iPos);
+        MultCoeff::mult3(lhs, rhs, res, kLastPos, kLastPos);
         break;
       default:
         break;
     }
   }
-  /** Default block */
-  static void arrayToBlock( Lhs const& lhs, Type* p_block
-                          , int iRow, int iCol)
+  /** Default size block */
+  static void arrayToBlock( Lhs const& lhs, Block<Type>& block, int iRow, int jCol)
   {
-    p_block[0]  = lhs.elt(iRow, iCol);
-    p_block[1]  = lhs.elt(iRow, iCol+1);
-    p_block[2]  = lhs.elt(iRow, iCol+2);
-    p_block[3]  = lhs.elt(iRow, iCol+3);
-    p_block[4]  = lhs.elt(iRow+1, iCol);
-    p_block[5]  = lhs.elt(iRow+1, iCol+1);
-    p_block[6]  = lhs.elt(iRow+1, iCol+2);
-    p_block[7]  = lhs.elt(iRow+1, iCol+3);
-    p_block[8]  = lhs.elt(iRow+2, iCol);
-    p_block[9]  = lhs.elt(iRow+2, iCol+1);
-    p_block[10] = lhs.elt(iRow+2, iCol+2);
-    p_block[11] = lhs.elt(iRow+2, iCol+3);
-    p_block[12] = lhs.elt(iRow+3, iCol);
-    p_block[13] = lhs.elt(iRow+3, iCol+1);
-    p_block[14] = lhs.elt(iRow+3, iCol+2);
-    p_block[15] = lhs.elt(iRow+3, iCol+3);
+     block[0]  = lhs.elt(iRow, jCol);
+     block[1]  = lhs.elt(iRow, jCol+1);
+     block[2]  = lhs.elt(iRow, jCol+2);
+     block[3]  = lhs.elt(iRow, jCol+3);
+     block[4]  = lhs.elt(iRow+1, jCol);
+     block[5]  = lhs.elt(iRow+1, jCol+1);
+     block[6]  = lhs.elt(iRow+1, jCol+2);
+     block[7]  = lhs.elt(iRow+1, jCol+3);
+     block[8]  = lhs.elt(iRow+2, jCol);
+     block[9]  = lhs.elt(iRow+2, jCol+1);
+     block[10] = lhs.elt(iRow+2, jCol+2);
+     block[11] = lhs.elt(iRow+2, jCol+3);
+     block[12] = lhs.elt(iRow+3, jCol);
+     block[13] = lhs.elt(iRow+3, jCol+1);
+     block[14] = lhs.elt(iRow+3, jCol+2);
+     block[15] = lhs.elt(iRow+3, jCol+3);
   }
   /** with block row-size given */
-  static void arrayToBlock( Lhs const& lhs, Type* p_block
-                          , int iRow, int iCol, int bSize)
+  static void arrayToBlock( Lhs const& lhs, Block<Type>& block, int iRow, int jCol, int bSize)
   {
     for (int i=0; i<bSize; ++i)
     {
-      p_block[i*blockSize]    = lhs.elt(iRow+i, iCol);
-      p_block[i*blockSize+1]  = lhs.elt(iRow+i, iCol+1);
-      p_block[i*blockSize+2]  = lhs.elt(iRow+i, iCol+2);
-      p_block[i*blockSize+3]  = lhs.elt(iRow+i, iCol+3);
+      block[i*blockSize]    = lhs.elt(iRow+i, jCol);
+      block[i*blockSize+1]  = lhs.elt(iRow+i, jCol+1);
+      block[i*blockSize+2]  = lhs.elt(iRow+i, jCol+2);
+      block[i*blockSize+3]  = lhs.elt(iRow+i, jCol+3);
     }
   }
   /** Default dimension */
-  static void arrayToPanel( Rhs const& rhs, Type* p_panel
-                          , int iRow, int iCol)
+  /** Default dimension */
+  static void arrayToPanel( Rhs const& rhs, Panel<Type>& panel, int iRow, int jCol)
   {
     for (int j=0; j<panelSize; ++j)
     {
-      p_panel[j*blockSize]   = rhs.elt(iRow,   iCol+j);
-      p_panel[j*blockSize+1] = rhs.elt(iRow+1, iCol+j);
-      p_panel[j*blockSize+2] = rhs.elt(iRow+2, iCol+j);
-      p_panel[j*blockSize+3] = rhs.elt(iRow+3, iCol+j);
+      panel[j*blockSize]   = rhs.elt(iRow,   jCol+j);
+      panel[j*blockSize+1] = rhs.elt(iRow+1, jCol+j);
+      panel[j*blockSize+2] = rhs.elt(iRow+2, jCol+j);
+      panel[j*blockSize+3] = rhs.elt(iRow+3, jCol+j);
     }
   }
   /** with panel size given */
-  static void arrayToPanel( Rhs const& rhs, Type* p_panel
-                          , int iRow, int iCol, int pSize)
+  static void arrayToPanel( Rhs const& rhs, Panel<Type>& panel, int iRow, int jCol, int pSize)
   {
     for (int j=0; j<pSize; ++j)
     {
-      p_panel[j*blockSize]   = rhs.elt(iRow,   iCol+j);
-      p_panel[j*blockSize+1] = rhs.elt(iRow+1, iCol+j);
-      p_panel[j*blockSize+2] = rhs.elt(iRow+2, iCol+j);
-      p_panel[j*blockSize+3] = rhs.elt(iRow+3, iCol+j);
+      panel[j*blockSize]   = rhs.elt(iRow,   jCol+j);
+      panel[j*blockSize+1] = rhs.elt(iRow+1, jCol+j);
+      panel[j*blockSize+2] = rhs.elt(iRow+2, jCol+j);
+      panel[j*blockSize+3] = rhs.elt(iRow+3, jCol+j);
     }
   }
   /** Default dimension */
-  static void blockByPanel( Type const* p_block, Type const* p_panel, Type* p_result
-                          , Result& res, int iRow, int iCol)
+  static void blockByPanel( Block<Type> const& block, Panel<Type> const& panel
+                          , Result& res, int iRow, int jCol)
   {
-    Cmult::blockByPanel( p_block, p_panel, p_result);
     for (int j=0; j<panelSize; ++j)
     {
-      res.elt(iRow  ,iCol+j) += p_result[j*blockSize];
-      res.elt(iRow+1,iCol+j) += p_result[j*blockSize+1];
-      res.elt(iRow+2,iCol+j) += p_result[j*blockSize+2];
-      res.elt(iRow+3,iCol+j) += p_result[j*blockSize+3];
+      res.elt(iRow  ,jCol+j) += panel[j*blockSize]    * block[0]
+                              + panel[j*blockSize+ 1] * block[1]
+                              + panel[j*blockSize+ 2] * block[2]
+                              + panel[j*blockSize+ 3] * block[3];
+      res.elt(iRow+1,jCol+j) += panel[j*blockSize]    * block[4]
+                              + panel[j*blockSize+ 1] * block[5]
+                              + panel[j*blockSize+ 2] * block[6]
+                              + panel[j*blockSize+ 3] * block[7];
+      res.elt(iRow+2,jCol+j) += panel[j*blockSize]    * block[8]
+                              + panel[j*blockSize+ 1] * block[9]
+                              + panel[j*blockSize+ 2] * block[10]
+                              + panel[j*blockSize+ 3] * block[11];
+      res.elt(iRow+3,jCol+j) += panel[j*blockSize]    * block[12]
+                              + panel[j*blockSize+ 1] * block[13]
+                              + panel[j*blockSize+ 2] * block[14]
+                              + panel[j*blockSize+ 3] * block[15];
     }
   }
   /** with panel size given */
-  static void blockByPanel( Type const* p_block, Type const* p_panel, Type* p_result
-                          , Result& res, int iRow, int iCol, int pSize)
+  static void blockByPanel( Block<Type> const& block, Panel<Type> const& panel
+                          , Result& res, int iRow, int jCol, int pSize)
   {
-    Cmult::blockByPanel( p_block, p_panel, p_result, pSize);
     for (int j=0; j<pSize; ++j)
     {
-      res.elt(iRow  ,iCol+j) += p_result[j*blockSize];
-      res.elt(iRow+1,iCol+j) += p_result[j*blockSize+1];
-      res.elt(iRow+2,iCol+j) += p_result[j*blockSize+2];
-      res.elt(iRow+3,iCol+j) += p_result[j*blockSize+3];
+      res.elt(iRow  ,jCol+j) += panel[j*blockSize]    * block[0]
+                              + panel[j*blockSize+ 1] * block[1]
+                              + panel[j*blockSize+ 2] * block[2]
+                              + panel[j*blockSize+ 3] * block[3];
+      res.elt(iRow+1,jCol+j) += panel[j*blockSize]    * block[4]
+                              + panel[j*blockSize+ 1] * block[5]
+                              + panel[j*blockSize+ 2] * block[6]
+                              + panel[j*blockSize+ 3] * block[7];
+      res.elt(iRow+2,jCol+j) += panel[j*blockSize]    * block[8]
+                              + panel[j*blockSize+ 1] * block[9]
+                              + panel[j*blockSize+ 2] * block[10]
+                              + panel[j*blockSize+ 3] * block[11];
+      res.elt(iRow+3,jCol+j) += panel[j*blockSize]    * block[12]
+                              + panel[j*blockSize+ 1] * block[13]
+                              + panel[j*blockSize+ 2] * block[14]
+                              + panel[j*blockSize+ 3] * block[15];
     }
   }
   /** with panel size given */
-  static void blockByPanel( Type const* p_block, Type const* p_panel, Type* p_result
-                          , Result& res, int iRow, int iCol, int pSize, int bSize)
+  static void blockByPanel( Block<Type> const& block, Panel<Type> const& panel
+                          , Result& res, int iRow, int jCol, int pSize, int bSize)
   {
-    Cmult::blockByPanel( p_block, p_panel, p_result, pSize, bSize);
     for (int j=0; j<pSize; ++j)
       for (int i=0; i<bSize; ++i)
-      { res.elt(iRow+i,iCol+j) += p_result[j*bSize+i];}
+      { res.elt(iRow+i,jCol+j) += panel[j*blockSize]   * block[i*blockSize]
+                                + panel[j*blockSize+1] * block[i*blockSize+1]
+                                + panel[j*blockSize+2] * block[i*blockSize+2]
+                                + panel[j*blockSize+3] * block[i*blockSize+3];}
   }
 }; // struct bp
 
-/** Methods to use for C=AB with A divided in panels and B divided in blocks.
+/** @ingroup hidden
+ *  Methods to use for C=AB with A divided in panels and B divided in blocks.
  * The structure pb contains only static method and typedef and should normally
  * not be used directly.
  **/
@@ -345,170 +378,177 @@ struct pb
   {
     // compute dimensions
     int nbInnerLoop = lhs.sizeCols()/blockSize; // = rhs.sizeRows()/blockSize;
-    int nbColBlocks = rhs.sizeCols()/blockSize;
-    int nbRowPanels = lhs.sizeRows()/panelSize;
-    // remaining sizes in the matrices
-    int pSize = lhs.sizeRows() - panelSize*nbRowPanels;
-    int bSize = rhs.sizeCols() - blockSize*nbColBlocks;
-    //
-   int tSize = lhs.sizeCols() -  blockSize*(lhs.sizeCols()/blockSize) ;
-               // = rhs.sizeRows() -  rhs.sizeRows()/blockSize
-    // create block and panels
-    Type* p_block  = new Type[blockSize*blockSize];
-    Type* p_panel  = new Type[blockSize*panelSize];
-    Type* p_result  = new Type[blockSize*panelSize];
-    // start blocks by panel
-    for (int k = 0, iPos = rhs.beginRows(); k<nbInnerLoop; ++k, iPos += blockSize)
-    {
-      for (int j = 0, iCol = rhs.beginCols(); j<nbColBlocks; ++j, iCol+=blockSize)
-      {
-        // fixed block
-        arrayToBlock( rhs, p_block, iPos, iCol);
+    int nbBlocks = rhs.sizeCols()/blockSize;
+    int nbPanels = lhs.sizeRows()/panelSize;
 
-        // move the panels
-        for (int i = 0, iRow= lhs.beginRows(); i<nbRowPanels; ++i, iRow+= panelSize)
-        {
-          arrayToPanel( lhs, p_panel, iRow, iPos);
-          blockByPanel( p_block, p_panel, p_result, res, iRow, iCol);
-        } // i loop
-        int iRow = lhs.beginRows() + panelSize * nbRowPanels;
-        // partial panel part : the panels have pSize columns
-        arrayToPanel( lhs, p_panel, iRow, iPos, pSize);
-        blockByPanel( p_block, p_panel, p_result, res, iRow, iCol, pSize);
-      } // j loop
-      int iCol = rhs.beginCols() + blockSize * nbColBlocks;
-      // fixed partial block
-      arrayToBlock( rhs, p_block, iPos, iCol, bSize);
-      // move the panels : the panel for the result have bSize rows
-      for (int i = 0, iRow= lhs.beginRows(); i<nbRowPanels; ++i, iRow+= panelSize)
+    // remaining sizes in the matrices
+    int pSize = lhs.sizeRows() - panelSize*nbPanels;
+    int bSize = rhs.sizeCols() - blockSize*nbBlocks;
+    int tSize = lhs.sizeCols() - blockSize*nbInnerLoop;
+    //
+    int lastCol = rhs.beginCols() + blockSize * nbBlocks;
+    int lastRow = lhs.beginRows() + panelSize * nbPanels;
+    int lastPos = rhs.beginRows() + blockSize * nbInnerLoop;
+
+    // create panels
+    Panel<Type>* tabPanel = new Panel<Type>[nbPanels+1];
+    Block<Type>* tabBlock = new Block<Type>[nbBlocks+1];
+    // start blocks by panel
+    for (int k = 0, kPos = rhs.beginRows(); k<nbInnerLoop; ++k, kPos += blockSize)
+    {
+      // get panels
+      for (int i = 0, iRow= lhs.beginRows(); i<nbPanels; ++i, iRow+= panelSize)
+      { arrayToPanel( lhs, tabPanel[i], iRow, kPos);}
+      arrayToPanel( lhs, tabPanel[nbPanels], lastRow, kPos, pSize);
+      // get blocks
+      for (int j = 0, jCol = rhs.beginCols(); j<nbBlocks; ++j, jCol+=blockSize)
+      { arrayToBlock( rhs, tabBlock[j], kPos, jCol);}
+      arrayToBlock( rhs, tabBlock[nbBlocks], kPos, lastCol, bSize);
+      // perform the products blocks * panel
+      for (int j = 0, jCol = rhs.beginCols(); j<nbBlocks; ++j, jCol+=blockSize)
       {
-        arrayToPanel( lhs, p_panel, iRow, iPos);
-        blockByPanel( p_block, p_panel, p_result, res, iRow, iCol, panelSize, bSize);
-      } // i loop
-      int iRow = lhs.beginRows() + panelSize * nbRowPanels;
-      // partial panel part : the panels have pSize columns
-      arrayToPanel( lhs, p_panel, iRow, iPos, pSize);
-      blockByPanel( p_block, p_panel, p_result, res, iRow, iCol, pSize, bSize);
+        for (int i = 0, iRow= lhs.beginRows(); i<nbPanels; ++i, iRow+= panelSize)
+        { panelByBlock( tabPanel[i], tabBlock[j], res, iRow, jCol);}
+        panelByBlock( tabPanel[nbPanels], tabBlock[j], res, lastRow, jCol, pSize);
+      } // j loop
+      // move the panels : the panel for the result have bSize rows
+      for (int i = 0, iRow= lhs.beginRows(); i<nbPanels; ++i, iRow+= panelSize)
+      { panelByBlock( tabPanel[i],  tabBlock[nbBlocks], res, iRow, lastCol, panelSize, bSize);}
+      panelByBlock( tabPanel[nbPanels],  tabBlock[nbBlocks], res, lastRow, lastCol, pSize, bSize);
     } // k loop
-    delete[] p_block;
-    delete[] p_panel;
-    delete[] p_result;
-    int iPos = rhs.beginRows() + blockSize * nbInnerLoop;
+    delete[] tabPanel;
+    delete[] tabBlock;
     // treat the remaining rows, columns
     switch (tSize)
     {
       case 1:
-        MultCoeff::mult1(lhs, rhs, res, iPos, iPos);
+        MultCoeff::mult1(lhs, rhs, res, lastPos, lastPos);
         break;
       case 2:
-        MultCoeff::mult2(lhs, rhs, res, iPos, iPos);
+        MultCoeff::mult2(lhs, rhs, res, lastPos, lastPos);
         break;
       case 3:
-        MultCoeff::mult3(lhs, rhs, res, iPos, iPos);
+        MultCoeff::mult3(lhs, rhs, res, lastPos, lastPos);
         break;
       default:
         break;
     }
   }
   /** default dimensions */
-  static void arrayToBlock( Rhs const& rhs, Type* p_block
-                          , int iRow, int iCol)
+  static void arrayToBlock( Rhs const& rhs, Block<Type>& block, int iRow, int jCol)
   {
-    p_block[0]  = rhs.elt(iRow  , iCol);
-    p_block[1]  = rhs.elt(iRow+1, iCol);
-    p_block[2]  = rhs.elt(iRow+2, iCol);
-    p_block[3]  = rhs.elt(iRow+3, iCol);
-    p_block[4]  = rhs.elt(iRow  , iCol+1);
-    p_block[5]  = rhs.elt(iRow+1, iCol+1);
-    p_block[6]  = rhs.elt(iRow+2, iCol+1);
-    p_block[7]  = rhs.elt(iRow+3, iCol+1);
-    p_block[8]  = rhs.elt(iRow  , iCol+2);
-    p_block[9]  = rhs.elt(iRow+1, iCol+2);
-    p_block[10] = rhs.elt(iRow+2, iCol+2);
-    p_block[11] = rhs.elt(iRow+3, iCol+2);
-    p_block[12] = rhs.elt(iRow  , iCol+3);
-    p_block[13] = rhs.elt(iRow+1, iCol+3);
-    p_block[14] = rhs.elt(iRow+2, iCol+3);
-    p_block[15] = rhs.elt(iRow+3, iCol+3);
+    block[0]  = rhs.elt(iRow  , jCol);
+    block[1]  = rhs.elt(iRow+1, jCol);
+    block[2]  = rhs.elt(iRow+2, jCol);
+    block[3]  = rhs.elt(iRow+3, jCol);
+    block[4]  = rhs.elt(iRow  , jCol+1);
+    block[5]  = rhs.elt(iRow+1, jCol+1);
+    block[6]  = rhs.elt(iRow+2, jCol+1);
+    block[7]  = rhs.elt(iRow+3, jCol+1);
+    block[8]  = rhs.elt(iRow  , jCol+2);
+    block[9]  = rhs.elt(iRow+1, jCol+2);
+    block[10] = rhs.elt(iRow+2, jCol+2);
+    block[11] = rhs.elt(iRow+3, jCol+2);
+    block[12] = rhs.elt(iRow  , jCol+3);
+    block[13] = rhs.elt(iRow+1, jCol+3);
+    block[14] = rhs.elt(iRow+2, jCol+3);
+    block[15] = rhs.elt(iRow+3, jCol+3);
   }
   /** with block size given */
-  static void arrayToBlock( Rhs const& rhs, Type* p_block
-                          , int iRow, int iCol, int bSize)
+  static void arrayToBlock( Rhs const& rhs, Block<Type>& block, int iRow, int jCol, int bSize)
   {
     for (int j=0; j<bSize; ++j)
     {
-      p_block[j*blockSize]    = rhs.elt(iRow,   iCol+j);
-      p_block[j*blockSize+1]  = rhs.elt(iRow+1, iCol+j);
-      p_block[j*blockSize+2]  = rhs.elt(iRow+2, iCol+j);
-      p_block[j*blockSize+3]  = rhs.elt(iRow+3, iCol+j);
+      block[j*blockSize]    = rhs.elt(iRow,   jCol+j);
+      block[j*blockSize+1]  = rhs.elt(iRow+1, jCol+j);
+      block[j*blockSize+2]  = rhs.elt(iRow+2, jCol+j);
+      block[j*blockSize+3]  = rhs.elt(iRow+3, jCol+j);
     }
   }
   /** default dimensions */
-  static void arrayToPanel( Lhs const& lhs, Type* p_panel
-                          , int iRow, int iCol)
+  static void arrayToPanel( Lhs const& lhs, Panel<Type>& panel, int iRow, int kPos)
   {
     for (int i=0; i<panelSize; ++i)
     {
-      p_panel[i*blockSize]   = lhs.elt(iRow+i,iCol);
-      p_panel[i*blockSize+1] = lhs.elt(iRow+i,iCol+1);
-      p_panel[i*blockSize+2] = lhs.elt(iRow+i,iCol+2);
-      p_panel[i*blockSize+3] = lhs.elt(iRow+i,iCol+3);
+      panel[i*blockSize]   = lhs.elt(iRow+i,kPos);
+      panel[i*blockSize+1] = lhs.elt(iRow+i,kPos+1);
+      panel[i*blockSize+2] = lhs.elt(iRow+i,kPos+2);
+      panel[i*blockSize+3] = lhs.elt(iRow+i,kPos+3);
     }
   }
   /** with panel size dimension given */
-  static void arrayToPanel( Lhs const& lhs, Type* p_panel
-                          , int iRow, int iCol, int pSize)
+  static void arrayToPanel( Lhs const& lhs, Panel<Type>& panel, int iRow, int kPos, int pSize)
   {
     for (int i=0; i<pSize; ++i)
     {
-      p_panel[i*blockSize]   = lhs.elt(iRow+i,iCol);
-      p_panel[i*blockSize+1] = lhs.elt(iRow+i,iCol+1);
-      p_panel[i*blockSize+2] = lhs.elt(iRow+i,iCol+2);
-      p_panel[i*blockSize+3] = lhs.elt(iRow+i,iCol+3);
+      panel[i*blockSize]   = lhs.elt(iRow+i,kPos);
+      panel[i*blockSize+1] = lhs.elt(iRow+i,kPos+1);
+      panel[i*blockSize+2] = lhs.elt(iRow+i,kPos+2);
+      panel[i*blockSize+3] = lhs.elt(iRow+i,kPos+3);
     }
   }
   /** Default dimension */
-  static void blockByPanel( Type const* p_block, Type const* p_panel, Type* p_result
-                          , Result& res, int iRow, int iCol)
+  static void panelByBlock( Panel<Type> const& panel, Block<Type> const& block
+                          , Result& res, int iRow, int jCol)
   {
-    Cmult::blockByPanel( p_block, p_panel, p_result);
     for (int i=0; i<panelSize; ++i)
     {
-      res.elt(iRow+i,iCol)   += p_result[i*blockSize];
-      res.elt(iRow+i,iCol+1) += p_result[i*blockSize+1];
-      res.elt(iRow+i,iCol+2) += p_result[i*blockSize+2];
-      res.elt(iRow+i,iCol+3) += p_result[i*blockSize+3];
+      res.elt(iRow+i,jCol)   += panel[i*blockSize]    * block[0]
+                              + panel[i*blockSize+ 1] * block[1]
+                              + panel[i*blockSize+ 2] * block[2]
+                              + panel[i*blockSize+ 3] * block[3];
+      res.elt(iRow+i,jCol+1) += panel[i*blockSize]    * block[4]
+                              + panel[i*blockSize+ 1] * block[5]
+                              + panel[i*blockSize+ 2] * block[6]
+                              + panel[i*blockSize+ 3] * block[7];
+      res.elt(iRow+i,jCol+2) += panel[i*blockSize]    * block[8]
+                              + panel[i*blockSize+ 1] * block[9]
+                              + panel[i*blockSize+ 2] * block[10]
+                              + panel[i*blockSize+ 3] * block[11];
+      res.elt(iRow+i,jCol+3) += panel[i*blockSize]    * block[12]
+                              + panel[i*blockSize+ 1] * block[13]
+                              + panel[i*blockSize+ 2] * block[14]
+                              + panel[i*blockSize+ 3] * block[15];
     }
   }
-  /** with panel size dimension given */
-  static void blockByPanel( Type const* p_block, Type const* p_panel, Type* p_result
-                          , Result& res, int iRow, int iCol, int pSize)
+  static void panelByBlock( Panel<Type> const& panel, Block<Type> const& block
+                          , Result& res, int iRow, int jCol, int pSize)
   {
-    Cmult::blockByPanel( p_block, p_panel, p_result, pSize);
     for (int i=0; i<pSize; ++i)
     {
-      res.elt(iRow+i,iCol)   += p_result[i*blockSize];
-      res.elt(iRow+i,iCol+1) += p_result[i*blockSize+1];
-      res.elt(iRow+i,iCol+2) += p_result[i*blockSize+2];
-      res.elt(iRow+i,iCol+3) += p_result[i*blockSize+3];
+      res.elt(iRow+i,jCol)   += panel[i*blockSize]    * block[0]
+                              + panel[i*blockSize+ 1] * block[1]
+                              + panel[i*blockSize+ 2] * block[2]
+                              + panel[i*blockSize+ 3] * block[3];
+      res.elt(iRow+i,jCol+1) += panel[i*blockSize]    * block[4]
+                              + panel[i*blockSize+ 1] * block[5]
+                              + panel[i*blockSize+ 2] * block[6]
+                              + panel[i*blockSize+ 3] * block[7];
+      res.elt(iRow+i,jCol+2) += panel[i*blockSize]    * block[8]
+                              + panel[i*blockSize+ 1] * block[9]
+                              + panel[i*blockSize+ 2] * block[10]
+                              + panel[i*blockSize+ 3] * block[11];
+      res.elt(iRow+i,jCol+3) += panel[i*blockSize]    * block[12]
+                              + panel[i*blockSize+ 1] * block[13]
+                              + panel[i*blockSize+ 2] * block[14]
+                              + panel[i*blockSize+ 3] * block[15];
     }
   }
   /** with panel size dimension given */
-  static void blockByPanel( Type const* p_block, Type const* p_panel, Type* p_result
-                          , Result& res, int iRow, int iCol, int pSize, int bSize)
+  static void panelByBlock( Panel<Type> const& panel, Block<Type> const&  block
+                          , Result& res, int iRow, int jCol, int pSize, int bSize)
   {
-    Cmult::blockByPanel( p_block, p_panel, p_result, pSize, bSize);
     for (int i=0; i<pSize; ++i)
       for (int j=0; j<bSize; ++j)
-        res.elt(iRow+i,iCol+j) += p_result[i*bSize+j];
+        res.elt(iRow+i,jCol+j) += panel[i*blockSize]   * block[j*blockSize]
+                                + panel[i*blockSize+1] * block[j*blockSize+1]
+                                + panel[i*blockSize+2] * block[j*blockSize+2]
+                                + panel[i*blockSize+3] * block[j*blockSize+3];
   }
 }; // struct pb
 
-
 } // namespace hidden
-
-
 
 } // namespace STK
 
-#endif /* STK_MATRIXBYMATRIXPRODUCT_H */
+#endif /* STK_GENERALBYGENERALPRODUCT_H */

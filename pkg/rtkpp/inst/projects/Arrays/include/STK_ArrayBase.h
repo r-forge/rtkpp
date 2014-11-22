@@ -150,7 +150,7 @@ class ArrayBase :  public ExprBase<Derived>
     /** @return a constant reference on element (i,j) of the 2D container
      *  @param i, j indexes of the row and of the column
      **/
-    inline Type const elt(int i, int j) const
+    inline Type const& elt(int i, int j) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (this->beginRows() > i)
@@ -175,7 +175,7 @@ class ArrayBase :  public ExprBase<Derived>
     /** @return the constant ith element
      *  @param i index of the ith element
      **/
-    inline Type const elt(int i) const
+    inline Type const& elt(int i) const
     {
       STK_STATICASSERT_ONE_DIMENSION_ONLY(Derived)
       return this->asDerived().elt1Impl(i);
@@ -187,7 +187,7 @@ class ArrayBase :  public ExprBase<Derived>
       return this->asDerived().elt0Impl();
     }
     /** @return a constant reference on the number */
-    inline Type const elt() const
+    inline Type const& elt() const
     {
       STK_STATICASSERT_ZERO_DIMENSION_ONLY(Derived)
       return this->asDerived().elt0Impl();
@@ -199,7 +199,7 @@ class ArrayBase :  public ExprBase<Derived>
     /** @return the ith element
      *  @param i index of the ith element
      **/
-    inline Type const operator[](int i) const { return this->asDerived().elt1Impl(i);}
+    inline Type const& operator[](int i) const { return this->asDerived().elt1Impl(i);}
     /** @return the ith element
      *  @param I range to get
      **/
@@ -225,7 +225,7 @@ class ArrayBase :  public ExprBase<Derived>
      *  @param i index of the row
      *  @param j index of the column
      **/
-    inline Type const operator()(int i, int j) const
+    inline Type const& operator()(int i, int j) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (this->beginRows() > i)
@@ -259,7 +259,7 @@ class ArrayBase :  public ExprBase<Derived>
      *  @param i index of the row
      *  @param j index of the col
      **/
-    Type const at(int i, int j) const
+    Type const& at(int i, int j) const
     {
       if (this->beginRows() > i)
       { STKOUT_OF_RANGE_2ARG(ArrayBase::at, i, j, beginRows() > i);}
@@ -285,7 +285,7 @@ class ArrayBase :  public ExprBase<Derived>
     /** @return safely the constant ith element
      *  @param i index of the element
      **/
-    Type const at(int i) const
+    Type const& at(int i) const
     {
       if (this->asDerived().begin() > i)
       { STKOUT_OF_RANGE_1ARG(ArrayBase::at, i, begin() > i);}
@@ -294,7 +294,7 @@ class ArrayBase :  public ExprBase<Derived>
       return this->asDerived().elt1Impl(i);
     }
     /** @return a constant reference on the number */
-    inline Type const operator()() const { return this->asDerived().elt0Impl();}
+    inline Type const& operator()() const { return this->asDerived().elt0Impl();}
     /** @return the number */
     inline Type& operator()() { return this->asDerived().elt0Impl();}
 
@@ -345,9 +345,9 @@ class ArrayBase :  public ExprBase<Derived>
     /** @return the last element */
     inline Type& back() { return elt(this->lastIdx());}
     /** @return the first element */
-    inline Type const front() const { return elt(this->begin());}
+    inline Type const& front() const { return elt(this->begin());}
     /** @return the last element */
-    inline Type const back() const { return elt(this->lastIdx());}
+    inline Type const& back() const { return elt(this->lastIdx());}
    /** Convenient operator to set the coefficients of a matrix.
       *
       * The coefficients must be provided in the row/column order and exactly

@@ -148,7 +148,7 @@ class Array2DDiagonal : public IArray2D< Array2DDiagonal<Type> >
     /** @param i index of the diagonal element
      *  @return a constant reference on the ith diagonal element
      **/
-    inline Type const elt1Impl(int const& i) const
+    inline Type const& elt1Impl(int const& i) const
     { return this->elt(i,i);}
     /** New beginning index for the object.
      *  @param beg first index of the container

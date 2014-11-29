@@ -53,7 +53,6 @@ struct MixtureTraits< Gaussian_sj<_Array> >
   typedef _Array Array;
   typedef typename Array::Type Type;
   typedef Gaussian_sj_Parameters Parameters;
-  typedef MixtureComponent<_Array, Parameters> Component;
   typedef Array2D<Real>        Param;
 };
 
@@ -72,13 +71,13 @@ class Gaussian_sj : public DiagGaussianBase<Gaussian_sj<Array> >
 {
   public:
     typedef DiagGaussianBase<Gaussian_sj<Array> > Base;
-    typedef typename Clust::MixtureTraits< Gaussian_sj<Array> >::Component Component;
     typedef typename Clust::MixtureTraits< Gaussian_sj<Array> >::Parameters Parameters;
 
     using Base::p_tik;
+    using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::components;
+    using Base::paramMean_;
 
     /** default constructor
      * @param nbCluster number of cluster in the model
@@ -113,11 +112,26 @@ class Gaussian_sj : public DiagGaussianBase<Gaussian_sj<Array> >
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable()+this->nbVariable();}
+    /** set the parameters of the model*/
+    void setParameters();
 
   protected:
     /** Common standard deviation */
     Array2DPoint<Real> sigma_;
 };
+
+/* set the parameters of the model */
+template<class Array>
+void Gaussian_sj<Array>::setParameters()
+{
+  for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
+  { sigma_[j] = paramMean_(baseIdx+1, j);}
+  for (int k= 0; k < this->nbCluster(); ++k)
+  {
+    for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
+    { p_param(baseIdx+k)->mean_[j] = paramMean_(baseIdx+2*k, j);}
+  }
+}
 
 /* Initialize randomly the parameters of the Gaussian mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation

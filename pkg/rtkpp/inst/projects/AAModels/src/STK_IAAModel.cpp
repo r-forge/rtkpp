@@ -54,7 +54,7 @@ namespace STK
 /* Constructor.
  *  @param p_workData A pointer on the the working data set
  **/
-IAAModel::IAAModel( Matrix* p_workData)
+IAAModel::IAAModel( ArrayXX* p_workData)
                   : p_regressor_(0)
                   , p_reductor_(0)
                   , p_workData_(p_workData)
@@ -68,7 +68,7 @@ IAAModel::IAAModel( Matrix* p_workData)
                   , isStandardized_(false)
 {}
 
-IAAModel::IAAModel( Matrix& workData)
+IAAModel::IAAModel( ArrayXX& workData)
                   : p_regressor_(0)
                   , p_reductor_(0)
                   , p_workData_(&workData)
@@ -84,7 +84,10 @@ IAAModel::IAAModel( Matrix& workData)
 
 /* destructor */
 IAAModel::~IAAModel()
-{ }
+{
+  if (p_reduced_)   delete p_reduced_;
+  if (p_predicted_) delete p_predicted_;
+}
 
 /* set the dimension of the model
  */
@@ -93,7 +96,7 @@ void IAAModel::setDimension( int const& dim) { dim_ = dim;}
 /* set the working set with the Data to treat.
  * @param p_reductor a pointer on the reduction dimension method to use
  */
-void IAAModel::setWorkData( Matrix& workData)
+void IAAModel::setWorkData( ArrayXX& workData)
 {
   p_workData_ = &workData;
   isCentered_     = false;
@@ -107,7 +110,7 @@ void IAAModel::setReductor( IReduct* p_reductor)
 /* set the regression method.
  * @param p_regressor a pointer on the regresssion method to use
  */
-void IAAModel::setRegressor( IRegression<Matrix, Matrix, Vector>* p_regressor)
+void IAAModel::setRegressor( IRegression<ArrayXX, ArrayXX, Vector>* p_regressor)
 { p_regressor_ = p_regressor;}
 
 /** delete the reductor allocated set to this model. */
@@ -224,8 +227,8 @@ void IAAModel::regressionStep()
   // compute regression
   p_regressor_->run();
   // get results
-  p_predicted_ = p_regressor_->p_predicted();
-  p_residuals_ = p_regressor_->p_residuals();
+  p_predicted_ = p_regressor_->p_predicted()->clone();
+  p_residuals_ = p_regressor_->p_residuals()->clone();
 }
 /* compute the weighted regression **/
 void IAAModel::regression( Vector const& weights)
@@ -235,8 +238,8 @@ void IAAModel::regression( Vector const& weights)
                            "regressor have not be set."));
   p_regressor_->run(weights);
   // get results
-  p_predicted_ = p_regressor_->p_predicted();
-  p_residuals_ = p_regressor_->p_residuals();
+  p_predicted_ = p_regressor_->p_predicted()->clone();
+  p_residuals_ = p_regressor_->p_residuals()->clone();
 }
 
 /* destandardize the predicted result and residuals */

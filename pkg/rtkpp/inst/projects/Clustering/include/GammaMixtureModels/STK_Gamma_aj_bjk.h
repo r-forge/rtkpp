@@ -53,7 +53,6 @@ struct MixtureTraits< Gamma_aj_bjk<_Array> >
 {
   typedef _Array Array;
   typedef typename Array::Type Type;
-  typedef MixtureComponent<_Array, Gamma_aj_bjk_Parameters> Component;
   typedef Gamma_aj_bjk_Parameters        Parameters;
   typedef Array2D<Real>        Param;
 };
@@ -73,14 +72,13 @@ template<class Array>
 class Gamma_aj_bjk : public GammaBase< Gamma_aj_bjk<Array> >
 {
   public:
-    typedef typename Clust::MixtureTraits< Gamma_aj_bjk<Array> >::Component Component;
     typedef typename Clust::MixtureTraits< Gamma_aj_bjk<Array> >::Parameters Parameters;
     typedef GammaBase< Gamma_aj_bjk<Array> > Base;
 
-    using Base::p_tik;
+     using Base::p_tik;using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::components;
+    using Base::paramMean_;
     using Base::meanjk;
     using Base::variancejk;
 
@@ -118,11 +116,27 @@ class Gamma_aj_bjk : public GammaBase< Gamma_aj_bjk<Array> >
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable()+this->nbVariable();}
+    /** set the parameters of the model */
+    void setParameters();
 
   protected:
     /** common shape */
     Array2DPoint<Real> shape_;
 };
+
+/* set the parameters of the model **/
+template<class Array>
+void Gamma_aj_bjk<Array>::setParameters()
+{
+  for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
+  { shape_[j] = paramMean_(baseIdx, j);}
+  for (int k= 0; k < this->nbCluster(); ++k)
+  {
+    for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
+    { p_param(baseIdx+k)->scale_[j] = paramMean_(baseIdx+2*k+1, j);}
+  }
+}
+
 
 /* Initialize randomly the parameters of the gamma mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation
@@ -160,7 +174,7 @@ bool Gamma_aj_bjk<Array>::mStep()
   for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
   {
     Real y =0.0, x0 = 0.0;
-    for (int k= baseIdx; k < p_tik()->endCols(); ++k)
+    for (int k= baseIdx; k < components().end(); ++k)
     {
       Real mean = meanjk(j,k);
       y  += p_param(k)->tk_ * (p_param(k)->meanLog_[j]-std::log(mean));
@@ -189,7 +203,7 @@ bool Gamma_aj_bjk<Array>::mStep()
     // set values
     shape_[j] = a;
     // update bjk
-    for (int k= baseIdx; k < p_tik()->endCols(); ++k)
+    for (int k= baseIdx; k < components().end(); ++k)
     { p_param(k)->scale_[j] = meanjk(j, k)/a;}
   }
   return true;

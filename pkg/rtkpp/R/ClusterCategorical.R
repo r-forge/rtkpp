@@ -223,7 +223,7 @@ setMethod(
       cat("* probabilities = \n");
       print(format(x@plkj[,k,]), quote=FALSE);
       cat("* levels = \n");
-      print(format(x@levels), quote=FALSE);
+      print(format(x@levels));
     }
 )
 
@@ -236,6 +236,8 @@ setMethod(
     {
       cat("* probabilities = \n");
       print(format(object@plkj), quote=FALSE);
+      cat("* levels = \n");
+      print(format(object@levels));
     }
 )
 

@@ -49,7 +49,7 @@ namespace STK
 namespace Stat
 {
 
-typedef Multivariate<Matrix, Real> MultivariateMatrix;
+typedef Multivariate<ArrayXX, Real> MultivariateArrayXX;
 
 /** @ingroup StatDesc
  *  @brief Computation of the Multivariate Statistics of a 2D Container
@@ -69,7 +69,7 @@ class Multivariate<Array, Real> : public IRunnerUnsupervised< Array, typename Ar
 
   public:
     /** Constructor.
-     *  Compute the Multivariate statistics of the Matrix data set.
+     *  Compute the Multivariate statistics of the Array data set.
      *  @param data the data set
      **/
     Multivariate( Array const& data)
@@ -84,7 +84,7 @@ class Multivariate<Array, Real> : public IRunnerUnsupervised< Array, typename Ar
     { }
 
     /** Constructor.
-     *  Compute the Multivariate statistics of the Matrix p_data set.
+     *  Compute the Multivariate statistics of the Array p_data set.
      *  @param p_data a pointer on the data set
      **/
     Multivariate( Array const* p_data)
@@ -130,13 +130,13 @@ class Multivariate<Array, Real> : public IRunnerUnsupervised< Array, typename Ar
     /**@return the variance of the variables in a RowVector */
     inline RowVector const& variance() const { return var_;}
     /** @return the covariance of the variables in a square matrix */
-    inline MatrixSquare const& covariance() const { return cov_;}
+    inline ArraySquareX const& covariance() const { return cov_;}
 
     /** run the estimation of the Multivariate statistics. **/
     virtual bool run()
     {
       if (!this->p_data_)
-      { this->msg_error_ = STKERROR_NO_ARG(MultivariateMatrix::run(),data have not be set);
+      { this->msg_error_ = STKERROR_NO_ARG(MultivariateArrayXX::run(),data have not be set);
         return false;
       }
       try
@@ -159,7 +159,7 @@ class Multivariate<Array, Real> : public IRunnerUnsupervised< Array, typename Ar
       }
       catch (Exception const& error)
       {
-        this->msg_error_ += _T("Error in MultivariateMatrix::run():\nWhat: ");
+        this->msg_error_ += _T("Error in MultivariateArrayXX::run():\nWhat: ");
         this->msg_error_ += error.error();
         return false;
       }
@@ -172,11 +172,11 @@ class Multivariate<Array, Real> : public IRunnerUnsupervised< Array, typename Ar
     virtual bool run( ColVector const& weights)
     {
       if (!this->p_data_)
-      { this->msg_error_ = STKERROR_NO_ARG(MultivariateMatrix::run(weights),data have not be set);
+      { this->msg_error_ = STKERROR_NO_ARG(MultivariateArrayXX::run(weights),data have not be set);
         return false;
       }
       if (this->p_data_->rows() != weights.rows())
-      { this->msg_error_ = STKERROR_NO_ARG(MultivariateMatrix::run(weights),data and weights does not have not the same size);
+      { this->msg_error_ = STKERROR_NO_ARG(MultivariateArrayXX::run(weights),data and weights does not have not the same size);
         return false;
       }
       try
@@ -198,7 +198,7 @@ class Multivariate<Array, Real> : public IRunnerUnsupervised< Array, typename Ar
       }
       catch (Exception const& error)
       {
-        this->msg_error_  = _T("Error in MultivariateMatrix::run(weights): ");
+        this->msg_error_  = _T("Error in MultivariateArrayXX::run(weights): ");
         this->msg_error_ += error.error();
         return false;
       }
@@ -220,8 +220,8 @@ class Multivariate<Array, Real> : public IRunnerUnsupervised< Array, typename Ar
     RowVector mean_;
     /** Vector of the variance of the variables */
     RowVector var_;
-    /** Matrix of the covariance of the variables */
-    MatrixSquare cov_;
+    /** Array of the covariance of the variables */
+    ArraySquareX cov_;
 
     /** udpating method in case we set a new data set */
     virtual void update()
@@ -258,7 +258,7 @@ class Multivariate<Array, Real> : public IRunnerUnsupervised< Array, typename Ar
  *  @c false otherwise (default is @c false)
  **/
 template < class Array >
-void covariance( Array const& V, MatrixSquare & cov, bool unbiased = false)
+void covariance( Array const& V, ArraySquareX & cov, bool unbiased = false)
 {
   typename Array::Row mean;
   // compute the mean
@@ -286,7 +286,7 @@ void covariance( Array const& V, MatrixSquare & cov, bool unbiased = false)
  *  @c false otherwise (default is @c false)
  **/
 template <class Array, class WColVector >
-void covariance( Array const& V, WColVector const& W, MatrixSquare & cov, bool unbiased = false)
+void covariance( Array const& V, WColVector const& W, ArraySquareX & cov, bool unbiased = false)
 {
   typedef typename Array::Row RowVector;
   typedef typename Array::Col ColVector;

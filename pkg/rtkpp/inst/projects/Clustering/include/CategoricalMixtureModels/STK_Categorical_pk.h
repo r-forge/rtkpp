@@ -53,7 +53,6 @@ struct MixtureTraits< Categorical_pk<_Array> >
   typedef _Array Array;
   typedef typename Array::Type Type;
   typedef Categorical_pkParameters Parameters;
-  typedef MixtureComponent<_Array, Parameters> Component;
   typedef Array2D<Real>   Param;
 };
 
@@ -72,15 +71,14 @@ class Categorical_pk : public CategoricalBase<Categorical_pk<Array> >
 {
   public:
     typedef CategoricalBase<Categorical_pk<Array> > Base;
-    typedef typename Clust::MixtureTraits< Categorical_pk<Array> >::Component Component;
     typedef typename Clust::MixtureTraits< Categorical_pk<Array> >::Parameters Parameters;
 
-    typedef Array2D<Real>::ColVector ColVector;
-
     using Base::p_tik;
+    using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::components;
+    using Base::paramMean_;
+    using Base::modalities_;
 
     /** default constructor
      * @param nbCluster number of cluster in the model
@@ -103,12 +101,28 @@ class Categorical_pk : public CategoricalBase<Categorical_pk<Array> >
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*(this->modalities_.size()-1);}
+    /** set the parameters of the model */
+    void setParameters();
 };
 
-/** Initialize the parameters using mStep. */
+/* set the parameters of the model */
 template<class Array>
-bool Categorical_pk<Array>::initializeStep()
-{ return mStep();}
+void Categorical_pk<Array>::setParameters()
+{
+  int nbCluster    = this->nbCluster();
+  int nbModalities = this->modalities_.size();
+  for (int k = 0; k < nbCluster; ++k)
+  {
+    for (int l = 0; l < nbModalities; ++l)
+    { p_param(baseIdx + k)->proba_[modalities_.begin() + l]
+                                  = this->paramMean_(baseIdx + k * nbModalities + l, p_data()->beginCols());
+    }
+  }
+}
+
+/* Initialize the parameters using mStep. */
+template<class Array>
+bool Categorical_pk<Array>::initializeStep() { return mStep();}
 
 /* Initialize randomly the parameters of the Categorical mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation
@@ -117,7 +131,7 @@ bool Categorical_pk<Array>::initializeStep()
 template<class Array>
 void Categorical_pk<Array>::randomInit()
 {
-  for (int k = baseIdx; k < p_tik()->endCols(); ++k)
+  for (int k = baseIdx; k < components().end(); ++k)
   {
     p_param(k)->proba_.randUnif();
     p_param(k)->proba_ /= p_param(k)->proba_.sum();
@@ -128,7 +142,7 @@ void Categorical_pk<Array>::randomInit()
 template<class Array>
 bool Categorical_pk<Array>::mStep()
 {
-  for (int k = baseIdx; k < p_tik()->endCols(); ++k)
+  for (int k = baseIdx; k < components().end(); ++k)
   {
     p_param(k)->proba_ = 0.;
     for (int j = p_data()->beginCols(); j < p_data()->endCols(); ++j)

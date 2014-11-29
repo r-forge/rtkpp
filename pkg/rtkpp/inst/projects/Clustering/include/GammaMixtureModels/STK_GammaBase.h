@@ -97,12 +97,13 @@ class GammaBase : public IMixtureModel<Derived >
 {
   public:
     typedef IMixtureModel<Derived > Base;
-    typedef Array2D<Real>::Col ColVector;
+    typedef ArrayXX::Col ColVector;
 
     using Base::p_tik;
+    using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::components;
+    using Base::paramMean_;
 
   protected:
     /** default constructor
@@ -121,7 +122,7 @@ class GammaBase : public IMixtureModel<Derived >
     Real impute(int i, int j) const
     {
       Real sum = 0.;
-      for (int k= p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
+      for (int k= p_tik()->beginCols(); k < components().end(); ++k)
       { sum += p_tik()->elt(i,k) * p_param(k)->shape(j) * p_param(k)->scale(j);}
       return sum;
     }
@@ -137,6 +138,8 @@ class GammaBase : public IMixtureModel<Derived >
      *  @param params the array to fill with the parameters of the model
      **/
     void getParameters(Array2D<Real>& params) const;
+    /** @return the parameters of the model in an array of size (K * 2d). */
+    ArrayXX getParametersImpl() const;
     /** Write the parameters on the output stream os */
     void writeParameters(ostream& os) const;
 
@@ -161,16 +164,33 @@ void GammaBase<Derived>::getParameters(Array2D<Real>& params) const
 {
   int nbClust = this->nbCluster();
   params.resize(2*nbClust, p_data()->cols());
-
   for (int k= 0; k < nbClust; ++k)
   {
     for (int j= p_data()->beginCols();  j < p_data()->endCols(); ++j)
     {
-      params(2*k+  baseIdx, j) = p_param(k+baseIdx)->shape(j);
-      params(2*k+1+baseIdx, j) = p_param(k+baseIdx)->scale(j);
+      params(2*k+  baseIdx, j) = p_param(baseIdx+k)->shape(j);
+      params(baseIdx+2*k+1, j) = p_param(baseIdx+k)->scale(j);
     }
   }
 }
+/* get the parameters of the model in an array of size (K * 2d). */
+template<class Derived>
+ArrayXX GammaBase<Derived>::getParametersImpl() const
+{
+  Array2D<Real> params;
+  int nbClust = this->nbCluster();
+  params.resize(2*nbClust, p_data()->cols());
+  for (int k= 0; k < nbClust; ++k)
+  {
+    for (int j= p_data()->beginCols();  j < p_data()->endCols(); ++j)
+    {
+      params(2*k+  baseIdx, j) = p_param(baseIdx+k)->shape(j);
+      params(baseIdx+2*k+1, j) = p_param(baseIdx+k)->scale(j);
+    }
+  }
+  return params;
+}
+
 /* Write the parameters on the output stream os */
 template<class Derived>
 void GammaBase<Derived>::writeParameters(ostream& os) const
@@ -194,7 +214,7 @@ void GammaBase<Derived>::writeParameters(ostream& os) const
 template<class Derived>
 bool GammaBase<Derived>::moments()
 {
-  for (int k= p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
+  for (int k= p_tik()->beginCols(); k < components().end(); ++k)
   {
     ColVector tik(p_tik()->col(k), true); // create a reference
     p_param(k)->tk_ = tik.sum();
@@ -222,7 +242,7 @@ template<class Derived>
 Real GammaBase<Derived>::qValue() const
 {
   Real value = 0.;
-  for (int k= p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
+  for (int k= p_tik()->beginCols(); k < components().end(); ++k)
   {
     Real sumjk=0.0;
     for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)

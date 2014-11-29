@@ -52,7 +52,6 @@ struct MixtureTraits< Gaussian_sjk<_Array> >
 {
   typedef _Array Array;
   typedef typename Array::Type Type;
-  typedef MixtureComponent<_Array, Gaussian_sjk_Parameters> Component;
   typedef Gaussian_sjk_Parameters        Parameters;
   typedef Array2D<Real>        Param;
 };
@@ -73,15 +72,14 @@ class Gaussian_sjk : public DiagGaussianBase<Gaussian_sjk<Array> >
 {
   public:
     typedef DiagGaussianBase<Gaussian_sjk<Array> > Base;
-    typedef typename Clust::MixtureTraits< Gaussian_sjk<Array> >::Component Component;
+
     typedef typename Clust::MixtureTraits< Gaussian_sjk<Array> >::Parameters Parameters;
 
-    typedef Array2D<Real>::ColVector ColVector;
-
     using Base::p_tik;
+    using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::components;
+    using Base::paramMean_;
 
     /** default constructor
      * @param nbCluster number of cluster in the model
@@ -106,7 +104,23 @@ class Gaussian_sjk : public DiagGaussianBase<Gaussian_sjk<Array> >
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return 2*this->nbCluster()*this->nbVariable();}
+    /** set the parameters of the model */
+    void setParameters();
 };
+
+/* set the parameters of the model */
+template<class Array>
+void Gaussian_sjk<Array>::setParameters()
+{
+  for (int k= 0; k < this->nbCluster(); ++k)
+  {
+    for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
+    {
+      p_param(baseIdx+k)->mean_[j]  = paramMean_(baseIdx+2*k  , j);
+      p_param(baseIdx+k)->sigma_[j] = paramMean_(baseIdx+2*k+1, j);
+    }
+  }
+}
 
 /* Initialize randomly the parameters of the Gaussian mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation
@@ -117,10 +131,9 @@ void Gaussian_sjk<Array>::randomInit()
 {
   this->randomMean();
   // compute the standard deviation
-  for (int k= baseIdx; k < p_tik()->endCols(); ++k)
+  for (int k= baseIdx; k < components().end(); ++k)
   {
-    ColVector tik(p_tik()->col(k), true); // create a reference
-    p_param(k)->sigma_ = Stat::varianceWithFixedMean(*p_data(), tik, p_param(k)->mean_, false).sqrt();
+    p_param(k)->sigma_ = Stat::varianceWithFixedMean(*p_data(), p_tik()->col(k), p_param(k)->mean_, false).sqrt();
   }
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Gaussian_sjk<Array>::randomInit() done\n");
@@ -134,10 +147,9 @@ bool Gaussian_sjk<Array>::mStep()
   // compute the means
   if (!this->updateMean()) return false;
   // compute the standard deviation
-  for (int k= baseIdx; k < p_tik()->endCols(); ++k)
+  for (int k= baseIdx; k < components().end(); ++k)
   {
-    ColVector tik(p_tik()->col(k), true); // create a reference
-    p_param(k)->sigma_ = Stat::varianceWithFixedMean(*p_data(), tik, p_param(k)->mean_, false).sqrt();
+    p_param(k)->sigma_ = Stat::varianceWithFixedMean(*p_data(), p_tik()->col(k), p_param(k)->mean_, false).sqrt();
     if (p_param(k)->sigma_.nbAvailableValues() != p_param(k)->sigma_.size()) return false;
   }
   return true;

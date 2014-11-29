@@ -53,7 +53,6 @@ struct MixtureTraits< Gaussian_s<_Array> >
   typedef _Array Array;
   typedef typename Array::Type Type;
   typedef Gaussian_s_Parameters Parameters;
-  typedef MixtureComponent<_Array, Parameters> Component;
   typedef Array2D<Real>        Param;
 };
 
@@ -71,13 +70,13 @@ class Gaussian_s : public DiagGaussianBase<Gaussian_s<Array> >
 {
   public:
     typedef DiagGaussianBase<Gaussian_s<Array> > Base;
-    typedef typename Clust::MixtureTraits< Gaussian_s<Array> >::Component Component;
     typedef typename Clust::MixtureTraits< Gaussian_s<Array> >::Parameters Parameters;
 
     using Base::p_tik;
+    using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::components;
+    using Base::paramMean_;
 
     /** default constructor
      * @param nbCluster number of cluster in the model
@@ -97,7 +96,7 @@ class Gaussian_s : public DiagGaussianBase<Gaussian_s<Array> >
     {
       sigma_ = 1.0;
       for (int k= baseIdx; k < components().end(); ++k)
-      { components()[k]->p_param()->p_sigma_ = &sigma_;}
+      { p_param(k)->p_sigma_ = &sigma_;}
     }
     /** Compute the inital weighted mean and the initial common standard deviation. */
     inline bool initializeStep() { return mStep();}
@@ -111,11 +110,24 @@ class Gaussian_s : public DiagGaussianBase<Gaussian_s<Array> >
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable()+1;}
+    /** set the parameters of the model*/
+    void setParameters();
 
   protected:
     /** Common standard deviation */
     Real sigma_;
 };
+
+/* set the parameters of the model */
+template<class Array>
+void Gaussian_s<Array>::setParameters()
+{
+  sigma_ = this->paramMean_(baseIdx+1, p_data()->beginCols());
+  for (int k= 0; k < this->nbCluster(); ++k)
+  {
+    for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
+    { p_param(baseIdx+k)->mean_[j] = paramMean_(baseIdx+2*k, j);}}
+}
 
 /* Initialize randomly the parameters of the Gaussian mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation
@@ -127,7 +139,7 @@ void Gaussian_s<Array>::randomInit()
   this->randomMean();
   // compute the standard deviation
   Real variance = 0.0;
-  for (int k= baseIdx; k < p_tik()->endCols(); ++k)
+  for (int k= baseIdx; k < components().end(); ++k)
   {
     variance += ( p_tik()->col(k).transpose()
                  * (*p_data() - (Const::Vector<Real>(p_data()->rows()) * p_param(k)->mean_)
@@ -150,7 +162,7 @@ bool Gaussian_s<Array>::mStep()
   if (!this->updateMean()) return false;
   // compute the standard deviation
   Real variance = 0.0;
-  for (int k= baseIdx; k < p_tik()->endCols(); ++k)
+  for (int k= baseIdx; k < components().end(); ++k)
   {
     variance += ( p_tik()->col(k).transpose()
                  * (*p_data() - (Const::Vector<Real>(p_data()->rows()) * p_param(k)->mean_)

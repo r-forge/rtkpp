@@ -40,15 +40,15 @@
 
 namespace STK
 {
-
 // forward declaration
 template< typename Type> class Array2DSquare;
 template< typename Type> class Array2D;
 template< typename Type> class Array2DPoint;
 template< typename Type> class Array2DVector;
 
-
-typedef Array2DSquare<Real> MatrixSquare;
+typedef Array2DSquare<Real>   ArraySquareX;
+typedef Array2DSquare<double> ArraySquareXd;
+typedef Array2DSquare<int>    ArraySquareXi;
 
 namespace hidden
 {

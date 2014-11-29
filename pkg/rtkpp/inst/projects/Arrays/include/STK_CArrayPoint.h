@@ -39,21 +39,25 @@
 
 namespace STK
 {
+// forward declaration
 template< typename Type, int SizeCols_=UnknownSize, bool Orient_ = Arrays::by_row_>
 class CArrayPoint;
 
-template< typename Type, int SizeRows_, int SizeCols_, bool Orient_>
-class CArray;
-template< typename Type, int Size_, bool Orient_>
-class CArraySquare;
-template< typename Type, int SizeRows_, bool Orient_>
-class CArrayVector;
-template< typename Type, int SizeRows_, int SizeCols_, bool Orient_>
-class CArrayNumber;
+template< typename Type, int SizeRows_, int SizeCols_, bool Orient_> class CArray;
+template< typename Type, int Size_, bool Orient_> class CArraySquare;
+template< typename Type, int SizeRows_, bool Orient_> class CArrayVector;
+template< typename Type, int SizeRows_, int SizeCols_, bool Orient_> class CArrayNumber;
 
+// typedef for CArrayVector Real is by default double, but can be float
 typedef CArrayPoint<Real, UnknownSize, Arrays::by_row_>   CPointX;
 typedef CArrayPoint<Real, 2, Arrays::by_row_>             CPoint2;
 typedef CArrayPoint<Real, 3, Arrays::by_row_>             CPoint3;
+typedef CArrayPoint<double, UnknownSize, Arrays::by_row_> CPointXd;
+typedef CArrayPoint<double, 2, Arrays::by_row_>           CPoint2d;
+typedef CArrayPoint<double, 3, Arrays::by_row_>           CPoint3d;
+typedef CArrayPoint<int, UnknownSize, Arrays::by_row_>    CPointXi;
+typedef CArrayPoint<int, 2, Arrays::by_row_>              CPoint2i;
+typedef CArrayPoint<int, 3, Arrays::by_row_>              CPoint3i;
 
 namespace hidden
 {

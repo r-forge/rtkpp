@@ -35,8 +35,16 @@
 #ifndef STK_PRODUCTIMPL_H
 #define STK_PRODUCTIMPL_H
 
-#include "STK_GeneralByVectorProduct.h"
-#include "STK_GeneralByGeneralProduct.h"
+namespace STK
+{
+/* size of the block and panels used in the product algorithm */
+const int blockSize = 4;
+const int panelSize = 64;
+const int vectorSize = 256;
+}
+
+#include "STK_ArrayByVectorProduct.h"
+#include "STK_ArrayByArrayProduct.h"
 
 namespace STK
 {
@@ -78,6 +86,11 @@ struct ProductImpl
 template <class Lhs, class Rhs, class Result>
 struct ProductImpl<Lhs, Rhs, Result, Arrays::array2D_, Arrays::array2D_>
 {
+  enum
+  {
+    orientLhs_ = Lhs::orient_,
+    orientRhs_ = Rhs::orient_
+  };
   static inline void runbp(Lhs const& lhs, Rhs const& rhs, Result& res )
   { bp<Lhs,Rhs,Result>::run(lhs, rhs, res);}
   static inline void runpb(Lhs const& lhs, Rhs const& rhs, Result& res )
@@ -87,6 +100,11 @@ struct ProductImpl<Lhs, Rhs, Result, Arrays::array2D_, Arrays::array2D_>
 template <class Lhs, class Rhs, class Result>
 struct ProductImpl<Lhs, Rhs, Result, Arrays::array2D_, Arrays::square_>
 {
+  enum
+  {
+    orientLhs_ = Lhs::orient_,
+    orientRhs_ = Rhs::orient_
+  };
   static inline void runbp(Lhs const& lhs, Rhs const& rhs, Result& res )
   { bp<Lhs,Rhs,Result>::run(lhs, rhs, res);}
   static inline void runpb(Lhs const& lhs, Rhs const& rhs, Result& res )
@@ -96,6 +114,11 @@ struct ProductImpl<Lhs, Rhs, Result, Arrays::array2D_, Arrays::square_>
 template <class Lhs, class Rhs, class Result>
 struct ProductImpl<Lhs, Rhs, Result, Arrays::square_, Arrays::square_>
 {
+  enum
+  {
+    orientLhs_ = Lhs::orient_,
+    orientRhs_ = Rhs::orient_
+  };
   static inline void runbp(Lhs const& lhs, Rhs const& rhs, Result& res )
   { bp<Lhs,Rhs,Result>::run(lhs, rhs, res);}
   static inline void runpb(Lhs const& lhs, Rhs const& rhs, Result& res )
@@ -105,6 +128,11 @@ struct ProductImpl<Lhs, Rhs, Result, Arrays::square_, Arrays::square_>
 template <class Lhs, class Rhs, class Result>
 struct ProductImpl<Lhs, Rhs, Result, Arrays::square_, Arrays::array2D_>
 {
+  enum
+  {
+    orientLhs_ = Lhs::orient_,
+    orientRhs_ = Rhs::orient_
+  };
   static inline void runbp(Lhs const& lhs, Rhs const& rhs, Result& res )
   { bp<Lhs,Rhs,Result>::run(lhs, rhs, res);}
   static inline void runpb(Lhs const& lhs, Rhs const& rhs, Result& res )

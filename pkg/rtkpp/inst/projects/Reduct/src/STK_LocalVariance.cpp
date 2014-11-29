@@ -67,7 +67,7 @@ String LocalVariance::typeGraphToString( TypeGraph const& type)
  * Constructor.
  * @param data the input data set
  */
-LocalVariance::LocalVariance( Matrix const* p_data, TypeGraph type, int nbNeighbor)
+LocalVariance::LocalVariance( ArrayXX const* p_data, TypeGraph type, int nbNeighbor)
                             : ILinearReduct(p_data)
                             , type_(type)
                             , nbNeighbor_(nbNeighbor)
@@ -99,7 +99,7 @@ LocalVariance::LocalVariance( Matrix const* p_data, TypeGraph type, int nbNeighb
  * Constructor.
  * @param data the input data set
  */
-LocalVariance::LocalVariance( Matrix const& data, TypeGraph type, int nbNeighbor)
+LocalVariance::LocalVariance( ArrayXX const& data, TypeGraph type, int nbNeighbor)
                             : ILinearReduct(data)
                             , type_(type)
                             , nbNeighbor_(nbNeighbor)
@@ -283,12 +283,12 @@ void LocalVariance::computeAxis()
   SymEigen* decomp = new SymEigen(localCovariance_);
   decomp->run();
   // compute the generalized inverse of the local covariance
-  MatrixSquare inv_local;
+  ArraySquareX inv_local;
   decomp->ginv(inv_local);
   // we can safely remove the decomposition
   delete decomp;
   // compute the product
-  MatrixSquare prod;
+  ArraySquareX prod;
   prod = inv_local * covariance_;
   // compute the eigenvalues decomposition of the product
   decomp = new SymEigen(prod);
@@ -418,7 +418,7 @@ void LocalVariance::clear()
 /* initialize dimension */
 void LocalVariance::initialize()
 {
-  p_dataStatistics_ = new Stat::MultivariateMatrix(p_data_);
+  p_dataStatistics_ = new Stat::MultivariateArrayXX(p_data_);
   localCovariance_.resize(p_data_->cols());
 }
 

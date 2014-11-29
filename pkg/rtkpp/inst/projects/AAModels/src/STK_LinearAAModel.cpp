@@ -57,7 +57,7 @@ namespace STK
 /* Default constructor : compute the Linear AA models of the matrix X
  *  using the local variance as criteria.
 **/
-LinearAAModel::LinearAAModel( Matrix const& data)
+LinearAAModel::LinearAAModel( ArrayXX const& data)
                             : Runner(data)
                             , GaussianAAModel(0)
                             , workData_(data)
@@ -200,7 +200,7 @@ bool LinearAAModel::run( Vector const& weights)
  **/
 void LinearAAModel::simul( const Law::IUnivLaw<Real>& law
                          , Vector const& mu, Real const& std
-                         , Matrix& proj, Matrix& data
+                         , ArrayXX& proj, ArrayXX& data
                          )
 {
   if (data.cols() != mu.range())

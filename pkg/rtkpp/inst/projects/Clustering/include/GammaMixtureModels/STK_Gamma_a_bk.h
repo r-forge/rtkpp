@@ -53,7 +53,6 @@ struct MixtureTraits< Gamma_a_bk<_Array> >
 {
   typedef _Array Array;
   typedef typename Array::Type Type;
-  typedef MixtureComponent<_Array, Gamma_a_bk_Parameters> Component;
   typedef Gamma_a_bk_Parameters        Parameters;
   typedef Array2D<Real>        Param;
 };
@@ -73,14 +72,13 @@ template<class Array>
 class Gamma_a_bk : public GammaBase< Gamma_a_bk<Array> >
 {
   public:
-    typedef typename Clust::MixtureTraits< Gamma_a_bk<Array> >::Component Component;
     typedef typename Clust::MixtureTraits< Gamma_a_bk<Array> >::Parameters Parameters;
     typedef GammaBase< Gamma_a_bk<Array> > Base;
 
-    using Base::p_tik;
+     using Base::p_tik;using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::components;
+    using Base::paramMean_;
     using Base::meanjk;
     using Base::variancejk;
 
@@ -117,17 +115,29 @@ class Gamma_a_bk : public GammaBase< Gamma_a_bk<Array> >
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()+1;}
+    /** set the parameters of the model*/
+    void setParameters();
 
   protected:
     /** common scale */
     Real shape_;
 };
 
+
+/* set the parameters of the model */
+template<class Array>
+void Gamma_a_bk<Array>::setParameters()
+{
+  shape_ = this->paramMean_(baseIdx, p_data()->beginCols());
+  for (int k= 0; k < this->nbCluster(); ++k)
+  { p_param(baseIdx+k)->scale_ = paramMean_(baseIdx+2*k+1, p_data()->beginCols());}
+}
+
 template<class Array>
 void Gamma_a_bk<Array>::randomInit()
 {
-    // compute moments
-    this->moments();
+  // compute moments
+  this->moments();
   // generate scales
   Real value = 0.0;
   for (int k= baseIdx; k < components().end(); ++k)
@@ -179,7 +189,7 @@ bool Gamma_a_bk<Array>::mStep()
   // set values
   shape_ = a;
   // estimate b
-  for (int k= baseIdx; k < p_tik()->endCols(); ++k)
+  for (int k= baseIdx; k < components().end(); ++k)
   { p_param(k)->scale_ = this->meank(k)/a;}
   return true;
 }

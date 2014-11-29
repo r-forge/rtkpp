@@ -45,10 +45,11 @@ template< typename Type> class Array2DVector;
 
 /** @ingroup Arrays
   * @brief Specialization of the Array2D class for Real values.
-  *
-  * A Matrix is a column oriented 2D container of Real.
+  * An Array is a column oriented 2D container of Real.
  **/
-typedef Array2D<Real> Matrix;
+typedef Array2D<Real>   ArrayXX;
+typedef Array2D<double> ArrayXXd;
+typedef Array2D<int>    ArrayXXi;
 
 
 namespace hidden

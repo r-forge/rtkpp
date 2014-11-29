@@ -46,10 +46,12 @@ template<typename> class Array2DVector;
 
 /** @ingroup Arrays
   * @brief final class for a Real horizontal container.
-  *
   * A Point is a row oriented 1D container of Real.
   */
-typedef Array2DPoint<Real> Point;
+typedef Array2DPoint<Real>   Point;
+typedef Array2DPoint<Real>   PointX;
+typedef Array2DPoint<double> PointXd;
+typedef Array2DPoint<int>    PointXi;
 
 namespace hidden
 {

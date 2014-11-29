@@ -70,9 +70,9 @@ IMixtureModelBase::~IMixtureModelBase() {}
  *  @param p_zi pointer on the class labels
  * */
 void IMixtureModelBase::setMixtureParameters( CArrayPoint<Real> const* p_pk
-                                          , Array2D<Real> const* p_tik
-                                          , CArrayVector<int> const* p_zi
-                                          )
+                                            , ArrayXX const* p_tik
+                                            , CArrayVector<int> const* p_zi
+                                            )
 {
   p_pk_ = p_pk;
   p_tik_ = p_tik;

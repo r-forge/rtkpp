@@ -56,7 +56,6 @@ struct MixtureTraits< Gamma_ak_bj<_Array> >
   typedef _Array Array;
   typedef typename Array::Type Type;
   typedef Gamma_ak_bj_Parameters Parameters;
-  typedef MixtureComponent<_Array, Parameters> Component;
   typedef Array2D<Real>        Param;
 };
 
@@ -75,16 +74,14 @@ template<class Array>
 class Gamma_ak_bj : public GammaBase<Gamma_ak_bj<Array> >
 {
   public:
-    typedef typename Clust::MixtureTraits< Gamma_ak_bj<Array> >::Component Component;
     typedef typename Clust::MixtureTraits< Gamma_ak_bj<Array> >::Parameters Parameters;
     typedef GammaBase<Gamma_ak_bj<Array> > Base;
 
-    typedef Array2D<Real>::ColVector ColVector;
-
     using Base::p_tik;
+    using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::components;
+    using Base::paramMean_;
     using Base::meanjk;
     using Base::variancejk;
 
@@ -123,11 +120,25 @@ class Gamma_ak_bj : public GammaBase<Gamma_ak_bj<Array> >
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()+ this->nbVariable();}
+    /** set the parameters of the model*/
+    void setParameters();
 
   protected:
     /** Array of the common scale */
     Array2DPoint<Real> scale_;
 };
+
+
+/* set the parameters of the model */
+template<class Array>
+void Gamma_ak_bj<Array>::setParameters()
+{
+  for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
+  { scale_[j] = paramMean_(baseIdx+1, j);}
+  for (int k= 0; k < this->nbCluster(); ++k)
+  { p_param(baseIdx+k)->shape_ = paramMean_(baseIdx+2*k, p_data()->beginCols());}
+}
+
 
 /* Initialize randomly the parameters of the Gaussian mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation
@@ -177,7 +188,7 @@ bool Gamma_ak_bj<Array>::mStep()
   for(iter=0; iter<MAXITER; ++iter)
   {
     // compute ak
-    for (int k= baseIdx; k < p_tik()->endCols(); ++k)
+    for (int k= baseIdx; k < components().end(); ++k)
     {
       // moment estimate and oldest value
       Real x0 = (p_param(k)->mean_.square()/p_param(k)->variance_).mean();
@@ -205,7 +216,7 @@ bool Gamma_ak_bj<Array>::mStep()
     for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)
     {
       Real num = 0., den = 0.;
-      for (int k= baseIdx; k < p_tik()->endCols(); ++k)
+      for (int k= baseIdx; k < components().end(); ++k)
       {
         num += p_param(k)->mean_[j] * p_param(k)->tk_;
         den += p_param(k)->shape_   * p_param(k)->tk_;

@@ -108,13 +108,16 @@ algoType stringToAlgo( std::string const& type)
  **/
 String exceptionToString( exceptions const& type)
 {
+  if (type == randomInitFail_)      return String(_T("RandomInit fail"));
+  if (type == randomClassInitFail_)     return String(_T("RandomClassInit fail"));
+  if (type == randomFuzzyInitFail_) return String(_T("RandomFuzzyInit fail"));
+  if (type == randomParamInitFail_) return String(_T("RandomParamInit fail"));
   if (type == initializeStepFail_)  return String(_T("initializeStep fail"));
-  if (type == randomInitFail_) return String(_T("RandomInit fail"));
   if (type == estimFail_) return String(_T("Estimation fail"));
-  if (type == mStepFail_)  return String(_T("mStep fail"));
-  if (type == eStepFail_)  return String(_T("eStep fail"));
-  if (type == cStepFail_)  return String(_T("cStep fail"));
-  if (type == sStepFail_)  return String(_T("sStep fail"));
+  if (type == mStepFail_) return String(_T("mStep fail"));
+  if (type == eStepFail_) return String(_T("eStep fail"));
+  if (type == cStepFail_) return String(_T("cStep fail"));
+  if (type == sStepFail_) return String(_T("sStep fail"));
   return String(_T("unknown exception"));
 }
 

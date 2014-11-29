@@ -52,7 +52,6 @@ struct MixtureTraits< Categorical_pjk<_Array> >
 {
   typedef _Array Array;
   typedef typename Array::Type Type;
-  typedef MixtureComponent<_Array, Categorical_pjkParameters> Component;
   typedef Categorical_pjkParameters        Parameters;
   typedef Array2D<Real>        Param;
 };
@@ -64,8 +63,7 @@ struct MixtureTraits< Categorical_pjk<_Array> >
  *  the most general diagonal Categorical model and have a probability
  *  function of the form
  * \f[
- *    P(\mathbf{x}=(l_1,\ldots,l_d)|\theta)
- *      = \sum_{k=1}^K p_k \prod_{j=1}^d p_{kl_j}^j.
+ *    P(\mathbf{x}=(l_1,\ldots,l_d)|\theta) = \sum_{k=1}^K p_k \prod_{j=1}^d p_{kl_j}^j.
  * \f]
  **/
 template<class Array>
@@ -73,15 +71,14 @@ class Categorical_pjk : public CategoricalBase<Categorical_pjk<Array> >
 {
   public:
     typedef CategoricalBase<Categorical_pjk<Array> > Base;
-    typedef typename Clust::MixtureTraits< Categorical_pjk<Array> >::Component Component;
     typedef typename Clust::MixtureTraits< Categorical_pjk<Array> >::Parameters Parameters;
 
-    typedef Array2D<Real>::ColVector ColVector;
-
     using Base::p_tik;
+    using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::components;
+    using Base::paramMean_;
+    using Base::modalities_;
 
     /** default constructor
      * @param nbCluster number of cluster in the model
@@ -102,7 +99,27 @@ class Categorical_pjk : public CategoricalBase<Categorical_pjk<Array> >
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*((this->nbModalities_-1).sum());}
+    /** set the parameters of the model */
+    void setParameters();
 };
+
+/* set the parameters of the model */
+template<class Array>
+void Categorical_pjk<Array>::setParameters()
+{
+  int nbCluster    = this->nbCluster();
+  int nbModalities = this->modalities_.size();
+  for (int k = 0; k < nbCluster; ++k)
+  {
+    for (int j = p_data()->beginCols(); j < p_data()->endCols(); ++j)
+    {
+      for (int l = 0; l < nbModalities; ++l)
+      { p_param(baseIdx + k)->proba_[j][modalities_.begin() + l]
+                          = this->paramMean_(baseIdx + k * nbModalities + l, j);
+      }
+    }
+  }
+}
 
 /* Initialize the parameters using mStep. */
 template<class Array>
@@ -114,7 +131,7 @@ bool Categorical_pjk<Array>::initializeStep()
 template<class Array>
 void Categorical_pjk<Array>::randomInit()
 {
-  for (int k = baseIdx; k < p_tik()->endCols(); ++k)
+  for (int k = baseIdx; k < components().end(); ++k)
   {
     for (int j=baseIdx; j< p_param(k)->proba_.end(); ++j)
     {
@@ -129,7 +146,7 @@ void Categorical_pjk<Array>::randomInit()
 template<class Array>
 bool Categorical_pjk<Array>::mStep()
 {
-  for (int k = baseIdx; k < p_tik()->endCols(); ++k)
+  for (int k = baseIdx; k < components().end(); ++k)
   {
     for (int j = p_data()->beginCols(); j < p_data()->endCols(); ++j)
     {

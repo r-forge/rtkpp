@@ -55,7 +55,6 @@ struct MixtureTraits< Exponential_bk<_Array> >
   typedef _Array Array;
   typedef typename Array::Type Type;
   typedef Exponential_bk_Parameters  Parameters;
-  typedef MixtureComponent<_Array, Parameters> Component;
   typedef Array2D<Real>            Param;
 };
 
@@ -65,23 +64,22 @@ struct MixtureTraits< Exponential_bk<_Array> >
  *  Exponential_bk is a mixture model of the following form
  * \f[
  *     f(\mathbf{x}_i|\theta) = \sum_{k=1}^K p_k
- *     \prod_{j=1}^p\left(\frac{x_i^j}{b_{k}}\right)^{a_{jk}-1}
- *                   \frac{e^{-x_i^j/b_{k}}}{b_{k} \, \Exponential(a_{jk})},
- *      \quad x_i^j>0, \quad i=1,\ldots,n.
+ *     \prod_{j=1}^p \left(\frac{x_i^j}{b_{k}}\right)^{a_{jk}-1}
+ *                   \frac{e^{-x_i^j/b_{k}}}{b_{k}} \,
+ *                    \quad x_i^j>0, \quad i=1,\ldots,n.
  * \f]
  **/
 template<class Array>
 class Exponential_bk : public ExponentialBase< Exponential_bk<Array> >
 {
   public:
-    typedef typename Clust::MixtureTraits< Exponential_bk<Array> >::Component Component;
     typedef typename Clust::MixtureTraits< Exponential_bk<Array> >::Parameters Parameters;
     typedef ExponentialBase< Exponential_bk<Array> > Base;
 
-    using Base::p_tik;
+     using Base::p_tik;using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::components;
+    using Base::paramMean_;
 
     /** default constructor
      * @param nbCluster number of cluster in the model
@@ -104,9 +102,21 @@ class Exponential_bk : public ExponentialBase< Exponential_bk<Array> >
     /** Compute the mStep. */
     bool mStep();
     /** @return the number of free parameters of the model */
-    inline int computeNbFreeParameters() const
-    { return this->nbCluster();}
+    inline int computeNbFreeParameters() const { return this->nbCluster();}
+    /** set the parameters of the model */
+    void setParameters();
 };
+
+/* set the parameters of the model
+ *  @param params the parameters of the model
+ **/
+template<class Array>
+void Exponential_bk<Array>::setParameters()
+{
+  for (int k = baseIdx; k < components().end(); ++k)
+  { p_param(k)->scale_  = this->paramMean_(k, p_data()->beginCols());}
+}
+
 
 /* Initialize randomly the parameters of the Gaussian mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation

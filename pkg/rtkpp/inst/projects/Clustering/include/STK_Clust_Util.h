@@ -132,6 +132,9 @@ enum strategyType
 enum exceptions
 {
   randomInitFail_,
+  randomParamInitFail_,
+  randomClassInitFail_,
+  randomFuzzyInitFail_,
   estimFail_,
   initializeStepFail_,
   mStepFail_,

@@ -24,13 +24,13 @@
 
 /*
  * Project:  stkpp::Arrays
- * Purpose:  Define the Upper Triangular Matrix class.
+ * Purpose:  Define the Upper Triangular Array class.
  * Author:   Serge Iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  *
  **/
 
 /** @file STK_Array2DUpperTriangular.h
-  * @brief In this file we define the MatrixTriangular class
+  * @brief In this file we define the ArrayXXTriangular class
  **/
 
 #ifndef STK_MATRIXUPPERTRIANGULAR_H
@@ -47,11 +47,12 @@ template<typename> class Array2DVector;
 
 /** @ingroup Arrays
   * @brief Specialization of the Array2D class for Type values.
-  *
   * A Array2DLowerTriangular is a column oriented 2D container of Type
   * whcih is lower triangular.
  **/
-typedef Array2DUpperTriangular<Real> MatrixUpperTriangular;
+typedef Array2DUpperTriangular<Real>   ArrayUpperTriangularXX;
+typedef Array2DUpperTriangular<double> ArrayUpperTriangularXXd;
+typedef Array2DUpperTriangular<int>    ArrayUpperTriangularXXi;
 
 namespace hidden
 {

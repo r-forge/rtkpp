@@ -69,15 +69,15 @@ int IMixture::nbSample() const { return p_composer_->nbSample();}
  */
 CArrayPoint<Real> const& IMixture::pk() const { return p_composer_->pk();}
 
-/* This function can be used in derived classes to get estimated proportions
+/* This function can be used in derived classes to get estimated numbers
  *  of individuals from the framework.
- *  @return Pointer to proportions.
+ *  @return the estiamted numbers of individuals in each classes.
  */
-Array2DPoint<Real> const& IMixture::tk() const { return p_composer_->tk();}
+Array2DPoint<Real> const& IMixture::nk() const { return p_composer_->nk();}
 /* This function can be used in derived classes to get posterior probabilities from the framework.
  *  @return Pointer to tik.
  */
-Array2D<Real> const& IMixture::tik() const { return p_composer_->tik();}
+ArrayXX const& IMixture::tik() const { return p_composer_->tik();}
 /* This function can be used in derived classes to get class labels from the framework.
  *  @return Pointer to zi.
  */
@@ -91,7 +91,7 @@ CArrayPoint<STK::Real> const* IMixture::p_pk() const { return p_composer_->p_pk(
 /* This function can be used in derived classes to get proportions from the framework.
  * @return Pointer to proportions.
  */
-Array2D<STK::Real> const* IMixture::p_tik() const { return p_composer_->p_tik();}
+ArrayXX const* IMixture::p_tik() const { return p_composer_->p_tik();}
 
 /* This function can be used in derived classes to get proportions from the framework.
  * @return Pointer to proportions.

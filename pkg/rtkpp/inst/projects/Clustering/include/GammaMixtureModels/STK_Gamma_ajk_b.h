@@ -58,7 +58,6 @@ struct MixtureTraits< Gamma_ajk_b<_Array> >
   typedef _Array Array;
   typedef typename Array::Type Type;
   typedef Gamma_ajk_b_Parameters Parameters;
-  typedef MixtureComponent<_Array, Parameters> Component;
   typedef Array2D<Real>        Param;
 };
 
@@ -77,16 +76,14 @@ template<class Array>
 class Gamma_ajk_b : public GammaBase<Gamma_ajk_b<Array> >
 {
   public:
-    typedef typename Clust::MixtureTraits< Gamma_ajk_b<Array> >::Component Component;
     typedef typename Clust::MixtureTraits< Gamma_ajk_b<Array> >::Parameters Parameters;
     typedef GammaBase<Gamma_ajk_b<Array> > Base;
 
-    typedef Array2D<Real>::ColVector ColVector;
-
     using Base::p_tik;
+    using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::components;
+    using Base::paramMean_;
     using Base::meanjk;
     using Base::variancejk;
 
@@ -124,11 +121,24 @@ class Gamma_ajk_b : public GammaBase<Gamma_ajk_b<Array> >
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable() + 1;}
+    /** set the parameters of the model */
+    void setParameters();
 
   protected:
     /** common scale */
     Real scale_;
 };
+
+/* set the parameters of the model */
+template<class Array>
+void Gamma_ajk_b<Array>::setParameters()
+{
+  scale_ = this->paramMean_(baseIdx+1, p_data()->beginCols());
+  for (int k= 0; k < this->nbCluster(); ++k)
+  {
+    for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
+    { p_param(baseIdx+k)->shape_[j] = paramMean_(baseIdx+2*k, j);}}
+}
 
 /* Initialize randomly the parameters of the gamma mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation
@@ -170,7 +180,7 @@ bool Gamma_ajk_b<Array>::mStep()
     for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)
     {
       // compute ajk
-      for (int k= baseIdx; k < p_tik()->endCols(); ++k)
+      for (int k= baseIdx; k < components().end(); ++k)
       {
         // moment estimate and oldest value
         Real x0 = meanjk(j,k)*meanjk(j,k)/variancejk(j,k);
@@ -195,7 +205,7 @@ bool Gamma_ajk_b<Array>::mStep()
       }
     }
     Real num=0., den = 0.;
-    for (int k= baseIdx; k < p_tik()->endCols(); ++k)
+    for (int k= baseIdx; k < components().end(); ++k)
     {
       num += p_param(k)->mean_.sum()  * p_param(k)->tk_;
       den += p_param(k)->shape_.sum() * p_param(k)->tk_;

@@ -39,17 +39,24 @@
 
 namespace STK
 {
-template< typename Type, int SizeRows_ =1, int SizeCols_=1, bool Orient_ = Arrays::by_col_>
-class CArrayNumber;
+// forward declaration
+template< typename Type, int SizeRows_ =1, int SizeCols_=1, bool Orient_ = Arrays::by_col_> class CArrayNumber;
 
-template< typename Type, int SizeRows_, int SizeCols_, bool Orient_>
-class CArray;
-template< typename Type, int Size_, bool Orient_>
-class CArraySquare;
-template< typename Type, int SizeCols_, bool Orient_>
-class CArrayPoint;
-template< typename Type, int SizeRows_, bool Orient_ >
-class CArrayVector;
+template< typename Type, int SizeRows_, int SizeCols_, bool Orient_> class CArray;
+template< typename Type, int Size_, bool Orient_> class CArraySquare;
+template< typename Type, int SizeCols_, bool Orient_> class CArrayPoint;
+template< typename Type, int SizeRows_, bool Orient_ > class CArrayVector;
+
+// typedef for CArrayVector Real is by default double, but can be float
+typedef CArrayNumber<Real, 1, 1, Arrays::by_col_>   CNumberX;
+typedef CArrayNumber<Real, 1, 1, Arrays::by_col_>   CNumber2;
+typedef CArrayNumber<Real, 1, 1, Arrays::by_col_>   CNumber3;
+typedef CArrayNumber<double, 1, 1, Arrays::by_col_> CNumberXd;
+typedef CArrayNumber<double, 1, 1, Arrays::by_col_> CNumber2d;
+typedef CArrayNumber<double, 1, 1, Arrays::by_col_> CNumber3d;
+typedef CArrayNumber<int, 1, 1, Arrays::by_col_>    CNumberXi;
+typedef CArrayNumber<int, 1, 1, Arrays::by_col_>    CNumber2i;
+typedef CArrayNumber<int, 1, 1, Arrays::by_col_>    CNumber3i;
 
 namespace hidden
 {

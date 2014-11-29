@@ -52,7 +52,9 @@ template<typename> class Array2DVector;
   * An Array2DLowerTriangular is a column oriented 2D container of Real
   * whcih is lower triangular.
  **/
-typedef Array2DLowerTriangular<Real> MatrixLowerTriangular;
+typedef Array2DLowerTriangular<Real>   ArrayLowerTriangularXX;
+typedef Array2DLowerTriangular<double> ArrayLowerTriangularXXd;
+typedef Array2DLowerTriangular<int>    ArrayLowerTriangularXXi;
 
 namespace hidden
 {

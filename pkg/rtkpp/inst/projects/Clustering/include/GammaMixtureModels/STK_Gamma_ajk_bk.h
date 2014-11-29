@@ -58,7 +58,6 @@ struct MixtureTraits< Gamma_ajk_bk<_Array> >
   typedef _Array Array;
   typedef typename Array::Type Type;
   typedef Gamma_ajk_bk_Parameters  Parameters;
-  typedef MixtureComponent<_Array, Parameters> Component;
   typedef Array2D<Real>            Param;
 };
 
@@ -77,14 +76,13 @@ template<class Array>
 class Gamma_ajk_bk : public GammaBase< Gamma_ajk_bk<Array> >
 {
   public:
-    typedef typename Clust::MixtureTraits< Gamma_ajk_bk<Array> >::Component Component;
     typedef typename Clust::MixtureTraits< Gamma_ajk_bk<Array> >::Parameters Parameters;
     typedef GammaBase< Gamma_ajk_bk<Array> > Base;
 
-    using Base::p_tik;
+     using Base::p_tik;using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::components;
+    using Base::paramMean_;
     using Base::meanjk;
     using Base::variancejk;
 
@@ -111,7 +109,21 @@ class Gamma_ajk_bk : public GammaBase< Gamma_ajk_bk<Array> >
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable()+this->nbCluster();}
+    /** set the parameters of the model */
+    void setParameters();
 };
+
+/* set the parameters of the model */
+template<class Array>
+void Gamma_ajk_bk<Array>::setParameters()
+{
+  for (int k= 0; k < this->nbCluster(); ++k)
+  {
+    for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
+    { p_param(baseIdx+k)->shape_[j] = paramMean_(baseIdx+2*k, j);}
+    p_param(baseIdx+k)->scale_ = paramMean_(baseIdx+2*k+1, p_data()->beginCols());
+  }
+}
 
 /* Initialize randomly the parameters of the Gaussian mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation
@@ -151,7 +163,7 @@ bool Gamma_ajk_bk<Array>::mStep()
   for(iter = 0; iter<MAXITER; ++iter)
   {
     // compute ajk
-    for (int k= baseIdx; k < p_tik()->endCols(); ++k)
+    for (int k= baseIdx; k < components().end(); ++k)
     {
       for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)
       {

@@ -214,9 +214,9 @@ namespace Arrays
 {
 
 /** @ingroup Arrays
- *  @brief Matrix sum (by coefficient)
- *  Perform the matrix sum coefficient by coefficient of the Matrix lhs
- *  by the Matrix rhs
+ *  @brief Array sum (by coefficient)
+ *  Perform the matrix sum coefficient by coefficient of the Array lhs
+ *  by the Array rhs
  **/
 template<typename Lhs, typename Rhs>
 struct SumOp
@@ -261,9 +261,9 @@ struct SumOp
 };
 
 /** @ingroup Arrays
- *  @brief Matrix difference (by coefficient)
- *  Perform the matrix difference coefficient by coefficient of the Matrix lhs
- *  by the Matrix rhs
+ *  @brief Array difference (by coefficient)
+ *  Perform the matrix difference coefficient by coefficient of the Array lhs
+ *  by the Array rhs
  **/
 template<typename Lhs, typename Rhs>
 struct DifferenceOp
@@ -308,9 +308,9 @@ struct DifferenceOp
 };
 
 /** @ingroup Arrays
- *  @brief Matrix product (by coefficient)
- *  Perform the matrix product coefficient by coefficient of the Matrix lhs
- *  by the Matrix rhs
+ *  @brief Array product (by coefficient)
+ *  Perform the matrix product coefficient by coefficient of the Array lhs
+ *  by the Array rhs
  **/
 template<typename Lhs, typename Rhs>
 struct Product
@@ -349,8 +349,8 @@ struct Product
 /** @ingroup Arrays
  *  @brief Matricial Division
  *
- *  Perform the matrix division coefficient by coefficient of the Matrix lhs
- *  by the Matrix rhs
+ *  Perform the matrix division coefficient by coefficient of the Array lhs
+ *  by the Array rhs
  **/
 template<typename Lhs, typename Rhs>
 struct DivOp
@@ -387,8 +387,8 @@ struct DivOp
 };
 
 /** @ingroup Arrays
- *  @brief Matrix multiplication
- *  Perform the matrix product of the Matrix lhs by the Matrix rhs
+ *  @brief Array multiplication
+ *  Perform the matrix product of the Array lhs by the Array rhs
  **/
 template<typename Lhs, typename Rhs>
 struct MultOp
@@ -441,8 +441,8 @@ struct MultOp
 };
 
 /** @ingroup Arrays
- *  @brief Matrix multiplication
- *  Perform the matrix product of the transposed Matrix lhs by the Matrix rhs
+ *  @brief Array multiplication
+ *  Perform the matrix product of the transposed Array lhs by the Array rhs
  **/
 template<typename Lhs, typename Rhs>
 struct MultLeftTransposeOp
@@ -493,8 +493,8 @@ struct MultLeftTransposeOp
 };
 
 /** @ingroup Arrays
- *  @brief Matrix multiplication
- *  Perform the matrix product of the Matrix lhs by the transposed Matrix rhs
+ *  @brief Array multiplication
+ *  Perform the matrix product of the Array lhs by the transposed Array rhs
  **/
 template<typename Lhs, typename Rhs>
 struct MultRightTransposeOp
@@ -766,7 +766,7 @@ Real weightedDist( ITContainer< Container1D1> const& x
 }
 
 /** @ingroup Arrays
- *  @brief Matrix multiplication by its transpose
+ *  @brief Array multiplication by its transpose
  *
  *  Perform the matrix product \f$ A'A \f$.
  *
@@ -793,7 +793,7 @@ Array2DSquare<typename Derived::Type> multLeftTranspose( ExprBase<Derived> const
 }
 
 /** @ingroup Arrays
- *  @brief Matrix multiplication by its transpose
+ *  @brief Array multiplication by its transpose
  *
  *  Perform the matrix product \f$ AA' \f$.
  *
@@ -851,7 +851,7 @@ Array2DSquare<typename Derived::Type>
 }
 
 /** @ingroup Arrays
- *  @brief Weigthed Matrix multiplication by its transpose
+ *  @brief Weigthed Array multiplication by its transpose
  *
  *  Perform the matrix product \f$ AWA' \f$.
  *

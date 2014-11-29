@@ -43,7 +43,7 @@ namespace STK
 /** @ingroup Clustering
  *  @brief Interface base class for the bridges of the STK++ mixture.
  *  In this interface we give a default implementation for almost all
- *  the virtual functions required by the IMixutre interface by delegating
+ *  the virtual functions required by the IMixture interface by delegating
  *  to the bridged mixture the computations.
  */
 template<class Derived>
@@ -61,7 +61,6 @@ class IMixtureBridge: public IMixture
   protected:
     /** default constructor. Remove the missing values from the data set and
      *  initialize the mixture by setting the data set.
-     *  @param p_data pointer on the MixtureData that will be used by the bridge.
      *  @param idData id name of the mixture model
      *  @param nbCluster number of cluster
      **/
@@ -119,6 +118,23 @@ class IMixtureBridge: public IMixture
      */
     virtual void writeParameters(std::ostream& out) const
     { mixture_.writeParameters(out);}
+    /** @brief This function should be used to store any intermediate results
+     * during various iterations after the burn-in period.
+     * @param iteration Provides the iteration number beginning after the burn-in
+     * period.
+     */
+    virtual void storeIntermediateResults(int iteration)
+    {mixture_.storeIntermediateResults(iteration);}
+    /** @brief set the parameters of the model.
+     *  This fonction should be used to set the parameters computed using the
+     *  intermediate results. This method will be called after the long-run,
+     *  before the finalize step.
+     **/
+    virtual void setParameters() { mixture_.setParameters();}
+    /** @brief This step can be used by developer to finalize any thing. It will
+     *  be called only once after we finish running the estimation algorithm.
+     */
+    virtual void finalizeStep() {mixture_.finalizeStep();}
 
   protected:
     /** protected constructor to use in order to create a bridge.

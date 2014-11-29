@@ -172,7 +172,7 @@ class MixtureComposer : public IMixtureComposer
      **/
     template<class ParametersManager, class Array>
     void getParameters(ParametersManager const& manager, String const& idData, Array& data) const
-    { manager.getParameters(getMixture(idData), idData, data);}
+    { manager.getParameters(getMixture(idData), data);}
 
   protected:
     /** @brief Create the composer using existing data handler and mixtures.

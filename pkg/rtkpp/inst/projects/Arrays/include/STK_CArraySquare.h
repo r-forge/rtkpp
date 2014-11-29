@@ -39,23 +39,23 @@
 
 namespace STK
 {
-template< typename Type_, int Size_ = UnknownSize, bool Orient_ = Arrays::by_col_>
-class CArraySquare;
+// forward declarations
+template< typename Type_, int Size_ = UnknownSize, bool Orient_ = Arrays::by_col_> class CArraySquare;
+template< typename Type, int SizeRows_, int SizeCols_, bool Orient_> class CArray;
+template< typename Type, int SizeCols_, bool Orient_> class CArrayPoint;
+template< typename Type, int SizeRows_, bool Orient_> class CArrayVector;
+template< typename Type, int SizeRows_, int SizeCols_, bool Orient_> class CArrayNumber;
 
-template< typename Type, int SizeRows_, int SizeCols_, bool Orient_>
-class CArray;
-template< typename Type, int SizeCols_, bool Orient_>
-class CArrayPoint;
-template< typename Type, int SizeRows_, bool Orient_>
-class CArrayVector;
-template< typename Type, int SizeRows_, int SizeCols_, bool Orient_>
-class CArrayNumber;
-
-
-
-typedef CArraySquare<Real>                        CArraySquareXX;
-typedef CArraySquare<Real, 2, Arrays::by_col_>    CArraySquare22;
-typedef CArraySquare<Real, 3, Arrays::by_col_>    CArraySquare33;
+// typedef for CArrayVector Real is by default double, but can be float
+typedef CArraySquare<Real>                                 CSquareX;
+typedef CArraySquare<Real, 2, Arrays::by_col_>             CSquare2;
+typedef CArraySquare<Real, 3, Arrays::by_col_>             CSquare3;
+typedef CArraySquare<double, UnknownSize, Arrays::by_col_> CSquareXd;
+typedef CArraySquare<double, 2, Arrays::by_col_>           CSquare2d;
+typedef CArraySquare<double, 3, Arrays::by_col_>           CSquare3d;
+typedef CArraySquare<int, UnknownSize, Arrays::by_col_>    CSquareXi;
+typedef CArraySquare<int, 2, Arrays::by_col_>              CSquare2i;
+typedef CArraySquare<int, 3, Arrays::by_col_>              CSquare3i;
 
 namespace hidden
 {

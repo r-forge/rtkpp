@@ -57,7 +57,6 @@ struct MixtureTraits< Gamma_ak_b<_Array> >
   typedef _Array Array;
   typedef typename Array::Type Type;
   typedef Gamma_ak_b_Parameters Parameters;
-  typedef MixtureComponent<_Array, Parameters> Component;
   typedef Array2D<Real>        Param;
 };
 
@@ -76,16 +75,14 @@ template<class Array>
 class Gamma_ak_b : public GammaBase<Gamma_ak_b<Array> >
 {
   public:
-    typedef typename Clust::MixtureTraits< Gamma_ak_b<Array> >::Component Component;
     typedef typename Clust::MixtureTraits< Gamma_ak_b<Array> >::Parameters Parameters;
     typedef GammaBase<Gamma_ak_b<Array> > Base;
 
-    typedef Array2D<Real>::ColVector ColVector;
-
     using Base::p_tik;
+    using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::components;
+    using Base::paramMean_;
     using Base::meanjk;
     using Base::variancejk;
 
@@ -121,13 +118,23 @@ class Gamma_ak_b : public GammaBase<Gamma_ak_b<Array> >
     /** Compute the weighted mean and the common variance. */
     bool mStep();
     /** @return the number of free parameters of the model */
-    inline int computeNbFreeParameters() const
-    { return this->nbCluster() + 1;}
+    inline int computeNbFreeParameters() const { return this->nbCluster() + 1;}
+    /** set the parameters of the model */
+    void setParameters();
 
   protected:
     /** common scale */
     Real scale_;
 };
+
+/* set the parameters of the model */
+template<class Array>
+void Gamma_ak_b<Array>::setParameters()
+{
+  scale_ = this->paramMean_(baseIdx+1, p_data()->beginCols());
+  for (int k= 0; k < this->nbCluster(); ++k)
+  { p_param(baseIdx+k)->shape_ = paramMean_(baseIdx+2*k, p_data()->beginCols());}
+}
 
 /* Initialize randomly the parameters of the Gaussian mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation
@@ -166,7 +173,7 @@ bool Gamma_ak_b<Array>::mStep()
   {
     // compute ak
     Real num = 0., den = 0.;
-    for (int k= baseIdx; k < p_tik()->endCols(); ++k)
+    for (int k= baseIdx; k < components().end(); ++k)
     {
       // moment estimate and oldest value
       Real x0 = (p_param(k)->mean_.square()/p_param(k)->variance_).mean();

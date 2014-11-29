@@ -45,7 +45,9 @@ template< typename Type> class Array2DDiagonal;
 template< typename Type> class Array2DPoint;
 template< typename Type> class Array2DVector;
 
-typedef Array2DDiagonal<Real> MatrixDiagonal;
+typedef Array2DDiagonal<Real>   ArrayDiagonalX;
+typedef Array2DDiagonal<double> ArrayDiagonalXd;
+typedef Array2DDiagonal<int>    ArrayDiagonalXi;
 
 namespace hidden
 {

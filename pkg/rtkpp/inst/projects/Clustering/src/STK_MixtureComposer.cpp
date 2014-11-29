@@ -44,7 +44,7 @@ namespace STK
  *  @param nbCluster,nbSample, number of clusters and samples.
  */
 MixtureComposer::MixtureComposer( int nbSample, int nbCluster)
-                                : IMixtureComposer( nbSample, 0, nbCluster)
+                                : IMixtureComposer( nbSample, nbCluster)
 { setNbFreeParameter(nbCluster-1);}
 
 /* copy constructor.
@@ -128,7 +128,8 @@ void MixtureComposer::randomInit()
   stk_cout << _T("Entering MixtureComposer::RandomInit()\n");
 #endif
   if (state() < 2) { initializeStep();}
-  randomFuzzyTik();
+  if (randomFuzzyTik()<2) throw(Clust::randomParamInitFail_);
+  mapStep();
   for (MixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
   { (*it)->randomInit();}
   eStep();

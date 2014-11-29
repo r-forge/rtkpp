@@ -107,9 +107,9 @@ class IMixtureComposer : public IStatModelBase
 {
   protected:
     /** Constructor.
-     * @param nbCluster,nbSample,nbVariable number of clusters, samples and Variables
+     * @param nbCluster,nbSample number of clusters and samples
      **/
-    IMixtureComposer( int nbSample, int nbVariable, int nbCluster);
+    IMixtureComposer( int nbSample, int nbCluster);
     /** copy constructor. If the pointer on the mixture parameters are not zero
      *  then they are cloned.
      *  @note if the model have not created the parameters, then the pointer are
@@ -130,16 +130,16 @@ class IMixtureComposer : public IStatModelBase
     /** @return the proportions of each mixtures */
     inline CArrayPoint<Real> const& pk() const { return prop_;};
     /** @return the tik probabilities */
-    inline Array2D<Real> const& tik() const { return tik_;};
+    inline ArrayXX const& tik() const { return tik_;};
     /** @return the estimated proportions of individuals  */
-    inline Array2DPoint<Real> const& tk() const { return tk_;};
+    inline Array2DPoint<Real> const& nk() const { return nk_;};
     /** @return the zi class label */
     inline CArrayVector<int> const& zi() const { return zi_;};
 
     /** @return a pointer on the proportions of each mixtures */
     inline CArrayPoint<Real> const* p_pk() const { return &prop_;};
     /** @return a pointer on the the tik probabilities */
-    inline Array2D<Real> const* p_tik() const { return &tik_;};
+    inline ArrayXX const* p_tik() const { return &tik_;};
     /** @return a pointer on the zi class labels */
     inline CArrayVector<int> const* p_zi() const { return &zi_;};
 
@@ -252,21 +252,23 @@ class IMixtureComposer : public IStatModelBase
     /** The proportions of each mixtures */
     CArrayPoint<Real> prop_;
     /** The tik probabilities */
-    Array2D<Real> tik_;
+    ArrayXX tik_;
     /** The sum of the columns of tik_ */
-    Array2DPoint<Real> tk_;
+    Array2DPoint<Real> nk_;
     /** The zi class label */
     CArrayVector<int> zi_;
     /** Create the mixture model parameters. */
     void initializeMixtureParameters();
     /** generate random tik_ */
-    void randomFuzzyTik();
+    int randomFuzzyTik();
 
   private:
     /** state of the model*/
     Clust::modelState state_;
     /** Auxiliary array used in the eStep */
+#ifndef _OPENMP
     Array2DPoint<Real> lnComp_;
+#endif
 };
 
 } // namespace STK

@@ -28,17 +28,20 @@
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
 
-/** @file STK_GeneralByGeneralProduct.h
- *  @brief In this file we implement the General Matrix by Matrix product.
+/** @file STK_ArrayByArrayProduct.h
+ *  @brief In this file we implement the General Array by Array product.
  **/
 
 
-#ifndef STK_GENERALBYGENERALPRODUCT_H
-#define STK_GENERALBYGENERALPRODUCT_H
+#ifndef STK_ARRAYBYARRAYPRODUCT_H
+#define STK_ARRAYBYARRAYPRODUCT_H
+
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 namespace STK
 {
-
 namespace hidden
 {
 /** @ingroup hidden
@@ -209,22 +212,46 @@ struct bp
     Panel<Type>* tabPanel = new Panel<Type>[nbPanels+1];
     Block<Type>* tabBlock = new Block<Type>[nbBlocks+1];
     // start blocks by panel
-    for (int k = 0, kPos = lhs.beginCols(); k<nbInnerLoop; ++k, kPos+= blockSize)
+    for (int k = 0; k<nbInnerLoop; ++k)
     {
-      for (int i = 0, iRow = lhs.beginRows(); i<nbBlocks; ++i, iRow+=blockSize)
-      { arrayToBlock( lhs, tabBlock[i], iRow, kPos);}
-      arrayToBlock( lhs, tabBlock[nbBlocks], iLastRow, kPos, bSize);
-      for (int j = 0, jCol = rhs.beginCols(); j<nbPanels; ++j, jCol+=panelSize)
-      { arrayToPanel( rhs, tabPanel[j], kPos, jCol);}
-      arrayToPanel( rhs, tabPanel[nbPanels], kPos, jLastCol, pSize);
-      for (int i = 0, iRow = lhs.beginRows(); i<nbBlocks; ++i, iRow+=blockSize)
+      int kPos = lhs.beginCols() + k * blockSize;
+      for (int i = 0; i<nbBlocks; ++i)
       {
-        for (int j = 0, jCol = rhs.beginCols(); j<nbPanels; ++j, jCol+=panelSize)
-        { blockByPanel( tabBlock[i], tabPanel[j], res, iRow, jCol);}
+        int iRow = lhs.beginRows() + i * blockSize;
+        arrayToBlock( lhs, tabBlock[i], iRow, kPos);
+      }
+      arrayToBlock( lhs, tabBlock[nbBlocks], iLastRow, kPos, bSize);
+      for (int j = 0; j<nbPanels; ++j)
+      {
+        int jCol = rhs.beginCols() + j*panelSize;
+        arrayToPanel( rhs, tabPanel[j], kPos, jCol);
+      }
+      arrayToPanel( rhs, tabPanel[nbPanels], kPos, jLastCol, pSize);
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+      for (int i = 0; i<nbBlocks; ++i)
+      {
+        int iRow = lhs.beginRows() + i * blockSize;
+        for (int j = 0; j<nbPanels; ++j)
+        {
+          int jCol = rhs.beginCols() + j * panelSize;
+          blockByPanel( tabBlock[i], tabPanel[j], res, iRow, jCol);
+        }
+      }
+      for (int i = 0; i<nbBlocks; ++i)
+      {
+        int iRow = lhs.beginRows() + i * blockSize;
         blockByPanel( tabBlock[i], tabPanel[nbPanels], res, iRow, jLastCol, pSize);
       }
-      for (int j = 0, jCol = rhs.beginCols(); j<nbPanels; ++j, jCol+=panelSize)
-      { blockByPanel( tabBlock[nbBlocks], tabPanel[j], res, iLastRow, jCol, panelSize, bSize);}
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+      for (int j = 0; j<nbPanels; ++j)
+      {
+        int jCol = rhs.beginCols() + j * panelSize;
+        blockByPanel( tabBlock[nbBlocks], tabPanel[j], res, iLastRow, jCol, panelSize, bSize);
+      }
       blockByPanel( tabBlock[nbBlocks], tabPanel[nbPanels], res, iLastRow, jLastCol, pSize, bSize);
     }
     delete[] tabBlock;
@@ -394,8 +421,9 @@ struct pb
     Panel<Type>* tabPanel = new Panel<Type>[nbPanels+1];
     Block<Type>* tabBlock = new Block<Type>[nbBlocks+1];
     // start blocks by panel
-    for (int k = 0, kPos = rhs.beginRows(); k<nbInnerLoop; ++k, kPos += blockSize)
+    for (int k = 0; k<nbInnerLoop; ++k)
     {
+      int kPos = rhs.beginRows() + k * blockSize;
       // get panels
       for (int i = 0, iRow= lhs.beginRows(); i<nbPanels; ++i, iRow+= panelSize)
       { arrayToPanel( lhs, tabPanel[i], iRow, kPos);}
@@ -405,15 +433,31 @@ struct pb
       { arrayToBlock( rhs, tabBlock[j], kPos, jCol);}
       arrayToBlock( rhs, tabBlock[nbBlocks], kPos, lastCol, bSize);
       // perform the products blocks * panel
-      for (int j = 0, jCol = rhs.beginCols(); j<nbBlocks; ++j, jCol+=blockSize)
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+      for (int j = 0; j<nbBlocks; ++j)
       {
-        for (int i = 0, iRow= lhs.beginRows(); i<nbPanels; ++i, iRow+= panelSize)
-        { panelByBlock( tabPanel[i], tabBlock[j], res, iRow, jCol);}
+        int jCol = rhs.beginCols() + j * blockSize;
+        for (int i = 0; i<nbPanels; ++i)
+        {
+          int iRow = lhs.beginRows() + i * panelSize;
+          panelByBlock( tabPanel[i], tabBlock[j], res, iRow, jCol);
+        }
+      }
+      for (int j = 0; j<nbBlocks; ++j)
+      {
+        int jCol = rhs.beginCols() + j * blockSize;
         panelByBlock( tabPanel[nbPanels], tabBlock[j], res, lastRow, jCol, pSize);
-      } // j loop
-      // move the panels : the panel for the result have bSize rows
-      for (int i = 0, iRow= lhs.beginRows(); i<nbPanels; ++i, iRow+= panelSize)
-      { panelByBlock( tabPanel[i],  tabBlock[nbBlocks], res, iRow, lastCol, panelSize, bSize);}
+      }
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+      for (int i = 0; i<nbPanels; ++i)
+      {
+        int iRow= lhs.beginRows() + i * panelSize;
+        panelByBlock( tabPanel[i],  tabBlock[nbBlocks], res, iRow, lastCol, panelSize, bSize);
+      }
       panelByBlock( tabPanel[nbPanels],  tabBlock[nbBlocks], res, lastRow, lastCol, pSize, bSize);
     } // k loop
     delete[] tabPanel;
@@ -551,4 +595,4 @@ struct pb
 
 } // namespace STK
 
-#endif /* STK_GENERALBYGENERALPRODUCT_H */
+#endif /* STK_ARRAYBYARRAYPRODUCT_H */

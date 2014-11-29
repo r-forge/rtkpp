@@ -59,6 +59,11 @@ class IStatModelBase
     /** Constructor with specified dimension.
      *  @param nbSample, nbVariable Number of sample and varaibmle of the model
      **/
+    inline IStatModelBase( int nbSample)
+    { initialize(nbSample, 0);}
+    /** Constructor with specified dimension.
+     *  @param nbSample, nbVariable Number of sample and varaibmle of the model
+     **/
     inline IStatModelBase( int nbSample, int nbVariable)
     { initialize(nbSample, nbVariable);}
     /** Copy constructor.

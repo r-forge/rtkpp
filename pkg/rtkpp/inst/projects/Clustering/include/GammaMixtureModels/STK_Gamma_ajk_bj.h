@@ -56,7 +56,6 @@ struct MixtureTraits< Gamma_ajk_bj<_Array> >
   typedef _Array Array;
   typedef typename Array::Type Type;
   typedef Gamma_ajk_bj_Parameters Parameters;
-  typedef MixtureComponent<_Array, Parameters> Component;
   typedef Array2D<Real>        Param;
 };
 
@@ -75,16 +74,14 @@ template<class Array>
 class Gamma_ajk_bj : public GammaBase<Gamma_ajk_bj<Array> >
 {
   public:
-    typedef typename Clust::MixtureTraits< Gamma_ajk_bj<Array> >::Component Component;
     typedef typename Clust::MixtureTraits< Gamma_ajk_bj<Array> >::Parameters Parameters;
     typedef GammaBase<Gamma_ajk_bj<Array> > Base;
 
-    typedef Array2D<Real>::ColVector ColVector;
-
     using Base::p_tik;
+    using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::components;
+    using Base::paramMean_;
     using Base::meanjk;
     using Base::variancejk;
 
@@ -123,11 +120,26 @@ class Gamma_ajk_bj : public GammaBase<Gamma_ajk_bj<Array> >
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable()+ this->nbVariable();}
+    /** set the parameters of the model */
+    void setParameters();
 
   protected:
     /** Array of the common scale */
     Array2DPoint<Real> scale_;
 };
+
+/* set the parameters of the model **/
+template<class Array>
+void Gamma_ajk_bj<Array>::setParameters()
+{
+  for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
+  { scale_[j] = paramMean_(baseIdx+1, j);}
+  for (int k= 0; k < this->nbCluster(); ++k)
+  {
+    for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
+    { p_param(baseIdx+k)->shape_[j] = paramMean_(baseIdx+2*k, j);}
+  }
+}
 
 /* Initialize randomly the parameters of the gamma mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation
@@ -169,7 +181,7 @@ bool Gamma_ajk_bj<Array>::mStep()
     {
       Real num=0., den = 0.;
       // compute ajk
-      for (int k= baseIdx; k < p_tik()->endCols(); ++k)
+      for (int k= baseIdx; k < components().end(); ++k)
       {
         // moment estimate and oldest value
         Real x0 = this->meanjk(j,k)*this->meanjk(j,k)/this->variancejk(j,k);

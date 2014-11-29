@@ -47,7 +47,7 @@ namespace STK
 /** @brief Compute a BSpline, multivalued, regression function using BSpline
  *  basis.
  */
-class BSplineRegression : public IRegression<Matrix, Vector, Vector>
+class BSplineRegression : public IRegression<ArrayXX, Vector, Vector>
 {
   private:
     typedef Regress::KnotsPosition _Kposition;
@@ -60,8 +60,8 @@ class BSplineRegression : public IRegression<Matrix, Vector, Vector>
      * @param degree degree of the BSpline basis
      * @param position position of the knots to used
      **/
-    BSplineRegression( Matrix const* p_y
-                     , Vector const* p_x
+    BSplineRegression( ArrayXX const* p_y
+                     , VectorX const* p_x
                      , int const& nbControlPoints
                      , int const& degree = 3
                      , const _Kposition& position = Regress::uniform_
@@ -73,29 +73,24 @@ class BSplineRegression : public IRegression<Matrix, Vector, Vector>
     /** give the degree of the B-Spline curve.
      *  @return the degree of the B-Spline curve
      * */
-    inline int degree() const
-    { return degree_;}
+    inline int degree() const { return degree_;}
     /** give the number of control points of the B-Spline curves.
      *  @return the number of control points of the B-Spline curve
      **/
-    inline int nbControlPoints() const
-    { return nbControlPoints_;}
+    inline int nbControlPoints() const { return nbControlPoints_;}
     /** give the control points.
      *  @return the control points of the B-Spline curve
      **/
-    inline Matrix const& controlPoints() const
-    { return controlPoints_; }
+    inline ArrayXX const& controlPoints() const { return controlPoints_; }
     /** give the knots.
      *  @return the knots of the B-Spline curve
      **/
-    inline Vector const& knots() const
-    { return coefs_.knots(); }
+    inline Vector const& knots() const { return coefs_.knots(); }
     /** give the computed coefficients of the B-Spline curves.
      *  This is a matrix of size (p_x_->range(), 0:lastControlPoints).
      *  @return the coefficients of the B-Spline curve
      **/
-    inline Matrix const& coefficients() const
-    { return coefs_.coefficients();}
+    inline ArrayXX const& coefficients() const { return coefs_.coefficients();}
 
     /** @return the Extrapolates values of y from the value @c x.
      *  Given the data set @c x will compute the values \f$ y = \psi(x) \hat{\beta} \f$
@@ -103,7 +98,7 @@ class BSplineRegression : public IRegression<Matrix, Vector, Vector>
      *  the estimated coefficients.
      *  @param x the input data set
      */
-    virtual Matrix extrapolate( Vector const& x) const;
+    virtual ArrayXX extrapolate( Vector const& x) const;
 
   protected:
     /** number of control points of the B-Spline curve. */
@@ -115,7 +110,7 @@ class BSplineRegression : public IRegression<Matrix, Vector, Vector>
     /** Coefficients of the regression matrix */
     BSplineCoefficients<Vector> coefs_;
     /** Estimated control points of the B-Spline curve */
-    Matrix controlPoints_;
+    ArrayXX controlPoints_;
 
     /** compute the coefficients of the BSpline basis. This method will be
      *  called in the base class @c IRegression::run()
@@ -130,7 +125,7 @@ class BSplineRegression : public IRegression<Matrix, Vector, Vector>
      *  called in the base class @c IRegression::run(weights) after initializeStep()
      *  @param weights the weights of the samples
      **/
-    virtual void regression(Vector const& weights);
+    virtual void regression(VectorX const& weights);
     /** Compute the predicted outputs by the regression function. This method
      *  will be called in the base class @c IRegression::run() after initializeStep()
      **/

@@ -186,11 +186,18 @@ bool SEMAlgo::run()
   stk_cout << _T("In SEMAlgo::run() current values:\n");
   p_model_->writeParameters(stk_cout);
 #endif
-  // set averaged parameters
-  p_model_->setParameters();
+  if (result)
+  {
+    // set averaged parameters
+    p_model_->setParameters();
 #ifdef STK_MIXTURE_VERY_VERBOSE
-  stk_cout << _T("\nIn SEMAlgo::run(), setParameters done:\n");
-  p_model_->writeParameters(stk_cout);
+    stk_cout << _T("\nIn SEMAlgo::run(), setParameters done:\n");
+    p_model_->writeParameters(stk_cout);
+#endif
+  }
+  else
+  { p_model_->releaseIntermediateResults();}
+#ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Terminating SEMAlgo::run()\n") << error();
   stk_cout << _T("--------------------------\n");
 #endif
@@ -250,13 +257,20 @@ bool SemiSEMAlgo::run()
   stk_cout << _T("In SemiSEMAlgo::run() current values:\n");
   p_model_->writeParameters(stk_cout);
 #endif
-  // set averaged parameters
-  p_model_->setParameters();
+  if (result)
+  {
+    // set averaged parameters
+    p_model_->setParameters();
 #ifdef STK_MIXTURE_VERY_VERBOSE
-  stk_cout << _T("\nIn SemiSEMAlgo::run(), setParameters done:\n");
-  p_model_->writeParameters(stk_cout);
+    stk_cout << _T("\nIn SemiSEMAlgo::run(), setParameters done:\n");
+    p_model_->writeParameters(stk_cout);
+#endif
+  }
+  else
+  { p_model_->releaseIntermediateResults();}
+#ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Terminating SemiSEMAlgo::run()\n") << error();
-  stk_cout << _T("------------------------------\n");
+  stk_cout << _T("--------------------------\n");
 #endif
   return result;
 }

@@ -42,7 +42,9 @@
 #include "Arrays/include/STK_CArrayPoint.h"
 #include "Arrays/include/STK_CArrayVector.h"
 #include "Arrays/include/STK_Array2D.h"
+#ifndef _OPENMP
 #include "Arrays/include/STK_Array2DPoint.h"
+#endif
 
 namespace STK
 {
@@ -132,7 +134,7 @@ class IMixtureComposer : public IStatModelBase
     /** @return the tik probabilities */
     inline ArrayXX const& tik() const { return tik_;};
     /** @return the estimated proportions of individuals  */
-    inline Array2DPoint<Real> const& nk() const { return nk_;};
+    inline CPointX const& nk() const { return nk_;};
     /** @return the zi class label */
     inline CArrayVector<int> const& zi() const { return zi_;};
 
@@ -214,6 +216,11 @@ class IMixtureComposer : public IStatModelBase
      * store the current value of the log-Likelihood.
      **/
     virtual void storeIntermediateResults(int iteration) {}
+    /**@brief This step can be used to signal to the mixtures that they must
+     * release the stored results. This is usually called if the estimation
+     * process failed.
+     **/
+    virtual void releaseIntermediateResults() {}
     /** @brief Finalize the estimation of the model.
      *  The default behavior is compute current lnLikelihood.
      **/
@@ -262,7 +269,7 @@ class IMixtureComposer : public IStatModelBase
     /** The tik probabilities */
     ArrayXX tik_;
     /** The sum of the columns of tik_ */
-    Array2DPoint<Real> nk_;
+    CPointX nk_;
     /** The zi class label */
     CArrayVector<int> zi_;
     /** Create the mixture model parameters. */

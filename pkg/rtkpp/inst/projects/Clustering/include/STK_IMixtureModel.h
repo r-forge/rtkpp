@@ -138,6 +138,10 @@ class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBa
      **/
     void storeIntermediateResults(int iteration)
     { paramBuffer_ += (this->asDerived().getParametersImpl() - paramBuffer_)/iteration;}
+    /** Release the stored results. This is usually called if the estimation
+     * process failed.
+     **/
+    virtual void releaseIntermediateResults() { paramBuffer_ = 0.;}
     /** call specific model finalization stuff */
     void finalizeStep() { this->asDerived().finalizeModelImpl();}
     /** set the parameters stored in paramBuffer_ and release paramBuffer_. */

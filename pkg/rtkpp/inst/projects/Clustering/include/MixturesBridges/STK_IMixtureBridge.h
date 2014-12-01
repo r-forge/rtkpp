@@ -126,6 +126,12 @@ class IMixtureBridge: public IMixture
      */
     virtual void storeIntermediateResults(int iteration)
     { mixture_.storeIntermediateResults(iteration);}
+    /**@brief This step can be used to signal to the mixtures that they must
+     * release the stored results. This is usually called if the estimation
+     * process failed.
+     **/
+    virtual void releaseIntermediateResults()
+    { mixture_.releaseIntermediateResults();}
     /** @brief set the parameters of the model.
      *  This function should be used to set the parameters computed using the
      *  intermediate results.

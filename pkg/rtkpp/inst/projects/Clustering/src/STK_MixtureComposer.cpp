@@ -33,7 +33,7 @@
  *  @brief In this file we implement the class MixtureComposer.
  **/
 
-// will include MixtureComposer.h
+#include "../include/STK_IMixture.h"
 #include "../include/STK_MixtureComposer.h"
 #include "Arrays/include/STK_Display.h"
 
@@ -177,12 +177,19 @@ void MixtureComposer::samplingStep()
   { (*it)->samplingStep();}
 }
 
-/* stor the  */
+/* store the  intermediate results */
 void MixtureComposer::storeIntermediateResults(int iteration)
 {
   for (MixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
   { (*it)->storeIntermediateResults(iteration);}
   meanlnLikelihood_ += (lnLikelihood() - meanlnLikelihood_)/iteration;
+}
+
+void MixtureComposer::releaseIntermediateResults()
+{
+  for (MixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
+  { (*it)->releaseIntermediateResults();}
+  meanlnLikelihood_ = 0.;
 }
 
 /* Utility method allowing to signal to a mixture to set its parameters */

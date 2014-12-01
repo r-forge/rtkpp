@@ -37,6 +37,7 @@
 
 #ifdef _OPENMP
 #include <omp.h>
+#include "Arrays/include/STK_Array2DPoint.h"
 #endif
 
 #ifdef STK_MIXTURE_DEBUG
@@ -46,6 +47,7 @@
 #include "../include/STK_IMixtureComposer.h"
 #include "STatistiK/include/STK_Law_Categorical.h"
 #include "STatistiK/include/STK_Stat_Functors.h"
+#include "Arrays/include/STK_Array2D.h"
 
 namespace STK
 {
@@ -135,7 +137,7 @@ int IMixtureComposer::cStep()
   for (int i=tik_.beginRows(); i < tik_.endRows(); i++)
   { tik_.elt(i, zi_[i]) = 1.;}
   // count the number of individuals in each class
-  nk_.move(Stat::sum(tik_));
+  nk_= Stat::sum(tik_);
   return nk_.minElt();
 }
 
@@ -147,6 +149,7 @@ int IMixtureComposer::sStep()
   { zi_.elt(i) = Law::Categorical::rand(tik_.row(i));}
   return cStep();
 }
+
 /* compute tik, default implementation. */
 Real IMixtureComposer::eStep()
 {
@@ -162,7 +165,7 @@ Real IMixtureComposer::eStep()
   // update ln-likelihood
   setLnLikelihood(sum);
   // compute proportions
-  nk_.move(Stat::sum(tik_));
+  nk_ = Stat::sum(tik_);
 #ifdef STK_MIXTURE_DEBUG
   stk_cout << _T("IMixtureComposer::eStep() done\n");
   stk_cout << _T("lnLikelihood =") << sum << _T("\n");

@@ -38,12 +38,13 @@
 
 #include <vector>
 #include <list>
-// will include IMixtureComposer
-#include "STK_IMixture.h"
+
+#include "STK_IMixtureComposer.h"
 #include "STK_IMixtureManager.h"
 
 namespace STK
 {
+class IMixture;
 /** @ingroup Clustering
  *  Main class for handling composed mixture models.
  *  A composed mixture model on some composed space
@@ -132,6 +133,11 @@ class MixtureComposer : public IMixtureComposer
      * store the current value of the log-Likelihood.
      **/
     virtual void storeIntermediateResults(int iteration);
+    /**@brief This step can be used to signal to the mixtures that they must
+     * release the stored results. This is usually called if the estimation
+     * process failed.
+     **/
+    virtual void releaseIntermediateResults();
     /** @brief Utility method allowing to signal to a mixture to set its parameters.
      *  It will be called once enough intermediate results have been stored. */
     virtual void setParameters();

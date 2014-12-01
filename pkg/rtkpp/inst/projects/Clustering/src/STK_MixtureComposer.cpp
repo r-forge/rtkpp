@@ -45,6 +45,7 @@ namespace STK
  */
 MixtureComposer::MixtureComposer( int nbSample, int nbCluster)
                                 : IMixtureComposer( nbSample, nbCluster)
+                                , meanlnLikelihood_(0.)
 { setNbFreeParameter(nbCluster-1);}
 
 /* copy constructor.
@@ -53,6 +54,7 @@ MixtureComposer::MixtureComposer( int nbSample, int nbCluster)
 MixtureComposer::MixtureComposer( MixtureComposer const& composer)
                                 : IMixtureComposer(composer)
                                 , v_mixtures_(composer.v_mixtures_)
+                                , meanlnLikelihood_(composer.meanlnLikelihood_)
 {
   // clone mixtures
   for (size_t l = 0; l < v_mixtures_.size(); ++l)
@@ -175,12 +177,24 @@ void MixtureComposer::samplingStep()
   { (*it)->samplingStep();}
 }
 
+/* stor the  */
 void MixtureComposer::storeIntermediateResults(int iteration)
 {
   for (MixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
   { (*it)->storeIntermediateResults(iteration);}
+  meanlnLikelihood_ += (lnLikelihood() - meanlnLikelihood_)/iteration;
 }
 
+/* Utility method allowing to signal to a mixture to set its parameters */
+void MixtureComposer::setParameters()
+{
+  for (MixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
+  { (*it)->setParameters();}
+  setLnLikelihood(meanlnLikelihood_);
+  meanlnLikelihood_ = 0.;
+}
+
+/* finalize */
 void MixtureComposer::finalizeStep()
 {
   for (MixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)

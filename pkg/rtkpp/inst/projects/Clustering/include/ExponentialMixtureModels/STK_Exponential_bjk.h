@@ -77,7 +77,7 @@ class Exponential_bjk : public ExponentialBase< Exponential_bjk<Array> >
      using Base::p_tik;using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::paramMean_;
+    using Base::paramBuffer_;
 
     /** default constructor
      * @param nbCluster number of cluster in the model
@@ -103,19 +103,19 @@ class Exponential_bjk : public ExponentialBase< Exponential_bjk<Array> >
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable();}
     /** set the parameters of the model */
-    void setParameters();
+    void setParametersImpl();
 };
 
 /* set the parameters of the model
  *  @param params the parameters of the model
  **/
 template<class Array>
-void Exponential_bjk<Array>::setParameters()
+void Exponential_bjk<Array>::setParametersImpl()
 {
     for (int k = baseIdx; k < components().end(); ++k)
     {
       for (int j = p_data()->beginCols(); j < p_data()->endCols(); ++j)
-      { p_param(k)->scale_[j]  = this->paramMean_(k, j);
+      { p_param(k)->scale_[j]  = this->paramBuffer_(k, j);
     }
   }
 }

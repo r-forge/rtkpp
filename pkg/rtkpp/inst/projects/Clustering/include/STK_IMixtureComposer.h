@@ -205,7 +205,15 @@ class IMixtureComposer : public IStatModelBase
     /** @brief Simulation of all the latent variables and/or missing data
      *  excluding class labels. Default behavior is "do nothing".
      */
-    virtual void samplingStep() {};
+    virtual void samplingStep() {}
+    /** @brief Utility method allowing to signal to a mixture to set its parameters.
+     *  It will be called once enough intermediate results have been stored. */
+    virtual void setParameters() {}
+    /**@brief This step can be used to signal to the mixtures that they must
+     * store results. This is usually called after a burn-in phase. The composer
+     * store the current value of the log-Likelihood.
+     **/
+    virtual void storeIntermediateResults(int iteration) {}
     /** @brief Finalize the estimation of the model.
      *  The default behavior is compute current lnLikelihood.
      **/

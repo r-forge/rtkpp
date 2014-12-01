@@ -103,7 +103,7 @@ class GammaBase : public IMixtureModel<Derived >
     using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::paramMean_;
+    using Base::paramBuffer_;
 
   protected:
     /** default constructor
@@ -177,7 +177,7 @@ void GammaBase<Derived>::getParameters(Array2D<Real>& params) const
 template<class Derived>
 ArrayXX GammaBase<Derived>::getParametersImpl() const
 {
-  Array2D<Real> params;
+  ArrayXX params;
   int nbClust = this->nbCluster();
   params.resize(2*nbClust, p_data()->cols());
   for (int k= 0; k < nbClust; ++k)

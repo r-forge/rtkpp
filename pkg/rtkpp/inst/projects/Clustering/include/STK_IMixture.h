@@ -131,7 +131,7 @@ class IMixture
      */
     virtual void storeIntermediateResults(int iteration) {/**Do nothing by default*/}
     /** @brief set the parameters of the model.
-     *  This fonction should be used to set the parameters computed using the
+     *  This function should be used to set the parameters computed using the
      *  intermediate results. This method will be called after the long-run and
      *  before the finalize step.
      **/

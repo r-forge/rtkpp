@@ -30,7 +30,7 @@
  **/
 
 /** @file STK_IMixtureModel.h
- *  @brief In this file we define the main class for mixture models.
+ *  @brief In this fil0e we define the main class for mixture models.
  **/
 
 
@@ -57,7 +57,15 @@ template <class Mixture> struct MixtureTraits;
 
 /**@ingroup Clustering
  * @brief Main interface class for mixture models.
- * At this level we create the array of Components
+ * At this level we create the array of Components.
+ *
+ * The pseudo virtual methods to implement in derived class are
+ * @code
+ * initializeModelImpl();
+ * finalizeModelImpl(); // default implementation is provided
+ * setParametersImpl();
+ * getParametersImpl();
+ * @endcode
  *
  * @sa IMixtureModelBase, IMultiParameters
  **/
@@ -67,6 +75,7 @@ class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBa
   public:
     typedef typename Clust::MixtureTraits<Derived>::Array Array;
     typedef typename Clust::MixtureTraits<Derived>::Parameters Parameters;
+    typedef typename Clust::MixtureTraits<Derived>::Param Param;
 
   protected:
     /** Default constructor.
@@ -74,8 +83,7 @@ class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBa
      **/
     IMixtureModel( int nbCluster)
                  : IMixtureModelBase(nbCluster)
-                 , paramMean_()
-                 , nbMean_(0)
+                 , paramBuffer_()
                  , p_dataij_(0)
                  , components_(nbCluster, 0)
     {
@@ -90,8 +98,7 @@ class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBa
      **/
     IMixtureModel( IMixtureModel const& model)
                  : IMixtureModelBase(model)
-                 , paramMean_(model.paramMean_)
-                 , nbMean_(model.nbMean_)
+                 , paramBuffer_(model.paramBuffer_)
                  , p_dataij_(model.p_dataij_)
                  , components_(model.components_)
     {
@@ -119,8 +126,6 @@ class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBa
       p_dataij_ = &data;
       initializeModel();
     }
-    /** default implementation of initializeModelImpl */
-    void initializeModelImpl() {}
     /** default implementation of finalizeModelImpl */
     void finalizeModelImpl() {}
     /** @return the value of the probability of the i-th sample in the k-th component.
@@ -128,23 +133,27 @@ class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBa
      **/
     inline Real lnComponentProbability(int i, int k)
     { return components_[k]->computeLnLikelihood(p_dataij_->row(i));}
-    /** Store the intermiediate results of the Mixture.
+    /** Store the intermediate results of the Mixture.
      *  @param iteration Provides the iteration number beginning after the burn-in period.
      **/
     void storeIntermediateResults(int iteration)
-    {
-      nbMean_++;
-      paramMean_ = paramMean_ + (this->asDerived().getParametersImpl() - paramMean_)/nbMean_;
-    }
+    { paramBuffer_ += (this->asDerived().getParametersImpl() - paramBuffer_)/iteration;}
     /** call specific model finalization stuff */
     void finalizeStep() { this->asDerived().finalizeModelImpl();}
-    /** @return the stored parameters. */
-    ArrayXX getParameters() const
-    { return (nbMean_ == 0) ? this->asDerived().getParametersImpl() : paramMean_;}
+    /** set the parameters stored in paramBuffer_ and release paramBuffer_. */
+    void setParameters()
+    { this->asDerived().setParametersImpl();
+      paramBuffer_ = 0.;
+    }
+    /** fill paramBuffer_ with the current values of the parameters.
+     *  @return the stored parameters.
+     **/
+    Param getParameters() const
+    { return this->asDerived().getParametersImpl();}
 
   protected:
     /** @brief Initialize the model before its first use.
-     * This function will be called when the data is set.
+     * This function is used when the data is set.
      * In this interface, the @c initializeModel() method
      *  - set the number of samples and variables of the mixture model
      *  - resize the parameters of each component with the range of the variables
@@ -164,9 +173,8 @@ class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBa
       { components_[k]->resize(p_dataij_->cols());}
       // call specific model initialization stuff
       this->asDerived().initializeModelImpl();
-      // initialize paramMean_
-      paramMean_.move(this->asDerived().getParametersImpl());
-      paramMean_ = 0.;
+      // initialize paramBuffer_
+      paramBuffer_ = 0.;
     }
     /** @return the array with the components */
     inline Array1D<Parameters*> const& components() const { return components_;}
@@ -175,10 +183,8 @@ class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBa
     /** @return a pointer on the k-th parameter */
     inline Parameters* p_param(int k) { return components_[k];}
 
-    /** Array of the average parameters */
-    ArrayXX paramMean_;
-    /** number of parameters in the mean */
-    int nbMean_;
+    /** structure of the averaged parameters */
+    Param paramBuffer_;
 
   private:
     /** pointer on the data set */

@@ -79,7 +79,7 @@ class Gaussian_sjk : public DiagGaussianBase<Gaussian_sjk<Array> >
     using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::paramMean_;
+    using Base::paramBuffer_;
 
     /** default constructor
      * @param nbCluster number of cluster in the model
@@ -91,6 +91,12 @@ class Gaussian_sjk : public DiagGaussianBase<Gaussian_sjk<Array> >
     Gaussian_sjk( Gaussian_sjk const& model) : Base(model) {}
     /** destructor */
     ~Gaussian_sjk() {}
+    /** Initialize the component of the model. */
+    void initializeModelImpl()
+    {
+      paramBuffer_.resize(2*this->nbCluster(), p_data()->cols());
+      paramBuffer_ = 0.;
+    }
     /** Compute the initial weighted means and the initial weighted standard deviations
      *  of the mixture */
     inline bool initializeStep() { return mStep();}
@@ -105,19 +111,19 @@ class Gaussian_sjk : public DiagGaussianBase<Gaussian_sjk<Array> >
     inline int computeNbFreeParameters() const
     { return 2*this->nbCluster()*this->nbVariable();}
     /** set the parameters of the model */
-    void setParameters();
+    void setParametersImpl();
 };
 
 /* set the parameters of the model */
 template<class Array>
-void Gaussian_sjk<Array>::setParameters()
+void Gaussian_sjk<Array>::setParametersImpl()
 {
   for (int k= 0; k < this->nbCluster(); ++k)
   {
     for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
     {
-      p_param(baseIdx+k)->mean_[j]  = paramMean_(baseIdx+2*k  , j);
-      p_param(baseIdx+k)->sigma_[j] = paramMean_(baseIdx+2*k+1, j);
+      p_param(baseIdx+k)->mean_[j]  = paramBuffer_(baseIdx+2*k  , j);
+      p_param(baseIdx+k)->sigma_[j] = paramBuffer_(baseIdx+2*k+1, j);
     }
   }
 }

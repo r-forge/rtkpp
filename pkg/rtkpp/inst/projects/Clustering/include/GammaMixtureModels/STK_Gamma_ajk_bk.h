@@ -79,10 +79,11 @@ class Gamma_ajk_bk : public GammaBase< Gamma_ajk_bk<Array> >
     typedef typename Clust::MixtureTraits< Gamma_ajk_bk<Array> >::Parameters Parameters;
     typedef GammaBase< Gamma_ajk_bk<Array> > Base;
 
-     using Base::p_tik;using Base::components;
+    using Base::p_tik;
+    using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::paramMean_;
+    using Base::paramBuffer_;
     using Base::meanjk;
     using Base::variancejk;
 
@@ -96,6 +97,12 @@ class Gamma_ajk_bk : public GammaBase< Gamma_ajk_bk<Array> >
     inline Gamma_ajk_bk( Gamma_ajk_bk const& model) : Base(model) {}
     /** destructor */
     inline ~Gamma_ajk_bk() {}
+    /** Initialize the component of the model. */
+    void initializeModelImpl()
+    {
+      paramBuffer_.resize(2*this->nbCluster(), p_data()->cols());
+      paramBuffer_ = 0.;
+    }
     /** initialize shape and scale parameters using weighted moment estimates.*/
     inline bool initializeStep() { return mStep();}
     /** Initialize randomly the parameters of the Gamma mixture. The shape
@@ -110,18 +117,18 @@ class Gamma_ajk_bk : public GammaBase< Gamma_ajk_bk<Array> >
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable()+this->nbCluster();}
     /** set the parameters of the model */
-    void setParameters();
+    void setParametersImpl();
 };
 
 /* set the parameters of the model */
 template<class Array>
-void Gamma_ajk_bk<Array>::setParameters()
+void Gamma_ajk_bk<Array>::setParametersImpl()
 {
   for (int k= 0; k < this->nbCluster(); ++k)
   {
     for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
-    { p_param(baseIdx+k)->shape_[j] = paramMean_(baseIdx+2*k, j);}
-    p_param(baseIdx+k)->scale_ = paramMean_(baseIdx+2*k+1, p_data()->beginCols());
+    { p_param(baseIdx+k)->shape_[j] = paramBuffer_(baseIdx+2*k, j);}
+    p_param(baseIdx+k)->scale_ = paramBuffer_(baseIdx+2*k+1, p_data()->beginCols());
   }
 }
 

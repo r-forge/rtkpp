@@ -78,7 +78,7 @@ class Gamma_a_bk : public GammaBase< Gamma_a_bk<Array> >
      using Base::p_tik;using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::paramMean_;
+    using Base::paramBuffer_;
     using Base::meanjk;
     using Base::variancejk;
 
@@ -101,6 +101,8 @@ class Gamma_a_bk : public GammaBase< Gamma_a_bk<Array> >
       shape_ = 1.;
       for (int k= baseIdx; k < components().end(); ++k)
       { p_param(k)->p_shape_ = &shape_;}
+      paramBuffer_.resize(2*this->nbCluster(), p_data()->cols());
+      paramBuffer_ = 0.;
     }
     /** initialize shape and scale parameters using weighted moment estimates.*/
     inline bool initializeStep() { return mStep();}
@@ -116,7 +118,7 @@ class Gamma_a_bk : public GammaBase< Gamma_a_bk<Array> >
     inline int computeNbFreeParameters() const
     { return this->nbCluster()+1;}
     /** set the parameters of the model*/
-    void setParameters();
+    void setParametersImpl();
 
   protected:
     /** common scale */
@@ -126,11 +128,11 @@ class Gamma_a_bk : public GammaBase< Gamma_a_bk<Array> >
 
 /* set the parameters of the model */
 template<class Array>
-void Gamma_a_bk<Array>::setParameters()
+void Gamma_a_bk<Array>::setParametersImpl()
 {
-  shape_ = this->paramMean_(baseIdx, p_data()->beginCols());
+  shape_ = this->paramBuffer_(baseIdx, p_data()->beginCols());
   for (int k= 0; k < this->nbCluster(); ++k)
-  { p_param(baseIdx+k)->scale_ = paramMean_(baseIdx+2*k+1, p_data()->beginCols());}
+  { p_param(baseIdx+k)->scale_ = paramBuffer_(baseIdx+2*k+1, p_data()->beginCols());}
 }
 
 template<class Array>

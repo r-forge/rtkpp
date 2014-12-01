@@ -52,6 +52,7 @@ class IMixtureBridge: public IMixture
   public:
     // type of Mixture
     typedef typename hidden::MixtureBridgeTraits<Derived>::Mixture Mixture;
+    typedef typename Clust::MixtureTraits<Mixture>::Param Param;
     // class of mixture
     enum
     {
@@ -124,17 +125,23 @@ class IMixtureBridge: public IMixture
      * period.
      */
     virtual void storeIntermediateResults(int iteration)
-    {mixture_.storeIntermediateResults(iteration);}
+    { mixture_.storeIntermediateResults(iteration);}
     /** @brief set the parameters of the model.
-     *  This fonction should be used to set the parameters computed using the
-     *  intermediate results. This method will be called after the long-run,
-     *  before the finalize step.
+     *  This function should be used to set the parameters computed using the
+     *  intermediate results.
      **/
     virtual void setParameters() { mixture_.setParameters();}
     /** @brief This step can be used by developer to finalize any thing. It will
      *  be called only once after we finish running the estimation algorithm.
      */
-    virtual void finalizeStep() {mixture_.finalizeStep();}
+    virtual void finalizeStep() { mixture_.finalizeStep();}
+    /** This function can be used in order to get the current values of the
+     *  parameters.
+     *  @param param the array with the parameters of the mixture.
+     */
+    void getParameters(Param& param) const { mixture_.getParameters(param);}
+    /** @return the current values of the parameters. */
+    Param const& getParameters() const { return mixture_.getParameters();}
 
   protected:
     /** protected constructor to use in order to create a bridge.

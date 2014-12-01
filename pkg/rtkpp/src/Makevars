@@ -30,9 +30,9 @@ STKPP_LIB = $(STKPP_LIB_DIR)/$(R_ARCH)/$(LIB_STKPP_A)
 STK_FLAGS =
 
 ## Use the R_HOME indirection to support installations of multiple R version
-PKG_CXXFLAGS = `${R_HOME}/bin/Rscript -e "Rcpp:::CxxFlags()"` $(STK_FLAGS)
+PKG_CXXFLAGS = `${R_HOME}/bin/Rscript -e "Rcpp:::CxxFlags()"` $(STK_FLAGS)  $(SHLIB_OPENMP_CXXFLAGS)
 PKG_CPPFLAGS = -I../inst/projects/ -I../inst/include/ -DIS_RTKPP_LIB
-PKG_LIBS     = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(STKPP_LIB)
+PKG_LIBS     = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(STKPP_LIB) $(SHLIB_OPENMP_CXXFLAGS)
 
 ## Define STK flags here
 STK_CXXFLAGS = $(PKG_CXXFLAGS) -DIS_RTKPP_LIB -DSTKUSELAPACK

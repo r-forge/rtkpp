@@ -77,7 +77,7 @@ class Categorical_pk : public CategoricalBase<Categorical_pk<Array> >
     using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::paramMean_;
+    using Base::paramBuffer_;
     using Base::modalities_;
 
     /** default constructor
@@ -102,12 +102,12 @@ class Categorical_pk : public CategoricalBase<Categorical_pk<Array> >
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*(this->modalities_.size()-1);}
     /** set the parameters of the model */
-    void setParameters();
+    void setParametersImpl();
 };
 
 /* set the parameters of the model */
 template<class Array>
-void Categorical_pk<Array>::setParameters()
+void Categorical_pk<Array>::setParametersImpl()
 {
   int nbCluster    = this->nbCluster();
   int nbModalities = this->modalities_.size();
@@ -115,7 +115,7 @@ void Categorical_pk<Array>::setParameters()
   {
     for (int l = 0; l < nbModalities; ++l)
     { p_param(baseIdx + k)->proba_[modalities_.begin() + l]
-                                  = this->paramMean_(baseIdx + k * nbModalities + l, p_data()->beginCols());
+                                  = paramBuffer_(baseIdx + k * nbModalities + l, p_data()->beginCols());
     }
   }
 }

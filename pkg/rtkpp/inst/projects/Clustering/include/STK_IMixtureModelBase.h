@@ -44,7 +44,6 @@
 
 namespace STK
 {
-
 /** @ingroup Clustering
  *  @brief Base class for Mixture model.
  *
@@ -87,7 +86,7 @@ class IMixtureModelBase
     inline ArrayXX const* p_tik() const { return p_tik_;};
     /** @return  the zi class label */
     inline CArrayVector<int> const* p_zi() const { return p_zi_;};
-    /** Set the parameters of the  mixture model using external prop, tik and zi.
+    /** Set the parameters of the  mixture model using external pk, tik and zi.
      *  @param p_pk pointer on the proportions of the mixture model
      *  @param p_tik pointer on the posterior probabilities
      *  @param p_zi pointer on the class labels

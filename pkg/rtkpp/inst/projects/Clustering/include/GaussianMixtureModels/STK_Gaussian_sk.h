@@ -78,7 +78,7 @@ class Gaussian_sk : public DiagGaussianBase<Gaussian_sk<Array> >
     using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::paramMean_;
+    using Base::paramBuffer_;
 
     /** default constructor
      * @param nbCluster number of cluster in the model
@@ -90,6 +90,12 @@ class Gaussian_sk : public DiagGaussianBase<Gaussian_sk<Array> >
     inline Gaussian_sk( Gaussian_sk const& model) : Base(model) {}
     /** destructor */
     inline ~Gaussian_sk() {}
+    /** Initialize the component of the model. */
+    void initializeModelImpl()
+    {
+      paramBuffer_.resize(2*this->nbCluster(), p_data()->cols());
+      paramBuffer_ = 0.;
+    }
     /** Compute the inital weighted mean and the initial common standard deviations. */
     inline bool initializeStep() { return mStep();}
     /** Initialize randomly the parameters of the Gaussian mixture. The centers
@@ -103,18 +109,18 @@ class Gaussian_sk : public DiagGaussianBase<Gaussian_sk<Array> >
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable() + this->nbCluster();}
     /** set the parameters of the model */
-    void setParameters();
+    void setParametersImpl();
 };
 
 /* set the parameters of the model */
 template<class Array>
-void Gaussian_sk<Array>::setParameters()
+void Gaussian_sk<Array>::setParametersImpl()
 {
   for (int k= baseIdx; k < this->nbCluster(); ++k)
   {
     for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
-    { p_param(baseIdx+k)->mean_[j] = paramMean_(baseIdx+2*k, j);}
-    p_param(baseIdx+k)->sigma_ = paramMean_(baseIdx+2*k+1, p_data()->beginCols());
+    { p_param(baseIdx+k)->mean_[j] = paramBuffer_(baseIdx+2*k, j);}
+    p_param(baseIdx+k)->sigma_ = paramBuffer_(baseIdx+2*k+1, p_data()->beginCols());
   }
 }
 /* Initialize randomly the parameters of the Gaussian mixture. The centers

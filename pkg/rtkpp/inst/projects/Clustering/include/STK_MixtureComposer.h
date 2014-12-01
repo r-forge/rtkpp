@@ -37,6 +37,7 @@
 #define STK_MIXTURECOMPOSER_H
 
 #include <vector>
+#include <list>
 // will include IMixtureComposer
 #include "STK_IMixture.h"
 #include "STK_IMixtureManager.h"
@@ -58,7 +59,8 @@ namespace STK
  * \f$\boldsymbol{\lambda}^l_k, \, k=1,\ldots K \f$ are the cluster specific parameters
  * and the parameters \f$ \boldsymbol{\alpha}^l \f$ are the shared parameters.
  *
- * The MixtureComposer class offer some
+ * The MixtureComposer class is a final class implementing the features requested
+ * by the interface class IMixtureComposer.
  **/
 class MixtureComposer : public IMixtureComposer
 {
@@ -126,9 +128,13 @@ class MixtureComposer : public IMixtureComposer
      */
     virtual void samplingStep();
     /**@brief This step can be used to signal to the mixtures that they must
-     * store results. This is usually called after a burn-in phase.
+     * store results. This is usually called after a burn-in phase. The composer
+     * store the current value of the log-Likelihood.
      **/
     virtual void storeIntermediateResults(int iteration);
+    /** @brief Utility method allowing to signal to a mixture to set its parameters.
+     *  It will be called once enough intermediate results have been stored. */
+    virtual void setParameters();
     /**@brief This step can be used by developer to finalize any thing. It will
      *  be called only once after we finish running the estimation algorithm.
      **/
@@ -168,11 +174,19 @@ class MixtureComposer : public IMixtureComposer
     /** Utility method allowing to get the parameters of a specific mixture.
      *  @param manager the manager with the responsibility of the parameters
      *  @param idData the Id of the data we want the parameters
-     *  @param data the structure which will receive the data
+     *  @param param the structure which will receive the parameters
      **/
-    template<class ParametersManager, class Array>
-    void getParameters(ParametersManager const& manager, String const& idData, Array& data) const
-    { manager.getParameters(getMixture(idData), data);}
+    template<class ParametersManager, class Param>
+    void getParameters(ParametersManager const& manager, String const& idData, Param& param) const
+    { manager.getParameters(getMixture(idData), param);}
+    /** Utility method allowing to get the parameters of a specific mixture.
+     *  @param manager the manager with the responsibility of the parameters
+     *  @param idData the Id of the data we want the parameters
+     *  @return the structure encapsulating the parameters
+     **/
+    template<class ParametersManager, class Param>
+    Param getParameters(ParametersManager const& manager, String const& idData) const
+    { return manager.getParameters(getMixture(idData));}
 
   protected:
     /** @brief Create the composer using existing data handler and mixtures.
@@ -185,6 +199,10 @@ class MixtureComposer : public IMixtureComposer
   private:
     /** vector of pointers to the mixtures components */
     std::vector<IMixture*> v_mixtures_;
+    /** averaged lnLikelihood values. Will be used by the
+     *  storeIntermediateResults method.
+     **/
+    Real meanlnLikelihood_;
 };
 
 /** @brief specialization of the composer for the fixed proportion case.

@@ -77,7 +77,7 @@ class Gaussian_sj : public DiagGaussianBase<Gaussian_sj<Array> >
     using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::paramMean_;
+    using Base::paramBuffer_;
 
     /** default constructor
      * @param nbCluster number of cluster in the model
@@ -99,6 +99,8 @@ class Gaussian_sj : public DiagGaussianBase<Gaussian_sj<Array> >
       sigma_ = 1.;
       for (int k= baseIdx; k < components().end(); ++k)
       { p_param(k)->p_sigma_ = &sigma_;}
+      paramBuffer_.resize(2*this->nbCluster(), p_data()->cols());
+      paramBuffer_ = 0.;
     }
     /** Compute the inital weighted mean and the initial common standard deviation. */
     inline bool initializeStep() { return mStep();}
@@ -113,7 +115,7 @@ class Gaussian_sj : public DiagGaussianBase<Gaussian_sj<Array> >
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable()+this->nbVariable();}
     /** set the parameters of the model*/
-    void setParameters();
+    void setParametersImpl();
 
   protected:
     /** Common standard deviation */
@@ -122,14 +124,14 @@ class Gaussian_sj : public DiagGaussianBase<Gaussian_sj<Array> >
 
 /* set the parameters of the model */
 template<class Array>
-void Gaussian_sj<Array>::setParameters()
+void Gaussian_sj<Array>::setParametersImpl()
 {
   for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
-  { sigma_[j] = paramMean_(baseIdx+1, j);}
+  { sigma_[j] = paramBuffer_(baseIdx+1, j);}
   for (int k= 0; k < this->nbCluster(); ++k)
   {
     for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
-    { p_param(baseIdx+k)->mean_[j] = paramMean_(baseIdx+2*k, j);}
+    { p_param(baseIdx+k)->mean_[j] = paramBuffer_(baseIdx+2*k, j);}
   }
 }
 

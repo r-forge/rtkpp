@@ -440,14 +440,6 @@ class MixtureBridge: public IMixtureBridge< MixtureBridge<Id,Data> >
       p_bridge->mixture_.setData(p_bridge->p_data_->m_dataij());
       return p_bridge;
     }
-    /** This function can be used in order to get the current values of the
-     *  parameters in Param (an Array2D).
-     *  @param param the array with the parameters of the mixture.
-     */
-    void getParameters(Param& param) const { mixture_.getParameters(param);}
-    /** @return the averaged values of the parameters in Param (an Array2D). */
-    Param getParameters() const { return mixture_.getParameters();}
-
   private:
     /** This function will be used for the imputation of the missing data
      *  at the initialization.

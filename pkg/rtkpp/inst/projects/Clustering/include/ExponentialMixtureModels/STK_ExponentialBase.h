@@ -56,7 +56,7 @@ class ExponentialBase : public IMixtureModel<Derived >
     using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::paramBuffer_;
+
 
   protected:
     /** default constructor
@@ -91,8 +91,6 @@ class ExponentialBase : public IMixtureModel<Derived >
      *  @param params the array to fill with the parameters of the model
      **/
     void getParameters(Array2D<Real>& params) const;
-    /** @return the parameters of the model in an array of size (K * d). */
-    void getParametersImpl() const;
     /** Write the parameters on the output stream os */
     void writeParameters(ostream& os) const;
 };
@@ -121,16 +119,6 @@ void ExponentialBase<Derived>::getParameters(Array2D<Real>& params) const
   {
     for (int j= p_data()->beginCols();  j < p_data()->endCols(); ++j)
     { params(k, j) = p_param(k)->scale(j);}
-  }
-}
-/* get the parameters of the model in an array of size (K * d). */
-template<class Derived>
-void ExponentialBase<Derived>::getParametersImpl() const
-{
-  for (int k= paramBuffer_.beginRows(); k < paramBuffer_.endRows(); ++k)
-  {
-    for (int j= p_data()->beginCols();  j < p_data()->endCols(); ++j)
-    { paramBuffer_(k, j) = p_param(k)->scale(j);}
   }
 }
 

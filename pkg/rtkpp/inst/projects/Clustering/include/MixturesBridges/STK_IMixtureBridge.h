@@ -87,7 +87,7 @@ class IMixtureBridge: public IMixture
     {
       if (!p_composer())
         STKRUNTIME_ERROR_NO_ARG(IMixtureBridge::initializeStep,composer is not set);
-      mixture_.setMixtureParameters( p_pk(), p_tik(), p_zi());
+      mixture_.setMixtureParameters( p_pk(), p_nk(), p_tik(), p_zi());
       if (!mixture_.initializeStep()) throw Clust::initializeStepFail_;
     }
      /** This function must be defined to return the component probability (PDF)
@@ -146,8 +146,6 @@ class IMixtureBridge: public IMixture
      *  @param param the array with the parameters of the mixture.
      */
     void getParameters(Param& param) const { mixture_.getParameters(param);}
-    /** @return the current values of the parameters. */
-    Param const& getParameters() const { return mixture_.getParameters();}
 
   protected:
     /** protected constructor to use in order to create a bridge.

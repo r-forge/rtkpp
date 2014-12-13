@@ -83,7 +83,7 @@ class Gamma_ajk_bk : public GammaBase< Gamma_ajk_bk<Array> >
     using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::paramBuffer_;
+
     using Base::meanjk;
     using Base::variancejk;
 
@@ -98,13 +98,7 @@ class Gamma_ajk_bk : public GammaBase< Gamma_ajk_bk<Array> >
     /** destructor */
     inline ~Gamma_ajk_bk() {}
     /** Initialize the component of the model. */
-    void initializeModelImpl()
-    {
-      paramBuffer_.resize(2*this->nbCluster(), p_data()->cols());
-      paramBuffer_ = 0.;
-    }
-    /** initialize shape and scale parameters using weighted moment estimates.*/
-    inline bool initializeStep() { return mStep();}
+    void initializeModelImpl() {}
     /** Initialize randomly the parameters of the Gamma mixture. The shape
      *  will be selected randomly using an exponential of parameter mean^2/variance
      *  and the scale will be selected randomly using an exponential of parameter
@@ -116,21 +110,7 @@ class Gamma_ajk_bk : public GammaBase< Gamma_ajk_bk<Array> >
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable()+this->nbCluster();}
-    /** set the parameters of the model */
-    void setParametersImpl();
 };
-
-/* set the parameters of the model */
-template<class Array>
-void Gamma_ajk_bk<Array>::setParametersImpl()
-{
-  for (int k= 0; k < this->nbCluster(); ++k)
-  {
-    for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
-    { p_param(baseIdx+k)->shape_[j] = paramBuffer_(baseIdx+2*k, j);}
-    p_param(baseIdx+k)->scale_ = paramBuffer_(baseIdx+2*k+1, p_data()->beginCols());
-  }
-}
 
 /* Initialize randomly the parameters of the Gaussian mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation

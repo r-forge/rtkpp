@@ -38,8 +38,8 @@
 #include "../STK_IMixtureModel.h"
 #include "STK_DiagGaussianParameters.h"
 
-#include "../../../STatistiK/include/STK_Law_Categorical.h"
-#include "../../../STatistiK/include/STK_Law_Uniform.h"
+#include "STatistiK/include/STK_Law_Normal.h"
+#include "STatistiK/include/STK_Law_Uniform.h"
 
 namespace STK
 {

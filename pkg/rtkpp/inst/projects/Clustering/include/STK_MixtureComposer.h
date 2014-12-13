@@ -185,14 +185,6 @@ class MixtureComposer : public IMixtureComposer
     template<class ParametersManager, class Param>
     void getParameters(ParametersManager const& manager, String const& idData, Param& param) const
     { manager.getParameters(getMixture(idData), param);}
-    /** Utility method allowing to get the parameters of a specific mixture.
-     *  @param manager the manager with the responsibility of the parameters
-     *  @param idData the Id of the data we want the parameters
-     *  @return the structure encapsulating the parameters
-     **/
-    template<class ParametersManager, class Param>
-    Param getParameters(ParametersManager const& manager, String const& idData) const
-    { return manager.getParameters(getMixture(idData));}
 
   protected:
     /** @brief Create the composer using existing data handler and mixtures.

@@ -92,6 +92,9 @@ class MixtureManager : public IMixtureManager
     // All Categorical bridges
     typedef MixtureBridge<Clust::Categorical_pjk_, DataInt> MixtureBridge_pjk;
     typedef MixtureBridge<Clust::Categorical_pk_,  DataInt> MixtureBridge_pk;
+    // All Poisson bridges
+    typedef MixtureBridge<Clust::Poisson_ljk_,  DataInt> MixtureBridge_ljk;
+    typedef MixtureBridge<Clust::Poisson_ljlk_, DataInt> MixtureBridge_ljlk;
 
     /** Default constructor, need an instance of a DataHandler.  */
     MixtureManager(DataHandler const& handler) : IMixtureManager(&handler), p_handler_(&handler) {}
@@ -165,6 +168,13 @@ class MixtureManager : public IMixtureManager
         case Clust::Categorical_pk_:
         { static_cast<MixtureBridge_pk const*>(p_mixture)->getParameters(param);}
         break;
+        // Categorical models
+        case Clust::Poisson_ljk_:
+        { static_cast<MixtureBridge_ljk const*>(p_mixture)->getParameters(param);}
+        break;
+        case Clust::Poisson_ljlk_:
+        { static_cast<MixtureBridge_ljlk const*>(p_mixture)->getParameters(param);}
+        break;
         default: // idModel is not implemented
         break;
       }
@@ -237,6 +247,13 @@ class MixtureManager : public IMixtureManager
         case Clust::Categorical_pk_:
         { return static_cast<MixtureBridge_pk const*>(p_mixture)->getParameters();}
         break;
+        // Categorical models
+        case Clust::Poisson_ljk_:
+        { return static_cast<MixtureBridge_ljk const*>(p_mixture)->getParameters();}
+        break;
+        case Clust::Poisson_ljlk_:
+        { return static_cast<MixtureBridge_ljlk const*>(p_mixture)->getParameters();}
+        break;
         default: // idModel is not implemented
         break;
       }
@@ -278,75 +295,67 @@ class MixtureManager : public IMixtureManager
     {
       switch (idModel)
       {
-        // gamma_ajk_bjk_ model
+        // gamma models
         case Clust::Gamma_ajk_bjk_:
         { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_ajk_bjk)}
         break;
-        // gamma_ajk_bk_ model
         case Clust::Gamma_ajk_bk_:
         { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_ajk_bk)}
         break;
-        // gamma_ajk_bj_ model
         case Clust::Gamma_ajk_bj_:
         { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_ajk_bj)}
         break;
-        // gamma_ajk_b_ model
         case Clust::Gamma_ajk_b_:
         { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_ajk_b)}
         break;
-        // gamma_ak_bjk_ model
         case Clust::Gamma_ak_bjk_:
         { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_ak_bjk)}
         break;
-        // gamma_ak_bk_ model
         case Clust::Gamma_ak_bk_:
         { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_ak_bk)}
         break;
-        // gamma_ak_bj_ model
         case Clust::Gamma_ak_bj_:
         { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_ak_bj)}
         break;
-        // gamma_ajk_b_ model
         case Clust::Gamma_ak_b_:
         { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_ak_b)}
         break;
-        // gamma_aj_bjk_ model
         case Clust::Gamma_aj_bjk_:
         { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_aj_bjk)}
         break;
-        // gamma_aj_bk_ model
         case Clust::Gamma_aj_bk_:
         { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_aj_bk)}
-        // gamma_aj_bjk_ model
         case Clust::Gamma_a_bjk_:
         { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_a_bjk)}
         break;
-        // gamma_aj_bk_ model
         case Clust::Gamma_a_bk_:
         { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_a_bk)}
-        // Gaussian_sjk_ model
+        // Gaussian models
         case Clust::Gaussian_sjk_:
         { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_sjk)}
         break;
-        // Gaussian_sk_ model
         case Clust::Gaussian_sk_:
         { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_sk)}
         break;
-        // Gaussian_sj_ model
         case Clust::Gaussian_sj_:
         { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_sj)}
         break;
-        // Gaussian_s_ model
         case Clust::Gaussian_s_:
         { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_s)}
         break;
-        // Categorical_pjk_ model
+        // Categorical models
         case Clust::Categorical_pjk_:
         { STK_CREATE_MIXTURE(MixtureDataInt, MixtureBridge_pjk)}
         break;
-        // Categorical_pjk_ model
         case Clust::Categorical_pk_:
         { STK_CREATE_MIXTURE(MixtureDataInt, MixtureBridge_pk)}
+        break;
+        // Poisson models
+        case Clust::Poisson_ljk_:
+        { STK_CREATE_MIXTURE(MixtureDataInt, MixtureBridge_ljk)}
+        break;
+        case Clust::Poisson_ljlk_:
+        { STK_CREATE_MIXTURE(MixtureDataInt, MixtureBridge_ljlk)}
         break;
         default:
           return 0; // 0 if idModel is not implemented

@@ -200,6 +200,18 @@ struct RandGaussVisitor
 };
 
 /** @ingroup hidden
+ *  @brief Visitor putting a gaussian random variable
+ */
+template <typename Type>
+struct RandVisitor
+{
+  RandVisitor( Law::IUnivLaw<Type> const& law):law_(law){}
+  inline void operator() ( Type& value)
+  { value = law_.rand();}
+  Law::IUnivLaw<Type> const& law_;
+};
+
+/** @ingroup hidden
   * @brief visitor putting a constant value
   */
 template <typename Type>

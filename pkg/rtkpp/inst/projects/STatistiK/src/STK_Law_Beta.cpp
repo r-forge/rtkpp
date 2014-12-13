@@ -42,7 +42,7 @@ namespace Law
 {
 /* Ctor
  */
-Beta::Beta( const Real& alpha, const Real& beta)
+Beta::Beta( Real const& alpha, Real const& beta)
           : IUnivLaw<Real>(String(_T("Beta")))
           , alpha_(alpha)
           , beta_(beta)
@@ -75,7 +75,7 @@ Real Beta::rand() const
  *  Generate a pseudo Beta random variate with the specified parameters.
  *  (static)
  */
-Real Beta::rand( const Real& a, const Real& b)
+Real Beta::rand( Real const& a, Real const& b)
 {
   // check parameters
   if (  Arithmetic<Real>::isNA(a)
@@ -95,7 +95,7 @@ Real Beta::rand( const Real& a, const Real& b)
 /*
  *  Give the value of the pdf at x.
  */
-Real Beta::pdf( const Real& x) const
+Real Beta::pdf( Real const& x) const
 {
   // check NA value
   if (Arithmetic<Real>::isNA(x)) return Arithmetic<Real>::NA();
@@ -108,7 +108,7 @@ Real Beta::pdf( const Real& x) const
 /*
  * Give the value of the log-pdf at x.
  */
-Real Beta::lpdf( const Real& x) const
+Real Beta::lpdf( Real const& x) const
 {
   // check NA value
   if (Arithmetic<Real>::isNA(x)) return Arithmetic<Real>::NA();
@@ -123,7 +123,7 @@ Real Beta::lpdf( const Real& x) const
 /*
  * The cumulative distribution function at t.
  */
-Real Beta::cdf( const Real& t) const
+Real Beta::cdf( Real const& t) const
 {
   // check NA value
   if (Arithmetic<Real>::isNA(t)) return Arithmetic<Real>::NA();
@@ -135,7 +135,7 @@ Real Beta::cdf( const Real& t) const
 /*
  * The inverse cumulative distribution function at p.
  */
-Real Beta::icdf( const Real& p) const
+Real Beta::icdf( Real const& p) const
 {
   // check NA value
   if (Arithmetic<Real>::isNA(p)) return Arithmetic<Real>::NA();

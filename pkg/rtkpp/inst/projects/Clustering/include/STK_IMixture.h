@@ -177,10 +177,15 @@ class IMixture
      *  @return Pointer to tik.
      */
     Real const** posteriorProbabilities() const;
+    /** This function can be used in derived classes to get estimated number
+     *  of individuals from the framework.
+     *  @return Pointer to the number of individuals.
+     */
+    CPointX const* p_pk() const;
     /** This function can be used in derived classes to get proportions from the framework.
      *  @return Pointer to proportions.
      */
-    CPointX const* p_pk() const;
+    CPointX const* p_nk() const;
     /** This function can be used in derived classes to get posterior probabilities from the framework.
      *  @return Pointer to tik.
      */

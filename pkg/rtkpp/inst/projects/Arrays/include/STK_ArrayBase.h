@@ -36,6 +36,8 @@
 #define STK_ARRAYBASE_H
 
 #include "STK_ExprBase.h"
+#include "STatistiK/include/STK_Law_IUnivLaw.h"
+
 
 namespace STK
 {
@@ -85,10 +87,14 @@ class ArrayBase :  public ExprBase<Derived>
      **/
     template<typename Visitor>
     void apply(Visitor& visitor);
-    /** set random values to this using a uniform law. @sa apply(), ones(), zeros() */
+    /** set random values to this using a uniform law. @sa apply(), randGauss() */
     void randUnif();
-    /** set random values to this using a standard gaussian law. @sa apply(), ones(), zeros() */
+    /** set random values to this using a standard gaussian law.
+     *  @sa randUnif(), rand(Law::IUnivLaw<Type> const& law), apply()
+     **/
     void randGauss();
+    /** set random values to this using a law given by the user. @sa randGauss(), randUnif(), apply() */
+    void rand( Law::IUnivLaw<Type> const& law);
     /** set one to this using a Visitor. @sa apply(), setValue(), zeros() */
     void ones();
     /** set zero to this using a Visitor. @sa apply(), ones(), setValue()*/

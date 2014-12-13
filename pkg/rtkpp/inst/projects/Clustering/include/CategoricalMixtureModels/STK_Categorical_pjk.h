@@ -77,7 +77,7 @@ class Categorical_pjk : public CategoricalBase<Categorical_pjk<Array> >
     using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::paramBuffer_;
+
     using Base::modalities_;
 
     /** default constructor
@@ -90,8 +90,6 @@ class Categorical_pjk : public CategoricalBase<Categorical_pjk<Array> >
     Categorical_pjk( Categorical_pjk const& model) : Base(model) {}
     /** destructor */
     ~Categorical_pjk() {}
-    /** Compute the initial weighted probabilities of the mixture */
-    bool initializeStep();
     /** Initialize randomly the parameters of the Categorical mixture. */
     void randomInit();
     /** Compute the weighted probabilities. */
@@ -99,35 +97,9 @@ class Categorical_pjk : public CategoricalBase<Categorical_pjk<Array> >
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*((this->nbModalities_-1).sum());}
-    /** set the parameters of the model */
-    void setParametersImpl();
 };
 
-/* set the parameters of the model */
-template<class Array>
-void Categorical_pjk<Array>::setParametersImpl()
-{
-  int nbCluster    = this->nbCluster();
-  int nbModalities = this->modalities_.size();
-  for (int k = 0; k < nbCluster; ++k)
-  {
-    for (int j = p_data()->beginCols(); j < p_data()->endCols(); ++j)
-    {
-      for (int l = 0; l < nbModalities; ++l)
-      { p_param(baseIdx + k)->proba_[j][modalities_.begin() + l]
-                          = paramBuffer_(baseIdx + k * nbModalities + l, j);
-      }
-    }
-  }
-}
-
-/* Initialize the parameters using mStep. */
-template<class Array>
-bool Categorical_pjk<Array>::initializeStep()
-{ return mStep();}
-
-/* Initialize randomly the parameters of the Categorical mixture.
- */
+/* Initialize randomly the parameters of the Categorical mixture. */
 template<class Array>
 void Categorical_pjk<Array>::randomInit()
 {

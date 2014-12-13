@@ -206,7 +206,7 @@ void LinearAAModel::simul( const Law::IUnivLaw<Real>& law
   if (data.cols() != mu.range())
     STKRUNTIME_ERROR_NO_ARG(LinearAAModel::simul,data.cols()!=mu.range());
   // simul AA model
-  law.randArray(data);
+  data.rand(law);
 #ifdef STK_AAMODELS_VERBOSE
   stk_cout << _T("data simulated\n");
 #endif

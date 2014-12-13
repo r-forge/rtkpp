@@ -93,6 +93,7 @@ bool SimpleStrategy::run()
   try
   {
     p_currentModel = p_model_->create();
+
     // initialize and run algo. break if success
     for (int iTry = 0; iTry < nbTry_; ++iTry)
     {
@@ -277,7 +278,7 @@ bool FullStrategy::run()
         msg_error_ += STKERROR_NO_ARG(FullStrategy::run,long algo failed\n);
         msg_error_ += p_param_->p_longAlgo_->error();
 #ifdef STK_MIXTURE_VERBOSE
-        stk_cout << _T("In FullStrategy::run(): Long Algo fail\n");
+        stk_cout << _T("In FullStrategy::run(): Long Algo failed\n");
 #endif
       }
       // if we get a better result, store it in p_model_

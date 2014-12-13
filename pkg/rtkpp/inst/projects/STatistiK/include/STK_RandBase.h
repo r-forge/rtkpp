@@ -175,49 +175,49 @@ class RandBase : protected MTRand
     **/
     Real randExp();
 
-    /** Pseudo-random int uniform generator for a uni-dimensional
-     *  container of int .
-     *  @param A container to fill
-     **/
-    template< class TContainer1D>
-    inline void randDiscreteUnif(ArrayBase<TContainer1D>& A)
-    { for (int i=A.beginRows(); i<=A.lastIdxRows(); i++)
-        for (int j=A.beginCols(); j<=A.lastIdxCols(); j++)
-          A(i,j) = randDiscreteUnif();
-    }
-
-    /** Pseudo-random Real uniform generator for a uni-dimensional
-     *  container of Real.
-     *  @param A container to fill
-     **/
-    template< class TContainer1D>
-    inline void randUnif(ArrayBase<TContainer1D>& A)
-    { for (int i=A.beginRows(); i<=A.lastIdxRows(); i++)
-        for (int j=A.beginCols(); j<=A.lastIdxCols(); j++)
-          A(i,j) = randUnif();
-    }
-
-    /** Pseudo-random Real gaussian generator for a uni-dimensional
-     *  container of Real.
-     *  @param A container to fill
-     **/
-    template< class TContainer1D>
-    inline void randGauss(ArrayBase< TContainer1D>& A)
-    { for (int i=A.beginRows(); i<=A.lastIdxRows(); i++)
-        for (int j=A.beginCols(); j<=A.lastIdxCols(); j++)
-          A(i,j) = randGauss();
-    }
-
-    /** Pseudo-random Real exponential generator for a uni-dimensional
-     *  container of Real.
-     *  @param A container to fill
-     **/
-    template< class TContainer1D>
-    inline void randExp(ArrayBase< TContainer1D>& A)
-    { for (int i=A.beginRows(); i<=A.lastIdxRows(); i++)
-        for (int j=A.beginCols(); j<=A.lastIdxCols(); j++)
-          A(i,j) = randExp();
-    }
+//    /** Pseudo-random int uniform generator for a uni-dimensional
+//     *  container of int .
+//     *  @param A container to fill
+//     **/
+//    template< class TContainer1D>
+//    inline void randDiscreteUnif(ArrayBase<TContainer1D>& A)
+//    { for (int i=A.beginRows(); i<=A.lastIdxRows(); i++)
+//        for (int j=A.beginCols(); j<=A.lastIdxCols(); j++)
+//          A(i,j) = randDiscreteUnif();
+//    }
+//
+//    /** Pseudo-random Real uniform generator for a uni-dimensional
+//     *  container of Real.
+//     *  @param A container to fill
+//     **/
+//    template< class TContainer1D>
+//    inline void randUnif(ArrayBase<TContainer1D>& A)
+//    { for (int i=A.beginRows(); i<=A.lastIdxRows(); i++)
+//        for (int j=A.beginCols(); j<=A.lastIdxCols(); j++)
+//          A(i,j) = randUnif();
+//    }
+//
+//    /** Pseudo-random Real gaussian generator for a uni-dimensional
+//     *  container of Real.
+//     *  @param A container to fill
+//     **/
+//    template< class TContainer1D>
+//    inline void randGauss(ArrayBase< TContainer1D>& A)
+//    { for (int i=A.beginRows(); i<=A.lastIdxRows(); i++)
+//        for (int j=A.beginCols(); j<=A.lastIdxCols(); j++)
+//          A(i,j) = randGauss();
+//    }
+//
+//    /** Pseudo-random Real exponential generator for a uni-dimensional
+//     *  container of Real.
+//     *  @param A container to fill
+//     **/
+//    template< class TContainer1D>
+//    inline void randExp(ArrayBase< TContainer1D>& A)
+//    { for (int i=A.beginRows(); i<=A.lastIdxRows(); i++)
+//        for (int j=A.beginCols(); j<=A.lastIdxCols(); j++)
+//          A(i,j) = randExp();
+//    }
 
   private:
     /*  Gauss parameters. */

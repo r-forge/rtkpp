@@ -277,6 +277,9 @@ void ClusterLauncher::getParameters(Rcpp::S4& s4_component, std::string const& i
     case Clust::Gaussian_:
       getDiagGaussianParameters(s4_component, idData);
       break;
+    case Clust::Poisson_:
+      getPoissonParameters(s4_component, idData);
+      break;
     case Clust::Gamma_:
       getGammaParameters(s4_component, idData);
       break;
@@ -306,6 +309,21 @@ void ClusterLauncher::getDiagGaussianParameters(Rcpp::S4& s4_component, std::str
   // save results in s4_model
   s4_component.slot("mean")  = wrap(mean);
   s4_component.slot("sigma") = wrap(sigma);
+  // get data
+  RcppMatrix<double> m_data =  manager_.getData<double>(idData);
+//  RcppMatrix<double> m_data;
+//  manager_.getData(idData_, m_data);
+  s4_component.slot("data") = (Rcpp::Matrix< RcppMatrix<double>::Rtype_>)m_data;
+}
+
+/* get the diagonal Gaussian parameters */
+void ClusterLauncher::getPoissonParameters(Rcpp::S4& s4_component, std::string const& idData)
+{
+  // get parameters
+  Array2D<Real> params;
+  static_cast<MixtureComposer*>(p_composer_)->getParameters(manager_,idData, params);
+  // save results in s4_model
+  s4_component.slot("lambda")  = wrap(params);
   // get data
   RcppMatrix<double> m_data =  manager_.getData<double>(idData);
 //  RcppMatrix<double> m_data;

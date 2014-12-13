@@ -46,6 +46,7 @@ Collate:
     'ClusterStrategy.R'
     'IClusterModel.R'
     'ClusterCategorical.R'
+    'ClusterPoisson.R'
     'ClusterDiagGaussian.R'
     'ClusterHeterogeneous.R'
     'ClusterGamma.R'

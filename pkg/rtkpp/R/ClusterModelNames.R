@@ -302,19 +302,19 @@ clusterCategoricalNames <- function(prop = "all", probabilities="all")
   { stop("prop is not valid. See ?clusterCategoricalNames for the list of prop.")}
   if(sum(probabilities %in% c("equal","free","all")) != 1)
   { stop("probabilities is not valid. See ?clusterCategoricalNames for the list of probabilities.")}
-  
-  all = c( "categorical_pk_pjk", "categorical_pk_pk", "categorical_p_pjk", "categorical_p_sk")
+
+  all = c( "categorical_pk_pjk", "categorical_pk_pk", "categorical_p_pjk", "categorical_p_pk")
   propFree  = c( "categorical_pk_pjk", "categorical_pk_pk")
   propEqual = c( "categorical_p_pjk", "categorical_p_pk")
   probFree  = c( "categorical_pk_pjk", "categorical_p_pjk")
   probEqual = c( "categorical_pk_pk", "categorical_p_pk")
-  
+
   res = all;
   if (prop == "free")  { res = intersect(res, propFree);}
   if (prop == "equal") { res = intersect(res, propEqual);}
   if (probabilities =="free")  { res = intersect(res, probFree);}
   if (probabilities =="equal") { res = intersect(res, probEqual);}
-  
+
   res
 }
 
@@ -328,6 +328,70 @@ clusterValidCategoricalNames <- function(names)
   if ( nb == 0 ) { return(FALSE);}
 
   all = c( "categorical_pk_pjk", "categorical_p_pjk",  "categorical_pk_pk", "categorical_p_pk")
+  for (i in 1:nb)
+  {  if ( sum(names[i] %in% all) != 1 ) { return(FALSE);}}
+  return(TRUE)
+}
+
+#' Build a vector of Poisson model names.
+#'
+#' In a poisson model, we can build 4 models:
+#' \enumerate{
+#'  \item {The proportions can be equal or free.}
+#'  \item {The intensities can be proportional or free for all the variables.}
+#' }
+#'
+#' The model names are summarized in the following array:
+#' \tabular{lll}{
+#'  Model Name      \tab Proportions \tab Proportional  \cr
+#'  poisson_p_ljk   \tab Equal       \tab No            \cr
+#'  poisson_p_ljpk  \tab Equal       \tab Yes           \cr
+#'  poisson_pk_ljk  \tab Free        \tab No            \cr
+#'  poisson_pk_ljpk \tab Free        \tab Yes           \cr
+#' }
+#'
+#' @param prop A character string equal to "equal", "free" or "all". Default is "all".
+#' @param proportional A character string equal to "yes", "no" or "both". Default is "both".
+#'
+#' @return A vector of character with the model names.
+#' @examples
+#' clusterPoissonNames()
+#' clusterPoissonNames("all", "yes") # same as c( "poisson_pk_ljlk", "poisson_p_ljlk")
+#'
+#' @rdname clusterPoissonNames
+#' @export
+clusterPoissonNames <- function(prop = "all", proportional="both")
+{
+  if(sum(prop %in% c("equal","free","all")) != 1)
+  { stop("prop is not valid. See ?clusterPoissonNames for the list of prop.")}
+  if(sum(proportional %in% c("yes","no","both")) != 1)
+  { stop("proportional is not valid. See ?clusterPoissonNames for the list of proportional.")}
+
+  all = c( "poisson_pk_ljk", "poisson_pk_ljlk", "poisson_p_ljk", "poisson_p_ljlk")
+  propFree  = c( "poisson_pk_ljk", "poisson_pk_ljlk")
+  propEqual = c( "poisson_p_ljk", "poisson_p_ljlk")
+  probNo  = c( "poisson_pk_ljk", "poisson_p_ljk")
+  probYes = c( "poisson_pk_ljlk", "poisson_p_ljlk")
+
+  res = all;
+  if (prop == "free")  { res = intersect(res, propFree);}
+  if (prop == "equal") { res = intersect(res, propEqual);}
+  if (proportional =="no")  { res = intersect(res, probNo);}
+  if (proportional =="yes") { res = intersect(res, probYes);}
+
+  res
+}
+
+#' check if a vector of Poisson model name is correct.
+#' @param names a vector of character
+#' @rdname clusterPoissonNames
+#' @keywords internal
+clusterValidPoissonNames <- function(names)
+{
+  nb = length(names)
+  if ( nb == 0 ) { return(FALSE);}
+
+  all = clusterPoissonNames();
   for (i in 1:nb)
   {  if ( sum(names[i] %in% all) != 1 ) { return(FALSE);}}
   return(TRUE)

@@ -77,7 +77,7 @@ class Categorical_pk : public CategoricalBase<Categorical_pk<Array> >
     using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::paramBuffer_;
+
     using Base::modalities_;
 
     /** default constructor
@@ -90,8 +90,6 @@ class Categorical_pk : public CategoricalBase<Categorical_pk<Array> >
     inline Categorical_pk( Categorical_pk const& model) : Base(model) {}
     /** destructor */
     inline ~Categorical_pk() {}
-    /** Compute the inital weighted mean and the initial common variances. */
-    bool initializeStep();
     /** Initialize randomly the parameters of the Categorical mixture.
      *  Probabilities will be choosen uniformly.
      */
@@ -101,28 +99,7 @@ class Categorical_pk : public CategoricalBase<Categorical_pk<Array> >
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*(this->modalities_.size()-1);}
-    /** set the parameters of the model */
-    void setParametersImpl();
 };
-
-/* set the parameters of the model */
-template<class Array>
-void Categorical_pk<Array>::setParametersImpl()
-{
-  int nbCluster    = this->nbCluster();
-  int nbModalities = this->modalities_.size();
-  for (int k = 0; k < nbCluster; ++k)
-  {
-    for (int l = 0; l < nbModalities; ++l)
-    { p_param(baseIdx + k)->proba_[modalities_.begin() + l]
-                                  = paramBuffer_(baseIdx + k * nbModalities + l, p_data()->beginCols());
-    }
-  }
-}
-
-/* Initialize the parameters using mStep. */
-template<class Array>
-bool Categorical_pk<Array>::initializeStep() { return mStep();}
 
 /* Initialize randomly the parameters of the Categorical mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation

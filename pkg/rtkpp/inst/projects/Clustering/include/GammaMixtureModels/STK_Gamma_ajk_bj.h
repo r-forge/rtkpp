@@ -81,18 +81,19 @@ class Gamma_ajk_bj : public GammaBase<Gamma_ajk_bj<Array> >
     using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::paramBuffer_;
+
     using Base::meanjk;
     using Base::variancejk;
 
     /** default constructor
      * @param nbCluster number of cluster in the model
      **/
-    inline Gamma_ajk_bj( int nbCluster) : Base(nbCluster), scale_() {}
+    inline Gamma_ajk_bj( int nbCluster) : Base(nbCluster), scale_(), stat_scale_() {}
     /** copy constructor
      *  @param model The model to copy
      **/
-    inline Gamma_ajk_bj( Gamma_ajk_bj const& model) : Base(model), scale_(model.scale_) {}
+    inline Gamma_ajk_bj( Gamma_ajk_bj const& model)
+                       : Base(model), scale_(model.scale_), stat_scale_(model.stat_scale_) {}
     /** destructor */
     inline ~Gamma_ajk_bj() {}
     /** Initialize the component of the model.
@@ -101,17 +102,28 @@ class Gamma_ajk_bj : public GammaBase<Gamma_ajk_bj<Array> >
      **/
     void initializeModelImpl()
     {
-      scale_.resize(this->nbVariable());
+      scale_.resize(p_data()->cols());
       scale_ = 1.;
       for (int k= baseIdx; k < components().end(); ++k)
       { p_param(k)->p_scale_ = &scale_;}
-      paramBuffer_.resize(2*this->nbCluster(), p_data()->cols());
-      paramBuffer_ = 0.;
+      stat_scale_.initialize(p_data()->cols());
     }
-    /** use the default static method initializeStep() for a first initialization
-     *  of the parameters using tik values.
+    /** Store the intermediate results of the Mixture.
+     *  @param iteration Provides the iteration number beginning after the burn-in period.
      **/
-    inline bool initializeStep() { return mStep();}
+    void storeIntermediateResultsImpl(int iteration)
+    { stat_scale_.update(scale_);}
+    /** Release the stored results. This is usually used if the estimation
+     *  process failed.
+     **/
+    void releaseIntermediateResultsImpl()
+    { stat_scale_.release();}
+    /** set the parameters stored in stat_proba_ and release stat_proba_. */
+    void setParametersImpl()
+    {
+      scale_ = stat_scale_.param_;
+      stat_scale_.release();
+    }
     /** Initialize randomly the parameters of the Gaussian mixture. The centers
      *  will be selected randomly among the data set and the standard-deviation
      *  will be set to 1.
@@ -122,26 +134,13 @@ class Gamma_ajk_bj : public GammaBase<Gamma_ajk_bj<Array> >
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable()+ this->nbVariable();}
-    /** set the parameters of the model */
-    void setParametersImpl();
 
   protected:
     /** Array of the common scale */
-    Array2DPoint<Real> scale_;
+    PointX scale_;
+    /** Array of the statistics */
+    MixtureStatVector stat_scale_;
 };
-
-/* set the parameters of the model **/
-template<class Array>
-void Gamma_ajk_bj<Array>::setParametersImpl()
-{
-  for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
-  { scale_[j] = paramBuffer_(baseIdx+1, j);}
-  for (int k= 0; k < this->nbCluster(); ++k)
-  {
-    for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
-    { p_param(baseIdx+k)->shape_[j] = paramBuffer_(baseIdx+2*k, j);}
-  }
-}
 
 /* Initialize randomly the parameters of the gamma mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation

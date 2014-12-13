@@ -77,7 +77,7 @@ class Exponential_bjk : public ExponentialBase< Exponential_bjk<Array> >
      using Base::p_tik;using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::paramBuffer_;
+
 
     /** default constructor
      * @param nbCluster number of cluster in the model
@@ -89,8 +89,6 @@ class Exponential_bjk : public ExponentialBase< Exponential_bjk<Array> >
     inline Exponential_bjk( Exponential_bjk const& model) : Base(model) {}
     /** destructor */
     inline ~Exponential_bjk() {}
-    /** initialize shape and scale parameters using weighted moment estimates.*/
-    inline bool initializeStep() { return mStep();}
     /** Initialize randomly the parameters of the Exponential mixture. The shape
      *  will be selected randomly using an exponential of parameter mean^2/variance
      *  and the scale will be selected randomly using an exponential of parameter
@@ -102,23 +100,11 @@ class Exponential_bjk : public ExponentialBase< Exponential_bjk<Array> >
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable();}
-    /** set the parameters of the model */
-    void setParametersImpl();
-};
 
-/* set the parameters of the model
- *  @param params the parameters of the model
- **/
-template<class Array>
-void Exponential_bjk<Array>::setParametersImpl()
-{
-    for (int k = baseIdx; k < components().end(); ++k)
-    {
-      for (int j = p_data()->beginCols(); j < p_data()->endCols(); ++j)
-      { p_param(k)->scale_[j]  = this->paramBuffer_(k, j);
-    }
-  }
-}
+  protected:
+    /** Array of the statistics */
+    MixtureStatVector stat_;
+};
 
 /* Initialize randomly the parameters of the gamma mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation

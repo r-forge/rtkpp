@@ -263,7 +263,7 @@ setClass(
       if (ncol(object@component@shape)!=ncol(object@component@data))
       {stop("shape must have nbVariable columns.")}
       if (nrow(object@component@shape)!=object@nbCluster)
-      {stop("shape must have nbVariable rows.")}
+      {stop("shape must have nbCluster rows.")}
 
       if (ncol(object@component@scale)!=ncol(object@component@data))
       {stop("scale must have nbVariable columns.")}
@@ -365,8 +365,7 @@ setMethod(
 #' @param ... further arguments passed to or from other methods
 #'
 #' @importFrom graphics plot
-#' @aliases plot-ClusterGamma
-#ClusterGamma-method
+#' @aliases plot-ClusterGamma, ClusterGamma-method
 #' @docType methods
 #' @rdname plot-ClusterGamma-method
 #' @export

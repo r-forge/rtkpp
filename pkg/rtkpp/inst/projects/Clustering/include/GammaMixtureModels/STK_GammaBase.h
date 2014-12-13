@@ -103,7 +103,7 @@ class GammaBase : public IMixtureModel<Derived >
     using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::paramBuffer_;
+
 
   protected:
     /** default constructor

@@ -58,7 +58,7 @@ class CategoricalBase : public IMixtureModel<Derived >
     using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::paramBuffer_;
+
 
     /** default constructor
      *  @param nbCluster number of cluster in the model
@@ -102,9 +102,6 @@ class CategoricalBase : public IMixtureModel<Derived >
       // resize vectors of probabilities
       for(int k=baseIdx; k < components().end(); ++k)
       { p_param(k)->initializeParameters(modalities_);}
-      // resize paramBuffer_
-      paramBuffer_.resize(modalities_.size() * this->nbCluster(), p_data()->cols());
-      paramBuffer_ = 0.;
     }
     /** Write the parameters on the output stream os */
     void writeParameters(ostream& os) const

@@ -171,6 +171,7 @@ enum MixtureClass
   Gamma_,
   Gaussian_,
   Categorical_,
+  Poisson_,
   unknown_mixture_class_
 };
 
@@ -197,6 +198,8 @@ enum Mixture
   Gaussian_s_,
   Categorical_pjk_,
   Categorical_pk_,
+  Poisson_ljk_,
+  Poisson_ljlk_,
   unknown_mixture_
 };
 
@@ -229,6 +232,8 @@ MixtureClass mixtureToMixtureClass( Mixture const& type);
  * <tr> <td> "Gaussian_s"      </td></tr>
  * <tr> <td> "Categorical_pjk" </td></tr>
  * <tr> <td> "Categorical_pk"  </td></tr>
+ * <tr> <td> "Poisson_ljk"    </td></tr>
+ * <tr> <td> "Poisson_ljlk"     </td></tr>
  * </table>
  *  @param type the String we want to convert
  *  @return the Mixture represented by the String @c type. if the string
@@ -259,6 +264,8 @@ Mixture stringToMixture( std::string const& type);
  * <tr> <td> "Gaussian_pk_s"      </td><td> "Gaussian_p_s"      </td> </tr>
  * <tr> <td> "Categorical_pk_pjk" </td><td> "Categorical_p_pjk" </td> </tr>
  * <tr> <td> "Categorical_pk_pk"  </td><td> "Categorical_p_pk"  </td> </tr>
+ * <tr> <td> "Poisson_pk_ljk"     </td><td> "Poisson_p_ljk"     </td></tr>
+ * <tr> <td> "Poisson_pk_ljlk"    </td><td> "Poisson_p_ljlk"    </td></tr>
  * </table>
  *  @param type the String we want to convert
  *  @param[out] freeProp @c true if the model have free proportions, @c false otherwise.

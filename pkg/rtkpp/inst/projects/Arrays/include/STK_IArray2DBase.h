@@ -148,7 +148,7 @@ class IArray2DBase :  protected IContainer2D<SizeRow_, SizeCol_>, public ArrayBa
                 , rangeCols_(J)
                 , capacityHo_(J.size())
     {
-      for (int j=J.begin(); j<=J.lastIdx(); j++)
+      for (int j=J.begin(); j<J.end(); j++)
       { // compute available wrapped range of the column j
         rangeCols_[j] = Range::inf(I, T.rangeCols()[j]);
       }
@@ -246,8 +246,8 @@ class IArray2DBase :  protected IContainer2D<SizeRow_, SizeCol_>, public ArrayBa
     {
       if (this->beginCols() > j)
       { STKOUT_OF_RANGE_1ARG(IArray2DBase::atCol, j, beginCols() > j);}
-      if (this->lastIdxCols() < j)
-      { STKOUT_OF_RANGE_1ARG(IArray2DBase::atCol, j, lastIdxCols() < j);}
+      if (this->endCols() <= j)
+      { STKOUT_OF_RANGE_1ARG(IArray2DBase::atCol, j, endCols() <= j);}
       return this->asDerived().col(j);
     }
     /** @return the row i.
@@ -257,7 +257,7 @@ class IArray2DBase :  protected IContainer2D<SizeRow_, SizeCol_>, public ArrayBa
     {
       if (this->beginRows() > i)
       { STKOUT_OF_RANGE_1ARG(IArray2DBase::atRow, i, beginRows() > i);}
-      if (this->lastIdxRows() < i)
+      if (this->endRows() <= i)
       { STKOUT_OF_RANGE_1ARG(IArray2DBase::at, i, lastIdxRows() < i);}
       return this->asDerived().row(i);
     }
@@ -341,12 +341,12 @@ class IArray2DBase :  protected IContainer2D<SizeRow_, SizeCol_>, public ArrayBa
     {
       if (this->beginCols() > pos1)
       { STKOUT_OF_RANGE_2ARG(IArray2D::swapCols,pos1, pos2,beginCols() >pos1);}
-      if (this->lastIdxCols() < pos1)
-      { STKOUT_OF_RANGE_2ARG(IArray2D::swapCols,pos1, pos2,lastIdxCols() <pos1);}
+      if (this->endCols() <= pos1)
+      { STKOUT_OF_RANGE_2ARG(IArray2D::swapCols,pos1, pos2,endCols() <= pos1);}
       if (this->beginCols() > pos2)
       { STKOUT_OF_RANGE_2ARG(IArray2D::swapCols,pos1, pos2,beginCols() >pos2);}
-      if (this->lastIdxCols() < pos2)
-      { STKOUT_OF_RANGE_2ARG(IArray2D::swapCols,pos1, pos2,lastIdxCols() <pos2);}
+      if (this->endCols() <= pos2)
+      { STKOUT_OF_RANGE_2ARG(IArray2D::swapCols,pos1, pos2,endCols() <=pos2);}
       // swap allocator part
       allocator_.swap(pos1, pos2);
       // swap capacityCols_
@@ -403,10 +403,9 @@ class IArray2DBase :  protected IContainer2D<SizeRow_, SizeCol_>, public ArrayBa
       this->reallocCols(cols);
       this->setCols(cols);
       // align other range
-      const int last = cols.lastIdx();
       Tref.shiftbeginCols(first); // easiest like that
       // copy data from other
-      for (int j=first; j<= last; j++) { copyColumn(Tref, j, j);}
+      for (int j=first; j< cols.end(); j++) { copyColumn(Tref, j, j);}
       // delete and set view on the data
       Tref.allocator().free();
       Tref.allocator().setPtrData(allocator_.p_data(), allocator_.rangeData(), true);

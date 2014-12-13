@@ -58,7 +58,7 @@ bool CEMAlgo::run()
     {
       if (p_model_->cStep()<threshold_)
       {
-        msg_error_ += STKERROR_NO_ARG(CEMAlgo::run,No more individuals after cStep\n);
+        msg_error_ = STKERROR_NO_ARG(CEMAlgo::run,No more individuals after cStep\n);
         return false;
       }
       p_model_->pStep();
@@ -67,7 +67,7 @@ bool CEMAlgo::run()
       Real nb = p_model_->eStep();
       if (nb<threshold_)
       {
-        msg_error_ += STKERROR_1ARG(CEMAlgo::run,nb,Not enough individuals after eStep\n);
+        msg_error_ = STKERROR_1ARG(CEMAlgo::run,nb,Not enough individuals after eStep\n);
         return false;
       }
       Real lnLikelihood = p_model_->lnLikelihood();
@@ -85,7 +85,7 @@ bool CEMAlgo::run()
   }
   catch (Clust::exceptions const& error)
   {
-    msg_error_ += Clust::exceptionToString(error);
+    msg_error_ = Clust::exceptionToString(error);
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("An error occur in CEM algorithm: ") << msg_error_ << _T("\n");
 #endif
@@ -113,7 +113,7 @@ bool EMAlgo::run()
       Real nb = p_model_->eStep();
       if (nb<threshold_)
       {
-        msg_error_ += STKERROR_1ARG(EMAlgo::run,nb,Not enough individuals after eStep\n);
+        msg_error_ = STKERROR_1ARG(EMAlgo::run,nb,Not enough individuals after eStep\n);
         return false;
       }
       Real lnLikelihood = p_model_->lnLikelihood();
@@ -157,7 +157,7 @@ bool SEMAlgo::run()
       Real nb = p_model_->sStep(); // simulate labels
       if (nb<threshold_)
       {
-        msg_error_ += STKERROR_1ARG(SEMAlgo::run,nb,Not enough individuals after sStep\n);
+        msg_error_ = STKERROR_1ARG(SEMAlgo::run,nb,Not enough individuals after sStep\n);
         result = false;
         break;
       }
@@ -168,7 +168,7 @@ bool SEMAlgo::run()
       p_model_->storeIntermediateResults(iter+1); // store current parameters
       if (nb<threshold_)
       {
-        msg_error_ += STKERROR_1ARG(SEMAlgo::run,nb,Not enough individuals after eStep\n);
+        msg_error_ = STKERROR_1ARG(SEMAlgo::run,nb,Not enough individuals after eStep\n);
         result = false;
         break;
       }
@@ -176,7 +176,7 @@ bool SEMAlgo::run()
   }
   catch (Clust::exceptions const& error)
   {
-    msg_error_ += Clust::exceptionToString(error);
+    msg_error_ = Clust::exceptionToString(error);
 #ifdef STK_MIXTURE_VERBOSE
   stk_cout << _T("An exception occur in SEM algorithm: ") << msg_error_ << _T("\n");
 #endif
@@ -247,7 +247,7 @@ bool SemiSEMAlgo::run()
   }
   catch (Clust::exceptions const& error)
   {
-    msg_error_ += Clust::exceptionToString(error);
+    msg_error_ = Clust::exceptionToString(error);
 #ifdef STK_MIXTURE_VERBOSE
   stk_cout << _T("An exception occur in SemiSEM algorithm: ") << msg_error_ << _T("\n");
 #endif

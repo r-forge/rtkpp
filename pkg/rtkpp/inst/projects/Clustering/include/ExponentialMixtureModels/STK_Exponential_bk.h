@@ -79,7 +79,7 @@ class Exponential_bk : public ExponentialBase< Exponential_bk<Array> >
      using Base::p_tik;using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::paramBuffer_;
+
 
     /** default constructor
      * @param nbCluster number of cluster in the model
@@ -91,8 +91,6 @@ class Exponential_bk : public ExponentialBase< Exponential_bk<Array> >
     inline Exponential_bk( Exponential_bk const& model) : Base(model) {}
     /** destructor */
     inline ~Exponential_bk() {}
-    /** initialize shape and scale parameters using weighted moment estimates.*/
-    inline bool initializeStep() { return mStep();}
     /** Initialize randomly the parameters of the Exponential mixture. The shape
      *  will be selected randomly using an exponential of parameter mean^2/variance
      *  and the scale will be selected randomly using an exponential of parameter
@@ -103,20 +101,7 @@ class Exponential_bk : public ExponentialBase< Exponential_bk<Array> >
     bool mStep();
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const { return this->nbCluster();}
-    /** set the parameters of the model */
-    void setParametersImpl();
 };
-
-/* set the parameters of the model
- *  @param params the parameters of the model
- **/
-template<class Array>
-void Exponential_bk<Array>::setParametersImpl()
-{
-  for (int k = baseIdx; k < components().end(); ++k)
-  { p_param(k)->scale_  = this->paramBuffer_(k, p_data()->beginCols());}
-}
-
 
 /* Initialize randomly the parameters of the Gaussian mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation

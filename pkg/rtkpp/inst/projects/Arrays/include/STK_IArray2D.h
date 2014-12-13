@@ -708,16 +708,16 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
       Type *dp =this->data(jDst), *sp =src.data(jSrc);
       const int tfirst(this->rangeCols_[jDst].begin())
               , sfirst(src.rangeCols_[jSrc].begin())
-              , slast (src.rangeCols_[jSrc].lastIdx());
-      for ( int it=tfirst, is=sfirst; is<=slast; it++, is++) dp[it] = sp[is];
+              , send (src.rangeCols_[jSrc].end());
+      for ( int it=tfirst, is=sfirst; is<send; it++, is++) dp[it] = sp[is];
     }
     /** copy backward the column @c jSrc of @c src in the column @c jDst of this. */
     void copyColumnBackward(IArray2D const& src, int jDst, int jSrc)
     {
       Type *dp =this->data(jDst), *sp =src.data(jSrc);
       const int tlast (this->rangeCols_[jDst].lastIdx())
-                  , sfirst(src.rangeCols_[jSrc].begin())
-                  , slast (src.rangeCols_[jSrc].lastIdx());
+              , sfirst(src.rangeCols_[jSrc].begin())
+              , slast (src.rangeCols_[jSrc].lastIdx());
 
       for ( int it=tlast, is=slast; is>=sfirst; it--, is--) dp[it] = sp[is];
     }

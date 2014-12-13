@@ -263,11 +263,11 @@ int IMixtureComposer::randomFuzzyTik()
 {
   RandBase generator;
   nk_ = 0.;
+  tik_.randUnif();
   for (int i = tik_.beginRows(); i < tik_.endRows(); ++i)
   {
     // create a reference on the i-th row
     PointX tikRowi(tik_.row(i), true);
-    generator.randUnif(tikRowi);
     tikRowi = tikRowi * prop_;
     tikRowi /= tikRowi.sum();
     nk_ += tikRowi;

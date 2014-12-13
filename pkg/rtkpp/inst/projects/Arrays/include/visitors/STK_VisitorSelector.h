@@ -45,9 +45,9 @@ template<typename Visitor, typename Derived, int Structure_, int SizeRows_, int 
 struct VisitorSelectorHelper;
 
 /** @ingroup hidden
- *  @brief visitor selector. If @c Derived is a full two-dimensionnal array and
+ *  @brief visitor selector. If @c Derived is a full two-dimensional array and
  *  the visitation can be unrolled,then we use directly the VisitorArrayImpl
- *  class in order to computate the result of the visitation.
+ *  class in order to compute the result of the visitation.
  *
  *  Otherwise we delegate the search of the correct implementation to the
  *  VisitorSelectorHelper class.
@@ -73,36 +73,45 @@ struct VisitorSelector
   typedef typename If<is2D_ && unrollRows_ && unrollCols_, ArrayImpl, HelperImpl >::Result Impl;
 };
 
+
 /** @ingroup hidden
  *  @brief specialization for the diagonal arrays */
 template<typename Visitor, typename Derived, int SizeRows_, int sizeCols_>
 struct VisitorSelectorHelper<Visitor, Derived, Arrays::diagonal_, SizeRows_, sizeCols_>
-{ typedef VisitorDiagonalImpl<Visitor, Derived, sizeCols_> Impl;};
+{
+  enum
+  {
+    sizeRows_  = hidden::Traits<Derived>::sizeRows_,
+    unrollRows_ = (sizeRows_ < MaxUnrollSquareRoot)
+  };
+  typedef VisitorDiagonalImpl<Visitor, Derived, SizeRows_> Unroll;
+  typedef VisitorDiagonalImpl<Visitor, Derived, UnknownSize> Loop;
+
+  typedef typename If<unrollRows_, Unroll, Loop  >::Result Impl;
+};
 
 /** @ingroup hidden
- *  @brief specialization for the diagonal arrays. Desambiguate specialization */
+ *  @brief specialization for the diagonal arrays. Disambiguate specialization */
 template<typename Visitor, typename Derived>
 struct VisitorSelectorHelper<Visitor, Derived, Arrays::diagonal_, UnknownSize, UnknownSize>
 { typedef VisitorDiagonalImpl<Visitor, Derived, UnknownSize> Impl;};
 
-/** @ingroup hidden
- *  @brief specialization for the diagonal arrays. Debugging specialization */
-template<typename Visitor, typename Derived, int SizeRows_>
-struct VisitorSelectorHelper<Visitor, Derived, Arrays::diagonal_, SizeRows_, UnknownSize>
-{ /* get an error at compile time */};
-
-/** @ingroup hidden
- *  @brief specialization for the diagonal arrays. Debugging specialization */
-template<typename Visitor, typename Derived, int sizeCols_>
-struct VisitorSelectorHelper<Visitor, Derived, Arrays::diagonal_, UnknownSize, sizeCols_>
-{ /* get an error at compile time */};
 
 
 /** @ingroup hidden
  *  @brief specialization for the vectors */
 template<typename Visitor, typename Derived, int SizeRows_>
 struct VisitorSelectorHelper<Visitor, Derived, Arrays::vector_, SizeRows_, 1>
-{ typedef VisitorVectorImpl<Visitor, Derived, SizeRows_> Impl;};
+{
+  enum
+  {
+    sizeRows_  = hidden::Traits<Derived>::sizeRows_,
+    unrollRows_ = (sizeRows_ < MaxUnrollSquareRoot)
+  };
+  typedef VisitorVectorImpl<Visitor, Derived, SizeRows_> Unroll;
+  typedef VisitorVectorImpl<Visitor, Derived, UnknownSize> Loop;
+  typedef typename If<unrollRows_, Unroll, Loop  >::Result Impl;
+};
 
 /** @ingroup hidden
  *  @brief specialization for the vectors. Disambiguate */
@@ -110,17 +119,23 @@ template<typename Visitor, typename Derived>
 struct VisitorSelectorHelper<Visitor, Derived, Arrays::vector_, UnknownSize, 1>
 { typedef VisitorVectorImpl<Visitor, Derived, UnknownSize> Impl;};
 
-/** @ingroup hidden
- *  @brief specialization for the vectors. Debugging specialization. */
-template<typename Visitor, typename Derived, int SizeRows_, int SizeCols_>
-struct VisitorSelectorHelper<Visitor, Derived, Arrays::vector_, SizeRows_, SizeCols_>
-{ /* get an error at compile time */};
+
 
 /** @ingroup hidden
  *  @brief specialization for the row vectors */
 template<typename Visitor, typename Derived, int SizeCols_>
 struct VisitorSelectorHelper<Visitor, Derived, Arrays::point_, 1, SizeCols_>
-{ typedef VisitorPointImpl<Visitor, Derived, SizeCols_> Impl;};
+{
+    enum
+    {
+      sizeRows_  = hidden::Traits<Derived>::sizeRows_,
+      unrollRows_ = (sizeRows_ < MaxUnrollSquareRoot)
+    };
+    typedef VisitorPointImpl<Visitor, Derived, SizeCols_> Unroll;
+    typedef VisitorPointImpl<Visitor, Derived, UnknownSize> Loop;
+
+    typedef typename If<unrollRows_, Unroll, Loop  >::Result Impl;
+};
 
 /** @ingroup hidden
  *  @brief specialization for the row vectors. Disambiguate */
@@ -128,11 +143,7 @@ template<typename Visitor, typename Derived>
 struct VisitorSelectorHelper<Visitor, Derived, Arrays::point_, 1, UnknownSize>
 { typedef VisitorPointImpl<Visitor, Derived, UnknownSize> Impl;};
 
-/** @ingroup hidden
- *  @brief specialization for the row vectors. Debugging specialization. */
-template<typename Visitor, typename Derived, int SizeRows_, int SizeCols_>
-struct VisitorSelectorHelper<Visitor, Derived, Arrays::point_, SizeRows_, SizeCols_>
-{ /* get an error at compile time */};
+
 
 /** @ingroup hidden
  *  @brief specialization for the upper triangular arrays */
@@ -172,6 +183,8 @@ struct VisitorSelectorHelper<Visitor, Derived, Arrays::upper_triangular_, Unknow
   typedef VisitorUpperImpl<Visitor, Derived, orient_> Impl;
 };
 
+
+
 /** @ingroup hidden
  *  @brief specialization for the lower triangular arrays */
 template<typename Visitor, typename Derived, int SizeRows_, int SizeCols_>
@@ -210,24 +223,21 @@ struct VisitorSelectorHelper<Visitor, Derived, Arrays::lower_triangular_, Unknow
   typedef VisitorLowerImpl<Visitor, Derived, orient_> Impl;
 };
 
+
+
 /** @ingroup hidden
- *  @brief specialization for the vectors */
+ *  @brief specialization for the numbers */
 template<typename Visitor, typename Derived>
 struct VisitorSelectorHelper<Visitor, Derived, Arrays::number_, 1, 1>
 { typedef VisitorNumberImpl<Visitor, Derived> Impl;};
 
-/** @ingroup hidden
- *  @brief specialization for the vectors */
-template<typename Visitor, typename Derived, int SizeRows_, int SizeCols_>
-struct VisitorSelectorHelper<Visitor, Derived, Arrays::number_, SizeRows_, SizeCols_>
-{ /* get an error at compile time */};
 
 
 /** @ingroup hidden
  *  @brief Helper for the Visitor selector: allow to select the correct
  *  implementation to instantiate. General case for general 2D arrays with
  *  known dimensions of the rows and columns but at least one of the dimension
- *  is too great for beeing unrolled.
+ *  is too great for being unrolled.
  **/
 template<typename Visitor, typename Derived, int Structure_, int SizeRows_, int SizeCols_>
 struct VisitorSelectorHelper

@@ -95,13 +95,21 @@ void ArrayBase<Derived>::randUnif()
   apply(visitor);
 }
 
+/* set Gaussian random values to this */
 template<typename Derived>
 void ArrayBase<Derived>::randGauss()
 {
-    hidden::RandGaussVisitor<Type> visitor;
-    apply(visitor);
+  hidden::RandGaussVisitor<Type> visitor;
+  apply(visitor);
 }
 
+/* set random values to this using a law given by the user */
+template<typename Derived>
+void ArrayBase<Derived>::rand( Law::IUnivLaw<Type> const& law)
+{
+  hidden::RandVisitor<Type> visitor(law);
+  apply(visitor);
+}
 
 
 

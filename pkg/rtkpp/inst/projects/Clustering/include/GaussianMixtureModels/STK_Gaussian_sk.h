@@ -75,10 +75,11 @@ class Gaussian_sk : public DiagGaussianBase<Gaussian_sk<Array> >
     typedef typename Clust::MixtureTraits< Gaussian_sk<Array> >::Parameters Parameters;
 
     using Base::p_tik;
+    using Base::p_nk;
     using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::paramBuffer_;
+
 
     /** default constructor
      * @param nbCluster number of cluster in the model
@@ -90,12 +91,6 @@ class Gaussian_sk : public DiagGaussianBase<Gaussian_sk<Array> >
     inline Gaussian_sk( Gaussian_sk const& model) : Base(model) {}
     /** destructor */
     inline ~Gaussian_sk() {}
-    /** Initialize the component of the model. */
-    void initializeModelImpl()
-    {
-      paramBuffer_.resize(2*this->nbCluster(), p_data()->cols());
-      paramBuffer_ = 0.;
-    }
     /** Compute the inital weighted mean and the initial common standard deviations. */
     inline bool initializeStep() { return mStep();}
     /** Initialize randomly the parameters of the Gaussian mixture. The centers
@@ -108,21 +103,8 @@ class Gaussian_sk : public DiagGaussianBase<Gaussian_sk<Array> >
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable() + this->nbCluster();}
-    /** set the parameters of the model */
-    void setParametersImpl();
 };
 
-/* set the parameters of the model */
-template<class Array>
-void Gaussian_sk<Array>::setParametersImpl()
-{
-  for (int k= baseIdx; k < this->nbCluster(); ++k)
-  {
-    for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
-    { p_param(baseIdx+k)->mean_[j] = paramBuffer_(baseIdx+2*k, j);}
-    p_param(baseIdx+k)->sigma_ = paramBuffer_(baseIdx+2*k+1, p_data()->beginCols());
-  }
-}
 /* Initialize randomly the parameters of the Gaussian mixture. The centers
  *  will be selected randomly among the data set and the standard-deviation
  *  will be set to 1.
@@ -138,7 +120,7 @@ void Gaussian_sk<Array>::randomInit()
     variance = sqrt( ( p_tik()->col(k).transpose()
                      *(*p_data() - (Const::Vector<Real>(p_data()->rows()) * p_param(k)->mean_)
                       ).square()
-                     ).sum() / (p_data()->sizeCols()*p_tik()->col(k).sum())
+                     ).sum() / (p_data()->sizeCols()*p_nk()->elt(k))
                    );
     p_param(k)->sigma_ = ((variance<=0) || !Arithmetic<Real>::isFinite(variance))
                        ? 1.

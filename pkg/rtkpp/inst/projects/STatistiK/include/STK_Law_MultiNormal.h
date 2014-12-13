@@ -217,7 +217,7 @@ class MultiNormal: public IMultiLaw<RowVector>
     virtual void rand( RowVector& x) const
     {
       // fill it with iid N(0,1) variates
-      Normal(0., 1.).randArray(x);
+      x.randGauss();
       // rotate with squareroot_ and translate with mu_
       x = x * squareroot_ + mu_;
     }
@@ -230,7 +230,7 @@ class MultiNormal: public IMultiLaw<RowVector>
     void rand( ArrayBase<Array>& x) const
     {
       // fill it with iid N(0,1) variates
-      Normal(0., 1.).randArray(x.asDerived());
+      x.randGauss();
       // rotate with squareroot_ and translate with mu_
       x.asDerived() = x.asDerived() * squareroot_ + Const::Vector<Real>(x.rows()) * mu_;
     }

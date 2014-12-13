@@ -78,18 +78,19 @@ class Gamma_a_bk : public GammaBase< Gamma_a_bk<Array> >
      using Base::p_tik;using Base::components;
     using Base::p_data;
     using Base::p_param;
-    using Base::paramBuffer_;
+
     using Base::meanjk;
     using Base::variancejk;
 
     /** default constructor
      * @param nbCluster number of cluster in the model
      **/
-    inline Gamma_a_bk( int nbCluster) : Base(nbCluster), shape_(1) {}
+    inline Gamma_a_bk( int nbCluster) : Base(nbCluster), shape_(1),stat_shape_() {}
     /** copy constructor
      *  @param model The model to copy
      **/
-    inline Gamma_a_bk( Gamma_a_bk const& model) : Base(model), shape_(model.shape_) {}
+    inline Gamma_a_bk( Gamma_a_bk const& model)
+                     : Base(model), shape_(model.shape_),stat_shape_(model.stat_shape_) {}
     /** destructor */
     inline ~Gamma_a_bk() {}
     /** Initialize the component of the model.
@@ -101,11 +102,23 @@ class Gamma_a_bk : public GammaBase< Gamma_a_bk<Array> >
       shape_ = 1.;
       for (int k= baseIdx; k < components().end(); ++k)
       { p_param(k)->p_shape_ = &shape_;}
-      paramBuffer_.resize(2*this->nbCluster(), p_data()->cols());
-      paramBuffer_ = 0.;
     }
-    /** initialize shape and scale parameters using weighted moment estimates.*/
-    inline bool initializeStep() { return mStep();}
+    /** Store the intermediate results of the Mixture.
+     *  @param iteration Provides the iteration number beginning after the burn-in period.
+     **/
+    void storeIntermediateResultsImpl(int iteration)
+    { stat_shape_.update(shape_);}
+    /** Release the stored results. This is usually used if the estimation
+     *  process failed.
+     **/
+    void releaseIntermediateResultsImpl()
+    { stat_shape_.release();}
+    /** set the parameters stored in stat_proba_ and release stat_proba_. */
+    void setParametersImpl()
+    {
+      shape_ = stat_shape_.param_;
+      stat_shape_.release();
+    }
     /** Initialize randomly the parameters of the Gamma mixture. The shape
      *  will be selected randomly using an exponential of parameter mean^2/variance
      *  and the scale will be selected randomly using an exponential of parameter
@@ -115,25 +128,14 @@ class Gamma_a_bk : public GammaBase< Gamma_a_bk<Array> >
     /** Compute the mStep. */
     bool mStep();
     /** @return the number of free parameters of the model */
-    inline int computeNbFreeParameters() const
-    { return this->nbCluster()+1;}
-    /** set the parameters of the model*/
-    void setParametersImpl();
+    inline int computeNbFreeParameters() const { return this->nbCluster()+1;}
 
   protected:
     /** common scale */
     Real shape_;
+    /** statistics */
+    MixtureStatReal stat_shape_;
 };
-
-
-/* set the parameters of the model */
-template<class Array>
-void Gamma_a_bk<Array>::setParametersImpl()
-{
-  shape_ = this->paramBuffer_(baseIdx, p_data()->beginCols());
-  for (int k= 0; k < this->nbCluster(); ++k)
-  { p_param(baseIdx+k)->scale_ = paramBuffer_(baseIdx+2*k+1, p_data()->beginCols());}
-}
 
 template<class Array>
 void Gamma_a_bk<Array>::randomInit()

@@ -41,7 +41,7 @@ namespace STK
 
 /* default constructor */
 IMixtureModelBase::IMixtureModelBase( int nbCluster)
-                                    : p_pk_(0), p_tik_(0), p_zi_(0)
+                                    : p_pk_(0), p_nk_(0), p_tik_(0), p_zi_(0)
                                     , nbCluster_(nbCluster)
                                     , nbSample_(0)
                                     , nbVariable_(0)
@@ -53,9 +53,7 @@ IMixtureModelBase::IMixtureModelBase( int nbCluster)
  *  @param model the model to clone
  **/
 IMixtureModelBase::IMixtureModelBase( IMixtureModelBase const& model)
-                                    : p_pk_(0)
-                                    , p_tik_(0)
-                                    , p_zi_(0)
+                                    : p_pk_(0), p_nk_(0), p_tik_(0), p_zi_(0)
                                     , nbCluster_(model.nbCluster_)
                                     , nbSample_(model.nbSample_)
                                     , nbVariable_(model.nbVariable_)
@@ -70,11 +68,13 @@ IMixtureModelBase::~IMixtureModelBase() {}
  *  @param p_zi pointer on the class labels
  * */
 void IMixtureModelBase::setMixtureParameters( CArrayPoint<Real> const* p_pk
+                                            , CArrayPoint<Real> const* p_nk
                                             , ArrayXX const* p_tik
                                             , CArrayVector<int> const* p_zi
                                             )
 {
   p_pk_  = p_pk;
+  p_nk_  = p_nk;
   p_tik_ = p_tik;
   p_zi_  = p_zi;
 }

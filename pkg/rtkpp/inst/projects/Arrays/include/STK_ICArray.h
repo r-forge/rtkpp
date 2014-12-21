@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2012  Serge Iovleff
+/*     Copyright (C) 2004-2014  Serge Iovleff
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as
@@ -68,17 +68,18 @@ namespace STK
 template<class Derived>
 class ICArray : public ArrayBase<Derived>
 {
+  protected:
+
   public:
     typedef ArrayBase<Derived> Base;
 
     typedef typename hidden::Traits<Derived>::Type Type;
-    typedef typename hidden::Traits<Derived>::Row Row;
-    typedef typename hidden::Traits<Derived>::Col Col;
+    typedef typename hidden::Traits<Derived>::Row  Row;
+    typedef typename hidden::Traits<Derived>::Col  Col;
     typedef typename hidden::Traits<Derived>::SubRow SubRow;
     typedef typename hidden::Traits<Derived>::SubCol SubCol;
     typedef typename hidden::Traits<Derived>::SubVector SubVector;
     typedef typename hidden::Traits<Derived>::SubArray SubArray;
-    typedef typename hidden::Traits<Derived>::Transposed Transposed;
 
     typedef typename hidden::Traits<Derived>::Allocator Allocator;
 
@@ -116,7 +117,7 @@ class ICArray : public ArrayBase<Derived>
      *  @param T size of the rows
      *  @param ref is this owning its own data ?
      **/
-    inline ICArray( ICArray const& T, bool ref = false)
+    inline ICArray( Derived const& T, bool ref = false)
                   : Base(), allocator_(T.allocator_, ref)
     {}
     /** wrapper constructor for 0 based C-Array.
@@ -131,8 +132,8 @@ class ICArray : public ArrayBase<Derived>
      *  @param allocator with the data
      **/
     template< class OtherAllocator>
-    inline ICArray( OtherAllocator const& allocator)
-                  : Base(), allocator_(allocator, true)
+    inline ICArray( CAllocatorBase<OtherAllocator> const& allocator)
+                  : Base(), allocator_(allocator.asDerived(), true)
     {}
     /**  destructor */
     inline ~ICArray() {}
@@ -190,18 +191,21 @@ class ICArray : public ArrayBase<Derived>
     inline Type& elt0Impl() { return allocator_.elt();}
     inline Type const& elt0Impl() const { return allocator_.elt();}
 
+    /** implement the row operator using a reference on the row of the allocator */
     inline Row rowImpl(int i) const { return  Row( allocator_.row(i));}
+    /** implement the row operator using a reference on the row of the allocator */
     inline SubRow rowImpl(int i, Range const& J) const { return SubRow( allocator_.row( i, J));}
 
+    /** implement the col operator using a reference on the column of the allocator */
     inline Col colImpl(int j) const { return  Col( allocator_.col(j));}
+    /** implement the col operator using a reference on the column of the allocator */
     inline SubCol colImpl(Range const& I, int j) const { return SubCol( allocator_.col( I, j));}
 
+    /** implement the sub operator for 2D arrays using a reference on the column of the allocator */
     inline SubArray subImpl(Range const& I, Range const& J) const { return SubArray(allocator_.sub(I, J));}
-
+    /** implement the sub operator for 1D arrays using a reference on the column of the allocator */
     inline SubVector subImpl( Range const& J) const { return SubVector( allocator_.sub(J));}
 
-    /** @return the transposed CArray. */
-    inline Transposed transpose() const { return Transposed(allocator_.transpose());}
     /** swap two elements: only for vectors an points. */
     inline void swap(int i, int  j) { std::swap(this->elt(i), this->elt(j)); }
     /** Swapping the pos1 column and the pos2 column.

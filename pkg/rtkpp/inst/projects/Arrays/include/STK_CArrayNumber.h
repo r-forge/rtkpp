@@ -40,33 +40,30 @@
 namespace STK
 {
 // forward declaration
-template< typename Type, int SizeRows_ =1, int SizeCols_=1, bool Orient_ = Arrays::by_col_> class CArrayNumber;
-
+template< typename Type, bool Orient_ = Arrays::by_col_> class CArrayNumber;
 template< typename Type, int SizeRows_, int SizeCols_, bool Orient_> class CArray;
 template< typename Type, int Size_, bool Orient_> class CArraySquare;
 template< typename Type, int SizeCols_, bool Orient_> class CArrayPoint;
 template< typename Type, int SizeRows_, bool Orient_ > class CArrayVector;
 
 // typedef for CArrayVector Real is by default double, but can be float
-typedef CArrayNumber<Real, 1, 1, Arrays::by_col_>   CNumberX;
-typedef CArrayNumber<Real, 1, 1, Arrays::by_col_>   CNumber2;
-typedef CArrayNumber<Real, 1, 1, Arrays::by_col_>   CNumber3;
-typedef CArrayNumber<double, 1, 1, Arrays::by_col_> CNumberXd;
-typedef CArrayNumber<double, 1, 1, Arrays::by_col_> CNumber2d;
-typedef CArrayNumber<double, 1, 1, Arrays::by_col_> CNumber3d;
-typedef CArrayNumber<int, 1, 1, Arrays::by_col_>    CNumberXi;
-typedef CArrayNumber<int, 1, 1, Arrays::by_col_>    CNumber2i;
-typedef CArrayNumber<int, 1, 1, Arrays::by_col_>    CNumber3i;
+typedef CArrayNumber<Real, Arrays::by_col_>   CNumber1;
+typedef CArrayNumber<double, Arrays::by_col_> CNumber1d;
+typedef CArrayNumber<int, Arrays::by_col_>    CNumber1i;
+
+typedef CArrayNumber<Real, Arrays::by_row_>   CNumberByRow1;
+typedef CArrayNumber<double, Arrays::by_row_> CNumberByRow1d;
+typedef CArrayNumber<int, Arrays::by_row_>    CNumberByRow1i;
 
 namespace hidden
 {
 /** @ingroup hidden
  *  @brief Specialization of the Traits class for CArrayNumber class.
  */
-template<typename Type_, int SizeRows_, int SizeCols_, bool Orient_>
-struct Traits< CArrayNumber<Type_, SizeRows_, SizeCols_, Orient_> >
+template<typename Type_, bool Orient_>
+struct Traits< CArrayNumber<Type_, Orient_> >
 {
-    typedef CArrayNumber<Type_, 1, 1, Orient_> Number;
+    typedef CArrayNumber<Type_, Orient_> Number;
 
     typedef Number Row;
     typedef Number SubRow;
@@ -74,8 +71,6 @@ struct Traits< CArrayNumber<Type_, SizeRows_, SizeCols_, Orient_> >
     typedef Number SubCol;
     typedef Number SubVector;
     typedef Number SubArray;
-    // Transposed type
-    typedef CArrayNumber< Type_, SizeCols_, SizeRows_, !Orient_> Transposed;
     // The CAllocator have to have the same structure than the CArrayNumber
     typedef CAllocator<Type_, Arrays::number_, 1, 1, Orient_> Allocator;
 
@@ -98,12 +93,11 @@ struct Traits< CArrayNumber<Type_, SizeRows_, SizeCols_, Orient_> >
  * @brief specialization for the number case.
  */
 template <typename Type, bool Orient_>
-class CArrayNumber <Type, 1, 1, Orient_>
-      : public ICArray < CArrayNumber<Type, 1, 1, Orient_> >
+class CArrayNumber: public ICArray < CArrayNumber<Type, Orient_> >
 {
   public:
-    typedef ICArray < CArrayNumber<Type, 1, 1, Orient_> > Base;
-    typedef ArrayBase < CArrayNumber<Type, 1, 1, Orient_> > LowBase;
+    typedef ICArray < CArrayNumber<Type, Orient_> > Base;
+    typedef ArrayBase < CArrayNumber<Type, Orient_> > LowBase;
     enum
     {
       structure_ = Arrays::number_,

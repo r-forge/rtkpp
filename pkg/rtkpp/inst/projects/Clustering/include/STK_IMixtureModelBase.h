@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2012  Serge Iovleff
+/*     Copyright (C) 2004-2014  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -40,7 +40,7 @@
 #include "STK_Clust_Util.h"
 #include "Arrays/include/STK_CArrayPoint.h"
 #include "Arrays/include/STK_CArrayVector.h"
-#include "Arrays/include/STK_Array2D.h"
+#include "Arrays/include/STK_CArray.h"
 
 namespace STK
 {
@@ -85,7 +85,7 @@ class IMixtureModelBase
     /** @return the estimated number of individuals of each mixtures */
     inline CPointX const* p_nk() const { return p_nk_;};
     /** @return the tik probabilities */
-    inline ArrayXX const* p_tik() const { return p_tik_;};
+    inline CArrayXX const* p_tik() const { return p_tik_;};
     /** @return  the zi class label */
     inline CVectorXi const* p_zi() const { return p_zi_;};
     /** Set the parameters of the  mixture model using external pk, tik and zi.
@@ -96,7 +96,7 @@ class IMixtureModelBase
      * */
     void setMixtureParameters( CPointX const* p_pk
                              , CPointX const* p_nk
-                             , ArrayXX const* p_tik
+                             , CArrayXX const* p_tik
                              , CVectorXi const* p_zi
                              );
 
@@ -106,7 +106,7 @@ class IMixtureModelBase
     /** The estimated number of individuals of each mixtures */
     CPointX const* p_nk_;
     /** The tik probabilities */
-    ArrayXX const* p_tik_;
+    CArrayXX const* p_tik_;
     /** The zik class label */
     CVectorXi const* p_zi_;
     /** Set the number of sample of the model

@@ -44,6 +44,9 @@ namespace STK
 {
 template <typename Type> class RcppVector;
 template <typename Type> class RcppMatrix;
+// emulate Rcpp wrap
+template <typename T> SEXP wrap( const T& object ) ;
+
 }
 
 
@@ -51,15 +54,25 @@ template <typename Type> class RcppMatrix;
 namespace Rcpp
 {
   /* support for wrap */
-  template<typename Derived>
-  SEXP wrap(STK::ITContainer<Derived, STK::hidden::Traits<Derived>::structure_> const& obj);
+  template<typename Type>
+  SEXP wrap( STK::Array2D<Type> const& matrix);
+  template<typename Type>
+  SEXP wrap( STK::Array2DVector<Type> const& vec);
+  template<typename Type>
+  SEXP wrap( STK::Array2DPoint<Type> const& vec);
+  template <typename Type, int SizeRows_, int SizeCols_, bool Orient_>
+  SEXP wrap( STK::CArray<Type, SizeRows_, SizeCols_, Orient_> const& matrix);
+  template <typename Type, int SizeRows_, bool Orient_>
+  SEXP wrap( STK::CArrayVector<Type, SizeRows_, Orient_ > const& vec);
+  template <typename Type, int SizeCols_, bool Orient_>
+  SEXP wrap( STK::CArrayPoint<Type, SizeCols_, Orient_> const& vec);
 
-  namespace traits
-  {
-    /* support for as */
-    template<typename Type> class Exporter< STK::RcppVector<Type> >;
-    template<typename Type> class Exporter< STK::RcppMatrix<Type> >;
-  } // namespace traits
+namespace traits
+{
+  /* support for as */
+  template<typename Type> class Exporter< STK::RcppVector<Type> >;
+  template<typename Type> class Exporter< STK::RcppMatrix<Type> >;
+} // namespace traits
 
 } // namespace Rcpp
 

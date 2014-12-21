@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2012  Serge Iovleff
+/*     Copyright (C) 2004-2014  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -78,7 +78,7 @@ CPointX const& IMixture::nk() const { return p_composer_->nk();}
 /* This function can be used in derived classes to get posterior probabilities from the framework.
  *  @return Pointer to tik.
  */
-ArrayXX const& IMixture::tik() const { return p_composer_->tik();}
+CArrayXX const& IMixture::tik() const { return p_composer_->tik();}
 /* This function can be used in derived classes to get class labels from the framework.
  *  @return Pointer to zi.
  */
@@ -97,7 +97,7 @@ CPointX const* IMixture::p_nk() const { return p_composer_->p_nk();}
 /* This function can be used in derived classes to get proportions from the framework.
  * @return Pointer to proportions.
  */
-ArrayXX const* IMixture::p_tik() const { return p_composer_->p_tik();}
+CArrayXX const* IMixture::p_tik() const { return p_composer_->p_tik();}
 
 /* This function can be used in derived classes to get proportions from the framework.
  * @return Pointer to proportions.

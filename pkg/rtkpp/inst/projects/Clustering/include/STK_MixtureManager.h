@@ -168,7 +168,7 @@ class MixtureManager : public IMixtureManager
         case Clust::Categorical_pk_:
         { static_cast<MixtureBridge_pk const*>(p_mixture)->getParameters(param);}
         break;
-        // Categorical models
+        // Poisson models
         case Clust::Poisson_ljk_:
         { static_cast<MixtureBridge_ljk const*>(p_mixture)->getParameters(param);}
         break;

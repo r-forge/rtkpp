@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2011  Serge Iovleff
+/*     Copyright (C) 2004-2014  Serge Iovleff
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as
@@ -45,9 +45,9 @@ template< typename Type, int SizeRows_=UnknownSize, bool Orient_ = Arrays::by_co
 template< typename Type, int SizeRows_, int SizeCols_, bool Orient_> class CArray;
 template< typename Type, int Size_, bool Orient_> class CArraySquare;
 template< typename Type, int SizeCols_, bool Orient_> class CArrayPoint;
-template< typename Type, int SizeRows_, int SizeCols_, bool Orient_> class CArrayNumber;
+template< typename Type, bool Orient_> class CArrayNumber;
 
-// typedef for CArrayVector Real is by default double, but can be float
+// useful typedef
 typedef CArrayVector<Real, UnknownSize, Arrays::by_col_>   CVectorX;
 typedef CArrayVector<Real, 2, Arrays::by_col_>             CVector2;
 typedef CArrayVector<Real, 3, Arrays::by_col_>             CVector3;
@@ -58,6 +58,16 @@ typedef CArrayVector<int, UnknownSize, Arrays::by_col_>    CVectorXi;
 typedef CArrayVector<int, 2, Arrays::by_col_>              CVector2i;
 typedef CArrayVector<int, 3, Arrays::by_col_>              CVector3i;
 
+typedef CArrayVector<Real, UnknownSize, Arrays::by_row_>   CVectorByRowX;
+typedef CArrayVector<Real, 2, Arrays::by_row_>             CVectorByRow2;
+typedef CArrayVector<Real, 3, Arrays::by_row_>             CVectorByRow3;
+typedef CArrayVector<double, UnknownSize, Arrays::by_row_> CVectorByRowXd;
+typedef CArrayVector<double, 2, Arrays::by_row_>           CVectorByRow2d;
+typedef CArrayVector<double, 3, Arrays::by_row_>           CVectorByRow3d;
+typedef CArrayVector<int, UnknownSize, Arrays::by_row_>    CVectorByRowXi;
+typedef CArrayVector<int, 2, Arrays::by_row_>              CVectorByRow2i;
+typedef CArrayVector<int, 3, Arrays::by_row_>              CVectorByRow3i;
+
 namespace hidden
 {
 /** @ingroup hidden
@@ -66,18 +76,15 @@ namespace hidden
 template<typename Type_, int SizeRows_, bool Orient_>
 struct Traits< CArrayVector<Type_, SizeRows_, Orient_> >
 {
-    typedef CArrayNumber<Type_, 1, 1, Orient_> Number;
-    typedef CArrayNumber<Type_, 1, 1, Orient_> Row;
-    typedef CArrayNumber<Type_, 1, 1, Orient_> SubRow;
+    typedef CArrayNumber<Type_, Orient_> Number;
+    typedef CArrayNumber<Type_, Orient_> Row;
+    typedef CArrayNumber<Type_, Orient_> SubRow;
 
     typedef CArrayVector<Type_, SizeRows_, Orient_> Col;
     typedef CArrayVector<Type_, UnknownSize, Orient_> SubCol;
 
     typedef typename  If<(SizeRows_ == 1), Number, SubCol>::Result SubVector;
     typedef typename  If<(SizeRows_ == 1), Number, SubCol>::Result SubArray;
-
-    // Transposed type
-    typedef CArrayPoint< Type_, SizeRows_, !Orient_> Transposed;
     // The CAllocator have to have the same structure than the CArray
     typedef CAllocator<Type_, Arrays::vector_, SizeRows_, 1, Orient_> Allocator;
 

@@ -29,7 +29,7 @@
  **/
 
 /** @file Rcpp_as.h
- *  @brief In this file we create the  .
+ *  @brief In this file we create the implement the non intrusive Rcpp::as Exporter class .
  **/
 
 #ifndef RCPP_AS_H

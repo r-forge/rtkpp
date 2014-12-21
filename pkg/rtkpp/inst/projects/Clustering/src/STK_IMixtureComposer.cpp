@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2012  Serge Iovleff
+/*     Copyright (C) 2004-2014  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -37,7 +37,6 @@
 
 #ifdef _OPENMP
 #include <omp.h>
-#include "Arrays/include/STK_Array2DPoint.h"
 #endif
 
 #ifdef STK_MIXTURE_DEBUG
@@ -47,7 +46,7 @@
 #include "../include/STK_IMixtureComposer.h"
 #include "STatistiK/include/STK_Law_Categorical.h"
 #include "STatistiK/include/STK_Stat_Functors.h"
-#include "Arrays/include/STK_Array2D.h"
+#include "Arrays/include/STK_Array2DPoint.h" // for sum
 
 namespace STK
 {
@@ -177,7 +176,7 @@ Real IMixtureComposer::eStep()
 Real IMixtureComposer::eStep(int i)
 {
 #ifdef _OPENMP
-  Array2DPoint<Real> lnComp_(tik_.cols());
+  CPointX lnComp_(tik_.sizeCols());
 #endif
   // get maximal element of ln(x_i,\theta_k) + ln(p_k)
   for (int k=baseIdx; k< tik_.endCols(); k++)
@@ -198,12 +197,11 @@ Real IMixtureComposer::eStep(int i)
 Real IMixtureComposer::computeLnLikelihood(int i) const
 {
   // get maximal value
-  CArrayPoint<Real> lnComp(prop_.size());
+  CPointX lnComp(prop_.size());
   for (int k = prop_.begin(); k< prop_.end(); ++k)
   { lnComp[k] = std::log(prop_[k]) + lnComponentProbability(i, k);}
-  int kmax;
-  Real lnCompMax = lnComp.maxElt(kmax);
   // compute result
+  Real lnCompMax = lnComp.maxElt();
   return std::log((lnComp-lnCompMax).exp().sum())+lnCompMax;
 }
 
@@ -267,7 +265,7 @@ int IMixtureComposer::randomFuzzyTik()
   for (int i = tik_.beginRows(); i < tik_.endRows(); ++i)
   {
     // create a reference on the i-th row
-    PointX tikRowi(tik_.row(i), true);
+    CPointX tikRowi(tik_.row(i), true);
     tikRowi = tikRowi * prop_;
     tikRowi /= tikRowi.sum();
     nk_ += tikRowi;

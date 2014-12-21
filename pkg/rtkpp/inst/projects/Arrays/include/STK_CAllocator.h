@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2012  Serge Iovleff
+/*     Copyright (C) 2004-2014  Serge Iovleff
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as
@@ -126,35 +126,16 @@ struct Traits< CAllocator<Scalar, Structure_, SizeRows_, SizeCols_, Orient_> >
   private:
     class Void { };
 
-    typedef CAllocator<Scalar, Arrays::point_, 1, SizeCols_, Arrays::by_col_> RowIndirect;
-    typedef CAllocator<Scalar, Arrays::point_, 1, SizeCols_, Arrays::by_row_> RowDirect;
-
-    typedef CAllocator<Scalar, Arrays::point_, 1, UnknownSize, Arrays::by_col_> SubRowIndirect;
-    typedef CAllocator<Scalar, Arrays::point_, 1, UnknownSize, Arrays::by_row_> SubRowDirect;
-
-    typedef CAllocator<Scalar, Arrays::vector_, SizeRows_, 1, Arrays::by_row_> ColIndirect;
-    typedef CAllocator<Scalar, Arrays::vector_, SizeRows_, 1, Arrays::by_col_> ColDirect;
-
-    typedef CAllocator<Scalar, Arrays::vector_, UnknownSize, 1, Arrays::by_row_> SubColIndirect;
-    typedef CAllocator<Scalar, Arrays::vector_, UnknownSize, 1, Arrays::by_col_> SubColDirect;
-
-    typedef CAllocator<Scalar, Arrays::array2D_, SizeRows_, UnknownSize, Arrays::by_row_> FixedRowArrayIndirect;
-    typedef CAllocator<Scalar, Arrays::array2D_, UnknownSize, SizeCols_, Arrays::by_row_> FixedColArrayDirect;
-
-    typedef CAllocator<Scalar, Arrays::array2D_, SizeRows_, UnknownSize, Arrays::by_col_> FixedRowArrayDirect;
-    typedef CAllocator<Scalar, Arrays::array2D_, UnknownSize, SizeCols_, Arrays::by_col_> FixedColArrayIndirect;
-
   public:
-
     typedef Scalar Type;
     typedef CAllocator<Scalar, Arrays::number_, 1, 1, Orient_> Number;
 
 
-    typedef typename If<Orient_, RowIndirect, RowDirect >::Result  Row;
-    typedef typename If<Orient_, ColDirect, ColIndirect >::Result  Col;
+    typedef CAllocator<Scalar, Arrays::point_, 1, SizeCols_, Orient_> Row;
+    typedef CAllocator<Scalar, Arrays::vector_, SizeRows_, 1, Orient_> Col;
 
-    typedef typename If<Orient_, SubRowIndirect, SubRowDirect >::Result  SubRow;
-    typedef typename If<Orient_, SubColDirect, SubColIndirect >::Result  SubCol;
+    typedef CAllocator<Scalar, Arrays::point_, 1, UnknownSize, Orient_> SubRow;
+    typedef CAllocator<Scalar, Arrays::vector_, UnknownSize, 1, Orient_> SubCol;
 
     /** If one of the Size is 1, we have a Vector (a column) or a Point (a row)
      *  (What to do if both are = 1 : Scalar or array (1,1) ?).
@@ -168,8 +149,6 @@ struct Traits< CAllocator<Scalar, Structure_, SizeRows_, SizeCols_, Orient_> >
     // use this as default. FIXME: Not optimal in case we just get a SubArray
     // with unmodified rows or cols size.
     typedef CAllocator<Type, Structure_, UnknownSize, UnknownSize, Orient_> SubArray;
-    // transposed Type
-    typedef CAllocator< Type, (Arrays::Structure)TStructure<Structure_>::structure_, SizeCols_, SizeRows_, !Orient_> Transposed;
 
     enum
     {
@@ -207,7 +186,6 @@ class CAllocatorBase : public ITContainer2D<Derived>
     typedef typename hidden::Traits<Derived>::SubCol SubColVector;
     typedef typename hidden::Traits<Derived>::SubArray SubArray;
     typedef typename hidden::Traits<Derived>::SubVector SubVector;
-    typedef typename hidden::Traits<Derived>::Transposed Transposed;
 
     enum
     {
@@ -262,11 +240,6 @@ class CAllocatorBase : public ITContainer2D<Derived>
       STK_STATICASSERT_ONE_DIMENSION_ONLY(Derived)
       return this->asDerived().sub1Impl(I);
     }
-    /** transpose the Allocator.
-     *  @return a transposed allocator
-     **/
-    inline Transposed transpose() const
-    { return Transposed(this->asDerived(), this->cols(), this->rows(), idx_);}
     /** swap this with T.
      *  @param T the container to swap
      **/
@@ -318,7 +291,8 @@ class CAllocatorBase : public ITContainer2D<Derived>
     void setIdx( int const& idx) { idx_ = idx;}
 };
 
-/** @brief Specialization for column-oriented Allocators.*/
+/**  @ingroup Arrays
+ *   @brief Specialization for column-oriented Allocators.*/
 template<class Derived>
 class OrientedCAllocator<Derived, Arrays::by_col_>: public CAllocatorBase<Derived>
 {
@@ -353,8 +327,8 @@ class OrientedCAllocator<Derived, Arrays::by_col_>: public CAllocatorBase<Derive
      **/
     void setValue(Type const& v)
     {
-      for (int j= this->beginCols(); j <= this->lastIdxCols(); ++j)
-        for (int i = this->beginRows(); i<=this->lastIdxRows(); ++i)
+      for (int j= this->beginCols(); j < this->endCols(); ++j)
+        for (int i = this->beginRows(); i < this->endRows(); ++i)
         { this->elt(i, j) = v;}
     }
 
@@ -378,7 +352,8 @@ class OrientedCAllocator<Derived, Arrays::by_col_>: public CAllocatorBase<Derive
     inline void setSizedIdx() {this->idx_ = this->asDerived().sizeRows();}
 };
 
-/** @brief Specialization for row-oriented Allocators.*/
+/**  @ingroup Arrays
+ *   @brief Specialization for row-oriented Allocators.*/
 template<class Derived>
 class OrientedCAllocator<Derived, Arrays::by_row_>: public CAllocatorBase<Derived>
 {
@@ -414,8 +389,8 @@ class OrientedCAllocator<Derived, Arrays::by_row_>: public CAllocatorBase<Derive
      **/
     void setValue(Type const& v)
     {
-      for (int i = this->beginRows(); i<=this->lastIdxRows(); ++i)
-        for (int j= this->beginCols(); j <= this->lastIdxCols(); ++j)
+      for (int i = this->beginRows(); i < this->endRows(); ++i)
+        for (int j= this->beginCols(); j < this->endCols(); ++j)
         { this->elt(i, j) = v;}
     }
 
@@ -718,7 +693,7 @@ class CAllocator<Type, Structure_, UnknownSize, UnknownSize, Orient_>
      *  @param ref : is this a wrapper of T ?
      **/
     inline CAllocator( CAllocator const& T, bool ref = true)
-                     : Base(T, ref ? T.idx(): T.sizedIdx())
+                     : Base(T, ref ? T.idx() : T.sizedIdx())
                      , Allocator(T, ref)
     { if (!ref) { Allocator::copy(T);}}
     /** Wrapper constructor. This become a reference on (some part of) the Allocator A.
@@ -820,22 +795,29 @@ class CAllocator<Type, Structure_, SizeRows_, UnknownSize, Orient_>
       : public StructuredCAllocator<CAllocator<Type, Structure_, SizeRows_, UnknownSize, Orient_>, SizeRows_, UnknownSize, Orient_  >
       , public AllocatorBase<Type>
 {
+  enum
+  {
+    isWith1Row_ = ((Structure_ == Arrays::point_)  || (Structure_ == Arrays::number_))
+  };
   public:
     typedef StructuredCAllocator<CAllocator, SizeRows_, UnknownSize, Orient_  > Base;
     typedef AllocatorBase<Type> Allocator;
     inline CAllocator() : Base(SizeRows_, 0), Allocator(this->prod(SizeRows_, 0))
-    { STK_STATICASSERT_POINT_SIZEROWS_MISMATCH( !((SizeRows_ != 1) && ((Structure_ == Arrays::point_)  || (Structure_ == Arrays::number_))) );}
+    { STK_STATICASSERT_POINT_SIZEROWS_MISMATCH( !((SizeRows_ != 1) && isWith1Row_) );}
     inline CAllocator( int, int const& sizeCols)
                      : Base(SizeRows_, sizeCols), Allocator(this->prod(SizeRows_, sizeCols))
-    { STK_STATICASSERT_POINT_SIZEROWS_MISMATCH( !((SizeRows_ != 1) && ((Structure_ == Arrays::point_)  || (Structure_ == Arrays::number_))) );}
+    { STK_STATICASSERT_POINT_SIZEROWS_MISMATCH( !((SizeRows_ != 1) && isWith1Row_) );}
     inline CAllocator( int, int const& sizeCols, Type const& v)
                      : Base(SizeRows_, sizeCols), Allocator(this->prod(SizeRows_, sizeCols))
     { this->setValue(v);
-      STK_STATICASSERT_POINT_SIZEROWS_MISMATCH( !((SizeRows_ != 1) && ((Structure_ == Arrays::point_)  || (Structure_ == Arrays::number_))) );
+      STK_STATICASSERT_POINT_SIZEROWS_MISMATCH( !((SizeRows_ != 1) && isWith1Row_) );
     }
     inline CAllocator( CAllocator const& T, bool ref = true)
                      : Base(T, ref ? T.idx() : T.sizedIdx()), Allocator(T, ref)
-    { if (!ref) { Allocator::copy(T);} }
+    { if (!ref) { Allocator::copy(T);}
+
+      STK_STATICASSERT_POINT_SIZEROWS_MISMATCH( !((SizeRows_ != 1) && isWith1Row_) );
+    }
     inline CAllocator( Allocator const& T, Range const& I, Range const& J, int const& idx)
                      : Base(I, J), Allocator(T, true)
     { this->setIdx(idx);}
@@ -895,7 +877,7 @@ class CAllocator<Type, Structure_, SizeRows_, UnknownSize, Orient_>
         // copy data
         const int lastCol = std::min(copy.lastIdxCols(), this->lastIdxCols());
         for (int j= this->beginCols(); j <= lastCol; ++j)
-          for (int i = this->beginRows(); i<=this->lastIdxRows(); ++i)
+          for (int i = this->beginRows(); i < this->endRows(); ++i)
         { this->elt(i, j) = copy.elt(i, j);}
 
       }

@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2012  Serge Iovleff
+/*     Copyright (C) 2004-2014  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -41,10 +41,7 @@
 
 #include "Arrays/include/STK_CArrayPoint.h"
 #include "Arrays/include/STK_CArrayVector.h"
-#include "Arrays/include/STK_Array2D.h"
-#ifndef _OPENMP
-#include "Arrays/include/STK_Array2DPoint.h"
-#endif
+#include "Arrays/include/STK_CArray.h"
 
 namespace STK
 {
@@ -130,22 +127,22 @@ class IMixtureComposer : public IStatModelBase
     inline Clust::modelState state() const { return state_;}
 
     /** @return the proportions of each mixtures */
-    inline CArrayPoint<Real> const& pk() const { return prop_;};
+    inline CPointX const& pk() const { return prop_;};
     /** @return the tik probabilities */
-    inline ArrayXX const& tik() const { return tik_;};
+    inline CArrayXX const& tik() const { return tik_;};
     /** @return the estimated proportions of individuals in each mixtures */
     inline CPointX const& nk() const { return nk_;};
     /** @return the zi class label */
-    inline CArrayVector<int> const& zi() const { return zi_;};
+    inline CVectorXi const& zi() const { return zi_;};
 
     /** @return a pointer on the proportions of each mixtures */
-    inline CArrayPoint<Real> const* p_pk() const { return &prop_;};
+    inline CPointX const* p_pk() const { return &prop_;};
     /** @return a pointer on the the estimated proportions of individuals in each mixtures */
-    inline CArrayPoint<Real> const* p_nk() const { return &nk_;};
+    inline CPointX const* p_nk() const { return &nk_;};
     /** @return a pointer on the the tik probabilities */
-    inline ArrayXX const* p_tik() const { return &tik_;};
+    inline CArrayXX const* p_tik() const { return &tik_;};
     /** @return a pointer on the zi class labels */
-    inline CArrayVector<int> const* p_zi() const { return &zi_;};
+    inline CVectorXi const* p_zi() const { return &zi_;};
 
     /** @return the computed log-likelihood of the i-th sample.
      *  @param i index of the sample
@@ -267,13 +264,13 @@ class IMixtureComposer : public IStatModelBase
     /** number of cluster. */
     int nbCluster_;
     /** The proportions of each mixtures */
-    CArrayPoint<Real> prop_;
+    CPointX prop_;
     /** The tik probabilities */
-    ArrayXX tik_;
+    CArrayXX tik_;
     /** The sum of the columns of tik_ */
     CPointX nk_;
     /** The zi class label */
-    CArrayVector<int> zi_;
+    CVectorXi zi_;
     /** Create the mixture model parameters. */
     void initializeMixtureParameters();
     /** generate random tik_ */
@@ -284,7 +281,7 @@ class IMixtureComposer : public IStatModelBase
     Clust::modelState state_;
     /** Auxiliary array used in the eStep */
 #ifndef _OPENMP
-    Array2DPoint<Real> lnComp_;
+    CPointX lnComp_;
 #endif
 };
 

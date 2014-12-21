@@ -119,8 +119,6 @@ class Gaussian_sj : public DiagGaussianBase<Gaussian_sj<Array> >
       sigma_ = stat_sigma_.param_;
       stat_sigma_.release();
     }
-    /** Compute the inital weighted mean and the initial common standard deviation. */
-    inline bool initializeStep() { return mStep();}
     /** Initialize randomly the parameters of the Gaussian mixture. The centers
      *  will be selected randomly among the data set and the standard-deviation
      *  will be set to 1.

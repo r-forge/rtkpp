@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2012  Serge Iovleff
+/*     Copyright (C) 2004-2014  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -67,10 +67,10 @@ IMixtureModelBase::~IMixtureModelBase() {}
  *  @param p_tik pointer on the posterior probabilities
  *  @param p_zi pointer on the class labels
  * */
-void IMixtureModelBase::setMixtureParameters( CArrayPoint<Real> const* p_pk
-                                            , CArrayPoint<Real> const* p_nk
-                                            , ArrayXX const* p_tik
-                                            , CArrayVector<int> const* p_zi
+void IMixtureModelBase::setMixtureParameters( CPointX const* p_pk
+                                            , CPointX const* p_nk
+                                            , CArrayXX const* p_tik
+                                            , CVectorXi const* p_zi
                                             )
 {
   p_pk_  = p_pk;

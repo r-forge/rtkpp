@@ -109,7 +109,7 @@ class DiagGaussianParametersBase : public IRecursiveTemplate<Parameters>
       stat_mean_.release();
     }
     /** vector of the mean */
-    Array2DPoint<Real> mean_;
+    PointX mean_;
     /** Array of the statistics */
     MixtureStatVector stat_mean_;
 };
@@ -151,7 +151,8 @@ class Gaussian_sjk_Parameters: public DiagGaussianParametersBase<Gaussian_sjk_Pa
     void storeIntermediateResults(int iteration)
     {
       Base::storeIntermediateResults(iteration);
-      stat_mean_.update(mean_); stat_sigma_.update(sigma_);}
+      stat_mean_.update(mean_); stat_sigma_.update(sigma_);
+    }
     /** Release the stored results. This is usually used if the estimation
      *  process failed.
      **/

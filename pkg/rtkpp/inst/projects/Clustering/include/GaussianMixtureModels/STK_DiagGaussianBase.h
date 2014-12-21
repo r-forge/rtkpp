@@ -88,7 +88,7 @@ class DiagGaussianBase : public IMixtureModel<Derived >
     /** get the parameters of the model
      *  @param params the parameters of the model
      **/
-    void getParameters(Array2D<Real>& params) const;
+    void getParameters(ArrayXX& params) const;
     /** @return the parameters of the model in an array of size (K * 2d). */
     ArrayXX getParametersImpl() const;
     /** Write the parameters on the output stream os */

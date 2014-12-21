@@ -91,8 +91,6 @@ class Gaussian_sk : public DiagGaussianBase<Gaussian_sk<Array> >
     inline Gaussian_sk( Gaussian_sk const& model) : Base(model) {}
     /** destructor */
     inline ~Gaussian_sk() {}
-    /** Compute the inital weighted mean and the initial common standard deviations. */
-    inline bool initializeStep() { return mStep();}
     /** Initialize randomly the parameters of the Gaussian mixture. The centers
      *  will be selected randomly among the data set and the standard-deviations
      *  will be set to 1.

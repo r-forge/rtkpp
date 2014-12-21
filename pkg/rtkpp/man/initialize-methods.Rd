@@ -41,8 +41,8 @@
 \S4method{initialize}{ClusterHeterogeneous}(.Object, ldata = list(),
   nbCluster = 2)
 
-\S4method{initialize}{ClusterInit}(.Object, method = "random",
-  nbInitRun = 5, algo = clusterAlgo("SEM", 20, 0))
+\S4method{initialize}{ClusterInit}(.Object, method = "class", nbInit = 5,
+  algo = clusterAlgo("SEM", 20, 0))
 
 \S4method{initialize}{ClusterPoissonComponent}(.Object, data = matrix(nrow =
   0, ncol = 0), nbCluster = 2, modelName = "poisson_pk_ljk")

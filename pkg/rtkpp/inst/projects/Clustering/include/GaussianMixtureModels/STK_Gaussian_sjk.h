@@ -91,9 +91,6 @@ class Gaussian_sjk : public DiagGaussianBase<Gaussian_sjk<Array> >
     Gaussian_sjk( Gaussian_sjk const& model) : Base(model) {}
     /** destructor */
     ~Gaussian_sjk() {}
-    /** Compute the initial weighted means and the initial weighted standard deviations
-     *  of the mixture */
-    inline bool initializeStep() { return mStep();}
     /** Initialize randomly the parameters of the Gaussian mixture. The centers
      *  will be selected randomly among the data set and the standard-deviation
      *  will be set to 1.

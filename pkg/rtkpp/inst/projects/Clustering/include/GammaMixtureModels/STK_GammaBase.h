@@ -97,7 +97,6 @@ class GammaBase : public IMixtureModel<Derived >
 {
   public:
     typedef IMixtureModel<Derived > Base;
-    typedef ArrayXX::Col ColVector;
 
     using Base::p_tik;
     using Base::components;
@@ -216,20 +215,20 @@ bool GammaBase<Derived>::moments()
 {
   for (int k= p_tik()->beginCols(); k < components().end(); ++k)
   {
-    ColVector tik(p_tik()->col(k), true); // create a reference
-    p_param(k)->tk_ = tik.sum();
+    CVectorX tikRowk(p_tik()->col(k), true); // create a reference
+    p_param(k)->tk_ = tikRowk.sum();
     for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)
     {
       // mean
-      Real mean =  p_data()->col(j).wmean(tik);
+      Real mean =  p_data()->col(j).wmean(tikRowk);
       if ( (mean<=0) || Arithmetic<Real>::isNA(mean) ) { return false;}
       p_param(k)->mean_[j] = mean;
       // mean log
-      Real meanLog =  p_data()->col(j).log().wmean(tik);
+      Real meanLog =  p_data()->col(j).log().wmean(tikRowk);
       if (Arithmetic<Real>::isNA(meanLog)) { return false;}
       p_param(k)->meanLog_[j] = meanLog;
       // variance
-      Real variance =  p_data()->col(j).wvariance(mean, tik);
+      Real variance =  p_data()->col(j).wvariance(mean, tikRowk);
       if ((variance<=0)||Arithmetic<Real>::isNA(variance)){ return false;}
       p_param(k)->variance_[j] = variance;
     }

@@ -39,35 +39,56 @@
 
 namespace STK
 {
-// forward declaration
+// forward declarations
 template< typename Type, int SizeRows_ = UnknownSize, int SizeCols_ = UnknownSize, bool Orient_ = Arrays::by_col_> class CArray;
-
 template< typename Type, int SizeCols_, bool Orient_> class CArrayPoint;
 template< typename Type, int SizeRows_, bool Orient_> class CArrayVector;
-template< typename Type, int SizeRows_, int SizeCols_, bool Orient_> class CArrayNumber;
+template< typename Type, bool Orient_> class CArrayNumber;
 
-// typedef for CArrayVector Real is by default double, but can be float
-typedef CArray<Real>                                    CArrayXX;
-typedef CArray<Real, UnknownSize, 2, Arrays::by_col_>   CArrayX2;
-typedef CArray<Real, UnknownSize, 3, Arrays::by_col_>   CArrayX3;
-typedef CArray<Real, 2, UnknownSize, Arrays::by_col_>   CArray2X;
-typedef CArray<Real, 3, UnknownSize, Arrays::by_col_>   CArray3X;
-typedef CArray<Real, 2, 2, Arrays::by_col_>             CArray22;
-typedef CArray<Real, 3, 3, Arrays::by_col_>             CArray33;
-typedef CArray<double>                                  CArrayXX;
-typedef CArray<double, UnknownSize, 2, Arrays::by_col_> CArrayX2d;
-typedef CArray<double, UnknownSize, 3, Arrays::by_col_> CArrayX3d;
-typedef CArray<double, 2, UnknownSize, Arrays::by_col_> CArray2Xd;
-typedef CArray<double, 3, UnknownSize, Arrays::by_col_> CArray3Xd;
-typedef CArray<double, 2, 2, Arrays::by_col_>           CArray22d;
-typedef CArray<double, 3, 3, Arrays::by_col_>           CArray33d;
-typedef CArray<int>                                     CArrayXXi;
-typedef CArray<int, UnknownSize, 2, Arrays::by_col_>    CArrayX2i;
-typedef CArray<int, UnknownSize, 3, Arrays::by_col_>    CArrayX3i;
-typedef CArray<int, 2, UnknownSize, Arrays::by_col_>    CArray2Xi;
-typedef CArray<int, 3, UnknownSize, Arrays::by_col_>    CArray3Xi;
-typedef CArray<int, 2, 2, Arrays::by_col_>              CArray22i;
-typedef CArray<int, 3, 3, Arrays::by_col_>              CArray33i;
+// useful typedef
+typedef CArray<Real, UnknownSize, UnknownSize, Arrays::by_col_> CArrayXX;
+typedef CArray<Real, UnknownSize, 2, Arrays::by_col_>           CArrayX2;
+typedef CArray<Real, UnknownSize, 3, Arrays::by_col_>           CArrayX3;
+typedef CArray<Real, 2, UnknownSize, Arrays::by_col_>           CArray2X;
+typedef CArray<Real, 3, UnknownSize, Arrays::by_col_>           CArray3X;
+typedef CArray<Real, 2, 2, Arrays::by_col_>                     CArray22;
+typedef CArray<Real, 3, 3, Arrays::by_col_>                     CArray33;
+typedef CArray<double, UnknownSize, UnknownSize, Arrays::by_col_>CArrayXX;
+typedef CArray<double, UnknownSize, 2, Arrays::by_col_>         CArrayX2d;
+typedef CArray<double, UnknownSize, 3, Arrays::by_col_>         CArrayX3d;
+typedef CArray<double, 2, UnknownSize, Arrays::by_col_>         CArray2Xd;
+typedef CArray<double, 3, UnknownSize, Arrays::by_col_>         CArray3Xd;
+typedef CArray<double, 2, 2, Arrays::by_col_>                   CArray22d;
+typedef CArray<double, 3, 3, Arrays::by_col_>                   CArray33d;
+typedef CArray<int, UnknownSize, UnknownSize, Arrays::by_col_>  CArrayXXi;
+typedef CArray<int, UnknownSize, 2, Arrays::by_col_>            CArrayX2i;
+typedef CArray<int, UnknownSize, 3, Arrays::by_col_>            CArrayX3i;
+typedef CArray<int, 2, UnknownSize, Arrays::by_col_>            CArray2Xi;
+typedef CArray<int, 3, UnknownSize, Arrays::by_col_>            CArray3Xi;
+typedef CArray<int, 2, 2, Arrays::by_col_>                      CArray22i;
+typedef CArray<int, 3, 3, Arrays::by_col_>                      CArray33i;
+
+typedef CArray<Real, UnknownSize, UnknownSize, Arrays::by_row_> CArrayByRowXX;
+typedef CArray<Real, UnknownSize, 2, Arrays::by_row_>           CArrayByRowX2;
+typedef CArray<Real, UnknownSize, 3, Arrays::by_row_>           CArrayByRowX3;
+typedef CArray<Real, 2, UnknownSize, Arrays::by_row_>           CArrayByRow2X;
+typedef CArray<Real, 3, UnknownSize, Arrays::by_row_>           CArrayByRow3X;
+typedef CArray<Real, 2, 2, Arrays::by_row_>                     CArrayByRow22;
+typedef CArray<Real, 3, 3, Arrays::by_row_>                     CArrayByRow33;
+typedef CArray<double, UnknownSize, UnknownSize, Arrays::by_row_> CArrayByRowXX;
+typedef CArray<double, UnknownSize, 2, Arrays::by_row_>         CArrayByRowX2d;
+typedef CArray<double, UnknownSize, 3, Arrays::by_row_>         CArrayByRowX3d;
+typedef CArray<double, 2, UnknownSize, Arrays::by_row_>         CArrayByRow2Xd;
+typedef CArray<double, 3, UnknownSize, Arrays::by_row_>         CArrayByRow3Xd;
+typedef CArray<double, 2, 2, Arrays::by_row_>                   CArrayByRow22d;
+typedef CArray<double, 3, 3, Arrays::by_row_>                   CArrayByRow33d;
+typedef CArray<int, UnknownSize, UnknownSize, Arrays::by_row_>  CArrayByRowXXi;
+typedef CArray<int, UnknownSize, 2, Arrays::by_row_>            CArrayByRowX2i;
+typedef CArray<int, UnknownSize, 3, Arrays::by_row_>            CArrayByRowX3i;
+typedef CArray<int, 2, UnknownSize, Arrays::by_row_>            CArrayByRow2Xi;
+typedef CArray<int, 3, UnknownSize, Arrays::by_row_>            CArrayByRow3Xi;
+typedef CArray<int, 2, 2, Arrays::by_row_>                      CArrayByRow22i;
+typedef CArray<int, 3, 3, Arrays::by_row_>                      CArrayByRow33i;
 
 namespace hidden
 {
@@ -80,32 +101,14 @@ struct Traits< CArray<Type_, SizeRows_, SizeCols_, Orient_> >
   private:
     class Void { };
 
-    typedef CArrayPoint<Type_, SizeCols_, Arrays::by_col_> RowIndirect;
-    typedef CArrayPoint<Type_, SizeCols_, Arrays::by_row_> RowDirect;
-
-    typedef CArrayPoint<Type_, UnknownSize, Arrays::by_col_> SubRowIndirect;
-    typedef CArrayPoint<Type_, UnknownSize, Arrays::by_row_> SubRowDirect;
-
-    typedef CArrayVector<Type_, SizeRows_, Arrays::by_row_> ColIndirect;
-    typedef CArrayVector<Type_, SizeRows_, Arrays::by_col_> ColDirect;
-
-    typedef CArrayVector<Type_, UnknownSize, Arrays::by_row_> SubColIndirect;
-    typedef CArrayVector<Type_, UnknownSize, Arrays::by_col_> SubColDirect;
-
-    typedef CArray<Type_, SizeRows_, UnknownSize, Arrays::by_row_> FixedRowArrayIndirect;
-    typedef CArray<Type_, UnknownSize, SizeCols_, Arrays::by_row_> FixedColArrayDirect;
-
-    typedef CArray<Type_, SizeRows_, UnknownSize, Arrays::by_col_> FixedRowArrayDirect;
-    typedef CArray<Type_, UnknownSize, SizeCols_, Arrays::by_col_> FixedColArrayIndirect;
-
   public:
-    typedef CArrayNumber<Type_, 1, 1, Orient_> Number;
+    typedef CArrayNumber<Type_, Orient_> Number;
 
-    typedef typename If<Orient_, RowIndirect, RowDirect >::Result  Row;
-    typedef typename If<Orient_, ColDirect, ColIndirect >::Result  Col;
+    typedef CArrayPoint<Type_, SizeCols_, Orient_> Row;
+    typedef CArrayVector<Type_, SizeRows_, Orient_>  Col;
 
-    typedef typename If<Orient_, SubRowIndirect, SubRowDirect >::Result  SubRow;
-    typedef typename If<Orient_, SubColDirect, SubColIndirect >::Result  SubCol;
+    typedef CArrayPoint<Type_, UnknownSize, Orient_>  SubRow;
+    typedef CArrayVector<Type_, UnknownSize, Orient_>  SubCol;
 
     /** If one of the Size is 1, we have a Vector (a column) or a Point (a row)
      *  (What to do if both are = 1 : Type or array (1,1) ?).
@@ -116,12 +119,7 @@ struct Traits< CArray<Type_, SizeRows_, SizeCols_, Orient_> >
                        >::Result SubVector;
     // FIXME does not seem optimal if we want only to get a subset of rows (columns)
     typedef CArray<Type_, UnknownSize, UnknownSize, Orient_> SubArray;
-//    typedef typename If< Orient_ == Arrays::by_col_
-//                       , typename If<SizeRows_ != UnknownSize, FixedRowArrayDirect, FixedColArrayIndirect>::Result
-//                       , typename If<SizeCols_ != UnknownSize, FixedRowArrayIndirect, FixedColArrayDirect>::Result
-//                       >::Result SubArray;
-    // Transposed type
-    typedef CArray< Type_, SizeCols_, SizeRows_, !Orient_> Transposed;
+
     // The CAllocator have to have the same structure than the CArray
     typedef CAllocator<Type_, Arrays::array2D_, SizeRows_, SizeCols_, Orient_> Allocator;
 

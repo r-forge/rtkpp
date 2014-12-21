@@ -10,7 +10,7 @@
 Deb and Trivedi (1997) analyze data on 4406 individuals, aged 66 and over, who are covered
 by Medicare, a public insurance program. Originally obtained from the US National Medical
 Expenditure Survey (NMES) for 1987/88, the data are available from the data archive of
-the \em{Journal of Applied Econometrics} at \url{http://www.econ.queensu.ca/jae/1997-v12.3/deb-trivedi/}.
+the \emph{Journal of Applied Econometrics} at \url{http://www.econ.queensu.ca/jae/1997-v12.3/deb-trivedi/}.
 It was prepared for an R package accompanying Kleiber and Zeileis (2008)
 and is also available asDebTrivedi.rda in the Journal of Statistical Software
 together with Zeileis (2006). The objective is to model the demand for medical

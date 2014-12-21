@@ -90,9 +90,9 @@ bool ClusterLauncher::run()
   s4_model_.slot("nbCluster")    = p_composer_->nbCluster();
   s4_model_.slot("lnLikelihood") = p_composer_->lnLikelihood();
   s4_model_.slot("nbFreeParameter")= p_composer_->nbFreeParameter();
-  s4_model_.slot("pk")           = wrap(p_composer_->pk());
-  s4_model_.slot("tik")          = wrap(p_composer_->tik());
-  s4_model_.slot("zi")           = wrap(p_composer_->zi());
+  s4_model_.slot("pk")           = Rcpp::wrap(p_composer_->pk());
+  s4_model_.slot("tik")          = Rcpp::wrap(p_composer_->tik());
+  s4_model_.slot("zi")           = Rcpp::wrap(p_composer_->zi());
   NumericVector fi = s4_model_.slot("lnFi");
   NumericVector zi = s4_model_.slot("zi");
   for (int i=0; i< fi.length(); ++i)
@@ -307,8 +307,8 @@ void ClusterLauncher::getDiagGaussianParameters(Rcpp::S4& s4_component, std::str
     sigma.row(k) = params.row(2*k+1);
   }
   // save results in s4_model
-  s4_component.slot("mean")  = wrap(mean);
-  s4_component.slot("sigma") = wrap(sigma);
+  s4_component.slot("mean")  = Rcpp::wrap(mean);
+  s4_component.slot("sigma") = Rcpp::wrap(sigma);
   // get data
   RcppMatrix<double> m_data =  manager_.getData<double>(idData);
 //  RcppMatrix<double> m_data;
@@ -323,7 +323,7 @@ void ClusterLauncher::getPoissonParameters(Rcpp::S4& s4_component, std::string c
   Array2D<Real> params;
   static_cast<MixtureComposer*>(p_composer_)->getParameters(manager_,idData, params);
   // save results in s4_model
-  s4_component.slot("lambda")  = wrap(params);
+  s4_component.slot("lambda")  = Rcpp::wrap(params);
   // get data
   RcppMatrix<double> m_data =  manager_.getData<double>(idData);
 //  RcppMatrix<double> m_data;
@@ -347,8 +347,8 @@ void ClusterLauncher::getGammaParameters(Rcpp::S4& s4_component, std::string con
     scale.row(k) = params.row(2*k+1);
   }
   // save results in s4_model
-  s4_component.slot("shape") = wrap(shape);
-  s4_component.slot("scale") = wrap(scale);
+  s4_component.slot("shape") = Rcpp::wrap(shape);
+  s4_component.slot("scale") = Rcpp::wrap(scale);
   // get data
   RcppMatrix<double> m_data =  manager_.getData<double>(idData);
   //manager_.getData(idData_, m_data);
@@ -363,7 +363,7 @@ void ClusterLauncher::getCategoricalParameters(Rcpp::S4& s4_component, std::stri
   static_cast<MixtureComposer*>(p_composer_)->getParameters(manager_,idData, params);
   params.shift(0,0);
   // save results in s4_model
-  s4_component.slot("plkj") = wrap(params);
+  s4_component.slot("plkj") = Rcpp::wrap(params);
   // get data
   RcppMatrix<int> m_data =  manager_.getData<int>(idData);
   s4_component.slot("data") = (Rcpp::Matrix< RcppMatrix<int>::Rtype_>) m_data;

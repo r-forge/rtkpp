@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2012  Serge Iovleff
+/*     Copyright (C) 2004-2014  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -40,7 +40,7 @@
 #include <string>
 #include "Arrays/include/STK_CArrayPoint.h"
 #include "Arrays/include/STK_CArrayVector.h"
-#include "Arrays/include/STK_Array2D.h"
+#include "Arrays/include/STK_CArray.h"
 
 namespace STK
 {
@@ -189,7 +189,7 @@ class IMixture
     /** This function can be used in derived classes to get posterior probabilities from the framework.
      *  @return Pointer to tik.
      */
-    ArrayXX const* p_tik() const;
+    CArrayXX const* p_tik() const;
     /** This function can be used in derived classes to get class labels from the framework.
      *  @return Pointer to zi.
      */
@@ -208,7 +208,7 @@ class IMixture
      *  from the framework.
      *  @return Pointer to tik.
      */
-    ArrayXX const& tik() const;
+    CArrayXX const& tik() const;
     /** This function can be used in derived classes to get class labels from
      *  the framework.
      *  @return Pointer to zi.

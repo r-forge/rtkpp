@@ -55,6 +55,7 @@
 #include "../CategoricalMixtureModels/STK_Categorical_pjk.h"
 #include "../CategoricalMixtureModels/STK_Categorical_pk.h"
 #include "../PoissonMixtureModels/STK_Poisson_ljk.h"
+#include "../PoissonMixtureModels/STK_Poisson_lk.h"
 #include "../PoissonMixtureModels/STK_Poisson_ljlk.h"
 
 #include "../STK_MixtureData.h"
@@ -164,6 +165,19 @@ struct MixtureBridgeTraits< MixtureBridge<Clust::Poisson_ljk_, Data> >
 {
   /** Type of the Mixture model */
   typedef Poisson_ljk<Data> Mixture;
+  enum
+  {
+    idMixtureClass_ = Clust::Poisson_
+  };
+};
+/** @ingroup hidden
+ *  Partial specialization of the MixtureBridgeTraits for the Poisson_lk model
+ **/
+template<class Data>
+struct MixtureBridgeTraits< MixtureBridge<Clust::Poisson_lk_, Data> >
+{
+  /** Type of the Mixture model */
+  typedef Poisson_lk<Data> Mixture;
   enum
   {
     idMixtureClass_ = Clust::Poisson_

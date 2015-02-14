@@ -55,11 +55,11 @@ namespace hidden
 class invPsiMLog : public IFunction<invPsiMLog >
 {
   public:
-    inline invPsiMLog( Real y): y_(y)  {}
+    inline invPsiMLog( Real const& y): y_(y)  {}
     /** @return the value of the function at a
      * @param a a positive real value
      **/
-    inline Real fImpl(Real a) const
+    inline Real fImpl(Real const& a) const
     { return (y_ + std::log(a) - Funct::psi_raw(a));}
     /** @return the minimal value of the function at x */
     inline Real xminImpl() const { return 0;}
@@ -75,11 +75,11 @@ class invPsi : public IFunction<invPsi >
 {
   public:
     /** initialize y_ */
-    inline invPsi( Real y): y_(y) {}
+    inline invPsi( Real const& y): y_(y) {}
     /** @return the value of the function at a
      *  @param x a positive real value
      **/
-    inline Real fImpl(Real x) const { return (y_ - Funct::psi_raw(x));}
+    inline Real fImpl(Real const& x) const { return (y_ - Funct::psi_raw(x));}
     /** @return the minimal value of the function at x */
     inline Real xminImpl() const { return 0;}
   private:
@@ -221,15 +221,15 @@ bool GammaBase<Derived>::moments()
     {
       // mean
       Real mean =  p_data()->col(j).wmean(tikRowk);
-      if ( (mean<=0) || Arithmetic<Real>::isNA(mean) ) { return false;}
+      if ( (mean<=0) || isNA(mean) ) { return false;}
       p_param(k)->mean_[j] = mean;
       // mean log
       Real meanLog =  p_data()->col(j).log().wmean(tikRowk);
-      if (Arithmetic<Real>::isNA(meanLog)) { return false;}
+      if (isNA(meanLog)) { return false;}
       p_param(k)->meanLog_[j] = meanLog;
       // variance
       Real variance =  p_data()->col(j).wvariance(mean, tikRowk);
-      if ((variance<=0)||Arithmetic<Real>::isNA(variance)){ return false;}
+      if ((variance<=0)||isNA(variance)){ return false;}
       p_param(k)->variance_[j] = variance;
     }
   }

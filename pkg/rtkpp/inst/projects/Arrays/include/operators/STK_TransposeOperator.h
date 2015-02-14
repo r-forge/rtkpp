@@ -35,7 +35,7 @@
 #ifndef STK_TRANSPOSEOPERATOR_H
 #define STK_TRANSPOSEOPERATOR_H
 
-#include "STK_SliceOperators.h"
+#include "STK_SlicingOperators.h"
 
 namespace STK
 {

@@ -35,7 +35,7 @@
 #ifndef STK_UNARYOPERATORS_H
 #define STK_UNARYOPERATORS_H
 
-#include "STK_SliceOperators.h"
+#include "STK_SlicingOperators.h"
 
 namespace STK
 {

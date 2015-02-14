@@ -37,7 +37,7 @@
 
 
 #include "Sdk/include/STK_StaticAssert.h"
-#include "STK_SliceOperators.h"
+#include "STK_SlicingOperators.h"
 
 namespace STK
 {

@@ -167,7 +167,7 @@ class CArraySquare
      *  @param T the container to wrap
      **/
     template<class OtherDerived>
-    CArraySquare( ExprBase<OtherDerived> const& T): Base()
+    inline CArraySquare( ExprBase<OtherDerived> const& T): Base(T.size(), T.size())
     { LowBase::operator=(T);}
     /** destructor. */
     inline ~CArraySquare() {}
@@ -179,7 +179,7 @@ class CArraySquare
      *  @param T the container to copy
      **/
     template<class Rhs>
-    inline CArraySquare& operator=(Rhs const& T) { return LowBase::assign(T);}
+    inline CArraySquare& operator=( ExprBase<Rhs> const& T) { return LowBase::assign(T);}
     /** operator = : overwrite the CArray with the Right hand side rhs.
      *  @param rhs the container to copy
      **/

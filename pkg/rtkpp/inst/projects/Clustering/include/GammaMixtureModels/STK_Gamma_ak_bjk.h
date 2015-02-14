@@ -143,7 +143,7 @@ bool Gamma_ak_bjk<Array>::mStep()
     // moment estimate and oldest value
     Real x0 = (p_param(k)->mean_.square()/p_param(k)->variance_).mean();
     Real x1 = p_param(k)->shape_;
-    if ((x0 <=0.) || (Arithmetic<Real>::isNA(x0))) return false;
+    if ((x0 <=0.) || (isNA(x0))) return false;
 
     // get shape
     hidden::invPsiMLog f( (p_param(k)->meanLog_-p_param(k)->mean_.log()).mean() );

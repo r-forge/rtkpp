@@ -122,7 +122,7 @@ bool Categorical_pjk<Array>::mStep()
   {
     for (int j = p_data()->beginCols(); j < p_data()->endCols(); ++j)
     {
-      // count the number of modalities weigthed by the tik
+      // count the number of modalities weighted by the tik
       p_param(k)->proba_[j] = 0.;
       for (int i = p_tik()->beginRows(); i < p_tik()->endRows(); ++i)
       { p_param(k)->proba_[j][(*p_data())(i, j)] += (*p_tik())(i, k);}

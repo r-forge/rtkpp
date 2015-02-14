@@ -50,7 +50,7 @@ namespace Law
 {
 
 /* The inverse cumulative distribution function at p.*/
-static Real icdf_gauss(Real const& p)
+static Real icdf_gauss_raw(Real const& p)
 {
  // trivial cases
  if (p == 0.5) return  0.;
@@ -108,13 +108,51 @@ static Real icdf_gauss(Real const& p)
  return (p > 0.5 ? - u : u);
 }
 
+/* @brief inverse cumulative distribution function
+ *  The quantile is defined as the smallest value @e x such that
+ *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.
+ *  @param p a probability number
+ **/
+static int icdf_poisson_raw(Real const& p, Real const& lambda)
+{
+  // check values 0 and 1
+  Real q=1, el = std::exp(-lambda), s = p/el;
+  if (s<q) return 0;
+  q += lambda;
+  if (s<q) return 1;
+  q += lambda*lambda/2;
+  if (s<q) return 1;
+  // otherwise search
+  q = icdf_gauss_raw(p);
+  Real sqlambda = std::sqrt(lambda);
+  int k = round(lambda + q * sqlambda + (q-1.)*(q+1.)*(1.-q/(12.*sqlambda))/6);
+  if (Funct::gammaRatioQ(k, lambda) >= p)
+  { /* decreasing search */
+    while(1)
+    {
+      if ( Funct::gammaRatioQ(k-1, lambda) < p) return k;
+      k--;
+    }
+  }
+  else
+  { /* increasing search */
+    while(1)
+    {
+      k++;
+      if( Funct::gammaRatioQ(k, lambda) >= p) return k;
+    }
+  }
+  return k; // avoid warning at compilation
+}
+
+
 /* constructor
- * @param lambda intensity of a Poisson process
+ * @param lambda mean of a Poisson variate
  **/
 Poisson::Poisson(Real const& lambda): Base(_T("Poisson")), lambda_(lambda) {}
 /* @return a Poisson random variate . */
 int Poisson::rand() const
-{ return icdf(Law::generator.randUnif());}
+{ return icdf_poisson_raw(Law::generator.randUnif(), lambda_);}
 /* @brief compute the probability distribution function.
  *  Give the value of the pdf at the point x.
  *  @param x a binary value
@@ -181,7 +219,7 @@ int Poisson::icdf(Real const& p) const
   if (p<el) return 0;
   if (p<(1+lambda_)*el) return 1;
   // othewise search
-  Real q = icdf_gauss(p), sqlambda = std::sqrt(lambda_);
+  Real q = icdf_gauss_raw(p), sqlambda = std::sqrt(lambda_);
   int k = round(lambda_ + q * sqlambda + (q-1.)*(q+1.)*(1.-q/(12.*sqlambda))/6);
   if (cdf(k) >= p)
   { /* decreasing search */
@@ -202,15 +240,15 @@ int Poisson::icdf(Real const& p) const
   return k; // avoid warning at compilation
 }
 
-/* @param lambda an intensity
+/* @param lambda the mean
  *  @return a int random variate.
  **/
 int Poisson::rand(Real const& lambda)
-{ return icdf(Law::generator.randUnif(), lambda);}
+{ return icdf_poisson_raw(Law::generator.randUnif(), lambda);}
 /* @brief compute the probability distribution function
  *  Give the value of the pdf at the point x.
  *  @param x a binary value
- *  @param lambda an intensity
+ *  @param lambda the mean
  *  @return the value of the pdf
  **/
 Real Poisson::pdf(int const& x, Real const& lambda)
@@ -230,7 +268,7 @@ Real Poisson::pdf(int const& x, Real const& lambda)
 /* @brief compute the log probability distribution function
  *  Give the value of the log-pdf at the point x.
  *  @param x a binary value
- *  @param lambda an intensity
+ *  @param lambda the mean
  *  @return the value of the log-pdf
  **/
 Real Poisson::lpdf(int const& x, Real const& lambda)
@@ -276,7 +314,7 @@ int Poisson::icdf(Real const& p, Real const& lambda)
   if (p<el) return 0;
   if (p< (1+lambda)*el) return 1;
   // othewise search
-  Real q = icdf_gauss(p), sqlambda = std::sqrt(lambda);
+  Real q = icdf_gauss_raw(p), sqlambda = std::sqrt(lambda);
   int k = round(lambda + q * sqlambda + (q-1.)*(q+1.)*(1.-q/(12.*sqlambda))/6);
   if (cdf(k, lambda) >= p)
   { /* decreasing search */

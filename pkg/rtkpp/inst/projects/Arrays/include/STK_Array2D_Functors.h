@@ -851,7 +851,7 @@ Array2DSquare<typename Derived::Type>
 }
 
 /** @ingroup Arrays
- *  @brief Weigthed Array multiplication by its transpose
+ *  @brief weighted Array multiplication by its transpose
  *
  *  Perform the matrix product \f$ AWA' \f$.
  *

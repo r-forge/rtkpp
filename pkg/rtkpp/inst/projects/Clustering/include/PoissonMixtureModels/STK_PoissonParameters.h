@@ -64,6 +64,10 @@ class PoissonParametersBase : public IRecursiveTemplate<Parameters>
     /** Destructor */
     inline ~PoissonParametersBase() {}
   public:
+    /** resize the parameters (default implementation).
+     *  @param range range of the parameters
+     **/
+    inline void resize(Range const& range) {}
     /** @return the j-th scale value */
     inline Real lambda(int j) const {return this->asDerived().lambdaImpl(j);}
     /** Value of the sum of the k-th column of the tik */
@@ -152,20 +156,15 @@ class Poisson_lk_Parameters: public PoissonParametersBase<Poisson_lk_Parameters>
     inline ~Poisson_lk_Parameters() {}
     /** @return the j-th scale value */
     inline Real lambdaImpl(int j) const {return lambda_;}
-    /** resize the parameters.
-     *  @param range range of the parameters
-     **/
-    inline void resize(Range const& range) {}
     /** Store the intermediate results of the Mixture.
      *  @param iteration Provides the iteration number beginning after the burn-in period.
      **/
-    void storeIntermediateResults(int iteration)
-    { stat_lambda_.update(lambda_);}
+    void storeIntermediateResults(int iteration) { stat_lambda_.update(lambda_);}
     /** Release the stored results. This is usually used if the estimation
      *  process failed.
      **/
     void releaseIntermediateResults() { stat_lambda_.release();}
-    /** set the parameters stored in stat_proba_ and release stat_proba_. */
+    /** set the parameters stored in stat_lambda_ and release stat_lambda_. */
     void setParameters()
     {
       lambda_ = stat_lambda_.param_;
@@ -198,10 +197,6 @@ class Poisson_ljlk_Parameters: public PoissonParametersBase<Poisson_ljlk_Paramet
     {}
     /** destructor */
     inline ~Poisson_ljlk_Parameters() {}
-    /** resize the parameters.
-     *  @param range range of the parameters
-     **/
-    inline void resize(Range const& range) {}
     /** @return the j-th lambda value */
     inline Real lambdaImpl(int j) const {return lambdak_ * p_lambdaj_->elt(j);}
     /** Store the intermediate results of the Mixture.

@@ -108,10 +108,6 @@ class TRange<UnknownSize>
      *  @return the size of the range
      **/
     inline int size()   const { return size_;};
-    /** get the first index of the TRange.
-     *  @return the first index of the range
-     **/
-    inline int firstIdx() const { return begin_;};
     /** get the last index of the TRange.
      *  @return the last index of the range
      **/
@@ -297,10 +293,6 @@ class TRange
      *  @return the size of the range
      **/
     inline int size()   const { return Size_;};
-    /** get the first index of the TRange.
-     *  @return the first index of the range
-     **/
-    inline int firstIdx()  const { return begin_;};
     /** get the last index of the TRange.
      *  @return the last index of the range
      **/

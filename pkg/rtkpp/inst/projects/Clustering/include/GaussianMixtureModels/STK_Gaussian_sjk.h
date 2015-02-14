@@ -36,7 +36,6 @@
 #define STK_GAUSSIAN_SJK_H
 
 #include "STK_DiagGaussianBase.h"
-
 namespace STK
 {
 

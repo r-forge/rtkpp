@@ -387,7 +387,7 @@ class Univariate<TContainer1D, Real>
       // discard missing values
       for (int i=V_.lastIdx(); i>=V_.begin(); i--)
       {
-        if ( Arithmetic<Real>::isNA(V_[i]) )
+        if ( isNA(V_[i]) )
         {
           // if NA
           nbAvailable_--;         // decrease nbAvailable_
@@ -427,7 +427,7 @@ class Univariate<TContainer1D, Real>
       // discard missing values or values without weights
       for (int i=V_.lastIdx(); i>=V_.begin(); i--)
       {
-        if ( Arithmetic<Real>::isNA(V_[i])||Arithmetic<Real>::isNA(W_[i]))
+        if ( isNA(V_[i])||isNA(W_[i]))
         {
           V_.erase(i); // Delete the current row
           W_.erase(i); // for the weights too

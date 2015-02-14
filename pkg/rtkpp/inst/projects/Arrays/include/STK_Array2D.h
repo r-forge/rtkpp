@@ -63,13 +63,13 @@ struct Traits< Array2D<_Type> >
   private:
     class Void {};
   public:
-    typedef _Type          Type;
-    typedef Array2DPoint<_Type> Row;
+    typedef _Type                Type;
+    typedef Array2DPoint<_Type>  Row;
     typedef Array2DVector<_Type> Col;
-    typedef Array2DPoint<_Type> SubRow;
+    typedef Array2DPoint<_Type>  SubRow;
     typedef Array2DVector<_Type> SubCol;
-    typedef Array2D<_Type> SubArray;
-    typedef Void SubVector;
+    typedef Array2D<_Type>       SubArray;
+    typedef Void                 SubVector;
 
     enum
     {
@@ -113,11 +113,12 @@ class Array2D : public IArray2D< Array2D<Type> >
   typedef ArrayBase < Array2D<Type> > LowBase;
 
   public:
-    typedef Array2DPoint<Type> Row;
-    typedef Array2DVector<Type> Col;
-    typedef Array2DPoint<Type> SubRow;
-    typedef Array2DVector<Type> SubCol;
-    typedef Array2D<Type> SubArray;
+    typedef typename hidden::Traits<Array2D<Type> >::Row Row;
+    typedef typename hidden::Traits<Array2D<Type> >::Col Col;
+    typedef typename hidden::Traits<Array2D<Type> >::SubRow SubRow;
+    typedef typename hidden::Traits<Array2D<Type> >::SubCol SubCol;
+    typedef typename hidden::Traits<Array2D<Type> >::SubVector SubVector;
+    typedef typename hidden::Traits<Array2D<Type> >::SubArray SubArray;
 
     enum
     {
@@ -169,7 +170,7 @@ class Array2D : public IArray2D< Array2D<Type> >
      *  @param T the container to copy
      **/
     template<class Rhs>
-    inline Array2D& operator=( Rhs const& T) { return LowBase::operator=(T);}
+    inline Array2D& operator=( ExprBase<Rhs> const& T) { return LowBase::operator=(T);}
     /** overwrite the Array2D with T.
      *  @param T the container to copy
      **/

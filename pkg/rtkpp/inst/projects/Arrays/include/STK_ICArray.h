@@ -45,7 +45,6 @@
 #include "STK_ExprBaseVisitor.h"
 #include "STK_ExprBaseDot.h"
 #include "STK_ExprBaseProduct.h"
-
 #include "STK_ArrayBaseApplier.h"
 #include "STK_ArrayBaseAssign.h"
 #include "STK_ArrayBaseInitializer.h"
@@ -68,8 +67,6 @@ namespace STK
 template<class Derived>
 class ICArray : public ArrayBase<Derived>
 {
-  protected:
-
   public:
     typedef ArrayBase<Derived> Base;
 
@@ -91,6 +88,10 @@ class ICArray : public ArrayBase<Derived>
       sizeCols_  = hidden::Traits<Derived>::sizeCols_,
       storage_   = hidden::Traits<Derived>::storage_
     };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
 
   protected:
     /** allocator of the memory  */
@@ -99,18 +100,16 @@ class ICArray : public ArrayBase<Derived>
     inline ICArray() : Base(), allocator_()
     {}
     /** constructor with specified sizes.
-     *  @param sizeRows size of the rows
-     *  @param sizeCols size of the columns
+     *  @param sizeRows,sizeCols size of the rows and columns
      **/
-    inline ICArray( int const& sizeRows, int const& sizeCols)
+    inline ICArray( int sizeRows, int sizeCols)
                   : Base(), allocator_(sizeRows, sizeCols)
     {}
     /** constructor with specified sizes and value.
-     *  @param sizeRows size of the rows
-     *  @param sizeCols size of the columns
+     *  @param sizeRows,sizeCols size of the rows and columns
      *  @param value the value to set
      **/
-    inline ICArray( int const& sizeRows, int const& sizeCols, Type const& value)
+    inline ICArray( int sizeRows, int sizeCols, Type const& value)
                   : Base(), allocator_(sizeRows, sizeCols, value)
     {}
     /** copy or wrapper constructor.
@@ -122,11 +121,10 @@ class ICArray : public ArrayBase<Derived>
     {}
     /** wrapper constructor for 0 based C-Array.
      *  @param q pointer on the array
-     *  @param nbRow number of rows
-     *  @param nbCol number of columns
+     *  @param sizeRows,sizeCols size of the rows and columns
      **/
-    inline ICArray( Type* const& q, int nbRow, int nbCol)
-                  : Base(), allocator_(q, nbRow, nbCol)
+    inline ICArray( Type* const& q, int sizeRows, int sizeCols)
+                  : Base(), allocator_(q, sizeRows, sizeCols)
     {}
     /** constructor by reference, ref_=1.
      *  @param allocator with the data
@@ -140,7 +138,7 @@ class ICArray : public ArrayBase<Derived>
 
   public:
     /** @return the Horizontal range */
-    inline Range cols() const { return allocator_.cols();};
+    inline ColRange const& cols() const { return allocator_.cols();};
     /**  @return the index of the first column */
     inline int beginColsImpl() const { return allocator_.beginCols();}
     /**  @return the ending index of the columns */
@@ -148,8 +146,8 @@ class ICArray : public ArrayBase<Derived>
     /** @return the Horizontal size (the number of column) */
     inline int sizeColsImpl() const { return allocator_.sizeCols();}
 
-    /**  @return the Range of the rows of the container */
-    inline Range rows() const { return allocator_.rows();}
+    /** @return the Vertical range */
+    inline RowRange const& rows() const { return allocator_.rows();}
     /** @return the index of the first row*/
     inline int beginRowsImpl() const { return allocator_.beginRows();}
     /** @return the ending index of the rows */
@@ -157,12 +155,8 @@ class ICArray : public ArrayBase<Derived>
     /** @return the Vertical size (the number of rows) */
     inline int sizeRowsImpl() const { return allocator_.sizeRows();}
 
-    /**  @return the index of the first column */
-    inline int firstIdxCols() const { return allocator_.beginCols();}
     /** @return the index of the last column */
     inline int lastIdxCols() const { return allocator_.lastIdxCols();}
-    /** @return the index of the first row*/
-    inline int firstIdxRows() const { return allocator_.beginRows();}
     /** @return the index of the last row */
     inline int lastIdxRows() const { return allocator_.lastIdxRows();}
 
@@ -174,9 +168,9 @@ class ICArray : public ArrayBase<Derived>
 
     /** Get a constant reference on the main allocator. */
     inline Allocator const& allocator() const { return allocator_;}
-    /** Get a constant reference on the main pointer. */
+    /** Get the constant main pointer. */
     inline Type const* p_data() const { return allocator_.p_data();}
-    /** Get a reference on the main pointer. */
+    /** Get the main pointer. */
     inline Type* p_data() { return allocator_.p_data();}
 
     // general arrays
@@ -208,10 +202,7 @@ class ICArray : public ArrayBase<Derived>
 
     /** swap two elements: only for vectors an points. */
     inline void swap(int i, int  j) { std::swap(this->elt(i), this->elt(j)); }
-    /** Swapping the pos1 column and the pos2 column.
-     *  @param pos1 position of the first col
-     *  @param pos2 position of the second col
-     **/
+    /** @param pos1, pos2 positions of the columns to swap */
     void swapCols(int pos1, int pos2)
     {
       if (this->beginCols() > pos1)
@@ -225,6 +216,20 @@ class ICArray : public ArrayBase<Derived>
       // swap allocator
       allocator_.swapCols(pos1, pos2);
     }
+    /** @param pos1, pos2 positions of the rows to swap */
+    void swapRows(int pos1, int pos2)
+    {
+      if (this->beginRows() > pos1)
+      { STKOUT_OF_RANGE_2ARG(ICArray::swapRows,pos1, pos2,beginRows() >pos1);}
+      if (this->lastIdxRows() < pos1)
+      { STKOUT_OF_RANGE_2ARG(ICArray::swapRows,pos1, pos2,lastIdxRows() <pos1);}
+      if (this->beginRows() > pos2)
+      { STKOUT_OF_RANGE_2ARG(ICArray::swapRows,pos1, pos2,beginRows() >pos2);}
+      if (this->lastIdxRows() < pos2)
+      { STKOUT_OF_RANGE_2ARG(ICArray::swapRows,pos1, pos2,lastIdxRows() <pos2);}
+      // swap allocator
+      allocator_.swapRows(pos1, pos2);
+    }
     /** exchange this with T.
      *  @param T the container to exchange with this
      **/
@@ -234,14 +239,14 @@ class ICArray : public ArrayBase<Derived>
      **/
     inline void move(Derived const& T) { allocator_.move(T.allocator_);}
     /** shift the Array.
-     *  @param firstIdxRows,beginCols  first indexes of the rows and columns
+     *  @param beginRows,beginCols  first indexes of the rows and columns
      **/
-    Derived& shift(int firstIdxRows, int beginCols)
+    Derived& shift(int beginRows, int beginCols)
     {
-      if((this->beginRows() == firstIdxRows) && (this->beginCols()==beginCols)) return this->asDerived();
+      if((this->beginRows() == beginRows) && (this->beginCols()==beginCols)) return this->asDerived();
       if (this->isRef())
-      { STKRUNTIME_ERROR_2ARG(ICArray::shift,firstIdxRows,beginCols,cannot operate on reference);}
-      allocator_.shift(firstIdxRows, beginCols);
+      { STKRUNTIME_ERROR_2ARG(ICArray::shift,beginRows,beginCols,cannot operate on reference);}
+      allocator_.shift(beginRows, beginCols);
       return this->asDerived();
     }
     /** shift the Array.
@@ -249,15 +254,14 @@ class ICArray : public ArrayBase<Derived>
      **/
     Derived& shift(int firstIdx)
     {
-      if((this->begin() == firstIdx)) return this->asDerived();
+      if((this->beginRows() == firstIdx)&&(this->beginCols() == firstIdx)) return this->asDerived();
       if (this->isRef())
       { STKRUNTIME_ERROR_1ARG(ICArray::shift,firstIdx,cannot operate on reference);}
       allocator_.shift(firstIdx);
       return this->asDerived();
     }
     /** resize the Array.
-     *  @param I range of the rows
-     *  @param J range of the columns
+     *  @param I, J range of the rows and columns
      **/
     Derived& resize(Range const& I, Range const& J)
     {
@@ -320,7 +324,6 @@ class ICArray : public ArrayBase<Derived>
       }
       return this->asDerived();
     }
-
 };
 
 } // namespace STK

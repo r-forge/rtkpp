@@ -59,8 +59,7 @@ struct MixtureTraits< Poisson_lk<_Array> >
 } // namespace hidden
 
 /** @ingroup Clustering
- *  The Poisson mixture model @c Poisson_lk is the most general Poisson model
- *  and have a probability function of the form
+ *  The Poisson mixture model @c Poisson_lk has a probability function of the form
  * \f[
  *    P(\mathbf{x}=(n_1,\ldots,n_d)|\theta)
  *     = \sum_{k=1}^K p_k \prod_{j=1}^d e^{-\lambda_{k}} \frac{\lambda_{k}^{n_j}}{n_j!}.
@@ -74,10 +73,10 @@ class Poisson_lk : public PoissonBase<Poisson_lk<Array> >
     typedef typename Clust::MixtureTraits< Poisson_lk<Array> >::Parameters Parameters;
 
     using Base::p_tik;
+    using Base::p_nk;
     using Base::components;
     using Base::p_data;
     using Base::p_param;
-
 
     /** default constructor
      * @param nbCluster number of cluster in the model
@@ -101,9 +100,9 @@ class Poisson_lk : public PoissonBase<Poisson_lk<Array> >
 template<class Array>
 void Poisson_lk<Array>::randomInit()
 {
+  Real m = p_data()->mean();
   for (int k = baseIdx; k < components().end(); ++k)
   {
-    Real m = p_data()->sum() / (this->nbSample()*this->nbVariable());
     p_param(k)->lambda_ = Law::Exponential::rand(m);
   }
 }
@@ -114,7 +113,9 @@ template<class Array>
 bool Poisson_lk<Array>::mStep()
 {
   for (int k = baseIdx; k < components().end(); ++k)
-  { p_param(k)->lambda_ = (p_data().transpose() * p_tik()->col(k)).sum()/p_nk()->elt(k);}
+  { p_param(k)->lambda_ = (p_data()->transpose() * p_tik()->col(k)).sum()
+                        / (p_data()->sizeCols()*p_nk()->elt(k));
+  }
   return true;
 }
 

@@ -44,16 +44,24 @@ namespace STK
 {
 template <typename Type> class RcppVector;
 template <typename Type> class RcppMatrix;
-// emulate Rcpp wrap
-template <typename T> SEXP wrap( const T& object ) ;
 
-}
+} // namespace STK
 
 
 /* Rcpp integration */
 namespace Rcpp
 {
-  /* support for wrap */
+  /* This support for wrap, will not work as base template
+   * template <typename T>
+   * inline SEXP wrap(const T& object);
+   * of Rcpp will be preferred by the compiler...
+   *
+   * If you want to wrap an expression, you have to use
+   * STK::wrap()
+   **/
+  template<typename Derived>
+  SEXP wrap( STK::ExprBase<Derived> const& matrix);
+
   template<typename Type>
   SEXP wrap( STK::Array2D<Type> const& matrix);
   template<typename Type>

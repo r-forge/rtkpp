@@ -148,11 +148,11 @@ class Multivariate<Array, Real> : public IRunnerUnsupervised< Array, typename Ar
           mean_[j] = Stat::mean(this->p_data_->col(j));
           min_[j] = Stat::min(this->p_data_->col(j));
           max_[j] = Stat::max(this->p_data_->col(j));
-          var_[j]  = varianceWithFixedMean(this->p_data_->col(j), mean_[j]);
+          var_[j]  = varianceWithFixedMean(this->p_data_->col(j), mean_[j], false);
           cov_(j, j) = var_[j];
           for (int i=this->p_data_->beginCols(); i<j; i++)
           {
-            cov_(i, j) = covarianceWithFixedMean(this->p_data_->col(i), this->p_data_->col(j), mean_[i], mean_[j]);
+            cov_(i, j) = covarianceWithFixedMean(this->p_data_->col(i), this->p_data_->col(j), mean_[i], mean_[j], false);
             cov_(j, i) = cov_(i, j);
           }
         }
@@ -186,7 +186,7 @@ class Multivariate<Array, Real> : public IRunnerUnsupervised< Array, typename Ar
         for (int j= this->p_data_->beginCols(); j<= this->p_data_->lastIdxCols(); j++)
         {
           mean_[j] = Stat::mean(this->p_data_->col(j), weights);
-          var_[j]  = varianceWithFixedMean(this->p_data_->col(j), weights, mean_[j]);
+          var_[j]  = varianceWithFixedMean(this->p_data_->col(j), weights, mean_[j], false);
           cov_(j, j) = var_[j];
           // compute the covariances
           for (int i= this->p_data_->beginCols(); i<j; i++)
@@ -289,7 +289,6 @@ template <class Array, class WColVector >
 void covariance( Array const& V, WColVector const& W, ArraySquareX & cov, bool unbiased = false)
 {
   typedef typename Array::Row RowVector;
-  typedef typename Array::Col ColVector;
   RowVector mean;
   // compute the
   mean = Stat::mean(V, W);
@@ -298,7 +297,7 @@ void covariance( Array const& V, WColVector const& W, ArraySquareX & cov, bool u
   cov.resize(V.cols());
   for (int j= firstVar; j<= lastVar; j++)
   {
-    cov(j, j) = varianceWithFixedMean<ColVector, WColVector>(V.col(j), W, mean[j], unbiased);
+    cov(j, j) = varianceWithFixedMean(V.col(j), W, mean[j], unbiased);
     for (int i= firstVar; i<j; i++)
     { cov(j,i) = ( cov(i, j) = covarianceWithFixedMean(V.col(i), V.col(j), W, mean[i], mean[j], unbiased));}
   }

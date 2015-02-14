@@ -181,7 +181,7 @@ bool Gamma_a_bjk<Array>::mStep()
   y  /= (this->nbSample()*this->nbVariable());
   x0 /= (this->nbSample()*this->nbVariable());
   // moment estimate and oldest value
-  if ((x0 <=0.) || (Arithmetic<Real>::isNA(x0))) return false;
+  if ((x0 <=0.) || (isNA(x0))) return false;
 
   // get shape
   hidden::invPsiMLog f(y);

@@ -209,7 +209,7 @@ void IAAModel::reduction()
 void IAAModel::reduction( Vector const& weights)
 {
   if (!p_reductor_)
-    throw runtime_error(_T("Error in IAAModel::reduction(weigths): "
+    throw runtime_error(_T("Error in IAAModel::reduction(weights): "
                            "reductor have not be set."));
   // compute axis
   p_reductor_->setDimension(dim_);

@@ -125,13 +125,13 @@ class CArrayVector : public ICArray < CArrayVector<Type, SizeRows_, Orient_> >
     /** constructor with specified dimension.
      *  @param sizeRows size of the rows
      **/
-    inline CArrayVector( int const& sizeRows) : Base(sizeRows, 1) {}
+    inline CArrayVector( int sizeRows) : Base(sizeRows, 1) {}
     /** constructor with sizeRows specified,
      *  initialization with a constant.
      *  @param sizeRows size of the rows
      *  @param v initial value of the container
      **/
-    inline CArrayVector( int const& sizeRows, Type const& v) : Base(sizeRows, 1, v) {}
+    inline CArrayVector( int sizeRows, Type const& v) : Base(sizeRows, 1, v) {}
     /** Copy constructor
      *  @param T the container to copy
      *  @param ref true if T is wrapped
@@ -151,18 +151,18 @@ class CArrayVector : public ICArray < CArrayVector<Type, SizeRows_, Orient_> >
      *  @param T the container to wrap
      **/
     template<class OtherDerived>
-    CArrayVector( ExprBase<OtherDerived> const& T): Base() { LowBase::operator=(T);}
+    inline CArrayVector( ExprBase<OtherDerived> const& T): Base(T.size(), 1) { LowBase::operator=(T);}
     /** destructor. */
     inline ~CArrayVector() {}
     /** operator= : set the container to a constant value.
      *  @param v the value to set
      **/
     inline CArrayVector& operator=(Type const& v) { return LowBase::setValue(v);}
-    /** operator = : overwrite the CArray with the Right hand side T.
+    /** operator = : overwrite the CArrayPoint with the Right hand side T.
      *  @param T the container to copy
      **/
     template<class Rhs>
-    inline CArrayVector& operator=(Rhs const& T) { return LowBase::assign(T);}
+    inline CArrayVector& operator=( ExprBase<Rhs> const& T) { return LowBase::assign(T);}
     /** operator = : overwrite the CArray with the Right hand side rhs.
      *  @param rhs the container to copy
      **/

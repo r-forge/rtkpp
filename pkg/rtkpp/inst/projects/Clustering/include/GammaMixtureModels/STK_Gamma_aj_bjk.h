@@ -185,7 +185,7 @@ bool Gamma_aj_bjk<Array>::mStep()
     y  /= this->nbSample();
     x0 /= this->nbSample();
     Real x1 = shape_[j];
-    if ((x0 <=0.) || (Arithmetic<Real>::isNA(x0))) return false;
+    if ((x0 <=0.) || (isNA(x0))) return false;
 
     // get shape
     hidden::invPsiMLog f(y);

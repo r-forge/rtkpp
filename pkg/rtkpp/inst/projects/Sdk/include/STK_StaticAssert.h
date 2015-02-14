@@ -78,6 +78,7 @@ template<> struct StaticAssert<true>
     YOU_TRIED_TO_WRAP_A_CONTAINER_WHICH_IS_NOT_1D_AS_A_VARIABLE,
     YOU_CANNOT_USED_AN_UNIDIMENSIONAL_METHOD_ON_THIS_OBJECT,
     YOU_CANNOT_USED_A_ZERODIMENSIONAL_METHOD_ON_THIS_OBJECT,
+    YOU_HAVE_TO_USE_TWO_ARRAYS_WITH_THE_SAME_ORIENTATION,
     YOU_HAVE_TO_USE_A_VECTOR_OR_POINT_IN_THIS_METHOD,
     YOU_HAVE_TO_USE_A_SQUARE_MATRIX_IN_THIS_METHOD,
     YOU_HAVE_TO_USE_A_MATRIX_OR_SQUARE_MATRIX_IN_THIS_METHOD,
@@ -130,6 +131,10 @@ STK_STATICASSERT(  (hidden::Traits<EXPR>::structure_==(int)Arrays::array2D_) \
                  ||(hidden::Traits<EXPR>::structure_==(int)Arrays::lower_triangular_) \
                  ||(hidden::Traits<EXPR>::structure_==(int)Arrays::upper_triangular_) \
                  ,YOU_TRIED_CALLING_A_MATRIX_METHOD_ON_A_VECTOR)
+
+#define STK_STATICASSERT_SAME_ORIENT(LHS, RHS) \
+STK_STATICASSERT( hidden::Traits<LHS>::structure_== hidden::Traits<RHS>::structure_ \
+                 ,YOU_HAVE_TO_USE_TWO_ARRAYS_WITH_THE_SAME_ORIENTATION)
 
 #define STK_STATICASSERT_VECTOR_ONLY(EXPR) \
 STK_STATICASSERT(  (hidden::Traits<EXPR>::structure_==(int)Arrays::vector_) \

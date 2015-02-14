@@ -44,7 +44,7 @@ namespace Law
 {
 /** @ingroup Laws
  * A discrete random variable @e X is said to have a Poisson distribution with
- * parameter \f$ \lambda >0 \f$ (the "intensity") if the probability mass function
+ * parameter \f$ \lambda >0 \f$ (the mean) if the probability mass function
  * of @e X is given by
  * \f[
  *   f(k; \lambda) = P(X=k) = \frac{\lambda^k e^{-\lambda}}{k!}, \quad k=0,1,2,\ldots,
@@ -62,14 +62,14 @@ class Poisson: public IUnivLaw<int>
   public:
     typedef IUnivLaw<int> Base;
     /** constructor
-     * @param lambda intensity of a Poisson process
+     * @param lambda mean of a Poisson distribution
      **/
     Poisson(Real const& lambda = 1.);
     /** destructor */
     inline virtual ~Poisson() {}
-    /** @return the intensity */
+    /** @return the mean */
     inline Real const& lambda() const { return lambda_;}
-    /** @param lambda intensity to set */
+    /** @param lambda mean to set */
     inline void setLambda(Real const& lambda )
     {
       if (lambda<0) STKDOMAIN_ERROR_1ARG(Poisson::setLambda,lambda,lambda must be >= 0);
@@ -105,21 +105,21 @@ class Poisson: public IUnivLaw<int>
      **/
     virtual int icdf(Real const& p) const;
 
-    /** @param lambda an intensity
+    /** @param lambda the mean
      *  @return a int random variate.
      **/
     static int rand(Real const& lambda);
     /** @brief compute the probability distribution function
      *  Give the value of the pdf at the point x.
      *  @param x a binary value
-     *  @param lambda an intensity
+     *  @param lambda the mean
      *  @return the value of the pdf
      **/
     static Real pdf(int const& x, Real const& lambda);
     /** @brief compute the log probability distribution function
      *  Give the value of the log-pdf at the point x.
      *  @param x a binary value
-     *  @param lambda an intensity
+     *  @param lambda the mean
      *  @return the value of the log-pdf
      **/
     static Real lpdf(int const& x, Real const& lambda);
@@ -127,7 +127,7 @@ class Poisson: public IUnivLaw<int>
      *  Give the probability that a Poisson random variate is less or equal
      *  to t.
      *  @param t a real value
-     *  @param lambda an intensity
+     *  @param lambda the mean
      *  @return the value of the cdf at t
      **/
     static Real cdf(Real const& t, Real const& lambda);
@@ -135,14 +135,14 @@ class Poisson: public IUnivLaw<int>
      *  The quantile is defined as the smallest value @e x such that
      *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.
      *  @param p a probability number
-     *  @param lambda an intensity
+     *  @param lambda the mean
      *  @return the quantile for p
      **/
     static int icdf(Real const& p, Real const& lambda);
 
 
   protected:
-    /** intensity of a Poisson process */
+    /** mean of the Poisson distribution */
     Real lambda_;
 };
 

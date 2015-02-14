@@ -24,7 +24,7 @@
 #-----------------------------------------------------------------------
 #' Build a vector of Gaussian model names.
 #'
-#' In a diagonql Gaussian model, we assume that the variance
+#' In a diagonal Gaussian model, we assume that the variance
 #' matrices are diagonal in each cluster. This gives rise to 8 models:
 #' \enumerate{
 #'  \item {The proportions can be equal or free.}
@@ -34,7 +34,7 @@
 #'
 #' The model names are summarized in the following array:
 #' \tabular{llll}{
-#'  Model Name      \tab Proportions \tab Variances in variables \tab Variances in clusters \cr
+#'  Model Name      \tab Proportions \tab s.d. in variables \tab s.d. in clusters \cr
 #'  gaussian_p_sjk  \tab Equal \tab Free                  \tab Free  \cr
 #'  gaussian_p_sj   \tab Equal \tab Free                  \tab Equal \cr
 #'  gaussian_p_sk   \tab Equal \tab Equal                 \tab Free  \cr
@@ -52,7 +52,8 @@
 #' @return A vector of character with the model names.
 #' @examples
 #' clusterDiagGaussianNames()
-#' clusterDiagGaussianNames("all", "equal", "free") # same as c("gaussian_p_sk", "gaussian_pk_sk")
+#' ## same as c("gaussian_p_sk", "gaussian_pk_sk")
+#' clusterDiagGaussianNames(prop="all", sdInCluster="equal", sdBetweenCluster= "free")
 #'
 #' @rdname clusterDiagGaussianNames
 #' @export
@@ -94,8 +95,7 @@ clusterValidDiagGaussianNames <- function(names)
   nb = length(names)
   if ( nb == 0 ) { return(FALSE);}
 
-  all = c( "gaussian_pk_sjk", "gaussian_pk_sj", "gaussian_pk_sk", "gaussian_pk_s"
-         , "gaussian_p_sjk", "gaussian_p_sj", "gaussian_p_sk", "gaussian_p_s")
+  all = clusterDiagGaussianNames();
   for (i in 1:nb)
   {  if ( sum(names[i] %in% all) != 1 ) { return(FALSE);}}
   return(TRUE)
@@ -338,47 +338,51 @@ clusterValidCategoricalNames <- function(names)
 #' In a poisson model, we can build 4 models:
 #' \enumerate{
 #'  \item {The proportions can be equal or free.}
-#'  \item {The intensities can be proportional or free for all the variables.}
+#'  \item {The means can be equal, free or proportional for all the variables.}
 #' }
 #'
 #' The model names are summarized in the following array:
 #' \tabular{lll}{
-#'  Model Name      \tab Proportions \tab Proportional  \cr
-#'  poisson_p_ljk   \tab Equal       \tab No            \cr
-#'  poisson_p_ljpk  \tab Equal       \tab Yes           \cr
-#'  poisson_pk_ljk  \tab Free        \tab No            \cr
-#'  poisson_pk_ljpk \tab Free        \tab Yes           \cr
+#'  Model Name      \tab Proportions \tab Mean between variables \cr
+#'  poisson_p_ljk   \tab Equal       \tab Free                   \cr
+#'  poisson_p_lk    \tab Equal       \tab Equal                  \cr
+#'  poisson_p_ljlk  \tab Equal       \tab Proportional           \cr
+#'  poisson_pk_ljk  \tab Free        \tab Free                   \cr
+#'  poisson_pk_lk   \tab Free        \tab Equal                  \cr
+#'  poisson_pk_ljlk \tab Free        \tab Proportional
 #' }
 #'
 #' @param prop A character string equal to "equal", "free" or "all". Default is "all".
-#' @param proportional A character string equal to "yes", "no" or "both". Default is "both".
+#' @param mean A character string equal to "equal", "free", "proportional or "all". Default is "all".
 #'
 #' @return A vector of character with the model names.
 #' @examples
 #' clusterPoissonNames()
-#' clusterPoissonNames("all", "yes") # same as c( "poisson_pk_ljlk", "poisson_p_ljlk")
+#' clusterPoissonNames("all", "proportional") # same as c( "poisson_pk_ljlk", "poisson_p_ljlk")
 #'
 #' @rdname clusterPoissonNames
 #' @export
-clusterPoissonNames <- function(prop = "all", proportional="both")
+clusterPoissonNames <- function(prop = "all", mean="all")
 {
   if(sum(prop %in% c("equal","free","all")) != 1)
   { stop("prop is not valid. See ?clusterPoissonNames for the list of prop.")}
-  if(sum(proportional %in% c("yes","no","both")) != 1)
-  { stop("proportional is not valid. See ?clusterPoissonNames for the list of proportional.")}
+  if(sum(mean %in% c("equal","free","proportional","all")) != 1)
+  { stop("mean is not valid. See ?clusterPoissonNames for the list of mean.")}
 
-  all = c( "poisson_pk_ljk", "poisson_pk_ljlk", "poisson_p_ljk", "poisson_p_ljlk")
-  propFree  = c( "poisson_pk_ljk", "poisson_pk_ljlk")
-  propEqual = c( "poisson_p_ljk", "poisson_p_ljlk")
-  probNo  = c( "poisson_pk_ljk", "poisson_p_ljk")
-  probYes = c( "poisson_pk_ljlk", "poisson_p_ljlk")
-
+  all = c( "poisson_pk_ljk", "poisson_pk_lk", "poisson_pk_ljlk", "poisson_p_ljk", "poisson_p_lk", "poisson_p_ljlk")
+  propFree  = c( "poisson_pk_ljk", "poisson_pk_ljlk", "poisson_pk_lk")
+  propEqual = c( "poisson_p_ljk", "poisson_p_ljlk", "poisson_p_lk")
+  meanFree  = c( "poisson_pk_ljk", "poisson_p_ljk")
+  meanEqual = c( "poisson_pk_lk", "poisson_p_lk")
+  meanProp  = c( "poisson_pk_ljlk", "poisson_p_ljlk")
+  
   res = all;
   if (prop == "free")  { res = intersect(res, propFree);}
   if (prop == "equal") { res = intersect(res, propEqual);}
-  if (proportional =="no")  { res = intersect(res, probNo);}
-  if (proportional =="yes") { res = intersect(res, probYes);}
-
+  if (mean =="Free")  { res = intersect(res, meanFree);}
+  if (mean =="equal") { res = intersect(res, meanEqual);}
+  if (mean =="proportional") { res = intersect(res, meanProp);}
+  
   res
 }
 

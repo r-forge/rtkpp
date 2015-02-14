@@ -28,12 +28,12 @@
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
 
-/** @file STK_SliceOperators.h
- *  @brief In this file we implement the RowOperator and ColOperator classes.
+/** @file STK_SlicingOperators.h
+ *  @brief In this file we implement the RowOperator, ColOperator and SubOperator classes.
  **/
 
-#ifndef STK_SLICEOPERATORS_H
-#define STK_SLICEOPERATORS_H
+#ifndef STK_SLICINGOPERATORS_H
+#define STK_SLICINGOPERATORS_H
 
 namespace STK
 {
@@ -145,7 +145,7 @@ template< typename Lhs> class ColOperatorBase;
   * don't have to name RowOperator type explicitly.
   */
 template< typename Lhs>
-class RowOperator  : public RowOperatorBase< Lhs>, public TRef<1>
+class RowOperator: public RowOperatorBase< Lhs>, public TRef<1>
 {
   public:
     typedef RowOperatorBase< Lhs> Base;
@@ -189,7 +189,7 @@ class RowOperator  : public RowOperatorBase< Lhs>, public TRef<1>
   * @brief implement the access to the elements in the general case.
   **/
 template< typename Lhs>
-class RowOperatorBase : public ExprBase< RowOperator< Lhs> >
+class RowOperatorBase: public ExprBase< RowOperator< Lhs> >
 {
   public:
     typedef typename hidden::Traits< RowOperator<Lhs> >::Type Type;
@@ -234,7 +234,7 @@ class RowOperatorBase : public ExprBase< RowOperator< Lhs> >
   * don't have to name ColOperator type explicitly.
   */
 template< typename Lhs>
-class ColOperator  : public ColOperatorBase< Lhs>, public TRef<1>
+class ColOperator: public ColOperatorBase< Lhs>, public TRef<1>
 {
   public:
     typedef ColOperatorBase< Lhs> Base;
@@ -437,4 +437,4 @@ class SubOperator<Lhs, Arrays::point_ > : public ExprBase< SubOperator< Lhs> >, 
 
 } // namespace STK
 
-#endif /* STK_SLICEOPERATORS_H */
+#endif /* STK_SLICINGOPERATORS_H */

@@ -128,7 +128,7 @@ void DiagGaussianBase<Derived>::randomMean()
     // random number in [0, end-k[
     int i = (int)Law::Uniform::rand(rind.begin(), rind.end());
     // get ith individuals
-    p_param(baseIdx + k)->mean_.copy(p_data()->row(indexes[i]));
+    p_param(k)->mean_.copy(p_data()->row(indexes[i]));
     // exchange it with nth
     indexes.swap(i, rind.lastIdx());
     // decrease

@@ -155,18 +155,18 @@ class CArrayPoint : public ICArray < CArrayPoint<Type, SizeCols_, Orient_> >
      *  @param T the container to wrap
      **/
     template<class OtherDerived>
-    CArrayPoint( ExprBase<OtherDerived> const& T): Base() { LowBase::operator=(T);}
+    inline CArrayPoint( ExprBase<OtherDerived> const& T): Base(1,T.size()) { LowBase::operator=(T);}
     /** destructor. */
     inline ~CArrayPoint() {}
     /** operator= : set the container to a constant value.
      *  @param v the value to set
      **/
     inline CArrayPoint& operator=(Type const& v) { return LowBase::setValue(v);}
-    /** operator = : overwrite the CArray with the Right hand side T.
+    /** operator = : overwrite the CArrayPoint with the Right hand side T.
      *  @param T the container to copy
      **/
     template<class Rhs>
-    inline CArrayPoint& operator=(Rhs const& T) { return LowBase::assign(T);}
+    inline CArrayPoint& operator=( ExprBase<Rhs> const& T) { return LowBase::assign(T);}
     /** operator = : overwrite the CArray with the Right hand side rhs.
      *  @param rhs the container to copy
      **/

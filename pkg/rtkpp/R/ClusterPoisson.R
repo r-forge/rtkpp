@@ -30,7 +30,8 @@ NULL
 #'
 #' This function computes the optimal poisson mixture model according
 #' to the [\code{criterion}] among the list of model given in [\code{modelNames}]
-#' and the number of clusters given in [\code{nbCluster}], using the strategy specified in [\code{strategy}].
+#' and the number of clusters given in [\code{nbCluster}], using the strategy 
+#' specified in [\code{strategy}].
 #'
 #' @param data frame or matrix containing the data. Rows correspond to observations
 #' and columns correspond to variables. If the data set contains NA values, they
@@ -114,7 +115,7 @@ clusterPoisson <- function(data, nbCluster=2, modelNames= clusterPoissonNames(),
 #'
 #' This class defines a poisson component of a mixture Model.
 #'
-#' @slot lambda Matrix with the intensity of the jth variable in the kth cluster.
+#' @slot lambda Matrix with the mean of the jth variable in the kth cluster.
 #' @seealso [\code{\linkS4class{IClusterComponent}}] class
 #'
 #' @examples

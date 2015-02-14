@@ -32,10 +32,8 @@
  *  @brief In this file we partially specialize the Rcpp::wrap converter.
  **/
 
-
 #ifndef RCPP_WRAP_H
 #define RCPP_WRAP_H
-
 
 /* Rcpp integration */
 namespace Rcpp

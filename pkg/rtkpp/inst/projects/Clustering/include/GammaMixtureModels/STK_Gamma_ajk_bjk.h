@@ -145,7 +145,7 @@ bool Gamma_ajk_bjk<Array>::mStep()
       // moment estimate and oldest value
       Real x0 = meanjk(j,k)*meanjk(j,k)/variancejk(j,k);
       Real x1 = p_param(k)->shape_[j];
-      if ((x0 <=0.) || (Arithmetic<Real>::isNA(x0))) return false;
+      if ((x0 <=0.) || (isNA(x0))) return false;
 
       // get shape
       hidden::invPsiMLog f(p_param(k)->meanLog_[j]-std::log(p_param(k)->mean_[j]));

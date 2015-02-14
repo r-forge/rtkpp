@@ -121,12 +121,16 @@ class CArrayNumber: public ICArray < CArrayNumber<Type, Orient_> >
      *  @param q pointer on the array
      **/
     inline CArrayNumber( Type* const& q): Base(q, 1, 1) {}
-
     /** constructor by reference.
      *  @param allocator the allocator to wrap
      **/
     template<class OtherAllocator>
     inline CArrayNumber( OtherAllocator const& allocator) : Base(allocator) {}
+    /** Copy constructor using an expression.
+     *  @param T the container to wrap
+     **/
+    template<class OtherDerived>
+    inline CArrayNumber( ExprBase<OtherDerived> const& T): Base(1, 1) { LowBase::operator=(T);}
     /** destructor. */
     inline ~CArrayNumber() {}
     /** operator= : set the container to a constant value.
@@ -137,7 +141,7 @@ class CArrayNumber: public ICArray < CArrayNumber<Type, Orient_> >
      *  @param T the container to copy
      **/
     template<class Rhs>
-    inline CArrayNumber& operator=(Rhs const& T) { return LowBase::assign(T);}
+    inline CArrayNumber& operator=(ExprBase<Rhs> const& T) { return LowBase::assign(T);}
     /** operator = : overwrite the CArrayNumber with the Right hand side rhs.
      *  @param rhs the container to copy
      **/

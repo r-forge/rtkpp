@@ -205,12 +205,18 @@ struct Traits< Const::LowerTriangular<Type_, SizeRows_, SizeCols_> >
 namespace Const
 {
 template< class Derived, int SizeRows_, int SizeCols_>
-class IConstArray: protected IContainer2D<SizeRows_, SizeCols_>, public ExprBase<Derived>
+class IConstArray: protected ICAllocatorBase<SizeRows_, SizeCols_>, public ExprBase<Derived>
 {
-  protected:
-    /** Type for the IContainer2D base Class. */
-    typedef IContainer2D<SizeRows_, SizeCols_ > Base2D;
+  public:
+    /** Type of the Range for the rows */
+    typedef TRange<SizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<SizeCols_> ColRange;
+    /** Type for the ICAllocatorBase base Class. */
+    typedef ICAllocatorBase<SizeRows_, SizeCols_ > Base2D;
     typedef ExprBase<Derived> Base;
+
+  protected:
     /** default constructor */
     inline IConstArray(): Base2D(), Base() {}
     /** constructor with specified dimension */
@@ -219,17 +225,8 @@ class IConstArray: protected IContainer2D<SizeRows_, SizeCols_>, public ExprBase
     inline ~IConstArray() {}
 
   public:
-    /** @return the Vertical range */
-    inline Range rows() const { return Base2D::rows();}
-    /** @return the index of the first row */
-    inline int beginRowsImpl() const { return Base2D::beginRowsImpl();}
-    /** @return the ending index of the rows */
-    inline int endRowsImpl() const { return Base2D::endRowsImpl();}
-    /** @return the number of rows */
-    inline int sizeRowsImpl() const { return Base2D::sizeRowsImpl();}
-
     /**@return the Horizontal range */
-    inline Range cols() const { return Base2D::cols();}
+    inline ColRange const& cols() const { return Base2D::colsImpl();}
     /** @return the index of the first column */
     inline int beginColsImpl() const { return Base2D::beginColsImpl();}
     /**  @return the ending index of columns */
@@ -237,12 +234,17 @@ class IConstArray: protected IContainer2D<SizeRows_, SizeCols_>, public ExprBase
     /** @return the number of columns */
     inline int sizeColsImpl() const { return Base2D ::sizeColsImpl();}
 
-    /** @return the index of the first column */
-    inline int firstIdxCols() const { return Base2D::firstIdxCols();}
+    /** @return the Vertical range */
+    inline RowRange const& rows() const { return Base2D::rowsImpl();}
+    /** @return the index of the first row */
+    inline int beginRowsImpl() const { return Base2D::beginRowsImpl();}
+    /** @return the ending index of the rows */
+    inline int endRowsImpl() const { return Base2D::endRowsImpl();}
+    /** @return the number of rows */
+    inline int sizeRowsImpl() const { return Base2D::sizeRowsImpl();}
+
     /**  @return the index of the last column */
     inline int lastIdxCols() const { return Base2D::lastIdxCols();}
-    /** @return the index of the first row */
-    inline int firstIdxRows() const { return Base2D::firstIdxRows();}
     /** @return the index of the last row */
     inline int lastIdxRows() const { return Base2D::lastIdxRows();}
 

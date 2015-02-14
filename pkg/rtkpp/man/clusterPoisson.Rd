@@ -30,7 +30,8 @@ An instance of the [\code{\linkS4class{ClusterPoisson}}] class.
 \description{
 This function computes the optimal poisson mixture model according
 to the [\code{criterion}] among the list of model given in [\code{modelNames}]
-and the number of clusters given in [\code{nbCluster}], using the strategy specified in [\code{strategy}].
+and the number of clusters given in [\code{nbCluster}], using the strategy
+specified in [\code{strategy}].
 }
 \examples{
 ## A quantitative example with the DebTrivedi data set.

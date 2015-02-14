@@ -62,12 +62,12 @@ template<class _Type>
 struct Traits< Array2DPoint<_Type> >
 {
   typedef _Type          Type;
-  typedef Array2DPoint<_Type> Row;
+  typedef Array2DPoint<_Type>  Row;
   typedef Array2DVector<_Type> Col;
-  typedef Array2DPoint<_Type> SubRow;
+  typedef Array2DPoint<_Type>  SubRow;
   typedef Array2DVector<_Type> SubCol;
-  typedef Array2DPoint<_Type> SubArray;
-  typedef Array2DPoint<_Type> SubVector;
+  typedef Array2DPoint<_Type>  SubArray;
+  typedef Array2DPoint<_Type>  SubVector;
   enum
   {
     structure_ = Arrays::point_,
@@ -93,12 +93,13 @@ template<class Type>
 class Array2DPoint : public IArray2D< Array2DPoint<Type> >
 {
   public:
-    typedef Array2DPoint<Type> Row;
-    typedef Array2DPoint<Type> Col;
-    typedef Array2DPoint<Type> SubRow;
-    typedef Array2DPoint<Type> SubCol;
-    typedef Array2DPoint<Type> SubArray;
-    typedef Array2DPoint<Type> SubVector;
+    typedef typename hidden::Traits<Array2DPoint<Type> >::Row Row;
+    typedef typename hidden::Traits<Array2DPoint<Type> >::Col Col;
+    typedef typename hidden::Traits<Array2DPoint<Type> >::SubRow SubRow;
+    typedef typename hidden::Traits<Array2DPoint<Type> >::SubCol SubCol;
+    typedef typename hidden::Traits<Array2DPoint<Type> >::SubVector SubVector;
+    typedef typename hidden::Traits<Array2DPoint<Type> >::SubArray SubArray;
+
     enum
     {
       structure_ = Arrays::point_,
@@ -135,7 +136,7 @@ class Array2DPoint : public IArray2D< Array2DPoint<Type> >
      *  @param T the container to wrap
      *  @param J the range of the columns to wrap
      **/
-    Array2DPoint( const Array2DPoint<Type>& T, Range const& J)
+    Array2DPoint( Array2DPoint const& T, Range const& J)
                 : Base(T, T.rows(), J) {}
     /** constructor by reference, ref_=1.
      *  @param T the container to wrap
@@ -200,7 +201,7 @@ class Array2DPoint : public IArray2D< Array2DPoint<Type> >
      *  @param T the container to copy
      **/
     template<class Rhs>
-    inline Array2DPoint& operator=(Rhs const& T) { return LowBase::operator=(T);}
+    inline Array2DPoint& operator=(ExprBase<Rhs> const& T) { return LowBase::operator=(T);}
     /** operator = : overwrite the CArray with the Right hand side T.
      *  @param T the container to copy
      **/

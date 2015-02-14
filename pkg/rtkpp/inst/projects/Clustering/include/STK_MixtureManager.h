@@ -94,6 +94,7 @@ class MixtureManager : public IMixtureManager
     typedef MixtureBridge<Clust::Categorical_pk_,  DataInt> MixtureBridge_pk;
     // All Poisson bridges
     typedef MixtureBridge<Clust::Poisson_ljk_,  DataInt> MixtureBridge_ljk;
+    typedef MixtureBridge<Clust::Poisson_lk_,  DataInt> MixtureBridge_lk;
     typedef MixtureBridge<Clust::Poisson_ljlk_, DataInt> MixtureBridge_ljlk;
 
     /** Default constructor, need an instance of a DataHandler.  */
@@ -172,6 +173,9 @@ class MixtureManager : public IMixtureManager
         case Clust::Poisson_ljk_:
         { static_cast<MixtureBridge_ljk const*>(p_mixture)->getParameters(param);}
         break;
+        case Clust::Poisson_lk_:
+        { static_cast<MixtureBridge_lk const*>(p_mixture)->getParameters(param);}
+        break;
         case Clust::Poisson_ljlk_:
         { static_cast<MixtureBridge_ljlk const*>(p_mixture)->getParameters(param);}
         break;
@@ -247,9 +251,12 @@ class MixtureManager : public IMixtureManager
         case Clust::Categorical_pk_:
         { return static_cast<MixtureBridge_pk const*>(p_mixture)->getParameters();}
         break;
-        // Categorical models
+        // Poisson models
         case Clust::Poisson_ljk_:
         { return static_cast<MixtureBridge_ljk const*>(p_mixture)->getParameters();}
+        break;
+        case Clust::Poisson_lk_:
+        { return static_cast<MixtureBridge_lk const*>(p_mixture)->getParameters();}
         break;
         case Clust::Poisson_ljlk_:
         { return static_cast<MixtureBridge_ljlk const*>(p_mixture)->getParameters();}
@@ -353,6 +360,9 @@ class MixtureManager : public IMixtureManager
         // Poisson models
         case Clust::Poisson_ljk_:
         { STK_CREATE_MIXTURE(MixtureDataInt, MixtureBridge_ljk)}
+        break;
+        case Clust::Poisson_lk_:
+        { STK_CREATE_MIXTURE(MixtureDataInt, MixtureBridge_lk)}
         break;
         case Clust::Poisson_ljlk_:
         { STK_CREATE_MIXTURE(MixtureDataInt, MixtureBridge_ljlk)}

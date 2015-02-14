@@ -41,7 +41,7 @@ namespace STK
 namespace hidden
 {
 // forward declaration
-template<typename Visitor, typename Derived, int Structure_, int SizeRows_, int SizeCols_>
+template<typename Visitor, typename Derived, int Structure_>
 struct VisitorSelectorHelper;
 
 /** @ingroup hidden
@@ -67,170 +67,11 @@ struct VisitorSelector
     is2D_       = (structure_ == (int)Arrays::array2D_ || structure_ == (int)Arrays::square_)
   };
 
-  typedef typename VisitorSelectorHelper<Visitor, Derived, structure_, sizeRows_, sizeCols_>::Impl HelperImpl;
-  typedef VisitorArrayImpl<Visitor, Derived, orient_, sizeRows_, sizeCols_> ArrayImpl;
+  typedef typename VisitorSelectorHelper<Visitor, Derived, structure_>::Impl HelperImpl;
+  typedef VisitorArrayUnrollImpl<Visitor, Derived, orient_, sizeRows_, sizeCols_> ArrayImpl;
   // the other cases will be take into account by the helper class
   typedef typename If<is2D_ && unrollRows_ && unrollCols_, ArrayImpl, HelperImpl >::Result Impl;
 };
-
-
-/** @ingroup hidden
- *  @brief specialization for the diagonal arrays */
-template<typename Visitor, typename Derived, int SizeRows_, int sizeCols_>
-struct VisitorSelectorHelper<Visitor, Derived, Arrays::diagonal_, SizeRows_, sizeCols_>
-{
-  enum
-  {
-    sizeRows_  = hidden::Traits<Derived>::sizeRows_,
-    unrollRows_ = (sizeRows_ < MaxUnrollSquareRoot)
-  };
-  typedef VisitorDiagonalImpl<Visitor, Derived, SizeRows_> Unroll;
-  typedef VisitorDiagonalImpl<Visitor, Derived, UnknownSize> Loop;
-
-  typedef typename If<unrollRows_, Unroll, Loop  >::Result Impl;
-};
-
-/** @ingroup hidden
- *  @brief specialization for the diagonal arrays. Disambiguate specialization */
-template<typename Visitor, typename Derived>
-struct VisitorSelectorHelper<Visitor, Derived, Arrays::diagonal_, UnknownSize, UnknownSize>
-{ typedef VisitorDiagonalImpl<Visitor, Derived, UnknownSize> Impl;};
-
-
-
-/** @ingroup hidden
- *  @brief specialization for the vectors */
-template<typename Visitor, typename Derived, int SizeRows_>
-struct VisitorSelectorHelper<Visitor, Derived, Arrays::vector_, SizeRows_, 1>
-{
-  enum
-  {
-    sizeRows_  = hidden::Traits<Derived>::sizeRows_,
-    unrollRows_ = (sizeRows_ < MaxUnrollSquareRoot)
-  };
-  typedef VisitorVectorImpl<Visitor, Derived, SizeRows_> Unroll;
-  typedef VisitorVectorImpl<Visitor, Derived, UnknownSize> Loop;
-  typedef typename If<unrollRows_, Unroll, Loop  >::Result Impl;
-};
-
-/** @ingroup hidden
- *  @brief specialization for the vectors. Disambiguate */
-template<typename Visitor, typename Derived>
-struct VisitorSelectorHelper<Visitor, Derived, Arrays::vector_, UnknownSize, 1>
-{ typedef VisitorVectorImpl<Visitor, Derived, UnknownSize> Impl;};
-
-
-
-/** @ingroup hidden
- *  @brief specialization for the row vectors */
-template<typename Visitor, typename Derived, int SizeCols_>
-struct VisitorSelectorHelper<Visitor, Derived, Arrays::point_, 1, SizeCols_>
-{
-    enum
-    {
-      sizeRows_  = hidden::Traits<Derived>::sizeRows_,
-      unrollRows_ = (sizeRows_ < MaxUnrollSquareRoot)
-    };
-    typedef VisitorPointImpl<Visitor, Derived, SizeCols_> Unroll;
-    typedef VisitorPointImpl<Visitor, Derived, UnknownSize> Loop;
-
-    typedef typename If<unrollRows_, Unroll, Loop  >::Result Impl;
-};
-
-/** @ingroup hidden
- *  @brief specialization for the row vectors. Disambiguate */
-template<typename Visitor, typename Derived>
-struct VisitorSelectorHelper<Visitor, Derived, Arrays::point_, 1, UnknownSize>
-{ typedef VisitorPointImpl<Visitor, Derived, UnknownSize> Impl;};
-
-
-
-/** @ingroup hidden
- *  @brief specialization for the upper triangular arrays */
-template<typename Visitor, typename Derived, int SizeRows_, int SizeCols_>
-struct VisitorSelectorHelper<Visitor, Derived, Arrays::upper_triangular_, SizeRows_, SizeCols_>
-{
-  enum
-  { orient_    = hidden::Traits<Derived>::orient_};
-  typedef VisitorUpperImpl<Visitor, Derived, orient_> Impl;
-};
-
-/** @ingroup hidden
- *  @brief specialization for the upper triangular arrays. Disambiguate */
-template<typename Visitor, typename Derived, int SizeCols_>
-struct VisitorSelectorHelper<Visitor, Derived, Arrays::upper_triangular_, UnknownSize, SizeCols_>
-{
-  enum
-  { orient_    = hidden::Traits<Derived>::orient_};
-  typedef VisitorUpperImpl<Visitor, Derived, orient_> Impl;
-};
-/** @ingroup hidden
- *  @brief specialization for the upper triangular arrays. Disambiguate */
-template<typename Visitor, typename Derived, int SizeRows_>
-struct VisitorSelectorHelper<Visitor, Derived, Arrays::upper_triangular_, SizeRows_, UnknownSize>
-{
-  enum
-  { orient_    = hidden::Traits<Derived>::orient_};
-  typedef VisitorUpperImpl<Visitor, Derived, orient_> Impl;
-};
-/** @ingroup hidden
- *  @brief specialization for the upper triangular arrays. Disambiguate */
-template<typename Visitor, typename Derived>
-struct VisitorSelectorHelper<Visitor, Derived, Arrays::upper_triangular_, UnknownSize, UnknownSize>
-{
-  enum
-  { orient_    = hidden::Traits<Derived>::orient_};
-  typedef VisitorUpperImpl<Visitor, Derived, orient_> Impl;
-};
-
-
-
-/** @ingroup hidden
- *  @brief specialization for the lower triangular arrays */
-template<typename Visitor, typename Derived, int SizeRows_, int SizeCols_>
-struct VisitorSelectorHelper<Visitor, Derived, Arrays::lower_triangular_, SizeRows_, SizeCols_>
-{
-  enum
-  { orient_    = hidden::Traits<Derived>::orient_};
-  typedef VisitorLowerImpl<Visitor, Derived, orient_> Impl;
-};
-
-/** @ingroup hidden
- *  @brief specialization for the upper triangular arrays. Disambiguate */
-template<typename Visitor, typename Derived, int SizeCols_>
-struct VisitorSelectorHelper<Visitor, Derived, Arrays::lower_triangular_, UnknownSize, SizeCols_>
-{
-  enum
-  { orient_    = hidden::Traits<Derived>::orient_};
-  typedef VisitorLowerImpl<Visitor, Derived, orient_> Impl;
-};
-/** @ingroup hidden
- *  @brief specialization for the upper triangular arrays. Disambiguate */
-template<typename Visitor, typename Derived, int SizeRows_>
-struct VisitorSelectorHelper<Visitor, Derived, Arrays::lower_triangular_, SizeRows_, UnknownSize>
-{
-  enum
-  { orient_    = hidden::Traits<Derived>::orient_};
-  typedef VisitorLowerImpl<Visitor, Derived, orient_> Impl;
-};
-/** @ingroup hidden
- *  @brief specialization for the upper triangular arrays. Disambiguate */
-template<typename Visitor, typename Derived>
-struct VisitorSelectorHelper<Visitor, Derived, Arrays::lower_triangular_, UnknownSize, UnknownSize>
-{
-  enum
-  { orient_    = hidden::Traits<Derived>::orient_};
-  typedef VisitorLowerImpl<Visitor, Derived, orient_> Impl;
-};
-
-
-
-/** @ingroup hidden
- *  @brief specialization for the numbers */
-template<typename Visitor, typename Derived>
-struct VisitorSelectorHelper<Visitor, Derived, Arrays::number_, 1, 1>
-{ typedef VisitorNumberImpl<Visitor, Derived> Impl;};
-
 
 
 /** @ingroup hidden
@@ -239,63 +80,96 @@ struct VisitorSelectorHelper<Visitor, Derived, Arrays::number_, 1, 1>
  *  known dimensions of the rows and columns but at least one of the dimension
  *  is too great for being unrolled.
  **/
-template<typename Visitor, typename Derived, int Structure_, int SizeRows_, int SizeCols_>
+template<typename Visitor, typename Derived, int Structure_>
 struct VisitorSelectorHelper
 {
   enum
   {
     orient_    = hidden::Traits<Derived>::orient_,
-    unrollRows_ = (SizeRows_ < MaxUnrollSquareRoot),
-    unrollCols_ = (SizeCols_ < MaxUnrollSquareRoot)
+    sizeRows_  = hidden::Traits<Derived>::sizeRows_,
+    sizeCols_  = hidden::Traits<Derived>::sizeCols_,
+    unrollRows_ = (sizeRows_ < MaxUnroll),
+    unrollCols_ = (sizeCols_ < MaxUnroll)
   };
-  typedef VisitorArrayImpl<Visitor, Derived, orient_, SizeRows_, UnknownSize> RowUnrollImpl;
-  typedef VisitorArrayImpl<Visitor, Derived, orient_, UnknownSize, SizeCols_> ColUnrollImpl;
-  typedef VisitorArrayImpl<Visitor, Derived, orient_, UnknownSize, UnknownSize> NoUnrollImpl;
+  typedef VisitorArrayImpl<Visitor, Derived, sizeRows_, UnknownSize> RowUnrollImpl;
+  typedef VisitorArrayImpl<Visitor, Derived, UnknownSize, sizeCols_> ColUnrollImpl;
+  typedef VisitorArrayNoUnrollImpl<Visitor, Derived, orient_, UnknownSize, UnknownSize> NoUnrollImpl;
   typedef typename If<unrollCols_, ColUnrollImpl
                                  , typename If<unrollRows_, RowUnrollImpl, NoUnrollImpl>::Result >::Result Impl;
 };
 
-/**  @ingroup hidden
- * @brief Specialization for general 2D arrays with unknown dimensions */
-template<typename Visitor, typename Derived, int Structure_>
-struct VisitorSelectorHelper< Visitor,  Derived,  Structure_,  UnknownSize,  UnknownSize>
+/** @ingroup hidden
+ *  @brief specialization for the diagonal arrays */
+template<typename Visitor, typename Derived>
+struct VisitorSelectorHelper<Visitor, Derived, Arrays::diagonal_>
 {
   enum
   {
-    orient_    = hidden::Traits<Derived>::orient_
+    sizeRows_  = hidden::Traits<Derived>::sizeRows_,
+    unrollRows_ = (sizeRows_ < MaxUnroll)
   };
-  typedef VisitorArrayImpl<Visitor, Derived, orient_,  UnknownSize,  UnknownSize> Impl;
+  typedef VisitorDiagonalImpl<Visitor, Derived, sizeRows_> Unroll;
+  typedef VisitorDiagonalImpl<Visitor, Derived, UnknownSize> Loop;
+
+  typedef typename If<unrollRows_, Unroll, Loop  >::Result Impl;
 };
 
 /** @ingroup hidden
- *  @brief Specialization for general 2D arrays with unknown dimensions for the columns */
-template<typename Visitor, typename Derived, int Structure_, int SizeRows_>
-struct VisitorSelectorHelper< Visitor,  Derived,  Structure_,  SizeRows_,  UnknownSize>
+ *  @brief specialization for the vectors */
+template<typename Visitor, typename Derived>
+struct VisitorSelectorHelper<Visitor, Derived, Arrays::vector_>
 {
-    enum
-    {
-      orient_    = hidden::Traits<Derived>::orient_,
-      unrollRows_ = (SizeRows_ < MaxUnrollSquareRoot)
-    };
-   typedef VisitorArrayImpl<Visitor, Derived, orient_, SizeRows_, UnknownSize> RowUnrollImpl;
-   typedef VisitorArrayImpl<Visitor, Derived, orient_, UnknownSize, UnknownSize> NoUnrollImpl;
-   typedef typename If<unrollRows_, RowUnrollImpl, NoUnrollImpl>::Result Impl;
+  enum
+  {
+    sizeRows_  = hidden::Traits<Derived>::sizeRows_,
+    unrollRows_ = (sizeRows_ < MaxUnroll)
+  };
+  typedef VisitorVectorImpl<Visitor, Derived, sizeRows_> Unroll;
+  typedef VisitorVectorImpl<Visitor, Derived, UnknownSize> Loop;
+  typedef typename If<unrollRows_, Unroll, Loop  >::Result Impl;
 };
 
 /** @ingroup hidden
- *  @brief Specialization for general 2D arrays with unknown dimensions for the rows */
-template<typename Visitor, typename Derived, int Structure_, int SizeCols_>
-struct VisitorSelectorHelper< Visitor,  Derived,  Structure_, UnknownSize, SizeCols_>
+ *  @brief specialization for the row vectors */
+template<typename Visitor, typename Derived>
+struct VisitorSelectorHelper<Visitor, Derived, Arrays::point_>
 {
-    enum
-    {
-      orient_    = hidden::Traits<Derived>::orient_,
-      unrollCols_ = (SizeCols_ < MaxUnrollSquareRoot)
-    };
-   typedef VisitorArrayImpl<Visitor, Derived, orient_, UnknownSize, SizeCols_> ColUnrollImpl;
-   typedef VisitorArrayImpl<Visitor, Derived, orient_, UnknownSize, UnknownSize> NoUnrollImpl;
-   typedef typename If<unrollCols_, ColUnrollImpl, NoUnrollImpl>::Result Impl;
+  enum
+  {
+    sizeCols_  = hidden::Traits<Derived>::sizeCols_,
+    unrollCols_ = (sizeCols_ < MaxUnroll)
+  };
+  typedef VisitorPointImpl<Visitor, Derived, sizeCols_> Unroll;
+  typedef VisitorPointImpl<Visitor, Derived, UnknownSize> Loop;
+
+  typedef typename If<unrollCols_, Unroll, Loop  >::Result Impl;
 };
+
+/** @ingroup hidden
+ *  @brief specialization for the upper triangular arrays */
+template<typename Visitor, typename Derived>
+struct VisitorSelectorHelper<Visitor, Derived, Arrays::upper_triangular_>
+{
+  enum
+  { orient_    = hidden::Traits<Derived>::orient_};
+  typedef VisitorUpperImpl<Visitor, Derived, orient_> Impl;
+};
+
+/** @ingroup hidden
+ *  @brief specialization for the lower triangular arrays */
+template<typename Visitor, typename Derived>
+struct VisitorSelectorHelper<Visitor, Derived, Arrays::lower_triangular_>
+{
+  enum
+  { orient_    = hidden::Traits<Derived>::orient_};
+  typedef VisitorLowerImpl<Visitor, Derived, orient_> Impl;
+};
+
+/** @ingroup hidden
+ *  @brief specialization for the numbers */
+template<typename Visitor, typename Derived>
+struct VisitorSelectorHelper<Visitor, Derived, Arrays::number_>
+{ typedef VisitorNumberImpl<Visitor, Derived> Impl;};
 
 
 } // namespace hidden

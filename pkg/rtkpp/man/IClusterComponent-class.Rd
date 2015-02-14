@@ -38,7 +38,7 @@ This class defines a component of a mixture Model
 
 \item{\code{scale}}{Matrix with the scale of the jth variable in the kth cluster.}
 
-\item{\code{lambda}}{Matrix with the intensity of the jth variable in the kth cluster.}
+\item{\code{lambda}}{Matrix with the mean of the jth variable in the kth cluster.}
 
 \item{\code{data}}{Matrix with the data set}
 

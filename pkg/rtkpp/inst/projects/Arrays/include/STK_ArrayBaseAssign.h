@@ -592,7 +592,7 @@ Derived&  ArrayBase<Derived>::operator+=( ExprBase<Rhs> const& other)
   this->asDerived() = this->asDerived() + other;
   return this->asDerived();
 }
-/* substract a Rhs to this. */
+/* subtract a Rhs to this. */
 template<class Derived>
 template<typename Rhs>
 Derived&  ArrayBase<Derived>::operator-=( ExprBase<Rhs> const& other)
@@ -601,30 +601,46 @@ Derived&  ArrayBase<Derived>::operator-=( ExprBase<Rhs> const& other)
   return this->asDerived();
 }
 
+template<class Derived>
+template<typename Rhs>
+Derived&  ArrayBase<Derived>::operator/=( ExprBase<Rhs> const& other)
+{
+  this->asDerived() = this->asDerived() / other;
+  return this->asDerived();
+}
+/* subtract a Rhs to this. */
+template<class Derived>
+template<typename Rhs>
+Derived&  ArrayBase<Derived>::operator*=( ExprBase<Rhs> const& other)
+{
+  this->asDerived() = this->asDerived() * other;
+  return this->asDerived();
+}
+
 /* Adding a constant to this. */
 template<class Derived>
-Derived& ArrayBase<Derived>::operator+=( Type const other)
+Derived& ArrayBase<Derived>::operator+=( Type const& other)
 {
   this->asDerived() = this->asDerived() + other;
   return this->asDerived();
 }
 /* Substract a constant to this. */
 template<class Derived>
-Derived& ArrayBase<Derived>::operator-=( Type const other)
+Derived& ArrayBase<Derived>::operator-=( Type const& other)
 {
   this->asDerived() = this->asDerived() - other;
   return this->asDerived();
 }
 /* product of this by a constant. */
 template<class Derived>
-Derived& ArrayBase<Derived>::operator*=( Type const other)
+Derived& ArrayBase<Derived>::operator*=( Type const& other)
 {
   this->asDerived() = this->asDerived() * other;
   return this->asDerived();
 }
 /* dividing this by a constant. */
 template<class Derived>
-Derived& ArrayBase<Derived>::operator/=( Type const other)
+Derived& ArrayBase<Derived>::operator/=( Type const& other)
 {
   this->asDerived() = this->asDerived() / other;
   return this->asDerived();

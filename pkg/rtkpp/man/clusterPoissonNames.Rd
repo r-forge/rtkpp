@@ -4,14 +4,14 @@
 \alias{clusterValidPoissonNames}
 \title{Build a vector of Poisson model names.}
 \usage{
-clusterPoissonNames(prop = "all", proportional = "both")
+clusterPoissonNames(prop = "all", mean = "all")
 
 clusterValidPoissonNames(names)
 }
 \arguments{
 \item{prop}{A character string equal to "equal", "free" or "all". Default is "all".}
 
-\item{proportional}{A character string equal to "yes", "no" or "both". Default is "both".}
+\item{mean}{A character string equal to "equal", "free", "proportional or "all". Default is "all".}
 
 \item{names}{a vector of character}
 }
@@ -22,7 +22,7 @@ A vector of character with the model names.
 In a poisson model, we can build 4 models:
 \enumerate{
  \item {The proportions can be equal or free.}
- \item {The intensities can be proportional or free for all the variables.}
+ \item {The means can be equal, free or proportional for all the variables.}
 }
 
 check if a vector of Poisson model name is correct.
@@ -30,16 +30,18 @@ check if a vector of Poisson model name is correct.
 \details{
 The model names are summarized in the following array:
 \tabular{lll}{
- Model Name      \tab Proportions \tab Proportional  \cr
- poisson_p_ljk   \tab Equal       \tab No            \cr
- poisson_p_ljpk  \tab Equal       \tab Yes           \cr
- poisson_pk_ljk  \tab Free        \tab No            \cr
- poisson_pk_ljpk \tab Free        \tab Yes           \cr
+ Model Name      \tab Proportions \tab Mean between variables \cr
+ poisson_p_ljk   \tab Equal       \tab Free                   \cr
+ poisson_p_lk    \tab Equal       \tab Equal                  \cr
+ poisson_p_ljlk  \tab Equal       \tab Proportional           \cr
+ poisson_pk_ljk  \tab Free        \tab Free                   \cr
+ poisson_pk_lk   \tab Free        \tab Equal                  \cr
+ poisson_pk_ljlk \tab Free        \tab Proportional
 }
 }
 \examples{
 clusterPoissonNames()
-clusterPoissonNames("all", "yes") # same as c( "poisson_pk_ljlk", "poisson_p_ljlk")
+clusterPoissonNames("all", "proportional") # same as c( "poisson_pk_ljlk", "poisson_p_ljlk")
 }
 \keyword{internal}
 

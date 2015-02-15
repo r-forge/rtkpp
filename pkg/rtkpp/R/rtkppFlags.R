@@ -93,7 +93,7 @@ LdFlags <- function() { cat(.rtkppLdFlags()) }
     path <- .rtkpp.system.file("lib",.Platform$r_arch)
   }
   else { path <- .rtkpp.system.file("lib") }
-  paste(path, "/libSTKpp.a", sep="")
+  paste( path, "/libSTKpp.a", sep="")
 }
 
 # Transform a path for passing to the build system on the command line.

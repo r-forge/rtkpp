@@ -22,7 +22,7 @@ Description: STK++ (http://www.stkpp.org) is a collection of
     functions.
   .
     The rtkpp package includes the header files from the STK++
-    library (currently version 0.8.4). Thus users do not need to
+    library (currently version 0.8.5). Thus users do not need to
     install STK++ itself in order to use it.
   .
     STK++ is licensed under the GNU LGPL version 2 or later. rtkpp

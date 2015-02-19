@@ -180,17 +180,17 @@ class IRegression
      * The array @c p_predicted_ will not be deleted by @c this.
      * @return the pointer on the predicted values
      **/
-    inline YArray const* p_predicted() const { return &predicted_;}
+    inline YArray* p_predicted() { return &predicted_;}
     /** get the pointer of the array of the residuals. The array
      *  @c p_residuals_ will not be deleted by @c this.
      *  @return the pointer on the residuals
      **/
-    inline YArray const* p_residuals() const {  return &residuals_;}
+    inline YArray* p_residuals() { return &residuals_;}
 
     /** Give the number of parameter of the regression function.
      *  @return the number of parameter of the regression function
      **/
-    inline int nbFreeParameter() const {  return nbFreeParameter_;}
+    inline int nbFreeParameter() const { return nbFreeParameter_;}
 
     /** Set the data set the regression method should use.
      * @param p_y data set to adjust

@@ -114,7 +114,7 @@ Real ClusterLauncher::selectSingleBestModel()
   // wrap data matrix with Rcpp and wrap Rcpp matrix with STK++ matrix
   NumericMatrix m_data = s4_component.slot("data");
   Real criter = s4_model_.slot("criterion");
-  RcppMatrix<double> data(m_data);
+  RMatrix<double> data(m_data);
 
   int nbSample   = s4_model_.slot("nbSample");
   IMixtureComposer*  p_current =0;
@@ -310,10 +310,10 @@ void ClusterLauncher::getDiagGaussianParameters(Rcpp::S4& s4_component, std::str
   s4_component.slot("mean")  = Rcpp::wrap(mean);
   s4_component.slot("sigma") = Rcpp::wrap(sigma);
   // get data
-  RcppMatrix<double> m_data =  manager_.getData<double>(idData);
-//  RcppMatrix<double> m_data;
+  RMatrix<double> m_data =  manager_.getData<double>(idData);
+//  RMatrix<double> m_data;
 //  manager_.getData(idData_, m_data);
-  s4_component.slot("data") = (Rcpp::Matrix< RcppMatrix<double>::Rtype_>)m_data;
+  s4_component.slot("data") = (Rcpp::Matrix< RMatrix<double>::Rtype_>)m_data;
 }
 
 /* get the diagonal Gaussian parameters */
@@ -325,10 +325,10 @@ void ClusterLauncher::getPoissonParameters(Rcpp::S4& s4_component, std::string c
   // save results in s4_model
   s4_component.slot("lambda")  = Rcpp::wrap(params);
   // get data
-  RcppMatrix<double> m_data =  manager_.getData<double>(idData);
-//  RcppMatrix<double> m_data;
+  RMatrix<double> m_data =  manager_.getData<double>(idData);
+//  RMatrix<double> m_data;
 //  manager_.getData(idData_, m_data);
-  s4_component.slot("data") = (Rcpp::Matrix< RcppMatrix<double>::Rtype_>)m_data;
+  s4_component.slot("data") = (Rcpp::Matrix< RMatrix<double>::Rtype_>)m_data;
 }
 
 /* get the gamma parameters */
@@ -350,9 +350,9 @@ void ClusterLauncher::getGammaParameters(Rcpp::S4& s4_component, std::string con
   s4_component.slot("shape") = Rcpp::wrap(shape);
   s4_component.slot("scale") = Rcpp::wrap(scale);
   // get data
-  RcppMatrix<double> m_data =  manager_.getData<double>(idData);
+  RMatrix<double> m_data =  manager_.getData<double>(idData);
   //manager_.getData(idData_, m_data);
-  s4_component.slot("data") = (Rcpp::Matrix< RcppMatrix<double>::Rtype_>)m_data;
+  s4_component.slot("data") = (Rcpp::Matrix< RMatrix<double>::Rtype_>)m_data;
 }
 
 /* get the diagonal Categorical parameters */
@@ -365,8 +365,8 @@ void ClusterLauncher::getCategoricalParameters(Rcpp::S4& s4_component, std::stri
   // save results in s4_model
   s4_component.slot("plkj") = Rcpp::wrap(params);
   // get data
-  RcppMatrix<int> m_data =  manager_.getData<int>(idData);
-  s4_component.slot("data") = (Rcpp::Matrix< RcppMatrix<int>::Rtype_>) m_data;
+  RMatrix<int> m_data =  manager_.getData<int>(idData);
+  s4_component.slot("data") = (Rcpp::Matrix< RMatrix<int>::Rtype_>) m_data;
 }
 
 /* select best model*/

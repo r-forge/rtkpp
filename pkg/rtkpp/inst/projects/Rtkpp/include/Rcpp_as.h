@@ -42,7 +42,7 @@ namespace traits
 {
 /* support for Rcpp::as */
 template<typename Type>
-class Exporter< STK::RcppMatrix<Type> >
+class Exporter< STK::RMatrix<Type> >
 {
   private:
     enum
@@ -56,7 +56,7 @@ class Exporter< STK::RcppMatrix<Type> >
     {
       if (TYPEOF(x) != Rtype_) ::Rf_error("Wrong R type for mapped matrix");
     }
-    STK::RcppMatrix<Type> get() {return STK::RcppMatrix<Type>(mat);}
+    STK::RMatrix<Type> get() {return STK::RMatrix<Type>(mat);}
 } ;
 
 } // namespace traits

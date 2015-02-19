@@ -84,10 +84,7 @@ IAAModel::IAAModel( ArrayXX& workData)
 
 /* destructor */
 IAAModel::~IAAModel()
-{
-  if (p_reduced_)   delete p_reduced_;
-  if (p_predicted_) delete p_predicted_;
-}
+{}
 
 /* set the dimension of the model
  */
@@ -227,8 +224,8 @@ void IAAModel::regressionStep()
   // compute regression
   p_regressor_->run();
   // get results
-  p_predicted_ = p_regressor_->p_predicted()->clone();
-  p_residuals_ = p_regressor_->p_residuals()->clone();
+  p_predicted_ = p_regressor_->p_predicted();
+  p_residuals_ = p_regressor_->p_residuals();
 }
 /* compute the weighted regression **/
 void IAAModel::regression( Vector const& weights)
@@ -238,8 +235,8 @@ void IAAModel::regression( Vector const& weights)
                            "regressor have not be set."));
   p_regressor_->run(weights);
   // get results
-  p_predicted_ = p_regressor_->p_predicted()->clone();
-  p_residuals_ = p_regressor_->p_residuals()->clone();
+  p_predicted_ = p_regressor_->p_predicted();
+  p_residuals_ = p_regressor_->p_residuals();
 }
 
 /* destandardize the predicted result and residuals */

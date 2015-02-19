@@ -135,7 +135,7 @@ struct WrapHelper<Derived, Arrays::square_>
 
 } // namespace hidden
 
-/** template method allowing to wrap expressions in a RcppMatrix and a SEXP
+/** template method allowing to wrap expressions in a RMatrix and a SEXP
  *  @param expr the expression to wrap
  *  @return a copy of expr in a SEXP
  **/

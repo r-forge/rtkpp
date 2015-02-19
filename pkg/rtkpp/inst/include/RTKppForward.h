@@ -42,8 +42,8 @@
 /* forward declarations */
 namespace STK
 {
-template <typename Type> class RcppVector;
-template <typename Type> class RcppMatrix;
+template <typename Type> class RVector;
+template <typename Type> class RMatrix;
 
 } // namespace STK
 
@@ -78,8 +78,8 @@ namespace Rcpp
 namespace traits
 {
   /* support for as */
-  template<typename Type> class Exporter< STK::RcppVector<Type> >;
-  template<typename Type> class Exporter< STK::RcppMatrix<Type> >;
+  template<typename Type> class Exporter< STK::RVector<Type> >;
+  template<typename Type> class Exporter< STK::RMatrix<Type> >;
 } // namespace traits
 
 } // namespace Rcpp

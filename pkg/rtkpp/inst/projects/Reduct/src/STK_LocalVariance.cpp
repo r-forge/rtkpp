@@ -212,19 +212,15 @@ void LocalVariance::computeCovarianceMatrices()
   covariance_ = p_dataStatistics_->covariance();
 
   // constants
-  const int begin_ind = p_data_->beginRows();
-  const int last_ind  = p_data_->lastIdxRows();
-  const int begin_var = p_data_->beginCols();
-  const int last_var  = p_data_->lastIdxCols();
   const Real pond = 2* nbNeighbor_ * p_data_->sizeRows();
 
   // compute local covariance matrix
-  for (int j=begin_var; j<=last_var; j++)
+  for (int j=p_data_->beginCols(); j<p_data_->endCols(); j++)
   {
-    for (int k=begin_var; k<=last_var; k++)
+    for (int k=p_data_->beginCols(); k<p_data_->endCols(); k++)
     {
       Real sum = 0.0;
-      for (int i=begin_ind; i<=last_ind; i++)
+      for (int i=p_data_->beginRows(); i<p_data_->endRows(); i++)
       {
         for (int l = 1; l <= nbNeighbor_; ++l)
         {
@@ -278,7 +274,6 @@ void LocalVariance::computeAxis()
 {
   // compute the number of axis, cannot be greater than the dimension of the data
   Range range(p_data_->beginCols(), std::min(dim_, p_data_->sizeCols()));
-
   // compute the eigenvalues decomposition of the local covariance
   SymEigen* decomp = new SymEigen(localCovariance_);
   decomp->run();

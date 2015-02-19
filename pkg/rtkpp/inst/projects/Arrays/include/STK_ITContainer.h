@@ -146,7 +146,7 @@ class ITContainerBase: public IRecursiveTemplate<Derived>, hidden::NoAssignOpera
     /** @return the Horizontal size (the number of column) */
     inline int sizeCols() const { return this->asDerived().sizeColsImpl();}
 
-    /** @return the Vertical range*/
+    /** @return the range of the rows */
     inline RowRange const& rows() const { return this->asDerived().rowsImpl();}
     /** @return the index of the first row*/
     inline int beginRows() const { return this->asDerived().beginRowsImpl();}
@@ -171,7 +171,7 @@ class ITContainerBase: public IRecursiveTemplate<Derived>, hidden::NoAssignOpera
     /** @return the size of the container (the number of rows by the number of columns */
     inline int sizeArray() const { return sizeRows()*sizeCols();}
     /** @return a constant reference on element (i,j) of the 2D container
-     *  @param i, j indexes of the row and of the column
+     *  @param i,j indexes of the row and of the column
      **/
     inline Type const elt(int i, int j) const
     {
@@ -188,8 +188,7 @@ class ITContainerBase: public IRecursiveTemplate<Derived>, hidden::NoAssignOpera
       return this->asDerived().elt2Impl(i,j);
     }
     /** @return a constant reference on the element (i,j) of the 2D container.
-     *  @param i index of the row
-     *  @param j index of the column
+     *  @param i,j indexes of the row and column
      **/
     inline Type const operator()(int i, int j) const
     {
@@ -206,8 +205,7 @@ class ITContainerBase: public IRecursiveTemplate<Derived>, hidden::NoAssignOpera
       return this->asDerived().elt2Impl(i,j);
     }
     /** @return safely the constant element (i, j).
-     *  @param i index of the row
-     *  @param j index of the col
+     *  @param i,j indexes of the row and column
      **/
     Type const at(int i, int j) const
     {
@@ -354,8 +352,7 @@ class ITContainer<Derived, Arrays::lower_triangular_> : public ITContainerBase<D
 
   public:
     /** @return safely the constant element (i, j).
-     *  @param i index of the row
-     *  @param j index of the col
+     *  @param i,j indexes of the row and column
      **/
     Type const at(int i, int j) const
     {

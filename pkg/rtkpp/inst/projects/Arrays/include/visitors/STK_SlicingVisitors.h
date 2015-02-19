@@ -246,7 +246,7 @@ class VisitorByRow : public VisitorByRowBase< Derived, Visitor >, public TRef<1>
       orient_    = hidden::Traits<VisitorByRow<Derived, Visitor> >::orient_,
       sizeRows_  = hidden::Traits<VisitorByRow<Derived, Visitor> >::sizeRows_,
       sizeCols_  = hidden::Traits<VisitorByRow<Derived, Visitor> >::sizeCols_,
-      storage_   = hidden::Traits<VisitorByRow<Derived, Visitor> >::storage_,
+      storage_   = hidden::Traits<VisitorByRow<Derived, Visitor> >::storage_
     };
     /** Type of the Range for the rows */
     typedef TRange<sizeRows_> RowRange;

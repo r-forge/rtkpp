@@ -629,8 +629,8 @@ inline typename Arrays::MultRightTransposeOp<Lhs, Rhs>::result_type
  *  @return the dot product of the two vectors
  **/
 template<class Container1D1, class Container1D2>
-Real dot( ITContainer< Container1D1> const& x
-        , ITContainer< Container1D2> const& y
+Real dot( ExprBase< Container1D1> const& x
+        , ExprBase< Container1D2> const& y
         )
 {
   // compute the valid range
@@ -661,17 +661,16 @@ Real dot( ITContainer< Container1D1> const& x
  *  @return the weighted dot product of the two vectors
  **/
 template<class Container1D1, class Container1D2, class Container1D3>
-Real weightedDot( ITContainer< Container1D1> const& x
-                , ITContainer< Container1D2> const& y
-                , ITContainer< Container1D3> const& w
+Real weightedDot( ExprBase< Container1D1> const& x
+                , ExprBase< Container1D2> const& y
+                , ExprBase< Container1D3> const& w
                 )
 {
   // compute the valid range
   const int first = std::max(x.begin(), y.begin()) , last = std::min(x.lastIdx(), y.lastIdx());
 #ifdef STK_DEBUG
-  if (!Range(first,last).isIn(w.range()))
-    throw runtime_error("In weightedDot(x, w) "
-                             "Range(first,last) not include in w.range()");
+  if (!Range(first,last,0).isIn(w.range()))
+  { STKRUNTIME_ERROR_2ARG(In weightedDot(x,y,w),Range(first,last,0),w.range(),first:last not include in w.range());}
 #endif
   // compute the sum product
   Real sum=0.0;
@@ -697,9 +696,7 @@ Real weightedDot( ITContainer< Container1D1> const& x
  *  @return the Euclidian distance between x and y
  **/
 template<class Container1D1, class Container1D2>
-Real dist( ITContainer< Container1D1> const& x
-         , ITContainer< Container1D2> const& y
-         )
+Real dist( ExprBase< Container1D1> const& x, ExprBase< Container1D2> const& y)
 {
   // compute the valid range
   const int first = std::max(x.begin(), y.begin()) , last = std::min(x.lastIdx(), y.lastIdx());
@@ -736,9 +733,9 @@ Real dist( ITContainer< Container1D1> const& x
  *  @return the weighted Euclidian distance between x and y
  **/
 template<class Container1D1, class Container1D2, class Container1D3>
-Real weightedDist( ITContainer< Container1D1> const& x
-                 , ITContainer< Container1D2> const& y
-                 , ITContainer< Container1D3> const& w
+Real weightedDist( ExprBase< Container1D1> const& x
+                 , ExprBase< Container1D2> const& y
+                 , ExprBase< Container1D3> const& w
                  )
 {
   // compute the valid range

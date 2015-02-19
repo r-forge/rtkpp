@@ -49,7 +49,7 @@ namespace hidden
 template<typename Type>
 struct DataHandlerTraits<RDataHandler, Type>
 {
-  typedef RcppMatrix<Type> Data;
+  typedef RMatrix<Type> Data;
 };
 
 } // namespace hidden
@@ -105,9 +105,9 @@ class RDataHandler : public IDataHandler
     /** @return the number of variables (the number of columns of the data) */
     inline virtual int nbVariable() const { return nbVariable_;}
 
-    /** return in an RcppMatrix the (cloned) data with the given idData */
+    /** return in an RMatrix the (cloned) data with the given idData */
     template<typename Type>
-    void getData(std::string const& idData, RcppMatrix<Type>& data, int& nbVariable) const
+    void getData(std::string const& idData, RMatrix<Type>& data, int& nbVariable) const
     {
       enum
       {

@@ -75,13 +75,13 @@ it is not strictly necessary to use it. You can rather use this kind
 of code
 \begin{lstlisting}[style=customcpp]
 Rcpp::NumericMatrix m_data = data; // data is SEXP representing a R-matrix
-STK::RcppMatrix<double> mat(m_data); // STK::RcppMatrix<double> mat(data) will work
+STK::RMatrix<double> mat(m_data); // STK::RMatrix<double> mat(data) will work
 \end{lstlisting}
-The templated class \texttt{STK::RcppMatrix} wrap the Rcpp matrix (which itself
+The templated class \texttt{STK::RMatrix} wrap the Rcpp matrix (which itself
 wrap the \texttt{R} \verb+SEXP+ structure). You can access directly (and
 eventually modify) the \texttt{R} data in your application.
 
-The second templated class you can use is the \texttt{STK::RcppVector} which
+The second templated class you can use is the \texttt{STK::RVector} which
 allow to wrap \texttt{Rcpp::NumericVector}.
 
 \section{Converting \texttt{stk++} arrays and expressions to \texttt{R} data}
@@ -128,7 +128,7 @@ and the C++ files looks
 RcppExport SEXP countNA( SEXP r_matrix)
 {
   BEGIN_RCPP
-  STK::RcppMatrix<double> m_data(r_matrix);
+  STK::RMatrix<double> m_data(r_matrix);
   // use STK::wrap function (Rcpp::wrap function will not work)
   return Rcpp::List::create( Rcpp::Named("rows")= STK::wrap(STK::countByRow(m_data.isNA()))
                            , Rcpp::Named("cols")= STK::wrap(STK::count(m_data.isNA()))
@@ -166,8 +166,7 @@ PKGLIB    = $(PKGLIBDIR)/lib$(PKGNAME).a
 ## use $(SHLIB_OPENMP_CXXFLAGS) if you want openmp
 PKG_CXXFLAGS = `${R_HOME}/bin/Rscript -e "Rcpp:::CxxFlags()"` \
                `${R_HOME}/bin/Rscript -e "rtkpp:::CxxFlags()"`
-PKG_CPPFLAGS = `${R_HOME}/bin/Rscript -e "Rcpp:::CxxFlags()"` \
-               `${R_HOME}/bin/Rscript -e "rtkpp:::CppFlags()"` \
+PKG_CPPFLAGS = `${R_HOME}/bin/Rscript -e "rtkpp:::CppFlags()"` \
                 $(SHLIB_OPENMP_CXXFLAGS)
 
 ## use $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) if you want lapack

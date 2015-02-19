@@ -173,7 +173,11 @@ PKG_CPPFLAGS = `${R_HOME}/bin/Rscript -e "Rcpp:::CxxFlags()"` \
 ## use $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) if you want lapack
 PKG_LIBS = `${R_HOME}/bin/Rscript -e "Rcpp:::LdFlags()"` \
            `$(R_HOME)/bin/Rscript -e "rtkpp:::LdFlags()"` \
-            $(SHLIB_OPENMP_CFLAGS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
+            $(SHLIB_OPENMP_CFLAGS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(PKGLIB)
+
+## Define any flags you need for compiling your sources
+PKGNAME_CXXFLAGS = $(PKG_CXXFLAGS)
+PKGNAME_CPPFLAGS =
 
 export
 

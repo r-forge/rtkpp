@@ -84,8 +84,7 @@ struct MixtureStatVector
    * @param param the current value of the parameters
    **/
   template<class OtherArray>
-  void update(OtherArray const& param)
-  { iter_++; param_ += (param - param_)/iter_;}
+  void update(OtherArray const& param) { iter_++; param_ += (param - param_)/iter_;}
   /** Vector of the parameters */
   VectorX param_;
   /** number of stored values */

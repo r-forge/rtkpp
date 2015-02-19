@@ -351,6 +351,10 @@ class PointByArrayProduct : public ExprBase< PointByArrayProduct<Lhs, Rhs> >
       sizeCols_  = hidden::Traits<PointByArrayProduct>::sizeCols_,
       storage_   = hidden::Traits<PointByArrayProduct>::storage_
     };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
 
     inline PointByArrayProduct( const Lhs& lhs, const Rhs& rhs)
                               : Base(), lhs_(lhs), rhs_(rhs)
@@ -362,7 +366,7 @@ class PointByArrayProduct : public ExprBase< PointByArrayProduct<Lhs, Rhs> >
       hidden::ProductImpl<Lhs, Rhs, Allocator>::run(lhs, rhs, result_);
     }
     /**  @return the range of the rows */
-    inline Range rows() const { return result_.rows();}
+    inline RowRange const& rowsImpl() const { return result_.rows();}
     /** @return the first index of the rows */
     inline int const beginRowsImpl() const { return result_.beginRows();}
     /** @return the ending index of the rows */
@@ -371,7 +375,7 @@ class PointByArrayProduct : public ExprBase< PointByArrayProduct<Lhs, Rhs> >
     inline int const sizeRowsImpl() const { return 1;}
 
     /** @return the range of the columns */
-    inline Range cols() const { return result_.cols();}
+    inline ColRange const& colsImpl() const { return result_.cols();}
     /** @return the first index of the columns */
     inline int const beginColsImpl() const { return result_.beginCols();}
     /** @return the ending index of the columns */
@@ -442,6 +446,10 @@ class ArrayByVectorProduct : public ExprBase< ArrayByVectorProduct<Lhs, Rhs> >
       sizeCols_  = hidden::Traits<ArrayByVectorProduct>::sizeCols_,
       storage_   = hidden::Traits<ArrayByVectorProduct>::storage_
     };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
 
     inline ArrayByVectorProduct( const Lhs& lhs, const Rhs& rhs)
                               : Base(), lhs_(lhs), rhs_(rhs)
@@ -453,7 +461,7 @@ class ArrayByVectorProduct : public ExprBase< ArrayByVectorProduct<Lhs, Rhs> >
       hidden::ProductImpl<Lhs, Rhs, Allocator>::run(lhs, rhs, result_);
     }
     /**  @return the range of the rows */
-    inline Range const rows() const { return result_.rows();}
+    inline RowRange const& rowsImpl() const { return result_.rows();}
     /** @return the first index of the rows */
     inline int const beginRowsImpl() const { return(result_.beginRows());}
     /** @return the ending index of the rows */
@@ -462,7 +470,7 @@ class ArrayByVectorProduct : public ExprBase< ArrayByVectorProduct<Lhs, Rhs> >
     inline int const sizeRowsImpl() const { return result_.sizeRows();}
 
     /** @return the range of the columns */
-    inline Range const cols() const { return result_.cols();}
+    inline ColRange const& colsImpl() const { return result_.cols();}
     /** @return the first index of the columns */
     inline int const beginColsImpl() const { return(result_.beginCols());}
     /** @return the ending index of the columns */
@@ -541,6 +549,10 @@ class ArrayByDiagonalProduct : public ExprBase< ArrayByDiagonalProduct<Lhs, Rhs>
       sizeCols_  = hidden::Traits<ArrayByDiagonalProduct>::sizeCols_,
       storage_   = hidden::Traits<ArrayByDiagonalProduct>::storage_
     };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
 
     inline ArrayByDiagonalProduct( const Lhs& lhs, const Rhs& rhs)
                                   : Base(), lhs_(lhs), rhs_(rhs)
@@ -549,7 +561,7 @@ class ArrayByDiagonalProduct : public ExprBase< ArrayByDiagonalProduct<Lhs, Rhs>
       { STKRUNTIME_ERROR_NO_ARG(ArrayByDiagonalProduct, sizes mismatch);}
     }
     /**  @return the range of the rows */
-    inline Range const rows() const { return lhs_.rows();}
+    inline RowRange const& rowsImpl() const { return lhs_.rows();}
     /** @return the first index of the rows */
     inline int beginRowsImpl() const { return(lhs_.beginRows());}
     /** @return the ending index of the rows */
@@ -558,7 +570,7 @@ class ArrayByDiagonalProduct : public ExprBase< ArrayByDiagonalProduct<Lhs, Rhs>
     inline int sizeRowsImpl() const { return lhs_.sizeRows();}
 
     /** @return the range of the columns */
-    inline Range const cols() const { return rhs_.cols();}
+    inline ColRange const& colsImpl() const { return rhs_.cols();}
     /** @return the first index of the columns */
     inline int beginColsImpl() const { return(rhs_.beginCols());}
     /** @return the ending index of the columns */
@@ -634,6 +646,10 @@ class PointByDiagonalProduct : public ExprBase< PointByDiagonalProduct<Lhs, Rhs>
       sizeCols_  = hidden::Traits<PointByDiagonalProduct>::sizeCols_,
       storage_   = hidden::Traits<PointByDiagonalProduct>::storage_
     };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
 
     inline PointByDiagonalProduct( const Lhs& lhs, const Rhs& rhs)
                                  : Base(), lhs_(lhs), rhs_(rhs)
@@ -642,7 +658,7 @@ class PointByDiagonalProduct : public ExprBase< PointByDiagonalProduct<Lhs, Rhs>
       { STKRUNTIME_ERROR_NO_ARG(PointByDiagonalProduct, sizes mismatch);}
     }
     /**  @return the range of the rows */
-    inline Range const rows() const { return lhs_.rows();}
+    inline RowRange const& rowsImpl() const { return lhs_.rows();}
     /** @return the first index of the rows */
     inline int beginRowsImpl() const { return(lhs_.beginRows());}
     /** @return the ending index of the rows */
@@ -651,7 +667,7 @@ class PointByDiagonalProduct : public ExprBase< PointByDiagonalProduct<Lhs, Rhs>
     inline int sizeRowsImpl() const { return lhs_.sizeRows();}
 
     /** @return the range of the columns */
-    inline Range const cols() const { return rhs_.cols();}
+    inline ColRange const& colsImpl() const { return rhs_.cols();}
     /** @return the first index of the columns */
     inline int beginColsImpl() const { return(rhs_.beginCols());}
     /** @return the ending index of the columns */
@@ -726,6 +742,10 @@ class DiagonalByVectorProduct : public ExprBase< DiagonalByVectorProduct<Lhs, Rh
       sizeCols_  = hidden::Traits<DiagonalByVectorProduct>::sizeCols_,
       storage_   = hidden::Traits<DiagonalByVectorProduct>::storage_
     };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
 
     inline DiagonalByVectorProduct( const Lhs& lhs, const Rhs& rhs)
                                   : Base(), lhs_(lhs), rhs_(rhs)
@@ -734,7 +754,7 @@ class DiagonalByVectorProduct : public ExprBase< DiagonalByVectorProduct<Lhs, Rh
       { STKRUNTIME_ERROR_NO_ARG(DiagonalByVectorProduct, sizes mismatch);}
     }
     /**  @return the range of the rows */
-    inline Range const rows() const { return lhs_.rows();}
+    inline RowRange const& rowsImpl() const { return lhs_.rows();}
     /** @return the first index of the rows */
     inline int beginRowsImpl() const { return(lhs_.beginRows());}
     /** @return the ending index of the rows */
@@ -743,7 +763,7 @@ class DiagonalByVectorProduct : public ExprBase< DiagonalByVectorProduct<Lhs, Rh
     inline int sizeRowsImpl() const { return lhs_.sizeRows();}
 
     /** @return the range of the columns */
-    inline Range const cols() const { return rhs_.cols();}
+    inline ColRange const& colsImpl() const { return rhs_.cols();}
     /** @return the first index of the columns */
     inline int beginColsImpl() const { return(rhs_.beginCols());}
     /** @return the ending index of the columns */
@@ -816,12 +836,16 @@ class VectorByPointProduct : public ExprBase< VectorByPointProduct<Lhs, Rhs> >
       sizeCols_  = hidden::Traits<VectorByPointProduct>::sizeCols_,
       storage_   = hidden::Traits<VectorByPointProduct>::storage_
     };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
 
     inline VectorByPointProduct( const Lhs& lhs, const Rhs& rhs)
                                : Base(), lhs_(lhs), rhs_(rhs)
     {}
     /**  @return the range of the rows */
-    inline Range const rows() const { return lhs_.rows();}
+    inline RowRange const& rowsImpl() const { return lhs_.rows();}
     /** @return the first index of the rows */
     inline int beginRowsImpl() const { return(lhs_.beginRows());}
     /** @return the ending index of the rows */
@@ -830,7 +854,7 @@ class VectorByPointProduct : public ExprBase< VectorByPointProduct<Lhs, Rhs> >
     inline int sizeRowsImpl() const { return lhs_.sizeRows();}
 
     /** @return the range of the columns */
-    inline Range const cols() const { return rhs_.cols();}
+    inline ColRange const& colsImpl() const { return rhs_.cols();}
     /** @return the first index of the columns */
     inline int beginColsImpl() const { return(rhs_.beginCols());}
     /** @return the ending index of the columns */
@@ -904,6 +928,10 @@ class DiagonalByArrayProduct : public ExprBase< DiagonalByArrayProduct<Lhs, Rhs>
       sizeCols_  = hidden::Traits<DiagonalByArrayProduct>::sizeCols_,
       storage_   = hidden::Traits<DiagonalByArrayProduct>::storage_
     };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
 
     inline DiagonalByArrayProduct( const Lhs& lhs, const Rhs& rhs)
                                   : Base(), lhs_(lhs), rhs_(rhs)
@@ -912,7 +940,7 @@ class DiagonalByArrayProduct : public ExprBase< DiagonalByArrayProduct<Lhs, Rhs>
       { STKRUNTIME_ERROR_NO_ARG(DiagonalByArrayProduct,sizes mismatch);}
     }
     /**  @return the range of the rows */
-    inline Range const rows() const { return lhs_.rows();}
+    inline RowRange const& rowsImpl() const { return lhs_.rows();}
     /** @return the first index of the rows */
     inline int beginRowsImpl() const { return(lhs_.beginRows());}
     /** @return the ending index of the rows */
@@ -921,7 +949,7 @@ class DiagonalByArrayProduct : public ExprBase< DiagonalByArrayProduct<Lhs, Rhs>
     inline int sizeRowsImpl() const { return lhs_.sizeRows();}
 
     /** @return the range of the columns */
-    inline Range const cols() const { return rhs_.cols();}
+    inline ColRange const& colsImpl() const { return rhs_.cols();}
     /** @return the first index of the columns */
     inline int beginColsImpl() const { return(rhs_.beginCols());}
     /** @return the ending index of the columns */
@@ -1007,6 +1035,10 @@ class ArrayByArrayProduct : public ProductBase< Lhs, Rhs >
       sizeCols_  = hidden::Traits<ArrayByArrayProduct>::sizeCols_,
       storage_   = hidden::Traits<ArrayByArrayProduct>::storage_
     };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
 
     inline ArrayByArrayProduct( const Lhs& lhs, const Rhs& rhs)
                               : Base(), lhs_(lhs), rhs_(rhs)
@@ -1020,7 +1052,7 @@ class ArrayByArrayProduct : public ProductBase< Lhs, Rhs >
                 : hidden::ProductImpl<Lhs, Rhs, Allocator>::runbp(lhs, rhs, result_);
     }
     /**  @return the range of the rows */
-    inline Range const rows() const { return lhs_.rows();}
+    inline RowRange const& rowsImpl() const { return lhs_.rows();}
     /** @return the first index of the rows */
     inline int const beginRowsImpl() const { return(lhs_.beginRows());}
     /** @return the ending index of the rows */
@@ -1029,7 +1061,7 @@ class ArrayByArrayProduct : public ProductBase< Lhs, Rhs >
     inline int const sizeRowsImpl() const { return(lhs_.sizeRows());}
 
     /** @return the range of the columns */
-    inline Range const cols() const { return rhs_.cols();}
+    inline ColRange const& colsImpl() const { return rhs_.cols();}
     /** @return the first index of the columns */
     inline int const beginColsImpl() const { return(rhs_.beginCols());}
     /** @return the ending index of the columns */

@@ -199,7 +199,6 @@ struct Traits< BinaryOperator<BinaryOp, Lhs, Rhs> >
   {
     // find the kind of binary operator and the Structure using helper class BinaryTraits
     binOpKind_ = BinaryTraits<Lhs::structure_, Rhs::structure_>::binOpKind_,
-    structure_ = hidden::BinaryTraits<Lhs::structure_, Rhs::structure_>::structure_,
     // helper flags
     isLhs1D_ = EGAL(Lhs,vector_)||EGAL(Lhs,point_)||EGAL(Lhs,diagonal_),
     isRhs1D_ = EGAL(Rhs,vector_)||EGAL(Rhs,point_)||EGAL(Rhs,diagonal_),
@@ -209,12 +208,15 @@ struct Traits< BinaryOperator<BinaryOp, Lhs, Rhs> >
     isRes1D_ = (EGAL(Lhs,vector_)||EGAL(Lhs,point_)) && (EGAL(Rhs,vector_)||EGAL(Rhs,point_)),
     isRes2D_ = isLhs2D_ && isRhs2D_,
     is1D1D_  = isLhs1D_ && isRhs1D_,
-
+    // get the structure from the helper class BinaryTraits
+    structure_ = hidden::BinaryTraits<Lhs::structure_, Rhs::structure_>::structure_,
     // preserve the Lhs storage orientation. Could be optimized ?
     orient_    = Lhs::orient_,
-    // try fixed sizes for 2D containers
-    sizeRows_  = ((Lhs::sizeRows_== UnknownSize) ? int(Rhs::sizeRows_) : Lhs::sizeRows_),
-    sizeCols_  = ((Lhs::sizeCols_== UnknownSize) ? int(Rhs::sizeCols_) : Lhs::sizeCols_),
+    // try fixed sizes for 2D containers but take care to the 1D-1D case
+    sizeRows_  = (EGAL(Lhs,point_)||EGAL(Lhs,number_))
+               ? 1 : ( (Lhs::sizeRows_!= UnknownSize)||(Rhs::sizeRows_ == 1) ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)),
+    sizeCols_  = (EGAL(Lhs,vector_)||EGAL(Lhs,number_))
+               ? 1 : ( (Lhs::sizeCols_!= UnknownSize)||(Rhs::sizeCols_ == 1) ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)),
     storage_   = (Lhs::storage_ == int(Arrays::dense_)) || (Rhs::storage_ == int(Arrays::dense_))
                ?  int(Arrays::dense_) : int(Arrays::sparse_)
   };
@@ -281,8 +283,16 @@ class BinaryOperator : public BinaryOperatorBase< BinaryOp, Lhs, Rhs >
       // All the valid cases for binary operators
       isValid_ =( isRes0D_ || isRes1D_  || isRes2D_ || is1D1D_)
     };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
+
+    /** default constructor */
     inline BinaryOperator( const Lhs& lhs, const Rhs& rhs, const BinaryOp& func = BinaryOp())
-                            : Base(), lhs_(lhs), rhs_(rhs), functor_(func)
+                         : Base(), lhs_(lhs), rhs_(rhs), functor_(func)
+                         , rows_(lhs_.beginRows(), (sizeRows_ != UnknownSize) ? sizeRows_ : lhs_.sizeRows())
+                         , cols_(lhs_.beginCols(), (sizeCols_ != UnknownSize) ? sizeCols_ : lhs_.sizeCols())
     { // FIXME : not safe. Add more test in the 1D case at compile time (and runtime ?)
       STK_STATICASSERT_BINARY_OPERATOR_MISMATCH( isValid_ );
       STK_STATICASSERT_COLS_DIMENSIONS_MISMATCH(!( (int(Lhs::sizeCols_) != UnknownSize)
@@ -301,26 +311,26 @@ class BinaryOperator : public BinaryOperatorBase< BinaryOp, Lhs, Rhs >
       { STKRUNTIME_ERROR_2ARG(BinaryOperator, lhs.cols(), rhs.cols(), Columns sizes mismatch for 2D array);}
     }
     /**  @return the range of the rows */
-    inline Range const rows() const { return lhs_.rows();}
+    inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the first index of the rows */
-    inline int beginRowsImpl() const { return(lhs_.beginRows());}
+    inline int beginRowsImpl() const { return(rows_.begin());}
     /** @return the ending index of the rows */
-    inline int endRowsImpl() const { return(lhs_.endRows());}
+    inline int endRowsImpl() const { return(rows_.end());}
     /** @return the fixed size type if available to enable compile time optimizations */
-    inline int sizeRowsImpl() const { return((sizeRows_ != UnknownSize) ? sizeRows_ : rhs_.sizeRows());}
+    inline int sizeRowsImpl() const { return(rows_.size());}
 
-    /** @return the range of the columns */
-    inline Range const cols() const { return lhs_.cols();}
+    /**  @return the range of the rows */
+    inline ColRange const& colsImpl() const { return cols_;}
     /** @return the first index of the columns */
-    inline int beginColsImpl() const { return(lhs_.beginCols());}
+    inline int beginColsImpl() const { return(cols_.begin());}
     /** @return the ending index of the columns */
-    inline int endColsImpl() const { return(lhs_.endCols());}
+    inline int endColsImpl() const { return(cols_.end());}
     /** @return the fixed size type if available to enable compile time optimizations */
-    inline int sizeColsImpl() const { return((sizeCols_ != UnknownSize) ? sizeCols_ : rhs_.sizeCols());}
+    inline int sizeColsImpl() const { return(cols_.size());}
 
     /**  @return the range */
     inline Range const range() const
-    { return (Lhs::sizeCols_==UnknownSize) ? this->asDerived().rhs().range() : this->asDerived().lhs().range();}
+    { return this->asDerived().lhs().range();}
 
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_; }
@@ -333,6 +343,8 @@ class BinaryOperator : public BinaryOperatorBase< BinaryOp, Lhs, Rhs >
     Lhs const& lhs_;
     Rhs const& rhs_;
     BinaryOp const functor_;
+    RowRange rows_;
+    ColRange cols_;
 };
 
 /** @ingroup Arrays

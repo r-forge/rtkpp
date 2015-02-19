@@ -93,24 +93,43 @@ class RcppMatrix : public ArrayBase< RcppMatrix<Type_> >
     typedef typename hidden::Traits<RcppMatrix >::SubCol SubCol;
     enum
     {
+      structure_ = hidden::Traits<RcppMatrix<Type_> >::structure_,
+      orient_    = hidden::Traits<RcppMatrix<Type_> >::orient_,
+      sizeRows_  = hidden::Traits<RcppMatrix<Type_> >::sizeRows_,
+      sizeCols_  = hidden::Traits<RcppMatrix<Type_> >::sizeCols_,
+      storage_   = hidden::Traits<RcppMatrix<Type_> >::storage_,
+
       Rtype_ = hidden::RcppTraits<Type_>::Rtype_
     };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
+
     /** Default Constructor. */
-    inline RcppMatrix() : matrix_() {}
+    inline RcppMatrix() : matrix_(),rows_(), cols_() {}
     /** Constructor with SEXP. */
-    inline RcppMatrix(SEXP robj) : matrix_(robj) {}
+    inline RcppMatrix( SEXP robj)
+                     : matrix_(robj),rows_(0, matrix_.rows()), cols_(0, matrix_.cols())
+    {}
     /** Constructor */
-    inline RcppMatrix( Rcpp::Matrix<Rtype_> matrix) : matrix_(matrix) {}
+    inline RcppMatrix( Rcpp::Matrix<Rtype_> matrix)
+                     : matrix_(matrix),rows_(0, matrix_.rows()), cols_(0, matrix_.cols())
+    {}
     /** set Matrix .
      *  @param matrix the Rcpp matrix to wrap
      *  @note cannot be passed as const& due to a bug from the Rcpop side
      * */
-    inline void setMatrix( Rcpp::Matrix<Rtype_> matrix) { matrix_ = matrix;}
+    inline void setMatrix( Rcpp::Matrix<Rtype_> matrix)
+    { matrix_ = matrix;
+      rows_ = RowRange(0, matrix_.rows());
+      cols_ = RowRange(0, matrix_.cols());
+    }
     /** cast operator */
     inline operator Rcpp::Matrix<Rtype_>() const { return matrix_;}
 
-    /** @return the Vertical range */
-    inline Range rows() const { return Range(0, matrix_.rows());}
+    /** @return the range of the rows */
+    inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the index of the first row */
     inline int beginRowsImpl() const { return 0;}
     /** @return the ending index of the rows */
@@ -118,8 +137,8 @@ class RcppMatrix : public ArrayBase< RcppMatrix<Type_> >
     /** @return the number of rows */
     inline int sizeRowsImpl() const { return matrix_.rows();}
 
-    /**@return the Horizontal range */
-    inline Range cols() const { return Range(0, matrix_.cols());}
+    /**@return the range of the columns */
+    inline ColRange const& colsImpl() const { return cols_;}
     /** @return the index of the first column */
     inline int beginColsImpl() const { return 0;}
     /**  @return the ending index of the columns */
@@ -158,6 +177,8 @@ class RcppMatrix : public ArrayBase< RcppMatrix<Type_> >
     { matrix_ = matrix; return *this;}
   private:
     Rcpp::Matrix<Rtype_> matrix_;
+    RowRange rows_;
+    ColRange cols_;
 };
 
 } // namespace STK

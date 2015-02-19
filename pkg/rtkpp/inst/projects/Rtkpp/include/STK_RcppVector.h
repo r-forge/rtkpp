@@ -95,20 +95,36 @@ class RcppVector : public ArrayBase< RcppVector<Type_> >
 
     enum
     {
+      structure_ = hidden::Traits<RcppVector<Type_> >::structure_,
+      orient_    = hidden::Traits<RcppVector<Type_> >::orient_,
+      sizeRows_  = hidden::Traits<RcppVector<Type_> >::sizeRows_,
+      sizeCols_  = hidden::Traits<RcppVector<Type_> >::sizeCols_,
+      storage_   = hidden::Traits<RcppVector<Type_> >::storage_,
+
       Rtype_ = hidden::RcppTraits<Type_>::Rtype_
     };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
+
+    /** Default Constructor. */
+    inline RcppVector() : vector_(),rows_(), cols_(0,1) {}
     /** Constructor */
-    inline RcppVector(Rcpp::Vector<Rtype_> vector) : vector_(vector) {}
+    inline RcppVector (Rcpp::Vector<Rtype_> vector)
+                      : vector_(vector), rows_(), cols_(0,1) {}
     /** Constructor with SEXP. */
-    inline RcppVector(SEXP robj) : vector_(robj) {}
+    inline RcppVector( SEXP robj)
+                     : vector_(robj), rows_(0, vector_.size()), cols_(0,1) {}
     /** set Vector .
      *  @param vector the Rcpp matrix to wrap
      *  @note cannot be passed as const& due to a bug from the (old versions of) Rcpp side
      * */
-    inline void setVector( Rcpp::Vector<Rtype_> vector) { vector_ = vector;}
+    inline void setVector( Rcpp::Vector<Rtype_> vector)
+    { vector_ = vector; rows_ = RowRange(0, vector_.size());}
 
     /** @return the Vertical range */
-    inline Range rows() const { return Range(0, vector_.size());}
+    inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the index of the first row */
     inline int beginRowsImpl() const { return 0;}
     /** @return the ending index of the rows */
@@ -117,7 +133,7 @@ class RcppVector : public ArrayBase< RcppVector<Type_> >
     inline int sizeRowsImpl() const { return vector_.size();}
 
     /**@return the Horizontal range */
-    inline Range cols() const { return Range(0,1);}
+    inline ColRange const& colsImpl() const { return cols_;}
     /** @return the index of the first column */
     inline int beginColsImpl() const { return 0;}
     /**  @return the ending index of the columns */
@@ -154,6 +170,8 @@ class RcppVector : public ArrayBase< RcppVector<Type_> >
     { vector_ = vector; return *this;}
   private:
     Rcpp::Vector<Rtype_> vector_;
+    RowRange rows_;
+    ColRange cols_;
 };
 
 } // namespace STK

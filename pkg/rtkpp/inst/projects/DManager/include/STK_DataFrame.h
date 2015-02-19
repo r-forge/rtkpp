@@ -76,7 +76,7 @@ class DataFrame : protected List1D<IVariable* >, public ICAllocatorBase<UnknownS
     virtual ~DataFrame();
 
     /**@return the range of the columns */
-    inline ColRange const& cols() const { return Base2D::colsImpl();}
+    inline ColRange const& colsImpl() const { return Base2D::colsImpl();}
     /** @return the index of the first column */
     inline int beginCols() const { return Base2D::beginColsImpl();}
     /**  @return the ending index of the columns */
@@ -85,7 +85,7 @@ class DataFrame : protected List1D<IVariable* >, public ICAllocatorBase<UnknownS
     inline int sizeCols() const { return Base2D ::sizeColsImpl();}
 
     /** @return the range of the rows */
-    inline RowRange const& rows() const { return Base2D::rowsImpl();}
+    inline RowRange const& rowsImpl() const { return Base2D::rowsImpl();}
     /** @return the index of the first row */
     inline int beginRows() const { return Base2D::beginRowsImpl();}
     /** @return the ending index of the rows */

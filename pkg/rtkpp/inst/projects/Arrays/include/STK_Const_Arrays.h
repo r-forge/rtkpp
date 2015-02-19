@@ -226,7 +226,7 @@ class IConstArray: protected ICAllocatorBase<SizeRows_, SizeCols_>, public ExprB
 
   public:
     /**@return the Horizontal range */
-    inline ColRange const& cols() const { return Base2D::colsImpl();}
+    inline ColRange const& colsImpl() const { return Base2D::colsImpl();}
     /** @return the index of the first column */
     inline int beginColsImpl() const { return Base2D::beginColsImpl();}
     /**  @return the ending index of columns */
@@ -235,7 +235,7 @@ class IConstArray: protected ICAllocatorBase<SizeRows_, SizeCols_>, public ExprB
     inline int sizeColsImpl() const { return Base2D ::sizeColsImpl();}
 
     /** @return the Vertical range */
-    inline RowRange const& rows() const { return Base2D::rowsImpl();}
+    inline RowRange const& rowsImpl() const { return Base2D::rowsImpl();}
     /** @return the index of the first row */
     inline int beginRowsImpl() const { return Base2D::beginRowsImpl();}
     /** @return the ending index of the rows */

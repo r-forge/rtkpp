@@ -71,8 +71,6 @@ class ICAllocatorBase
     /** destructor. **/
     inline ~ICAllocatorBase() {}
 
-//    /** @return the range of the columns */
-//    inline Range cols() const { return Range(beginColsImpl(), sizeColsImpl());}
     /** @return the range of the columns */
     inline ColRange const& colsImpl() const { return cols_;}
     /** @return the index of the first column */
@@ -233,7 +231,7 @@ class ICAllocator : protected ICAllocatorBase<SizeRows_, SizeCols_>
 
   public:
     /**@return the Horizontal range */
-    inline ColRange const& cols() const { return Base2D::colsImpl();}
+    inline ColRange const& colsImpl() const { return Base2D::colsImpl();}
     /** @return the index of the first column */
     inline int beginColsImpl() const { return Base2D::beginColsImpl();}
     /**  @return the ending index of the columns */
@@ -242,7 +240,7 @@ class ICAllocator : protected ICAllocatorBase<SizeRows_, SizeCols_>
     inline int sizeColsImpl() const { return Base2D::sizeColsImpl();}
 
     /** @return the Vertical range */
-    inline RowRange const& rows() const { return Base2D::rowsImpl();}
+    inline RowRange const& rowsImpl() const { return Base2D::rowsImpl();}
     /** @return the index of the first row */
     inline int beginRowsImpl() const { return Base2D::beginRowsImpl();}
     /** @return the ending index of the rows */

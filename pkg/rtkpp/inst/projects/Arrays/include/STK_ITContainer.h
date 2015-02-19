@@ -82,11 +82,11 @@ class NoAssignOperator
  * The pseudo virtual function defined in this interface and to implement
  * in the derived classes have the following definitions for the dimensions:
  * @code
- * Range cols() const;
+ * ColRange const& colsImpl() const;
  * int beginColsImpl() const;
  * int endColsImpl() const;
  * int sizeColsImpl() const;
- * Range rows() const;
+ * RowRange const& rowsImpl() const;
  * int beginRowsImpl() const;
  * int endRowsImpl() const;
  * int sizeRowsImpl() const;
@@ -125,6 +125,10 @@ class ITContainerBase: public IRecursiveTemplate<Derived>, hidden::NoAssignOpera
       sizeCols_  = hidden::Traits<Derived>::sizeCols_,
       storage_   = hidden::Traits<Derived>::storage_
     };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
 
   protected:
     /** Default constructor */
@@ -133,8 +137,8 @@ class ITContainerBase: public IRecursiveTemplate<Derived>, hidden::NoAssignOpera
     inline ~ITContainerBase() {}
 
   public:
-    /** @return the Horizontal range */
-    inline Range cols() const { return this->asDerived().cols();};
+    /** @return the range of the columns */
+    inline ColRange const& cols() const { return this->asDerived().colsImpl();};
     /**  @return the index of the first column */
     inline int beginCols() const { return this->asDerived().beginColsImpl();}
     /**  @return the ending index of the columns */
@@ -143,7 +147,7 @@ class ITContainerBase: public IRecursiveTemplate<Derived>, hidden::NoAssignOpera
     inline int sizeCols() const { return this->asDerived().sizeColsImpl();}
 
     /** @return the Vertical range*/
-    inline Range rows() const { return this->asDerived().rows();}
+    inline RowRange const& rows() const { return this->asDerived().rowsImpl();}
     /** @return the index of the first row*/
     inline int beginRows() const { return this->asDerived().beginRowsImpl();}
     /** @return the ending index of the rows*/
@@ -151,10 +155,15 @@ class ITContainerBase: public IRecursiveTemplate<Derived>, hidden::NoAssignOpera
     /** @return the Vertical size (the number of rows) */
     inline int sizeRows() const { return this->asDerived().sizeRowsImpl();}
 
+    // for backward compatibility
+    /** @return the index of the first column */
+    inline int firstIdxCols() const { return beginCols();}
+    /** @return the index of the first row */
+    inline int firstIdxRows() const { return beginRows();}
     /** @return the index of the last column */
-    inline int lastIdxCols() const { return this->asDerived().cols().lastIdx();}
+    inline int lastIdxCols() const { return endCols()-1;}
     /** @return the index of the last row */
-    inline int lastIdxRows() const { return this->asDerived().rows().lastIdx();}
+    inline int lastIdxRows() const { return endRows()-1;}
 
     /** @return @c true if the container is empty, @c false otherwise */
     inline bool empty() const { return (sizeCols()<=0 || sizeRows()<=0);}
@@ -252,11 +261,19 @@ class ITContainer<Derived, Arrays::array2D_> : public ITContainerBase<Derived>
   public:
     typedef ITContainerBase<Derived> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
+    enum
+    {
+      structure_ = hidden::Traits<Derived>::structure_,
+      orient_    = hidden::Traits<Derived>::orient_,
+      sizeRows_  = hidden::Traits<Derived>::sizeRows_,
+      sizeCols_  = hidden::Traits<Derived>::sizeCols_,
+      storage_   = hidden::Traits<Derived>::storage_
+    };
 
     /** compute the range of the stored elements in a column. */
-    inline Range rangeRowsInCol(int) const { return this->asDerived().rows();}
+    inline Range rangeRowsInCol(int) const { return this->rows();}
     /** compute the range of the stored elements in a row. */
-    inline Range rangeColsInRow(int) const { return this->asDerived().cols();}
+    inline Range rangeColsInRow(int) const { return this->cols();}
 
   protected:
     /** default constructor. */
@@ -272,6 +289,18 @@ class ITContainer<Derived, Arrays::square_> : public ITContainerBase<Derived>
   public:
     typedef ITContainerBase<Derived> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
+    enum
+    {
+      structure_ = hidden::Traits<Derived>::structure_,
+      orient_    = hidden::Traits<Derived>::orient_,
+      sizeRows_  = hidden::Traits<Derived>::sizeRows_,
+      sizeCols_  = hidden::Traits<Derived>::sizeCols_,
+      storage_   = hidden::Traits<Derived>::storage_
+    };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
 
   protected:
     /** default constructor. */
@@ -281,7 +310,7 @@ class ITContainer<Derived, Arrays::square_> : public ITContainerBase<Derived>
 
   public:
     /** @return the range of the square container. */
-    inline Range range() const { return this->asDerived().rows();}
+    inline RowRange const& range() const { return this->asDerived().rows();}
     /** @return the first index of the square container. */
     inline int begin() const { return this->asDerived().beginRowsImpl();}
     /** @return the ending index of the square container. */
@@ -289,8 +318,11 @@ class ITContainer<Derived, Arrays::square_> : public ITContainerBase<Derived>
     /** @return the size of the rows and columns of the container. */
     inline int size() const { return this->asDerived().sizeRowsImpl();}
 
+    // for backward compatibility
+    /** @return the first index of the square container */
+    inline int firstIdx() const { return this->beginRows();}
     /** @return the last index of the square container. */
-    inline int lastIdx() const { return this->asDerived().rows().lastIdx();}
+    inline int lastIdx() const { return this->endRows()-1;}
 
     /** compute the range of the stored elements in a column. */
     inline Range rangeRowsInCol(int) const { return this->asDerived().rows();}
@@ -401,6 +433,18 @@ class ITContainer<Derived, Arrays::diagonal_> : public ITContainerBase<Derived>
   public:
     typedef ITContainerBase<Derived> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
+    enum
+    {
+      structure_ = hidden::Traits<Derived>::structure_,
+      orient_    = hidden::Traits<Derived>::orient_,
+      sizeRows_  = hidden::Traits<Derived>::sizeRows_,
+      sizeCols_  = hidden::Traits<Derived>::sizeCols_,
+      storage_   = hidden::Traits<Derived>::storage_
+    };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
 
   protected:
     /** default constructor. */
@@ -410,7 +454,7 @@ class ITContainer<Derived, Arrays::diagonal_> : public ITContainerBase<Derived>
 
   public:
     /** @return the range of the diagonal container. */
-    inline Range range() const { return this->asDerived().rows();}
+    inline RowRange const& range() const { return this->asDerived().rows();}
     /** @return the first index of the diagonal container. */
     inline int begin() const { return this->asDerived().beginRowsImpl();}
     /** @return the ending index of the diagonal container. */
@@ -418,12 +462,16 @@ class ITContainer<Derived, Arrays::diagonal_> : public ITContainerBase<Derived>
     /** @return the size of the rows and columns of the container. */
     inline int size() const { return this->asDerived().sizeRowsImpl();}
 
-    /** @return the last index of the square container. */
-    inline int lastIdx() const { return this->asDerived().rows().lastIdx();}
+    // for backward compatibility
+    /** @return the first index of the diagonal container */
+    inline int firstIdx() const { return this->beginRows();}
+    /** @return the last index of the diagonal container. */
+    inline int lastIdx() const { return this->endRows()-1;}
+
     /** @return the first diagonal element */
-    inline Type const front() const { return elt(begin());}
+    inline Type const front() const { return this->asDerived().elt(begin());}
     /** @return the last diagonal element */
-    inline Type const back() const { return elt(begin());}
+    inline Type const back() const { return this->asDerived().elt(lastIdx());}
     /** @return safely the constant element (i, j).
      *  @param i index of the row
      *  @param j index of the col
@@ -458,6 +506,18 @@ class ITContainer<Derived, Arrays::vector_> : public ITContainerBase<Derived>
   public:
     typedef ITContainerBase<Derived> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
+    enum
+    {
+      structure_ = hidden::Traits<Derived>::structure_,
+      orient_    = hidden::Traits<Derived>::orient_,
+      sizeRows_  = hidden::Traits<Derived>::sizeRows_,
+      sizeCols_  = hidden::Traits<Derived>::sizeCols_,
+      storage_   = hidden::Traits<Derived>::storage_
+    };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
 
   protected:
     /** default constructor. */
@@ -467,7 +527,7 @@ class ITContainer<Derived, Arrays::vector_> : public ITContainerBase<Derived>
 
   public:
     /** @return the range of the container */
-    inline Range range() const  { return this->asDerived().rows();}
+    inline RowRange const& range() const  { return this->asDerived().rows();}
     /** @return the index of the first element */
     inline int begin() const { return this->asDerived().beginRowsImpl();}
     /**  @return the ending index of the elements */
@@ -475,15 +535,19 @@ class ITContainer<Derived, Arrays::vector_> : public ITContainerBase<Derived>
     /**  @return the size of the vector */
     inline int size() const  { return this->asDerived().sizeRowsImpl();}
 
-    /**  @return the index of the last element */
-    inline int lastIdx() const  { return this->asDerived().lastIdxRows();}
-    /** @return the index of the column of the vector */
-    inline int colIdx() const { return this->beginCols();}
+    // for backward compatibility
+    /** @return the first index of the vector */
+    inline int firstIdx() const { return this->beginRows();}
+    /** @return the last index of the vector */
+    inline int lastIdx() const { return this->endRows()-1;}
 
     /** @return the first element */
-    inline Type const front() const { return this->elt(begin());}
+    inline Type const front() const { return this->asDerived().elt(begin());}
     /** @return the last element */
-    inline Type const back() const { return this->elt(lastIdx());}
+    inline Type const back() const { return this->asDerived().elt(lastIdx());}
+
+    /** @return the index of the column of the vector */
+    inline int colIdx() const { return this->beginCols();}
 
     /** @return the range of the effectively stored elements in the column. */
     inline Range rangeRowsInCol(int) const { return this->rows();}
@@ -499,6 +563,18 @@ class ITContainer<Derived, Arrays::point_> : public ITContainerBase<Derived>
   public:
     typedef ITContainerBase<Derived> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
+    enum
+    {
+      structure_ = hidden::Traits<Derived>::structure_,
+      orient_    = hidden::Traits<Derived>::orient_,
+      sizeRows_  = hidden::Traits<Derived>::sizeRows_,
+      sizeCols_  = hidden::Traits<Derived>::sizeCols_,
+      storage_   = hidden::Traits<Derived>::storage_
+    };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
 
   protected:
     /** default constructor. */
@@ -508,7 +584,7 @@ class ITContainer<Derived, Arrays::point_> : public ITContainerBase<Derived>
 
   public:
     /** @return the range of the container */
-    inline Range range() const  { return this->asDerived().cols();}
+    inline ColRange const& range() const  { return this->asDerived().cols();}
     /** @return the index of the first element */
     inline int begin() const { return this->asDerived().beginColsImpl();}
     /**  @return the ending index of the elements */
@@ -518,13 +594,17 @@ class ITContainer<Derived, Arrays::point_> : public ITContainerBase<Derived>
 
     /** @return the index of the row of the point */
     inline int rowIdx() const { return this->beginRows();}
-    /**  @return the index of the last element */
-    inline int lastIdx() const  { return this->asDerived().lastIdxCols();}
+
+    // for backward compatibility
+    /** @return the first index of the point */
+    inline int firstIdx() const { return this->beginCols();}
+    /** @return the last index of the vector */
+    inline int lastIdx() const { return this->endCols()-1;}
 
     /** @return the first element */
-    inline Type const front() const { return this->elt(begin());}
+    inline Type const front() const { return this->asDerived().elt(begin());}
     /** @return the last element */
-    inline Type const back() const { return this->elt(lastIdx());}
+    inline Type const back() const { return this->asDerived().elt(lastIdx());}
 
     /** @return the range of the effectively stored elements in the column. */
     inline Range rangeRowsInCol(int) const { return this->rows();}
@@ -559,4 +639,4 @@ class ITContainer<Derived, Arrays::number_> : public ITContainerBase<Derived>
 } // namespace STK
 
 #endif
-// STK_ITCONTAINER2D_H
+// STK_ITCONTAINER_H

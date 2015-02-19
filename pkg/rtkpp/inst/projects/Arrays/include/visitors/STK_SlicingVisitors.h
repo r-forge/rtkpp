@@ -115,6 +115,18 @@ class VisitorByCol : public VisitorByColBase< Derived, Visitor >, public TRef<1>
 
     typedef typename hidden::Traits< VisitorByCol<Derived, Visitor> >::Allocator Allocator;
     typedef VisitorByCol Result;
+    enum
+    {
+      structure_ = hidden::Traits<VisitorByCol<Derived, Visitor> >::structure_,
+      orient_    = hidden::Traits<VisitorByCol<Derived, Visitor> >::orient_,
+      sizeRows_  = hidden::Traits<VisitorByCol<Derived, Visitor> >::sizeRows_,
+      sizeCols_  = hidden::Traits<VisitorByCol<Derived, Visitor> >::sizeCols_,
+      storage_   = hidden::Traits<VisitorByCol<Derived, Visitor> >::storage_,
+    };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
 
     /** constructor */
     inline VisitorByCol( Derived const& lhs) : lhs_(lhs), result_(1,lhs_.sizeCols())
@@ -127,7 +139,7 @@ class VisitorByCol : public VisitorByColBase< Derived, Visitor >, public TRef<1>
       }
     }
     /**  @return the range of the rows */
-    inline Range const rows() const { return result_.rows();}
+    inline RowRange const& rowsImpl() const { return result_.rows();}
     /** @return the first index of the rows */
     inline int const beginRowsImpl() const { return(result_.beginRows());}
     /** @return the ending index of the rows */
@@ -136,7 +148,7 @@ class VisitorByCol : public VisitorByColBase< Derived, Visitor >, public TRef<1>
     inline int const sizeRowsImpl() const { return(result_.sizeRows());}
 
     /** @return the range of the columns */
-    inline Range const cols() const { return result_.cols();}
+    inline ColRange const& colsImpl() const { return result_.cols();}
     /** @return the first index of the columns */
     inline int const beginColsImpl() const { return(result_.beginCols());}
     /** @return the ending index of the columns */
@@ -228,6 +240,18 @@ class VisitorByRow : public VisitorByRowBase< Derived, Visitor >, public TRef<1>
     typedef typename Visitor<Type_>::return_type Type;
     typedef typename hidden::Traits< VisitorByRow<Derived, Visitor> >::Allocator Allocator;
     typedef VisitorByRow Result;
+    enum
+    {
+      structure_ = hidden::Traits<VisitorByRow<Derived, Visitor> >::structure_,
+      orient_    = hidden::Traits<VisitorByRow<Derived, Visitor> >::orient_,
+      sizeRows_  = hidden::Traits<VisitorByRow<Derived, Visitor> >::sizeRows_,
+      sizeCols_  = hidden::Traits<VisitorByRow<Derived, Visitor> >::sizeCols_,
+      storage_   = hidden::Traits<VisitorByRow<Derived, Visitor> >::storage_,
+    };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
 
     /** constructor */
     inline VisitorByRow( Derived const& lhs) : lhs_(lhs), result_(lhs_.sizeRows(), 1)
@@ -240,7 +264,7 @@ class VisitorByRow : public VisitorByRowBase< Derived, Visitor >, public TRef<1>
       }
     }
     /**  @return the range of the rows */
-    inline Range const rows() const { return result_.rows();}
+    inline RowRange const& rowsImpl() const { return result_.rows();}
     /** @return the first index of the rows */
     inline int const beginRowsImpl() const { return(result_.beginRows());}
     /** @return the ending index of the rows */
@@ -249,7 +273,7 @@ class VisitorByRow : public VisitorByRowBase< Derived, Visitor >, public TRef<1>
     inline int const sizeRowsImpl() const { return(result_.sizeRows());}
 
     /** @return the range of the columns */
-    inline Range const cols() const { return result_.cols();}
+    inline ColRange const& colsImpl() const { return result_.cols();}
     /** @return the first index of the columns */
     inline int const beginColsImpl() const { return(result_.beginCols());}
     /** @return the ending index of the columns */

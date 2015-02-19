@@ -138,7 +138,7 @@ class ICArray : public ArrayBase<Derived>
 
   public:
     /** @return the Horizontal range */
-    inline ColRange const& cols() const { return allocator_.cols();};
+    inline ColRange const& colsImpl() const { return allocator_.cols();};
     /**  @return the index of the first column */
     inline int beginColsImpl() const { return allocator_.beginCols();}
     /**  @return the ending index of the columns */
@@ -147,7 +147,7 @@ class ICArray : public ArrayBase<Derived>
     inline int sizeColsImpl() const { return allocator_.sizeCols();}
 
     /** @return the Vertical range */
-    inline RowRange const& rows() const { return allocator_.rows();}
+    inline RowRange const& rowsImpl() const { return allocator_.rows();}
     /** @return the index of the first row*/
     inline int beginRowsImpl() const { return allocator_.beginRows();}
     /** @return the ending index of the rows */
@@ -265,7 +265,7 @@ class ICArray : public ArrayBase<Derived>
      **/
     Derived& resize(Range const& I, Range const& J)
     {
-      if((rows() == I) && (cols()==J)) return this->asDerived();
+      if((this->rows() == I) && (this->cols()==J)) return this->asDerived();
       if (this->isRef())
       { STKRUNTIME_ERROR_2ARG(ICArray::resize,I,J,cannot operate on reference);}
       allocator_.resize(I.size(), J.size());

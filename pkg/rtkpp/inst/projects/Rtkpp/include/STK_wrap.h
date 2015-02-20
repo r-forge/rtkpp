@@ -34,7 +34,7 @@
 
 
 #ifndef STK_WRAP_H
-#define S_WRAP_H
+#define STK_WRAP_H
 
 namespace STK
 {

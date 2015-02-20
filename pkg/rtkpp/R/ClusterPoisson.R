@@ -49,7 +49,8 @@ NULL
 #' @examples
 #' ## A quantitative example with the DebTrivedi data set.
 #' data(DebTrivedi)
-#' dt <- DebTrivedi[, c(1, 6,8, 15)]
+#' ## use 500 first observation of the Trivedi data set
+#' dt <- DebTrivedi[1:500, c(1, 6,8, 15)]
 #'
 #' model <- clusterPoisson(data=dt, nbCluster=2:3, strategy = clusterFastStrategy())
 #'
@@ -105,7 +106,7 @@ clusterPoisson <- function(data, nbCluster=2, modelNames= clusterPoissonNames(),
 
   # set names
   if (resFlag != 1) {cat("WARNING: An error occur during the clustering process")}
-  print(model@component@lambda)
+  # print(model@component@lambda)
   colnames(model@component@lambda) <- colnames(model@component@data)
   model
 }

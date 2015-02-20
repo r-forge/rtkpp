@@ -366,7 +366,7 @@ void ClusterLauncher::getCategoricalParameters(Rcpp::S4& s4_component, std::stri
   s4_component.slot("plkj") = Rcpp::wrap(params);
   // get data
   RMatrix<int> m_data =  manager_.getData<int>(idData);
-  s4_component.slot("data") = (Rcpp::Matrix< RMatrix<int>::Rtype_>) m_data;
+  s4_component.slot("data") = STK::wrap(m_data);
 }
 
 /* select best model*/

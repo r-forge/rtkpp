@@ -36,7 +36,8 @@ specified in [\code{strategy}].
 \examples{
 ## A quantitative example with the DebTrivedi data set.
 data(DebTrivedi)
-dt <- DebTrivedi[, c(1, 6,8, 15)]
+## use 500 first observation of the Trivedi data set
+dt <- DebTrivedi[1:500, c(1, 6,8, 15)]
 
 model <- clusterPoisson(data=dt, nbCluster=2:3, strategy = clusterFastStrategy())
 

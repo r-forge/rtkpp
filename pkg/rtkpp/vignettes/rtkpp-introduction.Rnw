@@ -146,7 +146,7 @@ The only thing to do is to include the header file
 \end{lstlisting}
 in the code. When compiling the sources, you indicate the location of the stk++
 library using \verb+rtkpp:::CxxFlags()+, \verb+rtkpp:::CppFlags()+ and
-\verb+rtkpp:::LdFlags()+ in the \texttt{Makevars}.
+\verb+rtkpp:::LdFlags()+ in package \texttt{Makevars} file.
 
 If you are building a package with a lot of cpp files, you may find
 convenient to locate your sources in a separate directory. Hereafter we give an
@@ -162,10 +162,13 @@ PKGDIR    = FULL_PATH_TO_YOUR_PACKAGE
 PKGLIBDIR = $(PKGDIR)/lib
 PKGLIB    = $(PKGLIBDIR)/lib$(PKGNAME).a
 
-## Use the R_HOME indirection to support installations of multiple R version
-## use $(SHLIB_OPENMP_CXXFLAGS) if you want openmp
+## Use the R_HOME indirection to support installations of multiple R version.
+## use $(SHLIB_OPENMP_CXXFLAGS) if you want openmp.
+## It is not necessary to use Rcpp:::CxxFlags() if there is already
+## LinkingTo: Rcpp in your DESCRIPTION file
 PKG_CXXFLAGS = `${R_HOME}/bin/Rscript -e "Rcpp:::CxxFlags()"` \
                `${R_HOME}/bin/Rscript -e "rtkpp:::CxxFlags()"`
+
 PKG_CPPFLAGS = `${R_HOME}/bin/Rscript -e "rtkpp:::CppFlags()"` \
                 $(SHLIB_OPENMP_CXXFLAGS)
 

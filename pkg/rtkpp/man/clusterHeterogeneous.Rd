@@ -38,7 +38,7 @@ to the [\code{criterion}] among the number of clusters given in
 ## with default values
 ldata = list(HeartDisease.cat,HeartDisease.cont);
 lnames = c("categorical_pk_pjk","gaussian_pk_sjk")
-model <- clusterHeterogeneous(ldata, lnames, nbCluster=2:5, strategy = clusterFastStrategy())
+model <- clusterHeterogeneous(ldata, lnames, nbCluster=2:3, strategy = clusterFastStrategy())
 
 ## get summary
 summary(model)

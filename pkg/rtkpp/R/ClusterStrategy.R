@@ -114,13 +114,13 @@ clusterStrategy <- function( nbTry =1
 clusterFastStrategy <- function()
 {
   # create init
-  initMethod = clusterInit("class", 3, "SEM", 5, 0.01);
+  initMethod = clusterInit("class", 1, "SEM", 5, 0.01);
   # create shortAlgo
   shortAlgo = clusterAlgo("CEM", 10, 0.001);
   # create longAlgo
   longAlgo = clusterAlgo("EM", 100, 1e-07);
   # create strategy
-  new("ClusterStrategy", nbTry= 1, nbShortRun= 2, initMethod= initMethod, shortAlgo= shortAlgo, longAlgo= longAlgo);
+  new("ClusterStrategy", nbTry= 1, nbShortRun= 1, initMethod= initMethod, shortAlgo= shortAlgo, longAlgo= longAlgo);
 }
 
 #-----------------------------------------------------------------------

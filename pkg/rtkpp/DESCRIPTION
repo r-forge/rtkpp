@@ -1,7 +1,7 @@
 Package: rtkpp
 Type: Package
 Title: STK++ Integration to R Using Rcpp
-Version: 0.8.5
+Version: 0.8.6
 Encoding: UTF-8
 Date: 2014-12-19
 Authors@R: c(person("Serge", "Iovleff", role=c("aut","cre"),

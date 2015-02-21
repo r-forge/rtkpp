@@ -5,8 +5,8 @@
 library(rtkpp)
 data(iris)
 
-gamma_model <- clusterGamma( iris[1:4], nbCluster = 2:4, modelNames = clusterGammaNames(shapeBetweenCluster = "all")
-                           , strategy = clusterStrategy(nbTry = 1, nbInit = 2))
+gamma_model <- clusterGamma( iris[1:4], nbCluster = 3:4, modelNames = clusterGammaNames(shapeBetweenCluster = "all")
+                           , strategy = clusterFastStrategy())
 
 data<-gamma_model@component@data
 nbSample <- nrow(data)

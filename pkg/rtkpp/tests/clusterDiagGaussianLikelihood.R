@@ -5,8 +5,8 @@
 library(rtkpp)
 data(iris)
 
-gauss_model <- clusterDiagGaussian(iris[1:4], nbCluster = 2:8, modelNames = clusterDiagGaussianNames()
-              , strategy = clusterStrategy(nbTry = 1, nbInit = 2), criterion = "ICL")
+gauss_model <- clusterDiagGaussian(iris[1:4], nbCluster = 3:4, modelNames = clusterDiagGaussianNames()
+              , strategy = clusterFastStrategy(), criterion = "ICL")
 
 data<-gauss_model@component@data
 nbSample <- nrow(data)
@@ -25,8 +25,7 @@ for (i in 1:nbSample)
   { lnComp[k] = log(prop[k]) + sum(dnorm(data[i,], mean[k,], sigma[k,],log=TRUE)); }
   lmax <- max(lnComp)
 
-  for (k in 1:nbCluster)
-  { lnComp[k] =  lnComp[k] -lmax;}
+  lnComp =  lnComp -lmax;
 
   f[i] = log(sum(exp(lnComp))) + lmax;
 }

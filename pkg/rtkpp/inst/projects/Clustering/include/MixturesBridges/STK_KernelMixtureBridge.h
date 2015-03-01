@@ -66,7 +66,7 @@ namespace STK
 {
 /** @ingroup Clustering
  *  @brief Templated implementation of the IMixture interface allowing
- *  to bridge a STK++ lernel mixture with the composer.
+ *  to bridge a STK++ kernel mixture with the composer.
  *
  *  This class inherit from the interface IMixtureBridge.
  *
@@ -77,22 +77,17 @@ template<int Id, class Data>
 class KernelMixtureBridge: public IMixtureBridge< KernelMixtureBridge<Id,Data> >
 {
   public:
-  public:
-    // type of Mixture
-    typedef IMixtureBridge< MixtureBridge<Id,Data> > Base;
-    // type of Mixture
+    typedef IMixtureBridge< KernelMixtureBridge<Id,Data> > Base;
     typedef typename hidden::MixtureBridgeTraits< KernelMixtureBridge<Id,Data> >::Mixture Mixture;
-    // type of data
+    typedef typename Clust::MixtureTraits<Mixture>::Param Param;
     typedef typename Data::Type Type;
+
     // class of mixture
     enum
     {
       idMixtureClass_ = hidden::MixtureBridgeTraits< KernelMixtureBridge<Id,Data>  >::idMixtureClass_
     };
     // parameters type to get
-    typedef typename Clust::MixtureTraits<Mixture>::Param Param;
-
-    typedef std::vector<std::pair<int,int> >::const_iterator ConstIterator;
     using Base::mixture_;
 
     /** default constructor. Remove the missing values from the data set and
@@ -101,16 +96,15 @@ class KernelMixtureBridge: public IMixtureBridge< KernelMixtureBridge<Id,Data> >
      *  @param idData id name of the mixture model
      *  @param nbCluster number of cluster
      **/
-    KernelMixtureBridge( MixtureData<Data>* p_data, std::string const& idData, int nbCluster)
+    KernelMixtureBridge( Data* p_data, std::string const& idData, int nbCluster)
                        : Base( idData, nbCluster)
                        , p_data_(p_data)
     { initializeMixture();}
     /** copy constructor */
     KernelMixtureBridge( KernelMixtureBridge const& bridge)
                        : Base(bridge)
-                       , p_data_(bridge.p_data_)
-                       , dik_(bridge.dik_)
-    {  mixture_.setData(dik_);}
+                       , p_gram_(bridge.p_gram_)
+    {  mixture_.setData(p_data_);}
     /** destructor */
     virtual ~KernelMixtureBridge() {}
     /** This is a standard clone function in usual sense. It must be defined to
@@ -128,19 +122,17 @@ class KernelMixtureBridge: public IMixtureBridge< KernelMixtureBridge<Id,Data> >
     virtual KernelMixtureBridge* create() const
     {
       KernelMixtureBridge* p_bridge = new KernelMixtureBridge( mixture_, idName(), nbCluster());
-      p_bridge->p_data_ = p_data_;
-      // Bug Fix: set the correct data set
-      p_bridge->mixture_.setData(p_bridge->p_data_->m_dataij());
+      p_bridge->p_gram_ = p_gram_;
+      p_bridge->mixture_.setData(p_bridge->p_gram_);
       return p_bridge;
     }
-    /** This function is equivalent to Mstep and must be defined to update
-     *  parameters. In a Kernel mixture model, the Mstep is defined by
+    /** This function is equivalent to MStep and must be defined to update
+     *  parameters. In a Kernel mixture model, the MStep is defined by
      *  - an update of the distance from the center of the class
      *  - an usual update of the parameters
      */
     virtual void paramUpdateStep()
     {
-
       if (!mixture_.mStep()) throw Clust::mStepFail_;
     }
     /** This function can be used in order to the values of the parameters
@@ -150,11 +142,18 @@ class KernelMixtureBridge: public IMixtureBridge< KernelMixtureBridge<Id,Data> >
     void getParameters(Param& param) const { mixture_.getParameters(param);}
 
   private:
+   /** Compute the */
+   void compute_yik()
+   {
+     // matrix of size (n,K) with values \sum_{j=1}^n k(x_i,x_j) t_{jk}/t_{.k}
+     CVectorXd Wik_ =  (*p_gram_) * (*p_tik())
+                    / Const::Vector<Real>(this->nbSample()) * this->nk();
+   }
     /** This function will be used in order to initialize the mixture model
      *  using informations stored by the MixtureData. For example the missing
      *  values in the case of a MixtureData instance.
      **/
-    void initializeMixture(){ mixture_.setData(dik_);}
+    void initializeMixture(){ mixture_.setData(p_gram_);}
     /** protected constructor to use in order to create a bridge.
      *  @param mixture the mixture to copy
      *  @param idData id name of the mixture
@@ -162,12 +161,11 @@ class KernelMixtureBridge: public IMixtureBridge< KernelMixtureBridge<Id,Data> >
      **/
     KernelMixtureBridge( Mixture const& mixture, std::string const& idData, int nbCluster)
                        : Base( idData, nbCluster)
-                       , p_data_(0)
+                       , p_gram_(0)
     {}
-    /** Bridge for the data */
-    MixtureData<Data>* p_data_;
-    /** estimated distances */
-    Array2D<Real> dik_;
+    /** reference on the gram matrix*/
+    Data const* p_gram_;
+    CArrayXX yik_;
 };
 
 } // namespace STK

@@ -17,12 +17,10 @@ Maintainer: Serge Iovleff <serge.iovleff@stkpp.org>
 Description: STK++ (http://www.stkpp.org) is a collection of
     C++ classes for statistics, clustering, linear algebra, arrays (with an
     Eigen-like API), regression, dimension reduction, etc. The integration of
-    the library to R is using Rcpp. Some functionalities of the Clustering
-    project provided by the library are available in the R environment as R
-    functions.
+    the library to R is using Rcpp.
   .
     The rtkpp package includes the header files from the STK++
-    library (currently version 0.8.5). Thus users do not need to
+    library (currently version 0.8.6). Thus users do not need to
     install STK++ itself in order to use it.
   .
     STK++ is licensed under the GNU LGPL version 2 or later. rtkpp
@@ -41,18 +39,6 @@ URL: http://www.stkpp.org
 NeedsCompilation: yes
 SystemRequirements: GNU make
 Collate:
-    'ClusterAlgo.R'
-    'ClusterInit.R'
-    'ClusterStrategy.R'
-    'IClusterModel.R'
-    'ClusterCategorical.R'
-    'ClusterPoisson.R'
-    'ClusterDiagGaussian.R'
-    'ClusterHeterogeneous.R'
-    'ClusterGamma.R'
-    'ClusterModelNames.R'
-    'ClusterPlot.R'
-    'global.R'
     'rtkpp.R'
     'rtkppFlags.R'
     'inlineCxxPlugin.R'

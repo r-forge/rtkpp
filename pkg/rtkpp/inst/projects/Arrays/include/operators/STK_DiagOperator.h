@@ -29,7 +29,7 @@
  **/
 
 /** @file STK_DiagOperator.h
- *  @brief In this file we implement the DiagOperator class.
+ *  @brief In this file we implement the DiagOperator and DiagonalizeOperator classes.
  **/
 
 #ifndef STK_DIAGOPERATOR_H
@@ -43,19 +43,17 @@ namespace STK
 {
 
 // forward declaration
+template< typename Array> class DiagonalizeOperator;
 template< typename Array> class DiagOperator;
 
 namespace hidden
 {
 /** @ingroup hidden
- *  @brief Traits class for the diag operator
+ *  @brief Traits class for the diagonalize operator
  */
 template<typename Lhs>
-struct Traits< DiagOperator <Lhs> >
+struct Traits< DiagonalizeOperator <Lhs> >
 {
-  typedef RowOperator<DiagOperator < Lhs> > Row;
-  typedef ColOperator<DiagOperator < Lhs> > Col;
-  typedef typename Lhs::Type Type;
   enum
   {
     structure_ = Arrays::diagonal_,
@@ -64,24 +62,153 @@ struct Traits< DiagOperator <Lhs> >
     sizeCols_  = ((Lhs::sizeCols_ != UnknownSize)&&(Lhs::sizeCols_!= 1)) ?  Lhs::sizeCols_  : UnknownSize,
     storage_   = Lhs::storage_
   };
+  typedef RowOperator<DiagonalizeOperator < Lhs> > Row;
+  typedef ColOperator<DiagonalizeOperator < Lhs> > Col;
+  typedef typename Lhs::Type Type;
+  typedef typename Lhs::ReturnType ReturnType;
+};
+
+/** @ingroup hidden
+ *  @brief Traits class for the diag operator
+ */
+template<typename Lhs>
+struct Traits< DiagOperator <Lhs> >
+{
+  enum
+  {
+    structure_ = Arrays::diagonal_,
+    orient_    = Lhs::orient_,
+    sizeRows_  = ((Lhs::sizeRows_ < Lhs::sizeCols_)) ?  Lhs::sizeRows_ : Lhs::sizeCols_,
+    sizeCols_  = sizeRows_,
+    storage_   = Lhs::storage_
+  };
+  typedef RowOperator<DiagOperator < Lhs> > Row;
+  typedef ColOperator<DiagOperator < Lhs> > Col;
+  typedef typename Lhs::Type Type;
+  typedef typename Lhs::ReturnType ReturnType;
 };
 
 } // end namespace hidden
 
 // forward declaration
+template<typename Lhs> class DiagonalizeOperatorBase;
 template<typename Lhs> class DiagOperatorBase;
 
-
 /** @ingroup Arrays
- *  @class DiagOperator
+ *  @class DiagonalizeOperator
   *
-  * \brief Generic expression when a vector expression is "diagonalized".
+  * @brief Generic expression when a vector expression is "diagonalized".
   *
   * @tparam Lhs the type of the expression to which we are applying the
   * diagonalize operator.
   *
   * This class represents an expression where a diagonalize operator is applied to
   * a vector expression. It is the return type of the diagonalize operation.
+  *
+  * Most of the time, this is the only way that it is used, so you typically
+  * don't have to name DiagonalizeOperator type explicitly.
+  */
+template< typename Lhs>
+class DiagonalizeOperator  : public DiagonalizeOperatorBase< Lhs >, public TRef<1>
+{
+  public:
+    typedef DiagonalizeOperatorBase< Lhs > Base;
+    typedef typename hidden::Traits< DiagonalizeOperator<Lhs> >::Type Type;
+    typedef typename hidden::Traits< DiagonalizeOperator<Lhs> >::Row Row;
+    typedef typename hidden::Traits< DiagonalizeOperator<Lhs> >::Col Col;
+    enum
+    {
+        structure_ = hidden::Traits< DiagonalizeOperator<Lhs> >::structure_,
+        orient_    = hidden::Traits< DiagonalizeOperator<Lhs> >::orient_,
+        sizeRows_  = hidden::Traits< DiagonalizeOperator<Lhs> >::sizeRows_,
+        sizeCols_  = hidden::Traits< DiagonalizeOperator<Lhs> >::sizeCols_,
+        storage_   = hidden::Traits< DiagonalizeOperator<Lhs> >::storage_,
+        // this is safe as we can use diagonalize operator only on 1D container
+        size_      = (sizeRows_ != UnknownSize) ? sizeRows_ : sizeCols_
+    };
+    /** Type of the Range for the rows */
+    typedef TRange<size_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<size_> ColRange;
+    /** Constructor */
+    inline DiagonalizeOperator( Lhs const& lhs)
+                       : Base(), lhs_(lhs)
+                       , rows_(lhs_.beginRows(), (size_ != UnknownSize) ? size_ : lhs_.size())
+                       , cols_(lhs_.beginCols(), (size_ != UnknownSize) ? size_ : lhs_.size())
+    {
+      STK_STATICASSERT_ONE_DIMENSION_ONLY(Lhs);
+    }
+    /** @return the first index */
+    inline int beginImpl() const { return lhs_.begin();}
+    /** @return the ending index */
+    inline int endImpl() const { return lhs_.end();}
+    /** @return the number of elements */
+    inline int sizeImpl() const { return lhs_.size();}
+
+    /**  @return the range of the rows */
+    inline RowRange const& rowsImpl() const { return rows_;}
+    /** @return the first index of the rows */
+    inline int beginRowsImpl() const { return rows_.begin();}
+    /** @return the ending index of the rows */
+    inline int endRowsImpl() const { return rows_.end();}
+    /** @return the number of rows */
+    inline int sizeRowsImpl() const { return rows_.size();}
+
+    /** @return the range of the Columns */
+    inline ColRange const& colsImpl() const { return cols_;}
+    /** @return the first index of the columns */
+    inline int beginColsImpl() const { return cols_.begin();}
+    /** @return the ending index of the columns */
+    inline int endColsImpl() const { return cols_.end();}
+    /** @return the number of columns */
+    inline int sizeColsImpl() const { return cols_.size();}
+
+    /** @return the left hand side expression */
+    inline Lhs const& lhs() const { return lhs_; }
+
+  protected:
+    Lhs const& lhs_;
+    RowRange rows_;
+    ColRange cols_;
+};
+
+/** @ingroup Arrays
+  * @brief implement the access to the elements in the (2D) general case.
+  **/
+template< typename Lhs>
+class DiagonalizeOperatorBase : public ExprBase< DiagonalizeOperator< Lhs> >
+{
+  public:
+    typedef DiagonalizeOperator<Lhs> Derived;
+    typedef ExprBase< Derived > Base;
+    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
+    /** constructor. */
+    inline DiagonalizeOperatorBase() : Base() {}
+    /** @return the element (i,j) of the expression.
+     *  @param i, j index of the row and of the column
+     **/
+    inline ReturnType elt2Impl(int i, int j) const
+    { return (this->asDerived().lhs().elt(i, j));}
+    /** @return the element ith element of the expression
+     *  @param i index of the ith element
+     **/
+    inline ReturnType elt1Impl(int i) const
+    { return (this->asDerived().lhs().elt(i));}
+    /** accesses to the element of the expression */
+    inline ReturnType elt0Impl() const
+    { return (this->asDerived().lhs().elt());}
+};
+
+/** @ingroup Arrays
+ *  @class DiagOperator
+  *
+  * @brief Generic expression when we get the .
+  *
+  * @tparam Lhs the type of the expression to which we are applying the
+  * diagonal operator.
+  *
+  * This class represents an expression where a diagonal operator is applied to
+  * an expression. It is the return type of the diagonal operation.
   *
   * Most of the time, this is the only way that it is used, so you typically
   * don't have to name DiagOperator type explicitly.
@@ -101,55 +228,51 @@ class DiagOperator  : public DiagOperatorBase< Lhs >, public TRef<1>
         sizeRows_  = hidden::Traits< DiagOperator<Lhs> >::sizeRows_,
         sizeCols_  = hidden::Traits< DiagOperator<Lhs> >::sizeCols_,
         storage_   = hidden::Traits< DiagOperator<Lhs> >::storage_,
-        // this is safe as we can use diag operator only on vectors/points
-        size_      = (sizeRows_ != UnknownSize) ? sizeRows_ : sizeCols_
+        // get size of the
+        size_      = (sizeCols_ < sizeRows_) ? sizeCols_ : sizeRows_
     };
-    /** Type of the Range for the rows */
-    typedef TRange<size_> RowRange;
-    /** Type of the Range for the columns */
-    typedef TRange<size_> ColRange;
+    /** Type of the diagonal Range */
+    typedef TRange<size_> DiagRange;
+
     /** Constructor */
     inline DiagOperator( Lhs const& lhs)
                        : Base(), lhs_(lhs)
-                       , rows_(lhs_.beginRows(), (size_ != UnknownSize) ? size_ : lhs_.size())
-                       , cols_(lhs_.beginCols(), (size_ != UnknownSize) ? size_ : lhs_.size())
+                       , range_( lhs_.beginRows(), (size_ != UnknownSize) ? size_ : lhs_.sizeRows())
     {
-      STK_STATICASSERT_VECTOR_ONLY(Lhs);
+      if (lhs.rows()!=lhs.cols())
+        STKRUNTIME_ERROR_NO_ARG(DiagOperatorBase,lhs.rows()!=lhs.cols());
     }
-    /**  @return the range of the rows */
-    inline Range const range() const { return lhs_.range();}
     /** @return the first index of the rows */
-    inline int const beginImpl() const { return lhs_.begin();}
+    inline int beginImpl() const { return range_.beginRows();}
     /** @return the ending index of the rows */
-    inline int const endImpl() const { return lhs_.end();}
+    inline int endImpl() const { return range_.end();}
     /** @return the number of rows */
-    inline int const sizeImpl() const { return lhs_.size();}
+    inline int sizeImpl() const { return range_.size();}
 
     /**  @return the range of the rows */
-    inline RowRange const& rowsImpl() const { return rows_;}
+    inline DiagRange const& rowsImpl() const { return range_;}
     /** @return the first index of the rows */
-    inline int const beginRowsImpl() const { return rows_.begin();}
+    inline int beginRowsImpl() const { return range_.begin();}
     /** @return the ending index of the rows */
-    inline int const endRowsImpl() const { return rows_.end();}
+    inline int endRowsImpl() const { return range_.end();}
     /** @return the number of rows */
-    inline int const sizeRowsImpl() const { return rows_.size();}
+    inline int sizeRowsImpl() const { return range_.size();}
 
     /** @return the range of the Columns */
-    inline ColRange const& colsImpl() const { return cols_;}
+    inline DiagRange const& colsImpl() const { return range_;}
     /** @return the first index of the columns */
-    inline int const beginColsImpl() const { return cols_.begin();}
+    inline int beginColsImpl() const { return range_.begin();}
     /** @return the ending index of the columns */
-    inline int const endColsImpl() const { return cols_.end();}
+    inline int endColsImpl() const { return range_.end();}
     /** @return the number of columns */
-    inline int const sizeColsImpl() const { return cols_.size();}
+    inline int sizeColsImpl() const { return range_.size();}
 
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_; }
 
   protected:
     Lhs const& lhs_;
-    RowRange rows_;
-    ColRange cols_;
+    DiagRange range_;
 };
 
 /** @ingroup Arrays
@@ -159,24 +282,26 @@ template< typename Lhs>
 class DiagOperatorBase : public ExprBase< DiagOperator< Lhs> >
 {
   public:
-    typedef typename hidden::Traits< DiagOperator<Lhs> >::Type Type;
-    typedef ExprBase< DiagOperator< Lhs> > Base;
+    typedef DiagOperator<Lhs> Derived;
+    typedef ExprBase< Derived > Base;
+    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
     /** constructor. */
     inline DiagOperatorBase() : Base() {}
-    /** @return the element (i,j) of the transposed expression.
+    /** @return the element (i,j) of the expression.
      *  @param i, j index of the row and of the column
      **/
-    inline Type const elt2Impl(int i, int j) const
+    inline ReturnType elt2Impl(int i, int j) const
     { return (this->asDerived().lhs().elt(i, j));}
     /** @return the element ith element of the transposed expression
      *  @param i index of the ith element
      **/
-    inline Type const elt1Impl(int i) const
+    inline ReturnType elt1Impl(int i) const
     { return (this->asDerived().lhs().elt(i));}
     /** accesses to the element of the transposed expression */
-    inline Type const elt0Impl() const
+    inline ReturnType elt0Impl() const
     { return (this->asDerived().lhs().elt());}
 };
+
 
 } // namespace STK
 

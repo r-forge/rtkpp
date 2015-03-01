@@ -119,6 +119,7 @@ class ITContainerBase: public IRecursiveTemplate<Derived>, hidden::NoAssignOpera
   public:
     typedef IRecursiveTemplate<Derived> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
+    typedef typename hidden::Traits<Derived>::ReturnType ReturnType;
     enum
     {
       structure_ = hidden::Traits<Derived>::structure_,
@@ -180,7 +181,7 @@ class ITContainerBase: public IRecursiveTemplate<Derived>, hidden::NoAssignOpera
     /** @return a constant reference on element (i,j) of the 2D container
      *  @param i,j indexes of the row and of the column
      **/
-    inline Type elt(int i, int j) const
+    inline ReturnType elt(int i, int j) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (this->beginRows() > i)
@@ -197,7 +198,7 @@ class ITContainerBase: public IRecursiveTemplate<Derived>, hidden::NoAssignOpera
     /** @return safely a constant value of the element (i,j) of the 2D container.
      *  @param i,j indexes of the row and column
      **/
-    inline Type operator()(int i, int j) const
+    inline ReturnType operator()(int i, int j) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (this->beginRows() > i)
@@ -214,19 +215,19 @@ class ITContainerBase: public IRecursiveTemplate<Derived>, hidden::NoAssignOpera
     /** @return the constant ith element
      *  @param i index of the ith element
      **/
-    inline Type elt(int i) const { return this->asDerived().elt1Impl(i);}
+    inline ReturnType elt(int i) const { return this->asDerived().elt1Impl(i);}
     /** @return the ith element
      *  @param i index of the ith element
      **/
-    inline Type operator[](int i) const { return this->asDerived().elt1Impl(i);}
+    inline ReturnType operator[](int i) const { return this->asDerived().elt1Impl(i);}
     /** @return a value on the number */
-    inline Type elt() const { return this->asDerived().elt0Impl();}
+    inline ReturnType elt() const { return this->asDerived().elt0Impl();}
     /** @return a constant reference on the number */
-    inline Type operator()() const { return this->asDerived().elt0Impl();}
+    inline ReturnType operator()() const { return this->asDerived().elt0Impl();}
     /** @return safely the constant element (i, j).
      *  @param i,j indexes of the row and column
      **/
-    Type at(int i, int j) const
+    ReturnType at(int i, int j) const
     {
       if (this->beginRows() > i)
       { STKOUT_OF_RANGE_2ARG(ITContainerBase::at, i, j, beginRows() > i);}
@@ -241,7 +242,7 @@ class ITContainerBase: public IRecursiveTemplate<Derived>, hidden::NoAssignOpera
     /** @return safely the constant ith element
      *  @param i index of the element
      **/
-    Type at(int i) const
+    ReturnType at(int i) const
     {
       if (this->asDerived().begin() > i)
       { STKOUT_OF_RANGE_1ARG(ITContainerBase::at, i, begin() > i);}
@@ -296,6 +297,7 @@ class ITContainer<Derived, Arrays::array2D_> : public ITContainerBase<Derived>
   public:
     typedef ITContainerBase<Derived> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
+    typedef typename hidden::Traits<Derived>::ReturnType ReturnType;
     enum
     {
       structure_ = hidden::Traits<Derived>::structure_,
@@ -324,6 +326,7 @@ class ITContainer<Derived, Arrays::square_> : public ITContainerBase<Derived>
   public:
     typedef ITContainerBase<Derived> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
+    typedef typename hidden::Traits<Derived>::ReturnType ReturnType;
     enum
     {
       structure_ = hidden::Traits<Derived>::structure_,
@@ -375,6 +378,7 @@ class ITContainer<Derived, Arrays::lower_triangular_> : public ITContainerBase<D
   public:
     typedef ITContainerBase<Derived> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
+    typedef typename hidden::Traits<Derived>::ReturnType ReturnType;
 
   protected:
     /** default constructor. */
@@ -437,6 +441,7 @@ class ITContainer<Derived, Arrays::upper_triangular_> : public ITContainerBase<D
   public:
     typedef ITContainerBase<Derived> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
+    typedef typename hidden::Traits<Derived>::ReturnType ReturnType;
 
   protected:
     /** default constructor. */
@@ -500,6 +505,8 @@ class ITContainer<Derived, Arrays::diagonal_> : public ITContainerBase<Derived>
   public:
     typedef ITContainerBase<Derived> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
+    typedef typename hidden::Traits<Derived>::ReturnType ReturnType;
+
     enum
     {
       structure_ = hidden::Traits<Derived>::structure_,
@@ -541,9 +548,9 @@ class ITContainer<Derived, Arrays::diagonal_> : public ITContainerBase<Derived>
     inline Range rangeColsInRow(int pos) const { return Range(pos,1);}
 
     /** @return the first element */
-    inline Type front() const { return this->elt(firstIdx());}
+    inline ReturnType front() const { return this->elt(firstIdx());}
     /** @return the last element */
-    inline Type back() const { return this->elt(lastIdx());}
+    inline ReturnType back() const { return this->elt(lastIdx());}
 
     /** @return safely the constant element (i, j).
      *  @param i,j indexes of the rows and columns
@@ -613,6 +620,8 @@ class ITContainer<Derived, Arrays::vector_> : public ITContainerBase<Derived>
   public:
     typedef ITContainerBase<Derived> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
+    typedef typename hidden::Traits<Derived>::ReturnType ReturnType;
+
     enum
     {
       structure_ = hidden::Traits<Derived>::structure_,
@@ -652,9 +661,9 @@ class ITContainer<Derived, Arrays::vector_> : public ITContainerBase<Derived>
     inline int colIdx() const { return this->beginCols();}
 
     /** @return the first element */
-    inline Type front() const { return this->elt(firstIdx());}
+    inline ReturnType front() const { return this->elt(firstIdx());}
     /** @return the last element */
-    inline Type back() const { return this->elt(lastIdx());}
+    inline ReturnType back() const { return this->elt(lastIdx());}
 };
 
 /** @ingroup Arrays
@@ -665,6 +674,8 @@ class ITContainer<Derived, Arrays::point_> : public ITContainerBase<Derived>
   public:
     typedef ITContainerBase<Derived> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
+    typedef typename hidden::Traits<Derived>::ReturnType ReturnType;
+
     enum
     {
       structure_ = hidden::Traits<Derived>::structure_,
@@ -704,9 +715,9 @@ class ITContainer<Derived, Arrays::point_> : public ITContainerBase<Derived>
     inline int lastIdx() const { return this->endCols()-1;}
 
     /** @return the first element */
-    inline Type front() const { return this->elt(firstIdx());}
+    inline ReturnType front() const { return this->elt(firstIdx());}
     /** @return the last element */
-    inline Type back() const { return this->elt(lastIdx());}
+    inline ReturnType back() const { return this->elt(lastIdx());}
 };
 /** @ingroup Arrays
  *  Specialization for number_ */
@@ -716,6 +727,7 @@ class ITContainer<Derived, Arrays::number_> : public ITContainerBase<Derived>
   public:
     typedef ITContainerBase<Derived> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
+    typedef typename hidden::Traits<Derived>::ReturnType ReturnType;
 
   protected:
     /** default constructor. */
@@ -724,8 +736,10 @@ class ITContainer<Derived, Arrays::number_> : public ITContainerBase<Derived>
     inline ~ITContainer() {}
 
   public:
+    /**  @return the size of the container */
+    inline int size() const  { return 1;}
     /** Conversion to scalar */
-    inline operator Type const() const {return this->asDerived().elt0Impl();}
+    inline operator ReturnType const() const {return this->asDerived().elt0Impl();}
 };
 
 } // namespace STK

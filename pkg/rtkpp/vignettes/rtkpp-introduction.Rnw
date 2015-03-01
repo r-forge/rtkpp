@@ -57,14 +57,21 @@ methods or Lapack), arrays (with an Eigen-like API \cite{JSS:RcppEigen}),
 regression, dimension reduction, etc. Some functionalities provided by the
 library are available in the \texttt{R} environment as \texttt{R} functions.
 
+
 The \texttt{rtkpp} package provides the header files composing the
 \texttt{stk++} \texttt{C++} library (thus users do not need to
-install \texttt{stk++} itself in order to use rtkpp), along with implementations
-of \texttt{Rcpp::as} and \texttt{Rcpp::wrap} for the \texttt{C++}
-classes defined in \texttt{stk++}. In this sense it is similar
+install \texttt{stk++} itself in order to use rtkpp), along with
+implementations of \texttt{Rcpp::as} and \texttt{Rcpp::wrap} for the
+\texttt{C++} classes defined in \texttt{stk++}. In this sense it is similar
 to the \texttt{RcppEigen} \cite{CRAN:RcppEigen,JSS:RcppEigen} and
 \texttt{RcppArmadillo} \cite{CRAN:RcppArmadillo} packages.
 
+The current version of the stk++ library is given below
+<< >>=
+require("rtkpp")
+stkVersion <- .Call("stk_version", FALSE, PACKAGE="rtkpp")
+stkVersion
+@
 
 \section{Wrapping \texttt{R} data by \texttt{stk++} arrays}
 

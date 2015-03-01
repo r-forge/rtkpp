@@ -111,7 +111,7 @@ class IMixtureBridge: public IMixture
      */
     virtual int nbFreeParameter() const { return mixture_.computeNbFreeParameters();}
     /** This function must return the number of variables.
-     *  @return Number of free parameters
+     *  @return Number of variables
      */
     virtual int nbVariable() const { return mixture_.nbVariable();}
     /** This function can be used to write summary of parameters to the output stream.

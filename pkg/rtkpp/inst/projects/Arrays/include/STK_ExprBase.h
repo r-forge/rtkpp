@@ -35,6 +35,8 @@
 #ifndef STK_EXPRBASE_H
 #define STK_EXPRBASE_H
 
+#include "STK_ITContainer.h"
+
 /// utility macro allowing to construct binary operators
 #define MAKE_BINARY_OPERATOR(OPERATOR, FUNCTOR) \
   template<typename Rhs> \
@@ -120,7 +122,7 @@ class ExprBase : public ITContainer<Derived, hidden::Traits<Derived>::structure_
      *  @endcode
      *  compute the number of positive element of the array @c a.
      *  @return the number of non-zero element in the expression.*/
-    int const count() const;
+    int count() const;
     /** @brief check if there is any non-zero element in an expression.
      * For example
      *  @code
@@ -138,7 +140,7 @@ class ExprBase : public ITContainer<Derived, hidden::Traits<Derived>::structure_
      *   @return @c true if all the elements are not zero in the expression, @c false otherwise.*/
     bool const all() const;
     /** @return the number of available values in the array (not count NA values).*/
-    int const nbAvailableValues() const;
+    int nbAvailableValues() const;
 
     /** @return the minimum of all elements of this using a Visitor
       * and puts in (row, col) its location.
@@ -413,8 +415,8 @@ class ExprBase : public ITContainer<Derived, hidden::Traits<Derived>::structure_
     { return TransposeOperator<Derived> (this->asDerived());}
 
     /** @return the diagonal expression of this. */
-    inline DiagOperator<Derived> diag() const
-    { return DiagOperator<Derived> (this->asDerived());}
+    inline DiagonalizeOperator<Derived> diagonalize() const
+    { return DiagonalizeOperator<Derived> (this->asDerived());}
 
     /** @return the j-th column of this. */
     inline ColOperator<Derived> col(int j) const

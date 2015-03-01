@@ -28,14 +28,14 @@
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
 
-/** @file STK_ICAllocator.h
+/** @file STK_IArrayBase.h
  *  @brief In this file we define the ICAllocator interface class.
  **/
 
-#ifndef STK_ICALLOCATOR_H
-#define STK_ICALLOCATOR_H
+#ifndef STK_IARRAYBASE_H
+#define STK_IARRAYBASE_H
 
-#include "STK_ITContainer.h"
+#include "STKernel/include/STK_Range.h"
 
 namespace STK
 {
@@ -43,12 +43,12 @@ namespace STK
 /** @ingroup Arrays
  *  @brief Interface base class for 2D containers.
  *
- *  The ICAllocatorBase class is the base class for all two-dimensional containers.
+ *  The IArrayBase class is the base class for all two-dimensional containers.
  *  A two-dimensional container is defined by an horizontal range of index
  *  for the columns and a vertical range of index for the rows.
  **/
 template<int SizeRows_, int SizeCols_>
-class ICAllocatorBase
+class IArrayBase
 {
   public:
     /** Type of the Range for the rows */
@@ -58,18 +58,18 @@ class ICAllocatorBase
 
   protected:
     /** Default constructor. cols_ = 1:0 and rows_ = 1:0. */
-    inline ICAllocatorBase() : rows_(), cols_() {}
+    inline IArrayBase() : rows_(), cols_() {}
     /** Constructor with specified ranges
      *  @param I the vertical range
      *  @param J the horizontal range
      **/
-    inline ICAllocatorBase( RowRange const& I, ColRange const& J) : rows_(I), cols_(J) {}
+    inline IArrayBase( RowRange const& I, ColRange const& J) : rows_(I), cols_(J) {}
     /** Copy constructor
      *  @param T the container to copy
      **/
-    inline ICAllocatorBase( ICAllocatorBase const& T) : rows_(T.rows_), cols_(T.cols_) {}
+    inline IArrayBase( IArrayBase const& T) : rows_(T.rows_), cols_(T.cols_) {}
     /** destructor. **/
-    inline ~ICAllocatorBase() {}
+    inline ~IArrayBase() {}
 
     /** @return the range of the columns */
     inline ColRange const& colsImpl() const { return cols_;}
@@ -80,8 +80,6 @@ class ICAllocatorBase
     /** @return the number of column */
     inline int sizeColsImpl() const { return cols_.size();}
 
-//    /** @return the range of the rows */
-//    inline Range rows() const { return Range(beginRowsImpl(), sizeRowsImpl());}
     /** @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the index of the first row */
@@ -170,7 +168,7 @@ class ICAllocatorBase
     /** exchange this container with T
      * @param T the container to exchange with this
      **/
-     inline void exchange(ICAllocatorBase& T)
+     inline void exchange(IArrayBase& T)
      {
        std::swap(T.rows_, this->rows_ );
        std::swap(T.cols_, this->cols_ );
@@ -182,150 +180,7 @@ class ICAllocatorBase
     ColRange cols_;
 };
 
-/** @ingroup Arrays
- *
- * @brief Interface class for homogeneous 2D containers which cannot be
- * expression or part of an expression (like allocators).
- *
- * Use the curious recursive template paradigm : the template
- * parameter @c Derived is the name of the class that
- * implements the interface ICAllocator.
- * For example
- * @code
- * template<class Type>
- * class Derived : public ICAllocator< Derived<Type> >
- * {...}
- * @endcode
- *
- * @sa CAllocator
- **/
-template < class Derived, int SizeRows_ = hidden::Traits<Derived>::sizeRows_
-                        , int SizeCols_ = hidden::Traits<Derived>::sizeCols_>
-class ICAllocator : protected ICAllocatorBase<SizeRows_, SizeCols_>
-                  , public ITContainer<Derived, hidden::Traits<Derived>::structure_>
-{
-  public:
-    /** Type of the Range for the rows */
-    typedef TRange<SizeRows_> RowRange;
-    /** Type of the Range for the columns */
-    typedef TRange<SizeCols_> ColRange;
-
-  protected:
-    /** Type of the Base container */
-    typedef ICAllocatorBase<hidden::Traits<Derived>::sizeRows_, hidden::Traits<Derived>::sizeCols_ > Base2D;
-    /** Type of the Base container */
-    typedef ITContainer<Derived, hidden::Traits<Derived>::structure_ > Base;
-    typedef typename hidden::Traits<Derived>::Type Type;
-    /** Default constructor.*/
-    inline ICAllocator() : Base2D(), Base() {}
-    /** constructor with specified Range.
-     *  @param I,J range of the rows and columns
-     **/
-    inline ICAllocator( Range const& I, Range const& J) : Base2D(I, J), Base() {}
-    /** Copy constructor.
-     *  @param T the container to copy
-     **/
-    inline ICAllocator( ICAllocator const& T) : Base2D(T), Base() {}
-    /** destructor. */
-    inline ~ICAllocator() {}
-
-  public:
-    /**@return the Horizontal range */
-    inline ColRange const& colsImpl() const { return Base2D::colsImpl();}
-    /** @return the index of the first column */
-    inline int beginColsImpl() const { return Base2D::beginColsImpl();}
-    /**  @return the ending index of the columns */
-    inline int endColsImpl() const { return Base2D::endColsImpl();}
-    /** @return the number of columns */
-    inline int sizeColsImpl() const { return Base2D::sizeColsImpl();}
-
-    /** @return the Vertical range */
-    inline RowRange const& rowsImpl() const { return Base2D::rowsImpl();}
-    /** @return the index of the first row */
-    inline int beginRowsImpl() const { return Base2D::beginRowsImpl();}
-    /** @return the ending index of the rows */
-    inline int endRowsImpl() const { return Base2D::endRowsImpl();}
-    /** @return the Vertical size (the number of rows) */
-    inline int sizeRowsImpl() const { return Base2D::sizeRowsImpl();}
-    /** @return the index of the first row */
-    inline int beginRows() const { return Base2D::beginRowsImpl();}
-    /** @return the ending index of the rows */
-    inline int endRows() const { return Base2D::endRowsImpl();}
-    /** @return the Vertical size (the number of rows) */
-    inline int sizeRows() const { return Base2D::sizeRowsImpl();}
-
-    /**  @return the index of the last column */
-    inline int lastIdxCols() const { return Base2D::lastIdxCols();}
-    /** @return the index of the last row */
-    inline int lastIdxRows() const { return Base2D::lastIdxRows();}
-
-    /** @return @c true if the container is empty, @c false otherwise */
-    inline bool empty() const { return Base2D::empty();}
-    /** @return the element (i,j) of the 2D container.
-     *  @param i, j index of row and of the column
-     **/
-    inline Type& elt(int i, int j)
-    {
-#ifdef STK_BOUNDS_CHECK
-      if (this->beginRows() > i)
-      { STKOUT_OF_RANGE_2ARG(ICAllocator::elt, i, j, beginRows() > i);}
-      if (this->endRows() <= i)
-      { STKOUT_OF_RANGE_2ARG(ICAllocator::elt, i, j, endRows() <= i);}
-      if (this->beginCols() > j)
-      { STKOUT_OF_RANGE_2ARG(ICAllocator::elt, i, j, beginCols() > j);}
-      if (this->endCols() <= j)
-      { STKOUT_OF_RANGE_2ARG(ICAllocator::elt, i, j, endCols() <= j);}
-#endif
-      return this->asDerived().elt2Impl(i,j);
-    }
-    /** @return a constant reference on element (i,j) of the 2D container
-     *  @param i, j indexes of the row and of the column
-     **/
-    inline Type const& elt(int i, int j) const
-    {
-#ifdef STK_BOUNDS_CHECK
-      if (this->beginRows() > i)
-      { STKOUT_OF_RANGE_2ARG(ICAllocator::elt, i, j, beginRows() > i);}
-      if (this->endRows() <= i)
-      { STKOUT_OF_RANGE_2ARG(ICAllocator::elt, i, j, endRows() <= i);}
-      if (this->beginCols() > j)
-      { STKOUT_OF_RANGE_2ARG(ICAllocator::elt, i, j, beginCols() > j);}
-      if (this->endCols() <= j)
-      { STKOUT_OF_RANGE_2ARG(ICAllocator::elt, i, j, endCols() <= j);}
-#endif
-      return this->asDerived().elt2Impl(i,j);
-    }
-    /** @return a reference on the ith element
-     *  @param i index of the ith element
-     **/
-    inline Type& elt(int i)
-    {
-      STK_STATICASSERT_ONE_DIMENSION_ONLY(Derived)
-      return this->asDerived().elt1Impl(i);
-    }
-    /** @return the constant ith element
-     *  @param i index of the ith element
-     **/
-    inline Type const& elt(int i) const
-    {
-      STK_STATICASSERT_ONE_DIMENSION_ONLY(Derived)
-      return this->asDerived().elt1Impl(i);
-    }
-    /** @return a reference on the number */
-    inline Type& elt()
-    {
-      STK_STATICASSERT_ZERO_DIMENSION_ONLY(Derived)
-      return this->asDerived().elt0Impl();
-    }
-    /** @return a constant reference on the number */
-    inline Type const& elt() const
-    {
-      STK_STATICASSERT_ZERO_DIMENSION_ONLY(Derived)
-      return this->asDerived().elt0Impl();
-    }
-};
-
 
 } // namespace STK
 
-#endif /* STK_IALLOCATOR_H */
+#endif /* STK_IARRAYBASE_H */

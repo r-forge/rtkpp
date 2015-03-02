@@ -33,8 +33,6 @@ Depends:
     R (>= 3.0.2),
     Rcpp
 LinkingTo: Rcpp
-Imports:
-    methods
 URL: http://www.stkpp.org
 NeedsCompilation: yes
 SystemRequirements: GNU make

@@ -122,7 +122,7 @@ It is basically composed of one R-script file (countNA.R) and one C++ file
 
 Given a R matrix, it is possible to get a list composed of two vectors
 constaining respectively the number of missing values in each rows and the
-number of missing values in each columns of the R matrixs.
+number of missing values in each columns of the R matrix.
 
 The R-script \texttt{countNA.R} looks
 \begin{lstlisting}[style=customcpp]

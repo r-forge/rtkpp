@@ -1,0 +1,31 @@
+Package: MixAll
+Version: 1.0
+Date: 2015-02-20
+Title: Clustering using Mixture Models
+Authors@R: c(person("Serge", "Iovleff", role = c("aut","cre"), email =
+    "Serge.Iovleff@stkpp.org"))
+Copyright: inria 2013-2015
+Depends:
+    R (>= 3.0.2),
+    rtkpp
+Imports:
+    methods
+Description: Algorithms and methods for estimating parametric mixture models.
+License: GPL (>= 2)
+LinkingTo: rtkpp
+Roxygen: list(wrap = FALSE)
+SystemRequirements: GNU make
+Collate:
+    'ClusterAlgo.R'
+    'ClusterInit.R'
+    'ClusterStrategy.R'
+    'IClusterModel.R'
+    'ClusterCategorical.R'
+    'ClusterPoisson.R'
+    'ClusterDiagGaussian.R'
+    'ClusterHeterogeneous.R'
+    'ClusterGamma.R'
+    'ClusterModelNames.R'
+    'ClusterPlot.R'
+    'global.R'
+    'MixAll.R'

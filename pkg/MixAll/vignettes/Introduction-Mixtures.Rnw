@@ -1,0 +1,593 @@
+\documentclass[shortnames,nojss,article]{jss}
+%\usepackage{booktabs,flafter,thumbpdf}
+
+\usepackage{Sweave}
+
+%\VignetteIndexEntry{rtkpp-cluster}
+%\VignetteKeywords{rtkpp, Rcpp, C++, R}
+%\VignettePackage{rtkpp}
+
+%% need no \usepackage{Sweave.sty}
+<<prelim,echo=FALSE,print=FALSE>>=
+library(rtkpp)
+rtkpp.version <- packageDescription("rtkpp")$Version
+rtkpp.date <- packageDescription("rtkpp")$Date
+now.date <- strftime(Sys.Date(), "%B %d, %Y")
+@
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+%------------------------------------------------
+%
+\usepackage{amsfonts,amstext,amsmath,amssymb}
+
+%------------------------------------------------
+% Sets
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Rd}{{\mathbb{R}^d}}
+
+\newcommand{\X}{{\mathcal{X}}}
+\newcommand{\Xd}{{\mathcal{X}^d}}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Nd}{{\mathbb{N}^d}}
+
+% bold letters
+\newcommand{\ba}{\mathbf{a}}
+\newcommand{\bb}{\mathbf{b}}
+\newcommand{\bc}{\mathbf{c}}
+\newcommand{\bg}{\mathbf{g}}
+\newcommand{\be}{\mathbf{e}}
+\newcommand{\bp}{\mathbf{p}}
+\newcommand{\bu}{\mathbf{u}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\bX}{\mathbf{X}}
+\newcommand{\bZ}{\mathbf{Z}}
+\newcommand{\bz}{\mathbf{z}}
+\newcommand{\bt}{\mathbf{t}}
+\newcommand{\by}{\mathbf{y}}
+
+% bold greek letters \usepackage{amssymb}
+\newcommand{\balpha}{\boldsymbol{\alpha}}
+\newcommand{\bbeta}{\boldsymbol{\beta}}
+\newcommand{\bsigma}{\boldsymbol{\sigma}}
+\newcommand{\bDelta}{\boldsymbol{\Delta}}
+\newcommand{\bepsilon}{\boldsymbol{\epsilon}}
+\newcommand{\bGamma}{\boldsymbol{\Gamma}}
+\newcommand{\blambda}{\boldsymbol{\lambda}}
+\newcommand{\bmu}{\boldsymbol{\mu}}
+\newcommand{\bpi}{\boldsymbol{\pi}}
+\newcommand{\bphi}{\boldsymbol{\phi}}
+\newcommand{\brho}{\boldsymbol{\rho}}
+\newcommand{\btheta}{\boldsymbol{\theta}}
+\newcommand{\bTheta}{\boldsymbol{\Theta}}
+\newcommand{\bvarepsilon}{\boldsymbol{\varepsilon}}
+
+%---------------------------------------------------------
+\title{Generative Clustering with missing values using
+the \pkg{rtkpp} package}
+\Plaintitle{Generative Clustering with missing
+values using the rtkpp package}
+\Shorttitle{Generative Clustering using the \pkg{rtkpp}
+package}
+
+\Abstract{
+  The Clustering project is a part of the \pkg{stkpp} library \citep{stk++}
+  that can be accessed from \proglang{R} \citep{R:Main} using the \pkg{MixAll}
+  package. It is possible to cluster gaussian, gamma, categorical and
+  Poisson mixture models or a combination of these models in case of
+  heterogeneous data.
+}
+
+\Keywords{\proglang{R}, \proglang{C++}, Clustering, missing values}
+\Plainkeywords{R, C++, Clustering, missing values}
+
+
+\Address{
+  Serge Iovleff \\
+  University Lille 1 \\
+  Cit\'e Scientifique \\
+  IUT "A", D\'epartement Informatique \\
+  59655 Villeneuve d'Ascq C\'edex, France \\
+  E-mail: \email{Serge.Iovleff@stkpp.org} \\
+  URL: \url{http://www.stkpp.org}\\
+}
+
+
+% Title Page
+\author{Serge Iovleff\\University Lille 1}
+\date{now.data}
+
+\begin{document}
+
+\SweaveOpts{concordance=FALSE}
+\maketitle
+
+%\tableofcontents
+
+\section{Introduction}
+The Clustering project implemented in STK++ allows to perform clustering on
+various data set using generative models. There is four kinds of generative
+models implemented:
+\begin{enumerate}
+  \item the diagonal Gaussian mixture models (8 models),
+  \item the diagonal gamma mixture models (24 models),
+  \item the diagonal categorical mixture models (8 models),
+  \item the diagonal Poisson mixture models (6 models).
+\end{enumerate}
+These models and the estimation algorithms allow to handle missing
+values. It is thus possible to use these models in order to cluster, but
+also complete data set with missing values.
+
+The \pkg{MixAll} package provide an access in \citep{R:Main} to the
+\pkg{STK++} \citep*{stk++} \proglang{C++} part of the library dedicated to
+clustering.
+
+In this paper we will first present the mixture models, the estimation
+algorithm, the initialization method and the strategy that can be used in order
+to find a good estimate of the parameters of the mixture model.
+In a second step we present shortly the different mixture models implemented in
+STK++ that can be used form rtkpp. Finally we give some examples on various data
+set.
+
+\section{Mixture Modeling}
+
+Let $\X$ be an arbitrary measurable space and let ${\bx}=\{{\bx}_1,...,{\bx}_n\}$
+be $n$ independent vectors in $\Xd$ such that each ${\bx}_i$ arises from a
+probability distribution with density
+\begin{equation}
+  f({\bx}_i|\theta) = \sum_{k=1}^K p_k h({\bx}_{i}| \blambda_{k},\balpha)
+\end{equation}
+where the $p_k$'s are the mixing proportions ($0<p_k<1$ for all $k=1,...,K$ and
+$p_1+...+p_K=1$), $h(\cdot| \blambda_{k},\balpha)$ denotes a $d$-dimensional
+distribution parameterized by $\blambda_k$ and $\balpha$. The parameters
+$\balpha$ do not depend from $k$ and are common to all the components of the
+mixture. The vector parameter to be estimated is
+$\theta=(p_1,\ldots,p_K,\blambda_1,\ldots,\blambda_K, \balpha)$ and is chosen
+to maximize the observed log-likelihood
+\begin{equation}
+  \label{eq:vraisemblance}
+  L(\theta|\bx_1,\ldots,\bx_n)=\sum_{i=1}^n \ln \left(\sum_{k=1}^K p_k h(\bx_i|\blambda_k, \balpha)\right).
+\end{equation}
+In case there is missing data, that is some $\bx_i$ are splited in observed
+values $\bx_i^o$ and missing values $\bx^m_i$, the log-likelihood to maximize
+should be the integrated log-likelihood
+\begin{equation}
+  \label{eq:vraisemblanceIntegrated}
+  L(\theta|\bx_1^o,\ldots,\bx_n^o)=
+  \sum_{i=1}^n  \int
+  \ln \left(\sum_{k=1}^K p_k h(\bx_i^o,\bx_i^m|\blambda_k, \balpha)\right)
+  d\bx_i^m.
+\end{equation}
+In the package \pkg{rtkpp}, this quantity is approximated using a Monte-Carlo
+estimator by the \code{SEM} or the \code{SemiSEM} algorithms and by a biased
+estimator by the \code{EM} or the \code{CEM} algorithms.
+
+It is well known that for a mixture distribution, a sample of indicator vectors
+or {\em labels} ${\bz}=\{ {\bz}_1,...,{\bz}_n\}$, with
+${\bz}_i=(z_{i1},\ldots,z_{iK})$, $z_{ik}=1$ or 0, according to the fact that
+${\bx}_i$ is arising from the $k$th mixture component or not, is associated to
+the observed data ${\bx}$. The sample ${\bz}$ is {\em unknown} so that the
+maximum likelihood estimation of mixture models is traditionally performed via
+the \code{EM} algorithm \cite{Dempster97} or by a stochastic version of
+\code{EM} called SEM (see \cite{McLachlanPeel00}), or by a k-means like
+algorithm called \code{CEM}. In the \pkg{rtkpp} package it is also possible to
+use an algorithm called \code{SemiSEM} which is an intermediate between the
+\code{EM} and \code{SEM} algorithm. In case there is no missing values,
+\code{SemiSEM} and \code{EM} are equivalents.
+
+\subsection{Estimation algorithms}
+
+\subsubsection{EM algorithm}
+Starting from an initial arbitrary parameter $\theta^0$, the $m$th iteration of
+the \code{EM} algorithm consists of repeating the following E (I if there exists
+missing values) and M steps.
+\begin{itemize}
+\item {\bf I step:} The missing values $\bx_i^m$ are imputed using the current MAP
+value given by the current value $\theta^{m-1}$ of the parameter.
+\item {\bf E step:} The current conditional probabilities that $z_{ik}=1$ for
+$i=1,\ldots,n$ and $k=1,\ldots,K$ are computed using the current value
+$\theta^{m-1}$ of the parameter:
+\begin{equation}\label{eq:condi}
+t^m_{ik}=t^m_k(\bx_i|\theta^{m-1})=\frac{ p^{m-1}_kh (\bx_i|{\blambda^{m-1}_k},\balpha^{m-1} )}
+{\sum_{l=1}^K  p^{m-1}_l h(\bx_i|\blambda^{m-1}_l,\balpha^{m-1})}.
+\end{equation}
+\item {\bf M step:} The maximum likelihood estimate $\theta^m$ of $\theta$
+is updated using the conditional probabilities $t^m_{ik}$ as conditional
+mixing weights. It leads to maximize
+\begin{equation} \label{eq:mStepEM}
+L(\theta| {\bx}_{1},\ldots,{\bx}_{n}, {\bt}^m)
+=\sum_{i=1}^{n}\sum_{k=1}^{K} t_{ik}^m \ln \left [p_{k} h({\bf x}_{i}|\blambda_{k},\balpha)\right],
+\end{equation}
+where ${\bt}^m=(t_{ik}^m, i=1,\ldots,n, k=1,\ldots,K)$. Updated expression of
+mixture proportions are, for $k=1,\ldots,K$,
+\begin{equation}
+p_k^m=\frac{\sum_{i=1}^n t^m_{ik}}{n}.
+\end{equation}
+Detailed formula for the updating of the $\blambda_k$'s and $\balpha$ are
+depending of the component parameterization and are detailed in the
+section \ref{sec:Implemented}.
+\end{itemize}
+The \code{EM} algorithm may converge to a local maximum of the observed data
+likelihood function, depending on starting values.
+
+\subsubsection{SEM algorithm}\label{subsubsec:SEM}
+The \code{SEM} algorithm is a stochastic version of \code{EM} incorporating
+between the E and M steps a restoration of the unknown component labels
+$\bz_i$, $i=1,\ldots,n,$ by drawing them at random from their current
+conditional distribution. Starting from an initial parameter $\theta^0$, an
+iteration of \code{SEM} consists of three steps.
+\begin{itemize}
+\item {\bf I step:} The missing values are simulated using the current value
+$\theta^{m-1}$ of the parameter.
+\item {\bf E step:} The conditional probabilities $t^m_{ik}$ $(1 \leq i \leq n,
+1 \leq k \leq K)$ are computed for the current value of $\theta^{m-1}$ as in
+the E step of \code{EM} algorithm (equation \ref{eq:condi}).
+\item {\bf S step:} Generate labels ${\bz}^m=\{ {\bz}^m_1,...,{\bz}^m_n\}$
+by assigning each point ${\bx}_i$ at random to one of the mixture
+components according to the categorical distribution with parameter $(t^m_{ik}, 1 \leq k \leq K)$.
+\item {\bf M step:} The maximum likelihood estimate of $\theta$ is updated
+using the generated labels by maximizing
+\begin{equation} \label{eq:mStepSEM}
+  L(\theta| {\bx}_{1},\ldots,{\bx}_{n}, {\bt}^m)
+    =\sum_{i=1}^{n}\sum_{k=1}^{K} z_{ik}^m \ln \left [p_{k} h({\bf x}_{i}|\blambda_{k},\balpha)\right],
+\end{equation}
+\end{itemize}
+
+SEM does not converge point wise.  It generates a Markov chain whose stationary
+distribution is more or less concentrated around the m.l. parameter estimator. A
+natural parameter estimate from a \code{SEM} sequence $(\theta^r)_{r=1, \ldots,R}$ is
+the mean $\sum_{r=b+1}^R \theta^r/(R-b)$ of the iterates values where the first
+$b$ burn-in iterates have been discarded when computing this mean. An
+alternative estimate is to consider the parameter value leading to the highest
+likelihood in a \code{SEM} sequence.
+
+\subsubsection{SemiSEM algorithm}\label{subsubsec:SemiSEM}
+The \code{SemiSEM} algorithm is a stochastic version of \code{EM} incorporating
+a restoration of the missing values $\bx_i^m$, $i=1,\ldots,n$ by drawing them at
+random from their current conditional distribution. Starting from an initial
+parameter $\theta^0$, an iteration of \code{SemiSEM} consists of three steps.
+\begin{itemize}
+\item {\bf I step:} The missing values are simulated using the current value
+$\theta^{m-1}$ of the parameter as in the \code{SEM} algorithm.
+\item {\bf E step:} The conditional probabilities $t^m_{ik}$ $(1 \leq i \leq n,
+1 \leq k \leq K)$ are computed for the current value of $\theta^{m-1}$.
+\item {\bf M step:} The maximum likelihood estimate of $\theta$ is updated
+by maximizing conditional probabilities $t^m_{ik}$ as conditional
+mixing weights as in the \code{EM} algorithm.
+\end{itemize}
+
+\subsubsection{CEM algorithm}
+This algorithm incorporates a classification step between the E and M steps of EM. Starting
+from an initial parameter $\theta^0$, an iteration of \code{CEM} consists of three steps.
+\begin{itemize}
+\item {\bf I step:} The missing values are imputed using the current MAP
+value given by the current value $\theta^{m-1}$ of the parameter as in the
+\code{EM} algorithm.
+\item {\bf E step:} The conditional probabilities $t^m_{ik}$ $(1
+\leq i \leq n, 1 \leq k \leq K)$ are computed for the current value of $\theta$ as done in the E step of EM.
+\item {\bf C step:} Generate labels ${\bz}^m=\{ {\bz}^m_1,...,{\bz}^m_n\}$ by assigning each
+  point ${\bx}_i$ to the component maximizing the conditional probability
+  $(t^m_{ik}, 1 \leq k \leq K)$.
+\item {\bf M step:} The maximum likelihood estimate of $\theta$ are computed as
+done in the M step of SEM.
+\end{itemize}
+CEM is a {\em K-means}-like algorithm and contrary to \code{EM}, it converges in a
+finite number of iterations. \code{CEM} is not maximizing the observed log-likelihood
+$L$ (\ref{eq:vraisemblance}) but is maximizing in
+$\theta$ and $\bz_{1},\ldots,\bz_{n}$ the complete data log-likelihood
+\begin{equation} \label{cl}
+  CL(\theta, {\bf z}_{1},\ldots,{\bf z}_{n}|{\bf
+    x}_{1},\ldots,{\bf x}_{n}) = \sum_{i=1}^n\sum_{k=1}^{K}
+  z_{ik}\ln[p_{k} h({\bf x}_i|\blambda_k)].
+\end{equation}
+where the missing component indicator vector $\bz_i$ of each sample point is
+included in the data set. As a consequence, \code{CEM} is not expected to converge to
+the maximum likelihood estimate of $\theta$ and yields inconsistent estimates
+of the parameters especially when the mixture components are overlapping or are
+in disparate proportions (see \cite{McLachlanPeel00}, Section 2.21).
+
+\subsection{Defining an algorithm in rtkpp}\label{subsubsec:algo}
+
+All the algorithms (EM, \code{SEM}, \code{CEM} and SemiSEM) are encoded in a \code{S4} class
+and can be created using the utility function \code{clusterAlgo}. This function
+take as input three parameters:
+\begin{itemize}
+\item \code{algo}: name of the algorithm to define (\code{"EM"},
+\code{"SEM"}, \code{"CEM"} or \code{"SemiSEM"}),
+\item \code{nbIteration}: maximal number of iteration to perform,
+\item \code{epsilon}:  threshold to use in order to stop the iterations
+(not used by the \code{SEM} algorithm).
+\end{itemize}
+<< >>=
+clusterAlgo(algo="EM",nbIteration=100,epsilon=1e-08)
+@
+
+\subsection{Initialization step}\label{subsubsec:init}
+
+All the estimation algorithms need a first value of the parameter $\theta$.
+There is three kinds of initialization that can be performed: by generating
+directly random parameters, by using random classes labels, by using random
+fuzzy classes. In order to prevent unlucky initialization, multiple
+initialization with a limited number of estimation steps are performed and
+the best initialization is conserved.
+
+The initialization step is encoded  in a \code{S4} class and can be created
+using the utility function \code{clusterInit}. This function take as input
+four parameters:
+\begin{itemize}
+\item \code{method}: name of the initialization to perform (\code{"random"},
+\code{"class"} or \code{"fuzzy"}),
+\item \code{nbInit} number of initialization to do,
+\item \code{algo} name of the algorithm to use during the limited
+estimation steps,
+\item \code{nbIteration} maximal number of iteration to perform during the
+initialization algorithm,
+\item \code{epsilon} threshold to use in order to stop the iterations (see
+also \ref{subsubsec:algo}).
+\end{itemize}
+
+<< >>=
+clusterInit(method="random", nbInit= 2, algo="CEM", nbIteration=10,epsilon=1e-04)
+@
+
+\subsection{Estimation Strategy}
+
+A strategy is a way to find a good estimate of the parameters of a mixture model
+and to avoid local maxima of the likelihood function.
+A strategy is an efficient three steps Search/Run/Select way for
+maximizing the likelihood:
+\begin{enumerate}
+\item Build a search method for generating \code{nbShortRun} initial positions.
+This is based on the initialization method we describe previously.
+\item Run a short algorithm for each initial position.
+\item Select the solution providing the best likelihood and launch a long
+run algorithm from this solution.
+\end{enumerate}
+
+A strategy is encoded in a S4 class and can be created using the utility
+function \code{clusterStrategy()}. This function have no mandatory argument but
+the default strategy can be tuned. In table~\ref{tab:clusterStrategy} the reader
+will find a summary of all the input parameters of the \code{clusterStrategy()}
+function.
+
+\begin{table}[htb]
+\centering
+\begin{tabular}{|p{0.3\textwidth}|p{0.65\textwidth}|}
+\hline
+Input Parameter & Description \\
+\hline
+\code{nbTry} & Integer defining the number of tries. \code{nbTry}
+  must be a positive integer. Default value is 1.\\
+\hline
+\code{nbInit} & Integer defining the number of initialization to do during the
+initialization step. Default is 3. \\
+\hline
+\code{initAlgo} & List of character string with the estimation
+  algorithm to use in the initialization step.  Possible values are \code{"EM"},
+  \code{"SEM"}, \code{"CEM"}, \code{"SemiSEM"}. Default value is
+  \code{"SEM"}.\\
+\hline
+\code{nbInitIteration} & Integer defining the maximal number of iteration in
+  \code{initAlgo} algorithm. \code{nbInitIteration} can be 0. Default value is
+  20.\\
+\hline
+\code{initEpsilon} & Real defining the epsilon value for the algorithm.
+\code{initEpsilon} is not used by the \code{SEM} algorithm. Default value is
+0.01.\\
+\hline
+\code{nbShortRun} & Integer defining the number of short run to try
+(the strategy launch an initialization before each short run). Default value is
+5.\\
+\hline
+\code{shortRunAlgo} & List of character string with the estimation
+  algorithm to use in s short run. Possible values are \code{"EM"},
+  \code{"SEM"}, \code{"CEM"}, \code{"SemiSEM"}. Default value is
+  \code{"EM"}.\\
+\hline
+\code{nbShortIteration} & Integers defining the maximal number of iterations
+in a short run. Default value is 100.\\
+\hline
+\code{shortEpsilon} & Real defining the epsilon value in
+  a short run. Only available if \code{shortRunAlgo} is not \code{"SEM"}.
+  Default value is 1e-04.\\
+\hline
+\code{longRunAlgo} & List of character string with the estimation
+  algorithm to use for the long run. Possible values are \code{"EM"},
+  \code{"SEM"}, \code{"CEM"}, \code{"SemiSEM"}. Default value is
+  \code{"EM"}.\\
+\hline
+\code{nbLongIteration} & Integers defining the maximal number of iterations
+in the the long run. Default value is 1000.\\
+\hline
+\code{longEpsilon} & Real defining the epsilon value in
+  the long run. Only available if \code{longRunAlgo} is not \code{"SEM"}.
+  Default value is 1e-07.\\
+\hline
+\end{tabular}
+\caption{List of all the input parameters of the  \code{clusterStrategy()} function.}
+\label{tab:clusterStrategy}
+\end{table}
+
+<< >>=
+clusterStrategy(nbTry=2, nbInit=5, initMethod="class"
+                       , initAlgo="CEM", nbInitIteration=10, initEpsilon=1e-02
+                       , nbShortRun=5
+                       , shortRunAlgo="EM", nbShortIteration=50, shortEpsilon=1e-04
+                       , longRunAlgo="EM", nbLongIteration=100, longEpsilon=1e-08)
+@
+Users have to take care that there will be \code{nbInit} x \code{nbShortRun}
+starting point of the algorithm.
+
+\section{Implemented Mixture Models}\label{sec:Implemented}
+\subsection{Multivariate (diagonal) Gaussian Mixture Models}
+
+A Gaussian density on $\R$ is a density of the form:
+\begin{equation}\label{law::gaussian-density}
+f(x;\mu,\sigma) = \frac{1}{\sqrt{2\pi} \sigma} \exp\left\{- \frac{(x-\mu)^2}{2\sigma^2}\right\} \quad \sigma>0.
+\end{equation}
+
+A joint diagonal Gaussian density on $\Rd$ is a density of the form:
+\begin{equation}\label{law::joint-gaussian-density}
+h(\bx;\bmu,\bsigma) = \prod_{j=1}^d f(x^j;\mu^j,\sigma^j) \quad \sigma^j>0.
+\end{equation}
+The parameters $\bmu=(\mu^1,\ldots,\mu^d)$ are the position parameters and the
+parameters $\bsigma=(\sigma^1,\ldots,\sigma^d)$ are the standard-deviation
+parameters. Assumptions on the position and standard-deviation parameters among
+the variables and the components lead to define four families of mixture model.
+
+Let us write a multidimensional Gaussian mixture model in the from \verb+gaussian_s*+
+with \verb+s*+, the different ways to parameterize the standard-deviation
+parameters of a Gaussian mixture:
+\begin{itemize}
+\item \verb+sjk+ means that we have one standard-deviation parameter for each
+variable and for each component,
+\item \verb+sk+ means that the standard-deviation parameters are the same for
+all the variables inside a component,
+\item \verb+sj+ means that the standard-deviation parameters are different for
+each variable but are equals between the components,
+\item and finally \verb+s+ means that the standard-deviation parameters are all
+equals.
+\end{itemize}
+
+The \verb+gaussian_sjk+ model is the most general model and have a density
+function of the form
+\begin{equation}\label{eq:f_sjk}
+  f({\bx}|\theta) = \sum_{k=1}^K p_k
+  \prod_{j=1}^d g(x^j_{i}| \mu^j_{k}, \sigma^j_{k}).
+\end{equation}
+
+It is possible to get a vector of Gaussian model names using the
+\code{clusterDiagGaussianNames} function.
+
+<< >>=
+clusterDiagGaussianNames()
+clusterDiagGaussianNames("all", "equal", "free")
+clusterValidDiagGaussianNames(c("gaussian_pk_sjk","poisson_p_ljk"))
+@
+
+
+\subsection{Multivariate categorical Mixture Models}
+
+A Categorical probability distribution on a finite space
+$\mathcal{X} = \{1,\ldots,L\}$ is a probability distribution of the form:
+\begin{equation}\label{law::categorical}
+P(x=l) = p_l \quad p_l>0,\, l\in \mathcal{X},
+\end{equation}
+with the constraint $p_1+\ldots+p_L = 1.$
+
+A joint Categorical probability distribution on $\Xd$ is a probability
+distribution of the form:
+\begin{equation}\label{law::joint-categorical-probability}
+P(\bx=(x_1,\ldots,x_d)) = \prod_{j=1}^d p^j_{x_j}
+\end{equation}
+The parameters $\bp=(p^1,\ldots,p^d)$ are the probabilities of the possibles
+outcomes. Assumptions on the probabilities among the variables and the
+components lead to define two families of mixture model.
+
+<< >>=
+clusterCategoricalNames()
+clusterCategoricalNames("all", "equal")
+clusterValidCategoricalNames(c("categorical_pk_pjk","categorical_p_pk"))
+@
+
+\subsection{Multivariate Poisson Mixture Models}
+
+A Poisson probability distribution is a probability over $\N$ of the form
+\begin{equation}\label{law::poisson-density}
+p(k;\lambda) = \frac{ \lambda^k}{k!} e^{-\lambda}  \quad \lambda>0.
+\end{equation}
+
+A joint Poisson probability on $\Nd$ is a probability distribution of the form
+\begin{equation}\label{law::joint-poisson-density}
+h(\bx;\blambda) = \prod_{j=1}^d p(x^j;\lambda^j)  \quad \lambda^j>0.
+\end{equation}
+The parameters $\blambda=(\lambda^1,\ldots,\lambda^d)$ are the mean
+parameters. Assumptions on the mean among the variables and the
+components lead to define three families of mixture model.
+
+<< >>=
+clusterPoissonNames()
+clusterPoissonNames("all")
+clusterValidPoissonNames(c("poisson_pk_ljk","poisson_p_ljlk"))
+@
+
+\subsection{Multivariate Gamma Mixture Models}
+
+A gamma density on $\R_+$ is a density of the form:
+\begin{equation}\label{law::gamma-density}
+g(x;a,b) = \frac{ \left(x\right)^{a-1} e^{-x/b}}{\Gamma(a) \left(b\right)^{a}} \quad a>0, \quad b>0.
+\end{equation}
+A joint gamma density on $\Rd_+$ is a density of the form:
+\begin{equation}\label{law::joint-gamma-density}
+h(\bx;\ba,\bb) = \prod_{j=1}^d g(x^j;a^j,b^j) \quad a^j>0, \quad b^j>0.
+\end{equation}
+The parameters $\ba=(a^1,\ldots,a^d)$ are the shape parameters and the
+parameters $\bb=(b^1,\ldots,b^d)$ are the scale parameters. Assumptions on the
+scale and shape parameters among the variables and the components lead to
+define twelve families of mixture model. Let us write a multidimensional gamma
+mixture model in the from \verb+gamma_a*_b*+ with \verb+a*+ (resp. \verb+b*+),
+the different ways to parameterize the shape (resp. scale) parameters of a
+gamma mixture:
+\begin{itemize}
+\item \verb+ajk+ (resp. \verb+bjk+) means that we have one shape (resp. scale)
+parameter for each variable and for each component,
+\item \verb+ak+ (resp. \verb+bk+) means that the shape (resp. scale) parameters
+are the same for all the variables inside a component,
+\item \verb+aj+ (resp. \verb+bj+) means that the shape (resp. scale) parameters
+are different for each variable but are equals between the components,
+\item and finally \verb+a+ (resp. \verb+b+) means that the shape (resp. scale)
+parameters are the same for all the variables and all the components.
+\end{itemize}
+
+The models we can build in this way are summarized in the table
+\ref{tab:gammamodels}, in parenthesis we give the number of parameters of each
+models.
+\begin{table}
+\begin{center}
+\begin{tabular}{lllll}
+           &  ajk                 &  ak          &  aj           &  a \\
+bjk & \begin{tabular}[t]{@{}c@{}} \verb+gamma_ajk_bjk+ \\ (2dK) \end{tabular}
+    & \begin{tabular}[t]{@{}c@{}} \verb+gamma_ak_bjk+  \\ (dK + K)  \end{tabular}
+    & \begin{tabular}[t]{@{}c@{}} \verb+gamma_aj_bjk+  \\ (dK+d) \end{tabular}
+    & \begin{tabular}[t]{@{}c@{}} \verb+gamma_a_bjk+   \\ (dK+1) \end{tabular}
+    \\
+bk  & \begin{tabular}[t]{@{}c@{}} \verb+gamma_ajk_bk+ \\  (dK+K)  \end{tabular}
+    & \begin{tabular}[t]{@{}c@{}} \verb+gamma_ak_bk+ \\ (2K)      \end{tabular}
+    & \begin{tabular}[t]{@{}c@{}} \verb+gamma_aj_bk+ \\ (K+d)  \end{tabular}
+    & \begin{tabular}[t]{@{}c@{}} \verb+gamma_a_bk+ \\ (K+1)  \end{tabular}
+    \\
+bj  & \begin{tabular}[t]{@{}c@{}} \verb+gamma_ajk_bj+  \\ (dK+d) \end{tabular}
+    & \begin{tabular}[t]{@{}c@{}} \verb+gamma_ak_bj+  \\(K+d)    \end{tabular} & NA  & NA  \\
+b   & \begin{tabular}[t]{@{}c@{}} \verb+gamma_ajk_b+  \\  (dK+1) \end{tabular}
+    & \begin{tabular}[t]{@{}c@{}} \verb+gamma_ak_b+  \\ (K+1)     \end{tabular} & NA & NA \\
+\end{tabular}
+\end{center}
+\caption{The twelve multidimensional gamma mixture models. In parenthesis the
+number of parameters of each model.}
+\label{tab:gammamodels}
+\end{table}
+
+The \verb+gamma_ajk_bjk+ model is the most general and have a density function of the form
+\begin{equation}\label{eq:gamma_ajk_bjk}
+  f({\bx}_i|\theta) = \sum_{k=1}^K p_k \prod_{j=1}^d g(x^j_{i}| a^j_{k},b^j_{k}).
+\end{equation}
+All the other models can be derived from this model by dropping the indexes in
+$j$ and/or $k$ from the expression (\ref{eq:gamma_ajk_bjk}). For example the
+mixture model $\verb+gamma_aj_bk+$ has a density function of the form
+\begin{equation}\label{eq:gamma_aj_bk}
+  f({\bx}_i|\theta) = \sum_{k=1}^K p_k \prod_{j=1}^d g(x^j_{i}| a^j,b^{k}).
+\end{equation}
+
+<< >>=
+clusterGammaNames()
+clusterGammaNames("all", "equal")
+clusterValidGammaNames(c("gamma_pk_ajbk","gamma_p_ajk_bjk"))
+@
+
+\bibliography{rtkpp}
+
+
+\end{document}

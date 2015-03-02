@@ -1,0 +1,10 @@
+## Use the R_HOME indirection to support installations of multiple R version
+PKG_CXXFLAGS = `${R_HOME}/bin/Rscript -e "Rcpp:::CxxFlags()"` \
+               `${R_HOME}/bin/Rscript -e "rtkpp:::CxxFlags()"`
+PKG_CPPFLAGS = `${R_HOME}/bin/Rscript -e "rtkpp:::CppFlags()"` \
+                $(SHLIB_OPENMP_CXXFLAGS)
+
+PKG_LIBS = `${R_HOME}/bin/Rscript -e "Rcpp:::LdFlags()"` \
+           `$(R_HOME)/bin/Rscript -e "rtkpp:::LdFlags()"` \
+           $(SHLIB_OPENMP_CFLAGS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
+

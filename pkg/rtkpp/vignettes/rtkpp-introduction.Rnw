@@ -37,7 +37,12 @@
 %---------------------
 
 \usepackage{Sweave}
-
+%% need no \usepackage{Sweave.sty}
+<<prelim,echo=FALSE,print=FALSE>>=
+library(rtkpp)
+rtkpp.version <- packageDescription("rtkpp")$Version
+rtkpp.date <- packageDescription("rtkpp")$Date
+@
 % Title Page
 \title{ rtkpp: R and stk++ integration using Rcpp}
 \author{Serge Iovleff}
@@ -68,9 +73,7 @@ to the \texttt{RcppEigen} \cite{CRAN:RcppEigen,JSS:RcppEigen} and
 
 The current version of the stk++ library is given below
 << >>=
-require("rtkpp")
-stkVersion <- .Call("stk_version", FALSE, PACKAGE="rtkpp")
-stkVersion
+.Call("stk_version", FALSE, PACKAGE="rtkpp")
 @
 
 \section{Wrapping \texttt{R} data by \texttt{stk++} arrays}

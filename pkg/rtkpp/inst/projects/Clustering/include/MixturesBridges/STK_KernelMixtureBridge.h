@@ -96,9 +96,9 @@ class KernelMixtureBridge: public IMixtureBridge< KernelMixtureBridge<Id,Data> >
      *  @param idData id name of the mixture model
      *  @param nbCluster number of cluster
      **/
-    KernelMixtureBridge( Data* p_data, std::string const& idData, int nbCluster)
+    KernelMixtureBridge( Data* p_gram, std::string const& idData, int nbCluster)
                        : Base( idData, nbCluster)
-                       , p_data_(p_data)
+                       , p_gram_(p_data)
     { initializeMixture();}
     /** copy constructor */
     KernelMixtureBridge( KernelMixtureBridge const& bridge)

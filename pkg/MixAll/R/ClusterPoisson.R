@@ -22,7 +22,7 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
-#' @include ClusterModelNames.R IClusterModel.R global.R
+#' @include ClusterModelNames.R IClusterModel.R
 NULL
 
 #-----------------------------------------------------------------------
@@ -30,7 +30,7 @@ NULL
 #'
 #' This function computes the optimal poisson mixture model according
 #' to the [\code{criterion}] among the list of model given in [\code{modelNames}]
-#' and the number of clusters given in [\code{nbCluster}], using the strategy 
+#' and the number of clusters given in [\code{nbCluster}], using the strategy
 #' specified in [\code{strategy}].
 #'
 #' @param data frame or matrix containing the data. Rows correspond to observations
@@ -218,7 +218,6 @@ setMethod(
   }
 )
 
-#-----------------------------------------------------------------------
 #' Definition of the [\code{\linkS4class{ClusterPoisson}}] class
 #'
 #' This class inherits from the [\code{\linkS4class{IClusterModelBase}}] class.

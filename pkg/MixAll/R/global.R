@@ -39,7 +39,6 @@
 #'
 NULL
 
-#-----------------------------------------------------------------------
 #' Print a rtkpp class to standard output.
 #'
 #' @param x a rtkpp object: a \code{\linkS4class{ClusterStrategy}},
@@ -67,7 +66,6 @@ NULL
 #'
 NULL
 
-#-----------------------------------------------------------------------
 #' Show description of a rtkpp class to standard output.
 #'
 #' @param object a rtkpp object: a \code{\linkS4class{ClusterStrategy}},
@@ -94,8 +92,8 @@ NULL
 #'   show(algo)
 NULL
 
-#-----------------------------------------------------------------------
-#' Produce summary of a rtkpp class. 
+
+#' Produce summary of a rtkpp class.
 #'
 #' @param object any cluster model deriving from a \code{\linkS4class{IClusterModelBase}} object.
 #' @param ... further arguments passed to or from other methods
@@ -114,29 +112,3 @@ NULL
 #'   summary(model)
 #'
 NULL
-
-#' Return the missing values of a component or a cluster class.
-#'
-#' The missing methods allow the user to get the extrapolated mssing
-#' values from a mixture model.
-#'
-#' @param x an object that can return the extrapolated missing values
-#'
-#' @return A matrix with three columns (row index, column index, value)
-#'
-#' @name missingValues
-#' @docType methods
-#' @rdname missingValues-methods
-#' @exportMethod missingValues
-#'
-#' @examples
-#'   data(geyser)
-#'   model <- clusterDiagGaussian(geyser,3)
-#'   missingValues(model)
-setGeneric(
-  name = "missingValues",
-  function(x)
-  { standardGeneric("missingValues")}
-)
-
-

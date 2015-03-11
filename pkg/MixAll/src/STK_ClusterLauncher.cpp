@@ -229,7 +229,7 @@ Real ClusterLauncher::selectHeteroBestModel()
       if (!sameProp) { p_current = new MixtureComposer(nbSample, K);}
       else           { p_current = new MixtureComposerFixedProp(nbSample, K);}
       // create all mixtures
-      static_cast<MixtureComposer*>(p_current)->createMixtures(manager_);
+      manager_.createMixtures(*static_cast<MixtureComposer*>(p_current));
       // run estimation and get results if possible
       if (!facade.run()) { msg_error_ += facade.error();}
       // compute criterion and update model if necessary

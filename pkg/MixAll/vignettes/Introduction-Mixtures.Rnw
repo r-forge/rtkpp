@@ -3,16 +3,15 @@
 
 \usepackage{Sweave}
 
-%\VignetteIndexEntry{rtkpp-cluster}
-%\VignetteKeywords{rtkpp, Rcpp, C++, R}
-%\VignettePackage{rtkpp}
+%\VignetteIndexEntry{MixAll-cluster}
+%\VignetteKeywords{MixAll, Rcpp, C++, R}
+%\VignettePackage{MixAll}
 
 %% need no \usepackage{Sweave.sty}
 <<prelim,echo=FALSE,print=FALSE>>=
-library(rtkpp)
-rtkpp.version <- packageDescription("rtkpp")$Version
-rtkpp.date <- packageDescription("rtkpp")$Date
-now.date <- strftime(Sys.Date(), "%B %d, %Y")
+library(MixAll)
+MixAll.version <- packageDescription("MixAll")$Version
+MixAll.date <- packageDescription("MixAll")$Date
 @
 
 \usepackage[utf8]{inputenc}
@@ -67,10 +66,10 @@ now.date <- strftime(Sys.Date(), "%B %d, %Y")
 
 %---------------------------------------------------------
 \title{Generative Clustering with missing values using
-the \pkg{rtkpp} package}
+the \pkg{MixAll} package}
 \Plaintitle{Generative Clustering with missing
-values using the rtkpp package}
-\Shorttitle{Generative Clustering using the \pkg{rtkpp}
+values using the MixAll package}
+\Shorttitle{Generative Clustering using the \pkg{MixAll}
 package}
 
 \Abstract{
@@ -78,7 +77,10 @@ package}
   that can be accessed from \proglang{R} \citep{R:Main} using the \pkg{MixAll}
   package. It is possible to cluster gaussian, gamma, categorical and
   Poisson mixture models or a combination of these models in case of
-  heterogeneous data.
+  heterogeneous data. Moreover, if there is mising values in the original
+  data set, these missing values will be imputed during the estimation
+  process. These imputations can be biased or exact estimators of the Maximum
+  A Posteriori (MAP) values depending of the algorithm used.
 }
 
 \Keywords{\proglang{R}, \proglang{C++}, Clustering, missing values}
@@ -129,10 +131,10 @@ In this paper we will first present the mixture models, the estimation
 algorithm, the initialization method and the strategy that can be used in order
 to find a good estimate of the parameters of the mixture model.
 In a second step we present shortly the different mixture models implemented in
-STK++ that can be used form rtkpp. Finally we give some examples on various data
+STK++ that can be used form MixAll. Finally we give some examples on various data
 set.
 
-\section{Mixture Modeling}
+\section{Mixture Modeling Estimation Tools}
 
 Let $\X$ be an arbitrary measurable space and let ${\bx}=\{{\bx}_1,...,{\bx}_n\}$
 be $n$ independent vectors in $\Xd$ such that each ${\bx}_i$ arises from a
@@ -161,7 +163,7 @@ should be the integrated log-likelihood
   \ln \left(\sum_{k=1}^K p_k h(\bx_i^o,\bx_i^m|\blambda_k, \balpha)\right)
   d\bx_i^m.
 \end{equation}
-In the package \pkg{rtkpp}, this quantity is approximated using a Monte-Carlo
+In the package \pkg{MixAll}, this quantity is approximated using a Monte-Carlo
 estimator by the \code{SEM} or the \code{SemiSEM} algorithms and by a biased
 estimator by the \code{EM} or the \code{CEM} algorithms.
 
@@ -173,7 +175,7 @@ the observed data ${\bx}$. The sample ${\bz}$ is {\em unknown} so that the
 maximum likelihood estimation of mixture models is traditionally performed via
 the \code{EM} algorithm \cite{Dempster97} or by a stochastic version of
 \code{EM} called SEM (see \cite{McLachlanPeel00}), or by a k-means like
-algorithm called \code{CEM}. In the \pkg{rtkpp} package it is also possible to
+algorithm called \code{CEM}. In the \pkg{MixAll} package it is also possible to
 use an algorithm called \code{SemiSEM} which is an intermediate between the
 \code{EM} and \code{SEM} algorithm. In case there is no missing values,
 \code{SemiSEM} and \code{EM} are equivalents.
@@ -284,12 +286,13 @@ $\theta$ and $\bz_{1},\ldots,\bz_{n}$ the complete data log-likelihood
   z_{ik}\ln[p_{k} h({\bf x}_i|\blambda_k)].
 \end{equation}
 where the missing component indicator vector $\bz_i$ of each sample point is
-included in the data set. As a consequence, \code{CEM} is not expected to converge to
-the maximum likelihood estimate of $\theta$ and yields inconsistent estimates
-of the parameters especially when the mixture components are overlapping or are
-in disparate proportions (see \cite{McLachlanPeel00}, Section 2.21).
+included in the data set. As a consequence, \code{CEM} is not expected to
+converge to the maximum likelihood estimate of $\theta$ and yields inconsistent
+estimates of the parameters especially when the mixture components are
+overlapping or are in disparate proportions (see \cite{McLachlanPeel00},
+Section 2.21).
 
-\subsection{Defining an algorithm in rtkpp}\label{subsubsec:algo}
+\subsection{Defining an algorithm in MixAll}\label{subsubsec:algo}
 
 All the algorithms (EM, \code{SEM}, \code{CEM} and SemiSEM) are encoded in a \code{S4} class
 and can be created using the utility function \code{clusterAlgo}. This function
@@ -418,8 +421,8 @@ clusterStrategy(nbTry=2, nbInit=5, initMethod="class"
                        , shortRunAlgo="EM", nbShortIteration=50, shortEpsilon=1e-04
                        , longRunAlgo="EM", nbLongIteration=100, longEpsilon=1e-08)
 @
-Users have to take care that there will be \code{nbInit} x \code{nbShortRun}
-starting point of the algorithm.
+Users have to take care that there will be \code{nbInit} $\times$
+\code{nbShortRun} starting points of the algorithm.
 
 \section{Implemented Mixture Models}\label{sec:Implemented}
 \subsection{Multivariate (diagonal) Gaussian Mixture Models}
@@ -584,10 +587,10 @@ mixture model $\verb+gamma_aj_bk+$ has a density function of the form
 << >>=
 clusterGammaNames()
 clusterGammaNames("all", "equal")
-clusterValidGammaNames(c("gamma_pk_ajbk","gamma_p_ajk_bjk"))
+clusterValidGammaNames(c("gamma_pk_aj_bk","gamma_p_ajk_bjk"))
 @
 
-\bibliography{rtkpp}
+\bibliography{MixAll}
 
 
 \end{document}

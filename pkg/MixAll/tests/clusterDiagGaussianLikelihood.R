@@ -2,7 +2,7 @@
 #
 # Author: iovleff
 #-----------------------------------------------------------------------
-library(rtkpp)
+library(MixAll)
 data(iris)
 
 gauss_model <- clusterDiagGaussian(iris[1:4], nbCluster = 3:4, modelNames = clusterDiagGaussianNames()

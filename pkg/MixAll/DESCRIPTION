@@ -16,6 +16,7 @@ LinkingTo: rtkpp
 Roxygen: list(wrap = FALSE)
 SystemRequirements: GNU make
 Collate:
+    'global.R'
     'ClusterAlgo.R'
     'ClusterInit.R'
     'ClusterStrategy.R'
@@ -27,5 +28,5 @@ Collate:
     'ClusterGamma.R'
     'ClusterModelNames.R'
     'ClusterPlot.R'
-    'global.R'
+    'missingValues.R'
     'MixAll.R'

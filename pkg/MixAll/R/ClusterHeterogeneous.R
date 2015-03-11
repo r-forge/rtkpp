@@ -22,7 +22,7 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
-#' @include  global.R ClusterModelNames.R IClusterModel.R
+#' @include ClusterModelNames.R IClusterModel.R
 NULL
 
 #-----------------------------------------------------------------------
@@ -357,7 +357,7 @@ setMethod(
     }
 )
 
-# get logisitic representation
+# get logistic representation
 .visut <- function(t, gp)
 { m <- min(t[,gp]);
   if (m==0) t[,gp] = t[,gp] + 1e-30;

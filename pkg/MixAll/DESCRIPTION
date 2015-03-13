@@ -10,7 +10,7 @@ Depends:
     rtkpp
 Imports:
     methods
-Description: Algorithms and methods for estimating parametric mixture models.
+Description: Algorithms and methods for estimating parametric mixture models with missing data.
 License: GPL (>= 2)
 LinkingTo: rtkpp
 Roxygen: list(wrap = FALSE)

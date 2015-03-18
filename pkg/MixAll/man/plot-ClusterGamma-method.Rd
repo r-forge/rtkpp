@@ -24,7 +24,9 @@ using the estimated parameters and partition.
 \examples{
 ## for quantitative case
   data(iris)
-  model <- clusterGamma(iris[1:4], 3, strategy = clusterFastStrategy())
+  model <- clusterGamma( data=iris[1:4], nbCluster=3
+                       , modelNames=clusterGammaNames(prop = "equal")
+                       , strategy = clusterFastStrategy())
 \dontrun{
   plot(model)
   plot(model, c(1,3))

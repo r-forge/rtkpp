@@ -43,12 +43,13 @@ model <- clusterHeterogeneous(ldata, lnames, nbCluster=2:5, strategy = clusterFa
 
 ## get summary
 summary(model)
+
 ## print model
 \dontrun{
 print(model)
 }
 ## get estimated missing values
-#missingValues(model)
+missingValues(model)
 
 ## use graphics functions
 \dontrun{

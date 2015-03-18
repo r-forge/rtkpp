@@ -42,7 +42,9 @@ x[round(runif(5,1,nrow(geyser))), 1] <- NA
 x[round(runif(5,1,nrow(geyser))), 2] <- NA
 
 ## use graphics functions
-model <- clusterGamma(data=x, nbCluster=2:3, modelNames=clusterGammaNames(prop = "equal"), strategy = clusterFastStrategy())
+model <- clusterGamma( data=x, nbCluster=2:3
+                     , modelNames=clusterGammaNames(prop = "equal", scaleBetweenCluster="free")
+                     , strategy = clusterFastStrategy())
 
 \dontrun{
 plot(model)

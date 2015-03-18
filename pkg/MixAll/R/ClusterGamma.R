@@ -54,7 +54,9 @@ NULL
 #' x[round(runif(5,1,nrow(geyser))), 2] <- NA
 #'
 #' ## use graphics functions
-#' model <- clusterGamma(data=x, nbCluster=2:3, modelNames=clusterGammaNames(prop = "equal"), strategy = clusterFastStrategy())
+#' model <- clusterGamma( data=x, nbCluster=2:3
+#'                      , modelNames=clusterGammaNames(prop = "equal", scaleBetweenCluster="free")
+#'                      , strategy = clusterFastStrategy())
 #'
 #' \dontrun{
 #' plot(model)
@@ -376,7 +378,9 @@ setMethod(
 #' @examples
 #'   ## for quantitative case
 #'   data(iris)
-#'   model <- clusterGamma(iris[1:4], 3, strategy = clusterFastStrategy())
+#'   model <- clusterGamma( data=iris[1:4], nbCluster=3
+#'                        , modelNames=clusterGammaNames(prop = "equal")
+#'                        , strategy = clusterFastStrategy())
 #' \dontrun{
 #'   plot(model)
 #'   plot(model, c(1,3))

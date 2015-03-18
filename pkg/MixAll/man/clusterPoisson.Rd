@@ -37,9 +37,11 @@ specified in [\code{strategy}].
 \examples{
 ## A quantitative example with the DebTrivedi data set.
 data(DebTrivedi)
-dt <- DebTrivedi[, c(1, 6,8, 15)]
+dt <- DebTrivedi[1:500, c(1, 6,8, 15)]
 
-model <- clusterPoisson(data=dt, nbCluster=2, strategy = clusterFastStrategy())
+model <- clusterPoisson( data=dt, nbCluster=2
+                       , modelNames=clusterPoissonNames(prop = "equal")
+                       , strategy = clusterFastStrategy())
 
 ## use graphics functions
 \dontrun{

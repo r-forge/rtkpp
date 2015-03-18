@@ -34,12 +34,12 @@ setMethod(
   c("ClusterHeterogeneous"),
   function(x)
   {
-    res <- list();
     nbData <- length(x@ldata)
+    res <- vector("list", nbData)
     if(nbData>0)
     {
       for (l in 1:nbData)
-      { res[l]  <- x@ldata[[nbData-l+1]]@data;}
+      { res[[l]]  <- cbind(x@ldata[[l]]@missing, (x@ldata[[l]]@data)[x@ldata[[l]]@missing]);}
     }
     return(res)
   }

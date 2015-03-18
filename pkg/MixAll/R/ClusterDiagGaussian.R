@@ -63,7 +63,9 @@ NULL
 #' ## get summary
 #' summary(model)
 #' ## print model
+#' \dontrun{
 #' print(model)
+#' }
 #' ## get estimated missing values
 #' missingValues(model)
 #'

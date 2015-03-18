@@ -56,15 +56,15 @@ NULL
 #' ## get summary
 #' summary(model)
 #' ## print model
+#' \dontrun{
 #' print(model)
-#'\dontrun{
+#' }
 #' ## get estimated missing values
 #' #missingValues(model)
 #'
 #' ## use graphics functions
-#'
+#' \dontrun{
 #' plot(model)
-#'
 #' }
 #'
 #' @return An instance of the [\code{\linkS4class{ClusterHeterogeneous}}] class.

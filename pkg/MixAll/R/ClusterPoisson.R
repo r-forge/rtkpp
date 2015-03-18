@@ -51,7 +51,7 @@ NULL
 #' data(DebTrivedi)
 #' dt <- DebTrivedi[, c(1, 6,8, 15)]
 #'
-#' model <- clusterPoisson(data=dt, nbCluster=2:3, strategy = clusterFastStrategy())
+#' model <- clusterPoisson(data=dt, nbCluster=2, strategy = clusterFastStrategy())
 #'
 #' ## use graphics functions
 #' \dontrun{
@@ -61,7 +61,9 @@ NULL
 #' ## get summary
 #' summary(model)
 #' ## print model
+#' \dontrun{
 #' print(model)
+#' }
 #' ## get estimated missing values
 #' missingValues(model)
 #'

@@ -64,7 +64,8 @@ RcppExport SEXP clusterMixtureHeterogene( SEXP model, SEXP nbCluster, SEXP strat
   BEGIN_RCPP
 
 #ifdef _OPENMP
-  omp_set_num_threads(2);
+  int cores = Rcpp::as<int>(nbCore);
+  if (cores >= 1) { omp_set_num_threads(cores);}
 #endif
   // create a launcher
   ClusterLauncher launcher(model, nbCluster, strategy, critName);

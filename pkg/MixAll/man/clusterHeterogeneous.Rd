@@ -5,7 +5,7 @@
 \title{Create an instance of the [\code{\linkS4class{ClusterHeterogeneous}}] class}
 \usage{
 clusterHeterogeneous(data, modelNames, nbCluster = 2,
-  strategy = clusterFastStrategy(), criterion = "ICL")
+  strategy = clusterFastStrategy(), criterion = "ICL", nbCore = 1)
 }
 \arguments{
 \item{data}{[\code{list}] containing the data sets (matrices and/or data.frames).
@@ -23,6 +23,8 @@ the strategy to run. clusterStrategy() method by default.}
 \item{criterion}{character defining the criterion to select the best model.
 The best model is the one with the lowest criterion value.
 Possible values: "BIC", "AIC", "ICL". Default is "ICL".}
+
+\item{nbCore}{integer defining the number of processors to use (default is 1, 0 for all).}
 }
 \value{
 An instance of the [\code{\linkS4class{ClusterHeterogeneous}}] class.

@@ -43,6 +43,7 @@ NULL
 #' @param criterion character defining the criterion to select the best model.
 #' The best model is the one with the lowest criterion value.
 #' Possible values: "BIC", "AIC", "ICL". Default is "ICL".
+#' @param nbCore integer defining the number of processors to use (default is 1, 0 for all).
 #'
 #' @examples
 #' ## A quantitative example with the heart disease data set
@@ -72,7 +73,10 @@ NULL
 #' @author Serge Iovleff
 #' @export
 #'
-clusterHeterogeneous <- function(data, modelNames, nbCluster=2, strategy=clusterFastStrategy(), criterion="ICL")
+clusterHeterogeneous <- function( data, modelNames, nbCluster=2
+                                , strategy=clusterFastStrategy()
+                                , criterion="ICL"
+                                , nbCore = 1)
 {
   # check nbCluster
   nbClusterModel = length(nbCluster);
@@ -117,7 +121,7 @@ clusterHeterogeneous <- function(data, modelNames, nbCluster=2, strategy=cluster
   resFlag  <- FALSE;
   if (length(nbCluster) >0)
   {
-   resFlag = .Call("clusterMixtureHeterogene", model, nbCluster, strategy, criterion, PACKAGE="MixAll");
+   resFlag = .Call("clusterMixtureHeterogene", model, nbCluster, strategy, criterion, nbCore, PACKAGE="MixAll");
   }
   # set names
   if (resFlag != TRUE) {cat("WARNING: An error occurs during the clustering process");}

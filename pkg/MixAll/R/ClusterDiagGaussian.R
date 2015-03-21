@@ -44,6 +44,7 @@ NULL
 #' @param criterion character defining the criterion to select the best model.
 #' The best model is the one with the lowest criterion value.
 #' Possible values: "BIC", "AIC", "ICL". Default is "ICL".
+#' @param nbCore integer defining the number of processor to use (default is 1, 0 for all).
 #'
 #' @examples
 #' ## A quantitative example with the famous geyser data set
@@ -73,7 +74,11 @@ NULL
 #' @author Serge Iovleff
 #' @export
 #'
-clusterDiagGaussian <- function(data, nbCluster=2, modelNames=clusterDiagGaussianNames(), strategy=clusterFastStrategy(), criterion="ICL")
+clusterDiagGaussian <- function( data, nbCluster=2
+                               , modelNames=clusterDiagGaussianNames()
+                               , strategy=clusterFastStrategy()
+                               , criterion="ICL"
+                               , nbCore = 1)
 {
   # check nbCluster
   nbClusterModel = length(nbCluster);
@@ -106,7 +111,7 @@ clusterDiagGaussian <- function(data, nbCluster=2, modelNames=clusterDiagGaussia
   ResFlag <- FALSE;
   if (length(nbCluster) >0)
   {
-    resFlag = .Call("clusterMixture", model, nbCluster, modelNames, strategy, criterion, PACKAGE="MixAll");
+    resFlag = .Call("clusterMixture", model, nbCluster, modelNames, strategy, criterion, nbCore, PACKAGE="MixAll");
   }
   # set names
   if (resFlag != TRUE ) {cat("WARNING: An error occur during the clustering process");}

@@ -44,6 +44,7 @@ NULL
 #' @param criterion character defining the criterion to select the best model.
 #' The best model is the one with the lowest criterion value.
 #' Possible values: "BIC", "AIC", "ICL". Default is "ICL".
+#' @param nbCore integer defining the number of processor to use (default is 1, 0 for all).
 #'
 #' @examples
 #' ## A quantitative example with the birds data set
@@ -73,7 +74,11 @@ NULL
 #' @author Serge Iovleff
 #' @export
 #'
-clusterCategorical <- function(data, nbCluster=2, modelNames=c( "categorical_pk_pjk", "categorical_p_pjk"), strategy=clusterFastStrategy(), criterion="ICL")
+clusterCategorical <- function( data, nbCluster=2
+                              , modelNames=c( "categorical_pk_pjk", "categorical_p_pjk")
+                              , strategy=clusterFastStrategy()
+                              , criterion="ICL"
+                              , nbCore = 1)
 {
   # check nbCluster
   nbClusterModel = length(nbCluster);
@@ -105,7 +110,7 @@ clusterCategorical <- function(data, nbCluster=2, modelNames=c( "categorical_pk_
   model@strategy = strategy;
 
   # start estimation of the models
-  resFlag = .Call("clusterMixture", model, nbCluster, modelNames, strategy, criterion, PACKAGE="MixAll")
+  resFlag = .Call("clusterMixture", model, nbCluster, modelNames, strategy, criterion, nbCore, PACKAGE="MixAll")
   # set names
   # dimnames(model@plkj) <- list(NULL, colnames(model@component@data), NULL) # not working
   # should be done on the C++ side

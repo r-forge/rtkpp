@@ -45,6 +45,7 @@ NULL
 #' @param criterion character defining the criterion to select the best model.
 #' The best model is the one with the lowest criterion value.
 #' Possible values: "BIC", "AIC", "ICL". Default is "ICL".
+#' @param nbCore integer defining the number of processor to use (default is 1, 0 for all).
 #'
 #' @examples
 #' ## A quantitative example with the DebTrivedi data set.
@@ -73,7 +74,11 @@ NULL
 #' @author Serge Iovleff
 #' @export
 #'
-clusterPoisson <- function(data, nbCluster=2, modelNames= clusterPoissonNames(), strategy=clusterFastStrategy(), criterion="ICL")
+clusterPoisson <- function( data, nbCluster=2
+                          , modelNames= clusterPoissonNames()
+                          , strategy=clusterFastStrategy()
+                          , criterion="ICL"
+                          , nbCore = 1)
 {
   # check nbCluster
   nbClusterModel = length(nbCluster);
@@ -105,7 +110,7 @@ clusterPoisson <- function(data, nbCluster=2, modelNames= clusterPoissonNames(),
   model@strategy = strategy;
 
   # start estimation of the models
-  resFlag = .Call("clusterMixture", model, nbCluster, modelNames, strategy, criterion, PACKAGE="MixAll")
+  resFlag = .Call("clusterMixture", model, nbCluster, modelNames, strategy, criterion, nbCore, PACKAGE="MixAll")
 
   # set names
   if (resFlag != 1) {cat("WARNING: An error occur during the clustering process")}

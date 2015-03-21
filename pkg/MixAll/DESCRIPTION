@@ -12,7 +12,7 @@ Imports:
     methods
 Description: Algorithms and methods for estimating parametric mixture models with missing data.
 License: GPL (>= 2)
-LinkingTo: rtkpp
+LinkingTo: Rcpp, rtkpp
 Roxygen: list(wrap = FALSE)
 SystemRequirements: GNU make
 Collate:

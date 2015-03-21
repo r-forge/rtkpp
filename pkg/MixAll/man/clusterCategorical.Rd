@@ -5,7 +5,8 @@
 \title{Create an instance of the [\code{\linkS4class{ClusterCategorical}}] class}
 \usage{
 clusterCategorical(data, nbCluster = 2, modelNames = c("categorical_pk_pjk",
-  "categorical_p_pjk"), strategy = clusterFastStrategy(), criterion = "ICL")
+  "categorical_p_pjk"), strategy = clusterFastStrategy(), criterion = "ICL",
+  nbCore = 1)
 }
 \arguments{
 \item{data}{frame or matrix containing the data. Rows correspond to observations
@@ -23,6 +24,8 @@ the strategy to run. clusterStrategy() method by default.}
 \item{criterion}{character defining the criterion to select the best model.
 The best model is the one with the lowest criterion value.
 Possible values: "BIC", "AIC", "ICL". Default is "ICL".}
+
+\item{nbCore}{integer defining the number of processor to use (default is 1, 0 for all).}
 }
 \value{
 An instance of the [\code{\linkS4class{ClusterCategorical}}] class.

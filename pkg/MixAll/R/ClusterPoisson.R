@@ -114,7 +114,6 @@ clusterPoisson <- function( data, nbCluster=2
 
   # set names
   if (resFlag != 1) {cat("WARNING: An error occur during the clustering process")}
-  print(model@component@lambda)
   colnames(model@component@lambda) <- colnames(model@component@data)
   model
 }

@@ -34,8 +34,9 @@
 
 
 #include "RTKpp.h"
-
-using namespace STK;
+#include "ClusterFacade.h"
+#include "ClusterLauncher.h"
+#include "RDataHandler.h"
 
 /** @param model ClusterDiagModel S4 class
  *  @param nbCluster a vector with the number of clusters to test

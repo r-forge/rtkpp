@@ -33,9 +33,7 @@
  **/
 
 #include "RTKpp.h"
-
-namespace STK
-{
+#include "ClusterFacade.h"
 
 ClusterFacade::~ClusterFacade() { if (p_strategy_) delete p_strategy_;}
 
@@ -52,33 +50,33 @@ void ClusterFacade::createFullStrategy(Rcpp::S4 R_strategy)
 
   // get fields of the initMethod
   std::string method = R_initMethod.slot("method");
-  Clust::initType init = Clust::stringToInit(method);
+  STK::Clust::initType init = STK::Clust::stringToInit(method);
   int nbInit = R_initMethod.slot("nbInit");
   Rcpp::S4 R_initAlgo = R_initMethod.slot("algo");
 
   // get fields of the initAlgo
   std::string initAlgoName = R_initAlgo.slot("algo");
-  Clust::algoType initAlgo = Clust::stringToAlgo(initAlgoName);
+  STK::Clust::algoType initAlgo = STK::Clust::stringToAlgo(initAlgoName);
   int nbInitIter = R_initAlgo.slot("nbIteration");
-  Real initEpsilon = R_initAlgo.slot("epsilon");
+  STK::Real initEpsilon = R_initAlgo.slot("epsilon");
 
   // get fields of the shortAlgo
   std::string shortAlgoName = R_shortAlgo.slot("algo");
-  Clust::algoType shortAlgo = Clust::stringToAlgo(shortAlgoName);
+  STK::Clust::algoType shortAlgo = STK::Clust::stringToAlgo(shortAlgoName);
   int nbShortIter = R_shortAlgo.slot("nbIteration");
-  Real shortEpsilon = R_shortAlgo.slot("epsilon");
+  STK::Real shortEpsilon = R_shortAlgo.slot("epsilon");
 
   // get fields of the longAlgo
   std::string longAlgoName = R_longAlgo.slot("algo");
-  Clust::algoType longAlgo = Clust::stringToAlgo(longAlgoName);
+  STK::Clust::algoType longAlgo = STK::Clust::stringToAlgo(longAlgoName);
   int nbLongIter = R_longAlgo.slot("nbIteration");
-  Real longEpsilon = R_longAlgo.slot("epsilon");
+  STK::Real longEpsilon = R_longAlgo.slot("epsilon");
 
   // create STK objects
-  IMixtureInit* p_init = Clust::createInit(init, 1, initAlgo, nbInitIter, initEpsilon);
-  IMixtureAlgo* p_shortAlgo = Clust::createAlgo(shortAlgo, nbShortIter, shortEpsilon);
-  IMixtureAlgo* p_longAlgo = Clust::createAlgo(longAlgo, nbLongIter, longEpsilon);
-  p_strategy_ = Clust::createFullStrategy(p_model_, nbTry, nbInit, p_init, nbShortRun, p_shortAlgo, p_longAlgo);
+  STK::IMixtureInit* p_init = STK::Clust::createInit(init, 1, initAlgo, nbInitIter, initEpsilon);
+  STK::IMixtureAlgo* p_shortAlgo = STK::Clust::createAlgo(shortAlgo, nbShortIter, shortEpsilon);
+  STK::IMixtureAlgo* p_longAlgo = STK::Clust::createAlgo(longAlgo, nbLongIter, longEpsilon);
+  p_strategy_ = STK::Clust::createFullStrategy(p_model_, nbTry, nbInit, p_init, nbShortRun, p_shortAlgo, p_longAlgo);
 }
 
 bool ClusterFacade::run()
@@ -96,10 +94,6 @@ bool ClusterFacade::run()
   { msg_error_ = STKERROR_NO_ARG(MixtureFacade::run(),strategy is not set);}
   return flag;
 }
-
-
-}  // namespace STK
-
 
 
 

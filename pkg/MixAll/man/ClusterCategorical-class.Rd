@@ -15,6 +15,8 @@ a mixture model of the form
   =\sum_{k=1}^K p_k \prod_{j=1}^d \mathcal{M}(x_j;p_{jk},1) \\
    \quad {x} \in \{1,\ldots,L\}^d.
 }
+The probabilities can be assumed equal between all variables in order to
+reduce the number of parameters.
 }
 \section{Slots}{
 

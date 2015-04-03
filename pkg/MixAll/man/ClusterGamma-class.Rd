@@ -13,6 +13,8 @@ A gamma mixture model is a mixture model of the form:
   =\sum_{k=1}^K p_k \prod_{j=1}^d \gamma(x_j;a_{jk},b_{jk}) \\
    \quad {x} \in {R}^d.
 }
+Constraints can be added to the shape and/or scale in order to reduce the number
+of parameters.
 }
 \section{Slots}{
 

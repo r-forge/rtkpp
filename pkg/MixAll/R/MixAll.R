@@ -22,25 +22,28 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
-#' rtkpp is a R/STK++ bridge
+#' MixAll allows to estimate parametric mixture models with heterogeneous data
+#' set and missing data.
 #'
-#' This package contains the header files for the STK++ library.
-#' The typical usage is to install this package and list it in
-#' the \env{LinkingTo: } line in the \file{DESCRIPTION} file of
-#' other packages.
+#' This package contains methods allowing R users to use the clustering methods
+#' of the STK++ library.
 #'
 #' As described at the STK++ project's home page, \url{http://www.stkpp.org},
 #' STK++ is a versatile, fast, reliable and elegant collection of C++ classes
 #' for statistics, clustering, linear algebra, arrays (with an Eigen-like API),
 #' regression, dimension reduction, etc. Some functionalities provided by the
-#' library are available in the R environment as R functions.
+#' library are available in the R environment as R functions in MixAll.
 #'
 #' The available functionalities are:
 #' \enumerate{
-#'    \item the clusterDiagGaussian method allowing to discover, group structures in
+#'    \item the clusterDiagGaussian method allowing to discover group structures in
 #' multivariate data sets using diagonal Gaussian multidimensional models (8 models).
-#'    \item the clusterGamma method allowing to discover, group structures in
+#'    \item the clusterGamma method allowing to discover group structures in
 #' multivariate data sets using gamma multidimensional models (24 models).
+#'    \item the clusterPoisson method allowing to discover group structures in
+#' multivariate data sets using poisson multidimensional models (8 models).
+#'    \item the clusterHeterogeneous method allowing to discover group structures in
+#' heterogeneous data sets.
 #'  }
 #'
 #' \tabular{ll}{
@@ -48,16 +51,16 @@
 #'   Type: \tab Package\cr
 #'   Version: \tab 0.8.1\cr
 #'   Date: \tab 2014-07-05\cr
-#'   License: \tab GPL for the rtkpp side, LGPL for the stkpp side  + file LICENSE\cr
+#'   License: \tab GPL for the MixAll and rtkpp side, LGPL for the stkpp side  + file LICENSE\cr
 #'   LazyLoad: \tab yes\cr
 #' }
 #'
-#' @rdname rtkpp-package
-#' @name rtkpp
-#' @aliases rtkpp
+#' @rdname MixAll-package
+#' @name MixAll
+#' @aliases MixAll
 #' @docType package
 #' @keywords STK++, stkpp
-#' @import Rcpp
+#' @import Rcpp, rtkpp
 #'
 #' @author
 #' Author: Serge Iovleff \email{contact@@stkpp.org}
@@ -159,8 +162,10 @@ NULL
 #' for each person on board of the Titanic, and is based on data originally
 #' collected by the British Board of Trade and reprinted in:
 #' British Board of Trade (1990), "Report on the Loss of the Titanic (S.S.)".
-#'  British Board of Trade Inquiry Report (reprint).  Gloucester, UK: Allan Sutton Publishing.
+#' British Board of Trade Inquiry Report (reprint).  Gloucester, UK: Allan Sutton Publishing.
 #'
+#' This data set is also part of the Rmixmod package.
+#' 
 #' @name titanic
 #' @docType data
 #' @keywords datasets
@@ -171,11 +176,13 @@ NULL
 
 #' Qualitative data : morphological description of birds
 #'
-#' The dataset contains details on the morphology of birds (puffins). Each
+#' The data set contains details on the morphology of birds (puffins). Each
 #' individual (bird) is described by 6 qualitative variables. One variable for
 #' the gender and 5 variables giving a morphological description of the birds.
 #' There is 69 puffins divided in 2 sub-classes: lherminieri (34) and subalaris (35).
 #'
+#' This data set is also part of the Rmixmod package.
+#' 
 #' @format A data frame with 69 observations on the following 5 variables.
 #'
 #' \describe{

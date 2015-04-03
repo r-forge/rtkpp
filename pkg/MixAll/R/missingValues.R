@@ -3,30 +3,6 @@
 # Author: iovleff
 ###############################################################################
 
-#' Return the missing values of a component or a cluster class.
-#'
-#' The missing methods allow the user to get the imputed mssing
-#' values from a mixture model.
-#'
-#' @param x an object that can return the imputed missing values
-#'
-#' @return A matrix with three columns (row index, column index, value)
-#'
-#' @name missingValues
-#' @docType methods
-#' @rdname missingValues-methods
-#' @exportMethod missingValues
-#'
-#' @examples
-#'   data(geyser)
-#'   model <- clusterDiagGaussian(geyser,3)
-#'   missingValues(model)
-setGeneric(
-  name = "missingValues",
-  function(x)
-  { standardGeneric("missingValues")}
-)
-
 #' @rdname missingValues-methods
 #' @aliases missingValues,ClusterDiagGaussian-method
 setMethod(

@@ -35,22 +35,23 @@
 #'   \item \code{fuzzy}  {The initial probabilities of membership of individuals are
 #'                        sampled randomly.}
 #' }
-#' A few iteration of an algorithm [\code{\link{clusterAlgo}}] are then performed.
-#' It is strongly recommended to use a few number of iterations of the \code{SEM}
-#' or \code{CEM} algorithms after initialization. This allow to detect "bad"
-#' initialization starting point of the estimation algorithm.
+#' A few iterations of an algorithm [\code{\link{clusterAlgo}}] are then performed.
+#' It is strongly recommended to use a few number of iterations of the \code{EM}
+#' or \code{SEM} algorithms after initialization. This allows to detect "bad"
+#' initialization starting point.
 #'
 #' These two stages are repeated until \code{nbInit} is reached. The initial
 #' point with the best log-likelihood is conserved as the initial starting point.
 #'
 #' @param method Character string with the initialisation method.
 #' Possible values: "random", "class", "fuzzy". Default value is "class".
-#' @param algo Character string with the initialisation algorithm.
-#' Possible values: "EM", "CEM", "SEM", "SemiSEM". Default value is "SEM".
 #' @param nbInit integer defining the number of initialization point to test. Default value is 5.
+#' @param algo String with the initialisation algorithm.
+#' Possible values: "EM", "CEM", "SEM", "SemiSEM". Default value is "EM".
 #' @param nbIteration Integer defining the number of iteration in \code{algo}.
-#' nbIteration must be a positive integer. Default values is 20. Not used if  \code{algo} = NULL.
-#' @param epsilon Real defining the epsilon value for the algorithm. Default value: 0.01.
+#' nbIteration must be a positive integer. Default values is 20. Not used if
+#' \code{algo} = NULL.
+#' @param epsilon threshold to use in order to stop the iterations. Default value is 0.01.
 #'
 #' @examples
 #'  clusterInit(method = "class", nbInit=1, algo="CEM",nbIteration=50, epsilon=0.00001)
@@ -59,19 +60,18 @@
 #' @return a [\code{\linkS4class{ClusterInit}}] object
 #' @author Serge Iovleff
 #' @export
-clusterInit <- function( method="class", nbInit=5,  algo = "SEM", nbIteration=20, epsilon=0.01)
+clusterInit <- function( method="class", nbInit=5,  algo = "EM", nbIteration=20, epsilon=0.01)
 { return(new("ClusterInit", nbInit=nbInit, algo=new("ClusterAlgo", algo, nbIteration, epsilon)))}
 
 
 #' Constructor of the [\code{\linkS4class{ClusterInit}}] class
 #'
-#' This class encapsulates the parameters of initialization methods of the
-#' rtkpp Cluster estimation method.
+#' This class encapsulates the parameters of clustering initialization methods.
 #'
-#' @slot method Character string with the initialization method to use. Default value: "random"
+#' @slot method Character string with the initialization method to use. Default value: "class"
 #' @slot nbInit Integer defining the number of initialization to perform. Default value: 5.
 #' @slot algo An instance of \code{\linkS4class{ClusterAlgo}} class.
-#' Default value: \code{clusterAlgo("SEM", 20, 0)}.
+#' Default value: \code{clusterAlgo("EM", 20, 0.01)}.
 #'
 #' @examples
 #'   getSlots("ClusterInit")
@@ -88,7 +88,7 @@ clusterInit <- function( method="class", nbInit=5,  algo = "SEM", nbIteration=20
 setClass(
   Class="ClusterInit",
   slots=c(method="character", nbInit = "numeric", algo = "ClusterAlgo"),
-  prototype=list(method="class", nbInit = 5, algo = clusterAlgo("SEM", 20, 0)),
+  prototype=list(method="class", nbInit = 5, algo = clusterAlgo("EM", 20, 0.01)),
   # validity function
   validity=function(object)
   {
@@ -113,10 +113,10 @@ setClass(
 )
 
 
-#' Initialize an instance of a rtkpp class.
+#' Initialize an instance of a MixAll S4 class.
 #'
 #' Initialization method of the [\code{\linkS4class{ClusterInit}}] class.
-#' Used internally in the `rtkpp' package.
+#' Used internally in the 'MixAll' package.
 #'
 #' @rdname initialize-methods
 #' @keywords internal
@@ -149,7 +149,7 @@ setMethod(
   function(x,...){
     function(object){
       cat("****************************************\n")
-      cat("*** Cluster init:\n")
+      cat("*** MixAll ClusterInit:\n")
       cat("* method               = ", object@method, "\n")
       cat("* number of init       = ", object@nbInit, "\n")
       cat("* algorithm            = ", object@algo@algo, "\n")
@@ -167,7 +167,7 @@ setMethod(
   signature=c("ClusterInit"),
   function(object){
     cat("****************************************\n")
-    cat("*** Cluster init:\n")
+    cat("*** MixAll ClusterInit:\n")
     cat("* method              = ", object@method, "\n")
     cat("* number of init      = ", object@nbInit, "\n")
     cat("* algorithm            = ", object@algo@algo, "\n")

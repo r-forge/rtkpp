@@ -6,18 +6,17 @@
 \alias{ClusterInit-class}
 \title{Constructor of the [\code{\linkS4class{ClusterInit}}] class}
 \description{
-This class encapsulates the parameters of initialization methods of the
-rtkpp Cluster estimation method.
+This class encapsulates the parameters of clustering initialization methods.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{method}}{Character string with the initialization method to use. Default value: "random"}
+\item{\code{method}}{Character string with the initialization method to use. Default value: "class"}
 
 \item{\code{nbInit}}{Integer defining the number of initialization to perform. Default value: 5.}
 
 \item{\code{algo}}{An instance of \code{\linkS4class{ClusterAlgo}} class.
-Default value: \code{clusterAlgo("SEM", 20, 0)}.}
+Default value: \code{clusterAlgo("EM", 20, 0.01)}.}
 }}
 \examples{
 getSlots("ClusterInit")

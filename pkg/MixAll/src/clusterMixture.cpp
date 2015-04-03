@@ -23,7 +23,7 @@
 */
 
 /*
- * Project:  rtkpp
+ * Project:  MixAll
  * created on: 28 juil. 2014
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
@@ -40,6 +40,7 @@
 
 /** @param model ClusterDiagModel S4 class
  *  @param nbCluster a vector with the number of clusters to test
+ *  @param modelNames a vector of string with the model names to try
  */
 RcppExport SEXP clusterMixture( SEXP model, SEXP nbCluster, SEXP modelNames, SEXP strategy, SEXP critName, SEXP nbCore )
 {
@@ -48,6 +49,16 @@ RcppExport SEXP clusterMixture( SEXP model, SEXP nbCluster, SEXP modelNames, SEX
 #ifdef _OPENMP
   int cores = Rcpp::as<int>(nbCore);
   if (cores >= 1) { omp_set_num_threads(cores);}
+#endif
+
+#if defined(__sun) && defined(__SVR4) && defined(__sparc)
+  Rcpp::CharacterVector v_modelNames(modelNames);
+  std::string idModel(Rcpp::as<std::string>(v_modelNames[0]));
+  bool freeProp;
+  STK::Clust::Mixture mixtModel = STK::Clust::stringToMixture(idModel, freeProp);
+  STK::Clust::MixtureClass modelClass = STK::Clust::mixtureToMixtureClass(mixtModel);
+  // Poisson models not working with sparc and solaris
+  if (modelClass == STK::Clust::Poisson_) return Rcpp::wrap(false);
 #endif
   // create a launcher
   ClusterLauncher launcher(model, nbCluster, modelNames, strategy, critName);

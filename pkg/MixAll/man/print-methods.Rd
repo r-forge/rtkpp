@@ -20,7 +20,7 @@
 \alias{print-algo,ClusterAlgo-method}
 \alias{print-init,ClusterInit,ClusterInit-method}
 \alias{print-strategy,ClusterStrategy-method}
-\title{Print a rtkpp class to standard output.}
+\title{Print a MixAll S4 class to standard output.}
 \usage{
 \S4method{print}{ClusterAlgo}(x, ...)
 
@@ -51,7 +51,7 @@
 \S4method{print}{IClusterComponent}(x, ...)
 }
 \arguments{
-\item{x}{a rtkpp object: a \code{\linkS4class{ClusterStrategy}},
+\item{x}{a MixAll object: a \code{\linkS4class{ClusterStrategy}},
 a \code{\linkS4class{ClusterInit}} or a \code{\linkS4class{ClusterAlgo}}.}
 
 \item{...}{further arguments passed to or from other methods}
@@ -62,7 +62,7 @@ a \code{\linkS4class{ClusterInit}} or a \code{\linkS4class{ClusterAlgo}}.}
 NULL. Prints to standard out.
 }
 \description{
-Print a rtkpp class to standard output.
+Print a MixAll S4 class to standard output.
 }
 \examples{
 ## for cluster strategy

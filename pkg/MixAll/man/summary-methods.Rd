@@ -11,7 +11,7 @@
 \alias{summary,IClusterComponent-method}
 \alias{summary,IClusterModelBase-method}
 \alias{summary,MixmodResults-method}
-\title{Produce summary of a rtkpp class.}
+\title{Produce summary of a MixAll S4 class.}
 \usage{
 \S4method{summary}{ClusterCategorical}(object, ...)
 
@@ -36,7 +36,7 @@
 NULL. Summaries to standard out.
 }
 \description{
-Produce summary of a rtkpp class.
+Produce summary of a MixAll S4 class.
 }
 \examples{
 data(geyser)

@@ -39,11 +39,11 @@ and the number of clusters given in [\code{nbCluster}], using the strategy speci
 \examples{
 ## A quantitative example with the famous geyser data set
 data(geyser)
-## add 10 missing values
-x = geyser;
-x[round(runif(5,1,nrow(geyser))), 1] <- NA
-x[round(runif(5,1,nrow(geyser))), 2] <- NA
-## with default values
+## add 10 missing values as random
+x = as.matrix(geyser); n <- nrow(x); p <- ncol(x);
+indexes <- matrix(c(round(runif(5,1,n)), round(runif(5,1,p))), ncol=2);
+x[indexes] <- NA;
+## estimate model (using fast strategy, results may be misleading)
 model <- clusterDiagGaussian(data=x, nbCluster=2:3, strategy = clusterFastStrategy())
 
 ## use graphics functions

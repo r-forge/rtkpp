@@ -16,7 +16,7 @@
 \alias{initialize,ClusterStrategy-method}
 \alias{initialize,IClusterComponent-method}
 \alias{initialize,IClusterModelBase-method}
-\title{Initialize an instance of a rtkpp class.}
+\title{Initialize an instance of a MixAll S4 class.}
 \usage{
 \S4method{initialize}{ClusterAlgo}(.Object, algo, nbIteration, epsilon)
 
@@ -61,46 +61,46 @@
 }
 \description{
 Initialization method of the [\code{\linkS4class{ClusterAlgo}}] class.
-Used internally in the `rtkpp' package.
+Used internally in the `MixAll' package.
 
 Initialization method of the [\code{\linkS4class{ClusterCategoricalComponent}}] class.
-Used internally in the `rtkpp' package.
+Used internally in the `MixAll' package.
 
 Initialization method of the [\code{\linkS4class{ClusterCategorical}}] class.
-Used internally in the `rtkpp' package.
+Used internally in the `MixAll' package.
 
 Initialization method of the [\code{\linkS4class{ClusterDiagGaussianComponent}}] class.
-Used internally in the `rtkpp' package.
+Used internally in the 'MixAll' package.
 
 Initialization method of the [\code{\linkS4class{ClusterDiagGaussian}}] class.
-Used internally in the `rtkpp' package.
+Used internally in the 'MixAll' package.
 
 Initialization method of the [\code{\linkS4class{ClusterGammaComponent}}] class.
-Used internally in the `rtkpp' package.
+Used internally in the 'MixAll' package.
 
 Initialization method of the [\code{\linkS4class{ClusterGamma}}] class.
-Used internally in the `rtkpp' package.
+Used internally in the 'MixAll' package.
 
 Initialization method of the [\code{\linkS4class{ClusterHeterogeneous}}] class.
-Used internally in the `rtkpp' package.
+Used internally in the 'MixAll' package.
 
 Initialization method of the [\code{\linkS4class{ClusterInit}}] class.
-Used internally in the `rtkpp' package.
+Used internally in the 'MixAll' package.
 
 Initialization method of the [\code{\linkS4class{ClusterPoissonComponent}}] class.
-Used internally in the `rtkpp' package.
+Used internally in the 'MixAll' package.
 
 Initialization method of the [\code{\linkS4class{ClusterPoisson}}] class.
-Used internally in the `rtkpp' package.
+Used internally in the 'MixAll' package.
 
 Initialization method of the [\code{\linkS4class{ClusterStrategy}}] class.
-Used internally in the `rtkpp' package.
+Used internally in the 'MixAll' package.
 
 Initialization method of the [\code{\linkS4class{IClusterModelBase}}] class.
-Used internally in the `rtkpp' package.
+Used internally in the 'MixAll' package.
 
 Initialization method of the [\code{\linkS4class{IClusterComponent}}] class.
-Used internally in the `rtkpp' package.
+Used internally in the 'MixAll' package.
 }
 \keyword{internal}
 

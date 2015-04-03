@@ -14,7 +14,7 @@
 \alias{[<-,ClusterAlgo-method}
 \alias{[<-,ClusterInit-method}
 \alias{[<-,ClusterStrategy-method}
-\title{Extract parts of a rtkpp S4 class}
+\title{Extract parts of a MixAll S4 class}
 \usage{
 \S4method{[}{ClusterAlgo}(x, i, j, drop)
 
@@ -51,6 +51,6 @@ not for the replacement.  See drop for further details.}
 of x we want to replace.}
 }
 \description{
-Extract parts of a rtkpp S4 class
+Extract parts of a MixAll S4 class
 }
 

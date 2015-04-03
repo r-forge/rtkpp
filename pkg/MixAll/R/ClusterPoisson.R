@@ -121,7 +121,8 @@ clusterPoisson <- function( data, nbCluster=2
 #-----------------------------------------------------------------------
 #' Definition of the [\code{\linkS4class{ClusterPoissonComponent}}] class
 #'
-#' This class defines a poisson component of a mixture Model.
+#' This class defines a poisson component of a mixture Model. It inherits
+#' from [\code{\linkS4class{IClusterComponent}}].
 #'
 #' @slot lambda Matrix with the mean of the jth variable in the kth cluster.
 #' @seealso [\code{\linkS4class{IClusterComponent}}] class
@@ -149,10 +150,10 @@ setClass(
       return(TRUE)
     }
 )
-#' Initialize an instance of a rtkpp class.
+#' Initialize an instance of a MixAll S4 class.
 #'
 #' Initialization method of the [\code{\linkS4class{ClusterPoissonComponent}}] class.
-#' Used internally in the `rtkpp' package.
+#' Used internally in the 'MixAll' package.
 #'
 #' @rdname initialize-methods
 #' @keywords internal
@@ -270,10 +271,10 @@ setClass(
     }
 )
 
-#' Initialize an instance of a rtkpp class.
+#' Initialize an instance of a MixAll S4 class.
 #'
 #' Initialization method of the [\code{\linkS4class{ClusterPoisson}}] class.
-#' Used internally in the `rtkpp' package.
+#' Used internally in the 'MixAll' package.
 #'
 #' @rdname initialize-methods
 #' @keywords internal

@@ -2,14 +2,17 @@
 % Please edit documentation in R/ClusterStrategy.R
 \name{clusterStrategy}
 \alias{clusterFastStrategy}
+\alias{clusterSemiSEMStrategy}
 \alias{clusterStrategy}
 \title{Create an instance of [\code{\linkS4class{ClusterStrategy}}] class}
 \usage{
-clusterStrategy(nbTry = 1, nbInit = 3, initMethod = "class",
-  initAlgo = "SEM", nbInitIteration = 20, initEpsilon = 0.01,
+clusterStrategy(nbTry = 1, nbInit = 5, initMethod = "class",
+  initAlgo = "EM", nbInitIteration = 20, initEpsilon = 0.01,
   nbShortRun = 5, shortRunAlgo = "EM", nbShortIteration = 100,
   shortEpsilon = 1e-04, longRunAlgo = "EM", nbLongIteration = 1000,
   longEpsilon = 1e-07)
+
+clusterSemiSEMStrategy()
 
 clusterFastStrategy()
 }
@@ -19,10 +22,10 @@ clusterFastStrategy()
 \item{nbInit}{Integer defining the number of initialization to try. Default value: 3.}
 
 \item{initMethod}{Character string with the initialization method, see [\code{\link{clusterInit}}]$
-for possible values. Default is "random".}
+for possible values. Default is "class".}
 
 \item{initAlgo}{Character string with the algorithm to use in the initialization stage,
-[\code{\link{clusterAlgo}}] for possible values. Default value: "SEM".}
+[\code{\link{clusterAlgo}}] for possible values. Default value: "EM".}
 
 \item{nbInitIteration}{Integer defining the maximal number of iterations in initialization algorithm
 if \code{initAlgo} = "EM", "CEM" or "SemiSEM". This is the number of iterations if \code{initAlgo} = "SEM".
@@ -59,7 +62,10 @@ a [\code{\linkS4class{ClusterStrategy}}] object
 }
 \description{
 A strategy is a multistage empirical process for finding a
-good estimate in the clusering estimation process.
+good estimate in the clustering estimation process.
+
+\code{clusterSemiSEMStrategy()} create an instance of [\code{\linkS4class{ClusterStrategy}}]
+for users with many missing values.
 
 \code{clusterFastStrategy()} create an instance of [\code{\linkS4class{ClusterStrategy}}] for impatient user.
 }
@@ -73,18 +79,19 @@ when using an EM algorithm or its variants. A ``try'' is composed of three stage
   method.
   \item A long run of the \code{EM}, \code{CEM}, \code{SEM} or \code{SemiSEM} algorithm.
 }
-For exemple if \code{nbInit} is 5 and \code{nbShortRun} is also 5, there will be
-5 packets of 5 models initialized. In each packet, the best model will be ameliorated using
-a short run. Among the 5 models ameliorated one will be estimated until convergence
-using a long run.
+For example if \code{nbInit} is 5 and \code{nbShortRun} is also 5, there will
+be 5 packets of 5 models initialized. In each packet, the best model will be
+ameliorated using a short run. Among the 5 models ameliorated one will be
+estimated until convergence using a long run. In total there were 25 initializations.
 
-This process can be repeated at least \code{nbTry} times. If all the tries failed,
-an empty model is returned.
+The whole process can be repeated at least \code{nbTry} times. If a try
+success, the estimated model is returned, otherwise an empty model is returned.
 }
 \examples{
 clusterStrategy()
    clusterStrategy(longRunAlgo= "CEM", nbLongIteration=100)
    clusterStrategy(nbTry = 1, nbInit= 1, shortRunAlgo= "SEM", nbShortIteration=100)
+clusterSemiSEMStrategy()
 clusterFastStrategy()
 }
 \author{

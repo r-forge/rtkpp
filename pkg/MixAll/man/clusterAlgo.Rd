@@ -4,7 +4,7 @@
 \alias{clusterAlgo}
 \title{Create an instance of the [\code{\linkS4class{ClusterAlgo}}] class}
 \usage{
-clusterAlgo(algo = "EM", nbIteration = 200, epsilon = 1e-08)
+clusterAlgo(algo = "EM", nbIteration = 200, epsilon = 1e-07)
 }
 \arguments{
 \item{algo}{character string with the estimation algorithm.
@@ -12,8 +12,8 @@ Possible values are "EM", "SEM", "CEM", "SemiSEM". Default value is "EM".}
 
 \item{nbIteration}{Integer defining the maximal number of iterations. Default value is 200.}
 
-\item{epsilon}{Real defining the epsilon value for the algorithm. Note that
-epsilon is not used by the SEM algorithm. Default value is 1.e-8.}
+\item{epsilon}{Real defining the epsilon value for the algorithm. Not used
+ by the SEM algorithm. Default value is 1.e-7.}
 }
 \value{
 a [\code{\linkS4class{ClusterAlgo}}] object
@@ -43,6 +43,6 @@ clusterAlgo(algo="SEM", nbIteration=50)
 clusterAlgo(algo="CEM", epsilon = 1e-06)
 }
 \author{
-Serge Iovleff, with contributions from V. Kubicki
+Serge Iovleff
 }
 

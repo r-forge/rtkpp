@@ -10,12 +10,14 @@ This class defines an Heterogeneous mixture Model.
 }
 \details{
 This class inherits from the [\code{\linkS4class{IClusterModelBase}}] class.
-A diagonal gaussian model is a mixture model of the form:
+An heterogeneous model is a mixture model of the form:
 \deqn{
-  f({x}|\boldsymbol{\theta})
-  =\sum_{k=1}^K p_k \prod_{j=1}^d \phi(x_j;\mu_{jk},\sigma^2_{jk})
-   \quad x \in {R}^d.
+f({{x}}_i=({{x}}_{1i}, {{x}}_{2i},\ldots {{x}}_{Li})|\theta)
+= \sum_{k=1}^K p_k \prod_{l=1}^L h({{x}}_{li}| \lambda_{lk},\alpha_l).
 }
+The density functions (or probability distribution functions)
+\deqn{h(.|\lambda_{lk},\alpha_l)}
+can be any implemented model (Gaussian, Poisson,...).
 }
 \section{Slots}{
 

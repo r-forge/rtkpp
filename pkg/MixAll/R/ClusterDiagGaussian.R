@@ -49,11 +49,11 @@ NULL
 #' @examples
 #' ## A quantitative example with the famous geyser data set
 #' data(geyser)
-#' ## add 10 missing values
-#' x = geyser;
-#' x[round(runif(5,1,nrow(geyser))), 1] <- NA
-#' x[round(runif(5,1,nrow(geyser))), 2] <- NA
-#' ## with default values
+#' ## add 10 missing values as random
+#' x = as.matrix(geyser); n <- nrow(x); p <- ncol(x);
+#' indexes <- matrix(c(round(runif(5,1,n)), round(runif(5,1,p))), ncol=2); 
+#' x[indexes] <- NA;
+#' ## estimate model (using fast strategy, results may be misleading)
 #' model <- clusterDiagGaussian(data=x, nbCluster=2:3, strategy = clusterFastStrategy())
 #'
 #' ## use graphics functions
@@ -123,10 +123,12 @@ clusterDiagGaussian <- function( data, nbCluster=2
 #-----------------------------------------------------------------------
 #' Definition of the [\code{\linkS4class{ClusterDiagGaussianComponent}}] class
 #'
-#' This class defines a diagonal Gaussian component of a mixture Model.
+#' This class defines a diagonal Gaussian component of a mixture Model. It inherits
+#' from [\code{\linkS4class{IClusterComponent}}].
 #'
 #' @slot mean  Matrix with the mean of the jth variable in the kth cluster.
 #' @slot sigma  Matrix with the standard deviation of the jth variable in the kth cluster.
+#' 
 #' @seealso [\code{\linkS4class{IClusterComponent}}] class
 #'
 #' @examples
@@ -135,7 +137,7 @@ clusterDiagGaussian <- function( data, nbCluster=2
 #' @author Serge Iovleff
 #'
 #' @name ClusterDiagGaussianComponent
-#' @rdname IClusterComponent-class
+#' @rdname ClusterDiagGaussianComponent-class
 #' @aliases ClusterDiagGaussianComponent-class
 #' @exportClass ClusterDiagGaussianComponent
 #'
@@ -154,10 +156,10 @@ setClass(
     return(TRUE)
   }
 )
-#' Initialize an instance of a rtkpp class.
+#' Initialize an instance of a MixAll S4 class.
 #'
 #' Initialization method of the [\code{\linkS4class{ClusterDiagGaussianComponent}}] class.
-#' Used internally in the `rtkpp' package.
+#' Used internally in the 'MixAll' package.
 #'
 #' @rdname initialize-methods
 #' @keywords internal
@@ -248,7 +250,9 @@ setMethod(
 #'   =\sum_{k=1}^K p_k \prod_{j=1}^d \phi(x_j;\mu_{jk},\sigma^2_{jk})
 #'    \quad x \in {R}^d.
 #' }
-#'
+#' Some constraints can be added to the variances in order to reduce the number
+#' of parameters.
+#'  
 #' @slot component  A [\code{\linkS4class{ClusterDiagGaussianComponent}}] with the
 #' mean and standard deviation of the diagonal mixture model.
 #' @seealso [\code{\linkS4class{IClusterModelBase}}] class
@@ -285,10 +289,10 @@ setClass(
   }
 )
 
-#' Initialize an instance of a rtkpp class.
+#' Initialize an instance of a MixAll S4 class.
 #'
 #' Initialization method of the [\code{\linkS4class{ClusterDiagGaussian}}] class.
-#' Used internally in the `rtkpp' package.
+#' Used internally in the 'MixAll' package.
 #'
 #' @rdname initialize-methods
 #' @keywords internal

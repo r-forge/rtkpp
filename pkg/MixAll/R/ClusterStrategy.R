@@ -29,7 +29,7 @@ NULL
 #' Create an instance of [\code{\linkS4class{ClusterStrategy}}] class
 #'
 #' A strategy is a multistage empirical process for finding a
-#' good estimate in the clusering estimation process.
+#' good estimate in the clustering estimation process.
 #'
 #' A strategy is a way to find a good estimate of the parameters of a mixture model
 #' when using an EM algorithm or its variants. A ``try'' is composed of three stages
@@ -40,19 +40,19 @@ NULL
 #'   method.
 #'   \item A long run of the \code{EM}, \code{CEM}, \code{SEM} or \code{SemiSEM} algorithm.
 #' }
-#' For exemple if \code{nbInit} is 5 and \code{nbShortRun} is also 5, there will be
-#' 5 packets of 5 models initialized. In each packet, the best model will be ameliorated using
-#' a short run. Among the 5 models ameliorated one will be estimated until convergence
-#' using a long run.
+#' For example if \code{nbInit} is 5 and \code{nbShortRun} is also 5, there will
+#' be 5 packets of 5 models initialized. In each packet, the best model will be
+#' ameliorated using a short run. Among the 5 models ameliorated one will be
+#' estimated until convergence using a long run. In total there were 25 initializations.
 #'
-#' This process can be repeated at least \code{nbTry} times. If all the tries failed,
-#' an empty model is returned.
+#' The whole process can be repeated at least \code{nbTry} times. If a try
+#' success, the estimated model is returned, otherwise an empty model is returned.
 #'
 #' @param nbInit Integer defining the number of initialization to try. Default value: 3.
 #' @param initMethod Character string with the initialization method, see [\code{\link{clusterInit}}]$
-#' for possible values. Default is "random".
+#' for possible values. Default is "class".
 #' @param initAlgo Character string with the algorithm to use in the initialization stage,
-#' [\code{\link{clusterAlgo}}] for possible values. Default value: "SEM".
+#' [\code{\link{clusterAlgo}}] for possible values. Default value: "EM".
 #' @param nbInitIteration Integer defining the maximal number of iterations in initialization algorithm
 #' if \code{initAlgo} = "EM", "CEM" or "SemiSEM". This is the number of iterations if \code{initAlgo} = "SEM".
 #' Default value: 20.
@@ -88,23 +88,42 @@ NULL
 #' @author Serge Iovleff
 #' @export
 clusterStrategy <- function( nbTry =1
-                           , nbInit= 3, initMethod="class", initAlgo= "SEM", nbInitIteration=20, initEpsilon=0.01
+                           , nbInit= 5, initMethod="class", initAlgo= "EM", nbInitIteration=20, initEpsilon=0.01
                            , nbShortRun= 5, shortRunAlgo= "EM", nbShortIteration=100, shortEpsilon=1e-04
                            , longRunAlgo= "EM", nbLongIteration=1000, longEpsilon=1e-07
                            )
 {
   # create init
-  initMethod = clusterInit(initMethod, nbInit, initAlgo, nbInitIteration, initEpsilon);
+  init = clusterInit(initMethod, nbInit, initAlgo, nbInitIteration, initEpsilon);
   # create shortAlgo
   shortAlgo = clusterAlgo(shortRunAlgo, nbShortIteration, shortEpsilon);
   # create longAlgo
   longAlgo = clusterAlgo(longRunAlgo, nbLongIteration, longEpsilon);
   # create strategy
-  new("ClusterStrategy", nbTry =nbTry, nbShortRun =nbShortRun, initMethod =initMethod, shortAlgo =shortAlgo, longAlgo =longAlgo);
+  new("ClusterStrategy", nbTry =nbTry, nbShortRun =nbShortRun, initMethod =init, shortAlgo =shortAlgo, longAlgo =longAlgo);
 }
 
-#-----------------------------------------------------------------------
-#' @description 
+#' @description
+#' \code{clusterSemiSEMStrategy()} create an instance of [\code{\linkS4class{ClusterStrategy}}]
+#' for users with many missing values.
+#' @examples
+#'    clusterSemiSEMStrategy()
+#'
+#' @rdname clusterStrategy
+#' @export
+clusterSemiSEMStrategy <- function()
+{
+  # create init
+  initMethod = clusterInit("class", 3, "SemiSEM", 20, 0.01);
+  # create shortAlgo
+  shortAlgo = clusterAlgo("SemiSEM", 100, 0.01);
+  # create longAlgo
+  longAlgo = clusterAlgo("SemiSEM", 1000, 0.01);
+  # create strategy
+  new("ClusterStrategy", nbTry= 2, nbShortRun= 5, initMethod= initMethod, shortAlgo= shortAlgo, longAlgo= longAlgo);
+}
+
+#' @description
 #' \code{clusterFastStrategy()} create an instance of [\code{\linkS4class{ClusterStrategy}}] for impatient user.
 #' @examples
 #'    clusterFastStrategy()
@@ -114,7 +133,7 @@ clusterStrategy <- function( nbTry =1
 clusterFastStrategy <- function()
 {
   # create init
-  initMethod = clusterInit("class", 3, "SEM", 5, 0.01);
+  initMethod = clusterInit("class", 3, "EM", 5, 0.01);
   # create shortAlgo
   shortAlgo = clusterAlgo("CEM", 10, 0.001);
   # create longAlgo
@@ -126,18 +145,19 @@ clusterFastStrategy <- function()
 #-----------------------------------------------------------------------
 #' Constructor of [\code{\linkS4class{ClusterStrategy}}] class
 #'
-#' This class encapsulate the parameters of the strategy of estimation of the rtkpp
-#' Cluster models.
+#' This class encapsulate the parameters of the clustering estimation strategies.
 #'
 #'   @slot nbTry Integer defining the number of tries. Default value: 1.
-#'   @slot nbShortRun Integer defining the number of short run
-#'   (the strategy launch an initialization before each short run).
+#'   @slot nbShortRun Integer defining the number of short run. Recall that the
+#'   strategy launch an initialization before each short run. Default value is 5.
 #'   @slot initMethod A [\code{\linkS4class{ClusterInit}}] object defining the way to
-#'   initialize the estimation method.
+#'   initialize the estimation method. Default value is [\code{\link{ClusterInit}}].
 #'   @slot shortAlgo A [\code{\linkS4class{ClusterAlgo}}] object defining the algorithm
-#'   to use during the short runs of the estimation method.
+#'   to use during the short runs of the estimation method. Default value is
+#'   \code{clusterAlgo("EM",100,1e-04)}.
 #'   @slot longAlgo A [\code{\linkS4class{ClusterAlgo}}] object defining the algorithm
-#'   to use during the long run of the estimation method.
+#'   to use during the long run of the estimation method.  Default value is
+#'   \code{clusterAlgo("EM",1000,1e-07)}.
 #'
 #' @examples
 #'   new("ClusterStrategy")
@@ -175,10 +195,10 @@ setClass(
     }
 )
 
-#' Initialize an instance of a rtkpp class.
+#' Initialize an instance of a MixAll S4 class.
 #'
 #' Initialization method of the [\code{\linkS4class{ClusterStrategy}}] class.
-#' Used internally in the `rtkpp' package.
+#' Used internally in the 'MixAll' package.
 #'
 #' @keywords internal
 #' @rdname initialize-methods

@@ -45,8 +45,8 @@
 #' @param algo character string with the estimation algorithm.
 #' Possible values are "EM", "SEM", "CEM", "SemiSEM". Default value is "EM".
 #' @param nbIteration Integer defining the maximal number of iterations. Default value is 200.
-#' @param epsilon Real defining the epsilon value for the algorithm. Note that
-#' epsilon is not used by the SEM algorithm. Default value is 1.e-8.
+#' @param epsilon Real defining the epsilon value for the algorithm. Not used
+#'  by the SEM algorithm. Default value is 1.e-7.
 #'
 #' @examples
 #' clusterAlgo()
@@ -54,20 +54,21 @@
 #' clusterAlgo(algo="CEM", epsilon = 1e-06)
 #'
 #' @return a [\code{\linkS4class{ClusterAlgo}}] object
-#' @author Serge Iovleff, with contributions from V. Kubicki
+#' @author Serge Iovleff
 #' @export
 #'
-clusterAlgo <- function( algo="EM", nbIteration=200, epsilon=1e-08)
+clusterAlgo <- function( algo="EM", nbIteration=200, epsilon=1e-07)
 { new("ClusterAlgo", algo=algo, nbIteration=nbIteration, epsilon=epsilon)}
 
 #-----------------------------------------------------------------------
 #' @title [\code{\linkS4class{ClusterAlgo}}] class for Cluster algorithms.
 #'
 #' @description
-#' This class encapsulate the parameters of estimation algorithms of the rtkpp Cluster
+#' This class encapsulate the parameters of clustering estimation algorithms
 #' methods.
 #'
-#' @slot algo A character string with the algorithm. Possible values: "SEM", "CEM", "EM", "SemiSEM". Default value: "EM".
+#' @slot algo A character string with the algorithm.
+#' Possible values: "SEM", "CEM", "EM", "SemiSEM". Default value: "EM".
 #' @slot nbIteration Integer defining the maximal number of iterations. Default value: 200.
 #' @slot epsilon real defining the epsilon value for the algorithm. epsilon is note used if \code{algo} is sem.
 #' Default value: 1e-07.
@@ -111,10 +112,10 @@ setClass (
 )
 
 #-----------------------------------------------------------------------
-#' Initialize an instance of a rtkpp class.
+#' Initialize an instance of a MixAll S4 class.
 #'
 #' Initialization method of the [\code{\linkS4class{ClusterAlgo}}] class.
-#' Used internally in the `rtkpp' package.
+#' Used internally in the `MixAll' package.
 #'
 #' @keywords internal
 #' @rdname initialize-methods
@@ -145,7 +146,7 @@ setMethod(
     signature=c("ClusterAlgo"),
     function(x,...){
       cat("****************************************\n")
-      cat("*** rtkpp ClusterAlgo:\n")
+      cat("*** MixAll ClusterAlgo:\n")
       cat("* algorithm            = ", x@algo, "\n")
       cat("* number of iterations = ", x@nbIteration, "\n")
       cat("* epsilon              = ", x@epsilon, "\n")
@@ -160,7 +161,7 @@ setMethod(
     signature=c("ClusterAlgo"),
     function(object){
       cat("****************************************\n")
-      cat("*** rtkpp ClusterAlgo:\n")
+      cat("*** MixAll ClusterAlgo:\n")
       cat("* algorithm            = ", object@algo, "\n")
       cat("* number of iterations = ", object@nbIteration, "\n")
       cat("* epsilon              = ", object@epsilon, "\n")

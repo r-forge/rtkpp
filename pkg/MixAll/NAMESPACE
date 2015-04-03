@@ -2,6 +2,7 @@ export(clusterAlgo
       ,clusterInit
       ,clusterStrategy
       ,clusterFastStrategy
+      ,clusterSemiSEMStrategy
       ,clusterDiagGaussianNames
       ,clusterGammaNames
       ,clusterCategoricalNames

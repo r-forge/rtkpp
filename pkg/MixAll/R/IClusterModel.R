@@ -123,10 +123,10 @@ setClass(
   }
 )
 
-#' Initialize an instance of a rtkpp class.
+#' Initialize an instance of a MixAll S4 class.
 #'
 #' Initialization method of the [\code{\linkS4class{IClusterModelBase}}] class.
-#' Used internally in the `rtkpp' package.
+#' Used internally in the 'MixAll' package.
 #'
 #' @rdname initialize-methods
 #' @keywords internal
@@ -238,10 +238,10 @@ setClass(
     return(TRUE);
   }
 )
-#' Initialize an instance of a rtkpp class.
+#' Initialize an instance of a MixAll S4 class.
 #'
 #' Initialization method of the [\code{\linkS4class{IClusterComponent}}] class.
-#' Used internally in the `rtkpp' package.
+#' Used internally in the 'MixAll' package.
 #'
 #' @rdname initialize-methods
 #' @keywords internal

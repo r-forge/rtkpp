@@ -6,25 +6,26 @@
 \alias{ClusterStrategy-class}
 \title{Constructor of [\code{\linkS4class{ClusterStrategy}}] class}
 \description{
-This class encapsulate the parameters of the strategy of estimation of the rtkpp
-Cluster models.
+This class encapsulate the parameters of the clustering estimation strategies.
 }
 \section{Slots}{
 
 \describe{
 \item{\code{nbTry}}{Integer defining the number of tries. Default value: 1.}
 
-\item{\code{nbShortRun}}{Integer defining the number of short run
-(the strategy launch an initialization before each short run).}
+\item{\code{nbShortRun}}{Integer defining the number of short run. Recall that the
+strategy launch an initialization before each short run. Default value is 5.}
 
 \item{\code{initMethod}}{A [\code{\linkS4class{ClusterInit}}] object defining the way to
-initialize the estimation method.}
+initialize the estimation method. Default value is [\code{\link{ClusterInit}}].}
 
 \item{\code{shortAlgo}}{A [\code{\linkS4class{ClusterAlgo}}] object defining the algorithm
-to use during the short runs of the estimation method.}
+to use during the short runs of the estimation method. Default value is
+\code{clusterAlgo("EM",100,1e-04)}.}
 
 \item{\code{longAlgo}}{A [\code{\linkS4class{ClusterAlgo}}] object defining the algorithm
-  to use during the long run of the estimation method.}
+  to use during the long run of the estimation method.  Default value is
+  \code{clusterAlgo("EM",1000,1e-07)}.}
 }}
 \examples{
 new("ClusterStrategy")

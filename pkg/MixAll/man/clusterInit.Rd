@@ -4,8 +4,8 @@
 \alias{clusterInit}
 \title{Create an instance of [\code{\linkS4class{ClusterInit}}] class}
 \usage{
-clusterInit(method = "class", nbInit = 5, algo = "SEM",
-  nbIteration = 20, epsilon = 0.01)
+clusterInit(method = "class", nbInit = 5, algo = "EM", nbIteration = 20,
+  epsilon = 0.01)
 }
 \arguments{
 \item{method}{Character string with the initialisation method.
@@ -13,13 +13,14 @@ Possible values: "random", "class", "fuzzy". Default value is "class".}
 
 \item{nbInit}{integer defining the number of initialization point to test. Default value is 5.}
 
-\item{algo}{Character string with the initialisation algorithm.
-Possible values: "EM", "CEM", "SEM", "SemiSEM". Default value is "SEM".}
+\item{algo}{String with the initialisation algorithm.
+Possible values: "EM", "CEM", "SEM", "SemiSEM". Default value is "EM".}
 
 \item{nbIteration}{Integer defining the number of iteration in \code{algo}.
-nbIteration must be a positive integer. Default values is 20. Not used if  \code{algo} = NULL.}
+nbIteration must be a positive integer. Default values is 20. Not used if
+\code{algo} = NULL.}
 
-\item{epsilon}{Real defining the epsilon value for the algorithm. Default value: 0.01.}
+\item{epsilon}{threshold to use in order to stop the iterations. Default value is 0.01.}
 }
 \value{
 a [\code{\linkS4class{ClusterInit}}] object
@@ -36,10 +37,10 @@ There is three ways to initialize the parameters:
   \item \code{fuzzy}  {The initial probabilities of membership of individuals are
                        sampled randomly.}
 }
-A few iteration of an algorithm [\code{\link{clusterAlgo}}] are then performed.
-It is strongly recommended to use a few number of iterations of the \code{SEM}
-or \code{CEM} algorithms after initialization. This allow to detect "bad"
-initialization starting point of the estimation algorithm.
+A few iterations of an algorithm [\code{\link{clusterAlgo}}] are then performed.
+It is strongly recommended to use a few number of iterations of the \code{EM}
+or \code{SEM} algorithms after initialization. This allows to detect "bad"
+initialization starting point.
 
 These two stages are repeated until \code{nbInit} is reached. The initial
 point with the best log-likelihood is conserved as the initial starting point.

@@ -17,10 +17,13 @@
 Bretagnolle, V., 2007. Personal communication, source: Museum.
 }
 \description{
-The dataset contains details on the morphology of birds (puffins). Each
+The data set contains details on the morphology of birds (puffins). Each
 individual (bird) is described by 6 qualitative variables. One variable for
 the gender and 5 variables giving a morphological description of the birds.
 There is 69 puffins divided in 2 sub-classes: lherminieri (34) and subalaris (35).
+}
+\details{
+This data set is also part of the Rmixmod package.
 }
 \examples{
 data(birds)

@@ -40,10 +40,10 @@ specified in [\code{strategy}].
 ## A quantitative example with the birds data set
 data(birds)
 ## add 10 missing values
-x = birds;
-x[round(runif(5,1,nrow(birds))), 2] <- NA
-x[round(runif(5,1,nrow(birds))), 4] <- NA
-## with default values
+x = as.matrix(birds); n <- nrow(x); p <- ncol(x);
+indexes <- matrix(c(round(runif(5,1,n)), round(runif(5,1,p))), ncol=2);
+x[indexes] <- NA;
+## estimate model (using fast strategy, results may be misleading)
 model <- clusterCategorical(data=x, nbCluster=2:3, strategy = clusterFastStrategy())
 
 ## use graphics functions

@@ -23,7 +23,7 @@
 */
 
 /*
- * Project:  rtkpp
+ * Project:  MixAll
  * created on: 4 sept. 2013
  * Author:   iovleff, serge.iovleff@stkpp.org
  * Originally created by Parmeet Bhatia <b..._DOT_p..._AT_gmail_Dot_com>

@@ -17,7 +17,9 @@ The source provides a data set recording class, sex, age, and survival status
 for each person on board of the Titanic, and is based on data originally
 collected by the British Board of Trade and reprinted in:
 British Board of Trade (1990), "Report on the Loss of the Titanic (S.S.)".
- British Board of Trade Inquiry Report (reprint).  Gloucester, UK: Allan Sutton Publishing.
+British Board of Trade Inquiry Report (reprint).  Gloucester, UK: Allan Sutton Publishing.
+
+This data set is also part of the Rmixmod package.
 }
 \description{
 For each person on board the fatal maiden voyage of the ocean liner Titanic,

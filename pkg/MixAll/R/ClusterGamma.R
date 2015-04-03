@@ -124,10 +124,12 @@ clusterGamma <- function( data, nbCluster=2
 #-----------------------------------------------------------------------
 #' Definition of the [\code{\linkS4class{ClusterGammaComponent}}] class
 #'
-#' This class defines a gamma component of a mixture Model.
+#' This class defines a gamma component of a mixture Model. It inherits
+#' from [\code{\linkS4class{IClusterComponent}}].
 #'
 #' @slot shape  Matrix with the shape of the jth variable in the kth cluster.
 #' @slot scale  Matrix with the scale of the jth variable in the kth cluster.
+#' 
 #' @seealso [\code{\linkS4class{IClusterComponent}}] class
 #'
 #' @examples
@@ -136,7 +138,7 @@ clusterGamma <- function( data, nbCluster=2
 #' @author Serge Iovleff
 #'
 #' @name ClusterGammaComponent
-#' @rdname IClusterComponent-class
+#' @rdname ClusterGammaComponent-class
 #' @aliases ClusterGammaComponent-class
 #' @exportClass ClusterGammaComponent
 #'
@@ -155,10 +157,10 @@ setClass(
       return(TRUE)
     }
 )
-#' Initialize an instance of a rtkpp class.
+#' Initialize an instance of a MixAll S4 class.
 #'
 #' Initialization method of the [\code{\linkS4class{ClusterGammaComponent}}] class.
-#' Used internally in the `rtkpp' package.
+#' Used internally in the 'MixAll' package.
 #'
 #' @rdname initialize-methods
 #' @keywords internal
@@ -246,7 +248,9 @@ setMethod(
 #'   =\sum_{k=1}^K p_k \prod_{j=1}^d \gamma(x_j;a_{jk},b_{jk}) \\
 #'    \quad {x} \in {R}^d.
 #' }
-#'
+#' Constraints can be added to the shape and/or scale in order to reduce the number
+#' of parameters.
+#'  
 #' @slot component  A [\code{\linkS4class{ClusterGammaComponent}}] with the
 #' shape and the scale of the component mixture model.
 #' @seealso [\code{\linkS4class{IClusterModelBase}}] class
@@ -285,10 +289,10 @@ setClass(
     }
 )
 
-#' Initialize an instance of a rtkpp class.
+#' Initialize an instance of a MixAll S4 class.
 #'
 #' Initialization method of the [\code{\linkS4class{ClusterGamma}}] class.
-#' Used internally in the `rtkpp' package.
+#' Used internally in the 'MixAll' package.
 #'
 #' @rdname initialize-methods
 #' @keywords internal

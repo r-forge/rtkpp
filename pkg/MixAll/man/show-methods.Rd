@@ -30,7 +30,7 @@
 \alias{show-algo,ClusterAlgo-method}
 \alias{show-init,ClusterInit,ClusterInit-method}
 \alias{show-strategy,ClusterStrategy-method}
-\title{Show description of a rtkpp class to standard output.}
+\title{Show description of a MixAll S4 class to standard output.}
 \usage{
 \S4method{show}{ClusterAlgo}(object)
 
@@ -61,14 +61,14 @@
 \S4method{show}{IClusterComponent}(object)
 }
 \arguments{
-\item{object}{a rtkpp object: a \code{\linkS4class{ClusterStrategy}},
+\item{object}{a MixAll object: a \code{\linkS4class{ClusterStrategy}},
 a \code{\linkS4class{ClusterInit}} or a \code{\linkS4class{ClusterAlgo}}.}
 }
 \value{
 NULL. Prints to standard out.
 }
 \description{
-Show description of a rtkpp class to standard output.
+Show description of a MixAll S4 class to standard output.
 }
 \examples{
 ## for strategy

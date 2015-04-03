@@ -22,7 +22,31 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
-#' Extract parts of a rtkpp S4 class
+#' Return the missing values of a component or a cluster class.
+#'
+#' The missing methods allow the user to get the imputed mssing
+#' values from a mixture model.
+#'
+#' @param x an object that can return the imputed missing values
+#'
+#' @return A matrix with three columns (row index, column index, value)
+#'
+#' @name missingValues
+#' @docType methods
+#' @rdname missingValues-methods
+#' @exportMethod missingValues
+#'
+#' @examples
+#'   data(geyser)
+#'   model <- clusterDiagGaussian(geyser,3)
+#'   missingValues(model)
+setGeneric(
+    name = "missingValues",
+    function(x)
+    { standardGeneric("missingValues")}
+)
+
+#' Extract parts of a MixAll S4 class
 #'
 #' @param x object from which to extract element(s) or in which to replace element(s).
 #' @param i the name of the element we want to extract or replace.
@@ -39,9 +63,9 @@
 #'
 NULL
 
-#' Print a rtkpp class to standard output.
+#' Print a MixAll S4 class to standard output.
 #'
-#' @param x a rtkpp object: a \code{\linkS4class{ClusterStrategy}},
+#' @param x a MixAll object: a \code{\linkS4class{ClusterStrategy}},
 #' a \code{\linkS4class{ClusterInit}} or a \code{\linkS4class{ClusterAlgo}}.
 #' @param ... further arguments passed to or from other methods
 #'
@@ -66,9 +90,9 @@ NULL
 #'
 NULL
 
-#' Show description of a rtkpp class to standard output.
+#' Show description of a MixAll S4 class to standard output.
 #'
-#' @param object a rtkpp object: a \code{\linkS4class{ClusterStrategy}},
+#' @param object a MixAll object: a \code{\linkS4class{ClusterStrategy}},
 #' a \code{\linkS4class{ClusterInit}} or a \code{\linkS4class{ClusterAlgo}}.
 #'
 #' @return NULL. Prints to standard out.
@@ -93,7 +117,7 @@ NULL
 NULL
 
 
-#' Produce summary of a rtkpp class.
+#' Produce summary of a MixAll S4 class.
 #'
 #' @param object any cluster model deriving from a \code{\linkS4class{IClusterModelBase}} object.
 #' @param ... further arguments passed to or from other methods

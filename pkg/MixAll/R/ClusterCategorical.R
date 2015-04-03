@@ -50,10 +50,10 @@ NULL
 #' ## A quantitative example with the birds data set
 #' data(birds)
 #' ## add 10 missing values
-#' x = birds;
-#' x[round(runif(5,1,nrow(birds))), 2] <- NA
-#' x[round(runif(5,1,nrow(birds))), 4] <- NA
-#' ## with default values
+#' x = as.matrix(birds); n <- nrow(x); p <- ncol(x);
+#' indexes <- matrix(c(round(runif(5,1,n)), round(runif(5,1,p))), ncol=2); 
+#' x[indexes] <- NA;
+#' ## estimate model (using fast strategy, results may be misleading)
 #' model <- clusterCategorical(data=x, nbCluster=2:3, strategy = clusterFastStrategy())
 #'
 #' ## use graphics functions
@@ -122,10 +122,13 @@ clusterCategorical <- function( data, nbCluster=2
 #-----------------------------------------------------------------------
 #' Definition of the [\code{\linkS4class{ClusterCategoricalComponent}}] class
 #'
-#' This class defines a categorical component of a mixture Model.
+#' This class defines a categorical component of a mixture Model. It inherits
+#' from [\code{\linkS4class{IClusterComponent}}].
 #'
 #' @slot plkj Array with the probability of the jth variable in the kth cluster to be l.
-#' @slot nbModalities Integer with the (maximal) number of modalities of the categorical  data.
+#' @slot nbModalities Integer with the (maximal) number of modalities of the categorical data.
+#' @slot levels list with the original levels of the variables
+#' 
 #' @seealso [\code{\linkS4class{IClusterComponent}}] class
 #'
 #' @examples
@@ -134,7 +137,7 @@ clusterCategorical <- function( data, nbCluster=2
 #' @author Serge Iovleff
 #'
 #' @name ClusterCategoricalComponent
-#' @rdname IClusterComponent-class
+#' @rdname ClusterCategoricalComponent-class
 #' @aliases ClusterCategoricalComponent-class
 #' @exportClass ClusterCategoricalComponent
 #'
@@ -155,10 +158,10 @@ setClass(
     return(TRUE)
   }
 )
-#' Initialize an instance of a rtkpp class.
+#' Initialize an instance of a MixAll class.
 #'
 #' Initialization method of the [\code{\linkS4class{ClusterCategoricalComponent}}] class.
-#' Used internally in the `rtkpp' package.
+#' Used internally in the `MixAll' package.
 #'
 #' @rdname initialize-methods
 #' @keywords internal
@@ -260,7 +263,9 @@ setMethod(
 #'   =\sum_{k=1}^K p_k \prod_{j=1}^d \mathcal{M}(x_j;p_{jk},1) \\
 #'    \quad {x} \in \{1,\ldots,L\}^d.
 #' }
-#'
+#' The probabilities can be assumed equal between all variables in order to
+#' reduce the number of parameters.
+#' 
 #' @slot component  A [\code{\linkS4class{ClusterCategoricalComponent}}] with the
 #' probabilities of the categorical component
 #'
@@ -297,10 +302,10 @@ setClass(
   }
 )
 
-#' Initialize an instance of a rtkpp class.
+#' Initialize an instance of a MixAll S4 class.
 #'
 #' Initialization method of the [\code{\linkS4class{ClusterCategorical}}] class.
-#' Used internally in the `rtkpp' package.
+#' Used internally in the `MixAll' package.
 #'
 #' @rdname initialize-methods
 #' @keywords internal

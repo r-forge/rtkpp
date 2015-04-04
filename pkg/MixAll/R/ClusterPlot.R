@@ -56,7 +56,7 @@
   split.screen(c(nbCol, nbCol))           # create layout matrix screens
   col = model@zi+2;                       # color for each group
   pch = rep(1, length.out = length(col)); # circles
-  pch[model@component@missing[,1]] = 3;            # + for missing values
+  pch[model@component@missing[,1]] = 3;   # + for missing values
   # create histograms on the diagonal
   for ( i in 1:nbCol )
   {
@@ -71,6 +71,7 @@
     if (is.numeric(y)) { xlab=colnames(model@component@data)[y[i]];}
     else               { xlab= y[i];}
     # TODO: check if xlab is empty
+    if (is.null(xlab)) { xlab = paste("dimension ", i)}
     main=paste("Histogram of",xlab)
     h<-hist(model@component@data[,y[i]], xlab=xlab, main=main, ...)
     # add on the histogram the estimated densities
@@ -88,16 +89,20 @@
     {
       if (is.numeric(y)) { xlab=colnames(model@component@data)[y[i]];}
       else               { xlab= y[i];}
+      if (is.null(xlab)) { xlab = paste("dimension ", i)}
+      main=paste("Histogram of",xlab)
       for( j in 1:(i-1) )
       {
         screen(j+((i-1)*nbCol)) # screen(i,j)
         if (is.numeric(y)) {ylab=colnames(model@component@data)[y[j]];}
         else {ylab= y[j];}
+        if (is.null(ylab)) { ylab = paste("dimension ", j)}
+        main=paste("Histogram of",xlab)
         plot(model@component@data[,y[j]], model@component@data[,y[i]], col=col, pch=pch, xlab=xlab, ylab=ylab, ...)
       }
     }
   }
-#  mtext("Visualisation using latent logistic representation", outer = TRUE, cex = 1.5)
+  #  mtext("Visualisation using latent logistic representation", outer = TRUE, cex = 1.5)
   close.screen(all.screens = TRUE)
   # restore plotting parameters
   par(op)

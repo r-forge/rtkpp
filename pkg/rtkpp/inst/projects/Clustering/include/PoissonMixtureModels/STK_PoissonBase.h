@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2014 Serge IOVLEFF
+/*     Copyright (C) 2004-2015 Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -35,13 +35,11 @@
 #define STK_POISSONBASE_H
 
 #include "../STK_IMixtureModel.h"
-#include "STK_PoissonParameters.h"
-
-#include "STatistiK/include/STK_Law_Poisson.h"
+#include "../STK_MixtureParameters.h"
+#include <STatistiK/include/STK_Law_Poisson.h>
 
 namespace STK
 {
-
 /** @ingroup Clustering
  *  Base class for the Poisson models
  **/
@@ -50,16 +48,13 @@ class PoissonBase : public IMixtureModel<Derived >
 {
   public:
     typedef IMixtureModel<Derived > Base;
-
-    using Base::p_tik;
-    using Base::components;
+    using Base::p_tik; using Base::param_;
     using Base::p_data;
-    using Base::p_param;
-
+    using Base::nbCluster;
 
   protected:
     /** default constructor
-     * @param nbCluster number of cluster in the model
+     *  @param nbCluster number of cluster in the model
      **/
     inline PoissonBase( int nbCluster) : Base(nbCluster) {}
     /** copy constructor
@@ -70,12 +65,16 @@ class PoissonBase : public IMixtureModel<Derived >
     inline ~PoissonBase() {}
 
   public:
+    /** @return the value of lambda of the kth cluster and jth variable */
+    inline Real lambda(int k, int j) const { return this->asDerived().lambdaImpl(k,j);}
+    /** Initialize the parameters of the model. */
+    void initializeModelImpl() { param_.resize(p_data()->cols());}
     /** @return a value to impute for the jth variable of the ith sample*/
     Real impute(int i, int j) const
     {
       Real sum = 0.;
-      for (int k= p_tik()->beginCols(); k < components().end(); ++k)
-      { sum += p_tik()->elt(i,k) * p_param(k)->lambda(j);}
+      for (int k= p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
+      { sum += p_tik()->elt(i,k) * lambda(k,j);}
       return sum;
     }
     /** @return a simulated value for the jth variable of the ith sample
@@ -84,14 +83,14 @@ class PoissonBase : public IMixtureModel<Derived >
     Real sample(int i, int j) const
     {
       int k = Law::Categorical::rand(p_tik()->row(i));
-      return Law::Poisson::rand(p_param(k)->lambda(j));
+      return Law::Poisson::rand(lambda(k,j));
     }
     /** get the parameters of the model
      *  @param params the array to fill with the parameters of the model
      **/
-    void getParameters(Array2D<Real>& params) const;
+    void getParameters(ArrayXX& params) const;
     /** @return the parameters of the model in an array of size (K * d). */
-    ArrayXX getParametersImpl() const;
+    ArrayXX getParameters() const;
     /** Write the parameters on the output stream os */
     void writeParameters(ostream& os) const;
 };
@@ -100,38 +99,36 @@ class PoissonBase : public IMixtureModel<Derived >
 template<class Derived>
 void PoissonBase<Derived>::writeParameters(ostream& os) const
 {
-  PointX lambda(p_data()->cols());
-  for (int k= baseIdx; k < components().end(); ++k)
+  ArrayXX params;
+  getParameters(params);
+  for (int k= params.beginRows(); k < params.endRows(); ++k)
   {
-    // store shape and scale values in an array for a nice output
-    for (int j= p_data()->beginCols();  j < p_data()->endCols(); ++j)
-    { lambda[j] = p_param(k)->lambda(j);}
     os << _T("---> Component ") << k << _T("\n");
-    os << _T("lambda = ") << lambda;
+    os << _T("lambda = ") << params.row(k);
   }
 }
 
 /*get the parameters of the model*/
 template<class Derived>
-void PoissonBase<Derived>::getParameters(Array2D<Real>& params) const
+void PoissonBase<Derived>::getParameters(ArrayXX& params) const
 {
-  params.resize(this->nbCluster(), p_data()->cols());
+  params.resize(nbCluster(), p_data()->cols());
   for (int k= params.beginRows(); k < params.endRows(); ++k)
   {
     for (int j= p_data()->beginCols();  j < p_data()->endCols(); ++j)
-    { params(k, j) = p_param(k)->lambda(j);}
+    { params(k, j) = lambda(k,j);}
   }
 }
 /* get the parameters of the model in an array of size (K * d). */
 template<class Derived>
-ArrayXX PoissonBase<Derived>::getParametersImpl() const
+ArrayXX PoissonBase<Derived>::getParameters() const
 {
   ArrayXX params;
-  params.resize(this->nbCluster(), p_data()->cols());
+  params.resize(nbCluster(), p_data()->cols());
   for (int k= params.beginRows(); k < params.endRows(); ++k)
   {
     for (int j= p_data()->beginCols();  j < p_data()->endCols(); ++j)
-    { params(k, j) = p_param(k)->lambda(j);}
+    { params(k, j) = lambda(k,j);}
   }
   return params;
 }

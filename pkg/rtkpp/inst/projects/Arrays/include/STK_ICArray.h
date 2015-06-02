@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2014  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as
@@ -54,7 +54,7 @@ namespace STK
 /** @class ICArray
   * @ingroup Arrays
   *
-  * @brief Interface class for all CArray, CPoint, CVector
+  * @brief Interface class for all CArray, CArrayPoint, CArrayVector and CArraySquare.
   *
   * This class is the base that is inherited by all objects (matrix, vector,
   * point) which are not expression and stored as CArrays. The common API for
@@ -127,10 +127,18 @@ class ICArray : public ArrayBase<Derived>
                   : Base(), allocator_(q, sizeRows, sizeCols)
     {}
     /** constructor by reference, ref_=1.
+     *  @param allocator the allocator to wrap
+     *  @param I,J range of the rows and columns to wrap
+     **/
+    template<class OtherAllocator>
+    ICArray( ICAllocator<OtherAllocator> const& allocator, Range const& I, Range const& J)
+           : Base(), allocator_(allocator.asDerived(), I, J)
+    {}
+    /** constructor by reference, ref_=1.
      *  @param allocator with the data
      **/
     template< class OtherAllocator>
-    inline ICArray( CAllocatorBase<OtherAllocator> const& allocator)
+    inline ICArray( ICAllocator<OtherAllocator> const& allocator)
                   : Base(), allocator_(allocator.asDerived(), true)
     {}
     /**  destructor */
@@ -189,16 +197,20 @@ class ICArray : public ArrayBase<Derived>
     inline Row rowImpl(int i) const { return  Row( allocator_.row(i));}
     /** implement the row operator using a reference on the row of the allocator */
     inline SubRow rowImpl(int i, Range const& J) const { return SubRow( allocator_.row( i, J));}
+    /** implement the row operator using a reference on the rows of the allocator */
+    inline SubArray rowImpl(Range const& I) const { return SubArray( allocator_.row(I, this->cols()));}
 
     /** implement the col operator using a reference on the column of the allocator */
     inline Col colImpl(int j) const { return  Col( allocator_.col(j));}
     /** implement the col operator using a reference on the column of the allocator */
     inline SubCol colImpl(Range const& I, int j) const { return SubCol( allocator_.col( I, j));}
+    /** implement the col operator using a reference on the columns of the allocator */
+    inline SubArray colImpl(Range const& J) const { return SubArray( allocator_.sub( this->rows(), J));}
 
-    /** implement the sub operator for 2D arrays using a reference on the column of the allocator */
-    inline SubArray subImpl(Range const& I, Range const& J) const { return SubArray(allocator_.sub(I, J));}
     /** implement the sub operator for 1D arrays using a reference on the column of the allocator */
     inline SubVector subImpl( Range const& J) const { return SubVector( allocator_.sub(J));}
+    /** implement the sub operator for 2D arrays using a reference on the column of the allocator */
+    inline SubArray subImpl(Range const& I, Range const& J) const { return SubArray(allocator_.sub(I, J));}
 
     /** swap two elements: only for vectors an points. */
     inline void swap(int i, int  j) { std::swap(this->elt(i), this->elt(j)); }
@@ -282,46 +294,6 @@ class ICArray : public ArrayBase<Derived>
       { STKRUNTIME_ERROR_1ARG(ICArray::resize,I,cannot operate on reference);}
       allocator_.resize(I.size());
       allocator_.shift(I.begin());
-      return this->asDerived();
-    }
-  private:
-    /** TODO: overwrite @c this with @c src.
-     *  @note If the size match, @c this is not resized, and in this case,
-     *  the method take care of the possibly of overlapping.
-     *  @param src the container to copy
-     **/
-    Derived& copy( ICArray const& src)
-    {
-      // Resize if necessary.
-      if ( (this->sizeRows() != src.sizeRows()) || (this->sizeCols() != src.sizeCols()) )
-        this->resize(src.rows(), src.cols());
-
-      // Copy without overlapping
-      if (src.beginRows()>=this->beginRows())
-      {
-        if (src.beginCols()>this->beginCols())
-        {
-          for ( int jSrc=src.beginCols(), jDst=this->beginCols(); jSrc<=src.lastIdxCols(); jDst++, jSrc++)
-          { this->copyColumnForward(src, jDst, jSrc);}
-        }
-        else
-        {
-          for ( int jSrc=src.lastIdxCols(), jDst=this->lastIdxCols(); jSrc>=src.beginCols(); jDst--, jSrc--)
-          { this->copyColumnForward(src, jDst, jSrc);}
-        }
-        return this->asDerived();
-      }
-      // src.beginRows()<this->beginRows()
-      if (src.beginCols()>=this->beginCols())
-      {
-        for ( int jSrc=src.beginCols(), jDst=this->beginCols(); jSrc<=src.lastIdxCols(); jDst++, jSrc++)
-        { this->copyColumnBackward(src, jDst, jSrc);}
-      }
-      else // src.beginCols()<this->beginCols()
-      {
-        for ( int jSrc=src.lastIdxCols(), jDst=this->lastIdxCols(); jSrc>=src.beginCols(); jDst--, jSrc--)
-        { this->copyColumnBackward(src, jDst, jSrc);}
-      }
       return this->asDerived();
     }
 };

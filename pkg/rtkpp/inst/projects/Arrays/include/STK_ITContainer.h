@@ -37,12 +37,12 @@
  *  Container Class.
  **/
 
-#ifndef STK_ITCONTAINER2D_H
-#define STK_ITCONTAINER2D_H
+#ifndef STK_ITCONTAINER_H
+#define STK_ITCONTAINER_H
 
-#include "Sdk/include/STK_Macros.h"
-#include "Sdk/include/STK_IRecursiveTemplate.h"
-#include "Sdk/include/STK_StaticAssert.h"
+#include <Sdk/include/STK_IRecursiveTemplate.h>
+#include <Sdk/include/STK_StaticAssert.h>
+#include <Sdk/include/STK_Macros.h>
 
 #include "STK_Traits.h"
 #include "STK_Arrays_Util.h"
@@ -744,5 +744,4 @@ class ITContainer<Derived, Arrays::number_> : public ITContainerBase<Derived>
 
 } // namespace STK
 
-#endif
-// STK_ITCONTAINER_H
+#endif /* STK_ITCONTAINER_H */

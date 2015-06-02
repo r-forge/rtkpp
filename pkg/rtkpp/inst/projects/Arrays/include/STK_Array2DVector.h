@@ -144,13 +144,13 @@ class Array2DVector : public IArray2D< Array2DVector<Type_> >
      *  @param T the container to wrap
      *  @param I the range of the columns to wrap
      **/
-    Array2DVector( const Array2DVector<Type>& T, Range const& I)
+    Array2DVector( const Array2DVector& T, Range const& I)
                  : Base(T, I, T.cols())
     {}
     /** constructor by reference, ref_=1.
      *  @param T the container to wrap
      *  @param I the range of the data to wrap
-     *  @param col the index of the col to wrap
+     *  @param col the index of the column to wrap
      **/
     template<class OtherArray>
     Array2DVector( IArray2D<OtherArray> const& T, Range const& I, int col)
@@ -165,7 +165,7 @@ class Array2DVector : public IArray2D< Array2DVector<Type_> >
     /** constructor by reference, ref_=1.
      *  @param p_data a pointer on the data to wrap
      *  @param I the range of the data to wrap
-     *  @param col the index of the col to wrap
+     *  @param col the index of the column to wrap
      **/
      Array2DVector( Type** p_data, Range const& I, int col)
                   : Base(p_data, I, Range(col, 1))

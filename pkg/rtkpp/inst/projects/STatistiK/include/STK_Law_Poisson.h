@@ -43,6 +43,20 @@ namespace STK
 namespace Law
 {
 /** @ingroup Laws
+ *  @brief Poisson distribution law.
+ *
+ *  In probability theory and statistics, the <em>Poisson distribution</em>,
+ *  named after French mathematician Siméon Denis Poisson, is a discrete
+ *  probability distribution that expresses the probability of a given number
+ *  of events occurring in a fixed interval of time and/or space if these events
+ *  occur with a known average rate and independently of the time since the last
+ *  event.
+ *
+ * The Poisson distribution can be applied to systems with a large number of
+ * possible events, each of which is rare. How many such events will occur
+ * during a fixed time interval? Under the right circumstances, this is a
+ * random number with a Poisson distribution.
+ *
  * A discrete random variable @e X is said to have a Poisson distribution with
  * parameter \f$ \lambda >0 \f$ (the mean) if the probability mass function
  * of @e X is given by
@@ -51,11 +65,6 @@ namespace Law
  * \f]
  * The positive real number \f$ \lambda \f$ is equal to the expected value of
  * @e X and also to its variance.
- *
- * The Poisson distribution can be applied to systems with a large number of
- * possible events, each of which is rare. How many such events will occur
- * during a fixed time interval? Under the right circumstances, this is a
- * random number with a Poisson distribution.
  */
 class Poisson: public IUnivLaw<int>
 {
@@ -139,7 +148,6 @@ class Poisson: public IUnivLaw<int>
      *  @return the quantile for p
      **/
     static int icdf(Real const& p, Real const& lambda);
-
 
   protected:
     /** mean of the Poisson distribution */

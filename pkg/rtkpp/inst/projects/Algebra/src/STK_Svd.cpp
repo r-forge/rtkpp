@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2007  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -23,7 +23,7 @@
 */
 
 /*
- * Project:  Algebra
+ * Project:  stkpp::Algebra
  * Purpose:  Implement the Svd Class.
  * Author:   Serge Iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  *
@@ -34,46 +34,22 @@
  **/
 
 #include "../include/STK_Svd.h"
-
-#include "Arrays/include/STK_Array2DLowerTriangular.h"
-#include "Arrays/include/STK_Array2DUpperTriangular.h"
-#include "Arrays/include/STK_Array2D_Functors.h"
-
-
 #include "../include/STK_Householder.h"
 #include "../include/STK_Givens.h"
 
+#include "Arrays/include/STK_Array2D_Functors.h"
+
+#define MAX_ITER 30
+
 namespace STK
 {
-
-/* Constructors   */
 /* Default constructor  */
- Svd::Svd( ArrayXX const& A, bool   ref, bool   withU, bool   withV)
-        : U_(A, ref)
-        , withU_(withU)
-        , withV_(withV)
-        , ref_(ref)
-{
-  init();
-  compSvd();
-}
+ Svd::Svd( ArrayXX const& A, bool   ref, bool withU, bool withV)
+         : Base(A, ref, withU, withV)
+{}
 
 /* Copy constructor */
-Svd::Svd( const Svd &S)
-        : U_(S.U_, S.ref_)
-        , V_(S.V_)
-        , D_(S.D_)
-        , ncolV_(S.ncolV_)
-        , ncolD_(S.ncolD_)
-        , ncolU_(S.ncolU_)
-        , nrowU_(S.nrowU_)
-        , withU_(S.withU_)
-        , withV_(S.withV_)
-        , ref_(S.ref_)
-        , norm_(S.norm_)
-        , rank_(S.rank_)
-        , error_(S.error_)
-{}
+Svd::Svd( const Svd &S): Base(S), F_(S.F_) {}
 
 /* Operator = : overwrite the Svd with S.*/
 Svd& Svd::operator=(const Svd &S)
@@ -81,132 +57,82 @@ Svd& Svd::operator=(const Svd &S)
   U_ = S.U_;
   V_ = S.V_;
   D_ = S.D_;
-  ncolV_ = S.ncolV_;
-  ncolD_ = S.ncolD_;
-  ncolU_ = S.ncolU_;
-  nrowU_ = S.nrowU_;
   withU_ = S.withU_;
   withV_ = S.withV_;
-  ref_ = false;        // no reference possible with operator =
   norm_ = S.norm_;
   rank_ = S.rank_;
-  error_ = S.error_;
-
   return *this;
 }
 
 /* virtual destructor.  */
-Svd::~Svd()
-{ ;}
+Svd::~Svd() {}
 
-
+/* run the Svd */
+bool Svd::run()
+{
+  init();             // initialize (U_) and dimensions
+  compSvd();          // compute the svd
+  return true;
+}
 /* Private functions. */
 /* initialization of the Svd. */
 void Svd::init()
 {
-  // U_ is just a copy of A, translate begin to 1
-  U_.shift(1,1);   // if U_ is a ref on A, this can generate an error
-
   // If the container is empty, set default
-  if (U_.empty())
-  { ncolV_ = 0;
-    ncolD_ = 0;
-    ncolU_ = U_.sizeCols();
-    nrowU_ = 0;
-    return;
-  }
-
-  // The container is not empty, thus we have to compute the dimension
-  // and eventually to adjust the container (U_)
-  ncolU_ = U_.sizeCols();         // Number of cols of (U_)
-  nrowU_ = U_.sizeRows();         // Number of rows of (U_)
-  ncolV_ = U_.sizeCols();         // Number of cols of V_
-  ncolD_ = std::min(nrowU_, ncolV_); // Maximal number of singular value
-  error_ = false;               // no problems...
+  if (U_.empty()) { return;}
+  // if U_ is just a copy of A, translate begin to 1
+  // if U_ is a ref on A, this can generate an error
+  U_.shift(1,1);
 }
 
 
-/* Main method for the svd computation.                               */
-void Svd::compSvd()
+/* Main method for the svd computation. */
+bool Svd::compSvd()
 {
   // if the container is empty, there is nothing to do
   if (U_.empty())
   { rank_ = 0;
     norm_ = 0.0;
-    return;
+    return true;
   }
   // Bidiagonalize (U_)
   norm_ = bidiag(U_, D_, F_);
+  // right householder vectors are in upper part of U_
   // We need to create V_ before rightEliminate
-  if (withV_) {
-    V_.resize(Range(1,ncolV_));
-    compV();
-  }
+  if (withV_) { compV();}
   // rightEliminate last element of F_ if any
-  if (nrowU_ < ncolV_)
-  { rightEliminate(D_, F_, nrowU_, V_, withV_, norm_);}
+  if (nrowU() < ncolV())
+  { rightEliminate(D_, F_, nrowU(), V_, withV_, norm_);}
   // If (U_) is not needed, we can destroy the storage
   if (withU_) { compU();}
   // Diagonalize
-  error_ = diag(D_, F_, U_, V_, withU_, withV_, norm_);
+  bool error = diag(D_, F_, U_, V_, withU_, withV_, norm_);
   // Compute the true inf norm
   norm_ = D_[1];
   // Compute the rank
   rank_ = 0;
-  for (int iter=1; iter<=ncolD_; iter++)
-    if (norm_+D_[iter]!=norm_) { rank_++;}
+  for (int i=D_.begin(); i<D_.end(); i++)
+    if (norm_+D_[i] != norm_) { rank_++;}
     else break;
   // The sub diagonal is now zero
   F_.clear();
+  return error;
 }
 
 
-/* New computation of the Svd.                                        */
-void Svd::newSvd( ArrayXX const&   A
-                , bool     withU
-                , bool     withV
-                )
-{ // clear old results
+/* New computation of the Svd. */
+void Svd::setData( ArrayXX const& A, bool withU, bool withV)
+{
+  // clear old results
   clear();
-
   // create U_
-  U_   = A;           // Copy A in U_
-  ref_ = false;       // this is not a ref_
-
-  withU_   = withU;   // copy withU_ value
-  withV_   = withV;   // copy withV_ value
-
-  init();             // initialize (U_) and dimensions
-  compSvd();          // compute the svd
+  U_ = A;           // Copy A in U_
+  withU_ = withU;   // copy withU_ value
+  withV_ = withV;   // copy withV_ value
 }
 
-
-/* clear (U_)                                                         */
-void Svd::clearU()
-{ U_.clear();
-  nrowU_ = 0;
-  ncolU_ = 0;
-  withU_ = false;
-}
-
-
-/* clear (U_)                                                         */
-void Svd::clearV()
-{ V_.clear(); withV_ = false;
-  ncolV_ = 0;
-}
-
-
-/* clear Svd                                                          */
-void Svd::clear()
-{ clearU();
-  clearV();
-  D_.clear();
-}
-
-
-/* Bidiagonalization of the matrix M.                                 */
-Real Svd::bidiag(const ArrayXX& M, Point& D, Vector& F)
+/* Bidiagonalization of the matrix M. */
+Real Svd::bidiag(const ArrayXX& M, ArrayDiagonalX& D, Vector& F)
 {
   // norm of the matrix M
   Real norm  = 0.0;
@@ -218,11 +144,11 @@ Real Svd::bidiag(const ArrayXX& M, Point& D, Vector& F)
   // Upper diagonal values
   F.resize(Range(begin_iter-1, last_iter, 0));
   F.front() = 0.0;
-  // Bidiagonalisation of M
+  // Bidiagonalization of M
   // loop on the cols and rows
   Range rowRange0(M.rows())
-    , rowRange1(Range(M.beginRows()+1, M.lastIdxRows(), 0))
-    , colRange1(Range(M.beginCols()+1, M.lastIdxCols(), 0));
+      , rowRange1(Range(M.beginRows()+1, M.lastIdxRows(), 0))
+      , colRange1(Range(M.beginCols()+1, M.lastIdxCols(), 0));
   for ( int iter=begin_iter ; iter<=last_iter
       ; iter++
       , rowRange0.incFirst(1)
@@ -256,21 +182,22 @@ Real Svd::bidiag(const ArrayXX& M, Point& D, Vector& F)
 }
 
 
-/* computation of V_                                                  */
+/* computation of V_ */
 void Svd::compV()
-{ // Construction of V_
+{
+  // Construction of V_
+  V_.resize(U_.cols());
   // Number of right Householder rotations
-  int  niter = (ncolV_>nrowU_) ? (nrowU_) : (ncolV_-1);
-
+  int  niter = (ncolV()>nrowU()) ? (nrowU()) : (ncolV()-1);
   // initialization of the remaining rows and cols of V_ to Identity
-  for (int iter=niter+2; iter<=ncolV_; iter++)
+  for (int iter=niter+2; iter<=ncolV(); iter++)
   {
     Vector W(V_, V_.cols(), iter);
     W       = 0.0;
     W[iter] = 1.0;
   }
 
-  Range range1(niter+1, ncolV_, 0), range2(niter+2, ncolV_, 0);
+  Range range1(niter+1, ncolV(), 0), range2(niter+2, ncolV(), 0);
   for ( int iter0=niter, iter1=niter+1, iter2=niter+2; iter0>=1
       ; iter0--, iter1--, iter2--
       , range1.decFirst(1), range2.decFirst(1)
@@ -289,14 +216,14 @@ void Svd::compV()
       // get the Householder vector
       Vcol1 = Point(U_, range2, iter0);
       // Apply housholder to next cols
-      for (int j=iter2; j<=ncolV_; j++)
+      for (int j=iter2; j<=ncolV(); j++)
       {
         Real aux;
         // ref on the column j
         Vector Vcolj( V_, range2, j);
         // update column j
         Vrow1[j] = (aux = dot(Vcol1, Vcolj) * beta);
-        for (int i= iter2; i <= ncolV_; ++i)
+        for (int i= iter2; i <= ncolV(); ++i)
         { Vcolj[i]   += Vcol1[i] * aux;}
       }
       // compute the Householder vector
@@ -311,27 +238,27 @@ void Svd::compV()
   }
   // First column and rows
   V_(1,1) =1.0;
-  V_(Range(2,ncolV_, 0),1) =0.0;
-  V_(1,Range(2,ncolV_, 0)) =0.0;
+  V_(Range(2,ncolV(), 0),1) =0.0;
+  V_(1,Range(2,ncolV(), 0)) =0.0;
 }
 
 
-/* computation of U_                                                  */
+/* computation of U_ */
 void Svd::compU()
 {
   int niter = D_.size();            // Number of iterations
-  int ncol  = std::min(nrowU_, ncolU_); // number of non zero cols of U_
+  int ncol  = std::min(nrowU(), ncolU()); // number of non zero cols of U_
 
   // initialization of the remaining cols of U_ to 0.0
   // put 0 to unused cols
-  U_.col(Range(ncol+1, ncolU_, 0)) = 0.0;
+  U_.col(Range(ncol+1, ncolU(), 0)) = 0.0;
   // Computation of U_
   for (int iter=niter, iter1=niter+1; iter>=1; iter--, iter1--)
   {
     // ref of the column iter
-    Vector X(U_, Range(iter1,nrowU_, 0), iter);
+    Vector X(U_, Range(iter1,nrowU(), 0), iter);
     // ref of the row iter
-    Point P(U_, Range(iter,ncolU_, 0), iter);
+    Point P(U_, Range(iter,ncolU(), 0), iter);
     // Get beta and test
     Real beta = P[iter];
     if (beta)
@@ -342,11 +269,11 @@ void Svd::compU()
       for (int j=iter1; j<=niter; j++)
       { // product of U_iter by U_j
         Real aux;
-        Vector Y(U_, Range(iter1, nrowU_, 0), j); // ref on the column j
+        Vector Y(U_, Range(iter1, nrowU(), 0), j); // ref on the column j
         // U_j = aux = beta * X'Y
         P[j] = (aux = dot( X, Y) *beta);
         // U^j += aux * U^iter
-        for (int i= iter1; i <= nrowU_; ++i)
+        for (int i= iter1; i <= nrowU(); ++i)
         {
           Y[i] += X[i] * aux;
         }
@@ -365,8 +292,8 @@ void Svd::compU()
 }
 
 
-/* eliminate the element of the surdiagonal with right rotations      */
-void Svd::rightEliminate( Point& D, Vector& F, int const& nrow
+/* eliminate the element of the subdiagonal with right rotations      */
+void Svd::rightEliminate( ArrayDiagonalX& D, Vector& F, int const& nrow
                         , ArraySquareX& V, bool withV, Real const& tol
                         )
 {
@@ -398,8 +325,8 @@ void Svd::rightEliminate( Point& D, Vector& F, int const& nrow
 }
 
 
-/* eliminate the element of the surdiagonal with left rotations       */
-void Svd::leftEliminate( Point& D, Vector& F
+/* eliminate the element of the subdiagonal with left rotations */
+void Svd::leftEliminate( ArrayDiagonalX& D, Vector& F
                        , int const& nrow
                        , ArrayXX& U
                        , bool withU
@@ -412,7 +339,7 @@ void Svd::leftEliminate( Point& D, Vector& F
   if (std::abs(z)+tol != tol)
   {
     // begin the Givens rotations
-    for (int k=nrow+1; k <=D.lastIdx(); k++)
+    for (int k=nrow+1; k <D.end(); k++)
     {
       // compute and apply Givens rotation to the rows (nrow, k)
       Real y = D[k];
@@ -431,7 +358,7 @@ void Svd::leftEliminate( Point& D, Vector& F
 
 
 /*  diagonalization of the bidiag matrix                              */
-bool Svd::diag( Point& D
+bool Svd::diag( ArrayDiagonalX& D
               , Vector& F
               , ArrayXX& U
               , ArraySquareX& V
@@ -446,8 +373,8 @@ bool Svd::diag( Point& D
   for (int end=D.lastIdx(); end>=D.begin(); --end)
   { // 30 iter max
     int iter;
-    for (iter=1; iter<=30; iter++)
-    { // if  the last element of the surdiagonale is 0.0
+    for (iter=1; iter<=MAX_ITER; iter++)
+    { // if  the last element of the subdiagonale is 0.0
       // stop the iterations
       int beg;
       if (std::abs(F[end-1])+tol == tol)  { F[end-1] = 0.0; break;}
@@ -458,11 +385,11 @@ bool Svd::diag( Point& D
       {
         D[end]   = 0.0;
         rightEliminate(D, F, end-1, V, withV, tol);
-        break; // Last element of the surdiagonal is 0
+        break; // Last element of the subdiagonal is 0
       }
       // now D[end] != 0 and F[end-1] != 0
       // look for the greatest matrix such that all the elements
-      // of the diagonal and surdiagonal are not zeros
+      // of the diagonal and subdiagonal are not zeros
       for (beg = end-1; beg>D.begin(); --beg)
       {
         if ((std::abs(D[beg])+tol == tol)||(std::abs(F[beg])+tol == tol))
@@ -583,3 +510,5 @@ bool Svd::diag( Point& D
 }
 
 } // namespace STK
+
+#undef MAX_ITER

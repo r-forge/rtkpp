@@ -181,6 +181,7 @@ Mixture stringToMixture( std::string const& type)
   if (toUpperString(type) == toUpperString(_T("Poisson_ljk"))) return Poisson_ljk_;
   if (toUpperString(type) == toUpperString(_T("Poisson_lk"))) return Poisson_lk_;
   if (toUpperString(type) == toUpperString(_T("Poisson_ljlk"))) return Poisson_ljlk_;
+  if (toUpperString(type) == toUpperString(_T("KernelGaussian_sk"))) return KernelGaussian_sk_;
   return unknown_mixture_;
 }
 /* @ingroup Clustering
@@ -213,6 +214,7 @@ Mixture stringToMixture( std::string const& type, bool& freeProp)
   if (toUpperString(type) == toUpperString(_T("Poisson_p_ljk"))) return Poisson_ljk_;
   if (toUpperString(type) == toUpperString(_T("Poisson_p_lk"))) return Poisson_lk_;
   if (toUpperString(type) == toUpperString(_T("Poisson_p_ljlk"))) return Poisson_ljlk_;
+  if (toUpperString(type) == toUpperString(_T("KernelGaussian_sk_p_"))) return KernelGaussian_sk_;
   freeProp = true;
   if (toUpperString(type) == toUpperString(_T("Gamma_pk_ajk_bjk"))) return Gamma_ajk_bjk_;
   if (toUpperString(type) == toUpperString(_T("Gamma_pk_ajk_bk"))) return Gamma_ajk_bk_;
@@ -235,6 +237,7 @@ Mixture stringToMixture( std::string const& type, bool& freeProp)
   if (toUpperString(type) == toUpperString(_T("Poisson_pk_ljk"))) return Poisson_ljk_;
   if (toUpperString(type) == toUpperString(_T("Poisson_pk_lk"))) return Poisson_lk_;
   if (toUpperString(type) == toUpperString(_T("Poisson_pk_ljlk"))) return Poisson_ljlk_;
+  if (toUpperString(type) == toUpperString(_T("KernelGaussian_pk_sk_"))) return KernelGaussian_sk_;
   return unknown_mixture_;
 }
 
@@ -266,6 +269,7 @@ std::string mixtureToString( Mixture const& type)
   if (type == Poisson_ljk_) return String(_T("Poisson_ljk"));
   if (type == Poisson_lk_) return String(_T("Poisson_lk"));
   if (type == Poisson_ljlk_) return String(_T("Poisson_ljlk"));
+  if (type == KernelGaussian_sk_) return String(_T("KernelGaussian_sk"));
   return String(_T("unknown"));
 }
 
@@ -302,6 +306,8 @@ std::string mixtureToString(Mixture type, bool freeProp)
     if (type == Poisson_ljk_) return String(_T("Poisson_p_ljk"));
     if (type == Poisson_lk_) return String(_T("Poisson_p_lk"));
     if (type == Poisson_ljlk_) return String(_T("Poisson_p_ljlk"));
+    if (type == Poisson_ljlk_) return String(_T("Poisson_p_ljlk"));
+    if (type == KernelGaussian_sk_) return String(_T("KernelGaussian_sk_p"));
   }
   else
   {
@@ -326,6 +332,7 @@ std::string mixtureToString(Mixture type, bool freeProp)
     if (type == Poisson_ljk_) return String(_T("Poisson_pk_ljk"));
     if (type == Poisson_lk_) return String(_T("Poisson_pk_lk"));
     if (type == Poisson_ljlk_) return String(_T("Poisson_pk_ljlk"));
+    if (type == KernelGaussian_sk_) return String(_T("KernelGaussian_pk_sk"));
   }
   return String(_T("unknown"));
 }

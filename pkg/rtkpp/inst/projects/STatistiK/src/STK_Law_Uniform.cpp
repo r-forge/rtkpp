@@ -42,7 +42,7 @@ namespace Law
 {
 
 /* constructor. */
-Uniform::Uniform( Real a, Real b) : Base(_T("Uniform")), a_(a), b_(b), range_(b_ - a_)
+Uniform::Uniform( Real const& a, Real const& b) : Base(_T("Uniform")), a_(a), b_(b), range_(b_ - a_)
 {
   if (range_ <= 0.)
     STKINVALIDARGUMENT_ERROR_2ARG(Uniform::Uniform, a_, b_,invalid parameters);
@@ -112,7 +112,7 @@ Real Uniform::icdf( Real const& p) const
  *  parameter.
  *  @param scale the scale of the distribution
  **/
-Real Uniform::rand( Real a, Real b)
+Real Uniform::rand( Real const& a, Real const& b)
 {
   return( (b-a <= 1.) ? a + (b-a) * generator.randUnif()
                       : a + generator.randDblExc(b-a));
@@ -121,7 +121,7 @@ Real Uniform::rand( Real a, Real b)
  *  @param x a real value
  *  @param scale the scale of the distribution
  **/
-Real Uniform::pdf( Real const& x, Real a, Real b)
+Real Uniform::pdf( Real const& x, Real const& a, Real const& b)
 {
   if (!Arithmetic<Real>::isFinite(x) ) return x;
   if ((x < a)||(x > b)) return 0.;
@@ -131,13 +131,23 @@ Real Uniform::pdf( Real const& x, Real a, Real b)
  *  @param x a real value
  *  @param scale the scale of the distribution
  **/
-Real Uniform::lpdf( Real const& x, Real a, Real b)
+Real Uniform::lpdf( Real const& x, Real const& a, Real const& b)
 {
   if (!Arithmetic<Real>::isFinite(x) ) return x;
   if ((x < a)||(x > b)) return -Arithmetic<Real>::infinity();
   return -std::log(b-a);
 }
 
+Real Uniform::cdf(const Real& t, const Real& a, const Real& b)
+{
+  return (b - t)/(b-a);
+}
+
+
+Real Uniform::icdf(const Real& p, const Real& a, const Real& b)
+{ return std::max(a,std::min((1.-p) * a + p * b, b));}
+
 } // namespace Law
 
 } // namespace STK
+

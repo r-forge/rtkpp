@@ -68,7 +68,7 @@ template<class Derived> class  ArrayInitializer;
 
 #include "products/STK_ProductOperators.h"
 #include "operators/STK_TransposeOperator.h"
-#include "operators/STK_DiagOperator.h"
+#include "operators/STK_DiagonalOperator.h"
 #include "operators/STK_UnaryOperators.h"
 #include "operators/STK_BinaryOperators.h"
 #include "operators/STK_DotOperators.h"
@@ -354,11 +354,35 @@ class ExprBase : public ITContainer<Derived, hidden::Traits<Derived>::structure_
     /** @return an expression of the cube of this. */
     MAKE_UNARY_OPERATOR_NOARG(cube, CubeOp)
 
-    /** @return an expression of the power of this. */
-    MAKE_UNARY_OPERATOR_1ARG(pow, PowOp)
+    /** @return an expression of the minimum of this and a number. */
+    MAKE_UNARY_OPERATOR_1ARG(min, MinimumOp)
+    /** @return an expression of the maximum of this and a number. */
+    MAKE_UNARY_OPERATOR_1ARG(max, MaximumOp)
     /** @return an expression of this with each elements incremented by
      *  the constant number */
     MAKE_UNARY_OPERATOR_1ARG(operator+, AddOp)
+    /** @return an expression of this scaled by the number factor number */
+    MAKE_UNARY_OPERATOR_1ARG(operator*, MultipleOp)
+    /** @return an expression of the power of this. */
+    MAKE_UNARY_OPERATOR_1ARG(pow, PowOp)
+    /** @return an expression of this divided by the number value number */
+    MAKE_UNARY_OPERATOR_1ARG(safeInverse, SafeInverseOp)
+    /** @return an expression of this divided by the number value number */
+    MAKE_UNARY_OPERATOR_1ARG(operator/, QuotientOp)
+    // boolean operations
+    /** @return an expression of *this < number. */
+    MAKE_UNARY_OPERATOR_1ARG(operator<, LessThanOp)
+    /** @return an expression of *this <= number. */
+    MAKE_UNARY_OPERATOR_1ARG(operator<=, LeqThanOp)
+    /** @return an expression of *this > number. */
+    MAKE_UNARY_OPERATOR_1ARG(operator>, GreaterThanOp)
+    /** @return the expression of *this >= number. */
+    MAKE_UNARY_OPERATOR_1ARG(operator>=, GeqThanOp)
+    /** @return an expression of *this == number. */
+    MAKE_UNARY_OPERATOR_1ARG(operator==, EqualThanOp)
+    /** @return an expression of *this != number. */
+    MAKE_UNARY_OPERATOR_1ARG(operator!=, NotEqualThanOp)
+
     // handle the case number + expression
     friend inline UnaryOperator<AddOp<Type>, Derived> const
     operator+(Type const number, ExprBase<Derived> const& other)
@@ -375,26 +399,10 @@ class ExprBase : public ITContainer<Derived, hidden::Traits<Derived>::structure_
     /** @return a safe value of this */
     inline UnaryOperator<SafeOp<Type>, Derived> const safe(Type const number = Type()) const
     { return UnaryOperator<SafeOp<Type>, Derived>(this->asDerived(), SafeOp<Type>(number)); }
-    /** @return an expression of this scaled by the number factor number */
-    MAKE_UNARY_OPERATOR_1ARG(operator*, MultipleOp)
     // handle the case number * expression
     inline friend UnaryOperator< MultipleOp<Type>, Derived> const
     operator*(Type const number, ExprBase<Derived> const& other)
     { return other.asDerived()*number; }
-    /** @return an expression of this divided by the number value number */
-    MAKE_UNARY_OPERATOR_1ARG(operator/, QuotientOp)
-    /** @return an expression of *this < number. */
-    MAKE_UNARY_OPERATOR_1ARG(operator<, LessThanOp)
-    /** @return an expression of *this <= number. */
-    MAKE_UNARY_OPERATOR_1ARG(operator<=, LeqThanOp)
-    /** @return an expression of *this > number. */
-    MAKE_UNARY_OPERATOR_1ARG(operator>, GreaterThanOp)
-    /** @return the expression of *this >= number. */
-    MAKE_UNARY_OPERATOR_1ARG(operator>=, GeqThanOp)
-    /** @return an expression of *this == number. */
-    MAKE_UNARY_OPERATOR_1ARG(operator==, EqualThanOp)
-    /** @return an expression of *this != number. */
-    MAKE_UNARY_OPERATOR_1ARG(operator!=, NotEqualThanOp)
 
     /** @return an expression of *this with the  Type type casted to  OtherType. */
     template<typename CastedType>
@@ -414,9 +422,12 @@ class ExprBase : public ITContainer<Derived, hidden::Traits<Derived>::structure_
     inline TransposeOperator<Derived> transpose() const
     { return TransposeOperator<Derived> (this->asDerived());}
 
-    /** @return the diagonal expression of this. */
+    /** @return the diagonal expression of this (work only for 1D expressions). */
     inline DiagonalizeOperator<Derived> diagonalize() const
     { return DiagonalizeOperator<Derived> (this->asDerived());}
+    /** @return the diagonal of this expression (work only for square expressions). */
+    inline DiagonalOperator<Derived> diagonal() const
+    { return DiagonalOperator<Derived> (this->asDerived());}
 
     /** @return the j-th column of this. */
     inline ColOperator<Derived> col(int j) const
@@ -424,7 +435,7 @@ class ExprBase : public ITContainer<Derived, hidden::Traits<Derived>::structure_
     /** @return the i-th row of this. */
     inline RowOperator<Derived> row(int i) const
     { return RowOperator<Derived> (this->asDerived(), i);}
-    /** @return the i-th row of this. */
+    /** @return the sub-vector(I) of this. */
     inline SubOperator<Derived> sub(Range I) const
     { return SubOperator<Derived> (this->asDerived(), I);}
 

@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2014  Serge Iovleff
+/*     Copyright (C) 2004-2015 Serge Iovleff
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as
@@ -29,7 +29,7 @@
  **/
 
 /** @file STK_CAllocator.h
- *  @brief In this file we define the CAllocator templated class.
+ *  @brief In this file we define the CAllocator class.
  **/
 
 #ifndef STK_CALLOCATOR_H
@@ -78,7 +78,7 @@ struct Traits< CAllocator<Type_, SizeRows_, SizeCols_, Orient_> >
                                     , SubRow>::Result
                        , Void
                        >::Result SubVector;
-    typedef Type_                Type;
+    typedef Type_  Type;
     typedef typename RemoveConst<Type_>::Type const& ReturnType;
 
     // use this as default. FIXME: Not optimal in case we just get a SubArray
@@ -97,9 +97,7 @@ struct Traits< CAllocator<Type_, SizeRows_, SizeCols_, Orient_> >
 } // namespace hidden
 
 // forward declaration
-template < class Derived, int SizeRows_, int SizeCols_> class ICAllocator;
-template<class Derived, int SizeRows_ = hidden::Traits<Derived>::sizeRows_, int SizeCols_ = hidden::Traits<Derived>::sizeCols_>
-class CAllocatorBase;
+template < class Derived> class ICAllocator;
 template<class Derived, int SizeRows_, int SizeCols_, bool Orient_> class OrientedCAllocator;
 template<class Derived, int SizeRows_, int SizeCols_, bool Orient_> class StructuredCAllocator;
 
@@ -119,17 +117,38 @@ template<class Derived, int SizeRows_, int SizeCols_, bool Orient_> class Struct
  * {...}
  * @endcode
  *
- * @sa CAllocator
+ *  The allocator stores the data in a single vector by row or by column.
+ *  In order to obtain the element (i,j) of the array, we have to apply,
+ *  either the formula @c i*ldx_+j or @c j*ldx_+i. Concrete implementation
+ *  depends of the structure of the allocator and of the orientation.
+ *
+ *  The pseudo-virtual function to implement have the following description
+ *  @code
+ *    // for all matrices classes except diagonal and square arrays
+ *    void shift2Impl( int firstRow, int firstCol)
+ *    Derived& resize2Impl(int sizeRows, int sizeCols)
+ *    // for all vector classes, diagonal and square arrays
+ *    void shift1Impl(int beg)
+ *    Derived& resize1Impl(int size)
+ *  @endcode
+ *  and the constructors allowing to access to a reference of the current
+ *  allocator.
+ *
+ *  @sa OrientedCAllocator, StructuredCAllocator, CAllocator
  **/
-template < class Derived, int SizeRows_, int SizeCols_>
-class ICAllocator : protected IArrayBase<SizeRows_, SizeCols_>
+template < class Derived>
+class ICAllocator : protected IArrayBase<hidden::Traits<Derived>::sizeRows_, hidden::Traits<Derived>::sizeCols_ >
                   , public IRecursiveTemplate<Derived>
 {
   public:
-    /** Type of the Range for the rows */
-    typedef TRange<SizeRows_> RowRange;
-    /** Type of the Range for the columns */
-    typedef TRange<SizeCols_> ColRange;
+    typedef typename hidden::Traits<Derived>::Type Type;
+    typedef typename hidden::Traits<Derived>::Row Row;
+    typedef typename hidden::Traits<Derived>::Col Col;
+    typedef typename hidden::Traits<Derived>::SubRow SubRow;
+    typedef typename hidden::Traits<Derived>::SubCol SubCol;
+    typedef typename hidden::Traits<Derived>::SubArray SubArray;
+    typedef typename hidden::Traits<Derived>::SubVector SubVector;
+
     enum
     {
       sizeRows_  = hidden::Traits<Derived>::sizeRows_,
@@ -137,12 +156,17 @@ class ICAllocator : protected IArrayBase<SizeRows_, SizeCols_>
       orient_    = hidden::Traits<Derived>::orient_,
       storage_   = hidden::Traits<Derived>::storage_
     };
-  protected:
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
+
     /** Type of the Base container */
-    typedef IArrayBase<hidden::Traits<Derived>::sizeRows_, hidden::Traits<Derived>::sizeCols_ > Base2D;
+    typedef IArrayBase<sizeRows_, sizeCols_ > Base2D;
     /** Type of the Base container */
     typedef IRecursiveTemplate<Derived> Base;
-    typedef typename hidden::Traits<Derived>::Type Type;
+
+  protected:
     /** Default constructor.*/
     inline ICAllocator() : Base2D(), Base() {}
     /** constructor with specified Range.
@@ -188,7 +212,7 @@ class ICAllocator : protected IArrayBase<SizeRows_, SizeCols_>
     /** @return @c true if the container is empty, @c false otherwise */
     inline bool empty() const { return Base2D::empty();}
     /** @return the element (i,j) of the 2D container.
-     *  @param i, j index of row and of the column
+     *  @param i, j index of the row and of the column
      **/
     inline Type& elt(int i, int j)
     {
@@ -233,60 +257,6 @@ class ICAllocator : protected IArrayBase<SizeRows_, SizeCols_>
     inline Type& elt() { return this->asDerived().elt0Impl();}
     /** @return a constant reference on the number */
     inline Type const& elt() const  { return this->asDerived().elt0Impl();}
-};
-
-/** @ingroup Arrays
- *  @brief  Interface Base class for the CAllocator classes.
- *
- *  The allocator stores the data in a single vector by row or by column.
- *  In order to obtain the element (i,j) of the Array, we have to apply,
- *  either the formula @c i*idx_+j or @c j*idx_+i. The class deriving from this
- *  Interface cannot be an expression, thus it derive from the ICAllocator
- *  interface. Concrete implementation depend of the structure of the allocator
- *  and of the Orientation.
- *
- *  The pseudo-virtual function to implement have the following description
- *  @code
- *    // for all matrices classes except diagonal and square arrays
- *    void shift2Impl( int firstRow, int firstCol)
- *    Derived& resize2Impl(int sizeRows, int sizeCols)
- *    // for all vector classes, diagonal and square arrays
- *    void shift1Impl(int beg)
- *    Derived& resize1Impl(int size)
- *    SubVector sub1Impl(Range const& I)
- *  @endcode
- *
- *  @sa OrientedCAllocator, StructuredCAllocator, CAllocator
- **/
-template<class Derived, int SizeRows_, int SizeCols_>
-class CAllocatorBase: public ICAllocator<Derived, SizeRows_, SizeCols_>
-{
-  protected:
-    /** Base class */
-    typedef ICAllocator<Derived, SizeRows_, SizeCols_> Base;
-    /** Default constructor */
-    inline CAllocatorBase( Range const& I, Range const& J): Base(I, J) {}
-    /** copy constructor */
-    inline CAllocatorBase( CAllocatorBase const& A): Base(A) {}
-    /** destructor */
-    inline ~CAllocatorBase() {}
-
-  public:
-    typedef typename hidden::Traits<Derived>::Type Type;
-    typedef typename hidden::Traits<Derived>::Row Row;
-    typedef typename hidden::Traits<Derived>::Col Col;
-    typedef typename hidden::Traits<Derived>::SubRow SubRow;
-    typedef typename hidden::Traits<Derived>::SubCol SubCol;
-    typedef typename hidden::Traits<Derived>::SubArray SubArray;
-    typedef typename hidden::Traits<Derived>::SubVector SubVector;
-
-    enum
-    {
-      sizeRows_  = hidden::Traits<Derived>::sizeRows_,
-      sizeCols_  = hidden::Traits<Derived>::sizeCols_,
-      orient_    = hidden::Traits<Derived>::orient_,
-      storage_   = hidden::Traits<Derived>::storage_
-    };
     /** Access to the ith row of the Allocator.
      *  @param i index of the row
      *  @return a reference on the ith row
@@ -369,43 +339,44 @@ class CAllocatorBase: public ICAllocator<Derived, SizeRows_, SizeCols_>
 template<class Derived, int SizeRows_, int SizeCols_>
 class OrientedCAllocator<Derived, SizeRows_, SizeCols_, Arrays::by_col_>
     : public AllocatorBase<typename hidden::Traits<Derived>::Type>
-    , public CAllocatorBase<Derived, SizeRows_, SizeCols_>
+    , public ICAllocator<Derived>
 {
   protected:
-    typedef CAllocatorBase<Derived, SizeRows_, SizeCols_> Base;
+    typedef ICAllocator<Derived> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
     typedef AllocatorBase<Type> Allocator;
     /** default constructor */
     inline OrientedCAllocator( Range const& I, Range const& J)
-                             : Allocator(prod(I, J)), Base(I, J), idx_(I.size())
+                             : Allocator(prod(I, J)), Base(I, J), ldx_(I.size())
     {}
     /** copy constructor */
     inline OrientedCAllocator( OrientedCAllocator const& A, bool ref)
-                             :  Allocator(A, ref), Base(A), idx_(A.idx()) {}
+                             :  Allocator(A, ref), Base(A), ldx_(A.ldx()) {}
     /** Reference constructor */
     template<class OtherDerived, int OtherSizeRows_, int OtherizeCols_>
     inline OrientedCAllocator( OrientedCAllocator<OtherDerived, OtherSizeRows_,OtherizeCols_, Arrays::by_col_> const& A
                              , Range const& I, Range const& J)
-                             : Allocator(A, true), Base(I, J), idx_(A.idx()) {}
+                             : Allocator(A, true), Base(I, J), ldx_(A.ldx()) {}
     /** wrapper constructor for 0 based C-Array*/
     inline OrientedCAllocator( Type* const& q, int nbRow, int nbCol)
                              : Allocator(q, nbRow * nbCol, true)
-                             , Base(Range(0,nbRow), Range(0,nbCol)), idx_(nbRow)
+                             , Base(Range(0,nbRow), Range(0,nbCol)), ldx_(nbRow)
     {}
     /** destructor */
     inline ~OrientedCAllocator() {}
 
   public:
+    using Allocator::p_data;
     /** @return the index of the allocator*/
-    inline int idx() const { return idx_;}
+    inline int ldx() const { return ldx_;}
     /** @return a constant reference on the element (i,j) of the Allocator.
      *  @param i, j indexes of the element
      **/
-    inline Type const& elt2Impl(int i, int j) const { return this->data(j*idx_ + i);}
+    inline Type const& elt2Impl(int i, int j) const { return p_data()[j*ldx_ + i];}
     /** @return a reference on the element (i,j) of the Allocator.
      *  @param i, j indexes of the element
      **/
-    inline Type& elt2Impl(int i, int j) { return this->data(j*idx_ + i);}
+    inline Type& elt2Impl(int i, int j) { return p_data()[j*ldx_ + i];}
     /** set a value to this allocator.
      *  @param v the value to set
      **/
@@ -417,9 +388,9 @@ class OrientedCAllocator<Derived, SizeRows_, SizeCols_, Arrays::by_col_>
     }
   protected:
     /** index of the data set */
-    int idx_;
+    int ldx_;
     /** set index of the data. */
-    inline void setIdx( int idx) { idx_ = idx;}
+    inline void setIdx( int idx) { ldx_ = idx;}
     /** exchange T with this.
      *  @param T the container to move
      **/
@@ -427,7 +398,7 @@ class OrientedCAllocator<Derived, SizeRows_, SizeCols_, Arrays::by_col_>
     {
       Allocator::exchange(T);
       Base::exchange(T);
-      std::swap(idx_, T.idx_);
+      std::swap(ldx_, T.ldx_);
     }
     /** @brief Compute the range of the 1D Allocator when we want to
      *  allocate a 2D array with  range I for the rows and range J for the
@@ -440,9 +411,9 @@ class OrientedCAllocator<Derived, SizeRows_, SizeCols_, Arrays::by_col_>
     /** return the increment to apply to a zero based pointer corresponding to
      *  the actual first row and first column indexes. */
     inline int shiftInc(int firstRow, int firstCol)
-    { return idx_*firstCol+firstRow; }
+    { return ldx_*firstCol+firstRow; }
     /** set the index corresponding to the actual size of the allocator. */
-    inline void setSizedIdx() {idx_ = this->asDerived().sizeRows();}
+    inline void setSizedIdx() {ldx_ = this->asDerived().sizeRows();}
 };
 
 /**  @ingroup Arrays
@@ -450,43 +421,44 @@ class OrientedCAllocator<Derived, SizeRows_, SizeCols_, Arrays::by_col_>
 template<class Derived, int SizeRows_, int SizeCols_>
 class OrientedCAllocator<Derived, SizeRows_, SizeCols_, Arrays::by_row_>
     : public AllocatorBase<typename hidden::Traits<Derived>::Type>
-    , public CAllocatorBase<Derived, SizeRows_, SizeCols_>
+    , public ICAllocator<Derived>
 {
   protected:
-    typedef CAllocatorBase<Derived, SizeRows_, SizeCols_> Base;
+    typedef ICAllocator<Derived> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
     typedef AllocatorBase<Type> Allocator;
     /** constructor with specified ranges */
     inline OrientedCAllocator( Range const& I, Range const& J)
-                             : Allocator(prod(I, J)), Base(I, J), idx_(J.size())
+                             : Allocator(prod(I, J)), Base(I, J), ldx_(J.size())
     {}
     /** copy constructor */
     inline OrientedCAllocator( OrientedCAllocator const& A, bool ref)
-                             : Allocator(A, ref), Base(A), idx_(A.idx()) {}
+                             : Allocator(A, ref), Base(A), ldx_(A.ldx()) {}
     /** Reference constructor */
     template<class OtherDerived, int OtherSizeRows_, int OtherizeCols_>
     inline OrientedCAllocator( OrientedCAllocator<OtherDerived, OtherSizeRows_,OtherizeCols_, Arrays::by_row_> const& A
                              , Range const& I, Range const& J)
-                             : Allocator(A, true), Base(I, J), idx_(A.idx())
+                             : Allocator(A, true), Base(I, J), ldx_(A.ldx())
     {}
     /** wrapper constructor for 0 based C-Array*/
     inline OrientedCAllocator( Type* const& q, int nbRow, int nbCol)
                              : Allocator(q, nbRow * nbCol, true)
-                             , Base(Range(0,nbRow), Range(0,nbCol)), idx_(nbCol)
+                             , Base(Range(0,nbRow), Range(0,nbCol)), ldx_(nbCol)
     {}
     inline ~OrientedCAllocator() {}
 
   public:
+    using Allocator::p_data;
     /** @return the index of the allocator*/
-    inline int idx() const { return idx_;}
+    inline int ldx() const { return ldx_;}
     /** @return a constant reference on the element (i,j) of the Allocator.
      *  @param i,j indexes of the element
      **/
-    inline Type const& elt2Impl(int i, int j) const { return this->data(i*idx_ + j);}
+    inline Type const& elt2Impl(int i, int j) const  { return p_data()[i*ldx_ + j];}
     /** @return a reference on the element (i,j) of the Allocator.
      *  @param i,j indexes of the element
      **/
-    inline Type& elt2Impl(int i, int j) { return this->data(i*idx_ + j);}
+    inline Type& elt2Impl(int i, int j) { return p_data()[i*ldx_ + j];}
     /** set a value to this container.
      *  @param v the value to set
      **/
@@ -496,11 +468,12 @@ class OrientedCAllocator<Derived, SizeRows_, SizeCols_, Arrays::by_row_>
         for (int j= this->beginCols(); j < this->endCols(); ++j)
         { this->elt(i, j) = v;}
     }
+
   protected:
     /** index of the data set */
-    int idx_;
+    int ldx_;
     /** set index of the data. */
-    inline void setIdx( int idx) { idx_ = idx;}
+    inline void setIdx( int idx) { ldx_ = idx;}
     /** exchange T with this.
      *  @param T the container to move
      **/
@@ -508,7 +481,7 @@ class OrientedCAllocator<Derived, SizeRows_, SizeCols_, Arrays::by_row_>
     {
       Allocator::exchange(T);
       Base::exchange(T);
-      std::swap(idx_, T.idx_);
+      std::swap(ldx_, T.ldx_);
     }
     /** @brief Compute the range of the 1D Allocator when we want to
      *  allocate a 2D array with I indexes in the first dimension and J indexes
@@ -520,21 +493,21 @@ class OrientedCAllocator<Derived, SizeRows_, SizeCols_, Arrays::by_row_>
     { return Range(J.size()*I.begin()+J.begin(), I.size()*J.size());}
     /** return the increment corresponding to the actual first row an column. */
     inline int shiftInc(int firstRow, int firstCol)
-    { return idx_*firstRow+firstCol; }
+    { return ldx_*firstRow+firstCol; }
     /** set the index corresponding to the actual size of the allocator. */
-    inline void setSizedIdx() { idx_ = this->asDerived().sizeCols();}
+    inline void setSizedIdx() { ldx_ = this->asDerived().sizeCols();}
 };
 
 /** @ingroup Arrays
  *  @brief  Base class for the general by_col_ structured case.
  **/
-template<class Derived, int SizeRows_, int SizeCols_>
-class StructuredCAllocator<Derived, SizeRows_, SizeCols_, Arrays::by_col_>
-    : public OrientedCAllocator<Derived, SizeRows_, SizeCols_, Arrays::by_col_>
+template<class Derived, int SizeRows_, int SizeCols_, bool Orient_>
+class StructuredCAllocator
+    : public OrientedCAllocator<Derived, SizeRows_, SizeCols_, Orient_>
 {
   protected:
     typedef typename hidden::Traits<Derived>::Type Type;
-    typedef OrientedCAllocator<Derived, SizeRows_, SizeCols_, Arrays::by_col_> Base;
+    typedef OrientedCAllocator<Derived, SizeRows_, SizeCols_, Orient_> Base;
     /** Default constructor */
     inline StructuredCAllocator( Range const& I, Range const& J)
                                : Base(I, J) {}
@@ -543,49 +516,7 @@ class StructuredCAllocator<Derived, SizeRows_, SizeCols_, Arrays::by_col_>
                                : Base(A, ref) {}
     /** Reference constructor */
     template<class OtherDerived, int OtherSizeRows_, int OtherSizeCols_>
-    inline StructuredCAllocator( StructuredCAllocator<OtherDerived, OtherSizeRows_, OtherSizeCols_, Arrays::by_col_> const& A
-                               , Range const& I, Range const& J)
-                               : Base(A, I, J)
-    {}
-    /** wrapper constructor for 0 based C-Array*/
-    inline StructuredCAllocator( Type* const& q, int nbRow, int nbCol)
-                               : Base(q, nbRow, nbCol)
-    {}
-    /** move T to this.
-     *  @param T the container to move
-     **/
-    inline StructuredCAllocator& move(StructuredCAllocator const& T) { return *this;}
-    /** exchange T with this.
-     *  @param T the container to exchange
-     **/
-    inline void exchange(StructuredCAllocator &T) { Base::exchange(T);}
-  public:
-    /** shift the first indexes of the allocator (for square matrices).
-     *  @param firstIdx the index of the first row and column
-     **/
-    void shift1Impl(int firstIdx)
-    { this->asDerived().shift2Impl(firstIdx, firstIdx);}
-};
-
-/** @ingroup Arrays
- *  @brief  Base class for the general by_row_ structured case.
- **/
-template<class Derived, int SizeRows_, int SizeCols_>
-class StructuredCAllocator<Derived, SizeRows_, SizeCols_, Arrays::by_row_>
-    : public OrientedCAllocator<Derived, SizeRows_, SizeCols_, Arrays::by_row_>
-{
-  protected:
-    typedef typename hidden::Traits<Derived>::Type Type;
-    typedef OrientedCAllocator<Derived, SizeRows_, SizeCols_, Arrays::by_row_> Base;
-    /** Default constructor */
-    inline StructuredCAllocator( Range const& I, Range const& J)
-                               : Base(I, J) {}
-    /** copy constructor */
-    inline StructuredCAllocator( StructuredCAllocator const& A, bool ref)
-                               : Base(A, ref) {}
-    /** Reference constructor */
-    template<class OtherDerived, int OtherSizeRows_, int OtherSizeCols_>
-    inline StructuredCAllocator( StructuredCAllocator<OtherDerived, OtherSizeRows_, OtherSizeCols_, Arrays::by_row_> const& A
+    inline StructuredCAllocator( StructuredCAllocator<OtherDerived, OtherSizeRows_, OtherSizeCols_, Orient_> const& A
                                , Range const& I, Range const& J)
                                : Base(A, I, J)
     {}
@@ -651,11 +582,11 @@ class StructuredCAllocator<Derived, 1, SizeCols_, Arrays::by_col_>
     /** @return a constant reference on the element (i,j) of the Allocator.
      *  @param j index of the column
      **/
-    inline Type const& elt1Impl( int j) const { return this->data(j*Base::idx_ + row_);}
+    inline Type const& elt1Impl( int j) const { return this->data(j*Base::ldx_ + row_);}
     /** @return a reference on the element (i,j) of the Allocator.
      *  @param j index of the columns
      **/
-    inline Type& elt1Impl( int j) { return this->data(j*Base::idx_ + row_);}
+    inline Type& elt1Impl( int j) { return this->data(j*Base::ldx_ + row_);}
     /** shift the first indexes of the allocator.
      *  @param first the index of the first column and first row */
     inline void shift1Impl(int first)
@@ -694,14 +625,14 @@ class StructuredCAllocator<Derived, 1, SizeCols_, Arrays::by_row_>
     /** copy constructor */
     inline StructuredCAllocator( StructuredCAllocator const& A, bool ref)
                                : Base(A, ref), row_(A.row_)
-                               , p_start_(this->p_data() + row_*A.idx())
+                               , p_start_(this->p_data() + row_*A.ldx())
     {}
     /** Reference constructor */
     template<class OtherDerived, int OtherSizeRows_, int OtherSizeCols_>
     inline StructuredCAllocator( StructuredCAllocator<OtherDerived, OtherSizeRows_, OtherSizeCols_, Arrays::by_row_> const& A
                                , Range const& I, Range const& J)
                                : Base(A, I, J), row_(I.begin())
-                               , p_start_(this->p_data() + row_*A.idx())
+                               , p_start_(this->p_data() + row_*A.ldx())
     {}
     /** wrapper constructor for 0 based C-Array*/
     inline StructuredCAllocator( Type* const& q, int , int nbCol)
@@ -736,7 +667,7 @@ class StructuredCAllocator<Derived, 1, SizeCols_, Arrays::by_row_>
     {
       this->asDerived().shift2Impl(first, first);
       row_ = first;
-      p_start_ = this->p_data() + row_*Base::idx_;
+      p_start_ = this->p_data() + row_*Base::ldx_;
     }
     /** resize the allocator.
      *  @param sizeCols the size of the point
@@ -744,7 +675,7 @@ class StructuredCAllocator<Derived, 1, SizeCols_, Arrays::by_row_>
     void resize1Impl(int sizeCols)
     { this->asDerived().resize2Impl(1, sizeCols);
       row_ = this->beginRows();
-      p_start_ = this->p_data() + row_*Base::idx_;
+      p_start_ = this->p_data() + row_*Base::ldx_;
     }
     /** @return a sub-vector in the specified range of the Allocator.
      *  @param J range of the sub-vector
@@ -778,7 +709,7 @@ class StructuredCAllocator<Derived, SizeRows_, 1, Arrays::by_col_>
     /** copy constructor */
     inline StructuredCAllocator( StructuredCAllocator const& A, bool ref)
                                : Base(A, ref), col_(A.col_)
-                               , p_start_(A.p_data() + col_*A.idx())
+                               , p_start_(A.p_data() + col_*A.ldx())
     {}
     /** Reference constructor */
     template<class OtherDerived, int OtherSizeRows_, int OtherSizeCols_>
@@ -786,7 +717,7 @@ class StructuredCAllocator<Derived, SizeRows_, 1, Arrays::by_col_>
                                , Range const& I, Range const& J)
                                : Base(A, I, J)
                                , col_(J.begin())
-                               , p_start_(A.p_data() + col_*A.idx())
+                               , p_start_(A.p_data() + col_*A.ldx())
     {}
     /** wrapper constructor for 0 based C-Array*/
     inline StructuredCAllocator( Type* const& q, int nbRow, int)
@@ -823,7 +754,7 @@ class StructuredCAllocator<Derived, SizeRows_, 1, Arrays::by_col_>
     {
       this->asDerived().shift2Impl(first, first);
       col_ = first;
-      p_start_ = this->p_data() + col_*Base::idx_;
+      p_start_ = this->p_data() + col_*Base::ldx_;
     }
     /** resize the allocator.
      *  @param sizeRow the size of the vector
@@ -832,7 +763,7 @@ class StructuredCAllocator<Derived, SizeRows_, 1, Arrays::by_col_>
     {
       this->asDerived().resize2Impl(sizeRow, 1);
       col_ = this->beginCols();
-      p_start_ = this->p_data() + col_*Base::idx_;
+      p_start_ = this->p_data() + col_*Base::ldx_;
     }
     /** @return a sub-vector in the specified range of the Allocator.
      *  @param I range of the sub-vector
@@ -889,11 +820,11 @@ class StructuredCAllocator<Derived, SizeRows_, 1, Arrays::by_row_>
     /** @return a constant reference on the element (i,j) of the Allocator.
      *  @param i index of the row
      **/
-    inline Type const& elt1Impl( int i) const { return this->data(i*Base::idx_ + col_);}
+    inline Type const& elt1Impl( int i) const { return this->data(i*Base::ldx_ + col_);}
     /** @return a reference on the element (i,j) of the Allocator.
      *  @param i index of the row
      **/
-    inline Type& elt1Impl( int i) { return this->data(i*Base::idx_ + col_);}
+    inline Type& elt1Impl( int i) { return this->data(i*Base::ldx_ + col_);}
     /** shift the first indexes of the allocator.
      *  @param firstCol the index of the first column
      **/
@@ -933,14 +864,14 @@ class StructuredCAllocator<Derived, 1, 1, Arrays::by_col_>
     inline StructuredCAllocator( StructuredCAllocator const& A, bool ref)
                                : Base(A, ref)
                                , row_(A.row_), col_(A.col_)
-                               , start_(col_*A.idx() + row_) {}
+                               , start_(col_*A.ldx() + row_) {}
     /** Reference constructor */
     template<class OtherDerived, int OtherSizeRows_, int OtherSizeCols_>
     inline StructuredCAllocator( StructuredCAllocator<OtherDerived, OtherSizeRows_, OtherSizeCols_, Arrays::by_col_> const& A
                                , Range const& I, Range const& J)
                                : Base(A, I, J)
                                , row_(I.begin()), col_(J.begin())
-                               , start_(row_*A.idx() + col_)
+                               , start_(row_*A.ldx() + col_)
     {}
     /** wrapper constructor for 0 based C-Array*/
     inline StructuredCAllocator( Type* const& q, int , int)
@@ -978,7 +909,7 @@ class StructuredCAllocator<Derived, 1, 1, Arrays::by_col_>
     inline void shift1Impl(int firstIdx)
     {
       this->asDerived().shift2Impl(firstIdx, firstIdx);
-      row_ = firstIdx; col_ = firstIdx; start_ = col_*Base::idx_ + row_;
+      row_ = firstIdx; col_ = firstIdx; start_ = col_*Base::ldx_ + row_;
     }
 
   private:
@@ -1007,14 +938,14 @@ class StructuredCAllocator<Derived, 1, 1, Arrays::by_row_>
     inline StructuredCAllocator( StructuredCAllocator const& A, bool ref)
                                : Base(A, ref)
                                , row_(A.row_), col_(A.col_)
-                               , start_(row_*A.idx() + col_) {}
+                               , start_(row_*A.ldx() + col_) {}
     /** Reference constructor */
     template<class OtherDerived, int OtherSizeRows_, int OtherSizeCols_>
     inline StructuredCAllocator( StructuredCAllocator<OtherDerived, OtherSizeRows_, OtherSizeCols_, Arrays::by_row_> const& A
                                , Range const& I, Range const& J)
                                : Base(A, I, J)
                                , row_(I.begin()), col_(J.begin())
-                               , start_(row_*A.idx() + col_)
+                               , start_(row_*A.ldx() + col_)
     {}
     /** wrapper constructor for 0 based C-Array*/
     inline StructuredCAllocator( Type* const& q, int , int)
@@ -1053,7 +984,7 @@ class StructuredCAllocator<Derived, 1, 1, Arrays::by_row_>
     inline void shift1Impl(int firstIdx)
     {
       this->asDerived().shift2Impl(firstIdx, firstIdx);
-      row_ = firstIdx; col_ = firstIdx; start_ = col_*Base::idx_ + row_;
+      row_ = firstIdx; col_ = firstIdx; start_ = col_*Base::ldx_ + row_;
     }
   private:
     int row_;
@@ -1095,7 +1026,7 @@ class CAllocator
       Allocator::move(T);
       Base::move(T);
       Base::setRanges(T.rows(), T.cols());
-      Base::setIdx(T.idx());
+      Base::setIdx(T.ldx());
       return *this;
     }
     void shift2Impl(int firstRow, int firstCol)
@@ -1171,7 +1102,7 @@ class CAllocator<Type_, UnknownSize, UnknownSize, Orient_>
       Allocator::move(T);
       Base::move(T);
       IArrayBase<UnknownSize, UnknownSize>::setRanges(T.rows(), T.cols());
-      this->setIdx(T.idx());
+      this->setIdx(T.ldx());
       return *this;
     }
     void shift2Impl(int firstRow, int firstCol)
@@ -1269,7 +1200,7 @@ class CAllocator<Type_, SizeRows_, UnknownSize, Orient_>
       Allocator::move(T);
       Base::move(T);
       Base::setRanges(T.rows(), T.cols());
-      this->setIdx(T.idx());
+      this->setIdx(T.ldx());
       return *this;
     }
     void shift2Impl(int firstRow, int firstCol)
@@ -1363,7 +1294,7 @@ class CAllocator<Type_, UnknownSize, SizeCols_, Orient_>
       Allocator::move(T);
       Base::move(T);
       Base::setRanges(T.rows(), T.cols());
-      this->setIdx(T.idx());
+      this->setIdx(T.ldx());
       return *this;
     }
     void shift2Impl(int firstRow, int firstCol)
@@ -1419,7 +1350,6 @@ class CAllocator<Type_, UnknownSize, SizeCols_, Orient_>
      }
    }
 };
-
 
 } // namespace STK
 

@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2007  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -35,6 +35,7 @@
 #ifndef STK_ARRAY1D_H
 #define STK_ARRAY1D_H
 
+#include <Arrays/include/STK_ExprBase.h>
 #include "STK_IArray1D.h"
 
 namespace STK
@@ -135,11 +136,10 @@ class Array1D : public IArray1D< Array1D<Type> >
       // check size
       if (this->size()!=T.size()) this->resize(T.range());
       // copy without ovelapping.
-      const int first = this->begin(), last = this->lastIdx();
-      if (first < T.begin())
-      { for (int i=first, j=T.begin(); i<=last; i++, j++) this->elt(i) = T.elt(j);}
+      if (this->begin() < T.begin())
+      { for (int i=this->begin(), j=T.begin(); i<this->end(); i++, j++) this->elt(i) = T.elt(j);}
       else
-      { for (int i=last, j=T.lastIdx(); i>=first; i--, j--) this->elt(i) = T.elt(j);}
+      { for (int i=this->lastIdx(), j=T.lastIdx(); i>=this->begin(); i--, j--) this->elt(i) = T.elt(j);}
       return *this;
     }
     /** operator= : set the container to a constant value.
@@ -147,7 +147,18 @@ class Array1D : public IArray1D< Array1D<Type> >
      **/
     inline Array1D& operator=(Type const& v)
     {
-      for (int i=this->begin(); i<=this->lastIdx(); i++) this->elt(i)= v;
+      for (int i=this->begin(); i<this->end(); i++) this->elt(i)= v;
+      return *this;
+    }
+    /** Copy an other type of array in an Array1D.
+     *  @param T the array to copy
+     **/
+    template<class OtherArray>
+    inline Array1D& operator=(ExprBase<OtherArray> const& T)
+    {
+      // check size
+      if (this->size()!=T.size()) this->resize(T.range());
+      for (int i=this->begin(); i<this->end(); i++) this->elt(i)= T[i];
       return *this;
     }
 };

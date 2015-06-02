@@ -46,13 +46,13 @@ namespace Law
 {
 
 /** @ingroup Laws
- *  @brief Implement the Categorical probability law.
+ *  @brief Categorical probability law.
  *
- * In probability theory and statistics, a categorical distribution (also called
- * a "generalized Bernoulli distribution" or, less precisely, a "discrete
- * distribution") is a probability distribution that describes the result of a
- * random event that can take on one of @e K possible outcomes, with the
- * probability of each outcome separately specified. There is not necessarily
+ * In probability theory and statistics, a <em>categorical distribution</em>
+ * (also called a "generalized Bernoulli distribution" or, less precisely, a
+ * "discrete distribution") is a probability distribution that describes the
+ * result of a random event that can take on one of @e K possible outcomes, with
+ * the probability of each outcome separately specified. There is not necessarily
  * an underlying ordering of these outcomes, but numerical labels are attached
  * for convenience in describing the distribution, often in the range 1 to K.
  * Note that the K-dimensional categorical distribution is the most general

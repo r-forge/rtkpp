@@ -1,0 +1,9 @@
+#-----------------------------------------------------------------------
+# makevars.local
+# author: Serge Iovleff
+#-----------------------------------------------------------------------
+# This file allow to activate the Verbose and Debug flag
+#-----------------------------------------------------------------------
+# flags in Debug mode 
+# STK_PROJECT_FLAGS = -DSTK_REDUCT_VERBOSE -DSTK_REDUCT_DEBUG  -DSTK_REDUCT_VERY_VERBOSE
+

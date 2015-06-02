@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2013  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -37,6 +37,9 @@
 #define STK_LAPACK_QR_H
 
 #include "STK_IQr.h"
+#include <Arrays/include/STK_CArray.h>
+#include <Arrays/include/STK_CArrayVector.h>
+#include <Arrays/include/STK_Array2D.h>
 
 #ifdef STKUSELAPACK
 
@@ -58,16 +61,38 @@ namespace STK
 
 namespace lapack
 {
+class Qr;
+}
+
+namespace hidden
+{
+/** @ingroup hidden
+ *  Specialization for the Qr class.
+ **
+ **/
+template<>
+struct AlgebraTraits< lapack::Qr >
+{
+  typedef ArrayXX Array;
+};
+
+} // namespace hidden
+
+
+namespace lapack
+{
 /** @ingroup Algebra
  *  {
  *    @class Qr
  *    @brief Qr computes the QR decomposition of a real matrix using the
  *    Lapack routine dgeqrf.
  */
-class Qr : public IQr<Qr>
+class Qr : public IQr<Qr >
 {
   public:
-    typedef IQr<Qr> Base;
+    typedef IQr<Qr > Base;
+    using Base::Q_;
+    using Base::R_;
     /** Default constructor.
      *  @param data the matrix to decompose
      *  @param ref true if we overwrite A
@@ -97,8 +122,6 @@ class Qr : public IQr<Qr>
      *  @return @c true if no error occur, @c false otherwise
      */
     bool runImpl();
-
-  protected:
     /** wrapper of the LAPACK DGEQRF routine. Compute the Qr decomposition
      *  of a matrix.
      *
@@ -160,11 +183,14 @@ class Qr : public IQr<Qr>
      *  and tau in TAU(i).
      * @endverbatim
      */
-    int geqrf(int m, int n, double* a, int lda, double* tau, double *work, int lwork);
+    static int geqrf(int m, int n, Real* a, int lda, Real* tau, Real *work, int lwork);
+
+  private:
+    /** private method for computing the Qr decomposition using a CArrayXX array */
+    bool computeQr(CArrayXX& a, CVectorX& tau);
 };
-
-
 /** @} */
+
 
 } // namespace lapack
 

@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2014 Serge IOVLEFF
+/*     Copyright (C) 2004-2015 Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -25,7 +25,7 @@
 /*
  * Project:  stkpp::Clustering
  * created on: Dec 4, 2013
- * Authors: Serge Iovleff, Vincent KUBICKI
+ * Authors: Serge Iovleff
  **/
 
 /** @file STK_CategoricalBase.h
@@ -37,9 +37,8 @@
 #define STK_CATEGORICALBASE_H
 
 #include "../STK_IMixtureModel.h"
-#include "STK_CategoricalParameters.h"
-
-#include "../../../STatistiK/include/STK_Law_Categorical.h"
+#include "../STK_MixtureParameters.h"
+#include <STatistiK/include/STK_Law_Categorical.h>
 
 namespace STK
 {
@@ -51,14 +50,10 @@ template<class Derived>
 class CategoricalBase : public IMixtureModel<Derived >
 {
   protected:
-    typedef IMixtureModel<Derived > Base;
-
-    using Base::p_pk;
+    typedef IMixtureModel<Derived> Base;
     using Base::p_tik;
-    using Base::components;
+    using Base::param_;
     using Base::p_data;
-    using Base::p_param;
-
 
     /** default constructor
      *  @param nbCluster number of cluster in the model
@@ -73,22 +68,18 @@ class CategoricalBase : public IMixtureModel<Derived >
     inline ~CategoricalBase() {}
 
   public:
-    /** @return an imputation value for the jth variable of the ith sample
-     *  @param i,j indexes of the data to impute */
-    int impute(int i, int j) const;
-    /** @return a simulated value for the jth variable of the ith sample
-     * @param i,j indexes of the data to simulate*/
-    int sample(int i, int j) const;
-    /** get the parameters of the model in an array of size (K * L) * d.
-     *  @param params the parameters of the model
-     **/
-    void getParameters(Array2D<Real>& params) const;
-    /** @return the parameters of the model in an array of size (K * L) * d. */
-    ArrayXX getParametersImpl() const;
-    /** Initialize the model. Resize the array of probabilities for each
-     *  component.*/
+    /** @return the array with the number of modalities of each columns in data set */
+    inline PointXi const& nbModalities() const { return nbModalities_;}
+    /** @return the range of the modalities */
+    inline Range  const& modalities() const { return modalities_;}
+    /** @return the probability of the kth cluster, jth variable, lth modality */
+    inline Real proba(int k, int j, int l) const { return this->asDerived().probaImpl(k,j,l);}
+    /** @return the probability of the kth cluster, jth variable, lth modality */
+    inline VectorX proba(int k, int j) const { return this->asDerived().probaImpl(k,j);}
+    /** Initialize the model. Resize the probability arrays of each component.*/
     void initializeModelImpl()
     {
+      // compute the maximal number of modalities
       nbModalities_.resize(p_data()->cols());
       int amin = Arithmetic<int>::max(), amax = Arithmetic<Real>::min();
       for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
@@ -100,29 +91,40 @@ class CategoricalBase : public IMixtureModel<Derived >
       // set range of the modalities
       modalities_ = _R(amin, amax);
       // resize vectors of probabilities
-      for(int k=baseIdx; k < components().end(); ++k)
-      { p_param(k)->initializeParameters(modalities_);}
+      param_.resize(modalities_,p_data()->cols());
     }
+    /** @return an imputation value for the jth variable of the ith sample
+     *  @param i,j indexes of the data to impute */
+    int impute(int i, int j) const;
+    /** @return a simulated value for the jth variable of the ith sample
+     * @param i,j indexes of the data to simulate*/
+    int sample(int i, int j) const;
+    /** get the parameters of the model in an array of size (K * L) * d.
+     *  @param params the parameters of the model
+     **/
+    void getParameters(ArrayXX& params) const;
+    /** @return the parameters of the model in an array of size (K * L) * d. */
+    ArrayXX getParameters() const;
     /** Write the parameters on the output stream os */
     void writeParameters(ostream& os) const
     {
-      Array2D<Real> proba(modalities_, p_data()->cols());
-      for (int k= baseIdx; k < components().end(); ++k)
+      ArrayXX p(modalities_, p_data()->cols());
+      for (int k= p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
       {
         // store proba values in an array for a nice output
-        for (int j= baseIdx;  j < proba.endCols(); ++j)
+        for (int j= p.beginCols();  j < p.endCols(); ++j)
         {
           for (int l= modalities_.begin(); l < modalities_.end(); ++l)
-          { proba(l, j) = p_param(k)->proba(j,l);}
+          { p(l, j) = proba(k,j,l);}
         }
         os << _T("---> Component ") << k << _T("\n");
-        os << _T("probabilities =\n") << proba  << _T("\n");
+        os << _T("probabilities =\n") << p  << _T("\n");
       }
     }
 
   protected:
     /** Array with the number of modalities of each columns of the data set */
-    Array2DPoint<int> nbModalities_;
+    PointXi nbModalities_;
     /** range of the modalities */
     Range modalities_;
 };
@@ -136,11 +138,11 @@ int CategoricalBase<Derived>::impute(int i, int j) const
   // compute for each modality the pondered probability of occurrence
   for (int l=modalities_.begin(); l< modalities_.end(); ++l)
   {
-    Real proba = 0.;
-    for (int k= p_pk()->begin(); k < p_pk()->end(); ++k)
-    { proba += p_tik()->elt(i,k) * p_param(k)->proba(j, l);}
+    Real p = 0.;
+    for (int k= p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
+    { p += p_tik()->elt(i,k) * proba(k, j, l);}
 
-    if (pmax < proba) { pmax = proba; lmax = l;}
+    if (pmax < p) { pmax = p; lmax = l;}
   }
   return lmax;
 }
@@ -152,14 +154,14 @@ int CategoricalBase<Derived>::sample(int i, int j) const
   // sample class
   int k = Law::Categorical::rand(p_tik()->row(i));
   // sample from conditional probability
-  return Law::Categorical::rand(p_param(k)->proba(j));
+  return Law::Categorical::rand(this->asDerived().param_[k]);
 }
 
 /* get the parameters of the model
  *  @param params the parameters of the model
  **/
 template<class Derived>
-void CategoricalBase<Derived>::getParameters(Array2D<Real>& params) const
+void CategoricalBase<Derived>::getParameters(ArrayXX& params) const
 {
   int nbCluster    = this->nbCluster();
   int nbModalities = modalities_.size();
@@ -170,7 +172,7 @@ void CategoricalBase<Derived>::getParameters(Array2D<Real>& params) const
     for (int j = p_data()->beginCols(); j < p_data()->endCols(); ++j)
     {
       for (int l = 0; l < nbModalities; ++l)
-      { params(baseIdx + k * nbModalities + l, j) = p_param(baseIdx + k)->proba(j, modalities_.begin() + l);}
+      { params(baseIdx+k * nbModalities + l, j) = proba(baseIdx+k, j, modalities_.begin() + l);}
     }
   }
 }
@@ -178,7 +180,7 @@ void CategoricalBase<Derived>::getParameters(Array2D<Real>& params) const
 /* get the parameters of the model in an array of size (K * L) * d.
  **/
 template<class Derived>
-ArrayXX CategoricalBase<Derived>::getParametersImpl() const
+ArrayXX CategoricalBase<Derived>::getParameters() const
 {
   ArrayXX params;
   int nbCluster    = this->nbCluster();
@@ -190,7 +192,7 @@ ArrayXX CategoricalBase<Derived>::getParametersImpl() const
     for (int k = 0; k < nbCluster; ++k)
     {
       for (int l = 0; l < nbModalities; ++l)
-      { params(baseIdx + k * nbModalities + l, j) = p_param(baseIdx + k)->proba(j, modalities_.begin() + l);}
+      { params(baseIdx+k * nbModalities + l, j) = proba(baseIdx+k, j, modalities_.begin() + l);}
     }
   }
   return params;

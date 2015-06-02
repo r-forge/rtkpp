@@ -46,8 +46,13 @@ namespace Law
 /** @ingroup Laws
  *  @brief class for the Uniform law distribution.
  * 
- *  The Uniform distribution, is a continuous probability
- *  distribution with probability pdf function
+ *  In probability theory and statistics, the <em>continuous uniform distribution</em>
+ *  or rectangular distribution is a family of symmetric probability distributions
+ *  such that for each member of the family, all intervals of the same length on
+ *  the distribution's support are equally probable. The support is defined by
+ *  the two parameters, @e a and @e b, which are its minimum and maximum values.
+ *
+ *  The probability density function of the continuous uniform distribution is:
  *  \f[
  *    f(x; a, b) = \frac{1}{b-a} 1_{ a \leq x \leq b}.
  *  \f]
@@ -57,16 +62,25 @@ class Uniform : public IUnivLaw<Real>
   public:
     typedef IUnivLaw<Real> Base;
     /** constructor.
-     *  @param a the lower bound
-     *  @param b the upper bound
+     *  @param a,b the lower and upper bounds
      **/
-    Uniform( Real a =0., Real b =1.);
+    Uniform( Real const& a =0., Real const& b =1.);
     /** copy constructor.
      *  @param law the law to copy
      **/
     Uniform( Uniform const& law);
     /** destructor. */
 	  virtual ~Uniform();
+    /** @return the lower bound */
+    inline Real const& a() const { return a_;}
+    /** @return the upper bound */
+    inline Real const& b() const { return b_;}
+    /** @return the value b-a */
+    inline Real const& range() const { return range_;}
+    /** @param a set the lower bound */
+    inline void setA(Real const& a) { a_ =a;}
+    /** @param b set the upper bound */
+    inline void setB(Real const& b){ b_ =b;}
 
     /** Generate a pseudo Uniform random variate. */
     virtual Real rand() const;
@@ -93,30 +107,37 @@ class Uniform : public IUnivLaw<Real>
      **/
     virtual Real icdf( Real const& p) const;
 
-    /** Generate a pseudo Uniform random variate with the specified
-     *  parameter.
-     *  @param a the lower bound
-     *  @param b the upper bound
+    /** Generate a pseudo Uniform random variate.
+     *  @param a,b the lower and upper bounds
      **/
-    static Real rand( Real a, Real b);
+    static Real rand( Real const& a, Real const& b);
     /** Give the value of the pdf at x.
      *  @param x a real value
-     *  @param a the lower bound
-     *  @param b the upper bound
+     *  @param a,b the lower and upper bounds
      **/
-    static Real pdf( Real const& x, Real a=0., Real b=1.);
+    static Real pdf( Real const& x, Real const& a, Real const& b);
     /** Give the value of the log-pdf at x.
      *  @param p a probablility
-     *  @param a the lower bound
-     *  @param b the upper bound
+     *  @param a,b the lower and upper bounds
      **/
-    static Real lpdf( Real const& p, Real a=0., Real b=1.);
+    static Real lpdf( Real const& p, Real const& a, Real const& b);
+    /** Give the value of the cdf at t.
+     *  @param t a real value
+     *  @param a,b the lower and upper bounds
+     **/
+    static Real cdf( Real const& t, Real const& a, Real const& b);
+    /** Give the value of the quantile at @e p.
+     *  @param p a probability
+     *  @param a,b the lower and upper bounds
+     **/
+    static Real icdf( Real const& p, Real const& a, Real const& b);
 
   protected:
     /** The lower bound. */
     Real a_;
     /** The upper bound. */
     Real b_;
+
   private:
     Real range_;
 };

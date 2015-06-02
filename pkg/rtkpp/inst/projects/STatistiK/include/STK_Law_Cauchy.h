@@ -46,38 +46,38 @@ namespace Law
 /** @ingroup Laws
  *  @brief Cauchy distribution law.
  * 
- *  The Cauchy distribution, is a continuous probability
- *  distribution with pdf function
+ *  The <em>Cauchy distribution</em>, named after Augustin Cauchy, is a
+ *  continuous probability distribution. The Cauchy distribution has the
+ *  probability density function
  *  \f[
- *    f(x; \mu, \gamma) =
- *    \frac{1}{\pi\gamma\left[1+\left(\frac{x-\mu}{\gamma}\right)^2\right]}
+ *  f(x; \mu,\gamma) =
+ *  \frac{1}{\pi\gamma \left[1 + \left(\frac{x - \mu}{\gamma}\right)^2\right]}
+ *   = \frac{ 1}{\pi \gamma }\left[ \frac{\gamma^2}{(x - \mu)^2 + \gamma^2} \right].
  *  \f]
  *  where \f$ \mu  \f$ is the location parameter, specifying the location
  *  of the peak of the distribution, and \f$ \gamma>0 \f$ is the scale
  *  parameter.
+ *
+ *  The simplest Cauchy distribution is called the standard Cauchy distribution.
+ *  It is the distribution of a random variable that is the ratio of two
+ *  independent standard normal variables and has the probability density
+ *  function \f$  f(x;0,1) \f$.
  **/
 class Cauchy : public IUnivLaw<Real>
 {
-  protected:
-    /** The location parameter. */
-    Real location_;
-    /** The scale parameter. */
-    Real scale_;
-    
   public:
     /** Default constructor.
-     *  @param location location of the Cauchy distribution
-     *  @param scale scale of the Cauchy distribution
+     *  @param mu, scale location and scale of the Cauchy distribution
      **/
-    Cauchy( Real const& location=0, Real const& scale=1);
+    Cauchy( Real const& mu=0, Real const& scale=1);
     /** Destructor. **/
     virtual ~Cauchy();
-    /** @return the location parameter */
-    inline Real const& location() const { return location_;}
+    /** @return the mu parameter */
+    inline Real const& mu() const { return mu_;}
     /** @return the scale parameter */
     inline Real const& scale() const { return scale_;}
-    /** @param location the location parameter */
-    inline void setLocation( Real const& location) { location_ = location;}
+    /** @param mu the mu parameter */
+    inline void setMu( Real const& mu) { mu_ = mu;}
     /** @param scale the scale parameter */
     inline void setScale( Real const& scale)
     {
@@ -119,23 +119,50 @@ class Cauchy : public IUnivLaw<Real>
 
     /** Generate a pseudo Cauchy random variate with the specified
      *  parameters.
-     *  @param location location of the Cauchy distribution
-     *  @param scale scale of the Cauchy distribution
+     *  @param mu, scale location and scale of the Cauchy distribution
      *  @return a cauchy random variable
      **/
-    static Real rand( Real const& location, Real const& scale);
+    static Real rand( Real const& mu, Real const& scale);
     /** @param x a real value
-     *  @param location location of the Cauchy distribution
-     *  @param scale scale of the Cauchy distribution
+     *  @param mu, scale location and scale of the Cauchy distribution
      *  @return the pdf of the cauchy distribution at x
      **/
-    static Real pdf( Real const& x, Real const& location, Real const& scale);
+    static Real pdf( Real const& x, Real const& mu, Real const& scale);
     /** @param x a real value
-     *  @param location location of the Cauchy distribution
+     *  @param mu mu of the Cauchy distribution
      *  @param scale scale of the Cauchy distribution
      *  @return the log-pdf of the cauchy distribution at x
      **/
-    static Real lpdf( Real const& x, Real const& location, Real const& scale);
+    static Real lpdf( Real const& x, Real const& mu, Real const& scale);
+    /** The cumulative distribution function of the Cauchy distribution at t is
+     * \f[
+     *  F(t; \mu,\gamma)=
+     * \frac{1}{\pi} \arctan\left(\frac{t-\mu}{\gamma}\right)+\frac{1}{2}
+     * \f]
+     * @see http://www.faqs.org/faqs/fr/maths/maths-faq-3/
+     * for the computation of arctan.
+     *
+     *  @param t a real value
+     *  @param mu, scale location and scale of the Cauchy distribution
+     *  @return the cdf of the Cauchy distribution at t
+     **/
+    static Real cdf( Real const& t, Real const& mu, Real const& scale);
+    /** The inverse cumulative distribution function at p is
+     * \f[
+     * F^{-1}(p; \mu,\gamma) = \mu + \gamma \tan(\pi (p-1/2)).
+     * \f]
+     *
+     *  @param p a probability number
+     *  @param mu, scale location and scale of the Cauchy distribution
+     *  @return the inverse cdf of the Cauchy distribution at p
+     **/
+    static Real icdf( Real const& p, Real const& mu, Real const& scale);
+
+  protected:
+    /** The mu parameter. */
+    Real mu_;
+    /** The scale parameter. */
+    Real scale_;
 };
 
 } // namespace Law

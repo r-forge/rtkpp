@@ -109,7 +109,7 @@ class IMixture
      * @param Cluster_num Cluster number
      * @return the value of component probability in log scale
      */
-    virtual double lnComponentProbability(int sample_num, int Cluster_num) = 0;
+    virtual Real lnComponentProbability(int sample_num, int Cluster_num) = 0;
     /** This function must return the number of free parameters.
      *  @return Number of free parameters
      */

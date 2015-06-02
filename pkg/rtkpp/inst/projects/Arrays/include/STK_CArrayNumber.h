@@ -47,13 +47,13 @@ template< typename Type, int SizeCols_, bool Orient_> class CArrayPoint;
 template< typename Type, int SizeRows_, bool Orient_ > class CArrayVector;
 
 // typedef for CArrayVector Real is by default double, but can be float
-typedef CArrayNumber<Real, Arrays::by_col_>   CNumber1;
-typedef CArrayNumber<double, Arrays::by_col_> CNumber1d;
-typedef CArrayNumber<int, Arrays::by_col_>    CNumber1i;
+typedef CArrayNumber<Real, Arrays::by_col_>   CNumber;
+typedef CArrayNumber<double, Arrays::by_col_> CNumberd;
+typedef CArrayNumber<int, Arrays::by_col_>    CNumberi;
 
-typedef CArrayNumber<Real, Arrays::by_row_>   CNumberByRow1;
-typedef CArrayNumber<double, Arrays::by_row_> CNumberByRow1d;
-typedef CArrayNumber<int, Arrays::by_row_>    CNumberByRow1i;
+typedef CArrayNumber<Real, Arrays::by_row_>   CNumberByRow;
+typedef CArrayNumber<double, Arrays::by_row_> CNumberByRowd;
+typedef CArrayNumber<int, Arrays::by_row_>    CNumberByRowi;
 
 namespace hidden
 {

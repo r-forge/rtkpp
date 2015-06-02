@@ -46,11 +46,12 @@ namespace Law
 {
 
 /** @ingroup Laws
- * @brief Implement the Bernoulli probability law.
+ *  @brief Bernoulli probability law.
+ *
  * In probability theory and statistics, the <em>Bernoulli distribution</em>,
  * named after Swiss scientist Jacob Bernoulli, is a discrete probability
  * distribution, which takes value 1 with success probability <em>p</em> and
- * value 0 with failure probability <em>q=1-p</em>.  So if <em>X</em> is a
+ * value 0 with failure probability <em>q=1-p</em>.  So if @e X is a
  * random variable with this distribution, we have:
  * @f[
  *    \mathbb{P}(X=1) = 1 - \mathbb{P}(X=0) = 1 - q = p.

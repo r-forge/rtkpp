@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2012  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -23,7 +23,7 @@
 */
 
 /*
- * Project:  stkpp::STKernel
+ * Project:  stkpp::Ddk
  * created on: 9 oct. 2012
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
@@ -61,7 +61,6 @@ template<> struct StaticAssert<true>
   {
     YOU_TRIED_CALLING_A_VECTOR_METHOD_ON_A_MATRIX,
     YOU_TRIED_CALLING_A_MATRIX_METHOD_ON_A_VECTOR,
-    YOU_TRIED_TO_USE_A_UNIDIMENSIONAL_METHOD_ON_A_MATRIX,
     YOU_TRIED_TO_CONSTRUCT_A_REFERENCE_WITH_A_DIFFERENT_ORIENTATION,
     YOU_TRIED_TO_CONSTRUCT_A_SQUAREMATRIX_WITH_DIFFERENT_DIMENSIONS,
     YOU_TRIED_TO_CONSTRUCT_A_VECTOR_WITH_MORE_THAN_ONE_COLUM,
@@ -76,8 +75,10 @@ template<> struct StaticAssert<true>
     YOU_TRIED_TO_APPLY_A_BINARY_OPERATOR_WITH_WRONG_DIMENSIONS_SIZE,
     YOU_TRIED_TO_WRAP_A_CONTAINER_WITH_THE_WRONG_TYPE_AS_A_VARIABLE,
     YOU_TRIED_TO_WRAP_A_CONTAINER_WHICH_IS_NOT_1D_AS_A_VARIABLE,
+    YOU_TRIED_TO_USE_A_UNIDIMENSIONAL_METHOD_ON_A_MATRIX,
     YOU_CANNOT_USED_AN_UNIDIMENSIONAL_METHOD_ON_THIS_OBJECT,
     YOU_CANNOT_USED_A_ZERODIMENSIONAL_METHOD_ON_THIS_OBJECT,
+    YOU_CANNOT_USED_THIS_TYPE_OF_DATA_WITH_THIS_OBJECT,
     YOU_HAVE_TO_USE_TWO_ARRAYS_WITH_THE_SAME_ORIENTATION,
     YOU_HAVE_TO_USE_A_VECTOR_OR_POINT_IN_THIS_METHOD,
     YOU_HAVE_TO_USE_A_SQUARE_MATRIX_IN_THIS_METHOD,

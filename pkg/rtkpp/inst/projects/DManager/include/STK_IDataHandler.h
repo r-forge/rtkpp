@@ -39,7 +39,8 @@
 #include <map>
 #include <string>
 
-#include "STKernel/include/STK_Stream.h"
+#include <STKernel/include/STK_Stream.h>
+#include <Sdk/include/STK_IRecursiveTemplate.h>
 
 namespace STK
 {
@@ -49,23 +50,22 @@ namespace hidden
  *  The DataHandlerTraits will give the type of container furnished by the
  *  concrete implementations of the IDataHandler class.
  **/
-template<class DataHandler, typename Type>
-struct DataHandlerTraits
-{};
+template<class DataHandler, typename Type> struct DataHandlerTraits;
 
 } // namespace hidden
 
 /** @ingroup DManager
  *  A DataHandler class allow to store various data set idetified with an idData
  */
-class IDataHandler
+template<class Derived>
+class IDataHandler : public IRecursiveTemplate<Derived>
 {
   public:
     typedef std::map<std::string, std::string> InfoMap;
     /** default constructor */
     inline IDataHandler() {}
     /** destructor */
-    inline virtual ~IDataHandler() {}
+    inline ~IDataHandler() {}
     /** @return the map with the idDatas and idModel of the models */
     inline InfoMap const& info() const { return info_;}
     /** @brief Add an info descriptor to the data handler.
@@ -88,11 +88,11 @@ class IDataHandler
      *  @return @c true if there exists an idData in the InfoMap, @c false
      *  otherwise.
      **/
-    bool getIdModel(std::string const& idData, std::string& idModel) const;
+    bool getIdModelName(std::string const& idData, std::string& idModel) const;
     /** @return the number of sample (the number of rows of the data) */
-    virtual int nbSample() const =0;
+    inline int nbSample() const { return this->asDerived().nbSampleImpl();}
     /** @return the number of variables (the number of columns of the data) */
-    virtual int nbVariable() const =0;
+    inline int nbVariable() const { return  this->asDerived().nbVariableImpl();}
     /** write the info on os */
     void writeInfo(ostream& os) const;
 
@@ -103,6 +103,54 @@ class IDataHandler
      * @sa stringToMixture */
     InfoMap info_;
 };
+
+
+template<class Derived>
+void IDataHandler<Derived>::writeInfo(ostream& os) const
+{
+  // show content
+  for (InfoMap::const_iterator it=info_.begin(); it!=info_.end(); ++it)
+  os << _T("IdData: ") << it->first << _T(", IdModel: ") << it->second << _T('\n');
+}
+
+template<class Derived>
+bool IDataHandler<Derived>::addInfo(std::string const& idData, std::string const& idModel)
+{
+  // parse descriptor file
+  std::pair<InfoMap::iterator,bool> ret;
+  // check if identifer is already present
+  ret = info_.insert(std::pair<std::string,std::string>(idData, idModel));
+  // if name already exists, check if there is incoherence
+  if (ret.second==false)
+  {
+     if (ret.first->second != idModel)
+     {
+#ifdef STK_MIXTURE_DEBUG
+       stk_cerr << _T("In IDataHandler::addInfo, There exists an idData with a different idModel.\n");
+#endif
+       return false;
+     }
+  }
+  return true;
+}
+
+/* @brief Giving a the Id of a dataset, find the Id of the model.
+ *  @param idData can be any string given by the user.
+ *  @param idModel The Id of the model associated with the data
+ *  (not modified if idData is not present in the map).
+ *  @return @c false if there exists already an idData matched with an other
+ *  idModel, @c true otherwise.
+ **/
+template<class Derived>
+bool IDataHandler<Derived>::getIdModelName(std::string const& idData, std::string& idModel) const
+{
+  bool res = false;
+  // show content
+  for (InfoMap::const_iterator it=info_.begin(); it!=info_.end(); ++it)
+  { if (it->first == idData) { idModel = it->second; res = true; break;}}
+ return res;
+}
+
 
 } // idDataspace STK
 

@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2013  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -36,8 +36,7 @@
 #define STK_GAMMA_AJK_BJK_H
 
 #include "STK_GammaBase.h"
-
-#include "../../../STatistiK/include/STK_Law_Exponential.h"
+#include <STatistiK/include/STK_Law_Exponential.h>
 
 namespace STK
 {
@@ -53,11 +52,53 @@ struct MixtureTraits< Gamma_ajk_bjk<_Array> >
 {
   typedef _Array Array;
   typedef typename Array::Type Type;
-  typedef Gamma_ajk_bjk_Parameters        Parameters;
   typedef Array2D<Real>        Param;
+  typedef ParametersHandler<Clust::Gamma_ajk_bjk_> ParamHandler;
 };
 
 } // namespace Clust
+
+/** Specialization of the ParametersHandler struct for Gaussian_sjk model */
+template <>
+struct ParametersHandler<Clust::Gamma_ajk_bjk_>: public ParametersHandlerGammaBase
+{
+    typedef ParametersHandlerGammaBase Base;
+  /** shape parameters and statistics */
+  MixtureParametersSet<PointX> shape_;
+  /** scale parameters and statistics */
+  MixtureParametersSet<PointX> scale_;
+  /** default constructor */
+  ParametersHandler( int nbCluster)
+                   : Base(nbCluster),shape_(nbCluster), scale_(nbCluster) {}
+  /** copy constructor */
+  ParametersHandler( ParametersHandler const& model)
+                   : Base(model),shape_(model.shape_), scale_(model.scale_) {}
+  /** destructor */
+  inline ~ParametersHandler() {}
+  /** Initialize the parameters of the model.
+   *  This function initialize the parameters and the statistics.
+   **/
+  void resize(Range const& range)
+  {
+    Base::resize(range);
+    shape_.resize(range);
+    shape_.initialize(1.);
+    scale_.resize(range);
+    scale_.initialize(1.);
+  }
+  /** Store the intermediate results of the Mixture.
+   *  @param iteration Provides the iteration number beginning after the burn-in period.
+   **/
+  inline void storeIntermediateResults(int iteration)
+  { shape_.storeIntermediateResults(iteration); scale_.storeIntermediateResults(iteration);}
+  /** Release the stored results. This is usually used if the estimation
+   *  process failed.
+   **/
+  inline void releaseIntermediateResults()
+  { shape_.releaseIntermediateResults(); scale_.releaseIntermediateResults();}
+  /** set the parameters stored in stat_proba_ and release stat_proba_. */
+  inline void setParameters() { shape_.setParameters(); scale_.setParameters();}
+};
 
 /** @ingroup Clustering
  *  Gamma_ajk_bjk is a mixture model of the following form
@@ -72,14 +113,9 @@ template<class Array>
 class Gamma_ajk_bjk : public GammaBase< Gamma_ajk_bjk<Array> >
 {
   public:
-    typedef typename Clust::MixtureTraits< Gamma_ajk_bjk<Array> >::Parameters Parameters;
     typedef GammaBase< Gamma_ajk_bjk<Array> > Base;
-
-    using Base::p_tik;
-    using Base::components;
+    using Base::p_tik; using Base::param_;
     using Base::p_data;
-    using Base::p_param;
-
     using Base::meanjk;
     using Base::variancejk;
 
@@ -90,11 +126,23 @@ class Gamma_ajk_bjk : public GammaBase< Gamma_ajk_bjk<Array> >
     /** copy constructor
      *  @param model The model to copy
      **/
-    inline Gamma_ajk_bjk( Gamma_ajk_bjk const& model) : Base(model) {}
+    inline Gamma_ajk_bjk( Gamma_ajk_bjk const& model): Base(model) {}
     /** destructor */
     inline ~Gamma_ajk_bjk() {}
-    /** Initialize the model. */
-    void initializeModelImpl() {}
+    /** @return the shape of the kth cluster and jth variable */
+    inline Real shapeImpl(int k, int j) const { return param_.shape_[k][j];}
+    /** @return the scale of the kth cluster and jth variable */
+    inline Real scaleImpl(int k, int j) const { return param_.scale_[k][j];}
+    /** @return the value of the probability of the i-th sample in the k-th component.
+     *  @param i,k indexes of the sample and of the component
+     **/
+    inline Real lnComponentProbability(int i, int k) const
+    {
+      Real sum =0.;
+      for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)
+      { sum += Law::Gamma::lpdf(p_data()->elt(i,j), param_.shape_[k][j], param_.scale_[k][j]);}
+      return sum;
+    }
     /** Initialize randomly the parameters of the Gamma mixture. The shape
      *  will be selected randomly using an exponential of parameter mean^2/variance
      *  and the scale will be selected randomly using an exponential of parameter
@@ -115,15 +163,15 @@ class Gamma_ajk_bjk : public GammaBase< Gamma_ajk_bjk<Array> >
 template<class Array>
 void Gamma_ajk_bjk<Array>::randomInit()
 {
-    // compute moments
-    this->moments();
+  // compute moments
+  this->moments();
   for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
   {
-    for (int k= baseIdx; k < components().end(); ++k)
+    for (int k= p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
     {
       Real mean = meanjk(j,k), variance = variancejk(j,k);
-      p_param(k)->shape_[j] = Law::Exponential::rand((mean*mean/variance));
-      p_param(k)->scale_[j] = Law::Exponential::rand((variance/mean));
+      param_.shape_[k][j] = Law::Exponential::rand((mean*mean/variance));
+      param_.scale_[k][j] = Law::Exponential::rand((variance/mean));
     }
   }
 #ifdef STK_MIXTURE_VERY_VERBOSE
@@ -138,17 +186,17 @@ bool Gamma_ajk_bjk<Array>::mStep()
 {
   if (!this->moments()) { return false;}
   // estimate a and b
-  for (int k= baseIdx; k < components().end(); ++k)
+  for (int k= p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
   {
     for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
     {
       // moment estimate and oldest value
       Real x0 = meanjk(j,k)*meanjk(j,k)/variancejk(j,k);
-      Real x1 = p_param(k)->shape_[j];
+      Real x1 = param_.shape_[k][j];
       if ((x0 <=0.) || (isNA(x0))) return false;
 
       // get shape
-      hidden::invPsiMLog f(p_param(k)->meanLog_[j]-std::log(p_param(k)->mean_[j]));
+      hidden::invPsiMLog f(param_.meanLog_[k][j]-std::log(param_.mean_[k][j]));
       Real a = Algo::findZero(f, x0, x1, 1e-08);
       if (!Arithmetic<Real>::isFinite(a))
       {
@@ -162,8 +210,8 @@ bool Gamma_ajk_bjk<Array>::mStep()
         a = x0; // use moment estimate
       }
       // set values
-      p_param(k)->shape_[j] = a;
-      p_param(k)->scale_[j] = p_param(k)->mean_[j]/a;
+      param_.shape_[k][j] = a;
+      param_.scale_[k][j] = param_.mean_[k][j]/a;
     }
   }
   return true;

@@ -54,7 +54,11 @@ namespace Clust
 {
 
 /** @ingroup Clustering
- *  initialization type
+ *  @brief initialization type.
+ *  There is trheee ways to initialize the mixture model:
+ *  - using random values for the parameters
+ *  - using random class for the individuals
+ *  - using random probabilities class for the individuals
  **/
 enum initType
 {
@@ -68,7 +72,7 @@ enum initType
  *  Convert a String to a initType. The recognized strings are
  * <table>
  * <tr> <th> Initialization   </th></tr>
- * <tr> <td> "randomInit"</td></tr>
+ * <tr> <td> "randomInit" (DEPECATED) </td></tr>
  * <tr> <td> "randomParamInit"</td></tr>
  * <tr> <td> "randomClassInit"</td></tr>
  * <tr> <td> "randomFuzzyInit"</td></tr>
@@ -201,6 +205,7 @@ enum Mixture
   Poisson_ljk_,
   Poisson_lk_,
   Poisson_ljlk_,
+  KernelGaussian_sk_,
   unknown_mixture_
 };
 
@@ -236,6 +241,7 @@ MixtureClass mixtureToMixtureClass( Mixture const& type);
  * <tr> <td> "Poisson_ljk"     </td></tr>
  * <tr> <td> "Poisson_lk"      </td></tr>
  * <tr> <td> "Poisson_ljlk"    </td></tr>
+ * <tr> <td> "KernelGaussian"  </td></tr>
  * </table>
  *  @param type the String we want to convert
  *  @return the Mixture represented by the String @c type. if the string
@@ -269,6 +275,7 @@ Mixture stringToMixture( std::string const& type);
  * <tr> <td> "Poisson_pk_ljk"     </td><td> "Poisson_p_ljk"     </td> </tr>
  * <tr> <td> "Poisson_pk_lk"      </td><td> "Poisson_p_lk"      </td> </tr>
  * <tr> <td> "Poisson_pk_ljlk"    </td><td> "Poisson_p_ljlk"    </td> </tr>
+ * <tr> <td> "KernelGaussian_pk_" </td><td> "KernelGaussian_p_"    </td> </tr>
  * </table>
  *  @param type the String we want to convert
  *  @param[out] freeProp @c true if the model have free proportions, @c false otherwise.

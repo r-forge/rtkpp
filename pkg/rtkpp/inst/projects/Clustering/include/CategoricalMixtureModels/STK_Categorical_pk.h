@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2013 Vincent KUBICKI
+/*     Copyright (C) 2004-2015 Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -52,11 +52,43 @@ struct MixtureTraits< Categorical_pk<_Array> >
 {
   typedef _Array Array;
   typedef typename Array::Type Type;
-  typedef Categorical_pkParameters Parameters;
   typedef Array2D<Real>   Param;
+  typedef ParametersHandler<Clust::Categorical_pk_> ParamHandler;
 };
 
 } // namespace hidden
+
+/** Specialization of the ParametersHandler struct for Categorical_pk model */
+template <>
+struct ParametersHandler<Clust::Categorical_pk_>
+{
+  /** default constructor */
+  ParametersHandler(int nbCluster):proba_(nbCluster) {}
+  /** copy constructor */
+  ParametersHandler(ParametersHandler const& model):proba_(model.proba_) {}
+  /** Initialize the parameters of the model.
+   *  This function initialize the parameter lambda and the statistics.
+   **/
+  void resize( Range const& rangeModalities, Range const& rangeData)
+  {
+    proba_.resize(rangeModalities);
+    proba_.initialize(1./rangeModalities.size());
+  }
+  /** Store the intermediate results of the Mixture.
+   *  @param iteration Provides the iteration number beginning after the burn-in period.
+   **/
+  inline void storeIntermediateResults(int iteration)
+  { proba_.storeIntermediateResults(iteration);}
+  /** Release the stored results. This is usually used if the estimation
+   *  process failed.
+   **/
+  inline void releaseIntermediateResults()
+  { proba_.releaseIntermediateResults();}
+  /** set the parameters stored in stat_proba_ and release stat_proba_. */
+  inline void setParameters() { proba_.setParameters();}
+  /** Vector and statistics of the probabilities */
+  MixtureParametersSet<VectorX> proba_;
+};
 
 /** @ingroup Clustering
  *  The diagonal Categorical mixture model @c Categorical_pk is
@@ -71,15 +103,9 @@ class Categorical_pk : public CategoricalBase<Categorical_pk<Array> >
 {
   public:
     typedef CategoricalBase<Categorical_pk<Array> > Base;
-    typedef typename Clust::MixtureTraits< Categorical_pk<Array> >::Parameters Parameters;
-
-    using Base::p_tik;
-    using Base::components;
+    using Base::p_tik; using Base::param_;
     using Base::p_data;
-    using Base::p_param;
-
     using Base::modalities_;
-
     /** default constructor
      * @param nbCluster number of cluster in the model
      **/
@@ -87,9 +113,24 @@ class Categorical_pk : public CategoricalBase<Categorical_pk<Array> >
     /** copy constructor
      *  @param model The model to copy
      **/
-    inline Categorical_pk( Categorical_pk const& model) : Base(model) {}
+    inline Categorical_pk( Categorical_pk const& model): Base(model) {}
     /** destructor */
     inline ~Categorical_pk() {}
+    /** @return the probability of the kth cluster, jth variable, lth modality */
+    inline Real probaImpl(int k, int j, int l) const { return param_.proba_[k][l];}
+    /** @return the value of the probability of the i-th sample in the k-th component.
+     *  @param i,k indexes of the sample and of the component
+     **/
+    inline Real lnComponentProbability(int i, int k) const
+    {
+      Real sum =0., prob;
+      for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)
+      {
+        if ( (prob = param_.proba_[k][p_data()->elt(i,j)]) <= 0.) return -Arithmetic<Real>::infinity();
+        sum += std::log(prob);
+       }
+      return sum;
+    }
     /** Initialize randomly the parameters of the Categorical mixture.
      *  Probabilities will be choosen uniformly.
      */
@@ -108,10 +149,10 @@ class Categorical_pk : public CategoricalBase<Categorical_pk<Array> >
 template<class Array>
 void Categorical_pk<Array>::randomInit()
 {
-  for (int k = baseIdx; k < components().end(); ++k)
+  for (int k = p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
   {
-    p_param(k)->proba_.randUnif();
-    p_param(k)->proba_ /= p_param(k)->proba_.sum();
+    param_.proba_[k].randUnif();
+    param_.proba_[k] /= param_.proba_[k].sum();
   }
 }
 
@@ -119,17 +160,17 @@ void Categorical_pk<Array>::randomInit()
 template<class Array>
 bool Categorical_pk<Array>::mStep()
 {
-  for (int k = baseIdx; k < components().end(); ++k)
+  for (int k = p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
   {
-    p_param(k)->proba_ = 0.;
+    param_.proba_[k] = 0.;
     for (int j = p_data()->beginCols(); j < p_data()->endCols(); ++j)
     {
       for (int i = p_tik()->beginRows(); i < p_tik()->endRows(); ++i)
-      { p_param(k)->proba_[(*p_data())(i, j)] += (*p_tik())(i, k);}
+      { param_.proba_[k][(*p_data())(i, j)] += (*p_tik())(i, k);}
     }
-    Real sum = p_param(k)->proba_.sum();
+    Real sum = param_.proba_[k].sum();
     if (sum<=0.) return false;
-    p_param(k)->proba_ /= sum;
+    param_.proba_[k] /= sum;
   }
   return true;
 }

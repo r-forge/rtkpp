@@ -36,6 +36,10 @@
 #include "../include/STK_Law_Gamma.h"
 #include "Analysis/include/STK_Funct_betaRatio.h"
 
+#ifdef IS_RTKPP_LIB
+#include <Rcpp.h>
+#endif
+//
 namespace STK
 {
 namespace Law
@@ -48,48 +52,24 @@ Beta::Beta( Real const& alpha, Real const& beta)
           , beta_(beta)
 {
   // check parameters
-  if (  isNA(alpha) || isNA(beta)
-     || alpha <= 0.0 || beta <= 0.0
-     )
-  STKDOMAIN_ERROR_2ARG("Beta::Beta",alpha,beta,"argument error");
+  if ( !isFinite(alpha) || !isFinite(beta) || alpha <= 0.0 || beta <= 0.0)
+    STKDOMAIN_ERROR_2ARG("Beta::Beta",alpha,beta,"argument error");
 }
 
 /* Dtor
  */
-Beta::~Beta()
-{}
+Beta::~Beta() {}
 
 /*  Generate a pseudo Beta random variate.
  */
 Real Beta::rand() const
 {
-  // trivial case 
-  if (!Arithmetic<Real>::isFinite(alpha_)) return 1.0;
-  if (!Arithmetic<Real>::isFinite(beta_)) return 0.0;
-  // general case
+#ifdef IS_RTKPP_LIB
+  return R::rbeta(alpha_, beta_);
+#else
   Real g1 = Law::Gamma::rand(alpha_, 1.);
   return g1/(g1+Law::Gamma::rand(beta_, 1.));
-}
-
-/*
- *  Generate a pseudo Beta random variate with the specified parameters.
- *  (static)
- */
-Real Beta::rand( Real const& a, Real const& b)
-{
-  // check parameters
-  if (  isNA(a)
-     || isNA(b)
-     || a <= 0.0
-     || b <= 0.0
-     )
-    STKDOMAIN_ERROR_2ARG("Beta::rand",a,b,"argument error");
-  // trivial case 
-  if (!Arithmetic<Real>::isFinite(a)) return 1.0;
-  if (!Arithmetic<Real>::isFinite(b)) return 0.0;
-  // general case
-  Real g1 = Gamma::rand(a, 1.);
-  return g1/(g1+Gamma::rand(b, 1.));
+#endif
 }
 
 /*
@@ -97,12 +77,14 @@ Real Beta::rand( Real const& a, Real const& b)
  */
 Real Beta::pdf( Real const& x) const
 {
-  // check NA value
-  if (isNA(x)) return Arithmetic<Real>::NA();
-  // trivial case
-  if (Arithmetic<Real>::isInfinite(x)) return 0.0;
+#ifdef IS_RTKPP_LIB
+  return R::dbeta(x,alpha_, beta_, false);
+#else
+  // trivial cases
+  if (!Arithmetic<Real>::isFinite(x)||(x<0.)||(x>1)) return 0.0;
   // compute result
   return 0.;
+#endif
 }
 
 /*
@@ -110,14 +92,17 @@ Real Beta::pdf( Real const& x) const
  */
 Real Beta::lpdf( Real const& x) const
 {
+#ifdef IS_RTKPP_LIB
+  return R::dbeta(x,alpha_, beta_, true);
+#else
   // check NA value
   if (isNA(x)) return Arithmetic<Real>::NA();
   // check parameter
   if (Arithmetic<Real>::isInfinite(x))
     return -Arithmetic<Real>::infinity();
-
   // compute result
   return 0.;
+#endif
 }
 
 /*
@@ -125,11 +110,15 @@ Real Beta::lpdf( Real const& x) const
  */
 Real Beta::cdf( Real const& t) const
 {
+#ifdef IS_RTKPP_LIB
+  return R::pbeta(t, alpha_, beta_, true, false);
+#else
   // check NA value
   if (isNA(t)) return Arithmetic<Real>::NA();
-  // check parameter
+  // compute result
   return (Arithmetic<Real>::isInfinite(t)) ? (t < 0.) ? 0.0 : 1.0
                                            :  Funct::betaRatio(alpha_,beta_,t, false);
+#endif
 }
     
 /*
@@ -137,21 +126,90 @@ Real Beta::cdf( Real const& t) const
  */
 Real Beta::icdf( Real const& p) const
 {
-  // check NA value
-  if (isNA(p)) return Arithmetic<Real>::NA();
-
+#ifdef IS_RTKPP_LIB
+  return R::qbeta(p , alpha_, beta_, true, false);
+#else
   // check parameter
   if ((p > 1.) || (p < 0.))
-    throw domain_error("Beta::icdf(p) "
-                       "argument error");
- // trivial cases
- if (p == 0.) return 0.;
- if (p == 1.) return 1.;
-
+    STKDOMAIN_ERROR_1ARG(Beta::icdf,p,argument outside [0;1]);
+  // trivial cases
+  if (p == 0.) return 0.;
+  if (p == 1.) return 1.;
   // result 
   return 0.;
+#endif
+}
+
+/*  Generate a pseudo Beta random variate with the specified parameters.
+ *  (static)
+ */
+Real Beta::rand( Real const& alpha, Real const& beta)
+{
+#ifdef IS_RTKPP_LIB
+  return R::rbeta(alpha, beta);
+#else
+  Real g1 = Law::Gamma::rand(alpha, 1.);
+  return g1/(g1+Law::Gamma::rand(beta, 1.));
+#endif
+}
+
+Real Beta::pdf(const Real& x, const Real& alpha, const Real& beta)
+{
+#ifdef IS_RTKPP_LIB
+  return R::dbeta(x,alpha, beta, false);
+#else
+  // trivial cases
+  if (!Arithmetic<Real>::isFinite(x)||(x<0.)||(x>1)) return 0.0;
+  // compute result
+  return 0.;
+#endif
+}
+
+Real Beta::lpdf(const Real& x, const Real& alpha, const Real& beta)
+{
+#ifdef IS_RTKPP_LIB
+  return R::dbeta(x,alpha, beta, true);
+#else
+  // check NA value
+  if (isNA(x)) return Arithmetic<Real>::NA();
+  // check parameter
+  if (Arithmetic<Real>::isInfinite(x))
+    return -Arithmetic<Real>::infinity();
+  // compute result
+  return 0.;
+#endif
+}
+
+Real Beta::cdf(const Real& t, const Real& alpha, const Real& beta)
+{
+#ifdef IS_RTKPP_LIB
+  return R::pbeta(t, alpha, beta, true, false);
+#else
+  // check NA value
+  if (isNA(t)) return Arithmetic<Real>::NA();
+  // compute result
+  return (Arithmetic<Real>::isInfinite(t)) ? (t < 0.) ? 0.0 : 1.0
+                                           :  Funct::betaRatio(alpha,beta,t, false);
+#endif
+}
+
+Real Beta::icdf(const Real& p, const Real& alpha, const Real& beta)
+{
+#ifdef IS_RTKPP_LIB
+  return R::qbeta(p , alpha, beta, true, false);
+#else
+  // check parameter
+  if ((p > 1.) || (p < 0.))
+    STKDOMAIN_ERROR_1ARG(Beta::icdf,p,argument outside [0;1]);
+  // trivial cases
+  if (p == 0.) return 0.;
+  if (p == 1.) return 1.;
+  // result
+  return 0.;
+#endif
 }
 
 } // namespace Law
 
 } // namespace STK
+

@@ -36,11 +36,6 @@
 #ifndef STK_ARRAYBYVECTORPRODUCT_H
 #define STK_ARRAYBYVECTORPRODUCT_H
 
-#ifdef _OPENMP
-#include <omp.h>
-#endif
-
-
 namespace STK
 {
 

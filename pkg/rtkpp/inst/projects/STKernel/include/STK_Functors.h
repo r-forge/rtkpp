@@ -470,6 +470,40 @@ struct LogOp
   inline result_type const operator()(param1_type a) const {return std::log(a);}
 };
 /** @ingroup Functors
+  * @brief Template functor to compute the minimum between a number and a fixed
+  * other one
+  */
+template<typename Type>
+struct MinimumOp
+{
+  enum { NbParam_ = 1 };
+  typedef Type const result_type;
+  typedef Type const param1_type ;
+
+  inline MinimumOp(Type const other) : other_(other) {}
+  inline MinimumOp( MinimumOp const& other) : other_(other.other_) {}
+  inline result_type const operator() (param1_type a) const
+  {return std::min(a,other_); }
+  Type const other_;
+};
+/** @ingroup Functors
+  * @brief Template functor to compute the minimum between a number and a fixed
+  * other one
+  */
+template<typename Type>
+struct MaximumOp
+{
+  enum { NbParam_ = 1 };
+  typedef Type const result_type;
+  typedef Type const param1_type ;
+
+  inline MaximumOp(Type const other) : other_(other) {}
+  inline MaximumOp( MaximumOp const& other) : other_(other.other_) {}
+  inline result_type const operator() (param1_type a) const
+  {return std::max(a,other_); }
+  Type const other_;
+};
+/** @ingroup Functors
   * @brief Template functor to multiply a number by a fixed other one
   */
 template<typename Type>
@@ -501,6 +535,22 @@ struct SafeOp
   inline result_type const operator()(param1_type a) const
   { return Arithmetic<Type>::isFinite(a) ? a : other_; }
   Type const other_;
+};
+/** @ingroup Functors
+  * @brief Template functor which compute safely the inverse of a number
+  */
+template<typename Type>
+struct SafeInverseOp
+{
+  enum { NbParam_ = 1 };
+  typedef Type result_type;
+  typedef Type param1_type ;
+
+  inline SafeInverseOp(Type const tol = Arithmetic<Type>::epsilon()) : tol_(tol) {}
+  inline SafeInverseOp( SafeInverseOp const& other) : tol_(other.tol_) {}
+  inline result_type const operator()(param1_type a) const
+  { return (std::abs(a)>tol_) ? Type(1)/a : 1.; }
+  Type const tol_;
 };
 
 

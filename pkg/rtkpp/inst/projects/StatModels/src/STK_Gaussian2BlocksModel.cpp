@@ -34,10 +34,10 @@
  *  @brief In this file we implement the GaussianModel class.
  **/
 
+#include <STatistiK/include/STK_MultiLaw_Normal.h>
 #include "../include/STK_Gaussian2BlocksModel.h"
 
 #include "STatistiK/include/STK_Stat_BivariateRealReal.h"
-#include "STatistiK/include/STK_Law_MultiNormal.h"
 
 namespace STK
 {

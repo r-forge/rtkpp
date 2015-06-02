@@ -51,14 +51,23 @@ typedef Normal Gaussian;
  *  @ingroup Laws
  *  @brief Normal distribution law.
  * 
- *  The Normal distribution is a continuous probability distribution
- *  with pdf
+ *  In probability theory, the <em>normal (or Gaussian) distribution</em> is a
+ *  very commonly occurring continuous probability distribution. Normal
+ *  distributions are extremely important in statistics and are often used in
+ *  the natural and social sciences for real-valued random variables whose
+ *  distributions are not known.
+ *
+ *  The normal distribution is immensely useful because of the central limit
+ *  theorem, which states that, under mild conditions, the mean of many random
+ *  variables independently drawn from the same distribution is distributed
+ *  approximately normally, irrespective of the form of the original distribution.
+ *
+ *  The probability density of normal distribution is:
  *  \f[
- * f(x;\mu,\sigma) = \frac{1}{\sigma\sqrt{2\pi}}
+ *  f(x;\mu,\sigma) = \frac{1}{\sigma\sqrt{2\pi}}
  *            \exp\left(-\frac{\left(x-\mu\right)^2}{2\sigma^2} \right)
  *  \f]
- * where \f$ \mu \f$ and \f$\sigma\f$ are the mean and the standard
- * deviation.
+ * where \f$ \mu \mbox{ and } \sigma\f$ are the mean and the standard deviation.
 **/
 class Normal : public IUnivLaw<Real>
 {
@@ -70,21 +79,21 @@ class Normal : public IUnivLaw<Real>
     Normal( Real const& mu=0., Real const& sigma=1.);
     /** Destructor. **/
     virtual ~Normal();
-    /** @return mu */
+    /** @return the mean */
     inline Real const& mu() const { return mu_;}
-    /** @return mu */
+    /** @return the standard deviation */
     inline Real const& sigma() const { return sigma_;}
-    /** @param mu the value to set to mu */
+    /** @param mu the mean to set */
     inline void setMu( Real const& mu) { mu_ = mu;}
-    /** @param sigma the value to set to sigma */
+    /** @param sigma the standard deviation to set */
     inline void setSigma( Real const& sigma)
     {
       if (sigma<0) STKDOMAIN_ERROR_1ARG(Normal::setSigma,sigma,sigma must be >= 0);
        sigma_ = sigma;
     }
-    /** @brief Generate a pseudo normalized Normal random variate.
+    /** @brief Generate a pseudo Normal random variate.
      *
-     *  Generate a pseudo normalized Normal random variate
+     *  Generate a pseudo Normal random variate
      *  with location parameter @c mu_ and standard deviation @c sigma_.
      *  @return a pseudo normal random variate
      **/
@@ -128,24 +137,37 @@ class Normal : public IUnivLaw<Real>
      *
      *  Generate a pseudo Normal random variate with location @c mu and
      *  standard deviation @c sigma parameters.
-     *  @param mu mean of the Normal distribution
-     *  @param sigma standard deviation of the Normal distribution
+     *  @param mu, sigma mean and standard deviation of the Normal distribution
      *  @return a pseudo normal random variate, centered in @c mu and with
      *  standard deviation @c sigma
      **/
     static Real rand( Real const& mu, Real const& sigma);
     /** @param x a real value
-     *  @param mu mean of the normal law
-     *  @param sigma standard deviation of the normal law
+     *  @param mu, sigma mean and standard deviation of the Normal distribution
      *  @return the value of the normal pdf at @c x
      **/
     static Real pdf( Real const& x, Real const& mu, Real const& sigma);
     /** @return Give the value of the log-pdf at x.
      *  @param x a real value
-     *  @param mu mean of the normal law
-     *  @param sigma standard deviation of the normal law
+     *  @param mu, sigma mean and standard deviation of the Normal distribution
      **/
     static Real lpdf( Real const& x, Real const& mu, Real const& sigma);
+    /** @brief Compute the cumulative distribution function at t of
+     *  the standard normal distribution.
+     *
+     *  @param t a real value
+     *  @param mu, sigma mean and standard deviation of the Normal distribution
+     *  @return the cumulative distribution function value at t
+     **/
+    static Real cdf( Real const& t, Real const& mu, Real const& sigma);
+    /** @brief Compute the inverse cumulative distribution function at p
+     *  of the standard normal distribution.
+     *
+     *  @param p a probability number.
+     *  @param mu, sigma mean and standard deviation of the Normal distribution
+     *  @return the inverse cumulative distribution function value at p.
+     **/
+    static Real icdf( Real const& p, Real const& mu, Real const& sigma);
 
   protected:
     /** The mu parameter. **/

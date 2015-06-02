@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2011  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as
@@ -134,17 +134,42 @@ class CArrayPoint : public ICArray < CArrayPoint<Type_, SizeCols_, Orient_> >
      *  @param sizeCols range of the columns
      **/
     inline CArrayPoint( int sizeCols): Base(1, sizeCols) {}
-    /** constructor with rbeg, rend, cbeg and cend specified,
-     *  initialization with a constant.
-     *  @param sizeCols range of the columns
+    /** constructor with specified ranges.
+     *  @param range range of the rows and columns
+     **/
+    inline CArrayPoint( Range range): Base(1, range.size())
+    { this->shift(range.begin());}
+    /** constructor with specified size, initialization with a constant.
+     *  @param sizeCols size of the columns
      *  @param v initial value of the container
      **/
     inline CArrayPoint( int sizeCols, Type const& v): Base(1, sizeCols, v) {}
+    /** constructor with specified ranges, initialization with a constant.
+     *  @param range range of the columns
+     *  @param v initial value of the container
+     **/
+    inline CArrayPoint( Range range, Type const& v): Base(1, range.size(), v)
+    { this->shift(range.begin());}
     /** Copy constructor
      *  @param T the container to copy
      *  @param ref true if T is wrapped
      **/
     inline CArrayPoint( CArrayPoint const& T, bool ref=false): Base(T, ref) {}
+    /** constructor by reference, ref_=1.
+     *  @param T the container to wrap
+     *  @param J the range of the columns to wrap
+     **/
+    CArrayPoint( CArrayPoint const& T, Range const& J)
+               : Base(T, T.rows(), J) {}
+    /** constructor by reference, ref_=1.
+     *  @param T the container to wrap
+     *  @param J the range of the data to wrap
+     *  @param row the index of the row to wrap
+     **/
+    template<class OtherArray>
+    CArrayPoint( ICArray<OtherArray> const& T, Range const& J, int row)
+               : Base(T.allocator(), Range(row, 1), J)
+    {}
     /** wrapper constructor for 0 based C-Array.
      *  @param q pointer on the array
      *  @param nbCol number of columns
@@ -154,7 +179,7 @@ class CArrayPoint : public ICArray < CArrayPoint<Type_, SizeCols_, Orient_> >
      *  @param allocator the allocator to wrap
      **/
     template<class OtherAllocator>
-    inline CArrayPoint( CAllocatorBase<OtherAllocator> const& allocator)
+    inline CArrayPoint( ICAllocator<OtherAllocator> const& allocator)
                       : Base(allocator.asDerived())
     {}
     /** Copy constructor using an expression.

@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2011  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as
@@ -145,12 +145,22 @@ class CArraySquare
      *  @param size range of the columns
      **/
     inline CArraySquare( int const& size): Base(size, size) {}
-    /** constructor with rbeg, rend, cbeg and cend specified,
-     *  initialization with a constant.
+    /** constructor with specified ranges.
+     *  @param range range of the rows and columns
+     **/
+    inline CArraySquare( Range range): Base(range.size(), range.size())
+    { this->shift(range.begin());}
+    /** constructor with specified dimension, initialization with a constant.
      *  @param size range of the columns
      *  @param v initial value of the container
      **/
-    inline CArraySquare( int const& size, Type const& v): Base(size, size, v) {}
+    inline CArraySquare( int size, Type const& v): Base(size, size, v) {}
+    /** constructor with specified ranges, initialization with a constant.
+     *  @param range range of the rows and columns
+     *  @param v initial value of the container
+     **/
+    inline CArraySquare( Range range, Type const& v): Base(range.size(), range.size(), v)
+    { this->shift(range.begin());}
     /** Copy constructor
      *  @param T the container to copy
      *  @param ref true if T is wrapped
@@ -165,13 +175,35 @@ class CArraySquare
      *  @param allocator the allocator to wrap
      **/
     template<class OtherAllocator>
-    inline CArraySquare( CAllocatorBase<OtherAllocator> const& allocator): Base(allocator.asDerived()) {}
+    inline CArraySquare( ICAllocator<OtherAllocator> const& allocator): Base(allocator.asDerived()) {}
     /** Copy constructor using an expression.
      *  @param T the container to wrap
      **/
     template<class OtherDerived>
     inline CArraySquare( ExprBase<OtherDerived> const& T): Base(T.size(), T.size())
     { LowBase::operator=(T);}
+    /** resize the Array.
+     *  @param I, J range of the rows and columns
+     **/
+    CArraySquare& resize(Range const& I, Range const& J)
+    { return Base::resize(I,I);}
+    /** shift the Array.
+     *  @param beginRows,beginCols  first indexes of the rows and columns
+     **/
+    CArraySquare& shift(int beginRows, int beginCols)
+    {
+      if (beginRows != beginCols)
+        STKRUNTIME_ERROR_2ARG(CArraySquare,beginRows,beginCols,beginRows!=beginCols);
+      return Base::shift(beginRows,beginCols);
+    }
+    /** Shift the square Array.
+     *  @param beg first index of the array
+     **/
+    CArraySquare& shift(int beg) { return Base::shift(beg,beg);}
+    /** Resize the square Array.
+     *  @param I Range of the vector
+     **/
+    CArraySquare& resize(Range const& I) { return Base::resize(I,I);}
     /** destructor. */
     inline ~CArraySquare() {}
     /** operator= : set the container to a constant value.

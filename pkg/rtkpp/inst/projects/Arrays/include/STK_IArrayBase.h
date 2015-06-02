@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2014  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as
@@ -29,7 +29,7 @@
  **/
 
 /** @file STK_IArrayBase.h
- *  @brief In this file we define the ICAllocator interface class.
+ *  @brief In this file we define the IArrayBase interface class.
  **/
 
 #ifndef STK_IARRAYBASE_H
@@ -46,6 +46,9 @@ namespace STK
  *  The IArrayBase class is the base class for all two-dimensional containers.
  *  A two-dimensional container is defined by an horizontal range of index
  *  for the columns and a vertical range of index for the rows.
+ *
+ *  This Interface base class store the ranges and allow to derived classes to
+ *  manipulate these ranges.
  **/
 template<int SizeRows_, int SizeCols_>
 class IArrayBase
@@ -98,13 +101,11 @@ class IArrayBase
     inline bool empty() const { return (cols_.empty() || rows_.empty());}
 
     /** Set the first index of the rows and columns.
-     *  @param rbeg the first index of the rows
-     *  @param cbeg the first index of the columns
+     *  @param rbeg, cbeg the first index of the rows and columns
      **/
     inline void shift( int rbeg, int cbeg) { rows_.shift(rbeg); cols_.shift(cbeg);}
     /** Set the ranges of the container.
-     *  @param I the vertical range
-     *  @param J the horizontal range
+     *  @param I,J the vertical and horizontal range
      **/
     inline void setRanges(RowRange const& I = RowRange(), ColRange const& J = ColRange())
     { rows_ = I; cols_ =J;}
@@ -136,7 +137,6 @@ class IArrayBase
      *  @param dec the decrement to apply
      **/
     inline void decLastIdxRows( int dec) { rows_.decLast(dec);}
-
     /** Set the range of the columns.
      * @param J the range of the cols number
      **/
@@ -146,7 +146,7 @@ class IArrayBase
      **/
     inline void shiftBeginCols( int beg) { cols_.shift(beg);}
     /** Increment the range of the number of columns.
-     *  @param inc the increment to apply
+     *  @param inc the increment to applycmake cl
      **/
     inline void incRangeCols( int inc) { cols_.inc(inc);}
     /** increment the first index of the number of columns.

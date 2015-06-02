@@ -36,10 +36,6 @@
 #ifndef STK_ARRAYBYARRAYPRODUCT_H
 #define STK_ARRAYBYARRAYPRODUCT_H
 
-#ifdef _OPENMP
-#include <omp.h>
-#endif
-
 namespace STK
 {
 namespace hidden
@@ -91,7 +87,7 @@ struct MultCoefImpl
   }
   /** dot product. general by vector */
   static void dot( Lhs const& lhs, ITContainer<Rhs, Arrays::vector_> const& rhs
-                 , ICAllocator<Result, sizeRows_, sizeCols_>& res, int iRow)
+                 , ICAllocator<Result>& res, int iRow)
   {
     res.elt(iRow) = Type(0);
     Range const dotRange = Range::inf(lhs.rangeColsInRow(iRow), rhs.range());
@@ -100,7 +96,7 @@ struct MultCoefImpl
   }
   /** dot product. general by vector */
   static void dot( ITContainer<Lhs, Arrays::point_> const& lhs
-                 , Rhs const& rhs, ICAllocator<Result, sizeRows_, sizeCols_>& res, int jCol)
+                 , Rhs const& rhs, ICAllocator<Result>& res, int jCol)
   {
     res.elt(jCol) = Type(0);
     Range const dotRange = Range::inf(rhs.rangeRowsInCol(jCol), lhs.range());

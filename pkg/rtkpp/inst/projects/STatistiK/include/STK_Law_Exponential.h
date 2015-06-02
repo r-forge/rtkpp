@@ -43,14 +43,22 @@ namespace STK
 namespace Law
 {
 /** @ingroup Laws
- *  @brief class for the Exponential random generator.
- * 
- *  The Exponential distribution, is a continuous probability
- *  distribution with probability pdf function
+ *  @brief Exponential distribution law.
+ *
+ *  In probability theory and statistics, the <em>exponential distribution</em>
+ *  (a.k.a. negative exponential distribution) is the probability distribution
+ *  that describes the time between events in a Poisson process, i.e. a process
+ *  in which events occur continuously and independently at a constant average
+ *  rate. It is a particular case of gamma distribution. It is the continuous
+ *  analogue of the geometric distribution, and it has the key property of being
+ *  memoryless. In addition to being used for the analysis of Poisson processes,
+ *  it is found in various other contexts.
+ *
+ *  The probability density function (pdf) of an exponential distribution is
  *  \f[
  *    f(x; \lambda) = \frac{1}{\lambda} e^{- x/\lambda} 1_{x\geq 0}
  *  \f]
- *  where \f$\lambda>0\f$ is the scale parameter.
+ *  where \f$\lambda>0\f$ is the scale (inverse rate) parameter.
 **/
 class Exponential : public IUnivLaw<Real>
 {
@@ -90,17 +98,27 @@ class Exponential : public IUnivLaw<Real>
      *  parameter.
      *  @param scale the scale of the distribution
      **/
-    static Real rand( Real const& scale=1);
+    static Real rand( Real const& scale);
     /** Give the value of the pdf at x.
      *  @param x a real value
      *  @param scale the scale of the distribution
      **/
-    static Real pdf( Real const& x, Real const& scale=1);
+    static Real pdf( Real const& x, Real const& scale);
     /** Give the value of the log-pdf at x.
      *  @param x a real value
      *  @param scale the scale of the distribution
      **/
-    static Real lpdf( Real const& x, Real const& scale=1);
+    static Real lpdf( Real const& x, Real const& scale);
+    /** Compute he cumulative distribution function
+     *  @param t a real value
+     *  @param scale the scale of the distribution
+     **/
+    static Real cdf( Real const& t, Real const& scale);
+    /** Compute rhe inverse cumulative distribution function
+     *  @param p a probability
+     *  @param scale the scale of the distribution
+     **/
+    static Real icdf( Real const& p, Real const& scale);
 
   protected:
     /** The scale parameter. */

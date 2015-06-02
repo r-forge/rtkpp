@@ -119,7 +119,6 @@ class Array2DNumber : public IArray2D< Array2DNumber<Type_> >
     /** Default constructor */
     Array2DNumber() : Base(Range(1), Range(1)) {}
     /** constructor with specified range, initialization with a constant.
-     *  @param J range of the container
      *  @param v initial value of the container
      **/
     Array2DNumber( Type const& v) : Base(Range(1), Range(1))
@@ -145,8 +144,8 @@ class Array2DNumber : public IArray2D< Array2DNumber<Type_> >
     { LowBase::operator=(T);}
     /** constructor by reference, ref_=1.
      *  @param p_data a pointer on the data to wrap
-     *  @param J the range of the data to wrap
      *  @param row the index of the row to wrap
+     *  @param col the index of the column to wrap
      **/
      Array2DNumber( Type** p_data, int row, int col)
                   : Base(p_data, Range(row, 1), Range(col, 1)) {}

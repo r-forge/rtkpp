@@ -46,20 +46,24 @@ namespace Law
 /** @ingroup Laws
  *  @brief Gamma distribution law.
  * 
- *  The Gamma distribution is a continuous probability distribution
+ *  In probability theory and statistics, the <em>gamma distribution</em>
+ *  is a two-parameter family of continuous probability distributions.
+ *  The common exponential distribution and chi-squared distribution are special
+ *  cases of the gamma distribution.
+ *
  *  The probability pdf function of the gamma distribution
  *  can be expressed in terms of the @ref Funct::gamma function:
  *  \f[
  *   f(x;a,b) = \left(\frac{x}{b}\right)^{a-1}
  *                   \frac{e^{-x/b}}{b \, \Gamma(a)}
- *   \ \mathrm{for}\ x > 0 
+ *   \ \mathrm{for}\ x>0,\ a>0,\ b>0
  *  \f]
- *  where \f$ a>0 \f$ is the shape parameter
- *  and   \f$ b>0 \f$ is the scale parameter.
+ *  where @a a is the shape parameter and @e b is the scale parameter.
  **/
 class Gamma : public IUnivLaw<Real>
 {
   public:
+    typedef IUnivLaw<Real> Base;
     /** Default constructor.
      *  @param shape shape (position) parameter
      *  @param scale scale (dispersion) parameter
@@ -83,13 +87,30 @@ class Gamma : public IUnivLaw<Real>
       if (scale<=0) STKDOMAIN_ERROR_1ARG(Gamma::setScale,scale,scale must be > 0);
       b_ = scale;
     }
-    /** @return a pseudo Gamma random variate. */
+    /** @brief generate a gamma random variate using the G.S algorithm
+     *  of Ahrens and Dieter (1974) for 0<a_<1
+     *  and Marsaglia fast Gamma generator with enhanced squeeze step for a>1.
+     *  @return a pseudo Gamma random variate.
+     **/
     virtual Real rand() const;
-    /** @return the value of the pdf
+    /** compute
+     *  \f[
+     *   f(x;\alpha,\beta) = \left(\frac{x}{\beta}\right)^{\alpha-1}
+     *                   \frac{e^{-x/\beta}}{\beta \, \Gamma(\alpha)}
+     *   \ \mathrm{for}\ x > 0
+     *  \f]
+     *  where \f$ \alpha >, \mbox{ et } \beta > 0\f$ are the shape and scale
+     *  parameters.
+     *  @return the value of the pdf
      *  @param x a positive real value
      **/
     virtual Real pdf(Real const& x) const;
-    /** @return the value of the log-pdf
+    /** Compute
+     *  \f[
+     *   \ln(f(x;\alpha,\beta)) = - x/\beta + (\alpha-1) \ln(x)
+     *                            - \alpha \ln(\beta) + \ln(\Gamma(\alpha))
+     *  \f]
+     *  @return the value of the log-pdf
      *  @param x a positive real value
      **/
     virtual Real lpdf(Real const& x) const;
@@ -101,29 +122,32 @@ class Gamma : public IUnivLaw<Real>
      *  @param p a probability number
      **/
     virtual Real icdf(Real const& p) const;
+
     /** @return a pseudo Gamma random variate with the specified parameters.
-     *  @param shape shape parameter
-     *  @param scale scale (dispersion) parameter
+     *  @param shape, scale shape and scale parameters
      **/
     static Real rand( Real const& shape, Real const& scale);
     /** @return the value of the pdf
      *  @param x a positive real value
-     *  @param shape shape parameter
-     *  @param scale scale (dispersion) parameter
+     *  @param shape, scale shape and scale parameters
      **/
     static Real pdf(Real const& x, Real const& shape, Real const& scale);
     /** @return the value of the log-pdf
      *  @param x a positive real value
-     *  @param shape shape parameter
-     *  @param scale scale (dispersion) parameter
+     *  @param shape, scale shape and scale parameters
      **/
     static Real lpdf(Real const& x, Real const& shape, Real const& scale);
     /** @return the cumulative distribution function
      *  @param t a positive real value
-     *  @param shape shape parameter
-     *  @param scale scale (dispersion) parameter
+     *  @param shape, scale shape and scale parameters
      **/
     static Real cdf(Real const& t, Real const& shape, Real const& scale);
+    /** @return the inverse cumulative distribution function
+     *  @param p a probability number
+     *  @param shape, scale shape and scale parameters
+     **/
+    static Real icdf(Real const& p, Real const& shape, Real const& scale);
+
   protected:
     /** The shape parameter */
     Real a_;

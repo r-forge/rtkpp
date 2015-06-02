@@ -216,7 +216,7 @@ bool SemiSEMAlgo::run()
   bool result = true;
   try
   {
-    Real currentLnLikelihood = p_model_->lnLikelihood();
+//    Real currentLnLikelihood = p_model_->lnLikelihood();
     for (int iter = 0; iter < this->nbIterMax_; ++iter)
     {
       p_model_->samplingStep();
@@ -230,19 +230,19 @@ bool SemiSEMAlgo::run()
         result = false;
         break;
       }
-      Real lnLikelihood = p_model_->lnLikelihood();
-      // the likelihood can increase
-      if ( std::abs(lnLikelihood - currentLnLikelihood) < epsilon_)
-      {
-#ifdef STK_MIXTURE_VERY_VERBOSE
-        stk_cout << _T("Terminating SemiSEMAlgo::run() with:\n")
-                 << _T("iter = ") << iter << _T("\n")
-                 << _T("delta = ") << std::abs(lnLikelihood - currentLnLikelihood)
-                 << _T("\n");
-#endif
-        break;
-      }
-      currentLnLikelihood = lnLikelihood;
+//      Real lnLikelihood = p_model_->lnLikelihood();
+//      // the likelihood can increase
+//      if ( std::abs(lnLikelihood - currentLnLikelihood) < epsilon_)
+//      {
+//#ifdef STK_MIXTURE_VERY_VERBOSE
+//        stk_cout << _T("Terminating SemiSEMAlgo::run() with:\n")
+//                 << _T("iter = ") << iter << _T("\n")
+//                 << _T("delta = ") << std::abs(lnLikelihood - currentLnLikelihood)
+//                 << _T("\n");
+//#endif
+//        break;
+//      }
+//      currentLnLikelihood = lnLikelihood;
     }
   }
   catch (Clust::exceptions const& error)

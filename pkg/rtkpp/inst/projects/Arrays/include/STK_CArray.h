@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2011  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as
@@ -53,7 +53,7 @@ typedef CArray<Real, 2, UnknownSize, Arrays::by_col_>           CArray2X;
 typedef CArray<Real, 3, UnknownSize, Arrays::by_col_>           CArray3X;
 typedef CArray<Real, 2, 2, Arrays::by_col_>                     CArray22;
 typedef CArray<Real, 3, 3, Arrays::by_col_>                     CArray33;
-typedef CArray<double, UnknownSize, UnknownSize, Arrays::by_col_>CArrayXX;
+typedef CArray<double, UnknownSize, UnknownSize, Arrays::by_col_>CArrayXXd;
 typedef CArray<double, UnknownSize, 2, Arrays::by_col_>         CArrayX2d;
 typedef CArray<double, UnknownSize, 3, Arrays::by_col_>         CArrayX3d;
 typedef CArray<double, 2, UnknownSize, Arrays::by_col_>         CArray2Xd;
@@ -75,7 +75,7 @@ typedef CArray<Real, 2, UnknownSize, Arrays::by_row_>           CArrayByRow2X;
 typedef CArray<Real, 3, UnknownSize, Arrays::by_row_>           CArrayByRow3X;
 typedef CArray<Real, 2, 2, Arrays::by_row_>                     CArrayByRow22;
 typedef CArray<Real, 3, 3, Arrays::by_row_>                     CArrayByRow33;
-typedef CArray<double, UnknownSize, UnknownSize, Arrays::by_row_> CArrayByRowXX;
+typedef CArray<double, UnknownSize, UnknownSize, Arrays::by_row_> CArrayByRowXXd;
 typedef CArray<double, UnknownSize, 2, Arrays::by_row_>         CArrayByRowX2d;
 typedef CArray<double, UnknownSize, 3, Arrays::by_row_>         CArrayByRowX3d;
 typedef CArray<double, 2, UnknownSize, Arrays::by_row_>         CArrayByRow2Xd;
@@ -166,19 +166,36 @@ class CArray: public ICArray < CArray<Type_, SizeRows_, SizeCols_, Orient_> >
      *  @param sizeRows, sizeCols size of the rows and columns
      **/
     inline CArray( int sizeRows, int sizeCols): Base(sizeRows, sizeCols) {}
-    /** constructor with rbeg, rend, cbeg and cend specified,
-     *  initialization with a constant.
+    /** constructor with specified ranges.
+     *  @param rows, cols range of the rows and columns
+     **/
+    inline CArray( Range rows, Range cols): Base(rows.size(), cols.size())
+    { this->shift(rows.begin(), cols.begin());}
+    /** constructor with specified size, initialization with a constant.
      *  @param sizeRows, sizeCols size of the rows and columns
      *  @param v initial value of the container
      **/
     inline CArray( int sizeRows, int sizeCols, Type const& v)
                  : Base(sizeRows, sizeCols, v)
     {}
+    /** constructor with specified ranges, initialization with a constant.
+     *  @param rows, cols range of the rows and columns
+     *  @param v initial value of the container
+     **/
+    inline CArray( Range rows, Range cols, Type const& v): Base(rows.size(), cols.size(), v)
+    { this->shift(rows.begin(), cols.begin());}
     /** Copy constructor
      *  @param T the container to copy
      *  @param ref true if T is wrapped
      **/
     inline CArray( CArray const& T, bool ref=false): Base(T, ref) {}
+    /** Copy constructor by reference, ref_=1.
+     *  @param T the container to wrap
+     *  @param I,J range of the rows and columns to wrap
+     **/
+    template<class OtherArray>
+    CArray( ICArray<OtherArray> const& T, Range const& I, Range const& J)
+           : Base(T.allocator(), I, J) {}
     /** wrapper constructor for 0 based C-Array.
      *  @param q pointer on the array
      *  @param sizeRows, sizeCols size of the rows and columns
@@ -188,7 +205,7 @@ class CArray: public ICArray < CArray<Type_, SizeRows_, SizeCols_, Orient_> >
      *  @param allocator the allocator to wrap
      **/
     template<class OtherAllocator>
-    inline CArray( CAllocatorBase<OtherAllocator> const& allocator): Base(allocator.asDerived()) {}
+    inline CArray( ICAllocator<OtherAllocator> const& allocator): Base(allocator.asDerived()) {}
     /** Copy constructor using an expression.
      *  @param T the container to wrap
      **/

@@ -42,6 +42,10 @@
 #include "../include/STK_Law_Util.h"
 #include "../include/STK_Law_Poisson.h"
 
+#ifdef IS_RTKPP_LIB
+#include <Rcpp.h>
+#endif
+
 
 namespace STK
 {
@@ -50,7 +54,7 @@ namespace Law
 {
 
 /* The inverse cumulative distribution function at p.*/
-static Real icdf_gauss_raw(Real const& p)
+static Real gauss_icdf_fast(Real const& p)
 {
  // trivial cases
  if (p == 0.5) return  0.;
@@ -121,9 +125,9 @@ static int icdf_poisson_raw(Real const& p, Real const& lambda)
   q += lambda;
   if (s<q) return 1;
   q += lambda*lambda/2;
-  if (s<q) return 1;
+  if (s<q) return 2;
   // otherwise search
-  q = icdf_gauss_raw(p);
+  q = gauss_icdf_fast(p);
   Real sqlambda = std::sqrt(lambda);
   int k = round(lambda + q * sqlambda + (q-1.)*(q+1.)*(1.-q/(12.*sqlambda))/6);
   if (Funct::gammaRatioQ(k, lambda) >= p)
@@ -149,10 +153,17 @@ static int icdf_poisson_raw(Real const& p, Real const& lambda)
 /* constructor
  * @param lambda mean of a Poisson variate
  **/
-Poisson::Poisson(Real const& lambda): Base(_T("Poisson")), lambda_(lambda) {}
+Poisson::Poisson( Real const& lambda)
+                : Base(_T("Poisson")), lambda_(lambda) {}
 /* @return a Poisson random variate . */
 int Poisson::rand() const
-{ return icdf_poisson_raw(Law::generator.randUnif(), lambda_);}
+{
+#ifdef IS_RTKPP_LIB
+  return R::rpois(lambda_);
+#else
+ return icdf_poisson_raw(Law::generator.randUnif(), lambda_);
+#endif
+}
 /* @brief compute the probability distribution function.
  *  Give the value of the pdf at the point x.
  *  @param x a binary value
@@ -160,6 +171,9 @@ int Poisson::rand() const
  **/
 Real Poisson::pdf(int const& x) const
 {
+#ifdef IS_RTKPP_LIB
+  return R::dpois(x, lambda_, false);
+#else
   // check trivial values
   if (x<0) return( 0. );
   // if lambda is 0, we have P(X=0) = 1
@@ -170,6 +184,7 @@ Real Poisson::pdf(int const& x) const
   return( std::exp(-Funct::gammaLnStirlingError((Real)x)-Funct::dev0((Real)x, lambda_))
           /(Const::_SQRT2PI_*std::sqrt(x))
         );
+#endif
 }
 
 /* @brief compute the log probability distribution function.
@@ -179,6 +194,9 @@ Real Poisson::pdf(int const& x) const
  **/
 Real Poisson::lpdf(int const& x) const
 {
+#ifdef IS_RTKPP_LIB
+  return R::dpois(x, lambda_, true);
+#else
   // check trivial values
   if (x<0) return( -Arithmetic<Real>::infinity() );
   // if lambda is 0, we have P(X=0) = 1
@@ -189,6 +207,7 @@ Real Poisson::lpdf(int const& x) const
   return( -Funct::gammaLnStirlingError(x)-Funct::dev0(x, lambda_)
           -Const::_LNSQRT2PI_-std::log((Real)x)/2.
         );
+#endif
 }
 /* @brief compute the cumulative distribution function
  *  Give the probability that a Poisson random variate is less or equal
@@ -198,11 +217,15 @@ Real Poisson::lpdf(int const& x) const
  **/
 Real Poisson::cdf(Real const& t) const
 {
+#ifdef IS_RTKPP_LIB
+  return R::ppois(t, lambda_, true, false);
+#else
   // check trivial values
   if (t < 0)    return 0;
   if (lambda_ == 0.) return( 1. );
   // use gamma ratio function
   return Funct::gammaRatioQ(std::floor(t) + 1, lambda_);
+#endif
 }
 /* @brief inverse cumulative distribution function
  *  The quantile is defined as the smallest value @e x such that
@@ -211,16 +234,19 @@ Real Poisson::cdf(Real const& t) const
  **/
 int Poisson::icdf(Real const& p) const
 {
+#ifdef IS_RTKPP_LIB
+  return R::qpois(p, lambda_, true, false);
+#else
   // check trivial values
   if (p == 0.) return 0;
-  if (p == 1.) return Arithmetic<int>::max();
+  if (p == 1.) return Arithmetic<int>::max(); // infty does not exists for int
   // check values 0 and 1
   Real el = std::exp(-lambda_);
   if (p<el) return 0;
   if (p<(1+lambda_)*el) return 1;
   // othewise search
-  Real q = icdf_gauss_raw(p), sqlambda = std::sqrt(lambda_);
-  int k = round(lambda_ + q * sqlambda + (q-1.)*(q+1.)*(1.-q/(12.*sqlambda))/6);
+  Real q = gauss_icdf_fast(p), sqlambda = std::sqrt(lambda_);
+  int k = std::max(0., round(lambda_ + q * sqlambda + (q-1.)*(q+1.)*(1.-q/(12.*sqlambda))/6));
   if (cdf(k) >= p)
   { /* decreasing search */
     while(1)
@@ -238,6 +264,7 @@ int Poisson::icdf(Real const& p) const
     }
   }
   return k; // avoid warning at compilation
+#endif
 }
 
 /* @param lambda the mean
@@ -293,11 +320,15 @@ Real Poisson::lpdf(int const& x, Real const& lambda)
  **/
 Real Poisson::cdf(Real const& t, Real const& lambda)
 {
+#ifdef IS_RTKPP_LIB
+  return R::ppois(t, lambda, true, false);
+#else
   // check trivial values
   if (t < 0) return 0;
   if (lambda == 0.) return( 1. );
   // use gamma ratio function
   return Funct::gammaRatioQ(std::floor(t) + 1, lambda);
+#endif
 }
 /* @brief inverse cumulative distribution function
  *  The quantile is defined as the smallest value @e x such that
@@ -306,6 +337,9 @@ Real Poisson::cdf(Real const& t, Real const& lambda)
  **/
 int Poisson::icdf(Real const& p, Real const& lambda)
 {
+#ifdef IS_RTKPP_LIB
+  return R::qpois(p, lambda, true, false);
+#else
   // check trivial values
   if (p == 0.) return 0;
   if (p == 1.) return Arithmetic<int>::max();
@@ -314,7 +348,7 @@ int Poisson::icdf(Real const& p, Real const& lambda)
   if (p<el) return 0;
   if (p< (1+lambda)*el) return 1;
   // othewise search
-  Real q = icdf_gauss_raw(p), sqlambda = std::sqrt(lambda);
+  Real q = gauss_icdf_fast(p), sqlambda = std::sqrt(lambda);
   int k = round(lambda + q * sqlambda + (q-1.)*(q+1.)*(1.-q/(12.*sqlambda))/6);
   if (cdf(k, lambda) >= p)
   { /* decreasing search */
@@ -333,6 +367,7 @@ int Poisson::icdf(Real const& p, Real const& lambda)
     }
   }
   return k; // avoid warning at compilation
+#endif
 }
 
 

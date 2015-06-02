@@ -1,6 +1,12 @@
 \name{NEWS}
 \title{News for Package 'rtkpp}
 
+\section{Changes in rtkpp version 0.9.0 (2014-12-01)}{
+  \itemize{
+    \item Provide more templated classes reducing the size of the library 
+    \item Adding GaussianKernel mixture model
+  }
+}
 \section{Changes in rtkpp version 0.8.5 (2014-12-01)}{
   \itemize{
     \item Using openmp support

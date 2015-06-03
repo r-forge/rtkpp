@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2008  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -32,76 +32,51 @@
  *  @brief In this file we implement the FisherSnedecor probability distribution.
  **/
 
+#ifndef IS_RTKPP_LIB
 #include "../include/STK_Law_FisherSnedecor.h"
-
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
 #endif
+
 
 namespace STK
 {
 
 namespace Law
 {
-/* Default constructor.
- *  @param df1, df2 degree of freedom parameters
- **/
-FisherSnedecor::FisherSnedecor( int df1, int df2):Base(_T("Fisher-Snedecor")), df1_(df1), df2_(df2)
-{}
-/* destructor */
-FisherSnedecor::~FisherSnedecor() {}
+
+#ifndef IS_RTKPP_LIB
+
 /* @return a pseudo FisherSnedecor random variate. */
 Real FisherSnedecor::rand() const
 {
-#ifdef IS_RTKPP_LIB
-  return R::rf(df1_, df2_);
-#else
   return 0;
-#endif
 }
 /* @return the value of the pdf
  *  @param x a positive real value
  **/
 Real FisherSnedecor::pdf(Real const& x) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::df(x, df1_, df2_, false);
-#else
   return 0;
-#endif
 }
 /* @return the value of the log-pdf
  *  @param x a positive real value
  **/
 Real FisherSnedecor::lpdf(Real const& x) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::df(x, df1_, df2_, true);
-#else
   return 0;
-#endif
 }
 /* @return the cumulative distribution function
  *  @param t a positive real value
  **/
 Real FisherSnedecor::cdf(Real const& t) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::pf(t, df1_, df2_, true, false);
-#else
   return 0;
-#endif
 }
 /* @return the inverse cumulative distribution function
  *  @param p a probability number
  **/
 Real FisherSnedecor::icdf(Real const& p) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::qf(p, df1_, df2_, true, false);
-#else
   return 0;
-#endif
 }
 
 /* @return a pseudo FisherSnedecor random variate with the specified parameters.
@@ -109,11 +84,7 @@ Real FisherSnedecor::icdf(Real const& p) const
  **/
 Real FisherSnedecor::rand( int df1, int df2)
 {
-#ifdef IS_RTKPP_LIB
-  return R::rf(df1, df2);
-#else
   return 0;
-#endif
 }
 /* @return the value of the pdf
  *  @param x a positive real value
@@ -121,11 +92,7 @@ Real FisherSnedecor::rand( int df1, int df2)
  **/
 Real FisherSnedecor::pdf(Real const& x, int df1, int df2)
 {
-#ifdef IS_RTKPP_LIB
-  return R::df(x, df1, df2, false);
-#else
   return 0;
-#endif
 }
 /* @return the value of the log-pdf
  *  @param x a positive real value
@@ -133,11 +100,7 @@ Real FisherSnedecor::pdf(Real const& x, int df1, int df2)
  **/
 Real FisherSnedecor::lpdf(Real const& x, int df1, int df2)
 {
-#ifdef IS_RTKPP_LIB
-  return R::df(x, df1, df2, true);
-#else
   return 0;
-#endif
 }
 /* @return the cumulative distribution function
  *  @param t a positive real value
@@ -145,11 +108,7 @@ Real FisherSnedecor::lpdf(Real const& x, int df1, int df2)
  **/
 Real FisherSnedecor::cdf(Real const& t, int df1, int df2)
 {
-#ifdef IS_RTKPP_LIB
-  return R::pf(t, df1, df2, true, false);
-#else
   return 0;
-#endif
 }
 
 /* @return the inverse cumulative distribution function
@@ -158,12 +117,10 @@ Real FisherSnedecor::cdf(Real const& t, int df1, int df2)
  **/
 Real FisherSnedecor::icdf(Real const& p, int df1, int df2)
 {
-#ifdef IS_RTKPP_LIB
-  return R::qf(p, df1, df2, true, false);
-#else
   return 0;
-#endif
 }
+
+#endif
 
 } // namespace Law
 

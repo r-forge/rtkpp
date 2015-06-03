@@ -36,7 +36,8 @@
 #define STK_LAW_UNIFORMDISCRETE_H
 
 #include "STK_Law_IUnivLaw.h"
-#include "STKernel/include/STK_Integer.h"
+#include <STKernel/include/STK_Integer.h>
+#include <Sdk/include/STK_Macros.h>
 
 namespace STK
 {
@@ -63,13 +64,19 @@ class UniformDiscrete : public IUnivLaw<int>
     /** constructor.
      *  @param a,b the lower and upper bounds
      **/
-    UniformDiscrete( int a, int b);
+    inline UniformDiscrete( int a, int b): Base(_T("UniformDiscrete")), a_(a), b_(b), n_(b_ - a_ + 1)
+    {
+      if (n_ <= 0.)
+      { STKINVALIDARGUMENT_ERROR_2ARG(UniformDiscrete::UniformDiscrete, a_, b_,invalid parameters);}
+    }
     /** copy constructor.
      *  @param law the law to copy
      **/
-    UniformDiscrete( UniformDiscrete const& law);
+    inline UniformDiscrete( UniformDiscrete const& law)
+                          : Base(law), a_(law.a_), b_(law.b_), n_(law.n_)
+    {}
     /** destructor. */
-	  virtual ~UniformDiscrete();
+	  inline virtual ~UniformDiscrete() {}
     /** @return the lower bound */
     inline int const& a() const { return a_;}
     /** @return the upper bound */

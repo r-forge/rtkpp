@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2008 Serge Iovleff
+/*     Copyright (C) 2004-2015 Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -36,7 +36,12 @@
 #define STK_LAW_NORMAL_H
 
 #include "STK_Law_IUnivLaw.h"
-#include "Sdk/include/STK_Macros.h"
+#include <Sdk/include/STK_Macros.h>
+#include <STKernel/include/STK_Real.h>
+
+#ifdef IS_RTKPP_LIB
+#include <Rcpp.h>
+#endif
 
 namespace STK
 {
@@ -72,13 +77,20 @@ typedef Normal Gaussian;
 class Normal : public IUnivLaw<Real>
 {
   public:
+    typedef IUnivLaw<Real> Base;
     /** Constructor.
      *  @param mu mean of the Normal distribution
      *  @param sigma standard deviation of the Normal distribution
      **/
-    Normal( Real const& mu=0., Real const& sigma=1.);
+    Normal( Real const& mu=0., Real const& sigma=1.)
+          : Base(String(_T("Normal")))
+          , mu_(mu), sigma_(sigma)
+    {
+      if (!Arithmetic<Real>::isFinite(mu) || !Arithmetic<Real>::isFinite(sigma) || sigma < 0)
+      { STKDOMAIN_ERROR_2ARG(Normal::Normal,mu,sigma,invalid argument);}
+    }
     /** Destructor. **/
-    virtual ~Normal();
+    inline virtual ~Normal() {}
     /** @return the mean */
     inline Real const& mu() const { return mu_;}
     /** @return the standard deviation */
@@ -92,7 +104,6 @@ class Normal : public IUnivLaw<Real>
        sigma_ = sigma;
     }
     /** @brief Generate a pseudo Normal random variate.
-     *
      *  Generate a pseudo Normal random variate
      *  with location parameter @c mu_ and standard deviation @c sigma_.
      *  @return a pseudo normal random variate
@@ -119,7 +130,6 @@ class Normal : public IUnivLaw<Real>
      *  @return the cumulative distribution function value at t
      **/
     virtual Real cdf( Real const& t) const;
-    
     /** @brief Compute the inverse cumulative distribution function at p
      *  of the standard normal distribution.
      *
@@ -154,7 +164,6 @@ class Normal : public IUnivLaw<Real>
     static Real lpdf( Real const& x, Real const& mu, Real const& sigma);
     /** @brief Compute the cumulative distribution function at t of
      *  the standard normal distribution.
-     *
      *  @param t a real value
      *  @param mu, sigma mean and standard deviation of the Normal distribution
      *  @return the cumulative distribution function value at t
@@ -162,7 +171,6 @@ class Normal : public IUnivLaw<Real>
     static Real cdf( Real const& t, Real const& mu, Real const& sigma);
     /** @brief Compute the inverse cumulative distribution function at p
      *  of the standard normal distribution.
-     *
      *  @param p a probability number.
      *  @param mu, sigma mean and standard deviation of the Normal distribution
      *  @return the inverse cumulative distribution function value at p.
@@ -175,6 +183,33 @@ class Normal : public IUnivLaw<Real>
     /** The sigma parameter. **/
     Real sigma_;
 };
+
+#ifdef IS_RTKPP_LIB
+
+/*  Generate a pseudo Normal random variate. */
+inline Real Normal::rand() const { return R::rnorm(mu_, sigma_);}
+/*  Give the value of the pdf at x. */
+inline Real Normal::pdf( Real const& x) const { return R::dnorm(x,mu_, sigma_, false);}
+/* Give the value of the log-pdf at x. */
+inline Real Normal::lpdf( Real const& x) const { return R::dnorm(x,mu_, sigma_, true);}
+/* The cumulative distribution function at t. */
+inline Real Normal::cdf( Real const& t) const { return R::pnorm(t, mu_, sigma_, true, false);}
+/* The inverse cumulative distribution function at p. */
+inline Real Normal::icdf( Real const& p) const { return R::qnorm(p , mu_, sigma_, true, false);}
+
+// static
+inline Real Normal::rand( Real const& mu, Real const& scale)
+{ return R::rnorm(mu, scale);}
+inline Real Normal::pdf(Real const& x, Real const& mu, Real const& scale)
+{ return R::dnorm(x,mu, scale, false);}
+inline Real Normal::lpdf(Real const& x, Real const& mu, Real const& scale)
+{ return R::dnorm(x,mu, scale, true);}
+inline Real Normal::cdf(Real const& t, Real const& mu, Real const& scale)
+{ return R::pnorm(t, mu, scale, true, false);}
+inline Real Normal::icdf(Real const& p, Real const& mu, Real const& scale)
+{ return R::qnorm(p , mu, scale, true, false);}
+
+#endif /* IS_RTKPP_LIB */
 
 } // namespace Law
 

@@ -198,7 +198,7 @@ class ICArray : public ArrayBase<Derived>
     /** implement the row operator using a reference on the row of the allocator */
     inline SubRow rowImpl(int i, Range const& J) const { return SubRow( allocator_.row( i, J));}
     /** implement the row operator using a reference on the rows of the allocator */
-    inline SubArray rowImpl(Range const& I) const { return SubArray( allocator_.row(I, this->cols()));}
+    inline SubArray rowImpl(Range const& I) const { return SubArray( allocator_.sub(I, this->cols()));}
 
     /** implement the col operator using a reference on the column of the allocator */
     inline Col colImpl(int j) const { return  Col( allocator_.col(j));}

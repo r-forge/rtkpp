@@ -41,19 +41,6 @@ namespace STK
 namespace Law
 {
 
-/* constructor. */
-UniformDiscrete::UniformDiscrete( int a, int b)
-                                : Base(_T("UniformDiscrete")), a_(a), b_(b), n_(b_ - a_ + 1)
-{
-  if (n_ <= 0.)
-    STKINVALIDARGUMENT_ERROR_2ARG(UniformDiscrete::UniformDiscrete, a_, b_,invalid parameters);
-}
-/* constructor. */
-UniformDiscrete::UniformDiscrete( UniformDiscrete const& law)
-                                : Base(law), a_(law.a_), b_(law.b_), n_(law.n_)
-{}
-/* destructor. */
-UniformDiscrete::~UniformDiscrete() {}
 /* Generate a pseudo UniformDiscrete random variate. */
 int UniformDiscrete::rand() const
 { return a_ + int(generator.rand(double(b_ - a_)));}

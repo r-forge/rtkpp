@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2013  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as
@@ -36,8 +36,13 @@
 #define STK_LAW_HYPERGEOMETRIC_H
 
 #include "STK_Law_IUnivLaw.h"
-#include "Sdk/include/STK_Macros.h"
-#include "STKernel/include/STK_Integer.h"
+#include <Sdk/include/STK_Macros.h>
+#include <STKernel/include/STK_Integer.h>
+
+#ifdef IS_RTKPP_LIB
+#include <Rcpp.h>
+#endif
+
 
 namespace STK
 {
@@ -70,9 +75,14 @@ class HyperGeometric: public IUnivLaw<Integer>
     /** constructor
      *  @param nbSuccesses, nbFailures, nbDraws number of successes, failures, draws
      **/
-    HyperGeometric(int nbSuccesses, int nbFailures, int nbDraws);
+    inline HyperGeometric( int nbSuccesses, int nbFailures, int nbDraws)
+                         : Base(_T("HyperGeometric"))
+                         , nbSuccesses_(nbSuccesses)
+                         , nbFailures_(nbFailures)
+                         , nbDraws_(nbDraws)
+    {}
     /** destructor */
-    virtual ~HyperGeometric();
+    inline virtual ~HyperGeometric() {}
     /** @return the number of successes */
     inline int nbSuccesses() const { return nbSuccesses_;}
     /** @return the number of failures */
@@ -82,20 +92,24 @@ class HyperGeometric: public IUnivLaw<Integer>
     /** @param nbSuccesses the number of successes to set */
     inline void setNbSuccesses(int nbSuccesses )
     {
-      if (nbSuccesses<0) STKDOMAIN_ERROR_1ARG(HyperGeometric::setNbSuccesses,nbSuccesses,nbSuccesses must be >= 0);
+      if (nbSuccesses<0)
+      { STKDOMAIN_ERROR_1ARG(HyperGeometric::setNbSuccesses,nbSuccesses,nbSuccesses must be >= 0);}
       nbSuccesses_ = nbSuccesses;
     }
     /** @param nbFailures the number of failures to set */
     inline void setNbFailures(int nbFailures )
     {
-      if (nbFailures<0) STKDOMAIN_ERROR_1ARG(HyperGeometric::setNbFailures,nbFailures,nbFailures must be >= 0);
+      if (nbFailures<0)
+      { STKDOMAIN_ERROR_1ARG(HyperGeometric::setNbFailures,nbFailures,nbFailures must be >= 0);}
       nbFailures_ = nbFailures;
     }
     /** @param nbDraws the number of draws to set */
     inline void setNbDraws(int nbDraws )
     {
-      if (nbDraws<0) STKDOMAIN_ERROR_1ARG(HyperGeometric::setNbDraws,nbDraws,nbDraws must be >= 0);
-      if (nbDraws>nbFailures_+nbSuccesses_) STKDOMAIN_ERROR_1ARG(HyperGeometric::setNbDraws,nbDraws,nbDraws must be <= nbFailures+nbSuccesses);
+      if (nbDraws<0)
+      {  STKDOMAIN_ERROR_1ARG(HyperGeometric::setNbDraws,nbDraws,nbDraws must be >= 0);}
+      if (nbDraws>nbFailures_+nbSuccesses_)
+      { STKDOMAIN_ERROR_1ARG(HyperGeometric::setNbDraws,nbDraws,nbDraws must be <= nbFailures+nbSuccesses);}
       nbDraws_ = nbDraws;
     }
     /** @return a random hypergeometric variate. */
@@ -131,7 +145,6 @@ class HyperGeometric: public IUnivLaw<Integer>
      *  @return a Integer random variate.
      **/
     static Integer rand( int nbSuccesses, int nbFailures, int nbDraws);
-
     /** @brief compute the probability distribution function.
      *  Give the value of the pdf at the point x.
      *  @param x an Integer value
@@ -161,7 +174,6 @@ class HyperGeometric: public IUnivLaw<Integer>
      **/
     static Integer icdf(Real const& p, int nbSuccesses, int nbFailures, int nbDraws);
 
-
   protected:
     /** number of successes */
     int nbSuccesses_;
@@ -170,6 +182,79 @@ class HyperGeometric: public IUnivLaw<Integer>
     /** number of draws */
     int nbDraws_;
 };
+
+#ifdef IS_RTKPP_LIB
+
+/* @return a random hypergeometric variate. */
+inline Integer HyperGeometric::rand() const
+{ return R::rhyper(nbSuccesses_, nbFailures_, nbDraws_);}
+/* @brief compute the probability distribution function (density)
+ *  Give the value of the pdf at the point x.
+ *  @param x an Integer value
+ *  @return the value of the pdf
+ **/
+inline Real HyperGeometric::pdf(Integer const& x) const
+{ return R::dhyper(x, nbSuccesses_, nbFailures_, nbDraws_, false);}
+/* @brief compute the log probability distribution function
+ *  Give the value of the log-pdf at the point x.
+ *  @param x an Integer value
+ *  @return the value of the log-pdf
+ **/
+inline Real HyperGeometric::lpdf(Integer const& x) const
+{ return R::dhyper(x, nbSuccesses_, nbFailures_, nbDraws_, true);}
+/* @brief compute the cumulative distribution function
+ *  Give the probability that a HyperGeometric random variate is less or equal
+ *  to t.
+ *  @param t a real value
+ *  @return the value of the cdf
+ **/
+inline Real HyperGeometric::cdf(Real const& t) const
+{ return R::phyper(t, nbSuccesses_, nbFailures_, nbDraws_, true, false);}
+/* @brief inverse cumulative distribution function
+ *  The quantile is defined as the smallest value @e x such that
+ *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.
+ *  @param p a probability number
+ **/
+inline Integer HyperGeometric::icdf(Real const& p) const
+{ return R::qhyper(p, nbSuccesses_, nbFailures_, nbDraws_, true, false);}
+/* @brief random hypergeometric variate generation.
+ *  @param nbSuccesses, nbFailures, nbDraws number of successes, failures, draws
+ *  @return a Integer random variate.
+ **/
+inline Integer HyperGeometric::rand( int nbSuccesses, int nbFailures, int nbDraws)
+{ return R::rhyper(nbSuccesses, nbFailures, nbDraws);}
+/* @brief compute the probability distribution function.
+ *  Give the value of the pdf at the point x.
+ *  @param x an Integer value
+ *  @param nbSuccesses, nbFailures, nbDraws number of successes, failures, draws
+ *  @return the value of the pdf
+ **/
+inline Real HyperGeometric::pdf(Integer x, int nbSuccesses, int nbFailures, int nbDraws)
+{ return R::dhyper(x, nbSuccesses, nbFailures, nbDraws, false);}
+/* @brief compute the log probability distribution function.
+ *  @param x an Integer value
+ *  @param nbSuccesses, nbFailures, nbDraws number of successes, failures, draws
+ *  @return the value of the log-pdf
+ **/
+inline Real HyperGeometric::lpdf(Integer x, int nbSuccesses, int nbFailures, int nbDraws)
+{ return R::dhyper(x, nbSuccesses, nbFailures, nbDraws, true);}
+/* @brief compute the cumulative distribution function
+ *  Give the probability that a HyperGeometric random variate is less or equal
+ *  to t.
+ *  @param t a real value
+ *  @return the value of the cdf
+ **/
+inline Real HyperGeometric::cdf(Real const& t, int nbSuccesses, int nbFailures, int nbDraws)
+{ return R::phyper(t, nbSuccesses, nbFailures, nbDraws, true, false);}
+/* @brief inverse cumulative distribution function
+ *  The quantile is defined as the smallest value @e x such that
+ *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.
+ *  @param p a probability number
+ **/
+inline Integer HyperGeometric::icdf(Real const& p, int nbSuccesses, int nbFailures, int nbDraws)
+{ return R::qhyper(p, nbSuccesses, nbFailures, nbDraws, true, false);}
+
+#endif
 
 } // namespace Law
 

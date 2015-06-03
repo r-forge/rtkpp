@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2013  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as
@@ -36,8 +36,12 @@
 #define STK_LAW_NEGATIVEBINOMIAL_H
 
 #include "STK_Law_IUnivLaw.h"
-#include "Sdk/include/STK_Macros.h"
-#include "STKernel/include/STK_Integer.h"
+#include <Sdk/include/STK_Macros.h>
+#include <STKernel/include/STK_Integer.h>
+
+#ifdef IS_RTKPP_LIB
+#include <Rcpp.h>
+#endif
 
 namespace STK
 {
@@ -74,9 +78,11 @@ class NegativeBinomial: public IUnivLaw<Integer>
     /** constructor
      *  @param prob, size probability of success and number of successes in a NegativeBinomial trial
      **/
-    NegativeBinomial( int size =1, Real const& prob =0.5);
+    inline NegativeBinomial( int size =1, Real const& prob =0.5)
+                           : Base(_T("Negative Binomial")), size_(size), prob_(prob) {}
+
     /** destructor */
-    virtual ~NegativeBinomial();
+    inline virtual ~NegativeBinomial() {}
     /** @return the probability of success */
     inline Real const& prob() const { return prob_;}
     /** @return the number of trials */
@@ -162,6 +168,80 @@ class NegativeBinomial: public IUnivLaw<Integer>
     /** probability of success in a Bernoulli trial */
     Real prob_;
 };
+
+#ifdef IS_RTKPP_LIB
+
+/* @return a Integer random variate . */
+inline Integer NegativeBinomial::rand() const
+{ return R::rnbinom(size_, prob_);}
+/* @brief compute the probability distribution function (density)
+ *  Give the value of the pdf at the point x.
+ *  @param x a binary value
+ *  @return the value of the pdf
+ **/
+inline Real NegativeBinomial::pdf(Integer const& x) const
+{ return R::dnbinom(x, size_, prob_, false);}
+/* @brief compute the log probability distribution function
+ *  Give the value of the log-pdf at the point x.
+ *  @param x a binary value
+ *  @return the value of the log-pdf
+ **/
+inline Real NegativeBinomial::lpdf(Integer const& x) const
+{ return R::dnbinom(x, size_, prob_, true);}
+/* @brief compute the cumulative distribution function
+ *  Give the probability that a NegativeBinomial random variate is less or equal
+ *  to t.
+ *  @param t a real value
+ *  @return the value of the cdf
+ **/
+inline Real NegativeBinomial::cdf(Real const& t) const
+{ return R::pnbinom(t, size_, prob_, true, false);}
+/* @brief inverse cumulative distribution function
+ *  The quantile is defined as the smallest value @e x such that
+ *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.
+ *  @param prob a probability number
+ **/
+inline Integer NegativeBinomial::icdf(Real const& p) const
+{ return R::qnbinom(p, size_, prob_, true, false);}
+
+/* @param prob a probability number
+ *  @return a Integer random variate.
+ **/
+inline Integer NegativeBinomial::rand(int size, Real const& prob)
+{ return R::rnbinom(size, prob);}
+/* @brief compute the probability distribution function (density)
+ *  Give the value of the pdf at the point x.
+ *  @param x a binary value
+ *  @param prob a probability number
+ *  @return the value of the pdf
+ **/
+inline Real NegativeBinomial::pdf(Integer x, int size, Real const& prob)
+{ return R::dnbinom(x, size, prob, false);}
+/* @brief compute the log probability distribution function
+ *  Give the value of the log-pdf at the point x.
+ *  @param x a binary value
+ *  @param prob a probability number
+ *  @return the value of the log-pdf
+ **/
+inline Real NegativeBinomial::lpdf(Integer x, int size, Real const& prob)
+{ return R::dnbinom(x, size, prob, true);}
+/* @brief compute the cumulative distribution function
+ *  Give the probability that a NegativeBinomial random variate is less or equal
+ *  to t.
+ *  @param t a real value
+ *  @return the value of the cdf
+ **/
+inline Real NegativeBinomial::cdf(Real const& t, int size, Real const& prob)
+{ return R::pnbinom(t, size, prob , true, false);}
+/* @brief inverse cumulative distribution function
+ *  The quantile is defined as the smallest value @e x such that
+ *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.
+ *  @param prob a probability number
+ **/
+inline Integer NegativeBinomial::icdf(Real const& p, int size, Real const& prob)
+{ return R::qnbinom(p, size, prob , true, false);}
+
+#endif
 
 } // namespace Law
 

@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2013 Serge Iovleff
+/*     Copyright (C) 2004-2015 Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -67,9 +67,7 @@ void KernelGaussian_sk::writeParameters(ostream& os) const
     os << _T("lambda = ") << param_.lambda_[k] << _T("\n");
   }
 }
-/* Initialize randomly the parameters of the Gaussian mixture. The centers
- *  will be selected randomly among the data set and the standard-deviation
- *  will be set to 1.
+/* Initialize randomly the parameters of the Gaussian mixture.
  */
 void KernelGaussian_sk::randomInit()
 {

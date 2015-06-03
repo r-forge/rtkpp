@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2008  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -36,7 +36,11 @@
 #define STK_LAW_STUDENT_H
 
 #include "STK_Law_IUnivLaw.h"
-#include "Sdk/include/STK_Macros.h"
+#include <Sdk/include/STK_Macros.h>
+
+#ifdef IS_RTKPP_LIB
+#include <Rcpp.h>
+#endif
 
 namespace STK
 {
@@ -77,9 +81,9 @@ class Student : public IUnivLaw<Real>
     /** Default constructor.
      *  @param df degree of freedom parameter
      **/
-    Student( int df = 1.);
+    inline Student( int df = 1.) : Base(_T("Student")), df_(df) {}
     /** destructor */
-    virtual ~Student();
+    inline virtual ~Student() {}
     /** @return the number of degree of freedom */
     inline int df() const { return df_;}
     /** @param df degree of freedom parameter */
@@ -136,6 +140,63 @@ class Student : public IUnivLaw<Real>
     /** degree of freedom */
     int df_;
 };
+
+#ifdef IS_RTKPP_LIB
+
+/* @return a pseudo Student random variate. */
+inline Real Student::rand() const
+{ return R::rt(df_);}
+/* @return the value of the pdf
+ *  @param x a positive real value
+ **/
+inline Real Student::pdf(Real const& x) const
+{ return R::dt(x, df_, false);}
+/* @return the value of the log-pdf
+ *  @param x a positive real value
+ **/
+inline Real Student::lpdf(Real const& x) const
+{ return R::dt(x, df_, true);}
+/* @return the cumulative distribution function
+ *  @param t a positive real value
+ **/
+inline Real Student::cdf(Real const& t) const
+{ return R::pt(t, df_, true, false);}
+/* @return the inverse cumulative distribution function
+ *  @param p a probability number
+ **/
+inline Real Student::icdf(Real const& p) const
+{ return R::qt(p, df_, true, false);}
+/* @return a pseudo Student random variate with the specified parameters.
+ *  @param df degree of freedom parameter
+ **/
+inline Real Student::rand( int df)
+{ return R::rt(df);}
+/* @return the value of the pdf
+ *  @param x a positive real value
+ *  @param df degree of freedom parameter
+ **/
+inline Real Student::pdf(Real const& x, int df)
+{ return R::dt(x, df, false);}
+/* @return the value of the log-pdf
+ *  @param x a positive real value
+ *  @param df degree of freedom parameter
+ **/
+inline Real Student::lpdf(Real const& x, int df)
+{ return R::dt(x, df, true);}
+/* @return the cumulative distribution function
+ *  @param t a positive real value
+ *  @param df degree of freedom parameter
+ **/
+inline Real Student::cdf(Real const& t, int df)
+{ return R::pt(t, df, true, false);}
+/* @return the inverse cumulative distribution function
+ *  @param p a probability number
+ *  @param df degree of freedom parameter
+ **/
+inline Real Student::icdf(Real const& p, int df)
+{ return R::qt(p, df, true, false);}
+
+#endif
 
 } // namespace Law
 

@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2008 Serge Iovleff
+/*     Copyright (C) 2004-2015 Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -32,25 +32,17 @@
  *  @brief In this file we define the Logistic probability law class.
  **/
 
+#ifndef IS_RTKPP_LIB
 #include "../include/STK_Law_Logistic.h"
-#include "Sdk/include/STK_Macros.h"
-
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
 #endif
 
 namespace STK
 {
 namespace Law
 {
-/* Constructor.
- *  @param mu mean of the Logistic distribution
- *  @param scale scale of the Logistic distribution
- **/
-Logistic::Logistic( Real const& mu, Real const& scale)
-                  : Base(_T("Logistic")), mu_(mu), scale_(scale) {}
-/* Destructor. **/
-Logistic::~Logistic() {}
+
+#ifndef IS_RTKPP_LIB
+
 /* @brief Generate a pseudo logisticized Logistic random variate.
  *
  *  Generate a pseudo logisticized Logistic random variate
@@ -59,33 +51,21 @@ Logistic::~Logistic() {}
  **/
 Real Logistic::rand() const
 {
-#ifdef IS_RTKPP_LIB
-  return R::rlogis(mu_, scale_);
-#else
   return 0;
-#endif
 }
 /* @param x a real value
  *  @return the value of the logistic pdf at @c x
  **/
 Real Logistic::pdf( Real const& x) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::dlogis(x, mu_, scale_, false);
-#else
   return 0;
-#endif
 }
 /* @return Give the value of the log-pdf at x.
  *  @param x a real value
  **/
 Real Logistic::lpdf( Real const& x) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::dlogis(x, mu_, scale_, true);
-#else
   return 0;
-#endif
 }
 /* @brief Compute the cumulative distribution function at t of
  *  the standard logistic distribution.
@@ -102,11 +82,7 @@ Real Logistic::lpdf( Real const& x) const
  **/
 Real Logistic::cdf( Real const& t) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::plogis(t, mu_, scale_, true, false);
-#else
   return 0;
-#endif
 }
 
 /* @brief Compute the inverse cumulative distribution function at p
@@ -123,11 +99,7 @@ Real Logistic::cdf( Real const& t) const
  **/
 Real Logistic::icdf( Real const& p) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::qlogis(p, mu_, scale_, true, false);
-#else
   return 0;
-#endif
 }
 
 /* @brief Generate a pseudo Logistic random variate.
@@ -141,11 +113,7 @@ Real Logistic::icdf( Real const& p) const
  **/
 Real Logistic::rand( Real const& mu, Real const& scale)
 {
-#ifdef IS_RTKPP_LIB
-  return R::rlogis(mu, scale);
-#else
   return 0;
-#endif
 }
 /* @param x a real value
  *  @param mu mean of the logistic law
@@ -154,11 +122,7 @@ Real Logistic::rand( Real const& mu, Real const& scale)
  **/
 Real Logistic::pdf( Real const& x, Real const& mu, Real const& scale)
 {
-#ifdef IS_RTKPP_LIB
-  return R::dlogis(x, mu, scale, false);
-#else
   return 0;
-#endif
 }
 /* @return Give the value of the log-pdf at x.
  *  @param x a real value
@@ -167,11 +131,7 @@ Real Logistic::pdf( Real const& x, Real const& mu, Real const& scale)
  **/
 Real Logistic::lpdf( Real const& x, Real const& mu, Real const& scale)
 {
-#ifdef IS_RTKPP_LIB
-  return R::dlogis(x, mu, scale, true);
-#else
   return 0;
-#endif
 }
 /* @brief Compute the cumulative distribution function at t of
  *  the standard logistic distribution.
@@ -181,11 +141,7 @@ Real Logistic::lpdf( Real const& x, Real const& mu, Real const& scale)
  **/
 Real Logistic::cdf( Real const& t, Real const& mu, Real const& scale)
 {
-#ifdef IS_RTKPP_LIB
-  return R::plogis(t, mu, scale, true, false);
-#else
   return 0;
-#endif
 }
 
 /* @brief Compute the inverse cumulative distribution function at p
@@ -196,12 +152,10 @@ Real Logistic::cdf( Real const& t, Real const& mu, Real const& scale)
  **/
 Real Logistic::icdf( Real const& p, Real const& mu, Real const& scale)
 {
-#ifdef IS_RTKPP_LIB
-  return R::qlogis(p, mu, scale, true, false);
-#else
   return 0;
-#endif
 }
+
+#endif
 
 } // namespace Law
 

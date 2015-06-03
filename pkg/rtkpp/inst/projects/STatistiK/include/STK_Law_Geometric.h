@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2013  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as
@@ -21,7 +21,6 @@
 
  Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  */
-
 /*
  * Project:  stkpp::STatistiK::Law
  * created on: 23 janv. 2013
@@ -36,8 +35,12 @@
 #define STK_LAW_GEOMETRIC_H
 
 #include "STK_Law_IUnivLaw.h"
-#include "Sdk/include/STK_Macros.h"
-#include "STKernel/include/STK_Integer.h"
+#include <Sdk/include/STK_Macros.h>
+#include <STKernel/include/STK_Integer.h>
+
+#ifdef IS_RTKPP_LIB
+#include <Rcpp.h>
+#endif
 
 namespace STK
 {
@@ -65,9 +68,10 @@ class Geometric: public IUnivLaw<Integer>
     /** constructor
      * @param prob probability of success in a Bernoulli trial
      **/
-    Geometric(Real const& prob =0.5);
+    inline Geometric(Real const& prob =0.5): Base(_T("Geometric")), prob_(prob)
+    {}
     /** destructor */
-    virtual ~Geometric();
+    inline virtual ~Geometric(){}
     /** @return the probability of success */
     inline Real const& prob() const { return prob_;}
     /** @param prob the probability of success to set */
@@ -144,6 +148,78 @@ class Geometric: public IUnivLaw<Integer>
     /** probability of success in a Bernoulli trial */
     Real prob_;
 };
+
+#ifdef IS_RTKPP_LIB
+
+/* @return a geometric random variate . */
+inline Integer Geometric::rand() const { return R::rgeom(prob_);}
+/* @brief compute the probability distribution function (density)
+ *  Give the value of the pdf at the point x.
+ *  @param x a binary value
+ *  @return the value of the pdf
+ **/
+inline Real Geometric::pdf(Integer const& x) const
+{ return R::dgeom(x, prob_, false);}
+/* @brief compute the log probability distribution function
+ *  Give the value of the log-pdf at the point x.
+ *  @param x a binary value
+ *  @return the value of the log-pdf
+ **/
+inline Real Geometric::lpdf(Integer const& x) const
+{ return R::dgeom(x, prob_, true);}
+/* @brief compute the cumulative distribution function
+ *  Give the probability that a Geometric random variate is less or equal
+ *  to t.
+ *  @param t a real value
+ *  @return the value of the cdf
+ **/
+inline Real Geometric::cdf(Real const& t) const
+{ return R::pgeom(t, prob_, true, false);}
+/* @brief inverse cumulative distribution function
+ *  The quantile is defined as the smallest value @e x such that
+ *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.
+ *  @param p a probability number
+ **/
+inline Integer Geometric::icdf(Real const& p) const
+{ return R::qgeom(p, prob_, true, false);}
+/* @param prob a probability number
+ *  @return a Integer random variate.
+ **/
+inline Integer Geometric::rand(Real const& prob)
+{ return R::rgeom(prob);}
+/* @brief compute the probability distribution function (density)
+ *  Give the value of the pdf at the point x.
+ *  @param x a binary value
+ *  @param prob a probability number
+ *  @return the value of the pdf
+ **/
+inline Real Geometric::pdf(Integer x, Real const& prob)
+{ return R::dgeom(x, prob, false);}
+/* @brief compute the log probability distribution function
+ *  Give the value of the log-pdf at the point x.
+ *  @param x a binary value
+ *  @param prob a probability number
+ *  @return the value of the log-pdf
+ **/
+inline Real Geometric::lpdf(Integer x, Real const& prob)
+{ return R::dgeom(x, prob, true);}
+/* @brief compute the cumulative distribution function
+ *  Give the probability that a Geometric random variate is less or equal
+ *  to t.
+ *  @param t a real value
+ *  @return the value of the cdf
+ **/
+Real Geometric::cdf(Real const& t, Real const& prob)
+{ return R::pgeom(t, prob, true, false);}
+/* @brief inverse cumulative distribution function
+ *  The quantile is defined as the smallest value @e x such that
+ *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.
+ *  @param p a probability number
+ **/
+Integer Geometric::icdf(Real const& p, Real const& prob)
+{ return R::qgeom(p, prob, true, false);}
+
+#endif
 
 } // namespace Law
 

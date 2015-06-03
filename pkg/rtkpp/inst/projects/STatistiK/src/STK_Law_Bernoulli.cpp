@@ -39,15 +39,6 @@ namespace STK
 {
 namespace Law
 {
-/* constructor
- * @param prob probability of success in a Bernoulli trial
- **/
-Bernoulli::Bernoulli(Real const& prob) : Base(String(_T("Bernoulli")) ), prob_(prob)
-{
-  if (prob<0) STKDOMAIN_ERROR_1ARG(Bernoulli,prob,prob must be >= 0);
-  if (prob>1) STKDOMAIN_ERROR_1ARG(Bernoulli,prob,prob must be <= 1);
-}
-
 /* @return a @c Type random variate . */
 Binary Bernoulli::rand() const
 {

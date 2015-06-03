@@ -33,9 +33,8 @@
  **/
 
 #include "../include/STK_Law_Binomial.h"
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
-#else
+
+#ifndef IS_RTKPP_LIB
 #include "Analysis/include/STK_Funct_raw.h"
 #endif
 
@@ -44,119 +43,74 @@ namespace STK
 
 namespace Law
 {
-Binomial::Binomial( int n, Real const& prob)
-                  : Base(_T("Binomial")), n_(n), prob_(prob)
-{
-  if (prob<0) STKDOMAIN_ERROR_2ARG(Binomial::Binomial,prob,n,prob must be >= 0);
-  if (prob>1) STKDOMAIN_ERROR_2ARG(Binomial::Binomial,prob,n,prob must be <= 1);
-  if (n<0) STKDOMAIN_ERROR_2ARG(Binomial::Binomial,prob,n,n must be >= 0);
-}
-Binomial::~Binomial() {}
+
+#ifndef IS_RTKPP_LIB
 
 int Binomial::rand() const
 {
-#ifdef IS_RTKPP_LIB
-  return (int)R::rbinom(n_, prob_);
-#else
   return 0;
-#endif
 }
 
 Real Binomial::pdf(int const& x) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::dbinom((double)x, (double)n_, prob_, false);
-#else
   // trivial cases
   if (Arithmetic<Real>::isNA(x)) return Arithmetic<Real>::NA();
   // compute result
   return Funct::binomial_pdf_raw(x, n_, prob_);
-#endif
 }
 
 Real Binomial::lpdf(int const& x) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::dbinom((double)x, (double)n_, prob_, true);
-#else
   // trivial cases
   if (Arithmetic<Real>::isNA(x)) return Arithmetic<Real>::NA();
   // compute result
   return Funct::binomial_lpdf_raw(x, n_, prob_);
-#endif
 }
 Real Binomial::cdf(Real const& t) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::pbinom(t, (double)n_, prob_, true, false);
-#else
   // trivial cases
   if (Arithmetic<Real>::isNA(t)) return Arithmetic<Real>::NA();
   return 0.;
-#endif
 }
 
 int Binomial::icdf(Real const& p) const
 {
-#ifdef IS_RTKPP_LIB
-  return (int)R::qbinom(p, (double)n_, prob_, true, false);
-#else
   // trivial cases
   if (Arithmetic<Real>::isNA(p)) return Arithmetic<Real>::NA();
   return 0.;
-#endif
 }
 
 int Binomial::rand(int n, Real const& prob)
 {
-#ifdef IS_RTKPP_LIB
-  return (int)R::rbinom(n, prob);
-#else
   return 0;
-#endif
 }
 
 Real Binomial::pdf(int x, int n, Real const& prob)
 {
-#ifdef IS_RTKPP_LIB
-  return R::dbinom(x, (double)n, prob, false);
-#else
   // trivial cases
   if (Arithmetic<Real>::isNA(x)) return Arithmetic<Real>::NA();
   // compute result
   return Funct::binomial_pdf_raw(x, n, prob);
-#endif
 }
 
 Real Binomial::lpdf(int x, int n, Real const& prob)
 {
-#ifdef IS_RTKPP_LIB
-  return R::dbinom((double)x, (double)n, prob, true);
-#else
   // trivial cases
   if (Arithmetic<Real>::isNA(x)) return Arithmetic<Real>::NA();
   // compute result
   return Funct::binomial_lpdf_raw(x, n, prob);
-#endif
 }
 Real Binomial::cdf(Real const& t, int n, Real const& prob)
 {
-#ifdef IS_RTKPP_LIB
-  return R::pbinom(t, (double)n, prob, true, false);
-#else
   return 0.;
-#endif
 }
 
 int Binomial::icdf(Real const& p, int n, Real const& prob)
 {
-#ifdef IS_RTKPP_LIB
-  return (int)R::qbinom(p, (double)n, prob, true, false);
-#else
   return 0.;
-#endif
 }
 
+#endif
 
 } // namespace Law
 

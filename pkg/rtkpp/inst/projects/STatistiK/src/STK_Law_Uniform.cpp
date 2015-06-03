@@ -41,17 +41,6 @@ namespace STK
 namespace Law
 {
 
-/* constructor. */
-Uniform::Uniform( Real const& a, Real const& b) : Base(_T("Uniform")), a_(a), b_(b), range_(b_ - a_)
-{
-  if (range_ <= 0.)
-    STKINVALIDARGUMENT_ERROR_2ARG(Uniform::Uniform, a_, b_,invalid parameters);
-}
-/* constructor. */
-Uniform::Uniform( Uniform const& law) : Base(law), a_(law.a_), b_(law.b_), range_(law.range_)
-{}
-/* destructor. */
-Uniform::~Uniform() {}
 /* Generate a pseudo Uniform random variate. */
 Real Uniform::rand() const
 {

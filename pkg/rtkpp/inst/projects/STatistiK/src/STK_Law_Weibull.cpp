@@ -32,10 +32,8 @@
  *  @brief In this file we implement the Weibull probability distribution.
  **/
 
+#ifndef IS_RTKPP_LIB
 #include "../include/STK_Law_Weibull.h"
-
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
 #endif
 
 namespace STK
@@ -43,41 +41,27 @@ namespace STK
 
 namespace Law
 {
-Weibull::Weibull( Real const& k, Real const& lambda)
-                : Base(_T("Weibull")), k_(k), lambda_(lambda)
-{}
-/* destructor */
-Weibull::~Weibull() {}
+
+#ifndef IS_RTKPP_LIB
+
 /* @return a pseudo Weibull random variate. */
 Real Weibull::rand() const
 {
-#ifdef IS_RTKPP_LIB
-  return R::rweibull(k_, lambda_);
-#else
   return 0;
-#endif
 }
 /* @return the value of the pdf
  *  @param x a positive real value
  **/
 Real Weibull::pdf(Real const& x) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::dweibull(x, k_, lambda_, false);
-#else
   return 0;
-#endif
 }
 /* @return the value of the log-pdf
  *  @param x a positive real value
  **/
 Real Weibull::lpdf(Real const& x) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::dweibull(x, k_, lambda_, true);
-#else
   return 0;
-#endif
 }
 /*The cumulative distribution function for the Weibull distribution is
  *  \f$ F(x;k,\lambda) = 1- e^{-(x/\lambda)^k}.\f$
@@ -86,11 +70,7 @@ Real Weibull::lpdf(Real const& x) const
  **/
 Real Weibull::cdf(Real const& t) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::pweibull(t, k_, lambda_, true, false);
-#else
   return 0;
-#endif
 }
 /*The quantile (inverse cumulative distribution) function for the Weibull
  * distribution is \f$ Q(p;k,\lambda) = \lambda {(-\ln(1-p))}^{1/k} \f$
@@ -99,11 +79,7 @@ Real Weibull::cdf(Real const& t) const
  **/
 Real Weibull::icdf(Real const& p) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::qweibull(p, k_, lambda_, true, false);
-#else
   return 0;
-#endif
 }
 
 /* @return a pseudo Weibull random variate with the specified parameters.
@@ -111,11 +87,7 @@ Real Weibull::icdf(Real const& p) const
  **/
 Real Weibull::rand( Real const& k, Real const& lambda)
 {
-#ifdef IS_RTKPP_LIB
-  return R::rweibull(k, lambda);
-#else
   return 0;
-#endif
 }
 /* @return the value of the pdf
  *  @param x a positive real value
@@ -123,11 +95,7 @@ Real Weibull::rand( Real const& k, Real const& lambda)
  **/
 Real Weibull::pdf(Real const& x, Real const& k, Real const& lambda)
 {
-#ifdef IS_RTKPP_LIB
-  return R::dweibull(x, k, lambda, false);
-#else
   return 0;
-#endif
 }
 /* @return the value of the log-pdf
  *  @param x a positive real value
@@ -135,11 +103,7 @@ Real Weibull::pdf(Real const& x, Real const& k, Real const& lambda)
  **/
 Real Weibull::lpdf(Real const& x, Real const& k, Real const& lambda)
 {
-#ifdef IS_RTKPP_LIB
-  return R::dweibull(x, k, lambda, true);
-#else
   return 0;
-#endif
 }
 /* @return the cumulative distribution function
  *  @param t a positive real value
@@ -147,11 +111,7 @@ Real Weibull::lpdf(Real const& x, Real const& k, Real const& lambda)
  **/
 Real Weibull::cdf(Real const& t, Real const& k, Real const& lambda)
 {
-#ifdef IS_RTKPP_LIB
-  return R::pweibull(t, k, lambda, true, false);
-#else
   return 0;
-#endif
 }
 /* @brief Compute the inverse cumulative distribution function at p
  *  of the standard log-normal distribution.
@@ -162,12 +122,10 @@ Real Weibull::cdf(Real const& t, Real const& k, Real const& lambda)
  **/
 Real Weibull::icdf( Real const& p, Real const& k, Real const& lambda)
 {
-#ifdef IS_RTKPP_LIB
-  return R::qweibull(p, k, lambda, true, false);
-#else
   return 0;
-#endif
 }
+
+#endif
 
 } // namespace Law
 

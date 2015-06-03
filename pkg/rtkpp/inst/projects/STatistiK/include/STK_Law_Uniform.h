@@ -36,7 +36,8 @@
 #define STK_LAW_UNIFORM_H
 
 #include "STK_Law_IUnivLaw.h"
-#include "STKernel/include/STK_Real.h"
+#include <STKernel/include/STK_Real.h>
+#include <Sdk/include/STK_Macros.h>
 
 namespace STK
 {
@@ -64,13 +65,19 @@ class Uniform : public IUnivLaw<Real>
     /** constructor.
      *  @param a,b the lower and upper bounds
      **/
-    Uniform( Real const& a =0., Real const& b =1.);
+    inline Uniform( Real const& a =0., Real const& b =1.)
+                  : Base(_T("Uniform")), a_(a), b_(b), range_(b_ - a_)
+    {
+      if (range_ <= 0.)
+        STKINVALIDARGUMENT_ERROR_2ARG(Uniform::Uniform, a_, b_,invalid parameters);
+    }
     /** copy constructor.
      *  @param law the law to copy
      **/
-    Uniform( Uniform const& law);
+    inline Uniform( Uniform const& law): Base(law), a_(law.a_), b_(law.b_), range_(law.range_)
+    {};
     /** destructor. */
-	  virtual ~Uniform();
+	  inline virtual ~Uniform() {}
     /** @return the lower bound */
     inline Real const& a() const { return a_;}
     /** @return the upper bound */

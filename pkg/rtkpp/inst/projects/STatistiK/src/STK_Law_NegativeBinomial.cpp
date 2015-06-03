@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2013  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as
@@ -32,34 +32,18 @@
  *  @brief In this file we define the NegativeBinomial distribution.
  **/
 
+#ifndef IS_RTKPP_LIB
 #include "../include/STK_Law_NegativeBinomial.h"
-
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
-#endif
 
 namespace STK
 {
 namespace Law
 {
 
-/** constructor
- *  @param prob probability of success in a NegativeBinomial trial
- *  @param size the number of successes
- **/
-NegativeBinomial::NegativeBinomial( int size, Real const& prob)
-                                  : Base(_T("Negative Binomial")), size_(size), prob_(prob) {}
-/** destructor */
-NegativeBinomial::~NegativeBinomial() {}
-
-/** @return a Integer random variate . */
+/* @return a Integer random variate . */
 Integer NegativeBinomial::rand() const
 {
-#ifdef IS_RTKPP_LIB
-  return R::rnbinom(size_, prob_);
-#else
   return 0;
-#endif
 }
 /* @brief compute the probability distribution function (density)
  *  Give the value of the pdf at the point x.
@@ -68,11 +52,7 @@ Integer NegativeBinomial::rand() const
  **/
 Real NegativeBinomial::pdf(Integer const& x) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::dnbinom(x, size_, prob_, false);
-#else
   return 0;
-#endif
 }
 /* @brief compute the log probability distribution function
  *  Give the value of the log-pdf at the point x.
@@ -81,11 +61,7 @@ Real NegativeBinomial::pdf(Integer const& x) const
  **/
 Real NegativeBinomial::lpdf(Integer const& x) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::dnbinom(x, size_, prob_, true);
-#else
   return 0;
-#endif
 }
 /* @brief compute the cumulative distribution function
  *  Give the probability that a NegativeBinomial random variate is less or equal
@@ -95,11 +71,7 @@ Real NegativeBinomial::lpdf(Integer const& x) const
  **/
 Real NegativeBinomial::cdf(Real const& t) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::pnbinom(t, size_, prob_, true, false);
-#else
   return 0;
-#endif
 }
 /* @brief inverse cumulative distribution function
  *  The quantile is defined as the smallest value @e x such that
@@ -108,11 +80,7 @@ Real NegativeBinomial::cdf(Real const& t) const
  **/
 Integer NegativeBinomial::icdf(Real const& p) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::qnbinom(p, size_, prob_, true, false);
-#else
   return 0;
-#endif
 }
 
 /* @param prob a probability number
@@ -120,11 +88,7 @@ Integer NegativeBinomial::icdf(Real const& p) const
  **/
 Integer NegativeBinomial::rand(int size, Real const& prob)
 {
-#ifdef IS_RTKPP_LIB
-  return R::rnbinom(size, prob);
-#else
   return 0;
-#endif
 }
 /* @brief compute the probability distribution function (density)
  *  Give the value of the pdf at the point x.
@@ -134,11 +98,7 @@ Integer NegativeBinomial::rand(int size, Real const& prob)
  **/
 Real NegativeBinomial::pdf(Integer x, int size, Real const& prob)
 {
-#ifdef IS_RTKPP_LIB
-  return R::dnbinom(x, size, prob, false);
-#else
   return 0;
-#endif
 }
 /* @brief compute the log probability distribution function
  *  Give the value of the log-pdf at the point x.
@@ -148,11 +108,7 @@ Real NegativeBinomial::pdf(Integer x, int size, Real const& prob)
  **/
 Real NegativeBinomial::lpdf(Integer x, int size, Real const& prob)
 {
-#ifdef IS_RTKPP_LIB
-  return R::dnbinom(x, size, prob, true);
-#else
   return 0;
-#endif
 }
 /* @brief compute the cumulative distribution function
  *  Give the probability that a NegativeBinomial random variate is less or equal
@@ -162,11 +118,7 @@ Real NegativeBinomial::lpdf(Integer x, int size, Real const& prob)
  **/
 Real NegativeBinomial::cdf(Real const& t, int size, Real const& prob)
 {
-#ifdef IS_RTKPP_LIB
-  return R::pnbinom(t, size, prob , true, false);
-#else
   return 0;
-#endif
 }
 /* @brief inverse cumulative distribution function
  *  The quantile is defined as the smallest value @e x such that
@@ -175,12 +127,12 @@ Real NegativeBinomial::cdf(Real const& t, int size, Real const& prob)
  **/
 Integer NegativeBinomial::icdf(Real const& p, int size, Real const& prob)
 {
-#ifdef IS_RTKPP_LIB
-  return R::qnbinom(p, size, prob , true, false);
-#else
   return 0;
-#endif
 }
+
 } // namespace Law
 
 } // namespace STK
+
+#endif
+

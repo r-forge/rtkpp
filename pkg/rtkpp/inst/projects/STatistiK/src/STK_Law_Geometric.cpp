@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2013  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as
@@ -32,12 +32,8 @@
  *  @brief In this file we implement the Geometric distribution.
  **/
 
+#ifndef IS_RTKPP_LIB
 #include "../include/STK_Law_Geometric.h"
-#include "Sdk/include/STK_Macros.h"
-
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
-#endif
 
 namespace STK
 {
@@ -45,20 +41,10 @@ namespace STK
 namespace Law
 {
 
-/* constructor */
-Geometric::Geometric(Real const& prob) : Base(_T("Geometric")), prob_(prob)
-{}
-/* destructor */
-Geometric::~Geometric() {}
-
 /* @return a geometric random variate . */
 Integer Geometric::rand() const
 {
-#ifdef IS_RTKPP_LIB
-  return R::rgeom(prob_);
-#else
   return 0;
-#endif
 }
 /* @brief compute the probability distribution function (density)
  *  Give the value of the pdf at the point x.
@@ -67,11 +53,7 @@ Integer Geometric::rand() const
  **/
 Real Geometric::pdf(Integer const& x) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::dgeom(x, prob_, false);
-#else
   return 0;
-#endif
 }
 /* @brief compute the log probability distribution function
  *  Give the value of the log-pdf at the point x.
@@ -80,11 +62,7 @@ Real Geometric::pdf(Integer const& x) const
  **/
 Real Geometric::lpdf(Integer const& x) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::dgeom(x, prob_, true);
-#else
   return 0;
-#endif
 }
 /* @brief compute the cumulative distribution function
  *  Give the probability that a Geometric random variate is less or equal
@@ -94,11 +72,7 @@ Real Geometric::lpdf(Integer const& x) const
  **/
 Real Geometric::cdf(Real const& t) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::pgeom(t, prob_, true, false);
-#else
   return 0;
-#endif
 }
 /* @brief inverse cumulative distribution function
  *  The quantile is defined as the smallest value @e x such that
@@ -107,11 +81,7 @@ Real Geometric::cdf(Real const& t) const
  **/
 Integer Geometric::icdf(Real const& p) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::qgeom(p, prob_, true, false);
-#else
   return 0;
-#endif
 }
 
 /* @param prob a probability number
@@ -119,11 +89,7 @@ Integer Geometric::icdf(Real const& p) const
  **/
 Integer Geometric::rand(Real const& prob)
 {
-#ifdef IS_RTKPP_LIB
-  return R::rgeom(prob);
-#else
   return 0;
-#endif
 }
 /* @brief compute the probability distribution function (density)
  *  Give the value of the pdf at the point x.
@@ -133,11 +99,7 @@ Integer Geometric::rand(Real const& prob)
  **/
 Real Geometric::pdf(Integer x, Real const& prob)
 {
-#ifdef IS_RTKPP_LIB
-  return R::dgeom(x, prob, false);
-#else
   return 0;
-#endif
 }
 /* @brief compute the log probability distribution function
  *  Give the value of the log-pdf at the point x.
@@ -147,11 +109,7 @@ Real Geometric::pdf(Integer x, Real const& prob)
  **/
 Real Geometric::lpdf(Integer x, Real const& prob)
 {
-#ifdef IS_RTKPP_LIB
-  return R::dgeom(x, prob, true);
-#else
   return 0;
-#endif
 }
 /* @brief compute the cumulative distribution function
  *  Give the probability that a Geometric random variate is less or equal
@@ -161,11 +119,7 @@ Real Geometric::lpdf(Integer x, Real const& prob)
  **/
 Real Geometric::cdf(Real const& t, Real const& prob)
 {
-#ifdef IS_RTKPP_LIB
-  return R::pgeom(t, prob, true, false);
-#else
   return 0;
-#endif
 }
 /* @brief inverse cumulative distribution function
  *  The quantile is defined as the smallest value @e x such that
@@ -174,14 +128,12 @@ Real Geometric::cdf(Real const& t, Real const& prob)
  **/
 Integer Geometric::icdf(Real const& p, Real const& prob)
 {
-#ifdef IS_RTKPP_LIB
-  return R::qgeom(p, prob, true, false);
-#else
   return 0;
-#endif
 }
 
 
 } // namespace Law
 
 } // namespace STK
+
+#endif

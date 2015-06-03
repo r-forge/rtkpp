@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2014  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as
@@ -36,6 +36,11 @@
 #define STK_LAW_POISSON_H
 
 #include "STK_Law_IUnivLaw.h"
+#include <Sdk/include/STK_Macros.h>
+
+#ifdef IS_RTKPP_LIB
+#include <Rcpp.h>
+#endif
 
 namespace STK
 {
@@ -73,7 +78,8 @@ class Poisson: public IUnivLaw<int>
     /** constructor
      * @param lambda mean of a Poisson distribution
      **/
-    Poisson(Real const& lambda = 1.);
+    inline Poisson( Real const& lambda = 1.)
+                  : Base(_T("Poisson")), lambda_(lambda) {}
     /** destructor */
     inline virtual ~Poisson() {}
     /** @return the mean */
@@ -81,7 +87,8 @@ class Poisson: public IUnivLaw<int>
     /** @param lambda mean to set */
     inline void setLambda(Real const& lambda )
     {
-      if (lambda<0) STKDOMAIN_ERROR_1ARG(Poisson::setLambda,lambda,lambda must be >= 0);
+      if (lambda<0)
+      { STKDOMAIN_ERROR_1ARG(Poisson::setLambda,lambda,lambda must be >= 0);}
       lambda_ = lambda;
     }
 
@@ -153,6 +160,83 @@ class Poisson: public IUnivLaw<int>
     /** mean of the Poisson distribution */
     Real lambda_;
 };
+
+#ifdef IS_RTKPP_LIB
+
+/* @return a Poisson random variate . */
+inline int Poisson::rand() const
+{ return R::rpois(lambda_);}
+/* @brief compute the probability distribution function.
+ *  Give the value of the pdf at the point x.
+ *  @param x a binary value
+ *  @return the value of the pdf
+ **/
+inline Real Poisson::pdf(int const& x) const
+{ return R::dpois(x, lambda_, false);}
+
+/* @brief compute the log probability distribution function.
+ *  Give the value of the log-pdf at the point x.
+ *  @param x an integer value
+ *  @return the value of the log-pdf
+ **/
+inline Real Poisson::lpdf(int const& x) const
+{ return R::dpois(x, lambda_, true);}
+/* @brief compute the cumulative distribution function
+ *  Give the probability that a Poisson random variate is less or equal
+ *  to t.
+ *  @param t a real value
+ *  @return the value of the cdf
+ **/
+inline Real Poisson::cdf(Real const& t) const
+{ return R::ppois(t, lambda_, true, false);}
+/* @brief inverse cumulative distribution function
+ *  The quantile is defined as the smallest value @e x such that
+ *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.
+ *  @param p a probability number
+ **/
+inline int Poisson::icdf(Real const& p) const
+{ return R::qpois(p, lambda_, true, false);}
+
+/* @param lambda the mean
+ *  @return a int random variate.
+ **/
+inline int Poisson::rand(Real const& lambda)
+{return R::rpois(lambda);;}
+/* @brief compute the probability distribution function
+ *  Give the value of the pdf at the point x.
+ *  @param x a binary value
+ *  @param lambda the mean
+ *  @return the value of the pdf
+ **/
+Real Poisson::pdf(int const& x, Real const& lambda)
+{ return R::dpois(x, lambda, false);}
+
+/* @brief compute the log probability distribution function
+ *  Give the value of the log-pdf at the point x.
+ *  @param x a binary value
+ *  @param lambda the mean
+ *  @return the value of the log-pdf
+ **/
+Real Poisson::lpdf(int const& x, Real const& lambda)
+{ return R::dpois(x, lambda, true);}
+/* @brief compute the cumulative distribution function
+ *  Give the probability that a Poisson random variate is less or equal
+ *  to t.
+ *  @param t a real value
+ *  @return the value of the cdf
+ **/
+Real Poisson::cdf(Real const& t, Real const& lambda)
+{ return R::ppois(t, lambda, true, false);}
+
+/* @brief inverse cumulative distribution function
+ *  The quantile is defined as the smallest value @e x such that
+ *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.
+ *  @param p a probability number
+ **/
+int Poisson::icdf(Real const& p, Real const& lambda)
+{ return R::qpois(p, lambda, true, false);}
+
+#endif
 
 } // namespace Law
 

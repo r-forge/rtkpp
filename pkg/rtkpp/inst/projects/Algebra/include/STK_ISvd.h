@@ -62,14 +62,14 @@ template<class Derived>
 class ISvd  : public IRunnerBase, public IRecursiveTemplate<Derived>
 {
   protected:
-//    typedef typename hidden::AlgebraTraits<Derived>::Array Array;
+    typedef typename hidden::AlgebraTraits<Derived>::Array Array;
     /** Default constructor
      *  @param A the matrix to decompose.
      *  @param ref if true, U_ is a reference of A.
      *  @param withU if @c true save the left housolder transforms in @c U_.
      *  @param withV if @c true save the right housolder transforms in @c V_.
      **/
-    ISvd( ArrayXX const& A, bool ref, bool withU = true, bool withV = true)
+    ISvd( Array const& A, bool ref, bool withU = true, bool withV = true)
         : U_(A, ref), V_(), D_(), withU_(withU), withV_(withV), norm_(0), rank_(0)
     {}
     /** Copy Constructor
@@ -108,21 +108,15 @@ class ISvd  : public IRunnerBase, public IRecursiveTemplate<Derived>
     /// @return the rank of the matrix
     inline int rank()  const { return rank_;}
     /// @return U
-    inline ArrayXX const& getU() const { return U_;}
+    inline Array const& getU() const { return U_;}
     /// @return  V
     inline ArraySquareX const& getV() const { return V_;}
     /// @return D
     inline ArrayDiagonalX const&  getD() const { return D_;}
-    /** clear U_. */
-    inline void clearU() { U_.clear();}
-    /** clear V_. */
-    inline void clearV() { V_.clear();}
-    /** clear U_, V_ and D_. */
-    inline void clear() { U_.clear(); V_.clear(); D_.clear();}
     
   protected:
     /// U_ matrix
-    ArrayXX U_;
+    Array U_;
     /// V_ square matrix
     ArraySquareX V_;
     /// Diagonal array of the singular values

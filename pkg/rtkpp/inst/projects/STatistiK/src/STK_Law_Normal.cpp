@@ -32,9 +32,11 @@
  *  @brief In this file we implement the Normal distribution.
  **/
 
+#ifndef IS_RTKPP_LIB
+
 #include "../include/STK_Law_Normal.h"
 #include "../include/STK_Law_Util.h"
-#include "Analysis/include/STK_Funct_raw.h"
+#include <Analysis/include/STK_Funct_raw.h>
 
 const STK::Real a[6] =
 {
@@ -75,18 +77,6 @@ namespace STK
 
 namespace Law
 {
-/* constructor */
-Normal::Normal(Real const& mu, Real const& sigma)
-              : IUnivLaw<Real>(String(_T("Normal")))
-              , mu_(mu), sigma_(sigma)
-{
-  // check parameters
-  if (!Arithmetic<Real>::isFinite(mu) || !Arithmetic<Real>::isFinite(sigma) || sigma < 0)
-    STKDOMAIN_ERROR_2ARG(Normal::Normal,mu,sigma,invalid argument);
-}
-
-/* destructor */
-Normal::~Normal() {}
 
 /*  Generate a pseudo Normal random variate. */
 Real Normal::rand() const
@@ -284,3 +274,5 @@ Real Normal::icdf(Real const& p, Real const& mu, Real const& sigma)
 } // namespace law
 
 } // namespace STK
+
+#endif

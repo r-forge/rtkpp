@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2008  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -32,15 +32,13 @@
  *  @brief In this file we implement the Gamma distribution.
  **/
 
+#ifndef IS_RTKPP_LIB
 #include "../include/STK_Law_Gamma.h"
 #include "../include/STK_Law_Exponential.h"
 #include "../include/STK_Law_Util.h"
 
-#include "Analysis/include/STK_Funct_raw.h"
-#include "Analysis/include/STK_Funct_gammaRatio.h"
-
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
+#include <Analysis/include/STK_Funct_raw.h>
+#include <Analysis/include/STK_Funct_gammaRatio.h>
 #endif
 
 namespace STK
@@ -48,31 +46,14 @@ namespace STK
 
 namespace Law
 {
-/* Ctor
- */
-Gamma::Gamma(Real const& shape, Real const& scale)
-            : Base(_T("Gamma"))
-            , a_(shape), b_(scale)
-{
-  // check parameters
-  if ( !Arithmetic<Real>::isFinite(a_) || !Arithmetic<Real>::isFinite(b_)
-     || a_ <= 0 || b_ <= 0
-     )
-    STKDOMAIN_ERROR_2ARG(Gamma::Gamma,a_, b_,arguments not valid);
-  computeCtes();
-}
-/** destructor */
-Gamma::~Gamma() {}
 
+#ifndef IS_RTKPP_LIB
 /* @brief generate a gamma random variate using the G.S algorithm
  *  of Ahrens and Dieter (1974) for 0<a_<1
  *  and the Fishman (1976) algorithm for a_>1.
  **/
 Real Gamma::rand() const
 {
-#ifdef IS_RTKPP_LIB
-  return R::rgamma(a_, b_);
-#else
   // GS algorithm for parameter a_ < 1.
   if (a_ < 1.)
   {
@@ -113,7 +94,6 @@ Real Gamma::rand() const
     if ( std::log(u) < 0.5*x*x+d_*(1.-v+std::log(v)) ) break;
   }
   return b_*d_*v;
-#endif
 }
 
 /*
@@ -128,9 +108,6 @@ Real Gamma::rand() const
  */
 Real Gamma::pdf( Real const& x) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::dgamma(x, a_, b_, false);
-#else
   // check NA value
   if (isNA(x)) return x;
   // trivial cases
@@ -141,7 +118,6 @@ Real Gamma::pdf( Real const& x) const
   // general case
   return (a_ < 1) ? Funct::poisson_pdf_raw(a_, x/b_) * a_/x
                   : Funct::poisson_pdf_raw(a_-1, x/b_)/b_;
-#endif
 }
 
 /*
@@ -153,9 +129,6 @@ Real Gamma::pdf( Real const& x) const
  */
 Real Gamma::lpdf( Real const& x) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::dgamma(x, a_, b_, true);
-#else
   // check NA value
   if (isNA(x)) return x;
   // trivial cases
@@ -166,7 +139,6 @@ Real Gamma::lpdf( Real const& x) const
   // general case
   return (a_ < 1) ? Funct::poisson_lpdf_raw(a_, x/b_) +std::log(a_/x)
                   : Funct::poisson_lpdf_raw(a_-1, x/b_) - std::log(b_);
-#endif
 }
 
 /*
@@ -179,9 +151,6 @@ Real Gamma::lpdf( Real const& x) const
  */
 Real Gamma::cdf( Real const& t) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::pgamma(t, a_, b_, true, false);
-#else
   // check NA value
   if (isNA(t)) return t;
   // trivial cases
@@ -189,7 +158,6 @@ Real Gamma::cdf( Real const& t) const
   if (Arithmetic<Real>::isInfinite(t)) return 1.;
   // general case
   return Funct::gammaRatioP(a_, t/b_);
-#endif
 }
     
 /*
@@ -198,19 +166,12 @@ Real Gamma::cdf( Real const& t) const
  */
 Real Gamma::icdf( Real const& p) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::qgamma(p, a_, b_, true, false);
-#else
   STKRUNTIME_ERROR_1ARG(Gamma::icdf,p,not implemented);
   return 0.0;
-#endif
 }
 
 Real Gamma::rand( Real const& a, Real const& b)
 {
-#ifdef IS_RTKPP_LIB
-  return R::rgamma(a, b);
-#else
   // check parameters
   if (  !Arithmetic<Real>::isFinite(a) || !Arithmetic<Real>::isFinite(b)
      || a <= 0 || b <= 0
@@ -260,7 +221,6 @@ Real Gamma::rand( Real const& a, Real const& b)
     if ( std::log(double(u)) < 0.5*x*x+d*(1.-v+log(v)) ) break;
   }
   return (b*d*v);
-#endif
 }
 
 /*
@@ -272,9 +232,6 @@ Real Gamma::rand( Real const& a, Real const& b)
  */
 Real Gamma::pdf( Real const& x, Real const& a, Real const& b)
 {
-#ifdef IS_RTKPP_LIB
-  return R::dgamma(x, a, b, false);
-#else
   // check NA value
   if (isNA(x)) return x;
   // trivial cases
@@ -285,7 +242,6 @@ Real Gamma::pdf( Real const& x, Real const& a, Real const& b)
   // general case
   return (a < 1) ? Funct::poisson_pdf_raw(a, x/b) * a/x
                  : Funct::poisson_pdf_raw(a-1, x/b)/b;
-#endif
 }
 
 /*
@@ -297,9 +253,6 @@ Real Gamma::pdf( Real const& x, Real const& a, Real const& b)
  */
 Real Gamma::lpdf( Real const& x, Real const& a, Real const& b)
 {
-#ifdef IS_RTKPP_LIB
-  return R::dgamma(x, a, b, true);
-#else
   // check NA value
   if (isNA(x)) return x;
   // trivial cases
@@ -310,7 +263,6 @@ Real Gamma::lpdf( Real const& x, Real const& a, Real const& b)
   // general case
   return (a < 1) ? Funct::poisson_lpdf_raw(a, x/b) + std::log(a/x)
                  : Funct::poisson_lpdf_raw(a-1, x/b) - std::log(b);
-#endif
 }
 
 /* @return the cumulative distribution function
@@ -320,9 +272,6 @@ Real Gamma::lpdf( Real const& x, Real const& a, Real const& b)
  **/
 Real Gamma::cdf(Real const& t, Real const& a, Real const& b)
 {
-#ifdef IS_RTKPP_LIB
-  return R::pgamma(t, a, b, true, false);
-#else
   // check NA value
   if (isNA(t)) return t;
   // trivial cases
@@ -330,7 +279,6 @@ Real Gamma::cdf(Real const& t, Real const& a, Real const& b)
   if (Arithmetic<Real>::isInfinite(t)) return 1.;
   // general case
   return Funct::gammaRatioP(a, t/b);
-#endif
 }
 
 /* @return the inverse cumulative distribution function
@@ -339,14 +287,8 @@ Real Gamma::cdf(Real const& t, Real const& a, Real const& b)
  **/
 Real Gamma::icdf(Real const& p, Real const& a, Real const& b)
 {
-#ifdef IS_RTKPP_LIB
-  return R::qgamma(p, a, b, true, false);
-#else
   return 0;
-#endif
 }
-
-
 
 void Gamma::computeCtes() const
 {
@@ -361,6 +303,8 @@ void Gamma::computeCtes() const
     c_ = 1./std::sqrt(9.*d_);
   }
 }
+
+#endif
 
 } // namespace Law
 

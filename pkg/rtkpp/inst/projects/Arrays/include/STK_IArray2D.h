@@ -204,10 +204,11 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
       this->shift(I.begin(), J.begin());
       // check again if there is something to do
       if ((this->rows() == I) && (this->cols() == J)) return this->asDerived();
+      // just clear empty container
+      if (I.size()<=0 || J.size() <= 0) { this->clear(); return this->asDerived();}
       // number of rows and columns to delete or add
-      int rinc = I.lastIdx() - this->lastIdxRows();
-      int cinc = J.lastIdx() - this->lastIdxCols();
-
+      int rinc = I.end() - this->endRows();
+      int cinc = J.end() - this->endCols();
       // check if we add columns
       if ((cinc >=0)) // work first on rows as we add columns
       {

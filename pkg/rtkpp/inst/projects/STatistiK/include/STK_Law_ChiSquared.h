@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2008  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -36,7 +36,12 @@
 #define STK_LAW_CHISQUARED_H
 
 #include "STK_Law_IUnivLaw.h"
-#include "Sdk/include/STK_Macros.h"
+#include <Sdk/include/STK_Macros.h>
+
+#ifdef IS_RTKPP_LIB
+#include <Rcpp.h>
+#endif
+
 
 namespace STK
 {
@@ -67,9 +72,10 @@ class ChiSquared : public IUnivLaw<Real>
     /** Default constructor.
      *  @param df degree of freedom parameter
      **/
-    ChiSquared( int df = 1.);
+    inline ChiSquared( int df = 1.): Base(_T("Chi-squared")), df_(df)
+    { if (df<=0) STKDOMAIN_ERROR_1ARG(ChiSquared::ChiSquared,df,df must be > 0);}
     /** destructor */
-    virtual ~ChiSquared();
+    inline virtual ~ChiSquared(){}
     /** @return the number of degree of freedom */
     inline int df() const { return df_;}
     /** @param df degree of freedom parameter */
@@ -126,6 +132,59 @@ class ChiSquared : public IUnivLaw<Real>
     /** degree of freedom */
     int df_;
 };
+
+#ifdef IS_RTKPP_LIB
+
+/* @return a pseudo ChiSquared random variate. */
+inline Real ChiSquared::rand() const
+{ return R::rchisq(df_);}
+/* @return the value of the pdf
+ *  @param x a positive real value
+ **/
+inline Real ChiSquared::pdf(const Real& x) const
+{ return R::dchisq(x, df_, false);}
+inline Real ChiSquared::lpdf(const Real& x) const
+{ return R::dchisq(x, df_, true);}
+/* @return the cumulative distribution function
+ *  @param t a positive real value
+ **/
+inline Real ChiSquared::cdf(const Real& t) const
+{ return R::pchisq(t, df_, true, false);}
+/* @return the inverse cumulative distribution function
+ *  @param p a probability number
+ **/
+inline Real ChiSquared::icdf(const Real& p) const
+{ return R::qchisq(p, df_, true, false);}
+/* @return a pseudo ChiSquared random variate with the specified parameters.
+ *  @param df degree of freedom parameter
+ **/
+inline Real ChiSquared::rand(int df){ return R::rchisq(df);}
+/* @return the value of the pdf
+ *  @param x a positive real value
+ *  @param df degree of freedom parameter
+ **/
+inline Real ChiSquared::pdf(const Real& x, int df)
+{ return R::dchisq(x, df, false);}
+/* @return the value of the log-pdf
+ *  @param x a positive real value
+ *  @param df degree of freedom parameter
+ **/
+inline Real ChiSquared::lpdf(const Real& x, int df)
+{ return R::dchisq(x, df, true);}
+/* @return the cumulative distribution function
+ *  @param t a positive real value
+ *  @param df degree of freedom parameter
+ **/
+inline Real ChiSquared::cdf(const Real& t, int df)
+{ return R::pchisq(t, df, true, false);}
+/* @return the inverse cumulative distribution function
+ *  @param p a probability number
+ *  @param df degree of freedom parameter
+ **/
+inline Real ChiSquared::icdf(const Real& p, int df)
+{ return R::qchisq(p, df, true, false);}
+
+#endif
 
 } // namespace Law
 

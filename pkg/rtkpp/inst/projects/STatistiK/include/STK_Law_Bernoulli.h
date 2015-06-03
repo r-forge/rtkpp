@@ -69,7 +69,11 @@ class Bernoulli: public IUnivLaw<Binary>
     /** constructor
      * @param prob probability of success in a Bernoulli trial
      **/
-    Bernoulli(Real const& prob =0.5);
+    inline Bernoulli(Real const& prob =0.5): Base(String(_T("Bernoulli")) ), prob_(prob)
+    {
+      if (prob<0) STKDOMAIN_ERROR_1ARG(Bernoulli,prob,prob must be >= 0);
+      if (prob>1) STKDOMAIN_ERROR_1ARG(Bernoulli,prob,prob must be <= 1);
+    }
     /** destructor */
     inline virtual ~Bernoulli() {}
     /** @return the probability of success */

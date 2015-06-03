@@ -32,12 +32,11 @@
  *  @brief In this file we implement the Cauchy distribution.
  **/
 
+#ifndef IS_RTKPP_LIB
+
 #include "../include/STK_Law_Cauchy.h"
 #include "../include/STK_Law_Util.h"
 
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
-#endif
 
 namespace STK
 {
@@ -229,3 +228,5 @@ Real Cauchy::icdf( Real const& p, Real const& mu, Real const& scale)
 } // namespace Law
 
 } // namespace STK
+
+#endif

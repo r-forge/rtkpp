@@ -32,75 +32,46 @@
  *  @brief In this file we implement the Student probability distribution.
  **/
 
+#ifndef IS_RTKPP_LIB
 #include "../include/STK_Law_Student.h"
-
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
-#endif
 
 namespace STK
 {
 
 namespace Law
 {
-/* Default constructor.
- *  @param df degree of freedom parameter
- **/
-Student::Student( int df) : Base(_T("Student")), df_(df) {}
-/* destructor */
-Student::~Student() {}
 /* @return a pseudo Student random variate. */
 Real Student::rand() const
 {
-#ifdef IS_RTKPP_LIB
-  return R::rt(df_);
-#else
   return 0;
-#endif
 }
 /* @return the value of the pdf
  *  @param x a positive real value
  **/
 Real Student::pdf(Real const& x) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::dt(x, df_, false);
-#else
   return 0;
-#endif
 }
 /* @return the value of the log-pdf
  *  @param x a positive real value
  **/
 Real Student::lpdf(Real const& x) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::dt(x, df_, true);
-#else
   return 0;
-#endif
 }
 /* @return the cumulative distribution function
  *  @param t a positive real value
  **/
 Real Student::cdf(Real const& t) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::pt(t, df_, true, false);
-#else
   return 0;
-#endif
 }
 /* @return the inverse cumulative distribution function
  *  @param p a probability number
  **/
 Real Student::icdf(Real const& p) const
 {
-#ifdef IS_RTKPP_LIB
-  return R::qt(p, df_, true, false);
-#else
   return 0;
-#endif
 }
 
 /* @return a pseudo Student random variate with the specified parameters.
@@ -108,11 +79,7 @@ Real Student::icdf(Real const& p) const
  **/
 Real Student::rand( int df)
 {
-#ifdef IS_RTKPP_LIB
-  return R::rt(df);
-#else
   return 0;
-#endif
 }
 /* @return the value of the pdf
  *  @param x a positive real value
@@ -120,11 +87,7 @@ Real Student::rand( int df)
  **/
 Real Student::pdf(Real const& x, int df)
 {
-#ifdef IS_RTKPP_LIB
-  return R::dt(x, df, false);
-#else
   return 0;
-#endif
 }
 /* @return the value of the log-pdf
  *  @param x a positive real value
@@ -132,11 +95,7 @@ Real Student::pdf(Real const& x, int df)
  **/
 Real Student::lpdf(Real const& x, int df)
 {
-#ifdef IS_RTKPP_LIB
-  return R::dt(x, df, true);
-#else
   return 0;
-#endif
 }
 /* @return the cumulative distribution function
  *  @param t a positive real value
@@ -144,11 +103,7 @@ Real Student::lpdf(Real const& x, int df)
  **/
 Real Student::cdf(Real const& t, int df)
 {
-#ifdef IS_RTKPP_LIB
-  return R::pt(t, df, true, false);
-#else
   return 0;
-#endif
 }
 /* @return the inverse cumulative distribution function
  *  @param p a probability number
@@ -156,13 +111,11 @@ Real Student::cdf(Real const& t, int df)
  **/
 Real Student::icdf(Real const& p, int df)
 {
-#ifdef IS_RTKPP_LIB
-  return R::qt(p, df, true, false);
-#else
   return 0;
-#endif
 }
 
 } // namespace Law
 
 } // namespace STK
+
+#endif

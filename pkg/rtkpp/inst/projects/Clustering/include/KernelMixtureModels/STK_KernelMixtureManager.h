@@ -69,6 +69,7 @@ class KernelMixtureManager : public IMixtureManager<DataHandler>
   public:
     typedef IMixtureManager<DataHandler> Base;
     using Base::registerMixtureData;
+    using Base::mixture_;
     using Base::getMixtureData;
     using Base::getIdModel;
     using Base::p_handler;
@@ -87,6 +88,9 @@ class KernelMixtureManager : public IMixtureManager<DataHandler>
     KernelMixtureManager(DataHandler const& handler): Base(&handler) {}
     /** destructor */
     virtual ~KernelMixtureManager() {}
+    /** set the dimension of the kernel mixture model */
+    inline void setLambda(IMixture* p_mixture, Real const& lambda)
+    { mixture_.setLambda(lambda);}
     /** get the parameters from an IMixture.
      *  @param p_mixture pointer on the mixture
      *  @param param the array to return with the parameters

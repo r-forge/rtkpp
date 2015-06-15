@@ -32,22 +32,49 @@
  *  @brief In this file we implement the Poisson distribution.
  **/
 
-#ifndef IS_RTKPP_LIB
 
+#include "../include/STK_Law_Poisson.h"
+
+#ifndef IS_RTKPP_LIB
+#include "../include/STK_Law_Util.h"
 #include <Analysis/include/STK_Funct_gammaRatio.h>
 #include <Analysis/include/STK_Funct_gamma.h>
 #include <Analysis/include/STK_Funct_raw.h>
 #include <Analysis/include/STK_Funct_Util.h>
 #include <Analysis/include/STK_Const_Math.h>
+#else
+#include <Rcpp.h>
+#endif
 
-#include "../include/STK_Law_Poisson.h"
-#include "../include/STK_Law_Util.h"
 
 namespace STK
 {
 
 namespace Law
 {
+
+#ifdef IS_RTKPP_LIB
+
+/* @return a Poisson random variate . */
+inline int Poisson::rand() const { return (int)R::rpois(lambda_);}
+inline Real Poisson::pdf(int const& x) const { return R::dpois((double)x, lambda_, false);}
+inline Real Poisson::lpdf(int const& x) const { return R::dpois((double)x, lambda_, true);}
+inline Real Poisson::cdf(Real const& t) const { return R::ppois(t, lambda_, true, false);}
+inline int Poisson::icdf(Real const& p) const { return (int)R::qpois(p, lambda_, true, false);}
+
+/* static */
+inline int Poisson::rand(Real const& lambda)
+{return (int)R::rpois(lambda);}
+inline Real Poisson::pdf(int const& x, Real const& lambda)
+{ return R::dpois((double)x, lambda, false);}
+inline Real Poisson::lpdf(int const& x, Real const& lambda)
+{ return R::dpois((double)x, lambda, true);}
+inline Real Poisson::cdf(Real const& t, Real const& lambda)
+{ return R::ppois(t, lambda, true, false);}
+inline int Poisson::icdf(Real const& p, Real const& lambda)
+{ return (int)R::qpois(p, lambda, true, false);}
+
+#else
 
 /* The inverse cumulative distribution function at p.*/
 static Real gauss_icdf_fast(Real const& p)
@@ -333,9 +360,10 @@ int Poisson::icdf(Real const& p, Real const& lambda)
   return k; // avoid warning at compilation
 }
 
+#endif
+
 } // namespace Law
 
 } // namespace STK
 
-#endif
 

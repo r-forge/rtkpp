@@ -32,8 +32,9 @@
  *  @brief In this file we implement the Weibull probability distribution.
  **/
 
-#ifndef IS_RTKPP_LIB
 #include "../include/STK_Law_Weibull.h"
+#ifdef IS_RTKPP_LIB
+#include <Rcpp.h>
 #endif
 
 namespace STK
@@ -42,7 +43,69 @@ namespace STK
 namespace Law
 {
 
-#ifndef IS_RTKPP_LIB
+#ifdef IS_RTKPP_LIB
+
+/* @return a pseudo Weibull random variate. */
+inline Real Weibull::rand() const
+{ return R::rweibull(k_, lambda_);}
+/* @return the value of the pdf
+ *  @param x a positive real value
+ **/
+inline Real Weibull::pdf(Real const& x) const
+{ return R::dweibull(x, k_, lambda_, false);}
+/* @return the value of the log-pdf
+ *  @param x a positive real value
+ **/
+inline Real Weibull::lpdf(Real const& x) const
+{ return R::dweibull(x, k_, lambda_, true);}
+/*The cumulative distribution function for the Weibull distribution is
+ *  \f$ F(x;k,\lambda) = 1- e^{-(x/\lambda)^k}.\f$
+ *  @return the cumulative distribution function
+ *  @param t a positive real value
+ **/
+inline Real Weibull::cdf(Real const& t) const
+{ return R::pweibull(t, k_, lambda_, true, false);}
+/*The quantile (inverse cumulative distribution) function for the Weibull
+ * distribution is \f$ Q(p;k,\lambda) = \lambda {(-\ln(1-p))}^{1/k} \f$
+ *  @return the inverse cumulative distribution function
+ *  @param p a probability number
+ **/
+inline Real Weibull::icdf(Real const& p) const
+{ return R::qweibull(p, k_, lambda_, true, false);}
+/* @return a pseudo Weibull random variate with the specified parameters.
+ *  @param k, lambda shape and scale (dispersion) parameters
+ **/
+inline Real Weibull::rand( Real const& k, Real const& lambda)
+{ return R::rweibull(k, lambda);}
+/* @return the value of the pdf
+ *  @param x a positive real value
+ *  @param k, lambda shape and scale (dispersion) parameters
+ **/
+inline Real Weibull::pdf(Real const& x, Real const& k, Real const& lambda)
+{ return R::dweibull(x, k, lambda, false);}
+/* @return the value of the log-pdf
+ *  @param x a positive real value
+ *  @param k, lambda shape and scale (dispersion) parameters
+ **/
+inline Real Weibull::lpdf(Real const& x, Real const& k, Real const& lambda)
+{ return R::dweibull(x, k, lambda, true);}
+/* @return the cumulative distribution function
+ *  @param t a positive real value
+ *  @param k, lambda shape and scale (dispersion) parameters
+ **/
+inline Real Weibull::cdf(Real const& t, Real const& k, Real const& lambda)
+{ return R::pweibull(t, k, lambda, true, false);}
+/* @brief Compute the inverse cumulative distribution function at p
+ *  of the standard log-normal distribution.
+ *
+ *  @param p a probability number.
+ *  @param mu, sigma location and scale of the log-normal law
+ *  @return the inverse cumulative distribution function value at p.
+ **/
+inline Real Weibull::icdf( Real const& p, Real const& k, Real const& lambda)
+{ return R::qweibull(p, k, lambda, true, false);}
+
+#else
 
 /* @return a pseudo Weibull random variate. */
 Real Weibull::rand() const

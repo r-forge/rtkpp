@@ -40,7 +40,7 @@ namespace STK
  * @param nbCluster number of cluster in the model
  **/
 KernelGaussian_sk::KernelGaussian_sk( int nbCluster) : Base(nbCluster)
-{ setLambda(10.);}
+{}
 /** copy constructor
  *  @param model The model to copy
  **/

@@ -1,4 +1,4 @@
-/*--------------------------------------------------------------------*/
+ /*--------------------------------------------------------------------*/
 /*     Copyright (C) 2013-2013  Serge Iovleff, Quentin Grimonprez
 
     This program is free software; you can redistribute it and/or modify
@@ -89,6 +89,8 @@ class CG : public IRunnerBase
 {
   public:
     typedef typename ColVector::Type Type;
+    /** Default Constructor */
+    CG(): x_(), r_(), eps_(0.), p_mult_(0), p_init_(0), p_b_(0) {}
     /**Constructor
      * @param p_mult functor which compute @b Ax with @b A a matrix and @b x a vector
      * @param b from @b Ax=b
@@ -96,13 +98,12 @@ class CG : public IRunnerBase
      * @param eps tolerance
      */
     CG( MultFunctor const& mult, ColVector const& b, InitFunctor* const& p_init =0, Type eps=Arithmetic<Type>::epsilon())
-      : x_()
-      , r_()
+      : x_(), r_()
       , eps_(eps)
       , p_mult_(&mult)
       , p_init_(p_init)
       , p_b_(&b)
-    {};
+    {}
 
     /**Copy constructor. The constructor to copy.
      * @param cg the conjugate gradient to copy
@@ -114,9 +115,9 @@ class CG : public IRunnerBase
       , p_mult_(cg.p_mult_)
       , p_init_(cg.p_init_)
       , p_b_(cg.p_b_)
-    {};
+    {}
     /**destructor*/
-    virtual ~CG() {};
+    virtual ~CG() {}
     /** clone pattern */
     CG* clone() const { return new CG(*this);}
 
@@ -170,25 +171,24 @@ class CG : public IRunnerBase
         p_= r_;
         while(1)
         {
-          Real rnorm2 = r_.norm2();
           //compute z=A p
           z.move((*p_mult_)(p_));
           //compute alpha
+          Real rnorm2 = r_.norm2();
           alpha = rnorm2/p_.dot(z);
           //update x_
           xOld.exchange(x_);
-          x_ = xOld + alpha * p_;
+          x_ = xOld + (alpha * p_);
           //update residuals
-          r_ = r_ - (alpha * z);
+          r_ -= alpha * z;
           //compute beta
           beta = 1/rnorm2;
           if ((rnorm2=r_.norm2())/bnorm2 <eps_) { nbStart = 2; break;}
-          beta *= rnorm2;
           //update p_
-          p_ = (p_ * beta) + r_;
+          p_ = (p_ * (beta * rnorm2)) + r_;
           step++;
           if( step > MAXITER )
-            throw runtime_error("CG reaches MAXITER before convergence.");
+            STKRUNTIME_ERROR_NO_ARG(CG::cg,CG reaches MAXITER before convergence);
         }
         nbStart++;
       };

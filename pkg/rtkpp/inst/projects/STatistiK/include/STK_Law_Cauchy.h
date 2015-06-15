@@ -39,10 +39,6 @@
 #include <Sdk/include/STK_Macros.h>
 #include <STKernel/include/STK_Real.h>
 
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
-#endif
-
 namespace STK
 {
 
@@ -71,12 +67,22 @@ namespace Law
 class Cauchy : public IUnivLaw<Real>
 {
   public:
+    typedef IUnivLaw<Real> Base;
     /** Default constructor.
      *  @param mu, scale location and scale of the Cauchy distribution
      **/
-    Cauchy( Real const& mu=0, Real const& scale=1);
+    inline Cauchy( Real const& mu=0, Real const& scale=1)
+                 : Base(String(_T("Cauchy")))
+                 , mu_(mu)
+                 , scale_(scale)
+    {
+      // check parameters
+      if (  !Arithmetic<Real>::isFinite(mu) || !Arithmetic<Real>::isFinite(scale) || scale <= 0)
+      STKDOMAIN_ERROR_2ARG(Cauchy::Cauchy,mu, scale,argument error);
+    }
+
     /** Destructor. **/
-    virtual ~Cauchy();
+    inline virtual ~Cauchy() {}
     /** @return the mu parameter */
     inline Real const& mu() const { return mu_;}
     /** @return the scale parameter */
@@ -169,34 +175,6 @@ class Cauchy : public IUnivLaw<Real>
     /** The scale parameter. */
     Real scale_;
 };
-
-#ifdef IS_RTKPP_LIB
-
-/*  Generate a pseudo Cauchy random variate. */
-inline Real Cauchy::rand() const { return R::rcauchy(mu_, scale_);}
-/*  Give the value of the pdf at x. */
-inline Real Cauchy::pdf( Real const& x) const { return R::dcauchy(x,mu_, scale_, false);}
-/* Give the value of the log-pdf at x. */
-inline Real Cauchy::lpdf( Real const& x) const { return R::dcauchy(x,mu_, scale_, true);}
-/* The cumulative distribution function at t. */
-inline Real Cauchy::cdf( Real const& t) const { return R::pcauchy(t, mu_, scale_, true, false);}
-/* The inverse cumulative distribution function at p. */
-inline Real Cauchy::icdf( Real const& p) const { return R::qcauchy(p , mu_, scale_, true, false);}
-
-// static
-inline Real Cauchy::rand( Real const& mu, Real const& scale)
-{ return R::rcauchy(mu, scale);}
-inline Real Cauchy::pdf(Real const& x, Real const& mu, Real const& scale)
-{ return R::dcauchy(x,mu, scale, false);}
-inline Real Cauchy::lpdf(Real const& x, Real const& mu, Real const& scale)
-{ return R::dcauchy(x,mu, scale, true);}
-inline Real Cauchy::cdf(Real const& t, Real const& mu, Real const& scale)
-{ return R::pcauchy(t, mu, scale, true, false);}
-inline Real Cauchy::icdf(Real const& p, Real const& mu, Real const& scale)
-{ return R::qcauchy(p , mu, scale, true, false);}
-
-#endif /* IS_RTKPP_LIB */
-
 
 } // namespace Law
 

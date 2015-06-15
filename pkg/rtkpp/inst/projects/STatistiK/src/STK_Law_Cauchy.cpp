@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2008  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -32,10 +32,14 @@
  *  @brief In this file we implement the Cauchy distribution.
  **/
 
-#ifndef IS_RTKPP_LIB
 
 #include "../include/STK_Law_Cauchy.h"
+
+#ifndef IS_RTKPP_LIB
 #include "../include/STK_Law_Util.h"
+#else
+#include <Rcpp.h>
+#endif
 
 
 namespace STK
@@ -44,19 +48,32 @@ namespace STK
 namespace Law
 {
 
-/* constructor */
-Cauchy::Cauchy( Real const& mu, Real const& scale)
-              : IUnivLaw<Real>(String(_T("Cauchy")))
-              , mu_(mu)
-              , scale_(scale)
-{
-  // check parameters
-  if (  !Arithmetic<Real>::isFinite(mu) || !Arithmetic<Real>::isFinite(scale) || scale <= 0)
-    STKDOMAIN_ERROR_2ARG(Cauchy::Cauchy,mu, scale,argument error);
-}
+#ifdef IS_RTKPP_LIB
 
-/* destructor */
-Cauchy::~Cauchy() {}
+/*  Generate a pseudo Cauchy random variate. */
+inline Real Cauchy::rand() const { return R::rcauchy(mu_, scale_);}
+/*  Give the value of the pdf at x. */
+inline Real Cauchy::pdf( Real const& x) const { return R::dcauchy(x,mu_, scale_, false);}
+/* Give the value of the log-pdf at x. */
+inline Real Cauchy::lpdf( Real const& x) const { return R::dcauchy(x,mu_, scale_, true);}
+/* The cumulative distribution function at t. */
+inline Real Cauchy::cdf( Real const& t) const { return R::pcauchy(t, mu_, scale_, true, false);}
+/* The inverse cumulative distribution function at p. */
+inline Real Cauchy::icdf( Real const& p) const { return R::qcauchy(p , mu_, scale_, true, false);}
+
+// static
+inline Real Cauchy::rand( Real const& mu, Real const& scale)
+{ return R::rcauchy(mu, scale);}
+inline Real Cauchy::pdf(Real const& x, Real const& mu, Real const& scale)
+{ return R::dcauchy(x,mu, scale, false);}
+inline Real Cauchy::lpdf(Real const& x, Real const& mu, Real const& scale)
+{ return R::dcauchy(x,mu, scale, true);}
+inline Real Cauchy::cdf(Real const& t, Real const& mu, Real const& scale)
+{ return R::pcauchy(t, mu, scale, true, false);}
+inline Real Cauchy::icdf(Real const& p, Real const& mu, Real const& scale)
+{ return R::qcauchy(p , mu, scale, true, false);}
+
+#else
 
 /*  Generate a pseudo Cauchy random variate. */
 Real Cauchy::rand() const
@@ -225,8 +242,9 @@ Real Cauchy::icdf( Real const& p, Real const& mu, Real const& scale)
   return mu - scale / Real(std::tan( double(Const::_PI_ * p) ));
 }
 
+#endif
+
 } // namespace Law
 
 } // namespace STK
 
-#endif

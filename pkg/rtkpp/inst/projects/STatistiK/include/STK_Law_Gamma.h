@@ -38,11 +38,6 @@
 #include "STK_Law_IUnivLaw.h"
 #include <Sdk/include/STK_Macros.h>
 
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
-#endif
-
-
 namespace STK
 {
 
@@ -181,87 +176,6 @@ class Gamma : public IUnivLaw<Real>
     void computeCtes() const;
 #endif
 };
-
-#ifdef IS_RTKPP_LIB
-/* @brief generate a gamma random variate using the G.S algorithm
- *  of Ahrens and Dieter (1974) for 0<a_<1
- *  and the Fishman (1976) algorithm for a_>1.
- **/
-inline Real Gamma::rand() const
-{ return R::rgamma(a_, b_);}
-/*
- *  compute
- *  \f[
- *   f(x;\alpha,\beta) = \left(\frac{x}{\beta}\right)^{\alpha-1}
- *                   \frac{e^{-x/\beta}}{\beta \, \Gamma(\alpha)}
- *   \ \mathrm{for}\ x > 0
- *  \f]
- *  where \f$ \alpha > 0 \f$ is the shape parameter
- *  and   \f$ \beta > 0 \f$ is the scale parameter.
- */
-inline Real Gamma::pdf( Real const& x) const
-{ return R::dgamma(x, a_, b_, false);}
-/*
- *  Give
- *  \f[
- *   \ln(f(x;k,\theta)) = - x/\theta + (k-1) \ln(x)
- *                      - k \ln(\theta) + \ln(\Gamma(k))
- *  \f]
- */
-inline Real Gamma::lpdf( Real const& x) const
-{  return R::dgamma(x, a_, b_, true);}
-/*
- * The cumulative distribution function can be expressed in terms of
- * the incomplete gamma function
- * \f[
- * F(x;k,\theta) = \int_0^x f(u;k,\theta)\,du
- * = \frac{\gamma(k, x/\theta)}{\Gamma(k)}.
- * \f]
- */
-inline Real Gamma::cdf( Real const& t) const
-{ return R::pgamma(t, a_, b_, true, false);}
-/*
- *  Give the quantile t such that the probability of a random variate
- *  is less to t is equal to p.
- */
-inline Real Gamma::icdf( Real const& p) const
-{ return R::qgamma(p, a_, b_, true, false);}
-inline Real Gamma::rand( Real const& a, Real const& b)
-{ return R::rgamma(a, b);}
-/*
- *  Give
- *  \f[
- *   \ln(f(x;k,\theta)) = - x/\theta + (k-1) \ln(x)
- *                      - k \ln(\theta) + \ln(\Gamma(k))
- *  \f]
- */
-inline Real Gamma::pdf( Real const& x, Real const& a, Real const& b)
-{ return R::dgamma(x, a, b, false);}
-/*
- *  Give
- *  \f[
- *   \ln(f(x;k,\theta)) = - x/\theta + (k-1) \ln(x)
- *                      - k \ln(\theta) + \ln(\Gamma(k))
- *  \f]
- */
-inline Real Gamma::lpdf( Real const& x, Real const& a, Real const& b)
-{ return R::dgamma(x, a, b, true);}
-/* @return the cumulative distribution function
- *  @param t a positive real value
- *  @param shape shape parameter
- *  @param scale scale (dispersion) parameter
- **/
-inline Real Gamma::cdf(Real const& t, Real const& a, Real const& b)
-{ return R::pgamma(t, a, b, true, false);}
-
-/* @return the inverse cumulative distribution function
- *  @param p a probability number
- *  @param df1, df2 degree of freedom parameters
- **/
-inline Real Gamma::icdf(Real const& p, Real const& a, Real const& b)
-{ return R::qgamma(p, a, b, true, false);}
-
-#endif
 
 } // namespace Law
 

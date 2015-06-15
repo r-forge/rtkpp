@@ -32,20 +32,47 @@
  *  @brief In this file we implement the Beta class.
  **/
 
-#ifndef IS_RTKPP_LIB
 
 #include "../include/STK_Law_Beta.h"
+
+#ifndef IS_RTKPP_LIB
 #include "../include/STK_Law_Gamma.h"
 #include <Analysis/include/STK_Funct_betaRatio.h>
-
+#else
+#include <Rcpp.h>
 #endif
+
 //
 namespace STK
 {
 namespace Law
 {
 
-#ifndef IS_RTKPP_LIB
+#ifdef IS_RTKPP_LIB
+
+/*  Generate a pseudo Beta random variate. */
+inline Real Beta::rand() const { return R::rbeta(alpha_, beta_);}
+/*  Give the value of the pdf at x. */
+inline Real Beta::pdf( Real const& x) const { return R::dbeta(x,alpha_, beta_, false);}
+/* Give the value of the log-pdf at x. */
+inline Real Beta::lpdf( Real const& x) const { return R::dbeta(x,alpha_, beta_, true);}
+/* The cumulative distribution function at t. */
+inline Real Beta::cdf( Real const& t) const { return R::pbeta(t, alpha_, beta_, true, false);}
+/* The inverse cumulative distribution function at p. */
+inline Real Beta::icdf( Real const& p) const { return R::qbeta(p , alpha_, beta_, true, false);}
+/*  Generate a pseudo Beta random variate with the specified parameters.(static) */
+inline Real Beta::rand( Real const& alpha, Real const& beta) { return R::rbeta(alpha, beta);}
+// static
+inline Real Beta::pdf(const Real& x, const Real& alpha, const Real& beta)
+{ return R::dbeta(x,alpha, beta, false);}
+inline Real Beta::lpdf(const Real& x, const Real& alpha, const Real& beta)
+{ return R::dbeta(x,alpha, beta, true);}
+inline Real Beta::cdf(const Real& t, const Real& alpha, const Real& beta)
+{ return R::pbeta(t, alpha, beta, true, false);}
+inline Real Beta::icdf(const Real& p, const Real& alpha, const Real& beta)
+{ return R::qbeta(p , alpha, beta, true, false);}
+
+#else
 
 /*  Generate a pseudo Beta random variate. */
 Real Beta::rand() const

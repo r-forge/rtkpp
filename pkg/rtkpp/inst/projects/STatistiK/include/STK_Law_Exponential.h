@@ -39,10 +39,6 @@
 #include <Sdk/include/STK_Macros.h>
 #include <STKernel/include/STK_Real.h>
 
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
-#endif
-
 namespace STK
 {
 
@@ -136,33 +132,6 @@ class Exponential : public IUnivLaw<Real>
     /** The scale parameter. */
     Real scale_;
 };
-
-#ifdef IS_RTKPP_LIB
-
-/*  Generate a pseudo Beta random variate. */
-inline Real Exponential::rand() const { return R::rexp(scale_);}
-/*  Give the value of the pdf at x. */
-inline Real Exponential::pdf( Real const& x) const { return R::dexp(x, scale_, false);}
-/* Give the value of the log-pdf at x. */
-inline Real Exponential::lpdf( Real const& x) const { return R::dexp(x, scale_, true);}
-/* The cumulative distribution function at t. */
-inline Real Exponential::cdf( Real const& t) const { return R::pexp(t, scale_, true, false);}
-/* The inverse cumulative distribution function at p. */
-inline Real Exponential::icdf( Real const& p) const { return R::qexp(p , scale_, true, false);}
-
-// static
-inline Real Exponential::rand( Real const& scale)
-{ return R::rexp(scale);}
-inline Real Exponential::pdf(Real const& x, Real const& scale)
-{ return R::dexp(x, scale, false);}
-inline Real Exponential::lpdf(Real const& x, Real const& scale)
-{ return R::dexp(x, scale, true);}
-inline Real Exponential::cdf(Real const& t, Real const& scale)
-{ return R::pexp(t, scale, true, false);}
-inline Real Exponential::icdf(Real const& p, Real const& scale)
-{ return R::qexp(p, scale, true, false);}
-
-#endif /* IS_RTKPP_LIB */
 
 
 } // namespace Law

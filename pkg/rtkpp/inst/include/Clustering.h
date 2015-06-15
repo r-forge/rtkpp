@@ -80,18 +80,25 @@
 #include "Clustering/include/GammaMixtureModels/STK_Gamma_aj_bk.h"
 #include "Clustering/include/GammaMixtureModels/STK_Gamma_a_bjk.h"
 #include "Clustering/include/GammaMixtureModels/STK_Gamma_a_bk.h"
+#include "Clustering/include/GammaMixtureModels/STK_GammaMixtureManager.h"
 
 #include "Clustering/include/DiagGaussianMixtureModels/STK_Gaussian_sjk.h"
 #include "Clustering/include/DiagGaussianMixtureModels/STK_Gaussian_sk.h"
 #include "Clustering/include/DiagGaussianMixtureModels/STK_Gaussian_sj.h"
 #include "Clustering/include/DiagGaussianMixtureModels/STK_Gaussian_s.h"
+#include "Clustering/include/DiagGaussianMixtureModels/STK_DiagGaussianMixtureManager.h"
 
 #include "Clustering/include/CategoricalMixtureModels/STK_Categorical_pjk.h"
 #include "Clustering/include/CategoricalMixtureModels/STK_Categorical_pk.h"
-#include "Clustering/include/CategoricalMixtureModels/STK_Categorical_pk.h"
+#include "Clustering/include/CategoricalMixtureModels/STK_CategoricalMixtureManager.h"
 
 #include "Clustering/include/PoissonMixtureModels/STK_Poisson_ljk.h"
+#include "Clustering/include/PoissonMixtureModels/STK_Poisson_lk.h"
 #include "Clustering/include/PoissonMixtureModels/STK_Poisson_ljlk.h"
+#include "Clustering/include/PoissonMixtureModels/STK_PoissonMixtureManager.h"
+
+#include "Clustering/include/KernelMixtureModels/STK_KernelGaussian.h"
+#include "Clustering/include/KernelMixtureModels/STK_KernelMixtureManager.h"
 
 #include "Clustering/include/STK_MixtureInit.h"
 #include "Clustering/include/STK_MixtureAlgo.h"

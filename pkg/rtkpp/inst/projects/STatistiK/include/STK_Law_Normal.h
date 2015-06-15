@@ -39,10 +39,6 @@
 #include <Sdk/include/STK_Macros.h>
 #include <STKernel/include/STK_Real.h>
 
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
-#endif
-
 namespace STK
 {
 
@@ -183,33 +179,6 @@ class Normal : public IUnivLaw<Real>
     /** The sigma parameter. **/
     Real sigma_;
 };
-
-#ifdef IS_RTKPP_LIB
-
-/*  Generate a pseudo Normal random variate. */
-inline Real Normal::rand() const { return R::rnorm(mu_, sigma_);}
-/*  Give the value of the pdf at x. */
-inline Real Normal::pdf( Real const& x) const { return R::dnorm(x,mu_, sigma_, false);}
-/* Give the value of the log-pdf at x. */
-inline Real Normal::lpdf( Real const& x) const { return R::dnorm(x,mu_, sigma_, true);}
-/* The cumulative distribution function at t. */
-inline Real Normal::cdf( Real const& t) const { return R::pnorm(t, mu_, sigma_, true, false);}
-/* The inverse cumulative distribution function at p. */
-inline Real Normal::icdf( Real const& p) const { return R::qnorm(p , mu_, sigma_, true, false);}
-
-// static
-inline Real Normal::rand( Real const& mu, Real const& scale)
-{ return R::rnorm(mu, scale);}
-inline Real Normal::pdf(Real const& x, Real const& mu, Real const& scale)
-{ return R::dnorm(x,mu, scale, false);}
-inline Real Normal::lpdf(Real const& x, Real const& mu, Real const& scale)
-{ return R::dnorm(x,mu, scale, true);}
-inline Real Normal::cdf(Real const& t, Real const& mu, Real const& scale)
-{ return R::pnorm(t, mu, scale, true, false);}
-inline Real Normal::icdf(Real const& p, Real const& mu, Real const& scale)
-{ return R::qnorm(p , mu, scale, true, false);}
-
-#endif /* IS_RTKPP_LIB */
 
 } // namespace Law
 

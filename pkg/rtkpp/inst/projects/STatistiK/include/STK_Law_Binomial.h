@@ -39,10 +39,6 @@
 #include <Sdk/include/STK_Macros.h>
 #include <STKernel/include/STK_Integer.h>
 
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
-#endif
-
 
 namespace STK
 {
@@ -172,31 +168,6 @@ class Binomial: public IUnivLaw<Integer>
     /** probability of success in a Bernoulli trial */
     Real prob_;
 };
-
-#ifdef IS_RTKPP_LIB
-
-inline int Binomial::rand() const { return (int)R::rbinom(n_, prob_);}
-inline Real Binomial::pdf(int const& x) const
-{ return (Real)R::dbinom((double)x, (double)n_, prob_, false);}
-inline Real Binomial::lpdf(int const& x) const
-{ return (Real)R::dbinom((double)x, (double)n_, prob_, true);}
-inline Real Binomial::cdf(Real const& t) const
-{ return (Real)R::pbinom(t, (double)n_, prob_, true, false);}
-inline int Binomial::icdf(Real const& p) const
-{ return (int)R::qbinom(p, (double)n_, prob_, true, false);}
-
-inline int Binomial::rand(int n, Real const& prob)
-{ return (int)R::rbinom(n, prob);}
-inline Real Binomial::pdf(int x, int n, Real const& prob)
-{ return (Real)R::dbinom(x, (double)n, prob, false);}
-inline Real Binomial::lpdf(int x, int n, Real const& prob)
-{ return (Real)R::dbinom((double)x, (double)n, prob, true);}
-inline Real Binomial::cdf(Real const& t, int n, Real const& prob)
-{ return (Real)R::pbinom(t, (double)n, prob, true, false);}
-inline int Binomial::icdf(Real const& p, int n, Real const& prob)
-{ return (int)R::qbinom(p, (double)n, prob, true, false);}
-
-#endif
 
 } // namespace Law
 

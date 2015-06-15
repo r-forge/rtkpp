@@ -32,15 +32,90 @@
  *  @brief In this file we implement the HyperGeometric distribution.
  **/
 
-#ifndef IS_RTKPP_LIB
-
 #include "../include/STK_Law_HyperGeometric.h"
+
+#ifdef IS_RTKPP_LIB
+#include <Rcpp.h>
+#endif
 
 namespace STK
 {
 
 namespace Law
 {
+
+#ifdef IS_RTKPP_LIB
+
+/* @return a random hypergeometric variate. */
+inline Integer HyperGeometric::rand() const
+{ return R::rhyper(nbSuccesses_, nbFailures_, nbDraws_);}
+/* @brief compute the probability distribution function (density)
+ *  Give the value of the pdf at the point x.
+ *  @param x an Integer value
+ *  @return the value of the pdf
+ **/
+inline Real HyperGeometric::pdf(Integer const& x) const
+{ return R::dhyper((double)x, nbSuccesses_, nbFailures_, nbDraws_, false);}
+/* @brief compute the log probability distribution function
+ *  Give the value of the log-pdf at the point x.
+ *  @param x an Integer value
+ *  @return the value of the log-pdf
+ **/
+inline Real HyperGeometric::lpdf(Integer const& x) const
+{ return R::dhyper((double)x, nbSuccesses_, nbFailures_, nbDraws_, true);}
+/* @brief compute the cumulative distribution function
+ *  Give the probability that a HyperGeometric random variate is less or equal
+ *  to t.
+ *  @param t a real value
+ *  @return the value of the cdf
+ **/
+inline Real HyperGeometric::cdf(Real const& t) const
+{ return R::phyper(t, nbSuccesses_, nbFailures_, nbDraws_, true, false);}
+/* @brief inverse cumulative distribution function
+ *  The quantile is defined as the smallest value @e x such that
+ *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.
+ *  @param p a probability number
+ **/
+inline Integer HyperGeometric::icdf(Real const& p) const
+{ return R::qhyper(p, nbSuccesses_, nbFailures_, nbDraws_, true, false);}
+/* @brief random hypergeometric variate generation.
+ *  @param nbSuccesses, nbFailures, nbDraws number of successes, failures, draws
+ *  @return a Integer random variate.
+ **/
+inline Integer HyperGeometric::rand( int nbSuccesses, int nbFailures, int nbDraws)
+{ return (Integer)R::rhyper(nbSuccesses, nbFailures, nbDraws);}
+/* @brief compute the probability distribution function.
+ *  Give the value of the pdf at the point x.
+ *  @param x an Integer value
+ *  @param nbSuccesses, nbFailures, nbDraws number of successes, failures, draws
+ *  @return the value of the pdf
+ **/
+inline Real HyperGeometric::pdf(Integer x, int nbSuccesses, int nbFailures, int nbDraws)
+{ return R::dhyper((double)x, nbSuccesses, nbFailures, nbDraws, false);}
+/* @brief compute the log probability distribution function.
+ *  @param x an Integer value
+ *  @param nbSuccesses, nbFailures, nbDraws number of successes, failures, draws
+ *  @return the value of the log-pdf
+ **/
+inline Real HyperGeometric::lpdf(Integer x, int nbSuccesses, int nbFailures, int nbDraws)
+{ return R::dhyper((double)x, nbSuccesses, nbFailures, nbDraws, true);}
+/* @brief compute the cumulative distribution function
+ *  Give the probability that a HyperGeometric random variate is less or equal
+ *  to t.
+ *  @param t a real value
+ *  @return the value of the cdf
+ **/
+inline Real HyperGeometric::cdf(Real const& t, int nbSuccesses, int nbFailures, int nbDraws)
+{ return R::phyper(t, nbSuccesses, nbFailures, nbDraws, true, false);}
+/* @brief inverse cumulative distribution function
+ *  The quantile is defined as the smallest value @e x such that
+ *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.
+ *  @param p a probability number
+ **/
+inline Integer HyperGeometric::icdf(Real const& p, int nbSuccesses, int nbFailures, int nbDraws)
+{ return (Integer)R::qhyper(p, nbSuccesses, nbFailures, nbDraws, true, false);}
+
+#else
 
 /* @return a random hypergeometric variate. */
 Integer HyperGeometric::rand() const
@@ -132,9 +207,10 @@ Integer HyperGeometric::icdf(Real const& p, int nbSuccesses, int nbFailures, int
   return 0;
 }
 
+#endif
+
 } // namespace Law
 
 } // namespace STK
 
-#endif
 

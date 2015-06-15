@@ -32,8 +32,10 @@
  *  @brief In this file we define the Logistic probability law class.
  **/
 
-#ifndef IS_RTKPP_LIB
 #include "../include/STK_Law_Logistic.h"
+
+#ifdef IS_RTKPP_LIB
+#include <Rcpp.h>
 #endif
 
 namespace STK
@@ -41,7 +43,98 @@ namespace STK
 namespace Law
 {
 
-#ifndef IS_RTKPP_LIB
+#ifdef IS_RTKPP_LIB
+
+/* @brief Generate a pseudo logisticized Logistic random variate.
+ *
+ *  Generate a pseudo logisticized Logistic random variate
+ *  with location parameter @c mu_ and scale @c scale_.
+ *  @return a pseudo logistic random variate
+ **/
+inline Real Logistic::rand() const
+{ return R::rlogis(mu_, scale_);}
+/* @param x a real value
+ *  @return the value of the logistic pdf at @c x
+ **/
+inline Real Logistic::pdf( Real const& x) const
+{ return R::dlogis(x, mu_, scale_, false);}
+/* @return Give the value of the log-pdf at x.
+ *  @param x a real value
+ **/
+inline Real Logistic::lpdf( Real const& x) const
+{ return R::dlogis(x, mu_, scale_, true);}
+/* @brief Compute the cumulative distribution function at t of
+ *  the standard logistic distribution.
+ *
+ *  The cumulative distribution function of the logistic distribution is
+ *  also a scaled version of the Hyperbolic function.
+ *  \f[
+ *   F(t; \mu, s) = \frac{1}{1+e^{-\frac{t-\mu}{s}}}
+ *   = \frac{1}{2} + \frac{1}{2} \;\operatorname{tanh}\!\left(\frac{t-\mu}{2s}\right).
+ *   \f]
+ *
+ *  @param t a real value
+ *  @return the cumulative distribution function value at t
+ **/
+inline Real Logistic::cdf( Real const& t) const
+{ return R::plogis(t, mu_, scale_, true, false);}
+/* @brief Compute the inverse cumulative distribution function at p
+ *  of the standard logistic distribution.
+ *
+ *  The inverse cumulative distribution function (quantile function) of the
+ *  logistic distribution is a generalization of the logit function.
+ *  It is defined as follows:
+ *  \f[
+ *      Q(p;\mu,s) = \mu + s\,\ln\left(\frac{p}{1-p}\right).
+ *  \f]
+ *  @param p a probability number.
+ *  @return the inverse cumulative distribution function value at p.
+ **/
+inline Real Logistic::icdf( Real const& p) const
+{ return R::qlogis(p, mu_, scale_, true, false);}
+/* @brief Generate a pseudo Logistic random variate.
+ *
+ *  Generate a pseudo Logistic random variate with location @c mu and
+ *  scale @c scale parameters.
+ *  @param mu mean of the Logistic distribution
+ *  @param scale scale of the Logistic distribution
+ *  @return a pseudo logistic random variate, centered in @c mu and with
+ *  scale @c scale
+ **/
+inline Real Logistic::rand( Real const& mu, Real const& scale)
+{ return R::rlogis(mu, scale);}
+/* @param x a real value
+ *  @param mu mean of the logistic law
+ *  @param scale scale of the logistic law
+ *  @return the value of the logistic pdf at @c x
+ **/
+inline Real Logistic::pdf( Real const& x, Real const& mu, Real const& scale)
+{ return R::dlogis(x, mu, scale, false);}
+/* @return Give the value of the log-pdf at x.
+ *  @param x a real value
+ *  @param mu mean of the logistic law
+ *  @param scale scale of the logistic law
+ **/
+inline Real Logistic::lpdf( Real const& x, Real const& mu, Real const& scale)
+{ return R::dlogis(x, mu, scale, true);}
+/* @brief Compute the cumulative distribution function at t of
+ *  the standard logistic distribution.
+ *
+ *  @param t a real value
+ *  @return the cumulative distribution function value at t
+ **/
+inline Real Logistic::cdf( Real const& t, Real const& mu, Real const& scale)
+{ return R::plogis(t, mu, scale, true, false);}
+/* @brief Compute the inverse cumulative distribution function at p
+ *  of the standard logistic distribution.
+ *
+ *  @param p a probability number.
+ *  @return the inverse cumulative distribution function value at p.
+ **/
+inline Real Logistic::icdf( Real const& p, Real const& mu, Real const& scale)
+{ return R::qlogis(p, mu, scale, true, false);}
+
+#else
 
 /* @brief Generate a pseudo logisticized Logistic random variate.
  *

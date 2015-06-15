@@ -32,14 +32,17 @@
  *  @brief In this file we implement the Gamma distribution.
  **/
 
-#ifndef IS_RTKPP_LIB
 #include "../include/STK_Law_Gamma.h"
+
+#ifndef IS_RTKPP_LIB
 #include "../include/STK_Law_Exponential.h"
 #include "../include/STK_Law_Util.h"
-
 #include <Analysis/include/STK_Funct_raw.h>
 #include <Analysis/include/STK_Funct_gammaRatio.h>
+#else
+#include <Rcpp.h>
 #endif
+
 
 namespace STK
 {
@@ -47,11 +50,37 @@ namespace STK
 namespace Law
 {
 
-#ifndef IS_RTKPP_LIB
-/* @brief generate a gamma random variate using the G.S algorithm
- *  of Ahrens and Dieter (1974) for 0<a_<1
- *  and the Fishman (1976) algorithm for a_>1.
- **/
+#ifdef IS_RTKPP_LIB
+
+inline Real Gamma::rand() const
+{ return R::rgamma(a_, b_);}
+inline Real Gamma::pdf( Real const& x) const
+{ return R::dgamma(x, a_, b_, false);}
+inline Real Gamma::lpdf( Real const& x) const
+{  return R::dgamma(x, a_, b_, true);}
+inline Real Gamma::cdf( Real const& t) const
+{ return R::pgamma(t, a_, b_, true, false);}
+/*  Give the quantile t such that the probability of a random variate
+ *  is less to t is equal to p.
+ */
+inline Real Gamma::icdf( Real const& p) const
+{ return R::qgamma(p, a_, b_, true, false);}
+inline Real Gamma::rand( Real const& a, Real const& b)
+{ return R::rgamma(a, b);}
+inline Real Gamma::pdf( Real const& x, Real const& a, Real const& b)
+{ return R::dgamma(x, a, b, false);}
+inline Real Gamma::lpdf( Real const& x, Real const& a, Real const& b)
+{ return R::dgamma(x, a, b, true);}
+/* @return the cumulative distribution function */
+inline Real Gamma::cdf(Real const& t, Real const& a, Real const& b)
+{ return R::pgamma(t, a, b, true, false);}
+/* @return the inverse cumulative distribution function */
+inline Real Gamma::icdf(Real const& p, Real const& a, Real const& b)
+{ return R::qgamma(p, a, b, true, false);}
+
+#else
+
+/* @brief generate a gamma random variate using the G.S algorithm */
 Real Gamma::rand() const
 {
   // GS algorithm for parameter a_ < 1.

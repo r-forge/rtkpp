@@ -38,8 +38,8 @@
 #define STK_IMIXTUREMODEL_H
 
 #include "STK_IMixtureModelBase.h"
-#include "Arrays/include/STK_Array1D.h"
-#include "Arrays/include/STK_Array2D.h"
+#include <Arrays/include/STK_Array1D.h>
+#include <Arrays/include/STK_Array2D.h>
 
 #ifdef STK_MIXTURE_DEBUG
 #include "Arrays/include/STK_Display.h"

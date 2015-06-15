@@ -39,6 +39,7 @@
 
 #include "STK_IGaussianModel.h"
 #include <STatistiK/include/STK_Stat_MultivariateReal.h>
+#include <STatistiK/include/STK_MultiLaw_Normal.h>
 
 namespace STK
 {

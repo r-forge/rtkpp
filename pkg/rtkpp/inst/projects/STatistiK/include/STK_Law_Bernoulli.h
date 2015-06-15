@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2013  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as
@@ -36,8 +36,8 @@
 #define STK_LAW_BERNOULLI_H
 
 #include "STK_Law_IUnivLaw.h"
-#include "Sdk/include/STK_Macros.h"
-#include "STKernel/include/STK_Binary.h"
+#include <Sdk/include/STK_Macros.h>
+#include <STKernel/include/STK_Binary.h>
 
 namespace STK
 {

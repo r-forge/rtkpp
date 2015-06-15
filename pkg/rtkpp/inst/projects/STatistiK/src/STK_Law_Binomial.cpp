@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2013  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as
@@ -36,7 +36,10 @@
 
 #ifndef IS_RTKPP_LIB
 #include "Analysis/include/STK_Funct_raw.h"
+#else
+#include <Rcpp.h>
 #endif
+
 
 namespace STK
 {
@@ -44,7 +47,30 @@ namespace STK
 namespace Law
 {
 
-#ifndef IS_RTKPP_LIB
+#ifdef IS_RTKPP_LIB
+
+inline int Binomial::rand() const { return (int)R::rbinom(n_, prob_);}
+inline Real Binomial::pdf(int const& x) const
+{ return (Real)R::dbinom((double)x, (double)n_, prob_, false);}
+inline Real Binomial::lpdf(int const& x) const
+{ return (Real)R::dbinom((double)x, (double)n_, prob_, true);}
+inline Real Binomial::cdf(Real const& t) const
+{ return (Real)R::pbinom(t, (double)n_, prob_, true, false);}
+inline int Binomial::icdf(Real const& p) const
+{ return (int)R::qbinom(p, (double)n_, prob_, true, false);}
+
+inline int Binomial::rand(int n, Real const& prob)
+{ return (int)R::rbinom(n, prob);}
+inline Real Binomial::pdf(int x, int n, Real const& prob)
+{ return (Real)R::dbinom(x, (double)n, prob, false);}
+inline Real Binomial::lpdf(int x, int n, Real const& prob)
+{ return (Real)R::dbinom((double)x, (double)n, prob, true);}
+inline Real Binomial::cdf(Real const& t, int n, Real const& prob)
+{ return (Real)R::pbinom(t, (double)n, prob, true, false);}
+inline int Binomial::icdf(Real const& p, int n, Real const& prob)
+{ return (int)R::qbinom(p, (double)n, prob, true, false);}
+
+#else
 
 int Binomial::rand() const
 {

@@ -32,8 +32,10 @@
  *  @brief In this file we implement the FisherSnedecor probability distribution.
  **/
 
-#ifndef IS_RTKPP_LIB
 #include "../include/STK_Law_FisherSnedecor.h"
+
+#ifdef IS_RTKPP_LIB
+#include <Rcpp.h>
 #endif
 
 
@@ -43,7 +45,62 @@ namespace STK
 namespace Law
 {
 
-#ifndef IS_RTKPP_LIB
+#ifdef IS_RTKPP_LIB
+
+/* @return a pseudo FisherSnedecor random variate. */
+inline Real FisherSnedecor::rand() const
+{ return R::rf(df1_, df2_);}
+/* @return the value of the pdf
+ *  @param x a positive real value
+ **/
+inline Real FisherSnedecor::pdf(Real const& x) const
+{ return R::df(x, df1_, df2_, false);}
+/* @return the value of the log-pdf
+ *  @param x a positive real value
+ **/
+inline Real FisherSnedecor::lpdf(Real const& x) const
+{ return R::df(x, df1_, df2_, true);}
+/* @return the cumulative distribution function
+ *  @param t a positive real value
+ **/
+inline Real FisherSnedecor::cdf(Real const& t) const
+{ return R::pf(t, df1_, df2_, true, false);}
+/* @return the inverse cumulative distribution function
+ *  @param p a probability number
+ **/
+inline Real FisherSnedecor::icdf(Real const& p) const
+{ return R::qf(p, df1_, df2_, true, false);}
+/* @return a pseudo FisherSnedecor random variate with the specified parameters.
+ *  @param df1, df2 degree of freedom parameters
+ **/
+inline Real FisherSnedecor::rand( int df1, int df2)
+{ return R::rf(df1, df2);}
+/* @return the value of the pdf
+ *  @param x a positive real value
+ *  @param df1, df2 degree of freedom parameters
+ **/
+inline Real FisherSnedecor::pdf(Real const& x, int df1, int df2)
+{ return R::df(x, df1, df2, false);}
+/* @return the value of the log-pdf
+ *  @param x a positive real value
+ *  @param df1, df2 degree of freedom parameters
+ **/
+inline Real FisherSnedecor::lpdf(Real const& x, int df1, int df2)
+{ return R::df(x, df1, df2, true);}
+/* @return the cumulative distribution function
+ *  @param t a positive real value
+ *  @param df1, df2 degree of freedom parameters
+ **/
+inline Real FisherSnedecor::cdf(Real const& t, int df1, int df2)
+{  return R::pf(t, df1, df2, true, false);}
+/* @return the inverse cumulative distribution function
+ *  @param p a probability number
+ *  @param df1, df2 degree of freedom parameters
+ **/
+inline Real FisherSnedecor::icdf(Real const& p, int df1, int df2)
+{  return R::qf(p, df1, df2, true, false);}
+
+#else
 
 /* @return a pseudo FisherSnedecor random variate. */
 Real FisherSnedecor::rand() const

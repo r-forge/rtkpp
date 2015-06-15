@@ -32,8 +32,10 @@
  *  @brief In this file we implement the LogNormal probability law class.
  **/
 
-#ifndef IS_RTKPP_LIB
 #include "../include/STK_Law_LogNormal.h"
+
+#ifdef IS_RTKPP_LIB
+#include <Rcpp.h>
 #endif
 
 namespace STK
@@ -42,7 +44,84 @@ namespace STK
 namespace Law
 {
 
-#ifndef IS_RTKPP_LIB
+#ifdef IS_RTKPP_LIB
+/* @brief Generate a pseudo log-normalized LogNormal random variate.
+ *
+ *  Generate a pseudo log-normalized LogNormal random variate
+ *  with location parameter @c mu_ and sigma @c sigma_.
+ *  @return a pseudo log-normal random variate
+ **/
+inline Real LogNormal::rand() const
+{ return R::rlnorm(mu_, sigma_);}
+/* @param x a real value
+ *  @return the value of the log-normal pdf at @c x
+ **/
+inline Real LogNormal::pdf( Real const& x) const
+{ return R::dlnorm(x, mu_, sigma_, false);}
+/* @return Give the value of the log-pdf at x.
+ *  @param x a real value
+ **/
+inline Real LogNormal::lpdf( Real const& x) const
+{ return R::dlnorm(x, mu_, sigma_, true);}
+/* @brief Compute the cumulative distribution function at t of
+ *  the standard log-normal distribution.
+ *  @param t a real value
+ *  @return the cumulative distribution function value at t
+ **/
+inline Real LogNormal::cdf( Real const& t) const
+{ return R::plnorm(t, mu_, sigma_, true, false);}
+/* @brief Compute the inverse cumulative distribution function at p
+ *  of the standard log-normal distribution.
+ *
+ *  @param p a probability number.
+ *  @return the inverse cumulative distribution function value at p.
+ **/
+inline Real LogNormal::icdf( Real const& p) const
+{ return R::qlnorm(p, mu_, sigma_, true, false);}
+/* @brief Generate a pseudo LogNormal random variate.
+ *
+ *  Generate a pseudo LogNormal random variate with location @c mu and
+ *  sigma @c sigma parameters.
+ *  @param mu location of the LogNormal distribution
+ *  @param sigma sigma of the LogNormal distribution
+ *  @return a pseudo log-normal random variate, centered in @c mu and with
+ *  sigma @c sigma
+ **/
+inline Real LogNormal::rand( Real const& mu, Real const& sigma)
+{ return R::rlnorm(mu, sigma);}
+/* @param x a real value
+ *  @param mu location of the log-normal law
+ *  @param sigma sigma of the log-normal law
+ *  @return the value of the log-normal pdf at @c x
+ **/
+inline Real LogNormal::pdf( Real const& x, Real const& mu, Real const& sigma)
+{ return R::dlnorm(x, mu, sigma, false);}
+/* @return Give the value of the log-pdf at x.
+ *  @param x a real value
+ *  @param mu location of the log-normal law
+ *  @param sigma sigma of the log-normal law
+ **/
+inline Real LogNormal::lpdf( Real const& x, Real const& mu, Real const& sigma)
+{ return R::dlnorm(x, mu, sigma, true);}
+/* @brief Compute the cumulative distribution function at t of
+ *  the standard log-normal distribution.
+ *  @param t a real value
+ *  @param mu, sigma location and sigma of the log-normal law
+ *  @return the cumulative distribution function value at t
+ **/
+inline Real LogNormal::cdf( Real const& t, Real const& mu, Real const& sigma)
+{ return R::plnorm(t, mu, sigma, true, false);}
+/* @brief Compute the inverse cumulative distribution function at p
+ *  of the standard log-normal distribution.
+ *
+ *  @param p a probability number.
+ *  @param mu, sigma location and sigma of the log-normal law
+ *  @return the inverse cumulative distribution function value at p.
+ **/
+inline Real LogNormal::icdf( Real const& p, Real const& mu, Real const& sigma)
+{ return R::qlnorm(p, mu, sigma, true, false);}
+
+#else
 
 /* @brief Generate a pseudo log-normalized LogNormal random variate.
  *

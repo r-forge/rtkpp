@@ -36,10 +36,11 @@
 #ifndef STK_CG_H
 #define STK_CG_H
 
-#include "Sdk/include/STK_Macros.h"
-#include "Sdk/include/STK_IRunner.h"
+#include <Sdk/include/STK_Macros.h>
+#include <Sdk/include/STK_IRunner.h>
 
-#define MAXITER 100
+//#include "Arrays/include/STK_Display.h"
+
 namespace STK
 {
 
@@ -85,21 +86,25 @@ struct DefaultFunctor
  * @tparam ColVector The type of the containers for the vectors.
  */
 template<class MultFunctor, class ColVector, class InitFunctor = DefaultFunctor<ColVector> >
-class CG : public IRunnerBase
+class CG
 {
   public:
     typedef typename ColVector::Type Type;
     /** Default Constructor */
-    CG(): x_(), r_(), eps_(0.), p_mult_(0), p_init_(0), p_b_(0) {}
+    CG(): x_(), r_(), eps_(0.), iter_(0), nbStart_(0), p_mult_(0), p_init_(0), p_b_(0) {}
     /**Constructor
      * @param p_mult functor which compute @b Ax with @b A a matrix and @b x a vector
      * @param b from @b Ax=b
      * @param p_init functor which initialize @b x
      * @param eps tolerance
+     * @param max_iter maximal number of iterations
      */
-    CG( MultFunctor const& mult, ColVector const& b, InitFunctor* const& p_init =0, Type eps=Arithmetic<Type>::epsilon())
+    CG( MultFunctor const& mult
+      , ColVector const& b
+      , InitFunctor* const& p_init =0
+      , Type eps=Arithmetic<Type>::epsilon())
       : x_(), r_()
-      , eps_(eps)
+      , eps_(eps), iter_(0), nbStart_(0)
       , p_mult_(&mult)
       , p_init_(p_init)
       , p_b_(&b)
@@ -111,13 +116,13 @@ class CG : public IRunnerBase
     CG( CG const& cg)
       : x_(cg.x_)
       , r_(cg.r_)
-      , eps_(cg.eps_)
+      , eps_(cg.eps_), iter_(cg.iter_), nbStart_(cg.nbStart_)
       , p_mult_(cg.p_mult_)
       , p_init_(cg.p_init_)
       , p_b_(cg.p_b_)
     {}
     /**destructor*/
-    virtual ~CG() {}
+    ~CG() {}
     /** clone pattern */
     CG* clone() const { return new CG(*this);}
 
@@ -125,6 +130,10 @@ class CG : public IRunnerBase
     inline ColVector const& x() const { return x_;}
     /**@return the ith coordinate of the solution of the linear system Ax=b*/
     inline Real const& x(int const& i) const { return x_[i];}
+    /**@return the number of iterations */
+    inline int const& iter() const { return iter_;}
+    /**@return the number of starting */
+    inline int const& nbStart() const { return nbStart_;}
     /**@return the residuals b-A*x*/
     inline ColVector const& r() const { return r_;}
     /** Set the tolerance*/
@@ -135,63 +144,67 @@ class CG : public IRunnerBase
     inline void setMultFunctor(MultFunctor const& mult) { p_mult_= &mult; }
     /** Set functor computing @b x at initialization */
     inline void setInitFunctor(InitFunctor* const& p_init) { p_init_=p_init; }
-    /** run the conjugate gradient */
-    virtual bool run()
-    {
-      try
-      {
-        cg();
-      }
-      catch (Exception const& e)
-      {
-        this->msg_error_ = e.error();
-        return false;
-      }
-      return true;
-    }
+    /** @return the number of iterations or -1 if the maximal number of iteration
+     *  is reached.
+     **/
+    int run() { return cg();}
+    /** get the last error message.
+     * @return the last error message
+     **/
+    inline String const& error() const { return msg_error_;}
 
   protected:
-    void cg()
+    /** String with the last error message. */
+    String msg_error_;
+    /** @return the number of iterations */
+    int cg()
     {
-      int nbStart = 0;
-      ColVector xOld, z, p_;
-
-      Real bnorm2 = p_b_->norm2(), alpha, beta; //
-      int step = 0; //number of step
+      ColVector z, p, xold, rold;
+      Real rnorm2_old = p_b_->norm2(), rnorm2_new, alpha;
+      if (rnorm2_old == 0.) rnorm2_old = 1.;
       // initialization
-      if(!p_init_) {x_ = *p_b_;}
-      else { x_ = (*p_init_)();}
-      while(nbStart<2)
+      if (!p_init_) { x_ = *p_b_;}        // set x_{-1} = 0 give x_0 = b_
+      else          { x_ = (*p_init_)();} // set x_0
+      // compute initial residuals
+      r_ = *p_b_ - (*p_mult_)(x_);
+      // start iterations
+      for(nbStart_ = 1; ; nbStart_++)
       {
-        if (bnorm2 == 0.) bnorm2 = 1.;
-        //compute the residuals
-        r_ = *p_b_ - (*p_mult_)(x_);
-        if (r_.norm2()/bnorm2 <eps_) { break;}
+        iter_ = 0;
+        // compute rnomr2_new and check convergence
+        if (((rnorm2_new = r_.norm2())/ rnorm2_old) <eps_) { return iter_;}
         //initialization of the conjugate direction
-        p_= r_;
-        while(1)
+        p = r_;
+        for( iter_=1; iter_ < p_b_->size() ; iter_++)
         {
+          // save old values
+          xold.exchange(x_);
+          rold.exchange(r_);
+          rnorm2_old = rnorm2_new;
           //compute z=A p
-          z.move((*p_mult_)(p_));
+          z.move((*p_mult_)(p));
           //compute alpha
-          Real rnorm2 = r_.norm2();
-          alpha = rnorm2/p_.dot(z);
-          //update x_
-          xOld.exchange(x_);
-          x_ = xOld + (alpha * p_);
-          //update residuals
-          r_ -= alpha * z;
-          //compute beta
-          beta = 1/rnorm2;
-          if ((rnorm2=r_.norm2())/bnorm2 <eps_) { nbStart = 2; break;}
+          alpha = rnorm2_old/p.dot(z);
+          //update x_ and r_
+          x_ = xold + (alpha * p);
+          r_ = rold - alpha * z;
+          // compute rnorm2_new and check divergence/convergence
+          if ( (rnorm2_new=r_.norm2()) > rnorm2_old) { break; }
+          Real beta = rnorm2_new/rnorm2_old;
+          if ( beta < eps_) { return iter_;}
           //update p_
-          p_ = (p_ * (beta * rnorm2)) + r_;
-          step++;
-          if( step > MAXITER )
-            STKRUNTIME_ERROR_NO_ARG(CG::cg,CG reaches MAXITER before convergence);
+          p = (p * beta) + r_;
         }
-        nbStart++;
-      };
+        // restore x_ and r_
+        xold.exchange(x_);
+        rold.exchange(r_);
+        // in case of divergence at the first iterations, it means we don't have
+        // any solution to the system (residuals cannot be zero)
+        // compute initial residuals
+        if (iter_ <= 2) { return iter_;}
+      }
+      // return an error
+      return -1;
     }
 
   private:
@@ -201,6 +214,10 @@ class CG : public IRunnerBase
     ColVector r_;
     /** tolerance */
     Type eps_;
+    /** number of iterations */
+    int iter_;
+    /** number of restart_ */
+    int nbStart_;
     /** pointer on the functor performing @b Ax */
     MultFunctor const*  p_mult_;
     /** pointer on the functor initializing @b x*/
@@ -362,8 +379,8 @@ class PCG : public IRunnerBase
           //update p_
           p = (p * beta) + y;
           step++;
-          if( step > MAXITER )
-            throw runtime_error("CG reaches MAXITER before convergence.");
+          if( step > p_b_->size() )
+            throw runtime_error("CG reaches p_b_->size() before convergence.");
         }
         nbStart++;
       };

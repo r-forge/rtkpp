@@ -46,53 +46,21 @@ namespace Law
 #ifdef IS_RTKPP_LIB
 
 /* @return a pseudo ChiSquared random variate. */
-inline Real ChiSquared::rand() const
+/*inline*/ Real ChiSquared::rand() const
 { return R::rchisq(df_);}
 /* @return the value of the pdf
  *  @param x a positive real value
  **/
-inline Real ChiSquared::pdf(const Real& x) const
-{ return R::dchisq(x, df_, false);}
-inline Real ChiSquared::lpdf(const Real& x) const
-{ return R::dchisq(x, df_, true);}
-/* @return the cumulative distribution function
- *  @param t a positive real value
- **/
-inline Real ChiSquared::cdf(const Real& t) const
-{ return R::pchisq(t, df_, true, false);}
-/* @return the inverse cumulative distribution function
- *  @param p a probability number
- **/
-inline Real ChiSquared::icdf(const Real& p) const
-{ return R::qchisq(p, df_, true, false);}
-/* @return a pseudo ChiSquared random variate with the specified parameters.
- *  @param df degree of freedom parameter
- **/
-inline Real ChiSquared::rand(int df){ return R::rchisq(df);}
-/* @return the value of the pdf
- *  @param x a positive real value
- *  @param df degree of freedom parameter
- **/
-inline Real ChiSquared::pdf(const Real& x, int df)
-{ return R::dchisq(x, df, false);}
-/* @return the value of the log-pdf
- *  @param x a positive real value
- *  @param df degree of freedom parameter
- **/
-inline Real ChiSquared::lpdf(const Real& x, int df)
-{ return R::dchisq(x, df, true);}
-/* @return the cumulative distribution function
- *  @param t a positive real value
- *  @param df degree of freedom parameter
- **/
-inline Real ChiSquared::cdf(const Real& t, int df)
-{ return R::pchisq(t, df, true, false);}
-/* @return the inverse cumulative distribution function
- *  @param p a probability number
- *  @param df degree of freedom parameter
- **/
-inline Real ChiSquared::icdf(const Real& p, int df)
-{ return R::qchisq(p, df, true, false);}
+/*inline*/ Real ChiSquared::pdf(const Real& x) const { return R::dchisq(x, df_, false);}
+/*inline*/ Real ChiSquared::lpdf(const Real& x) const { return R::dchisq(x, df_, true);}
+/*inline*/ Real ChiSquared::cdf(const Real& t) const { return R::pchisq(t, df_, true, false);}
+/*inline*/ Real ChiSquared::icdf(const Real& p) const { return R::qchisq(p, df_, true, false);}
+
+/*inline*/ Real ChiSquared::rand(int df){ return R::rchisq(df);}
+/*inline*/ Real ChiSquared::pdf(const Real& x, int df) { return R::dchisq(x, df, false);}
+/*inline*/ Real ChiSquared::lpdf(const Real& x, int df) { return R::dchisq(x, df, true);}
+/*inline*/ Real ChiSquared::cdf(const Real& t, int df) { return R::pchisq(t, df, true, false);}
+/*inline*/ Real ChiSquared::icdf(const Real& p, int df) { return R::qchisq(p, df, true, false);}
 
 #else
 

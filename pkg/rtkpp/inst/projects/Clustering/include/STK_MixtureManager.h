@@ -36,7 +36,7 @@
 #ifndef STK_MIXTUREMANAGER_H
 #define STK_MIXTUREMANAGER_H
 
-#include <DManager/include/STK_IDataHandler.h>
+#include <DManager/include/STK_DataHandlerBase.h>
 
 #include "CategoricalMixtureModels/STK_CategoricalMixtureManager.h"
 #include "GammaMixtureModels/STK_GammaMixtureManager.h"
@@ -61,7 +61,7 @@ namespace STK
  *  It allows to handle all the creation and initialization stuff needed by the
  *  (bridged) mixture models of the stkpp library.
  *
- *  @tparam DataHandler is any concrete class from the interface IDataHandler
+ *  @tparam DataHandler is any concrete class from the interface DataHandlerBase
  */
 template<class DataHandler>
 class MixtureManager : public IMixtureManager<DataHandler>
@@ -312,7 +312,7 @@ template<class DataHandler>
 void MixtureManager<DataHandler>::createMixtures(MixtureComposer& composer)
 {
   int nbCluster = composer.nbCluster();
-  typedef typename IDataHandler<DataHandler>::InfoMap InfoMap;
+  typedef typename DataHandlerBase<DataHandler>::InfoMap InfoMap;
   for ( typename InfoMap::const_iterator it=p_handler()->info().begin(); it!=p_handler()->info().end(); ++it)
   {
     IMixture* p_mixture = createMixtureImpl(it->second, it->first, nbCluster);

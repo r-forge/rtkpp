@@ -28,21 +28,14 @@
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
 
-/** @file STK_ProductImpl.h
- *  @brief In this file we implement the matrix-matrix product static methods.
+/** @file STK_ProductDispatcher.h
+ *  @brief In this file we select the product method to use.
  **/
 
-#ifndef STK_PRODUCTIMPL_H
-#define STK_PRODUCTIMPL_H
+#ifndef STK_PRODUCTDISPATCHER_H
+#define STK_PRODUCTDISPATCHER_H
 
-namespace STK
-{
-/* size of the block and panels used in the product algorithm */
-const int blockSize = 4;
-const int panelSize = 64;
-const int vectorSize = 256;
-}
-
+#include "STK_ProductRaw.h"
 #include "STK_ArrayByVectorProduct.h"
 #include "STK_ArrayByArrayProduct.h"
 
@@ -57,7 +50,7 @@ namespace hidden
 template < class Lhs, class Rhs, class Result
          , int lhsStructure_ = hidden::Traits<Lhs>::structure_
          , int RhsStructure_ = hidden::Traits<Rhs>::structure_ >
-struct ProductImpl
+struct ProductDispatcher
 {
   typedef MultCoefImpl<Lhs, Rhs, Result> MultCoeff;
 
@@ -83,7 +76,7 @@ struct ProductImpl
 
 /** Specialization for the array2d by array2D case. */
 template <class Lhs, class Rhs, class Result>
-struct ProductImpl<Lhs, Rhs, Result, Arrays::array2D_, Arrays::array2D_>
+struct ProductDispatcher<Lhs, Rhs, Result, Arrays::array2D_, Arrays::array2D_>
 {
   static inline void runbp(Lhs const& lhs, Rhs const& rhs, Result& res )
   { bp<Lhs,Rhs,Result>::run(lhs, rhs, res);}
@@ -92,7 +85,7 @@ struct ProductImpl<Lhs, Rhs, Result, Arrays::array2D_, Arrays::array2D_>
 };
 
 template <class Lhs, class Rhs, class Result>
-struct ProductImpl<Lhs, Rhs, Result, Arrays::array2D_, Arrays::square_>
+struct ProductDispatcher<Lhs, Rhs, Result, Arrays::array2D_, Arrays::square_>
 {
   static inline void runbp(Lhs const& lhs, Rhs const& rhs, Result& res )
   { bp<Lhs,Rhs,Result>::run(lhs, rhs, res);}
@@ -101,7 +94,7 @@ struct ProductImpl<Lhs, Rhs, Result, Arrays::array2D_, Arrays::square_>
 };
 
 template <class Lhs, class Rhs, class Result>
-struct ProductImpl<Lhs, Rhs, Result, Arrays::square_, Arrays::square_>
+struct ProductDispatcher<Lhs, Rhs, Result, Arrays::square_, Arrays::square_>
 {
   static inline void runbp(Lhs const& lhs, Rhs const& rhs, Result& res )
   { bp<Lhs,Rhs,Result>::run(lhs, rhs, res);}
@@ -110,7 +103,7 @@ struct ProductImpl<Lhs, Rhs, Result, Arrays::square_, Arrays::square_>
 };
 
 template <class Lhs, class Rhs, class Result>
-struct ProductImpl<Lhs, Rhs, Result, Arrays::square_, Arrays::array2D_>
+struct ProductDispatcher<Lhs, Rhs, Result, Arrays::square_, Arrays::array2D_>
 {
   static inline void runbp(Lhs const& lhs, Rhs const& rhs, Result& res )
   { bp<Lhs,Rhs,Result>::run(lhs, rhs, res);}
@@ -119,21 +112,21 @@ struct ProductImpl<Lhs, Rhs, Result, Arrays::square_, Arrays::array2D_>
 };
 
 template <class Lhs, class Rhs, class Result>
-struct ProductImpl<Lhs, Rhs, Result, Arrays::array2D_, Arrays::vector_>
+struct ProductDispatcher<Lhs, Rhs, Result, Arrays::array2D_, Arrays::vector_>
 {
   static inline void run(Lhs const& lhs, Rhs const& rhs, Result& res )
   { bv<Lhs,Rhs,Result>::run(lhs, rhs, res);}
 };
 
 template <class Lhs, class Rhs, class Result>
-struct ProductImpl<Lhs, Rhs, Result, Arrays::square_, Arrays::vector_>
+struct ProductDispatcher<Lhs, Rhs, Result, Arrays::square_, Arrays::vector_>
 {
   static inline void run(Lhs const& lhs, Rhs const& rhs, Result& res )
   { bv<Lhs,Rhs,Result>::run(lhs, rhs, res);}
 };
 
 template <class Lhs, class Rhs, class Result, int lhsStructure_>
-struct ProductImpl<Lhs, Rhs, Result, lhsStructure_, Arrays::vector_>
+struct ProductDispatcher<Lhs, Rhs, Result, lhsStructure_, Arrays::vector_>
 {
   typedef MultCoefImpl<Lhs, Rhs, Result> MultCoeff;
   static void run(Lhs const& lhs, Rhs const& rhs, Result& res )
@@ -145,7 +138,7 @@ struct ProductImpl<Lhs, Rhs, Result, lhsStructure_, Arrays::vector_>
 
 
 template <class Lhs, class Rhs, class Result, int RhsStructure_>
-struct ProductImpl<Lhs, Rhs, Result, Arrays::point_, RhsStructure_>
+struct ProductDispatcher<Lhs, Rhs, Result, Arrays::point_, RhsStructure_>
 {
   typedef MultCoefImpl<Lhs, Rhs, Result> MultCoeff;
   static void run(Lhs const& lhs, Rhs const& rhs, Result& res )
@@ -156,14 +149,14 @@ struct ProductImpl<Lhs, Rhs, Result, Arrays::point_, RhsStructure_>
 };
 
 template <class Lhs, class Rhs, class Result>
-struct ProductImpl<Lhs, Rhs, Result, Arrays::point_, Arrays::array2D_>
+struct ProductDispatcher<Lhs, Rhs, Result, Arrays::point_, Arrays::array2D_>
 {
   static inline void run(Lhs const& lhs, Rhs const& rhs, Result& res )
   { vb<Lhs,Rhs,Result>::run(lhs, rhs, res);}
 };
 
 template <class Lhs, class Rhs, class Result>
-struct ProductImpl<Lhs, Rhs, Result, Arrays::point_, Arrays::square_>
+struct ProductDispatcher<Lhs, Rhs, Result, Arrays::point_, Arrays::square_>
 {
   static inline void run(Lhs const& lhs, Rhs const& rhs, Result& res )
   { vb<Lhs,Rhs,Result>::run(lhs, rhs, res);}
@@ -173,4 +166,4 @@ struct ProductImpl<Lhs, Rhs, Result, Arrays::point_, Arrays::square_>
 
 } // namespace STK
 
-#endif /* STK_PRODUCTIMPL_H */
+#endif /* STK_PRODUCTDISPATCHER_H */

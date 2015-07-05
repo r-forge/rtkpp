@@ -36,9 +36,7 @@
 
 #ifdef IS_RTKPP_LIB
 #include <Rcpp.h>
-#endif
-
-#ifndef IS_RTKPP_LIB
+#else
 #include "../include/STK_Law_Util.h"
 #include <Analysis/include/STK_Funct_raw.h>
 
@@ -75,6 +73,7 @@ const STK::Real d[4] =
  , 2.445134137142996e+00
  , 3.754408661907416e+00
 };
+
 #endif
 
 namespace STK
@@ -87,29 +86,25 @@ namespace Law
 #ifdef IS_RTKPP_LIB
 
 /*  Generate a pseudo Normal random variate. */
-inline Real Normal::rand() const { return R::rnorm(mu_, sigma_);}
-/*  Give the value of the pdf at x. */
-inline Real Normal::pdf( Real const& x) const { return R::dnorm(x,mu_, sigma_, false);}
-/* Give the value of the log-pdf at x. */
-inline Real Normal::lpdf( Real const& x) const { return R::dnorm(x,mu_, sigma_, true);}
-/* The cumulative distribution function at t. */
-inline Real Normal::cdf( Real const& t) const { return R::pnorm(t, mu_, sigma_, true, false);}
-/* The inverse cumulative distribution function at p. */
-inline Real Normal::icdf( Real const& p) const { return R::qnorm(p , mu_, sigma_, true, false);}
+/*inline*/ Real Normal::rand() const { return R::rnorm(mu_, sigma_);}
+/*inline*/ Real Normal::pdf( Real const& x) const { return R::dnorm(x, mu_, sigma_, false);}
+/*inline*/ Real Normal::lpdf( Real const& x) const { return R::dnorm(x, mu_, sigma_, true);}
+/*inline*/ Real Normal::cdf( Real const& t) const { return R::pnorm(t, mu_, sigma_, true, false);}
+/*inline*/ Real Normal::icdf( Real const& p) const { return R::qnorm(p , mu_, sigma_, true, false);}
 
 // static
-inline Real Normal::rand( Real const& mu, Real const& scale)
+/*inline*/ Real Normal::rand( Real const& mu, Real const& scale)
 { return R::rnorm(mu, scale);}
-inline Real Normal::pdf(Real const& x, Real const& mu, Real const& scale)
+/*inline*/ Real Normal::pdf(Real const& x, Real const& mu, Real const& scale)
 { return R::dnorm(x,mu, scale, false);}
-inline Real Normal::lpdf(Real const& x, Real const& mu, Real const& scale)
+/*inline*/ Real Normal::lpdf(Real const& x, Real const& mu, Real const& scale)
 { return R::dnorm(x,mu, scale, true);}
-inline Real Normal::cdf(Real const& t, Real const& mu, Real const& scale)
+/*inline*/ Real Normal::cdf(Real const& t, Real const& mu, Real const& scale)
 { return R::pnorm(t, mu, scale, true, false);}
-inline Real Normal::icdf(Real const& p, Real const& mu, Real const& scale)
+/*inline*/ Real Normal::icdf(Real const& p, Real const& mu, Real const& scale)
 { return R::qnorm(p , mu, scale, true, false);}
 
-#else /* IS_RTKPP_LIB */
+#else /* not IS_RTKPP_LIB */
 
 /*  Generate a pseudo Normal random variate. */
 Real Normal::rand() const

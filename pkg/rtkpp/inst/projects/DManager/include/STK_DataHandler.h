@@ -38,7 +38,7 @@
 
 #include <vector>
 
-#include "STK_IDataHandler.h"
+#include "STK_DataHandlerBase.h"
 #include "STK_ReadWriteCsv.h"
 #include "Arrays/include/STK_Array2D.h"
 
@@ -61,17 +61,17 @@ struct DataHandlerTraits<DataHandler, Type>
 } // namespace hidden
 
 /** @ingroup DManager
- *  @c implementation of the IDataHandler class using ReadWriteCsv and Array2D.
+ *  @c implementation of the DataHandlerBase class using ReadWriteCsv and Array2D.
  *  The DataHandler class allow to read various csv files with their description
  *  files and to get the columns identified by an idData in an @c Array2D.
  *  All data are stored in memory in a ReadWriteCsv structure.
  */
-class DataHandler : public IDataHandler<DataHandler>
+class DataHandler : public DataHandlerBase<DataHandler>
 {
   public:
-    typedef IDataHandler<DataHandler>::InfoMap InfoMap;
+    typedef DataHandlerBase<DataHandler>::InfoMap InfoMap;
     /** default constructor */
-    inline DataHandler() : IDataHandler(), withNames_(false)
+    inline DataHandler() : DataHandlerBase(), withNames_(false)
     { data_.setWithNames(false); descriptor_.setWithNames(false);}
     /** destructor */
     inline ~DataHandler() {}

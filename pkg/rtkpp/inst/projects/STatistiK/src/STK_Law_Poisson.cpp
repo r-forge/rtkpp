@@ -56,22 +56,22 @@ namespace Law
 #ifdef IS_RTKPP_LIB
 
 /* @return a Poisson random variate . */
-inline int Poisson::rand() const { return (int)R::rpois(lambda_);}
-inline Real Poisson::pdf(int const& x) const { return R::dpois((double)x, lambda_, false);}
-inline Real Poisson::lpdf(int const& x) const { return R::dpois((double)x, lambda_, true);}
-inline Real Poisson::cdf(Real const& t) const { return R::ppois(t, lambda_, true, false);}
-inline int Poisson::icdf(Real const& p) const { return (int)R::qpois(p, lambda_, true, false);}
+/*inline*/ int Poisson::rand() const { return (int)R::rpois(lambda_);}
+/*inline*/ Real Poisson::pdf(int const& x) const { return R::dpois((double)x, lambda_, false);}
+/*inline*/ Real Poisson::lpdf(int const& x) const { return R::dpois((double)x, lambda_, true);}
+/*inline*/ Real Poisson::cdf(Real const& t) const { return R::ppois(t, lambda_, true, false);}
+/*inline*/ int Poisson::icdf(Real const& p) const { return (int)R::qpois(p, lambda_, true, false);}
 
 /* static */
-inline int Poisson::rand(Real const& lambda)
+/*inline*/ int Poisson::rand(Real const& lambda)
 {return (int)R::rpois(lambda);}
-inline Real Poisson::pdf(int const& x, Real const& lambda)
+/*inline*/ Real Poisson::pdf(int const& x, Real const& lambda)
 { return R::dpois((double)x, lambda, false);}
-inline Real Poisson::lpdf(int const& x, Real const& lambda)
+/*inline*/ Real Poisson::lpdf(int const& x, Real const& lambda)
 { return R::dpois((double)x, lambda, true);}
-inline Real Poisson::cdf(Real const& t, Real const& lambda)
+/*inline*/ Real Poisson::cdf(Real const& t, Real const& lambda)
 { return R::ppois(t, lambda, true, false);}
-inline int Poisson::icdf(Real const& p, Real const& lambda)
+/*inline*/ int Poisson::icdf(Real const& p, Real const& lambda)
 { return (int)R::qpois(p, lambda, true, false);}
 
 #else

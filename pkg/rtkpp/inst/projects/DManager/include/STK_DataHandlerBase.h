@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2013  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -29,17 +29,18 @@
  **/
 
 /** @file STK_DataHandler.h
- *  @brief In this file we define the interface class IDataHandler.
+ *  @brief In this file we define the interface class DataHandlerBase.
  **/
 
 
-#ifndef STK_IDATAHANDLER_H
-#define STK_IDATAHANDLER_H
+#ifndef STK_DATAHANDLERBASE_H
+#define STK_DATAHANDLERBASE_H
 
 #include <map>
 #include <string>
 
-#include "STKernel/include/STK_Stream.h"
+#include <STKernel/include/STK_Stream.h>
+#include <Sdk/include/STK_IRecursiveTemplate.h>
 
 namespace STK
 {
@@ -47,25 +48,24 @@ namespace hidden
 {
 /** @ingroup hidden
  *  The DataHandlerTraits will give the type of container furnished by the
- *  concrete implementations of the IDataHandler class.
+ *  concrete implementations of the DataHandlerBase class.
  **/
-template<class DataHandler, typename Type>
-struct DataHandlerTraits
-{};
+template<class DataHandler, typename Type> struct DataHandlerTraits;
 
 } // namespace hidden
 
 /** @ingroup DManager
  *  A DataHandler class allow to store various data set idetified with an idData
  */
-class IDataHandler
+template<class Derived>
+class DataHandlerBase : public IRecursiveTemplate<Derived>
 {
   public:
     typedef std::map<std::string, std::string> InfoMap;
     /** default constructor */
-    inline IDataHandler() {}
+    inline DataHandlerBase() {}
     /** destructor */
-    inline virtual ~IDataHandler() {}
+    inline ~DataHandlerBase() {}
     /** @return the map with the idDatas and idModel of the models */
     inline InfoMap const& info() const { return info_;}
     /** @brief Add an info descriptor to the data handler.
@@ -90,9 +90,9 @@ class IDataHandler
      **/
     bool getIdModelName(std::string const& idData, std::string& idModel) const;
     /** @return the number of sample (the number of rows of the data) */
-    virtual int nbSample() const =0;
+    inline int nbSample() const { return this->asDerived().nbSampleImpl();}
     /** @return the number of variables (the number of columns of the data) */
-    virtual int nbVariable() const =0;
+    inline int nbVariable() const { return  this->asDerived().nbVariableImpl();}
     /** write the info on os */
     void writeInfo(ostream& os) const;
 
@@ -104,14 +104,17 @@ class IDataHandler
     InfoMap info_;
 };
 
-inline void IDataHandler::writeInfo(ostream& os) const
+
+template<class Derived>
+void DataHandlerBase<Derived>::writeInfo(ostream& os) const
 {
   // show content
   for (InfoMap::const_iterator it=info_.begin(); it!=info_.end(); ++it)
   os << _T("IdData: ") << it->first << _T(", IdModel: ") << it->second << _T('\n');
 }
 
-inline bool IDataHandler::addInfo(std::string const& idData, std::string const& idModel)
+template<class Derived>
+bool DataHandlerBase<Derived>::addInfo(std::string const& idData, std::string const& idModel)
 {
   // parse descriptor file
   std::pair<InfoMap::iterator,bool> ret;
@@ -123,7 +126,7 @@ inline bool IDataHandler::addInfo(std::string const& idData, std::string const& 
      if (ret.first->second != idModel)
      {
 #ifdef STK_MIXTURE_DEBUG
-       stk_cerr << _T("In IDataHandler::addInfo, There exists an idData with a different idModel.\n");
+       stk_cerr << _T("In DataHandlerBase::addInfo, There exists an idData with a different idModel.\n");
 #endif
        return false;
      }
@@ -138,7 +141,8 @@ inline bool IDataHandler::addInfo(std::string const& idData, std::string const& 
  *  @return @c false if there exists already an idData matched with an other
  *  idModel, @c true otherwise.
  **/
-inline bool IDataHandler::getIdModelName(std::string const& idData, std::string& idModel) const
+template<class Derived>
+bool DataHandlerBase<Derived>::getIdModelName(std::string const& idData, std::string& idModel) const
 {
   bool res = false;
   // show content
@@ -147,6 +151,7 @@ inline bool IDataHandler::getIdModelName(std::string const& idData, std::string&
  return res;
 }
 
+
 } // namespace STK
 
-#endif /* STK_IDATAHANDLER_H */
+#endif /* STK_DATAHANDLERBASE_H */

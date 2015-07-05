@@ -80,10 +80,9 @@
 #include "../projects/Algebra/include/STK_GinvSymmetric.h"
 
 // the lapack classes
-#ifdef STKUSELAPACK
 #include "../projects/Algebra/include/STK_lapack_SymEigen.h"
 #include "../projects/Algebra/include/STK_lapack_Qr.h"
 #include "../projects/Algebra/include/STK_lapack_MultiLeastSquare.h"
-#endif
+
 #endif /*Algebra_H*/
 

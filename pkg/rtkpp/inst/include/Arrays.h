@@ -66,9 +66,6 @@
 #define ARRAYS_H
 
 
-/* Uni-dimensionnal Array. */
-#include "../projects/Arrays/include/STK_Array1D.h"
-
 /* Array2D */
 #include "../projects/Arrays/include/STK_Array2DPoint.h"
 #include "../projects/Arrays/include/STK_Array2DVector.h"
@@ -95,5 +92,7 @@
 /* display arrays and expressions */
 #include "../projects/Arrays/include/STK_Display.h"
 
+/* Uni-dimensionnal Array. */
+#include "../projects/Arrays/include/STK_Array1D.h"
 
 #endif  /* ARRAYS_H */

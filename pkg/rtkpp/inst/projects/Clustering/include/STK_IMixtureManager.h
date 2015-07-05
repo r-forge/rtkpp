@@ -36,7 +36,7 @@
 #ifndef STK_IMIXTUREMANAGER_H
 #define STK_IMIXTUREMANAGER_H
 
-#include <DManager/include/STK_IDataHandler.h>
+#include <DManager/include/STK_DataHandlerBase.h>
 #include <Arrays/include/STK_Array2D.h>
 
 #include "STK_IMixture.h"
@@ -52,7 +52,7 @@ namespace STK
  *  and initialization stuff needed by the mixture models. It allow to get the
  *  parameters and imputed missing values.
  *
- *  @tparam DataHandler is any concrete class from the interface IDataHandler
+ *  @tparam DataHandler is any concrete class from the interface DataHandlerBase
  */
 template<class DataHandler>
 class IMixtureManager

@@ -643,7 +643,7 @@ class ITContainer<Derived, Arrays::vector_> : public ITContainerBase<Derived>
 
   public:
     /** @return the range of the container */
-    inline RowRange const& range() const  { return this->asDerived().rows();}
+    inline RowRange const& range() const  { return Base::rows();}
     /** @return the index of the first element */
     inline int begin() const { return this->asDerived().beginRowsImpl();}
     /**  @return the ending index of the elements */

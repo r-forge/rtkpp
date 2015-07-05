@@ -63,26 +63,23 @@ class ExportToCsv
 {
   public:
     /** Default constructor. Create an instance of ExportToCvs. */
-    inline ExportToCsv(): p_data_(new ReadWriteCsv()), isColNamed_(true)
-    {}
+    inline ExportToCsv(): p_data_(new ReadWriteCsv()) {}
     /** Constructor : create an instance of ExportToCvs with a DataFrame.
      *  @param df the DataFrame to export
      **/
-    inline ExportToCsv( DataFrame const& df): p_data_(new ReadWriteCsv()), isColNamed_(true)
+    inline ExportToCsv( DataFrame const& df): p_data_(new ReadWriteCsv())
     {
-        p_data_->setReserve(df.sizeRows());
-        p_data_->resize(0, df.sizeCols());
-        // for each field Try a String conversion
-        for(int iVar = df.beginCols(), irw = p_data_->begin(); iVar<df.endCols(); iVar++, irw++)
-        { if (df.elt(iVar)) df.elt(iVar)->exportAsString(p_data_->var(irw));}
+      p_data_->setReserve(df.sizeRows());
+      p_data_->resize(df.sizeRows(), df.sizeCols());
+      // for each field Try a String conversion
+      for(int iVar = df.beginCols(), irw = p_data_->begin(); iVar<df.endCols(); iVar++, irw++)
+      { if (df.elt(iVar)) df.elt(iVar)->exportAsString(p_data_->var(irw));}
     }
     /** Constructor : create an instance of ExportToCvs with a ReadWriteCsv.
      *  @param rw the TReadWriteCsv to export
      **/
     template<class Type>
-    ExportToCsv( TReadWriteCsv<Type> const& rw)
-               : p_data_(new ReadWriteCsv())
-               , isColNamed_(true)
+    ExportToCsv( TReadWriteCsv<Type> const& rw): p_data_(new ReadWriteCsv())
     {
       p_data_->setReserve(rw.sizeRows());
       p_data_->resize(rw.sizeRows(), rw.sizeCols());
@@ -92,26 +89,22 @@ class ExportToCsv
       { rw.var(iRw).exportAsString(p_data_->var(iData));}
     }
 
-    /** Instantiates an instance of ExportToCvs with a vector.
-     *  @param A the ITContainer1D to export
+    /** Instantiates an instance of ExportToCvs with an Array1D, a list1D, etc....
+     *  @param A the 1D container to export
      *  @param prefix the prefix of the name to set to the variable
      **/
     template < class Container>
     ExportToCsv( ITContainer1D<Container> const& A, String const& prefix=Csv::DEFAULT_COLUMN_PREFIX)
-               : p_data_(0)
-               , isColNamed_(false)
+               : p_data_(new ReadWriteCsv())
     {
-        typedef typename hidden::Traits<Container>::Type TYPE;
-      // create an empty ReadWriteCsv with no variable name
-      p_data_ = new ReadWriteCsv();
+      typedef typename hidden::Traits<Container>::Type TYPE;
+      // add an empty string variable (an empty column)
       p_data_->setWithNames(true);
-      for(int iVar = A.begin(); iVar<A.end(); iVar++)
-      {
-        // add an empty string variable (an empty column)
-        p_data_->push_back(Variable<String>());
-        p_data_->back().setName(prefix+typeToString<int>(iVar)) ;
-        p_data_->back().push_back(typeToString<TYPE>(A.at(iVar)));
-      }
+      p_data_->push_back(Variable<String>(A.range()));
+      p_data_->back().setName(prefix);
+
+      for(int i = A.begin(); i<A.end(); i++)
+      { p_data_->back()[i] = typeToString(A.at(i));}
     }
 
     /** Instantiates an instance of ExportToCvs with a vector.
@@ -120,20 +113,16 @@ class ExportToCsv
      **/
     template < class Container>
     ExportToCsv( ITContainer<Container, Arrays::vector_> const& A, String const& prefix=Csv::DEFAULT_COLUMN_PREFIX)
-               : p_data_(0)
-               , isColNamed_(false)
+               : p_data_(new ReadWriteCsv())
     {
-        typedef typename hidden::Traits<Container>::Type TYPE;
-      // create an empty ReadWriteCsv with no variable name
-      p_data_ = new ReadWriteCsv();
+      typedef typename hidden::Traits<Container>::Type TYPE;
+      // add an empty string variable (an empty column)
       p_data_->setWithNames(true);
-      for(int iVar = A.begin(); iVar<A.end(); iVar++)
-      {
-        // add an empty string variable (an empty column)
-        p_data_->push_back(Variable<String>());
-        p_data_->back().setName(prefix+typeToString<int>(iVar)) ;
-        p_data_->back().push_back(typeToString<TYPE>(A.at(iVar)));
-      }
+      p_data_->push_back(Variable<String>(A.range()));
+      p_data_->back().setName(prefix);
+
+      for(int i = A.begin(); i<A.end(); i++)
+      { p_data_->back()[i] = typeToString(A[i]);}
     }
     /** Instantiates an instance of ExportToCvs with a point.
      *  @param A the ITContainer1D to export
@@ -141,19 +130,16 @@ class ExportToCsv
      **/
     template < class Container>
     ExportToCsv( ITContainer<Container, Arrays::point_> const& A, String const& prefix=Csv::DEFAULT_COLUMN_PREFIX)
-               : p_data_(0)
-               , isColNamed_(false)
+               : p_data_(new ReadWriteCsv())
     {
-        typedef typename hidden::Traits<Container>::Type TYPE;
-      // create an empty ReadWriteCsv with no variable name
-      p_data_ = new ReadWriteCsv();
-      for(int iVar = A.begin(); iVar<A.end(); iVar++)
-      {
-        // add an empty string variable (an empty column)
-        p_data_->push_back(Variable<String>());
-        p_data_->back().setName(prefix+typeToString<int>(iVar)) ;
-        p_data_->back().push_back(typeToString<TYPE>(A.at(iVar)));
-      }
+      typedef typename hidden::Traits<Container>::Type TYPE;
+      // add an empty string variable (an empty column)
+      p_data_->setWithNames(true);
+      p_data_->push_back(Variable<String>(A.range()));
+      p_data_->back().setName(prefix);
+
+      for(int i = A.begin(); i<A.end(); i++)
+      { p_data_->back()[i] = typeToString(A[i]);}
     }
     /** Instantiates an instance of ExportToCvs with a general array
      *  @param A the IArray2d to export
@@ -161,22 +147,17 @@ class ExportToCsv
      **/
     template <class Container >
     ExportToCsv( ITContainer<Container> const& A, String const& prefix=Csv::DEFAULT_COLUMN_PREFIX)
-               : p_data_(0)
-               , isColNamed_(false)
+               : p_data_(new ReadWriteCsv())
     {
       typedef typename hidden::Traits<Container>::Type TYPE;
-      // create an empty ReadWriteCsv with no name
-      p_data_ = new ReadWriteCsv();
-
-      // for each field try a String conversion
+      p_data_->setWithNames(true);
       for(int iVar = A.beginCols(); iVar<A.endCols(); iVar++)
       {
         // add an empty string variable (an empty column)
-        p_data_->push_back(Variable<String>());
-        p_data_->back().setName(prefix+typeToString<int>(iVar)) ;
-
-        for (int irow=A.beginRows(); irow<A.endRows(); irow++)
-        { p_data_->back().push_back(typeToString<TYPE>(A.at(irow,iVar)));}
+        p_data_->push_back(Variable<String>(A.rows()));
+        p_data_->back().setName(prefix) ;
+        for (int iRow=A.beginRows(); iRow<A.endRows(); iRow++)
+        { p_data_->back()[iRow] = typeToString(A.at(iRow,iVar));}
       }
     }
 
@@ -193,11 +174,11 @@ class ExportToCsv
     {
       typedef typename hidden::Traits<Container>::Type TYPE;
       // add an empty string variable
-      p_data_->push_back(Variable<String>());
+      p_data_->push_back(Variable<String>(A.range()));
       p_data_->back().setName(prefix) ;
       // add strings to the String variable
       for(int i = A.begin(); i< A.end(); i++)
-      { p_data_->back().push_back(typeToString<TYPE>(A.at(i)));}
+      { p_data_->back()[i] = typeToString(A[i]);}
     }
     /** Append a point (as a column vector).
      *  @param A the container to export
@@ -208,13 +189,12 @@ class ExportToCsv
     {
       typedef typename hidden::Traits<Container>::Type TYPE;
       // add an empty string variable
-      p_data_->push_back(Variable<String>());
+      p_data_->push_back(Variable<String>(A.range()));
       p_data_->back().setName(prefix) ;
       // add strings to the String variable
       for(int i = A.begin(); i< A.end(); i++)
-      { p_data_->back().push_back(typeToString<TYPE>(A.at(i)));}
+      { p_data_->back()[i] = typeToString(A[i]);}
     }
-
     /** Append a 2D container.
      *  @param A the container to export
      *  @param prefix the prefix ot the name to set to the variable
@@ -227,14 +207,32 @@ class ExportToCsv
       for(int iVar = A.beginCols(), iNum=1; iVar<A.endCols(); iVar++, iNum++)
       {
         // add an empty string variable (an empty column)
-        p_data_->push_back(Variable<String>());
-        p_data_->back().setName(prefix+typeToString<int>(iNum)) ;
-        for (int irow=A.beginRows(); irow<A.endRows(); irow++)
-        { p_data_->back().push_back(typeToString<TYPE>(A.at(irow,iVar)));}
+        p_data_->push_back(Variable<String>(A.rows()));
+        p_data_->back().setName(prefix+typeToString(iNum)) ;
+        for (int iRow=A.beginRows(); iRow<A.endRows(); iRow++)
+        { p_data_->back()[iRow] = typeToString(A(iRow,iVar));}
       }
     }
-    /** Append a 1D container.
+    /** Append a 2D container.
      *  @param A the container to export
+     *  @param prefix the prefix ot the name to set to the variable
+     **/
+    template < class Container>
+    void append( ITContainer<Container, Arrays::square_> const& A, String const& prefix=Csv::DEFAULT_COLUMN_PREFIX)
+    {
+      typedef typename hidden::Traits<Container>::Type TYPE;
+      // for each field try a String conversion
+      for(int iVar = A.beginCols(), iNum=1; iVar<A.endCols(); iVar++, iNum++)
+      {
+        // add an empty string variable (an empty column)
+        p_data_->push_back(Variable<String>(A.rows()));
+        p_data_->back().setName(prefix+typeToString(iNum)) ;
+        for (int iRow=A.beginRows(); iRow<A.endRows(); iRow++)
+        { p_data_->back()[iRow] = typeToString(A(iRow,iVar));}
+      }
+    }
+    /** Append a value.
+     *  @param A the value to export
      *  @param prefix the prefix ot the name to set to the variable
      **/
     template < class TYPE>
@@ -244,7 +242,7 @@ class ExportToCsv
       p_data_->push_back(Variable<String>());
       p_data_->back().setName(prefix + typeToString(p_data_->lastIdx()) );
       // add strings to the String variable
-      p_data_->back().push_back(typeToString<TYPE>(A));
+      p_data_->back().push_back(typeToString(A));
     }
     /** Set a name to each column of the ReadWriteCsv using the form
      *  prefix + number.
@@ -254,8 +252,8 @@ class ExportToCsv
     {
       for(int i = p_data_->begin(); i<p_data_->end(); i++)
       { p_data_->setName(i, prefix + typeToString(i)) ;}
-      isColNamed_ = true;
     }
+
     /** Accesor. Return a ptr on the the ReadWriteCsv. */
     inline ReadWriteCsv* const p_readWriteCsv() const { return p_data_;}
     /** release the ReadWriteCsv. It will be freed by the user. */
@@ -264,8 +262,6 @@ class ExportToCsv
   protected:
     /** ptr on the ReadWriteCsv containing the data. */
     ReadWriteCsv* p_data_;
-    /** @c true if the columns have a name. @c false otherwise*/
-    bool isColNamed_;
 };
 
 } // namespace STK

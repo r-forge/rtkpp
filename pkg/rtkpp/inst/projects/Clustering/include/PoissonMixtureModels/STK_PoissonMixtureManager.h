@@ -57,7 +57,7 @@ namespace STK
  *  It allows to handle all the creation and initialization stuff needed by the
  *  (bridged) mixture models of the stkpp library.
  *
- *  @tparam DataHandler is any concrete class from the interface IDataHandler
+ *  @tparam DataHandler is any concrete class from the interface DataHandlerBase
  */
 template<class DataHandler>
 class PoissonMixtureManager : public IMixtureManager<DataHandler>

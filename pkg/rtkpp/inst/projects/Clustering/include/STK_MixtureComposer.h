@@ -240,7 +240,7 @@ class MixtureComposerFixedProp : public MixtureComposer
 template<class DataHandler>
 void MixtureComposer::createMixture(IMixtureManager<DataHandler>& manager)
 {
-  typedef typename IDataHandler<DataHandler>::InfoMap InfoMap;
+  typedef typename DataHandlerBase<DataHandler>::InfoMap InfoMap;
   for ( typename InfoMap::const_iterator it=manager.p_handler()->info().begin(); it!=manager.p_handler()->info().end(); ++it)
   {
     IMixture* p_mixture = manager.createMixture(it->first, nbCluster());

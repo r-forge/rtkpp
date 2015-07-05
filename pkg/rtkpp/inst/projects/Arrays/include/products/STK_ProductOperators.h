@@ -39,7 +39,7 @@
 #define EGAL(arg1, arg2) ((arg1::structure_ == int(Arrays::arg2)))
 
 #include "../STK_CAllocator.h"
-#include "STK_ProductImpl.h"
+#include "STK_ProductDispatcher.h"
 
 namespace STK
 {
@@ -597,7 +597,7 @@ class PointByArrayProduct : public ExprBase< PointByArrayProduct<Lhs, Rhs> >
       if (lhs.range() != rhs.rows())
       { STKRUNTIME_ERROR_2ARG(PointByArrayProduct, lhs.range(), rhs.rows(), sizes mismatch);}
       result_.shift(rhs_.beginCols());
-      hidden::ProductImpl<Lhs, Rhs, Allocator>::run(lhs, rhs, result_);
+      hidden::ProductDispatcher<Lhs, Rhs, Allocator>::run(lhs, rhs, result_);
     }
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return result_.rows();}
@@ -670,7 +670,7 @@ class ArrayByVectorProduct : public ExprBase< ArrayByVectorProduct<Lhs, Rhs> >
       if (lhs.cols() != rhs.range())
       { STKRUNTIME_ERROR_NO_ARG(ArrayByVectorProduct, sizes mismatch);}
       result_.shift(lhs_.beginRows());
-      hidden::ProductImpl<Lhs, Rhs, Allocator>::run(lhs, rhs, result_);
+      hidden::ProductDispatcher<Lhs, Rhs, Allocator>::run(lhs, rhs, result_);
     }
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return result_.rows();}
@@ -812,8 +812,8 @@ class ArrayByArrayProduct : public ArrayByArrayProductBase< Lhs, Rhs >, public T
       if (lhs.cols() != rhs.rows())
       { STKRUNTIME_ERROR_NO_ARG(ArrayByArrayProduct,sizes mismatch for 2D array);}
       result_.shift(lhs_.beginRows(), rhs_.beginCols());
-      (orient_) ? hidden::ProductImpl<Lhs, Rhs, Allocator>::runpb(lhs, rhs, result_)
-                : hidden::ProductImpl<Lhs, Rhs, Allocator>::runbp(lhs, rhs, result_);
+      (orient_) ? hidden::ProductDispatcher<Lhs, Rhs, Allocator>::runpb(lhs, rhs, result_)
+                : hidden::ProductDispatcher<Lhs, Rhs, Allocator>::runbp(lhs, rhs, result_);
     }
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return lhs_.rows();}

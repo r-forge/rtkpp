@@ -159,52 +159,95 @@ class CG
     /** @return the number of iterations */
     int cg()
     {
-      ColVector z, p, xold, rold;
-      Real rnorm2_old = p_b_->norm2(), rnorm2_new, alpha;
-      if (rnorm2_old == 0.) rnorm2_old = 1.;
+      iter_ = 0;
+//      ColVector z, p, xold;
+//      // initialization
+//      if (!p_init_) { x_ = *p_b_;}        // set x_{-1} = 0 give x_0 = b_
+//      else          { x_ = (*p_init_)();} // set x_0
+//      // start iterations
+//      for(nbStart_ = 1; ; nbStart_++)
+//      {
+//        Real rnorm2_old = p_b_->norm2(), rnorm2_new;
+//        if (rnorm2_old == 0.) rnorm2_old = 1.;
+//        // compute initial residuals
+//        r_ = *p_b_ - (*p_mult_)(x_);
+//        // compute rnomr2_new and check convergence
+//        if ((rnorm2_new = r_.norm2()) <rnorm2_old * eps_) { return iter_;}
+//        //initialization of the conjugate direction
+//        p = r_;
+//        int iter;
+//        for( iter=1; iter < 50 ; iter++)
+//        {
+//          iter_++;
+//          // save old values
+//          xold.exchange(x_);
+//          rnorm2_old = rnorm2_new;
+//          //compute z=A p
+//          z.move((*p_mult_)(p));
+//          //compute alpha
+//          Real alpha = rnorm2_old/p.dot(z);
+//          //update x_ and r_
+//          x_ = xold + (alpha * p);
+//          r_ -= (alpha * z);
+//          // compute rnorm2_new and check divergence/convergence
+//          if ( (rnorm2_new=r_.norm2()) > rnorm2_old)
+//          { // restore x_
+//            xold.exchange(x_);
+//            break;
+//          }
+//          Real beta = rnorm2_new/rnorm2_old;
+//          if ( beta < eps_) { return iter_;}
+//          //update p_
+//          p = (p * beta) + r_;
+//        }
+//        // in case of divergence at the first iterations, it means we don't have
+//        // any solution to the system (residuals cannot be zero)
+//        if (iter <= 3) { return iter_;}
+//      }
+//      // return an error
+//      return -1;
+      int nbStart = 0;
+      ColVector xOld, z, p_;
+
       // initialization
-      if (!p_init_) { x_ = *p_b_;}        // set x_{-1} = 0 give x_0 = b_
-      else          { x_ = (*p_init_)();} // set x_0
-      // compute initial residuals
-      r_ = *p_b_ - (*p_mult_)(x_);
-      // start iterations
-      for(nbStart_ = 1; ; nbStart_++)
+      if(!p_init_) {x_ = *p_b_;}
+      else { x_ = (*p_init_)();}
+      while(nbStart<3)
       {
-        iter_ = 0;
-        // compute rnomr2_new and check convergence
-        if (((rnorm2_new = r_.norm2())/ rnorm2_old) <eps_) { return iter_;}
+        int step = 0; //number of step
+        Real bnorm2 = p_b_->norm2(), alpha, beta; //
+        if (bnorm2 == 0.) bnorm2 = 1.;
+        //compute the residuals
+        r_ = *p_b_ - (*p_mult_)(x_);
+        if (r_.norm2()/bnorm2 <eps_) { break;}
         //initialization of the conjugate direction
-        p = r_;
-        for( iter_=1; iter_ < p_b_->size() ; iter_++)
+        p_= r_;
+        while(1)
         {
-          // save old values
-          xold.exchange(x_);
-          rold.exchange(r_);
-          rnorm2_old = rnorm2_new;
+          Real rnorm2 = r_.norm2();
           //compute z=A p
-          z.move((*p_mult_)(p));
+          z.move((*p_mult_)(p_));
           //compute alpha
-          alpha = rnorm2_old/p.dot(z);
-          //update x_ and r_
-          x_ = xold + (alpha * p);
-          r_ = rold - alpha * z;
-          // compute rnorm2_new and check divergence/convergence
-          if ( (rnorm2_new=r_.norm2()) > rnorm2_old) { break; }
-          Real beta = rnorm2_new/rnorm2_old;
-          if ( beta < eps_) { return iter_;}
+          alpha = rnorm2/p_.dot(z);
+          //update x_
+          xOld.exchange(x_);
+          x_ = xOld + alpha * p_;
+          iter_++;
+          //update residuals
+          r_ = r_ - (alpha * z);
+          //compute beta
+          beta = 1/rnorm2;
+          if ((rnorm2=r_.norm2())/bnorm2 <eps_) { nbStart = 2; break;}
+          beta *= rnorm2;
           //update p_
-          p = (p * beta) + r_;
+          p_ = (p_ * beta) + r_;
+          step++;
+          if( step > 50 ) { break;}
         }
-        // restore x_ and r_
-        xold.exchange(x_);
-        rold.exchange(r_);
-        // in case of divergence at the first iterations, it means we don't have
-        // any solution to the system (residuals cannot be zero)
-        // compute initial residuals
-        if (iter_ <= 2) { return iter_;}
+        nbStart++;
       }
       // return an error
-      return -1;
+      return iter_;
     }
 
   private:

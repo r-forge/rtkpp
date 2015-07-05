@@ -52,33 +52,33 @@ template< typename Type_, int SizeRows_ = UnknownSize, int SizeCols_ = UnknownSi
 template< typename Type_, int SizeRows_ = UnknownSize, int SizeCols_ = UnknownSize> class UpperTriangular;
 template< typename Type_, int SizeRows_ = UnknownSize, int SizeCols_ = UnknownSize> class LowerTriangular;
 
-typedef Vector<Real, UnknownSize> ConstVectorX;
-typedef Vector<Real, 3> ConstVector3;
-typedef Vector<Real, 2> ConstVector2;
-typedef Vector<double, UnknownSize> ConstVectorXd;
-typedef Vector<double, 3> ConstVector3d;
-typedef Vector<double, 2> ConstVector2d;
-typedef Vector<int, UnknownSize> ConstVectorXi;
-typedef Vector<int, 3> ConstVector3i;
-typedef Vector<int, 2> ConstVector2i;
+typedef Vector<Real, UnknownSize> VectorX;
+typedef Vector<Real, 3> Vector3;
+typedef Vector<Real, 2> Vector2;
+typedef Vector<double, UnknownSize> VectorXd;
+typedef Vector<double, 3> Vector3d;
+typedef Vector<double, 2> Vector2d;
+typedef Vector<int, UnknownSize> VectorXi;
+typedef Vector<int, 3> Vector3i;
+typedef Vector<int, 2> Vector2i;
 
-typedef Point<Real, UnknownSize> ConstPointX;
+typedef Point<Real, UnknownSize> PointX;
 typedef Point<Real, 3> ConstPoint3;
 typedef Point<Real, 2> ConstPoint2;
-typedef Point<double, UnknownSize> ConstPointXd;
+typedef Point<double, UnknownSize> PointXd;
 typedef Point<double, 3> ConstPoint3d;
 typedef Point<double, 2> ConstPoint2d;
-typedef Point<int, UnknownSize> ConstPointXi;
+typedef Point<int, UnknownSize> PointXi;
 typedef Point<int, 3> ConstPoint3i;
 typedef Point<int, 2> ConstPoint2i;
 
-typedef Point<Real, UnknownSize> ConstPointX;
+typedef Point<Real, UnknownSize> PointX;
 typedef Point<Real, 3> ConstPoint3;
 typedef Point<Real, 2> ConstPoint2;
-typedef Point<double, UnknownSize> ConstPointXd;
+typedef Point<double, UnknownSize> PointXd;
 typedef Point<double, 3> ConstPoint3d;
 typedef Point<double, 2> ConstPoint2d;
-typedef Point<int, UnknownSize> ConstPointXi;
+typedef Point<int, UnknownSize> PointXi;
 typedef Point<int, 3> ConstPoint3i;
 typedef Point<int, 2> ConstPoint2i;
 }
@@ -211,16 +211,24 @@ struct Traits< Const::LowerTriangular<Type_, SizeRows_, SizeCols_> >
 
 namespace Const
 {
-template< class Derived, int SizeRows_, int SizeCols_>
-class IConstArray: protected IArrayBase<SizeRows_, SizeCols_>, public ExprBase<Derived>
+template< class Derived>
+class IConstArray: protected IArrayBase<hidden::Traits<Derived>::sizeRows_, hidden::Traits<Derived>::sizeCols_>, public ExprBase<Derived>
 {
   public:
+    enum
+    {
+      structure_ = hidden::Traits< Derived >::structure_,
+      orient_    = hidden::Traits< Derived >::orient_,
+      sizeRows_  = hidden::Traits< Derived >::sizeRows_,
+      sizeCols_  = hidden::Traits< Derived >::sizeCols_,
+      storage_   = hidden::Traits< Derived >::storage_
+    };
     /** Type of the Range for the rows */
-    typedef TRange<SizeRows_> RowRange;
+    typedef TRange<sizeRows_> RowRange;
     /** Type of the Range for the columns */
-    typedef TRange<SizeCols_> ColRange;
+    typedef TRange<sizeCols_> ColRange;
     /** Type for the IArrayBase base Class. */
-    typedef IArrayBase<SizeRows_, SizeCols_ > Base2D;
+    typedef IArrayBase<sizeRows_, sizeCols_ > Base2D;
     typedef ExprBase<Derived> Base;
 
   protected:
@@ -282,10 +290,10 @@ class IConstArray: protected IArrayBase<SizeRows_, SizeCols_>, public ExprBase<D
  * @tparam Size_ the size of the identity ArrayXX. Default is UnknownSize.
  **/
 template< typename Type_, int Size_ >
-class Identity : public IConstArray<Identity<Type_, Size_>, Size_, Size_ >
+class Identity : public IConstArray<Identity<Type_, Size_> >
 {
   public:
-    typedef IConstArray<Identity<Type_, Size_>, Size_, Size_ > Base;
+    typedef IConstArray<Identity<Type_, Size_> > Base;
     typedef typename hidden::Traits< Identity<Type_, Size_> >::Type Type;
     typedef typename hidden::Traits< Identity<Type_, Size_> >::ReturnType ReturnType;
     enum
@@ -335,10 +343,10 @@ class Identity : public IConstArray<Identity<Type_, Size_>, Size_, Size_ >
  * @tparam Size_ the size of the square ArrayXX. Default is UnknownSize.
  **/
 template< typename Type_, int Size_ >
-class Square : public IConstArray<Square<Type_, Size_>, Size_, Size_ >
+class Square : public IConstArray<Square<Type_, Size_> >
 {
   public:
-    typedef IConstArray<Square<Type_, Size_>, Size_, Size_ > Base;
+    typedef IConstArray<Square<Type_, Size_> > Base;
     typedef typename hidden::Traits< Square<Type_, Size_> >::Type Type;
     typedef typename hidden::Traits< Square<Type_, Size_> >::ReturnType ReturnType;
     enum
@@ -384,10 +392,10 @@ class Square : public IConstArray<Square<Type_, Size_>, Size_, Size_ >
  * @tparam SizeCols_ the number of column of the matrix. Default is UnknownSize.
  **/
 template< typename Type_, int SizeRows_, int SizeCols_ >
-class Array : public IConstArray<Array<Type_, SizeRows_, SizeCols_>, SizeRows_, SizeCols_ >
+class Array : public IConstArray<Array<Type_, SizeRows_, SizeCols_> >
 {
   public:
-    typedef IConstArray<Array<Type_, SizeRows_, SizeCols_>, SizeRows_, SizeCols_ > Base;
+    typedef IConstArray<Array<Type_, SizeRows_, SizeCols_> > Base;
     typedef typename hidden::Traits< Array<Type_, SizeRows_, SizeCols_> >::Type Type;
     typedef typename hidden::Traits< Array<Type_, SizeRows_, SizeCols_> >::ReturnType ReturnType;
 
@@ -434,10 +442,10 @@ class Array : public IConstArray<Array<Type_, SizeRows_, SizeCols_>, SizeRows_, 
  * @tparam SizeCols_ the number of column of the matrix. Default is UnknownSize.
  **/
 template< typename Type_, int SizeRows_, int SizeCols_ >
-class UpperTriangular : public IConstArray<UpperTriangular<Type_, SizeRows_, SizeCols_>, SizeRows_, SizeCols_ >
+class UpperTriangular : public IConstArray<UpperTriangular<Type_, SizeRows_, SizeCols_> >
 {
   public:
-    typedef IConstArray<UpperTriangular<Type_, SizeRows_, SizeCols_>, SizeRows_, SizeCols_ > Base;
+    typedef IConstArray<UpperTriangular<Type_, SizeRows_, SizeCols_> > Base;
     typedef typename hidden::Traits< UpperTriangular<Type_, SizeRows_, SizeCols_> >::Type Type;
     typedef typename hidden::Traits< UpperTriangular<Type_, SizeRows_, SizeCols_> >::ReturnType ReturnType;
 
@@ -484,10 +492,10 @@ class UpperTriangular : public IConstArray<UpperTriangular<Type_, SizeRows_, Siz
  * @tparam SizeCols_ the number of column of the matrix. Default is UnknownSize.
  **/
 template< typename Type_, int SizeRows_, int SizeCols_ >
-class LowerTriangular : public IConstArray<LowerTriangular<Type_, SizeRows_, SizeCols_>, SizeRows_, SizeCols_ >
+class LowerTriangular : public IConstArray<LowerTriangular<Type_, SizeRows_, SizeCols_> >
 {
   public:
-    typedef IConstArray<LowerTriangular<Type_, SizeRows_, SizeCols_>, SizeRows_, SizeCols_ > Base;
+    typedef IConstArray<LowerTriangular<Type_, SizeRows_, SizeCols_> > Base;
     typedef typename hidden::Traits< LowerTriangular<Type_, SizeRows_, SizeCols_> >::Type Type;
     typedef typename hidden::Traits< LowerTriangular<Type_, SizeRows_, SizeCols_> >::ReturnType ReturnType;
 
@@ -529,10 +537,10 @@ class LowerTriangular : public IConstArray<LowerTriangular<Type_, SizeRows_, Siz
  * @tparam Size_ the size of the row-vector. Default is UnknownSize.
  **/
 template< typename Type_, int Size_ >
-class Point : public IConstArray<Point<Type_, Size_>, Size_, Size_ >
+class Point : public IConstArray<Point<Type_, Size_> >
 {
   public:
-    typedef IConstArray<Point<Type_, Size_>, Size_, Size_ > Base;
+    typedef IConstArray<Point<Type_, Size_> > Base;
     typedef typename hidden::Traits< Point<Type_, Size_> >::Type Type;
     typedef typename hidden::Traits< Point<Type_, Size_> >::ReturnType ReturnType;
 
@@ -578,10 +586,10 @@ class Point : public IConstArray<Point<Type_, Size_>, Size_, Size_ >
  * @tparam Size_ the size of the row-vector. Default is UnknownSize.
  **/
 template< typename Type_, int Size_ >
-class Vector : public IConstArray<Vector<Type_, Size_>, Size_, Size_ >
+class Vector : public IConstArray<Vector<Type_, Size_> >
 {
   public:
-    typedef IConstArray<Vector<Type_, Size_>, Size_, Size_ > Base;
+    typedef IConstArray<Vector<Type_, Size_> > Base;
     typedef typename hidden::Traits< Vector<Type_, Size_> >::Type Type;
     typedef typename hidden::Traits< Vector<Type_, Size_> >::ReturnType ReturnType;
 

@@ -46,72 +46,26 @@ namespace Law
 
 #ifdef IS_RTKPP_LIB
 
-/* @return a geometric random variate . */
-inline Integer Geometric::rand() const { return R::rgeom(prob_);}
-/* @brief compute the probability distribution function (density)
- *  Give the value of the pdf at the point x.
- *  @param x a binary value
- *  @return the value of the pdf
- **/
-inline Real Geometric::pdf(Integer const& x) const
+
+/*inline*/ Integer Geometric::rand() const { return R::rgeom(prob_);}
+/*inline*/ Real Geometric::pdf(Integer const& x) const
 { return R::dgeom((double)x, prob_, false);}
-/* @brief compute the log probability distribution function
- *  Give the value of the log-pdf at the point x.
- *  @param x a binary value
- *  @return the value of the log-pdf
- **/
-inline Real Geometric::lpdf(Integer const& x) const
+/*inline*/ Real Geometric::lpdf(Integer const& x) const
 { return R::dgeom((double)x, prob_, true);}
-/* @brief compute the cumulative distribution function
- *  Give the probability that a Geometric random variate is less or equal
- *  to t.
- *  @param t a real value
- *  @return the value of the cdf
- **/
-inline Real Geometric::cdf(Real const& t) const
+/*inline*/ Real Geometric::cdf(Real const& t) const
 { return R::pgeom(t, prob_, true, false);}
-/* @brief inverse cumulative distribution function
- *  The quantile is defined as the smallest value @e x such that
- *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.
- *  @param p a probability number
- **/
-inline Integer Geometric::icdf(Real const& p) const
+/*inline*/ Integer Geometric::icdf(Real const& p) const
 { return R::qgeom(p, prob_, true, false);}
-/* @param prob a probability number
- *  @return a Integer random variate.
- **/
-inline Integer Geometric::rand(Real const& prob)
+
+/*inline*/ Integer Geometric::rand(Real const& prob)
 { return (Integer)R::rgeom(prob);}
-/* @brief compute the probability distribution function (density)
- *  Give the value of the pdf at the point x.
- *  @param x a binary value
- *  @param prob a probability number
- *  @return the value of the pdf
- **/
-inline Real Geometric::pdf(Integer x, Real const& prob)
+/*inline*/ Real Geometric::pdf(Integer x, Real const& prob)
 { return R::dgeom((double)x, prob, false);}
-/* @brief compute the log probability distribution function
- *  Give the value of the log-pdf at the point x.
- *  @param x a binary value
- *  @param prob a probability number
- *  @return the value of the log-pdf
- **/
-inline Real Geometric::lpdf(Integer x, Real const& prob)
+/*inline*/ Real Geometric::lpdf(Integer x, Real const& prob)
 { return R::dgeom((double)x, prob, true);}
-/* @brief compute the cumulative distribution function
- *  Give the probability that a Geometric random variate is less or equal
- *  to t.
- *  @param t a real value
- *  @return the value of the cdf
- **/
-inline Real Geometric::cdf(Real const& t, Real const& prob)
+/*inline*/ Real Geometric::cdf(Real const& t, Real const& prob)
 { return R::pgeom(t, prob, true, false);}
-/* @brief inverse cumulative distribution function
- *  The quantile is defined as the smallest value @e x such that
- *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.
- *  @param p a probability number
- **/
-inline Integer Geometric::icdf(Real const& p, Real const& prob)
+/*inline*/ Integer Geometric::icdf(Real const& p, Real const& prob)
 { return (Integer)R::qgeom(p, prob, true, false);}
 
 #else

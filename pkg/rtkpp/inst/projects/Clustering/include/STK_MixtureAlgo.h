@@ -37,8 +37,7 @@
 #define STK_MIXTUREALGO_H
 
 #include "STK_Clust_Util.h"
-
-#include "Sdk/include/STK_IRunner.h"
+#include <Sdk/include/STK_IRunner.h>
 
 namespace STK
 {

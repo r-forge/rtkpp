@@ -66,11 +66,10 @@ template<class Derived>
 class IMixtureBridge: public IMixture, public IRecursiveTemplate<Derived>
 {
   public:
+    typedef std::vector<std::pair<int,int> >::const_iterator ConstIterator;
     // type of Mixture
     typedef typename hidden::MixtureBridgeTraits<Derived>::Mixture Mixture;
-    // type of Data
     typedef typename hidden::MixtureBridgeTraits<Derived>::Data Data;
-    // type of parameters
     typedef typename Clust::MixtureTraits<Mixture>::Param Param;
     // class of mixture
     enum
@@ -163,11 +162,22 @@ class IMixtureBridge: public IMixture, public IRecursiveTemplate<Derived>
      *  be called only once after we finish running the estimation algorithm.
      */
     virtual void finalizeStep() { mixture_.finalizeStep();}
+    /** @brief This function should be used for Imputation of data.
+     *  The default implementation (in the base class) is to do nothing.
+     */
+    virtual void imputationStep();
+    /** @brief This function must be defined for simulation of all the latent
+     * variables and/or missing data excluding class labels. The class labels
+     * will be simulated by the framework itself because to do so we have to
+     * take into account all the mixture laws.
+     */
+    virtual void samplingStep();
+
     /** This function can be used in order to get the current values of the
      *  parameters.
      *  @param param the array with the parameters of the mixture.
      */
-    virtual void getParameters(Param& param) const { mixture_.getParameters(param);}
+    void getParameters(Param& param) const { mixture_.getParameters(param);}
 
   protected:
     /** protected constructor to use in order to create a bridge.
@@ -185,6 +195,21 @@ class IMixtureBridge: public IMixture, public IRecursiveTemplate<Derived>
     /** pointer on the data manager */
     MixtureData<Data>* p_data_;
 };
+
+// implementation
+template< class Derived>
+void IMixtureBridge<Derived>::imputationStep()
+{
+  for(ConstIterator it = p_data_->v_missing().begin(); it!= p_data_->v_missing().end(); ++it)
+  { p_data_->dataij_(it->first, it->second) = mixture_.impute(it->first, it->second);}
+}
+// implementation
+template< class Derived>
+void IMixtureBridge<Derived>::samplingStep()
+{
+  for(ConstIterator it = p_data_->v_missing().begin(); it!= p_data_->v_missing().end(); ++it)
+  { p_data_->dataij_(it->first, it->second) = mixture_.sample(it->first, it->second);}
+}
 
 } // namespace STK
 

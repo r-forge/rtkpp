@@ -38,9 +38,9 @@
  * composer.
  */
 #include <string>
-#include "Arrays/include/STK_CArrayPoint.h"
-#include "Arrays/include/STK_CArrayVector.h"
-#include "Arrays/include/STK_CArray.h"
+#include <Arrays/include/STK_CArrayPoint.h>
+#include <Arrays/include/STK_CArrayVector.h>
+#include <Arrays/include/STK_CArray.h>
 
 namespace STK
 {

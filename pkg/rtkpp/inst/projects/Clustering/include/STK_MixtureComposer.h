@@ -231,11 +231,9 @@ class MixtureComposerFixedProp : public MixtureComposer
     virtual void pStep();
 };
 
-/* Utility method allowing to create a mixture with a given data set
- *  and register it. The Mixture Manager will find the associated model
- *  to use with this data set.
+/* Utility method allowing to create all the mixtures handled by a mixture
+ * manager.
  *  @param manager the manager with the responsibility of the creation.
- *  @param idData the id name of the data to modelize.
  **/
 template<class DataHandler>
 void MixtureComposer::createMixture(IMixtureManager<DataHandler>& manager)

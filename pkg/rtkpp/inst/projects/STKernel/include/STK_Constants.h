@@ -36,6 +36,8 @@
 #ifndef STK_CONSTANTS_H
 #define STK_CONSTANTS_H
 
+#include <cmath>
+#include "STK_Real.h"
 #include "STK_String.h"
 
 #ifndef STKBASEARRAYS
@@ -58,6 +60,11 @@ const int baseIdx = STKBASEARRAYS;
  *  that the value used for representing NA Integers when Integer is int.
  **/
 const int UnknownSize = INT_MAX;
+/** @ingroup STKernel
+ *  Same as floor(sqrt(INT_MAX+1))
+ **/
+const int SqrtUnknownSize = (1UL << (sizeof(size_t) * (CHAR_BIT/2)));
+
 //const int UnknownSize = STK::Arithmetic<int>::NA();
 
 /** @ingroup STKernel

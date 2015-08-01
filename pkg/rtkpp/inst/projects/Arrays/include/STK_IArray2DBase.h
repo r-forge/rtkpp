@@ -41,7 +41,7 @@
 #ifndef STK_IARRAY2DBASE_H
 #define STK_IARRAY2DBASE_H
 
-#include "STK_IArrayBase.h"
+#include "STK_ITContainer2D.h"
 #include "STK_ArrayBase.h"
 
 #include "STK_ExprBaseProduct.h"
@@ -80,7 +80,7 @@ class IArray2DBase;
  * @tparam Derived is the name of the class that implements @c IArray2DBase.
  **/
 template < class PTRCOL, class Derived, int SizeRows_, int SizeCols_>
-class IArray2DBase :  protected IArrayBase<SizeRows_, SizeCols_>, public ArrayBase<Derived>
+class IArray2DBase :  protected IContainer2D<SizeRows_, SizeCols_>, public ArrayBase<Derived>
 {
   template <class OTHERPTRCOL, class OtherDerived, int OtherSizeRows, int OtherSizeCols>
   friend    class IArray2DBase;
@@ -90,10 +90,10 @@ class IArray2DBase :  protected IArrayBase<SizeRows_, SizeCols_>, public ArrayBa
     typedef TRange<SizeRows_> RowRange;
     /** Type of the Range for the columns */
     typedef TRange<SizeCols_> ColRange;
-    /** Type for the IArrayBase base Class. */
-    typedef IArrayBase<SizeRows_, SizeCols_ > Base2D;
+    /** Type for the IContainer2D base Class. */
+    typedef IContainer2D<SizeRows_, SizeCols_ > Base2D;
     /** Type for the Base Class. */
-    typedef AllocatorBase<PTRCOL> Allocator;
+    typedef AllocatorBase<PTRCOL, SizeCols_> Allocator;
     /** type of the Base Container Class. */
     typedef ArrayBase<Derived> Base;
 
@@ -179,22 +179,38 @@ class IArray2DBase :  protected IArrayBase<SizeRows_, SizeCols_>, public ArrayBa
 
   public:
     /**@return the Horizontal range */
-    inline ColRange const& colsImpl() const { return Base2D::colsImpl();}
+    inline ColRange const& colsImpl() const { return Base2D::cols();}
     /** @return the index of the first column */
-    inline int beginColsImpl() const { return Base2D::beginColsImpl();}
+    inline int beginColsImpl() const { return Base2D::beginCols();}
     /**  @return the ending index of columns */
-    inline int endColsImpl() const { return Base2D::endColsImpl();}
+    inline int endColsImpl() const { return Base2D::endCols();}
     /** @return the number of columns */
-    inline int sizeColsImpl() const { return Base2D ::sizeColsImpl();}
+    inline int sizeColsImpl() const { return Base2D::sizeCols();}
+    /**@return the Horizontal range */
+    inline ColRange const& cols() const { return Base2D::cols();}
+    /** @return the index of the first column */
+    inline int beginCols() const { return Base2D::beginCols();}
+    /**  @return the ending index of columns */
+    inline int endCols() const { return Base2D::endCols();}
+    /** @return the number of columns */
+    inline int sizeCols() const { return Base2D::sizeCols();}
 
     /** @return the Vertical range */
-    inline RowRange const& rowsImpl() const { return Base2D::rowsImpl();}
+    inline RowRange const& rowsImpl() const { return Base2D::rows();}
     /** @return the index of the first row */
-    inline int beginRowsImpl() const { return Base2D::beginRowsImpl();}
+    inline int beginRowsImpl() const { return Base2D::beginRows();}
     /** @return the ending index of the rows */
-    inline int endRowsImpl() const { return Base2D::endRowsImpl();}
+    inline int endRowsImpl() const { return Base2D::endRows();}
     /** @return the number of rows */
-    inline int sizeRowsImpl() const { return Base2D::sizeRowsImpl();}
+    inline int sizeRowsImpl() const { return Base2D::sizeRows();}
+    /** @return the Vertical range */
+    inline RowRange const& rows() const { return Base2D::rows();}
+    /** @return the index of the first row */
+    inline int beginRows() const { return Base2D::beginRows();}
+    /** @return the ending index of the rows */
+    inline int endRows() const { return Base2D::endRows();}
+    /** @return the number of rows */
+    inline int sizeRows() const { return Base2D::sizeRows();}
 
     /**  @return the index of the last column */
     inline int lastIdxCols() const { return Base2D::lastIdxCols();}
@@ -273,33 +289,6 @@ class IArray2DBase :  protected IArrayBase<SizeRows_, SizeCols_>, public ArrayBa
     inline PTRCOL* const& p_data() const { return allocator_.p_data();}
     /**  @return @c true if the container is empty, @c false otherwise */
     inline bool isRef() const { return allocator_.isRef();}
-    /** @return a reference on the element (i,j) of the 2D container.
-     *  @param i,j indexes of the row and of the column
-     **/
-    inline Type& operator()(int i, int j) { return this->elt(i,j);}
-    /** @return a constant reference on the element (i,j) of the 2D container.
-     *  @param i,j indexes of the row and of the column
-     **/
-    inline Type const operator()(int i, int j) const { return this->elt(i,j);}
-    /** @param I range of the index of the rows
-     *  @param j index of the column
-     *  @return a Vertical container containing the column @c j of this
-     *  in the range @c I
-     **/
-    inline SubCol operator()(Range const& I, int j) const
-    { return this->asDerived().col(I, j);}
-    /** @param i index of the row
-     *  @param J range of the columns
-     *  @return an Horizontal container containing the row @c i of this
-     *  in the range @c J
-     **/
-    inline SubRow operator()(int i, Range const& J) const
-    { return this->asDerived().row(i, J);}
-    /** @param I,J range of the rows and of the columns
-     *  @return a 2D container containing this in the range @c I, @c J
-     **/
-    inline SubArray operator()(Range const& I, Range const& J) const
-    { return this->asDerived().sub(I, J);}
     /** @return the column j.
      *  @param j index of the column
      **/
@@ -421,7 +410,7 @@ class IArray2DBase :  protected IArrayBase<SizeRows_, SizeCols_>, public ArrayBa
     {
       // swap AllocatorBase part
       allocator_.exchange(T.allocator_);
-      // swap IArrayBase part
+      // swap IContainer2D part
       Base2D::exchange(T);
       // swap this part
       std::swap(availableCols_, T.availableCols_);
@@ -539,7 +528,7 @@ class IArray2DBase :  protected IArrayBase<SizeRows_, SizeCols_>, public ArrayBa
       availableRows_.move(T.availableRows_);
       rangeCols_.move(T.rangeCols_);
       availableCols_ = T.availableCols_;
-      // Set IArrayBase part
+      // Set IContainer2D part
       this->setCols(T.cols());
       this->setRows(T.rows());
     }

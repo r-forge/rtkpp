@@ -118,6 +118,8 @@ class Categorical_pk : public CategoricalBase<Categorical_pk<Array> >
     inline ~Categorical_pk() {}
     /** @return the probability of the kth cluster, jth variable, lth modality */
     inline Real probaImpl(int k, int j, int l) const { return param_.proba_[k][l];}
+    /** @return the probability law of the kth cluster for the jth variable */
+    inline VectorX probaImpl(int k, int j) const { return param_.proba_[k];}
     /** @return the value of the probability of the i-th sample in the k-th component.
      *  @param i,k indexes of the sample and of the component
      **/

@@ -62,6 +62,8 @@ struct MixtureBridgeTraits< DiagGaussianBridge< Clust::Gaussian_sjk_, Data_> >
   typedef Data_ Data;
   /** Type of the mixture model */
   typedef Gaussian_sjk<Data> Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::Gaussian_sjk_> ParamHandler;
   /** Structure storing Parameters */
   typedef ArrayXX Parameters;
   enum
@@ -76,8 +78,12 @@ template<class Data_>
 struct MixtureBridgeTraits< DiagGaussianBridge< Clust::Gaussian_sk_, Data_> >
 {
   typedef Data_ Data;
+  /** Data Type */
+  typedef typename Data_::Type Type;
   /** Type of the mixture model */
   typedef Gaussian_sk<Data> Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::Gaussian_sk_> ParamHandler;
   /** Structure storing Parameters */
   typedef ArrayXX Parameters;
   enum
@@ -92,8 +98,12 @@ template<class Data_>
 struct MixtureBridgeTraits< DiagGaussianBridge< Clust::Gaussian_sj_, Data_> >
 {
   typedef Data_ Data;
+  /** Data Type */
+  typedef typename Data_::Type Type;
   /** Type of the mixture model */
   typedef Gaussian_sj<Data> Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::Gaussian_sj_> ParamHandler;
   /** Structure storing Parameters */
   typedef ArrayXX Parameters;
   enum
@@ -108,8 +118,12 @@ template<class Data_>
 struct MixtureBridgeTraits< DiagGaussianBridge< Clust::Gaussian_s_, Data_> >
 {
   typedef Data_ Data;
+  /** Data Type */
+  typedef typename Data_::Type Type;
   /** Type of the mixture model */
   typedef Gaussian_s<Data> Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::Gaussian_s_> ParamHandler;
   /** Structure storing Parameters */
   typedef ArrayXX Parameters;
   enum
@@ -191,10 +205,10 @@ class DiagGaussianBridge: public IMixtureBridge< DiagGaussianBridge<Id,Data> >
       return p_bridge;
     }
     /** This function is used in order to get the current values of the
-     *  parameters.
-     *  @param params the array with the parameters of the mixture.
+     *  parameters in an array.
+     *  @param[out] params the array with the parameters of the mixture.
      */
-    virtual void getParameters(ArrayXX& params) const;
+    void getParameters(ArrayXX& params) const;
 
   private:
     /** This function will be used for the imputation of the missing data

@@ -102,7 +102,7 @@ struct MultCoefImpl
   }
   /** dot product. general by vector */
   static void dot( Lhs const& lhs, ITContainer<Rhs, Arrays::vector_> const& rhs
-                 , ICAllocator<Result>& res, int iRow)
+                 , ITContainer2D<Result>& res, int iRow)
   {
     res.elt(iRow) = Type(0);
     Range const dotRange = Range::inf(lhs.rangeColsInRow(iRow), rhs.range());
@@ -111,7 +111,7 @@ struct MultCoefImpl
   }
   /** dot product. general by vector */
   static void dot( ITContainer<Lhs, Arrays::point_> const& lhs
-                 , Rhs const& rhs, ICAllocator<Result>& res, int jCol)
+                 , Rhs const& rhs, ITContainer2D<Result>& res, int jCol)
   {
     res.elt(jCol) = Type(0);
     Range const dotRange = Range::inf(rhs.rangeRowsInCol(jCol), lhs.range());

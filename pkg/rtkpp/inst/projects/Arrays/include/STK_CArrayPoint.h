@@ -179,7 +179,7 @@ class CArrayPoint : public ICArray < CArrayPoint<Type_, SizeCols_, Orient_> >
      *  @param allocator the allocator to wrap
      **/
     template<class OtherAllocator>
-    inline CArrayPoint( ICAllocator<OtherAllocator> const& allocator)
+    inline CArrayPoint( ITContainer2D<OtherAllocator> const& allocator)
                       : Base(allocator.asDerived())
     {}
     /** Copy constructor using an expression.

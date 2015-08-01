@@ -40,6 +40,7 @@
 #include "STK_IMixtureModelBase.h"
 #include <Arrays/include/STK_Array1D.h>
 #include <Arrays/include/STK_Array2D.h>
+#include <STatistiK/include/STK_Law_Categorical.h>
 
 #ifdef STK_MIXTURE_DEBUG
 #include "Arrays/include/STK_Display.h"
@@ -68,9 +69,6 @@ template <int Id> struct ParametersHandler;
  *
  * The pseudo virtual methods to implement in derived class are
  * @code
- * // implementation of this method is required
- * Param getParameters() const;
- *
  * // default implementation (do nothing) provided to all these methods
  * void initializeModelImpl();
  * bool initializeStepImpl(); // return true by default
@@ -118,7 +116,8 @@ class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBa
     /** @return a pointer on the current data set */
     inline Array const* p_data() const { return p_dataij_;}
     /** @return the parameter handler of the model */
-    inline ParamHandler const& param() const { return param_;}
+    inline ParamHandler const& getParameters() const { return param_;}
+
     /** @brief Set the data set.
      *  Setting a (new) data set will trigger the initialization process of the model.
      *  @param data the data set to set
@@ -172,6 +171,12 @@ class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBa
     inline void setParametersImpl() {}
     /** default implementation of releaseIntermediateResultsImpl (do nothing) */
     inline void releaseIntermediateResultsImpl() {}
+
+    /** @return a simulated value for the jth variable of the ith sample
+     *  @param i,j indexes of the data to simulate
+     **/
+    inline Real sample(int i, int j) const
+    { return this->asDerived().rand(i, j, Law::Categorical::rand(p_tik()->row(i)));}
 
   protected:
     /** @brief Initialize the model before its first use.

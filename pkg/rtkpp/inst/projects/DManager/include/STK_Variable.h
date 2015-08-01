@@ -97,7 +97,7 @@ class Variable : public IVariable
       sizeRows_  = UnknownSize,
       storage_ = Arrays::dense_ // always dense
     };
-    typedef AllocatorBase<Type*> Allocator;
+    typedef AllocatorBase<Type*, UnknownSize> Allocator;
     typedef IArray2D< Variable<Type> > Base;
     typedef ArrayBase < Variable<Type> > LowBase;
 

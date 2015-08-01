@@ -131,14 +131,14 @@ class ICArray : public ArrayBase<Derived>
      *  @param I,J range of the rows and columns to wrap
      **/
     template<class OtherAllocator>
-    ICArray( ICAllocator<OtherAllocator> const& allocator, Range const& I, Range const& J)
+    ICArray( ITContainer2D<OtherAllocator> const& allocator, Range const& I, Range const& J)
            : Base(), allocator_(allocator.asDerived(), I, J)
     {}
     /** constructor by reference, ref_=1.
      *  @param allocator with the data
      **/
     template< class OtherAllocator>
-    inline ICArray( ICAllocator<OtherAllocator> const& allocator)
+    inline ICArray( ITContainer2D<OtherAllocator> const& allocator)
                   : Base(), allocator_(allocator.asDerived(), true)
     {}
     /**  destructor */

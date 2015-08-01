@@ -716,13 +716,13 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
      *  @param other the column to add to this
      **/
     template<class Other>
-    Derived& pushBackCols(ITContainer1D<Other> const& other)
+    Derived& pushBackCols(IArray1D<Other> const& other)
     {
       // check if the array is empty
       if (this->empty())
       {
         resize(other.rows(),1);
-        for (int i=other.begin(); i<=other.lastIdx(); i++)
+        for (int i=other.begin(); i<other.end(); i++)
           (*this)(i, baseIdx) = other[i];
         return this->asDerived();
       }

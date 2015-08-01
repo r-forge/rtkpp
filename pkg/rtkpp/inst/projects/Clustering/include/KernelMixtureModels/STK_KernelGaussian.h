@@ -35,7 +35,7 @@
 #ifndef STK_KERNELGAUSSIAN_H
 #define STK_KERNELGAUSSIAN_H
 
-#include <Arrays/include/STK_Array2DVector.h>
+#include <Arrays/include/STK_Array2DPoint.h>
 #include <STatistiK/include/STK_Stat_Online.h>
 #include "../STK_IMixtureModel.h"
 
@@ -44,6 +44,7 @@ namespace STK
 
 //forward declaration, to allow for recursive template
 class KernelGaussian_sk;
+class KernelGaussian_s;
 
 namespace Clust
 {
@@ -53,9 +54,20 @@ template<>
 struct MixtureTraits< KernelGaussian_sk >
 {
   typedef ArrayXX Array;
+  typedef ArrayXX Param;
   typedef typename Array::Type       Type;
-  typedef Array2D<Real>              Param;
   typedef ParametersHandler<KernelGaussian_sk_>  ParamHandler;
+};
+
+/** @ingroup Clustering
+ *  Traits class for the KernelGaussian_sk traits policy. */
+template<>
+struct MixtureTraits< KernelGaussian_s >
+{
+  typedef ArrayXX Array;
+  typedef ArrayXX Param;
+  typedef typename Array::Type       Type;
+  typedef ParametersHandler<KernelGaussian_s_>  ParamHandler;
 };
 
 } // namespace Clust
@@ -66,7 +78,7 @@ struct ParametersHandler<Clust::KernelGaussian_sk_>
 {
   /** default constructor */
   inline ParametersHandler(int nbCluster): sigma2_(nbCluster, 1.), stat_sigma2_(nbCluster)
-                                         , lambda_(nbCluster, 1.), stat_lambda_(nbCluster)
+                                         , dim_(nbCluster, 1.), stat_dim_(nbCluster)
   {}
   /** copy constructor.
    * @param param the parameters to copy.
@@ -74,8 +86,8 @@ struct ParametersHandler<Clust::KernelGaussian_sk_>
   inline ParametersHandler( ParametersHandler const& param)
                           : sigma2_(param.sigma2_)
                           , stat_sigma2_(param.stat_sigma2_)
-                          , lambda_(param.lambda_)
-                          , stat_lambda_(param.stat_lambda_)
+                          , dim_(param.dim_)
+                          , stat_dim_(param.stat_dim_)
   {}
   /** destructor */
   inline ~ParametersHandler() {}
@@ -83,40 +95,89 @@ struct ParametersHandler<Clust::KernelGaussian_sk_>
    *  @param iteration Provides the iteration number beginning after the burn-in period.
    **/
   inline void storeIntermediateResults(int iteration)
-  { stat_sigma2_.update(sigma2_); stat_lambda_.update(lambda_);}
+  { stat_sigma2_.update(sigma2_); stat_dim_.update(dim_);}
   /** Release the stored results. This is usually used if the estimation
    *  process failed.
    **/
   inline void releaseIntermediateResults()
-  { stat_sigma2_.release(); stat_lambda_.release();}
+  { stat_sigma2_.release(); stat_dim_.release();}
   /** set the parameters stored in stat_proba_ and release stat_proba_. */
   inline void setParameters()
   {
     sigma2_ = stat_sigma2_.mean_;
     stat_sigma2_.release();
-    lambda_ = stat_lambda_.mean_;
-    stat_lambda_.release();
+    dim_ = stat_dim_.mean_;
+    stat_dim_.release();
   }
   /** vector of the standard deviations */
-  VectorX sigma2_;
+  PointX sigma2_;
   /** Array of the statistics */
-  Stat::Online<VectorX, Real> stat_sigma2_;
+  Stat::Online<PointX, Real> stat_sigma2_;
   /** vector of the dimensions */
-  VectorX lambda_;
+  PointX dim_;
   /** Array of the statistics */
-  Stat::Online<VectorX, Real> stat_lambda_;
+  Stat::Online<PointX, Real> stat_dim_;
 };
 
+/** Specialization of the ParametersHandler struct for KernelGaussian_s models*/
+template <>
+struct ParametersHandler<Clust::KernelGaussian_s_>
+{
+  /** default constructor */
+  inline ParametersHandler(int nbCluster): sigma2_(1.), stat_sigma2_()
+                                         , dim_(nbCluster, 1.), stat_dim_(nbCluster)
+  {}
+  /** copy constructor.
+   * @param param the parameters to copy.
+   **/
+  inline ParametersHandler( ParametersHandler const& param)
+                          : sigma2_(param.sigma2_)
+                          , stat_sigma2_(param.stat_sigma2_)
+                          , dim_(param.dim_)
+                          , stat_dim_(param.stat_dim_)
+  {}
+  /** destructor */
+  inline ~ParametersHandler() {}
+  /** Store the intermediate results of the Mixture.
+   *  @param iteration Provides the iteration number beginning after the burn-in period.
+   **/
+  inline void storeIntermediateResults(int iteration)
+  { stat_sigma2_.update(sigma2_); stat_dim_.update(dim_);}
+  /** Release the stored results. This is usually used if the estimation
+   *  process failed.
+   **/
+  inline void releaseIntermediateResults()
+  { stat_sigma2_.release(); stat_dim_.release();}
+  /** set the parameters stored in stat_proba_ and release stat_proba_. */
+  inline void setParameters()
+  {
+    sigma2_ = stat_sigma2_.mean_;
+    stat_sigma2_.release();
+    dim_ = stat_dim_.mean_;
+    stat_dim_.release();
+  }
+  /** value of the standard deviation */
+  Real sigma2_;
+  /** Array of the statistics */
+  Stat::Online<Real, Real> stat_sigma2_;
+  /** vector of the dimensions */
+  PointX dim_;
+  /** Array of the statistics */
+  Stat::Online<PointX, Real> stat_dim_;
+};
 
 /** @ingroup Clustering
- *  The Gaussian mixture model @c KernelGaussian_sk is
- *  an isotrope Gaussian model on a kernel space. It has a density function of the
+ *  The Gaussian mixture model @c KernelGaussian_sk is an isotrope Gaussian
+ *  mixture model on a kernel space. It has a density function of the
  *  form
  * \f[
- *  f(\mathbf{x}|\theta) = \sum_{k=1}^K p_k \prod_{j=1}^d
- *    \frac{1}{\sqrt{2\pi}\sigma^j_{k}} \exp\left\{-\frac{(\phi(x^j_)-\mu^j_{ik})^2}{2(\sigma^j_{k})^2}\right\}.
+ *  f(\mathbf{x}|\theta) = \sum_{k=1}^K p_k
+ *    \sum_{k=1}^K p_k \left(\frac{1}{\sqrt{2\pi}\sigma_k}\right)^{d_k}
+ *    \exp\left\{ -\frac{\|\phi(x)-m_k\|^2}{2\sigma_k^2} \right\}
  * \f]
- * The data set
+ * where \f$ \phi \f$ denote a feature mapping from the original space to an RKHS.
+ *
+ * In a KernelGaussian_sk model, the data set refer to the Gram's matrix.
  **/
 class KernelGaussian_sk : public IMixtureModel<KernelGaussian_sk >
 {
@@ -124,36 +185,39 @@ class KernelGaussian_sk : public IMixtureModel<KernelGaussian_sk >
     typedef IMixtureModel<KernelGaussian_sk > Base;
     typedef ParametersHandler<Clust::KernelGaussian_sk_> ParamHandler;
 
-    using Base::p_tik; using Base::param_;
+    using Base::p_tik;
+    using Base::param_;
     using Base::p_nk;
     using Base::p_data;
 
     /** default constructor
      * @param nbCluster number of cluster in the model
      **/
-    KernelGaussian_sk( int nbCluster);
+    inline KernelGaussian_sk( int nbCluster): Base(nbCluster) {}
     /** copy constructor
      *  @param model The model to copy
      **/
-    KernelGaussian_sk( KernelGaussian_sk const& model);
+    inline KernelGaussian_sk( KernelGaussian_sk const& model): Base(model) {}
     /** destructor */
-    ~KernelGaussian_sk();
-    /** @return a constant reference on the paremeter handler structure.*/
-    inline ParamHandler const& getParameters() const { return param_;}
+    inline ~KernelGaussian_sk() {}
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const { return this->nbCluster();}
+    /** set the dimensions of the kernel mixture model using an unique value */
+    inline void setDim(Real const& dim)  { param_.dim_ = dim;}
     /** set the dimension of the kernel mixture model */
-    inline void setLambda(Real const& lambda)  { param_.lambda_ = lambda;}
-    /** set the dimension of the kernel mixture model */
-    inline void setLambda(VectorX const& lambda)  { param_.lambda_ = lambda;}
+    inline void setDim(PointX const& dim)  { param_.dim_ = dim;}
     /** @return the value of the probability of the i-th sample in the k-th component.
      *  @param i,k indexes of the sample and of the component
      **/
     inline Real lnComponentProbability(int i, int k) const
     {
       return(- p_data()->elt(i,k)/(2.*param_.sigma2_[k])
-             - (std::log(param_.sigma2_[k])+2.*Const::_LNSQRT2PI_)*param_.lambda_[k]/2.);
+             - (std::log(param_.sigma2_[k])+2.*Const::_LNSQRT2PI_)*param_.dim_[k]/2.);
     }
+    /** @return an imputation value for the jth variable of the ith sample */
+    inline Real impute(int i, int j) const { return 0.;}
+    /** @return a simulated value for the jth variable of the ith sample */
+    inline Real rand(int i, int j, int k) const { return 0.;}
     /** get the parameters */
     void getParameters(ArrayXX& param) const;
     /** Write the parameters on the output stream os */
@@ -163,6 +227,71 @@ class KernelGaussian_sk : public IMixtureModel<KernelGaussian_sk >
     /** update the variances. */
     bool mStep();
 };
+
+/** @ingroup Clustering
+ *  The Gaussian mixture model @c KernelGaussian_sk is an isotrope Gaussian
+ *  mixture model on a kernel space. It has a density function of the
+ *  form
+ * \f[
+ *  f(\mathbf{x}|\theta) = \sum_{k=1}^K p_k
+ *    \sum_{k=1}^K p_k \left(\frac{1}{\sqrt{2\pi}\sigma_k}\right)^{d_k}
+ *    \exp\left\{ -\frac{\|\phi(x)-m_k\|^2}{2\sigma_k^2}  \right\}
+ * \f]
+ * where \f$ \phi \f$ denote a feature mapping from the original space to an RKHS.
+ *
+ * In a KernelGaussian_sk model, the data set refer to the Gram's matrix.
+ **/
+class KernelGaussian_s : public IMixtureModel<KernelGaussian_s >
+{
+  public:
+    typedef IMixtureModel<KernelGaussian_s > Base;
+    typedef ParametersHandler<Clust::KernelGaussian_s_> ParamHandler;
+
+    using Base::p_tik;
+    using Base::param_;
+    using Base::p_nk;
+    using Base::p_data;
+
+    /** default constructor
+     * @param nbCluster number of cluster in the model
+     **/
+    inline KernelGaussian_s( int nbCluster): Base(nbCluster) {}
+    /** copy constructor
+     *  @param model The model to copy
+     **/
+    inline KernelGaussian_s( KernelGaussian_s const& model): Base(model) {}
+    /** destructor */
+    inline ~KernelGaussian_s() {}
+    /** @return a constant reference on the paremeter handler structure.*/
+    inline ParamHandler const& getParameters() const { return param_;}
+    /** @return the number of free parameters of the model */
+    inline int computeNbFreeParameters() const { return 1;}
+    /** set the dimensions of the kernel mixture model using an unique value */
+    inline void setDim(Real const& dim)  { param_.dim_ = dim;}
+    /** set the dimensions of the kernel mixture model */
+    inline void setDim(PointX const& dim)  { param_.dim_ = dim;}
+    /** @return the value of the probability of the i-th sample in the k-th component.
+     *  @param i,k indexes of the sample and of the component
+     **/
+    inline Real lnComponentProbability(int i, int k) const
+    {
+      return(- p_data()->elt(i,k)/(2.*param_.sigma2_)
+             - (std::log(param_.sigma2_)+2.*Const::_LNSQRT2PI_)*param_.dim_[k]/2.);
+    }
+    /** @return an imputation value for the jth variable of the ith sample */
+    inline Real impute(int i, int j) const { return 0.;}
+    /** @return a simulated value for the jth variable of the ith sample */
+    inline Real rand(int i, int j, int k) const { return 0.;}
+    /** get the parameters */
+    void getParameters(ArrayXX& param) const;
+    /** Write the parameters on the output stream os */
+    void writeParameters(ostream& os) const;
+    /** Initialize randomly the variances of the Gaussian kernel mixture. */
+    void randomInit();
+    /** update the variances. */
+    bool mStep();
+};
+
 
 } // namespace STK
 

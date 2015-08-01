@@ -260,11 +260,11 @@ bool FullStrategy::run()
           initStep(p_currentModel, p_currentBestModel);
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("In FullStrategy::run(), init step in short run terminated\n")
-           << _T("iTyry =") << iTry << _T(", iShort =") << iShort << _T("\n")
+           << _T("iTyry =") << iTry << _T(", iShort =") << iShort
            << _T(", p_currentBestModel->lnLikelihood() = ") << p_currentBestModel->lnLikelihood()
            << _T("\n");
 #endif
-          // perform short run on the current best model
+          // perform short run with the current best model
           p_param_->p_shortAlgo_->setModel(p_currentBestModel);
           if (!p_param_->p_shortAlgo_->run())
           {
@@ -272,25 +272,26 @@ bool FullStrategy::run()
             msg_error_ += p_param_->p_shortAlgo_->error();
 #ifdef STK_MIXTURE_VERBOSE
             stk_cout << _T("In FullStrategy::run()\n")
-                     << _T("iShort = ") << iShort << _T("\n")
-                     << _T("Short Algo fail\n");
+                     << _T("iShort = ") << iShort << _T(", short Algo fail\n");
 #endif
           }
           // if we get a better result, store it in p_bestShortModel
           if( p_bestShortModel->lnLikelihood()<p_currentBestModel->lnLikelihood())
           { std::swap(p_bestShortModel, p_currentBestModel);}
 #ifdef STK_MIXTURE_VERY_VERBOSE
-  stk_cout << _T("In FullStrategy::run()\n")
-           << _T("iTyry =") << iTry << _T(", iShort =") << iShort << _T(", short run terminated\n")
+  stk_cout << _T("In FullStrategy::run(), short run terminated\n")
+           << _T("iTyry =") << iTry << _T(", iShort =") << iShort
            << _T(", p_bestShortModel->lnLikelihood() = ") << p_bestShortModel->lnLikelihood()
            << _T("\n");
 #endif
         } // ishort
       }
-      stk_cout << _T("In FullStrategy::run(), short run terminated.\n")
-               << _T("iTry =") << iTry << _T("\n")
-               << _T("p_bestShortModel->lnLikelihood() = ") << p_bestShortModel->lnLikelihood()
+#ifdef STK_MIXTURE_VERBOSE
+      stk_cout << _T("In FullStrategy::run(), all short run terminated.\n")
+               << _T("iTry =") << iTry
+               << _T(", p_bestShortModel->lnLikelihood() = ") << p_bestShortModel->lnLikelihood()
                << _T("\n");
+#endif
       // start a long run with p_bestShortModel. If success, save model
       // and exit the iTry loop
       p_param_->p_longAlgo_->setModel(p_bestShortModel);
@@ -307,8 +308,8 @@ bool FullStrategy::run()
       { std::swap(p_model_, p_bestShortModel); break;}
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("In FullStrategy::run(), long run terminated\n")
-           << _T("iTry =") << iTry << _T("\n")
-           << _T("p_model_->lnLikelihood() = ") << p_model_->lnLikelihood()
+           << _T("iTry =") << iTry
+           << _T(", p_model_->lnLikelihood() = ") << p_model_->lnLikelihood()
            << _T("\n");
 #endif
     } // end iTry

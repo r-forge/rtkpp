@@ -1,18 +1,25 @@
 \name{NEWS}
 \title{News for Package 'rtkpp}
 
+\section{Changes in rtkpp version 0.9.2 (2015-07-30)}{
+  \itemize{
+    \item Creating fixed size allocators and Array1D
+    \item Adding support for the kernel mixture models
+    \item Adding miscellneous kernels in STatistiK project
+  }
+}
 \section{Changes in rtkpp version 0.9.0 (2014-12-01)}{
   \itemize{
-    \item Provide more templated classes reducing the size of the library 
-    \item Adding GaussianKernel mixture model
+    \item Provide more templated classes reducing the size of the library
+    \item Adding GaussianKernel mixture models
   }
 }
 \section{Changes in rtkpp version 0.8.5 (2014-12-01)}{
   \itemize{
     \item Using openmp support
     \item using accelerated new version of the stk++ library
-    \item adding factors to the categorical mixtures 
-    \item many bug corrections 
+    \item adding factors to the categorical mixtures
+    \item many bug corrections
   }
 }
 \section{Changes in rtkpp version 0.8.4 (2014-11-06)}{

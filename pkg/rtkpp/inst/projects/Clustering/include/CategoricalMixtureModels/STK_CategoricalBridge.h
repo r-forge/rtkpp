@@ -60,8 +60,12 @@ struct MixtureBridgeTraits< CategoricalBridge<Clust::Categorical_pjk_, Data_> >
 {
   /** Structure storing the Data */
   typedef Data_ Data;
+  /** Data Type */
+  typedef typename Data_::Type Type;
   /** Type of the Mixture model */
   typedef Categorical_pjk<Data> Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::Categorical_pjk_> ParamHandler;
   /** Structure storing Parameters */
   typedef ArrayXX Parameters;
   enum
@@ -77,8 +81,12 @@ struct MixtureBridgeTraits< CategoricalBridge< Clust::Categorical_pk_, Data_> >
 {
   /** Structure storing the Data */
   typedef Data_ Data;
+  /** Data Type */
+  typedef typename Data_::Type Type;
   /** Type of the mixture model */
   typedef Categorical_pk<Data> Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::Categorical_pk_> ParamHandler;
   /** Structure storing Parameters */
   typedef ArrayXX Parameters;
   enum

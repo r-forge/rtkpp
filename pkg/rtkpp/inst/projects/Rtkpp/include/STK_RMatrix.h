@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*  Copyright (C) 2004-2014  Serge Iovleff, University Lille 1, Inria
+/*  Copyright (C) 2004-2015  Serge Iovleff, University Lille 1, Inria
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as
@@ -84,7 +84,7 @@ struct Traits< RMatrix<Type_> >
 } // namespace hidden
 
 template <typename Type_>
-class RMatrix : public ArrayBase< RMatrix<Type_> >
+class RMatrix : public ArrayBase< RMatrix<Type_> >, public TRef<1>
 {
   public:
     typedef typename hidden::Traits<RMatrix<Type_> >::Row Row;
@@ -110,15 +110,22 @@ class RMatrix : public ArrayBase< RMatrix<Type_> >
     typedef TRange<sizeCols_> ColRange;
 
     /** Default Constructor. */
-    inline RMatrix() : matrix_(),rows_(), cols_() {}
+    inline RMatrix(): matrix_(),rows_(), cols_() {}
     /** Constructor with SEXP. */
     inline RMatrix( SEXP robj)
-                     : matrix_(robj),rows_(0, matrix_.rows()), cols_(0, matrix_.cols())
+                  : matrix_(robj),rows_(0, matrix_.rows()), cols_(0, matrix_.cols())
     {}
     /** Constructor */
     inline RMatrix( Rcpp::Matrix<Rtype_> matrix)
-                     : matrix_(matrix),rows_(0, matrix_.rows()), cols_(0, matrix_.cols())
+                  : matrix_(matrix), rows_(0, matrix_.rows()), cols_(0, matrix_.cols())
     {}
+    /** Copy Constructor. @c ref is only there for compatibility */
+    inline RMatrix( RMatrix const& matrix, bool ref)
+                  : matrix_(matrix), rows_(0, matrix_.rows()), cols_(0, matrix_.cols())
+    {}
+
+    /** @return the underlying Rcpp matrix */
+    inline Rcpp::Matrix<Rtype_> const& matrix() const { return matrix_;}
     /** set Matrix .
      *  @param matrix the Rcpp matrix to wrap
      *  @note cannot be passed as const& due to a bug from the Rcpop side

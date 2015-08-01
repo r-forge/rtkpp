@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2007  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -23,22 +23,22 @@
 */
 
 /*
- * Project:  stkpp::hidden::TContainer
+ * Project:  stkpp::Arrays
  * Purpose:  Define the Interface 1D templated Container class.
  * Author:   Serge Iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  *
  **/
 
 /** @file STK_ITContainer1D.h
- *  @brief in this file we define the interface class for ITContainer1D.
+ *  @brief in this file we define the interface classes IContainer1D and ITContainer1D.
  **/
 
 #ifndef STK_ITCONTAINER1D_H
 #define STK_ITCONTAINER1D_H
 
 
-#include "Sdk/include/STK_IRecursiveTemplate.h"
-#include "Sdk/include/STK_Macros.h"
+#include <Sdk/include/STK_IRecursiveTemplate.h>
+#include <Sdk/include/STK_Macros.h>
 
 #include "STK_Traits.h"
 #include "STK_Arrays_Util.h"
@@ -51,9 +51,12 @@ namespace STK
  * The IContainer1D class is an interface base class for all
  * one dimensional containers.
  **/
+template<int Size_>
 class IContainer1D
 {
-  protected:
+  public:
+    typedef TRange<Size_> Range1D;
+
     /** Default constructor */
     inline IContainer1D() : range_() {}
     /** constructor with specified range
@@ -68,21 +71,22 @@ class IContainer1D
     inline ~IContainer1D() {}
 
     /**  @return the range of the container */
-    inline Range const& rangeImpl() const  { return range_;}
+    inline Range1D const& range() const  { return range_;}
     /** @return the index of the first element */
-    inline int beginImpl() const { return range_.begin();}
+    inline int begin() const { return range_.begin();}
     /**  @return the ending index of the elements */
-    inline int endImpl() const { return range_.end();}
+    inline int end() const { return range_.end();}
     /**  @return the size of the container */
-    inline int sizeImpl() const  { return range_.size();}
-
+    inline int size() const  { return range_.size();}
     /**  @return the index of the last element */
-    inline int lastIdxImpl() const  { return range_.lastIdx();}
+    inline int lastIdx() const  { return range_.lastIdx();}
 
     /** Is there some data ?
      *  @return @c true if the container is empty, @c false otherwise
      **/
     inline bool empty() const { return range_.empty();}
+
+  protected:
     /** exchange this container with T
      * @param T the container to exchange with T
      **/
@@ -94,7 +98,7 @@ class IContainer1D
     /** Set range of the rows of the container.
      *  @param I the range to set (default empty)
      **/
-    inline void setRange(Range const& I = Range()) { range_ = I;}
+    inline void setRange(Range const& I = Range1D()) { range_ = I;}
     /** increment the range of the container (can be negative).
      *  @param inc increment to apply to the range
      **/
@@ -117,8 +121,8 @@ class IContainer1D
     inline void decLast(int const& inc =1) { range_.decLast(inc);}
 
   private:
-    /** Range of the indexes. */
-    Range range_;
+    /** range of the array. */
+    Range1D range_;
 };
 
 /** @ingroup Arrays
@@ -126,9 +130,11 @@ class IContainer1D
  *
  * The ITContainer1D class is the templated base class for all
  * homogeneous one-dimensional containers containing element of type @c Type
- * where Type is note necessarily a scalar. Even if it is essentially a
- * not oriented (row or column) container, it have been defined as a container
- * with one column and many rows.
+ * where Type is note necessarily a scalar. It assumes that the derived class
+ * cannot be part of an expression and is not constant, so that it can be
+ * #- shifted,
+ * #- resized
+ * #- accessed in modification.
  *
  * Implement the curious recursive template paradigm : the template
  * parameter @c Derived is the name of the class that
@@ -144,7 +150,6 @@ class IContainer1D
  * @code
  *   Type& elt1Impl(int const& pos);
  *   Type const& elt1Impl(int const& pos) const;
- *   SubVector subImpl(range const& I) const;
  *   void shiftImpl(int const& beg);
  *   Derived& resizeImpl(Range const& I);
  * @endcode
@@ -156,67 +161,59 @@ class IContainer1D
  * are using derived classes for storing any kind of data.
  **/
 template <class Derived>
-class ITContainer1D : protected IContainer1D, public IRecursiveTemplate<Derived>
+class ITContainer1D : public IContainer1D< hidden::Traits<Derived>::size_ >
+                    , public IRecursiveTemplate<Derived>
 {
   public:
-    typedef IContainer1D Base;
+    typedef IContainer1D< hidden::Traits<Derived>::size_ > Base;
+    using Base::begin;
+    using Base::end;
+    using Base::lastIdx;
 
   protected:
     typedef typename hidden::Traits<Derived>::Type Type;
     typedef typename hidden::Traits<Derived>::SubVector SubVector;
 
     /** Default constructor */
-    inline ITContainer1D(): IContainer1D() {}
+    inline ITContainer1D(): Base() {}
     /** constructor with a specified range.
      *  @param I : the range of the container
      **/
-    inline ITContainer1D( Range const& I): IContainer1D(I) {}
+    inline ITContainer1D( Range const& I): Base(I) {}
     /** Copy constructor
      *  @param T the container to copy
      **/
-    inline ITContainer1D( ITContainer1D const& T): IContainer1D(T) {}
+    inline ITContainer1D( ITContainer1D const& T): Base(T) {}
     /** destructor. */
     inline ~ITContainer1D() {}
 
   public:
-    /** @return the Vertical range*/
-    inline Range const& rows() const { return IContainer1D::rangeImpl();}
-    /** @return the index of the first element */
-    inline int beginRows() const { return IContainer1D::beginImpl();}
-    /**  @return the index of the last element*/
-    inline int endRows() const  { return IContainer1D::endImpl();}
-    /** @return the size of the container in number of rows */
-    inline int sizeRows() const  { return IContainer1D::sizeImpl();};
-
-    /** @return the Vertical range*/
-    inline Range const& range() const { return IContainer1D::rangeImpl();}
-    /** @return the index of the first element */
-    inline int begin() const { return IContainer1D::beginImpl();}
-    /**  @return the index of the last element*/
-    inline int end() const  { return IContainer1D::endImpl();}
-    /** @return the size of the container */
-    inline int size() const  { return IContainer1D::sizeImpl();};
-
-    /**  @return the index of the last element*/
-    inline int lastIdx() const  { return IContainer1D::lastIdxImpl();}
-
-    /** @return the Horizontal range (1 column) */
-    inline Range cols() const { return Range(1);};
-    /** @return the index of the first element */
-    inline int beginCols() const { return baseIdx;}
-    /**  @return the index of the last element*/
-    inline int endCols() const  { return baseIdx+1;}
-    /** @return the size of the container in number of columns */
-    inline int sizeCols() const  { return 1;};
-
     /** @return the ith element for vector_, point_ and diagonal_ containers
      *  @param i index of the ith element
      **/
-    inline Type& elt(int i) { return this->asDerived().elt1Impl(i);}
+    inline Type& elt(int i)
+    {
+#ifdef STK_BOUNDS_CHECK
+      if (this->asDerived().begin() > i)
+      { STKOUT_OF_RANGE_1ARG(ITContainer1D::elt, i, begin() > i);}
+      if (this->asDerived().end() <= i)
+      { STKOUT_OF_RANGE_1ARG(ITContainer1D::elt, i, end() <= i);}
+#endif
+      return this->asDerived().elt1Impl(i);
+    }
     /** @return a constant reference on the ith element for vector_, point_ and diagonal_ containers
      *  @param i index of the ith element
      **/
-    inline Type const& elt(int i) const { return this->asDerived().elt1Impl(i);}
+    inline Type const& elt(int i) const
+    {
+#ifdef STK_BOUNDS_CHECK
+      if (this->asDerived().begin() > i)
+      { STKOUT_OF_RANGE_1ARG(ITContainer1D::elt, i, begin() > i);}
+      if (this->asDerived().end() <= i)
+      { STKOUT_OF_RANGE_1ARG(ITContainer1D::elt, i, end() <= i);}
+#endif
+      return this->asDerived().elt1Impl(i);
+    }
     /** @return the element ith element
      *  @param i index of the ith element
      **/
@@ -232,8 +229,8 @@ class ITContainer1D : protected IContainer1D, public IRecursiveTemplate<Derived>
     {
       if (this->asDerived().begin() > i)
       { STKOUT_OF_RANGE_1ARG(ITContainer1D::at, i, begin() > i);}
-      if (this->asDerived().lastIdx() < i)
-      { STKOUT_OF_RANGE_1ARG(ITContainer1D::at, i, lastIdx() < i);}
+      if (this->asDerived().end() <= i)
+      { STKOUT_OF_RANGE_1ARG(ITContainer1D::at, i, lastIdx() <= i);}
       return elt(i);
     }
     /** @return safely the constant jth element
@@ -247,6 +244,20 @@ class ITContainer1D : protected IContainer1D, public IRecursiveTemplate<Derived>
       { STKOUT_OF_RANGE_1ARG(ITContainer1D::at, i, lastIdx() < i);}
       return elt(i);
     }
+    /** Access to many elements.
+     *  @param I the range of the elements
+     *  @return a reference container with the elements of this in the range I
+     **/
+    inline SubVector sub(Range const& I) const
+    {
+#ifdef STK_BOUNDS_CHECK
+      if ((I.begin()<begin()))
+      { STKOUT_OF_RANGE_1ARG(ITContainer1D::sub,I,I.begin()<begin());}
+      if ((I.end()>end()))
+      { STKOUT_OF_RANGE_1ARG(ITContainer1D::sub,I,I.end()>end());}
+#endif
+      return SubVector(this->asDerived(),I);
+    }
 
     /** @return a reference on the first element. */
     inline Type& front() { return elt(begin());}
@@ -256,11 +267,7 @@ class ITContainer1D : protected IContainer1D, public IRecursiveTemplate<Derived>
     inline Type& back() { return elt(lastIdx());}
     /** @return a constant reference on the last element */
     inline Type const& back() const { return elt(lastIdx());}
-    /** Access to many elements.
-     *  @param I the range of the elements
-     *  @return a reference container with the elements of this in the range I
-     **/
-    inline SubVector sub(Range const& I) const { return this->asDerived().subImpl(I);}
+
     /**  @param beg the index of the first column to set */
     inline void shift(int beg) { this->asDerived().shiftImpl(beg);}
     /** @return the resized container.

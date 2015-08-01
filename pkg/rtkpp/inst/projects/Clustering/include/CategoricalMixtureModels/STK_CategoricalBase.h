@@ -74,7 +74,7 @@ class CategoricalBase : public IMixtureModel<Derived >
     inline Range  const& modalities() const { return modalities_;}
     /** @return the probability of the kth cluster, jth variable, lth modality */
     inline Real proba(int k, int j, int l) const { return this->asDerived().probaImpl(k,j,l);}
-    /** @return the probability of the kth cluster, jth variable, lth modality */
+    /** @return the probability of the kth cluster for the jth variable */
     inline VectorX proba(int k, int j) const { return this->asDerived().probaImpl(k,j);}
     /** Initialize the model. Resize the probability arrays of each component.*/
     void initializeModelImpl()
@@ -97,14 +97,14 @@ class CategoricalBase : public IMixtureModel<Derived >
      *  @param i,j indexes of the data to impute */
     int impute(int i, int j) const;
     /** @return a simulated value for the jth variable of the ith sample
-     * @param i,j indexes of the data to simulate*/
-    int sample(int i, int j) const;
+     * in the kth cluster
+     * @param i,j,k indexes of the data to simulate */
+    inline Real rand(int i, int j, int k) const
+    { return Law::Categorical::rand(proba(k,j));}
     /** get the parameters of the model in an array of size (K * L) * d.
      *  @param params the parameters of the model
      **/
     void getParameters(ArrayXX& params) const;
-    /** @return the parameters of the model in an array of size (K * L) * d. */
-    ArrayXX getParameters() const;
     /** Write the parameters on the output stream os */
     void writeParameters(ostream& os) const
     {
@@ -147,16 +147,6 @@ int CategoricalBase<Derived>::impute(int i, int j) const
   return lmax;
 }
 
-/* Implementation  */
-template<class Derived>
-int CategoricalBase<Derived>::sample(int i, int j) const
-{
-  // sample class
-  int k = Law::Categorical::rand(p_tik()->row(i));
-  // sample from conditional probability
-  return Law::Categorical::rand(this->asDerived().param_[k]);
-}
-
 /* get the parameters of the model
  *  @param params the parameters of the model
  **/
@@ -177,26 +167,6 @@ void CategoricalBase<Derived>::getParameters(ArrayXX& params) const
   }
 }
 
-/* get the parameters of the model in an array of size (K * L) * d.
- **/
-template<class Derived>
-ArrayXX CategoricalBase<Derived>::getParameters() const
-{
-  ArrayXX params;
-  int nbCluster    = this->nbCluster();
-  int nbModalities = modalities_.size();
-
-  params.resize(nbModalities * nbCluster, p_data()->cols());
-  for (int j = p_data()->beginCols(); j < p_data()->endCols(); ++j)
-  {
-    for (int k = 0; k < nbCluster; ++k)
-    {
-      for (int l = 0; l < nbModalities; ++l)
-      { params(baseIdx+k * nbModalities + l, j) = proba(baseIdx+k, j, modalities_.begin() + l);}
-    }
-  }
-  return params;
-}
 
 } // namespace STK
 

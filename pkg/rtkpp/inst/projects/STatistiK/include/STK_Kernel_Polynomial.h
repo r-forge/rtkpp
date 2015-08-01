@@ -46,9 +46,10 @@ namespace Kernel
 /** @ingroup Kernel
  * The Polynomial Kernel is a kernel of the form
  * \f[
- * k(x,y) = \exp\left( \frac{\|x-y\|}{h} \right)
+ * k(x,y) = \left(<x-y>+c\right)^d
  * \f]
- * where @e h represents the bandwidth of the kernel.
+ * where @e c  represents the shift of the kernel (default is 0)
+ * and @c d represents the degree.
  */
 template<class Array>
 class Polynomial : public IKernelBase<Array>
@@ -63,8 +64,8 @@ class Polynomial : public IKernelBase<Array>
      *  @param shift the shift to use in the kernel
      *  @param d degree of the polynomial
      **/
-    Polynomial( Array const* p_data, Real const& shift= 0, Real const& d=2.)
-              : Base(p_data), shift_(shift), d_(d)
+    Polynomial( Array const* p_data, Real const& d=2., Real const& shift= 0)
+              : Base(p_data), d_(d), shift_(shift)
     { if (d_ <= 0.)
       STKDOMAIN_ERROR_2ARG(Polynomial::Polynomial,shift,d,d must be>0);
     }
@@ -73,8 +74,8 @@ class Polynomial : public IKernelBase<Array>
      *  @param shift the shift to use in the kernel
      *  @param d degree of the polynomial
      **/
-    Polynomial( Array const& data, Real const& shift= 0., Real const& d=2.)
-              : Base(data),shift_(shift), d_(d)
+    Polynomial( Array const& data, Real const& d=2., Real const& shift= 0.)
+              : Base(data), d_(d), shift_(shift)
     { if (d_ <= 0.)
       STKDOMAIN_ERROR_2ARG(Polynomial::Polynomial,shift,d,d must be>0);
     }
@@ -87,15 +88,15 @@ class Polynomial : public IKernelBase<Array>
     /** @return the shift of the kernel */
     Real const& shift() const {return shift_;}
     /** set the shift of the kernel */
-    void setWidth(Real const& shift) { shift_ = shift;}
+    void setShift(Real const& shift) { shift_ = shift;}
     /** compute the kernel */
     virtual bool run();
 
   private:
-    /** shift of the kernel */
-    Real shift_;
     /** degree of the kernel */
     Real d_;
+    /** shift of the kernel */
+    Real shift_;
 };
 
 template<class Array>

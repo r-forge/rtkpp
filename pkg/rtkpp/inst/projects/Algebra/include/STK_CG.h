@@ -1,5 +1,5 @@
  /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2013-2013  Serge Iovleff, Quentin Grimonprez
+/*     Copyright (C) 2013-2015  Serge Iovleff, Quentin Grimonprez
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -25,7 +25,7 @@
 /*
  * Project:  stkpp::Algebra
  * created on: 24 mai 2013
- * Author:   Quentin Grimonprez
+ * Author:   Quentin Grimonprez, Serge Iovleff
  **/
 
 /** @file STK_CG.h
@@ -93,11 +93,10 @@ class CG
     /** Default Constructor */
     CG(): x_(), r_(), eps_(0.), iter_(0), nbStart_(0), p_mult_(0), p_init_(0), p_b_(0) {}
     /**Constructor
-     * @param p_mult functor which compute @b Ax with @b A a matrix and @b x a vector
+     * @param mult functor which compute @b Ax with @b A a matrix and @b x a vector
      * @param b from @b Ax=b
      * @param p_init functor which initialize @b x
      * @param eps tolerance
-     * @param max_iter maximal number of iterations
      */
     CG( MultFunctor const& mult
       , ColVector const& b
@@ -160,52 +159,6 @@ class CG
     int cg()
     {
       iter_ = 0;
-//      ColVector z, p, xold;
-//      // initialization
-//      if (!p_init_) { x_ = *p_b_;}        // set x_{-1} = 0 give x_0 = b_
-//      else          { x_ = (*p_init_)();} // set x_0
-//      // start iterations
-//      for(nbStart_ = 1; ; nbStart_++)
-//      {
-//        Real rnorm2_old = p_b_->norm2(), rnorm2_new;
-//        if (rnorm2_old == 0.) rnorm2_old = 1.;
-//        // compute initial residuals
-//        r_ = *p_b_ - (*p_mult_)(x_);
-//        // compute rnomr2_new and check convergence
-//        if ((rnorm2_new = r_.norm2()) <rnorm2_old * eps_) { return iter_;}
-//        //initialization of the conjugate direction
-//        p = r_;
-//        int iter;
-//        for( iter=1; iter < 50 ; iter++)
-//        {
-//          iter_++;
-//          // save old values
-//          xold.exchange(x_);
-//          rnorm2_old = rnorm2_new;
-//          //compute z=A p
-//          z.move((*p_mult_)(p));
-//          //compute alpha
-//          Real alpha = rnorm2_old/p.dot(z);
-//          //update x_ and r_
-//          x_ = xold + (alpha * p);
-//          r_ -= (alpha * z);
-//          // compute rnorm2_new and check divergence/convergence
-//          if ( (rnorm2_new=r_.norm2()) > rnorm2_old)
-//          { // restore x_
-//            xold.exchange(x_);
-//            break;
-//          }
-//          Real beta = rnorm2_new/rnorm2_old;
-//          if ( beta < eps_) { return iter_;}
-//          //update p_
-//          p = (p * beta) + r_;
-//        }
-//        // in case of divergence at the first iterations, it means we don't have
-//        // any solution to the system (residuals cannot be zero)
-//        if (iter <= 3) { return iter_;}
-//      }
-//      // return an error
-//      return -1;
       int nbStart = 0;
       ColVector xOld, z, p_;
 
@@ -311,7 +264,7 @@ class CG
  * @tparam ColVector The type of the containers for the vectors.
  */
 template<class MultFunctor, class CondFunctor, class ColVector, class InitFunctor = DefaultFunctor<ColVector> >
-class PCG : public IRunnerBase
+class PCG
 {
   public:
     typedef typename ColVector::Type Type;
@@ -322,9 +275,8 @@ class PCG : public IRunnerBase
      * @param eps tolerance
      */
     PCG( MultFunctor const& mult, CondFunctor const& cond, ColVector const& b, InitFunctor* const& p_init =0, Type eps=Arithmetic<Type>::epsilon())
-       : x_()
-       , r_()
-       , eps_(eps)
+       : x_(), r_()
+       , iter_(0), eps_(eps)
        , p_mult_(&mult)
        , p_cond_(&cond)
        , p_init_(p_init)
@@ -334,16 +286,15 @@ class PCG : public IRunnerBase
      * @param pcg the preconditioned conjugate gradient to copy
      */
     PCG( PCG const& pcg)
-      : x_(pcg.x_)
-      , r_(pcg.r_)
-      , eps_(pcg.eps_)
+      : x_(pcg.x_), r_(pcg.r_)
+      , eps_(pcg.eps_), iter_(0)
       , p_mult_(pcg.p_mult_)
       , p_cond_(pcg.p_cond_)
       , p_init_(pcg.p_init_)
       , p_b_(pcg.p_b_)
     {};
     /**destructor*/
-    virtual ~PCG() {};
+    ~PCG() {};
     /** clone pattern */
     PCG* clone() const { return new PCG(*this);}
 
@@ -364,28 +315,23 @@ class PCG : public IRunnerBase
     /** Set functor computing the value \f$ \mathbf{M}^{-1} \mathbf{r}\f$ */
     inline void setCondFunctor(CondFunctor const& cond) { p_cond_= &cond; }
     /** run the conjugate gradient */
-    virtual bool run()
-    {
-      try
-      {
-        pcg();
-      }
-      catch (Exception const& e)
-      {
-        this->msg_error_ = e.error();
-        return false;
-      }
-      return true;
-    }
+    inline int run() { return pcg();}
+    /** get the last error message.
+     * @return the last error message
+     **/
+    inline String const& error() const { return msg_error_;}
 
   protected:
-    void pcg()
+    /** String with the last error message. */
+    String msg_error_;
+    /** preconditioned Gradient implementation */
+    int pcg()
     {
       int nbStart = 0;
       ColVector xOld, y, z, p;
 
       Real bnorm2 = p_b_->norm2(), alpha, beta; //
-      int step = 0; //number of step
+      iter_= 0;
       // initialization
       if(!p_init_) {x_ = *p_b_;}
       else { x_ = (*p_init_)();}
@@ -410,6 +356,7 @@ class PCG : public IRunnerBase
           //update x_
           xOld.exchange(x_);
           x_ = xOld + alpha * p;
+          iter_++;
           //update residuals
           r_ = r_ - (alpha * z);
           //update y
@@ -421,12 +368,10 @@ class PCG : public IRunnerBase
           beta *= rty;
           //update p_
           p = (p * beta) + y;
-          step++;
-          if( step > p_b_->size() )
-            throw runtime_error("CG reaches p_b_->size() before convergence.");
         }
         nbStart++;
-      };
+      }
+      return iter_;
     }
 
   private:
@@ -434,6 +379,8 @@ class PCG : public IRunnerBase
     ColVector x_;
     /** residuals of the system */
     ColVector r_;
+    /** number of iterations */
+    int iter_;
     /** tolerance */
     Type eps_;
     /** pointer on the functor performing @b Ax */

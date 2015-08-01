@@ -564,18 +564,14 @@ Derived& ArrayBase<Derived>::assign(ExprBase<Rhs> const& rhs)
 {
   enum
   {
-    lhs_struct_ = hidden::Traits<Derived>::structure_
-  , lhs_orient_ = hidden::Traits<Derived>::orient_
-  , lhs_sizeRows_ = hidden::Traits<Derived>::sizeRows_
-  , lhs_sizeCols_ = hidden::Traits<Derived>::sizeCols_
-  , rhs_struct_ = hidden::Traits<Rhs>::structure_
+    rhs_struct_ = hidden::Traits<Rhs>::structure_
   , rhs_orient_ = hidden::Traits<Rhs>::orient_
   , rhs_sizeRows_ = hidden::Traits<Rhs>::sizeRows_
   , rhs_sizeCols_ = hidden::Traits<Rhs>::sizeCols_
   };
-   STK_STATICASSERT(CORRECT_ASSIGN((Arrays::Structure)lhs_struct_, (Arrays::Structure)rhs_struct_),YOU_TRIED_TO_ASSIGN_A_NOT_COMPATIBLE_ARRAY);
+   STK_STATICASSERT(CORRECT_ASSIGN((Arrays::Structure)structure_, (Arrays::Structure)rhs_struct_),YOU_TRIED_TO_ASSIGN_A_NOT_COMPATIBLE_ARRAY);
   // choose the correct way to resize if necessary
-  hidden::resizeSelector<Derived, Rhs, lhs_struct_>::run(this->asDerived(), rhs.asDerived());
+  hidden::resizeSelector<Derived, Rhs, structure_>::run(this->asDerived(), rhs.asDerived());
   // choose the correct way to copy
   hidden::CopycatSelector<Derived, Rhs,  orient_>::run(this->asDerived(), rhs.asDerived());
   return this->asDerived();

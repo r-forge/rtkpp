@@ -156,24 +156,20 @@ class GammaBase : public IMixtureModel<Derived >
     Real impute(int i, int j) const
     {
       Real sum = 0.;
-      for (int k= p_tik()->beginCols(); k < p_tik().endCols(); ++k)
+      for (int k= p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
       { sum += p_tik()->elt(i,k) * shape(k,j) * scale(k,j);}
       return sum;
     }
     /** @return a simulated value for the jth variable of the ith sample
-     *  @param i,j indexes of the value to sample
+     *  in the kth cluster.
+     *  @param i,j,k indexes of the data to simulate
      **/
-    Real sample(int i, int j) const
-    {
-      int k = Law::Categorical::rand(p_tik()->row(i));
-      return Law::Gamma::rand(shape(k,j), scale(k,j));
-    }
+    inline Real rand(int i, int j, int k) const
+    { return Law::Gamma::rand(shape(k,j), scale(k,j));}
     /** get the parameters of the model
      *  @param params the array to fill with the parameters of the model
      **/
     void getParameters(Array2D<Real>& params) const;
-    /** @return the parameters of the model in an array of size (K * 2d). */
-    ArrayXX getParameters() const;
     /** Write the parameters on the output stream os */
     void writeParameters(ostream& os) const;
 
@@ -206,23 +202,6 @@ void GammaBase<Derived>::getParameters(Array2D<Real>& params) const
       params(baseIdx+2*k+1, j) = scale(k,j);
     }
   }
-}
-/* get the parameters of the model in an array of size (K * 2d). */
-template<class Derived>
-ArrayXX GammaBase<Derived>::getParameters() const
-{
-  ArrayXX params;
-  int nbClust = this->nbCluster();
-  params.resize(2*nbClust, p_data()->cols());
-  for (int k= 0; k < nbClust; ++k)
-  {
-    for (int j= p_data()->beginCols();  j < p_data()->endCols(); ++j)
-    {
-      params(2*k+  baseIdx, j) = shape(k,j);
-      params(baseIdx+2*k+1, j) = scale(k,j);
-    }
-  }
-  return params;
 }
 
 /* Write the parameters on the output stream os */

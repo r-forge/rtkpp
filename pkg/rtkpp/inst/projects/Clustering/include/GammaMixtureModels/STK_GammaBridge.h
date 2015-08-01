@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2013 Serge Iovleff
+/*     Copyright (C) 2004-2015 Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -68,8 +68,12 @@ template<class Data_>
 struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_ajk_bjk_, Data_> >
 {
   typedef Data_ Data;
+  /** Data Type */
+  typedef typename Data_::Type Type;
   /** Type of the mixture model */
   typedef Gamma_ajk_bjk<Data> Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::Gamma_ajk_bjk_> ParamHandler;
   /** Structure storing Parameters */
   typedef ArrayXX Parameters;
   enum
@@ -84,8 +88,12 @@ template<class Data_>
 struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_ajk_bk_, Data_> >
 {
   typedef Data_ Data;
+  /** Data Type */
+  typedef typename Data_::Type Type;
   /** Type of the mixture model */
   typedef Gamma_ajk_bk<Data> Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::Gamma_ajk_bk_> ParamHandler;
   /** Structure storing Parameters */
   typedef ArrayXX Parameters;
   enum
@@ -100,8 +108,12 @@ template<class Data_>
 struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_ajk_bj_, Data_> >
 {
   typedef Data_ Data;
+  /** Data Type */
+  typedef typename Data_::Type Type;
   /** Type of the mixture model */
   typedef Gamma_ajk_bj<Data> Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::Gamma_ajk_bj_> ParamHandler;
   /** Structure storing Parameters */
   typedef ArrayXX Parameters;
   enum
@@ -116,8 +128,12 @@ template<class Data_>
 struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_ajk_b_, Data_> >
 {
   typedef Data_ Data;
+  /** Data Type */
+  typedef typename Data_::Type Type;
   /** Type of the mixture model */
   typedef Gamma_ajk_b<Data> Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::Gamma_ajk_b_> ParamHandler;
   /** Structure storing Parameters */
   typedef ArrayXX Parameters;
   enum
@@ -132,8 +148,12 @@ template<class Data_>
 struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_ak_bjk_, Data_> >
 {
   typedef Data_ Data;
+  /** Data Type */
+  typedef typename Data_::Type Type;
   /** Type of the mixture model */
   typedef Gamma_ak_bjk<Data> Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::Gamma_ak_bjk_> ParamHandler;
   /** Structure storing Parameters */
   typedef ArrayXX Parameters;
   enum
@@ -148,8 +168,12 @@ template<class Data_>
 struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_ak_bk_, Data_> >
 {
   typedef Data_ Data;
+  /** Data Type */
+  typedef typename Data_::Type Type;
   /** Type of the mixture model */
   typedef Gamma_ak_bk<Data> Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::Gamma_ak_bk_> ParamHandler;
   /** Structure storing Parameters */
   typedef ArrayXX Parameters;
   enum
@@ -164,8 +188,12 @@ template<class Data_>
 struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_ak_bj_, Data_> >
 {
   typedef Data_ Data;
+  /** Data Type */
+  typedef typename Data_::Type Type;
   /** Type of the mixture model */
   typedef Gamma_ak_bj<Data> Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::Gamma_ak_bj_> ParamHandler;
   /** Structure storing Parameters */
   typedef ArrayXX Parameters;
   enum
@@ -180,8 +208,12 @@ template<class Data_>
 struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_ak_b_, Data_> >
 {
   typedef Data_ Data;
+  /** Data Type */
+  typedef typename Data_::Type Type;
   /** Type of the mixture model */
   typedef Gamma_ak_b<Data> Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::Gamma_ak_b_> ParamHandler;
   /** Structure storing Parameters */
   typedef ArrayXX Parameters;
   enum
@@ -196,8 +228,12 @@ template<class Data_>
 struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_aj_bjk_, Data_> >
 {
   typedef Data_ Data;
+  /** Data Type */
+  typedef typename Data_::Type Type;
   /** Type of the mixture model */
   typedef Gamma_aj_bjk<Data> Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::Gamma_aj_bjk_> ParamHandler;
   /** Structure storing Parameters */
   typedef ArrayXX Parameters;
   enum
@@ -212,8 +248,12 @@ template<class Data_>
 struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_aj_bk_, Data_> >
 {
   typedef Data_ Data;
+  /** Data Type */
+  typedef typename Data_::Type Type;
   /** Type of the mixture model */
   typedef Gamma_aj_bk<Data> Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::Gamma_aj_bk_> ParamHandler;
   /** Structure storing Parameters */
   typedef ArrayXX Parameters;
   enum
@@ -228,8 +268,12 @@ template<class Data_>
 struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_a_bjk_, Data_> >
 {
   typedef Data_ Data;
+  /** Data Type */
+  typedef typename Data_::Type Type;
   /** Type of the mixture model */
   typedef Gamma_a_bjk<Data> Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::Gamma_a_bjk_> ParamHandler;
   /** Structure storing Parameters */
   typedef ArrayXX Parameters;
   enum
@@ -244,8 +288,12 @@ template<class Data_>
 struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_a_bk_, Data_> >
 {
   typedef Data_ Data;
+  /** Data Type */
+  typedef typename Data_::Type Type;
   /** Type of the mixture model */
   typedef Gamma_a_bk<Data> Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::Gamma_a_bk_> ParamHandler;
   /** Structure storing Parameters */
   typedef ArrayXX Parameters;
   enum

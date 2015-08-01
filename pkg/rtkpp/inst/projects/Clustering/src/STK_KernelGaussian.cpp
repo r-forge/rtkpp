@@ -29,32 +29,22 @@
  **/
 
 /** @file STK_KernelGaussian.cpp
- *  @brief In this file we implement the KernelGaussian_sk class
+ *  @brief In this file we implement the KernelGaussian_s and KernelGaussian_sk classes
  **/
 
 #include "../include/KernelMixtureModels/STK_KernelGaussian.h"
+#include <Arrays/include/STK_Array2DVector.h>
 
 namespace STK
 {
-/* default constructor
- * @param nbCluster number of cluster in the model
- **/
-KernelGaussian_sk::KernelGaussian_sk( int nbCluster) : Base(nbCluster)
-{}
-/** copy constructor
- *  @param model The model to copy
- **/
-KernelGaussian_sk::KernelGaussian_sk( KernelGaussian_sk const& model) : Base(model) {}
-/** destructor */
-KernelGaussian_sk::~KernelGaussian_sk() {}
-/** */
+/* */
 void KernelGaussian_sk::getParameters(ArrayXX& param) const
 {
-  param.resize(nbCluster(), 2);
-  for (int k= 0; k < nbCluster(); ++k)
+  param.resize(2, nbCluster());
+  for (int k= param_.sigma2_.begin(); k < param_.sigma2_.end(); ++k)
   {
-    param(baseIdx+k, baseIdx)   = std::sqrt(param_.sigma2_[baseIdx+k]);
-    param(baseIdx+k, baseIdx+1) = param_.lambda_[baseIdx+k];
+    param(baseIdx  , k) = std::sqrt(param_.sigma2_[k]);
+    param(baseIdx+1, k) = param_.dim_[k];
   }
 }
 /* Write the parameters on the output stream os */
@@ -63,8 +53,8 @@ void KernelGaussian_sk::writeParameters(ostream& os) const
   for (int k= p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
   {
     os << _T("---> Component ") << k << _T("\n");
-    os << _T("sigma2 = ") << param_.sigma2_[k] << _T("\n");
-    os << _T("lambda = ") << param_.lambda_[k] << _T("\n");
+    os << _T("sigma = ") << std::sqrt(param_.sigma2_[k]) << _T("\n");
+    os << _T("dim = ")   << param_.dim_[k] << _T("\n");
   }
 }
 /* Initialize randomly the parameters of the Gaussian mixture.
@@ -73,24 +63,63 @@ void KernelGaussian_sk::randomInit()
 {
   // compute the standard deviation
   for (int k= p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
-  {
-    param_.sigma2_[k] = p_data()->col(k).dot(p_tik()->col(k))/p_nk()->elt(k);
-  }
+  { param_.sigma2_[k] = p_data()->col(k).dot(p_tik()->col(k))/p_nk()->elt(k);}
+
 #ifdef STK_MIXTURE_VERY_VERBOSE
-  stk_cout << _T("KernelGaussian<Array>::randomInit() done\n");
+  stk_cout << _T("KernelGaussian_sk::randomInit() done\n");
 #endif
 }
 
 /* Compute the weighted means and the weighted standard deviations. */
 bool KernelGaussian_sk::mStep()
 {
-  // compute the standard deviation
+  param_.sigma2_ =  sum( p_data()->prod(*p_tik()) )/ (*p_nk() * param_.dim_);
+  if ((param_.sigma2_ <= 0.).any())  return false;
+
+  return true;
+}
+
+/* */
+void KernelGaussian_s::getParameters(ArrayXX& param) const
+{
+  param.resize(2, nbCluster());
+  for (int k= param_.dim_.begin(); k < param_.dim_.end(); ++k)
+  {
+    param(baseIdx  , k) = std::sqrt(param_.sigma2_);
+    param(baseIdx+1, k) = param_.dim_[k];
+  }
+}
+/* Write the parameters on the output stream os */
+void KernelGaussian_s::writeParameters(ostream& os) const
+{
   for (int k= p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
   {
-    param_.sigma2_[k] =  p_data()->col(k).dot(p_tik()->col(k))
-                      / (p_nk()->elt(k)*param_.lambda_[k]);
-    if (param_.sigma2_[k] <= 0.) return false;
+    os << _T("---> Component ") << k << _T("\n");
+    os << _T("sigma = ") << std::sqrt(param_.sigma2_) << _T("\n");
+    os << _T("dim = ")  << param_.dim_[k] << _T("\n");
   }
+}
+/* Initialize randomly the parameters of the Gaussian mixture.
+ */
+void KernelGaussian_s::randomInit()
+{
+  // compute the standard deviation
+  param_.sigma2_ = 0.;
+  for (int k= p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
+  { param_.sigma2_ += p_data()->col(k).dot(p_tik()->col(k));}
+  param_.sigma2_ /= this->nbSample();
+
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("KernelGaussian_s::randomInit() done\n");
+#endif
+}
+
+/* Compute the weighted means and the weighted standard deviations. */
+bool KernelGaussian_s::mStep()
+{
+  param_.sigma2_ =  ( p_data()->prod( *p_tik() ) ).sum()/ (this->nbSample() * param_.dim_.sum());
+  if (param_.sigma2_ <= 0.)  return false;
+
   return true;
 }
 

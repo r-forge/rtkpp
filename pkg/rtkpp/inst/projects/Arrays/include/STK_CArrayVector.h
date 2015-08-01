@@ -178,7 +178,7 @@ class CArrayVector : public ICArray < CArrayVector<Type_, SizeRows_, Orient_> >
      *  @param allocator the allocator to wrap
      **/
     template<class OtherAllocator>
-    inline CArrayVector( ICAllocator<OtherAllocator> const& allocator): Base(allocator.asDerived()) {}
+    inline CArrayVector( ITContainer2D<OtherAllocator> const& allocator): Base(allocator.asDerived()) {}
     /** Copy constructor using an expression.
      *  @param T the container to wrap
      **/

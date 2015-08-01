@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2007  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -125,6 +125,8 @@
 #include "STatistiK/include/STK_Stat_Transform.h"
 
 // Kernels
+#include "STatistiK/include/STK_Kernel_Util.h"
+
 #include "STatistiK/include/STK_Kernel_Gaussian.h"
 #include "STatistiK/include/STK_Kernel_Exponential.h"
 #include "STatistiK/include/STK_Kernel_Linear.h"

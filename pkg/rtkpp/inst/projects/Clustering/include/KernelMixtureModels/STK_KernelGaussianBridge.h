@@ -35,10 +35,9 @@
 #ifndef STK_KERNELMIXTUREBRIDGE_H
 #define STK_KERNELMIXTUREBRIDGE_H
 
-#include "STK_KernelGaussian.h"
-
 #include "../STK_MixtureData.h"
 #include "../STK_IMixtureBridge.h"
+#include "STK_KernelGaussian.h"
 
 
 namespace STK
@@ -49,20 +48,46 @@ template<int Id, class Data> class KernelGaussianBridge;
 namespace hidden
 {
 /** @ingroup hidden
- *  Partial  specialization of the MixtureBridgeTraits for the KernelGaussian model
+ *  Partial  specialization of the MixtureBridgeTraits for the KernelGaussian_sk_ model
  **/
 template<class Data_>
 struct MixtureBridgeTraits< KernelGaussianBridge< Clust::KernelGaussian_sk_, Data_> >
 {
   typedef Data_ Data;
+  /** Data Type */
+  typedef typename Data_::Type Type;
   /** Type of the mixture model */
   typedef KernelGaussian_sk Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::KernelGaussian_sk_> ParamHandler;
   /** Structure storing Parameters */
   typedef ArrayXX Parameters;
   // class of mixture
   enum
   {
-    idMixtureClass_ = Clust::KernelGaussian_sk_
+    idMixtureClass_ = Clust::Kernel_
+  };
+};
+
+/** @ingroup hidden
+ *  Partial  specialization of the MixtureBridgeTraits for the KernelGaussian_s_ model
+ **/
+template<class Data_>
+struct MixtureBridgeTraits< KernelGaussianBridge< Clust::KernelGaussian_s_, Data_> >
+{
+  typedef Data_ Data;
+  /** Data Type */
+  typedef typename Data_::Type Type;
+  /** Type of the mixture model */
+  typedef KernelGaussian_s Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::KernelGaussian_s_> ParamHandler;
+  /** Structure storing Parameters */
+  typedef ArrayXX Parameters;
+  // class of mixture
+  enum
+  {
+    idMixtureClass_ = Clust::Kernel_
   };
 };
 
@@ -108,13 +133,13 @@ class KernelGaussianBridge: public IMixtureBridge< KernelGaussianBridge<Id,Data>
     KernelGaussianBridge( MixtureData<Data>* p_data, std::string const& idData, int nbCluster)
                        : Base( p_data, idData, nbCluster)
                        , p_kii_(&(p_data->dataij_))
-                       , yik_(p_kii_->rows(), nbCluster)
+                       , dik_(p_kii_->rows(), nbCluster)
     { initializeMixture();}
     /** copy constructor */
     KernelGaussianBridge( KernelGaussianBridge const& bridge)
                        : Base(bridge)
                        , p_kii_(&(p_data_->dataij_))
-                       , yik_(bridge.yik_)
+                       , dik_(bridge.dik_)
     { initializeMixture();}
     /** destructor */
     virtual ~KernelGaussianBridge() {}
@@ -139,17 +164,15 @@ class KernelGaussianBridge: public IMixtureBridge< KernelGaussianBridge<Id,Data>
       return p_bridge;
     }
     /** set the dimension of the kernel mixture model */
-    inline void setLambda(Real const& lambda) { mixture_.setLambda(lambda);}
-    /** set the dimension of the kernel mixture model */
+    inline void setDim(Real const& dim) { mixture_.setDim(dim);}
     /** This function is equivalent to MStep and must be defined to update
-    inline void setLambda(VectorX const& lambda) { mixture_.setLambda(lambda);}
      *  parameters. In a Kernel mixture model, the MStep is defined by
      *  - an update of the distance from the center of the class
      *  - an usual update of the parameters
      */
     virtual void paramUpdateStep()
     {
-      compute_yik();
+      compute_dik(); // this update the values needed by the mixture_
       if (!mixture_.mStep()) throw Clust::mStepFail_;
     }
     /** This function can be used in order to the values of the parameters
@@ -159,30 +182,30 @@ class KernelGaussianBridge: public IMixtureBridge< KernelGaussianBridge<Id,Data>
     void getParameters(Param& param) const { mixture_.getParameters(param);}
 
   private:
-    /** Compute the intermediate results yik */
-    void compute_yik()
+    /** Compute the intermediate results dik */
+    void compute_dik()
     {
       // matrix of size (n,K) with values \sum_{j=1}^n k(x_i,x_j) t_{jk}/t_{.k}
       CArrayXX wik = (*p_kii_ * tik()) / (Const::Vector<Real>(p_kii_->rows()) * nk());
-      for (int k= yik_.beginCols(); k<yik_.endCols(); ++k)
+      for (int k= dik_.beginCols(); k<dik_.endCols(); ++k)
       {
         Real scal =tik().col(k).dot(wik.col(k))/nk()[k];
-        for (int i= yik_.beginRows(); i<yik_.endRows(); ++i)
-        { yik_(i,k) = p_kii_->elt(i,i) - 2. * wik(i,k) + scal  ;}
+        for (int i= dik_.beginRows(); i<dik_.endRows(); ++i)
+        { dik_(i,k) = p_kii_->elt(i,i) - 2. * wik(i,k) + scal  ;}
       }
     }
     /** This function will be used in order to initialize the mixture model
      *  using informations stored by the MixtureData. For example the missing
      *  values in the case of a MixtureData instance.
      *
-     *  In the kernel bridge the mixture use the intermediary array @c yik_ computed
+     *  In the kernel bridge the mixture use the intermediary array @c dik_ computed
      *  by the bridge. The initialization step consist in resizing the array
      *  and to set the pointer to @c mixture_.
      **/
     void initializeMixture()
     {
-      yik_.resize(p_kii_->rows(), this->nbCluster());
-      mixture_.setData(yik_);
+      dik_.resize(p_kii_->rows(), this->nbCluster());
+      mixture_.setData(dik_);
     }
     /** protected constructor to use in order to create a bridge.
      *  @param mixture the mixture to copy
@@ -192,12 +215,12 @@ class KernelGaussianBridge: public IMixtureBridge< KernelGaussianBridge<Id,Data>
     KernelGaussianBridge( Mixture const& mixture, std::string const& idData, int nbCluster)
                         : Base( mixture, idData, nbCluster)
                         , p_kii_(0)
-                        , yik_()
+                        , dik_()
     {}
     /** constant reference on the gram matrix*/
     Data const* p_kii_;
-    /** Array of the intermediate results yik */
-    ArrayXX yik_;
+    /** Array of the intermediate results dik */
+    ArrayXX dik_;
 };
 
 } // namespace STK

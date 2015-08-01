@@ -175,7 +175,7 @@ class CArraySquare
      *  @param allocator the allocator to wrap
      **/
     template<class OtherAllocator>
-    inline CArraySquare( ICAllocator<OtherAllocator> const& allocator): Base(allocator.asDerived()) {}
+    inline CArraySquare( ITContainer2D<OtherAllocator> const& allocator): Base(allocator.asDerived()) {}
     /** Copy constructor using an expression.
      *  @param T the container to wrap
      **/

@@ -81,22 +81,18 @@ class DiagGaussianBase : public IMixtureModel<Derived >
     {
       Real sum = 0.;
       for (int k= p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
-      { sum += p_tik()->elt(i,k) * mean(j,k);}
+      { sum += p_tik()->elt(i,k) * mean(k,j);}
       return sum;
     }
     /** @return a simulated value for the jth variable of the ith sample
-     * @param i,j indexes of the data to simulate */
-    Real sample(int i, int j) const
-    {
-      int k = Law::Categorical::rand(p_tik()->row(i));
-      return Law::Normal::rand(mean(j,k), sigma(j,k));
-    }
+     * in the kth cluster
+     * @param i,j,k indexes of the data to simulate */
+    inline Real rand(int i, int j, int k) const
+    { return Law::Normal::rand(mean(k, j), sigma(k,j));}
     /** get the parameters of the model
      *  @param params the parameters of the model
      **/
     void getParameters(ArrayXX& params) const;
-    /** @return the parameters of the model in an array of size (K * 2d). */
-    ArrayXX getParameters() const;
     /** Write the parameters on the output stream os */
     void writeParameters(ostream& os) const
     {
@@ -171,23 +167,6 @@ void DiagGaussianBase<Derived>::getParameters(ArrayXX& params) const
       params(baseIdx+2*k+1, j) = sigma(k,j);
     }
   }
-}
-/* @return the parameters of the model in an array of size (K * 2d). */
-template<class Derived>
-ArrayXX DiagGaussianBase<Derived>::getParameters() const
-{
-  ArrayXX params;
-  int nbClust = this->nbCluster();
-  params.resize(2*nbClust, p_data()->cols());
-  for (int k= 0; k < nbClust; ++k)
-  {
-    for (int j=  p_data()->beginCols();  j < p_data()->endCols(); ++j)
-    {
-      params(baseIdx+2*k  , j) = mean(k,j);
-      params(baseIdx+2*k+1, j) = sigma(k,j);
-    }
-  }
-  return params;
 }
 
 } // namespace STK

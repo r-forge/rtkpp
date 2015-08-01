@@ -36,10 +36,6 @@
 #ifndef STK_KERNELMIXTUREMANAGER_H
 #define STK_KERNELMIXTUREMANAGER_H
 
-//#ifdef STK_MIXTURE_VERY_VERBOSE
-//#include <STKernel/include/STK_String.h>
-//#endif
-
 #include "../STK_IMixtureManager.h"
 #include "STK_KernelGaussianBridge.h"
 
@@ -49,8 +45,7 @@
           registerMixtureData(p_data); \
           p_handler()->getData(idData, p_data->dataij_, p_data->nbVariable_ ); \
           p_data->initialize(); \
-          Bridge* p_bridge = new Bridge( p_data, idData, nbCluster);  \
-          return p_bridge;
+          return new Bridge( p_data, idData, nbCluster);
 
 namespace STK
 {
@@ -81,29 +76,69 @@ class KernelMixtureManager : public IMixtureManager<DataHandler>
     typedef MixtureData<DataReal> MixtureDataReal;
 
     // All Kernel bridges
-    typedef KernelGaussianBridge<Clust::KernelGaussian_sk_,  DataReal> MixtureKernelGaussianBridge;
+    typedef KernelGaussianBridge<Clust::KernelGaussian_sk_,  DataReal> MixtureKernelGaussianBridge_sk;
+    typedef KernelGaussianBridge<Clust::KernelGaussian_s_,  DataReal> MixtureKernelGaussianBridge_s;
 
     /** Default constructor, need an instance of a DataHandler.  */
-    KernelMixtureManager(DataHandler const& handler): Base(&handler) {}
+    inline KernelMixtureManager(DataHandler const& handler): Base(&handler) {}
     /** destructor */
-    virtual ~KernelMixtureManager() {}
-//    /** set the dimension of the kernel mixture model */
-//    inline void setLambda(IMixture* p_mixture, Real const& lambda)
-//    { static_cast<>(p_mixture)->setLambda(lambda);}
+    inline virtual ~KernelMixtureManager() {}
+
+    /** set the dimension of the kernel mixture model */
+    void setDim(IMixture* p_mixture, Real const& dim)
+    {
+      if (!p_mixture) return;
+      Clust::Mixture idModel = getIdModel(p_mixture->idName());
+      // up-cast... (Yes it's bad....;)...)
+      switch (idModel)
+      {
+        // Kernel models
+        case Clust::KernelGaussian_sk_:
+        { static_cast<MixtureKernelGaussianBridge_sk*>(p_mixture)->setDim(dim);}
+        break;
+        case Clust::KernelGaussian_s_:
+        { static_cast<MixtureKernelGaussianBridge_s*>(p_mixture)->setDim(dim);}
+        break;
+        default: // idModel is not implemented
+        break;
+      }
+    }
+    /** set the dimension of the kernel mixture model */
+    void setDim(IMixture* p_mixture, PointX const& dim)
+    {
+      if (!p_mixture) return;
+      Clust::Mixture idModel = getIdModel(p_mixture->idName());
+      // up-cast... (Yes it's bad....;)...)
+      switch (idModel)
+      {
+        // Kernel models
+        case Clust::KernelGaussian_sk_:
+        { static_cast<MixtureKernelGaussianBridge_sk const*>(p_mixture)->setDim(dim);}
+        break;
+        case Clust::KernelGaussian_s_:
+        { static_cast<MixtureKernelGaussianBridge_s const*>(p_mixture)->setDim(dim);}
+        break;
+        default: // idModel is not implemented
+        break;
+      }
+    }
     /** get the parameters from an IMixture.
      *  @param p_mixture pointer on the mixture
      *  @param param the array to return with the parameters
      **/
     void getParameters(IMixture* p_mixture, ArrayXX& param) const
     {
+      if (!p_mixture) return;
       Clust::Mixture idModel = getIdModel(p_mixture->idName());
-      if (idModel == Clust::unknown_mixture_) return;
       // up-cast... (Yes it's bad....;)...)
       switch (idModel)
       {
         // Kernel models
         case Clust::KernelGaussian_sk_:
-        { static_cast<MixtureKernelGaussianBridge const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureKernelGaussianBridge_sk const*>(p_mixture)->getParameters(param);}
+        break;
+        case Clust::KernelGaussian_s_:
+        { static_cast<MixtureKernelGaussianBridge_s const*>(p_mixture)->getParameters(param);}
         break;
         default: // idModel is not implemented
         break;
@@ -118,24 +153,27 @@ class KernelMixtureManager : public IMixtureManager<DataHandler>
     virtual IMixture* createMixtureImpl(String const&  idModelName, String const& idData, int nbCluster)
     {
 #ifdef STK_MIXTURE_VERY_VERBOSE
-      stk_cout << _T("Entering createMixtureImpl(") <<  idModelName << _T(",") << idData << _T(",") << nbCluster << _T(")\n");
+      stk_cout << _T("KernelMixtureManager::Entering createMixtureImpl(") <<  idModelName
+               << _T(",") << idData << _T(",") << nbCluster << _T(")\n");
 #endif
       Clust::Mixture idModel = Clust::stringToMixture(idModelName);
       return createMixtureImpl(idModel, idData, nbCluster);
     }
   private:
     /** create a concrete mixture and initialize it.
-     *  @param idModel Id name of the model
-     *  @param idData Id name of the data
+     *  @param idModel Id of the model
+     *  @param idData Id of the data
      *  @param nbCluster number of cluster of the model
      **/
     IMixture* createMixtureImpl(Clust::Mixture idModel, String const& idData, int nbCluster)
     {
       switch (idModel)
       {
-        // Kernel models
         case Clust::KernelGaussian_sk_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureKernelGaussianBridge)}
+        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureKernelGaussianBridge_sk)}
+        break;
+        case Clust::KernelGaussian_s_:
+        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureKernelGaussianBridge_s)}
         break;
         default:
           return 0; // 0 if idModel is not implemented

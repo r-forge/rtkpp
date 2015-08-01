@@ -59,8 +59,12 @@ template<class Data_>
 struct MixtureBridgeTraits< PoissonBridge<Clust::Poisson_ljk_, Data_> >
 {
   typedef Data_ Data;
+  /** Data Type */
+  typedef typename Data_::Type Type;
   /** Type of the Mixture model */
   typedef Poisson_ljk<Data> Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::Poisson_ljk_> ParamHandler;
   /** Structure storing Parameters */
   typedef ArrayXX Parameters;
   enum
@@ -75,8 +79,12 @@ template<class Data_>
 struct MixtureBridgeTraits< PoissonBridge<Clust::Poisson_lk_, Data_> >
 {
   typedef Data_ Data;
+  /** Data Type */
+  typedef typename Data_::Type Type;
   /** Type of the Mixture model */
   typedef Poisson_lk<Data> Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::Poisson_lk_> ParamHandler;
   /** Structure storing Parameters */
   typedef ArrayXX Parameters;
   enum
@@ -93,6 +101,8 @@ struct MixtureBridgeTraits< PoissonBridge< Clust::Poisson_ljlk_, Data_> >
   typedef Data_ Data;
   /** Type of the mixture model */
   typedef Poisson_ljlk<Data> Mixture;
+  /** Type of the parameter handler */
+  typedef ParametersHandler<Clust::Poisson_ljlk_> ParamHandler;
   /** Structure storing Parameters */
   typedef ArrayXX Parameters;
   enum

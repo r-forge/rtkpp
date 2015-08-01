@@ -149,6 +149,8 @@ MixtureClass mixtureToMixtureClass( Mixture const& type)
   if (type == Poisson_ljk_) return Poisson_;
   if (type == Poisson_lk_) return Poisson_;
   if (type == Poisson_ljlk_) return Poisson_;
+  if (type == KernelGaussian_sk_) return Kernel_;
+  if (type == KernelGaussian_s_) return Kernel_;
   return unknown_mixture_class_;
 }
 
@@ -182,6 +184,10 @@ Mixture stringToMixture( std::string const& type)
   if (toUpperString(type) == toUpperString(_T("Poisson_lk"))) return Poisson_lk_;
   if (toUpperString(type) == toUpperString(_T("Poisson_ljlk"))) return Poisson_ljlk_;
   if (toUpperString(type) == toUpperString(_T("KernelGaussian_sk"))) return KernelGaussian_sk_;
+  if (toUpperString(type) == toUpperString(_T("KernelGaussian_s"))) return KernelGaussian_s_;
+#ifdef STK_MIXTURE_DEBUG
+  stk_cout << _T("In stringToMixture, mixture ") << type << _T(" not found.\n");
+#endif
   return unknown_mixture_;
 }
 /* @ingroup Clustering
@@ -214,7 +220,8 @@ Mixture stringToMixture( std::string const& type, bool& freeProp)
   if (toUpperString(type) == toUpperString(_T("Poisson_p_ljk"))) return Poisson_ljk_;
   if (toUpperString(type) == toUpperString(_T("Poisson_p_lk"))) return Poisson_lk_;
   if (toUpperString(type) == toUpperString(_T("Poisson_p_ljlk"))) return Poisson_ljlk_;
-  if (toUpperString(type) == toUpperString(_T("KernelGaussian_sk_p_"))) return KernelGaussian_sk_;
+  if (toUpperString(type) == toUpperString(_T("KernelGaussian_p_sk"))) return KernelGaussian_sk_;
+  if (toUpperString(type) == toUpperString(_T("KernelGaussian_p_s"))) return KernelGaussian_s_;
   freeProp = true;
   if (toUpperString(type) == toUpperString(_T("Gamma_pk_ajk_bjk"))) return Gamma_ajk_bjk_;
   if (toUpperString(type) == toUpperString(_T("Gamma_pk_ajk_bk"))) return Gamma_ajk_bk_;
@@ -237,7 +244,11 @@ Mixture stringToMixture( std::string const& type, bool& freeProp)
   if (toUpperString(type) == toUpperString(_T("Poisson_pk_ljk"))) return Poisson_ljk_;
   if (toUpperString(type) == toUpperString(_T("Poisson_pk_lk"))) return Poisson_lk_;
   if (toUpperString(type) == toUpperString(_T("Poisson_pk_ljlk"))) return Poisson_ljlk_;
-  if (toUpperString(type) == toUpperString(_T("KernelGaussian_pk_sk_"))) return KernelGaussian_sk_;
+  if (toUpperString(type) == toUpperString(_T("KernelGaussian_pk_sk"))) return KernelGaussian_sk_;
+  if (toUpperString(type) == toUpperString(_T("KernelGaussian_pk_s"))) return KernelGaussian_s_;
+#ifdef STK_MIXTURE_DEBUG
+  stk_cout << _T("In stringToMixture, mixture ") << type << _T(" not found.\n");
+#endif
   return unknown_mixture_;
 }
 
@@ -270,6 +281,7 @@ std::string mixtureToString( Mixture const& type)
   if (type == Poisson_lk_) return String(_T("Poisson_lk"));
   if (type == Poisson_ljlk_) return String(_T("Poisson_ljlk"));
   if (type == KernelGaussian_sk_) return String(_T("KernelGaussian_sk"));
+  if (type == KernelGaussian_s_) return String(_T("KernelGaussian_s"));
   return String(_T("unknown"));
 }
 
@@ -308,6 +320,7 @@ std::string mixtureToString(Mixture type, bool freeProp)
     if (type == Poisson_ljlk_) return String(_T("Poisson_p_ljlk"));
     if (type == Poisson_ljlk_) return String(_T("Poisson_p_ljlk"));
     if (type == KernelGaussian_sk_) return String(_T("KernelGaussian_sk_p"));
+    if (type == KernelGaussian_s_) return String(_T("KernelGaussian_s_p"));
   }
   else
   {

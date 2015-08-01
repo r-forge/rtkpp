@@ -23,13 +23,13 @@
 */
 
 /*
- * Project:  stkpp::
+ * Project:  stkpp::Algebra
  * created on: 10 avr. 2015
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
 
 /** @file STK_Algebra_Util.h
- *  @brief In this file .
+ *  @brief In this file we define and implement utilies class and method for the Algebra project.
  **/
 
 

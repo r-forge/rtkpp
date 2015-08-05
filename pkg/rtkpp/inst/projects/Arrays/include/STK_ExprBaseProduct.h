@@ -195,8 +195,8 @@ ExprBase<Derived>::operator*( ExprBase<Rhs> const& other) const
                         || int(Derived::sizeCols_) == int(Rhs::sizeCols_)
                         )
   };
-  STK_STATICASSERT(productSizeIsValid_ || !(areVectors_ && haveSameSizeRows_),INVALID_VECTOR_VECTOR_PRODUCT);
-  STK_STATICASSERT(productSizeIsValid_ || !(arePoints_  && haveSameSizeCols_),INVALID_POINT_POINT_PRODUCT);
+  STK_STATIC_ASSERT(productSizeIsValid_ || !(areVectors_ && haveSameSizeRows_),INVALID_VECTOR_VECTOR_PRODUCT);
+  STK_STATIC_ASSERT(productSizeIsValid_ || !(arePoints_  && haveSameSizeCols_),INVALID_POINT_POINT_PRODUCT);
 
   return typename ProductReturnType<Derived, Rhs>::ReturnType(this->asDerived(), other.asDerived());
 }

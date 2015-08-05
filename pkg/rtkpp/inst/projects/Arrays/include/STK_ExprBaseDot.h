@@ -47,8 +47,8 @@ template<class Rhs>
 typename STK::hidden::Promote<typename STK::hidden::Traits<Derived>::Type, typename Rhs::Type>::result_type const
 ExprBase<Derived>::dot(ExprBase<Rhs> const& other) const
 {
-  STK_STATICASSERT_VECTOR_ONLY(Derived);
-  STK_STATICASSERT_ONE_DIMENSION_ONLY(Rhs);
+  STK_STATIC_ASSERT_VECTOR_ONLY(Derived);
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Rhs);
   return BinaryOperator< ProductOp<Type, typename hidden::Traits<Rhs>::Type>
                        , Derived
                        , Rhs>(this->asDerived(), other.asDerived()).sum();
@@ -60,8 +60,8 @@ template<class Rhs>
 typename STK::hidden::Promote<typename STK::hidden::Traits<Derived>::Type, typename Rhs::Type>::result_type const
 ExprBase<Derived>::dotSafe(ExprBase<Rhs> const& other) const
 {
-  STK_STATICASSERT_VECTOR_ONLY(Derived);
-  STK_STATICASSERT_ONE_DIMENSION_ONLY(Rhs);
+  STK_STATIC_ASSERT_VECTOR_ONLY(Derived);
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Rhs);
   return BinaryOperator< ProductOp<Type, typename hidden::Traits<Rhs>::Type>
                        , Derived
                        , Rhs>(this->asDerived(), other.asDerived()).sumSafe();

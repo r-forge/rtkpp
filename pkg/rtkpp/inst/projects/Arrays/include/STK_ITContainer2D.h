@@ -365,11 +365,8 @@ class ITContainer2D : public IContainer2D< hidden::Traits<Derived>::sizeRows_, h
     /** resize the allocator
      *  @param sizeRows, sizeCols size of the rows and columns
      **/
-   inline Derived& resize(int sizeRows, int sizeCols)
-    {
-      this->asDerived().resize2Impl(sizeRows, sizeCols);
-      return this->asDerived();
-    }
+    inline Derived& resize(int sizeRows, int sizeCols)
+    { return this->asDerived().resize2Impl(sizeRows, sizeCols);}
     /** shift the first indexes of the vector or point.
      *  @param beg the index of the first row or column
      **/
@@ -378,10 +375,7 @@ class ITContainer2D : public IContainer2D< hidden::Traits<Derived>::sizeRows_, h
      *  @param size the size to set to the vector
      **/
     inline Derived& resize(int size)
-    {
-      this->asDerived().resize1Impl(size);
-      return this->asDerived();
-    }
+    { return this->asDerived().resize1Impl(size);}
     /** @param pos1, pos2 position of the first and second columns to swap */
     void swapCols(int pos1, int pos2)
     {

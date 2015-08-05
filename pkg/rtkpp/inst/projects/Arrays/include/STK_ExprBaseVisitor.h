@@ -280,16 +280,16 @@ template<typename Derived>
 template<typename Rhs>
 typename hidden::Traits<Derived>::Type const ExprBase<Derived>::wsum(ExprBase<Rhs> const& weights) const
 {
-  STK_STATICASSERT_VECTOR_ONLY(Derived);
-  STK_STATICASSERT_ONE_DIMENSION_ONLY(Rhs);
+  STK_STATIC_ASSERT_VECTOR_ONLY(Derived);
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Rhs);
   return dot(weights);
 }
 template<typename Derived>
 template<typename Rhs>
 typename hidden::Traits<Derived>::Type const ExprBase<Derived>::wsumSafe(ExprBase<Rhs> const& weights) const
 {
-  STK_STATICASSERT_VECTOR_ONLY(Derived);
-  STK_STATICASSERT_ONE_DIMENSION_ONLY(Rhs);
+  STK_STATIC_ASSERT_VECTOR_ONLY(Derived);
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Rhs);
   return dotSafe(weights);
 }
 /* @return the norm of this*/
@@ -297,16 +297,16 @@ template<typename Derived>
 template<typename Rhs>
 typename hidden::Traits<Derived>::Type const ExprBase<Derived>::wnorm(ExprBase<Rhs> const& weights) const
 {
-  STK_STATICASSERT_VECTOR_ONLY(Derived);
-  STK_STATICASSERT_ONE_DIMENSION_ONLY(Rhs);
+  STK_STATIC_ASSERT_VECTOR_ONLY(Derived);
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Rhs);
   return static_cast<Type>(std::sqrt(wnorm2(weights)));
 }
 template<typename Derived>
 template<typename Rhs>
 typename hidden::Traits<Derived>::Type const ExprBase<Derived>::wnormSafe(ExprBase<Rhs> const& weights) const
 {
-  STK_STATICASSERT_VECTOR_ONLY(Derived);
-  STK_STATICASSERT_ONE_DIMENSION_ONLY(Rhs);
+  STK_STATIC_ASSERT_VECTOR_ONLY(Derived);
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Rhs);
   return static_cast<Type>(std::sqrt(wnorm2Safe(weights)));
 }
 /* @return the square norm of this*/
@@ -314,16 +314,16 @@ template<typename Derived>
 template<typename Rhs>
 typename hidden::Traits<Derived>::Type const ExprBase<Derived>::wnorm2(ExprBase<Rhs> const& weights) const
 {
-  STK_STATICASSERT_VECTOR_ONLY(Derived);
-  STK_STATICASSERT_ONE_DIMENSION_ONLY(Rhs);
+  STK_STATIC_ASSERT_VECTOR_ONLY(Derived);
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Rhs);
   return square().dot(weights);
 }
 template<typename Derived>
 template<typename Rhs>
 typename hidden::Traits<Derived>::Type const ExprBase<Derived>::wnorm2Safe(ExprBase<Rhs> const& weights) const
 {
-  STK_STATICASSERT_VECTOR_ONLY(Derived);
-  STK_STATICASSERT_ONE_DIMENSION_ONLY(Rhs);
+  STK_STATIC_ASSERT_VECTOR_ONLY(Derived);
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Rhs);
   return square().dotSafe(weights);
 }
 
@@ -332,8 +332,8 @@ template<typename Derived>
 template<typename Rhs>
 typename hidden::Traits<Derived>::Type const ExprBase<Derived>::wmean(ExprBase<Rhs> const& weights) const
 {
-  STK_STATICASSERT_VECTOR_ONLY(Derived);
-  STK_STATICASSERT_ONE_DIMENSION_ONLY(Rhs);
+  STK_STATIC_ASSERT_VECTOR_ONLY(Derived);
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Rhs);
   Type size = weights.sum();
   if (size <= 0 || !STK::isFinite(size)) return Arithmetic<Type>::NA();
   return wsumSafe(weights)/size;
@@ -343,8 +343,8 @@ template<typename Derived>
 template<typename Rhs>
 typename hidden::Traits<Derived>::Type const ExprBase<Derived>::wmeanSafe(ExprBase<Rhs> const& weights) const
 {
-  STK_STATICASSERT_VECTOR_ONLY(Derived);
-  STK_STATICASSERT_ONE_DIMENSION_ONLY(Rhs);
+  STK_STATIC_ASSERT_VECTOR_ONLY(Derived);
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Rhs);
   Type size = weights.sumSafe();
   if (size <= 0) return Arithmetic<Type>::NA();
   return wsum(weights)/size;
@@ -355,8 +355,8 @@ template<typename Derived>
 template<typename Rhs>
 typename hidden::Traits<Derived>::Type const ExprBase<Derived>::wvariance(ExprBase<Rhs> const& weights) const
 {
-  STK_STATICASSERT_VECTOR_ONLY(Derived);
-  STK_STATICASSERT_ONE_DIMENSION_ONLY(Rhs);
+  STK_STATIC_ASSERT_VECTOR_ONLY(Derived);
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Rhs);
   Type mean = wmean(weights);
   if (!STK::isFinite(mean)) return Arithmetic<Type>::NA();
   return (*this-mean).square().wmean(weights);
@@ -365,8 +365,8 @@ template<typename Derived>
 template<typename Rhs>
 typename hidden::Traits<Derived>::Type const ExprBase<Derived>::wvarianceSafe(ExprBase<Rhs> const& weights) const
 {
-  STK_STATICASSERT_VECTOR_ONLY(Derived);
-  STK_STATICASSERT_ONE_DIMENSION_ONLY(Rhs);
+  STK_STATIC_ASSERT_VECTOR_ONLY(Derived);
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Rhs);
   Type mean = wmeanSafe(weights);
   if (!STK::isFinite(mean)) return Arithmetic<Type>::NA();
   return (*this-mean).square().wmeanSafe(weights);
@@ -377,16 +377,16 @@ template<typename Derived>
 template<typename Rhs>
 typename hidden::Traits<Derived>::Type const ExprBase<Derived>::wvariance(Type const& mean, ExprBase<Rhs> const& weights) const
 {
-  STK_STATICASSERT_VECTOR_ONLY(Derived);
-  STK_STATICASSERT_ONE_DIMENSION_ONLY(Rhs);
+  STK_STATIC_ASSERT_VECTOR_ONLY(Derived);
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Rhs);
   return (*this-mean).square().wmean(weights);
 }
 template<typename Derived>
 template<typename Rhs>
 typename hidden::Traits<Derived>::Type const ExprBase<Derived>::wvarianceSafe(Type const& mean, ExprBase<Rhs> const& weights) const
 {
-  STK_STATICASSERT_VECTOR_ONLY(Derived);
-  STK_STATICASSERT_ONE_DIMENSION_ONLY(Rhs);
+  STK_STATIC_ASSERT_VECTOR_ONLY(Derived);
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Rhs);
   return (*this-mean).square().wmeanSafe(weights);
 }
 

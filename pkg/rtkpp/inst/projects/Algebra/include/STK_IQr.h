@@ -306,7 +306,7 @@ template<class Derived>
 template<class ColVector>
 void IQr<Derived>::pushBackCol(ColVector const& T)
 {
-  STK_STATICASSERT(ColVector::structure_==(int)Arrays::vector_||ColVector::structure_==(int)Arrays::point_,YOU_HAVE_TO_USE_A_VECTOR_OR_POINT_IN_THIS_METHOD)
+  STK_STATIC_ASSERT(ColVector::structure_==(int)Arrays::vector_||ColVector::structure_==(int)Arrays::point_,YOU_HAVE_TO_USE_A_VECTOR_OR_POINT_IN_THIS_METHOD)
   // check conditions
   if (T.range() != Q_.rows())
   { STKRUNTIME_ERROR_NO_ARG(Qr::pushBackCol,T.range() != Q_.rows());}
@@ -341,7 +341,7 @@ template<class Derived>
 template<class ColVector>
 void IQr<Derived>::insertCol(ColVector const& T, int pos)
 {
-  STK_STATICASSERT(ColVector::structure_==(int)Arrays::vector_||ColVector::structure_==(int)Arrays::point_,YOU_HAVE_TO_USE_A_VECTOR_OR_POINT_IN_THIS_METHOD)
+  STK_STATIC_ASSERT(ColVector::structure_==(int)Arrays::vector_||ColVector::structure_==(int)Arrays::point_,YOU_HAVE_TO_USE_A_VECTOR_OR_POINT_IN_THIS_METHOD)
   if (pos < R_.beginCols())
   { STKOUT_OF_RANGE_1ARG(Qr::insertCol,pos,pos<R_.beginCols());}
   if (R_.lastIdxCols() < pos)

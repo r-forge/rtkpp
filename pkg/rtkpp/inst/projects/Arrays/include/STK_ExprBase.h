@@ -384,31 +384,31 @@ class ExprBase : public ITContainer<Derived, hidden::Traits<Derived>::structure_
     MAKE_UNARY_OPERATOR_1ARG(operator!=, NotEqualThanOp)
 
     // handle the case number + expression
+    /** @return an expression of number + this */
     friend inline UnaryOperator<AddOp<Type>, Derived> const
     operator+(Type const number, ExprBase<Derived> const& other)
     { return other.asDerived() + number;}
-    /** @return an expression of this with each elements decremented by the
-     * constant  number */
+    /** @return an expression of number - this */
     inline UnaryOperator<AddOp<Type>, Derived> const
     operator-(Type const number) const
     { return UnaryOperator<AddOp<Type>, Derived>(this->asDerived(), AddOp<Type>(-number));}
-    // handle the case number - expression
-    friend inline UnaryOperator<AddOp<Type>, UnaryOperator<OppositeOp<Type>, Derived> > const
-    operator-(Type const number, const ExprBase<Derived>& other)
-    { return (-other.asDerived()) + number;}
     /** @return a safe value of this */
     inline UnaryOperator<SafeOp<Type>, Derived> const safe(Type const number = Type()) const
     { return UnaryOperator<SafeOp<Type>, Derived>(this->asDerived(), SafeOp<Type>(number)); }
+    // friends
+    // handle the case number - expression
+    friend inline UnaryOperator<AddOppositeOp<Type>, Derived > const
+    operator-(Type const number, ExprBase<Derived> const& other)
+    { return UnaryOperator<AddOppositeOp<Type>, Derived>(other.asDerived(), AddOppositeOp<Type>(number));}
     // handle the case number * expression
     inline friend UnaryOperator< MultipleOp<Type>, Derived> const
     operator*(Type const number, ExprBase<Derived> const& other)
     { return other.asDerived()*number; }
-
+    // templated
     /** @return an expression of *this with the  Type type casted to  OtherType. */
     template<typename CastedType>
     inline UnaryOperator<CastOp<Type, CastedType>, Derived> const cast() const
     { return UnaryOperator<CastOp<Type, CastedType>, Derived>(this->asDerived());}
-
     /** @return an expression of funct0 to this. */
     template< template<typename> class OtherOperator>
     inline UnaryOperator<OtherOperator<Type>, Derived> const funct0() const

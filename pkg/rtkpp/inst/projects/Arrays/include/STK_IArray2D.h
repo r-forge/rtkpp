@@ -91,11 +91,26 @@ template < class  Derived  >
 class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, Derived>
 {
   public:
-    /** type of the Base Container Class. */
-    typedef typename hidden::Traits<Derived>::Type Type;
-    typedef IArray2DBase< Type*, Derived> Base;
+     typedef typename hidden::Traits<Derived>::Type Type;
+    typedef typename hidden::Traits<Derived>::Row  Row;
+    typedef typename hidden::Traits<Derived>::Col  Col;
+    typedef typename hidden::Traits<Derived>::SubRow SubRow;
+    typedef typename hidden::Traits<Derived>::SubCol SubCol;
+    typedef typename hidden::Traits<Derived>::SubVector SubVector;
+    typedef typename hidden::Traits<Derived>::SubArray SubArray;
 
-  protected:
+    enum
+    {
+      structure_ = hidden::Traits<Derived>::structure_,
+      orient_    = hidden::Traits<Derived>::orient_,
+      sizeRows_  = hidden::Traits<Derived>::sizeRows_,
+      sizeCols_  = hidden::Traits<Derived>::sizeCols_,
+      storage_   = hidden::Traits<Derived>::storage_
+    };
+
+     typedef IArray2DBase< Type*, Derived> Base;
+
+ protected:
     /** Default constructor */
     IArray2D() : Base() {}
     /** Constructor with specified ranges

@@ -37,6 +37,7 @@
 #define STK_RANGE_H
 
 #include "STK_Constants.h"
+#include "STK_String.h"
 
 /** Utility macro that can be used in a similar way that first:last */
 #define _R(first,last) Range(first, last, 0)

@@ -36,13 +36,15 @@
 #ifndef STK_SVD_H
 #define STK_SVD_H
 
+#include <Arrays/include/STK_Array2DVector.h>
+#include <Arrays/include/STK_Array2DDiagonal.h>
+#include <Arrays/include/STK_Array2DSquare.h>
+#include <Arrays/include/STK_Array2D_Functors.h>
+
 #include "STK_ISvd.h"
-#include "Arrays/include/STK_Array2DPoint.h"
-#include "Arrays/include/STK_Array2DVector.h"
 #include "STK_Householder.h"
 #include "STK_Givens.h"
 
-#include "Arrays/include/STK_Array2D_Functors.h"
 
 #define MAX_ITER 30
 
@@ -59,7 +61,9 @@ namespace hidden
 template<class Array_>
 struct AlgebraTraits< Svd<Array_> >
 {
-  typedef Array_ Array;
+  typedef Array_ ArrayU;
+  typedef ArrayDiagonalX ArrayD;
+  typedef ArraySquareX ArrayV;
 };
 
 } // namespace hidden
@@ -103,13 +107,13 @@ static void leftEliminate( ArrayDiagonalX& D
  *  and perform the decomposition: 
  *  - A = UDV' (transpose V).
  *  U can have more columns than A,
- *  and it is possible to ompute some (all) vectors of Ker(A).
+ *  and it is possible to compute some (all) vectors of Ker(A).
  **/
 template<class Array>
 class Svd : public ISvd<Svd<Array> >
 {
   public :
-    typedef ISvd<Svd<Array> > Base;
+    typedef ISvd< Svd<Array> > Base;
     typedef typename Array::Col ColVector;
     typedef typename Array::Row RowVector;
     using Base::U_;
@@ -132,6 +136,14 @@ class Svd : public ISvd<Svd<Array> >
     inline Svd( Array const& A, bool ref= false, bool withU= true, bool withV= true)
               : Base(A, ref, withU, withV)
     {}
+    /** constructor with other kind of array/expression
+     *  @param A the matrix/expression to decompose.
+     *  @param withU if @c true save the left housolder transforms in @c U_.
+     *  @param withV if @c true save the right housolder transforms in @c V_.
+     */
+    template<class OtherArray>
+    inline Svd( ArrayBase<OtherArray> const& A, bool withU = true, bool withV = true)
+              : Base(A, withU, withV) {}
     /** Copy Constructor
      *  @param S the Svd to copy
      **/
@@ -143,17 +155,7 @@ class Svd : public ISvd<Svd<Array> >
      **/
     Svd& operator=(const Svd &S);
     /** run the Svd */
-    virtual bool run();
-    /** Compute the svd of the Array A and copy the data
-     *  see the corresponding constructor Take care that if U_ was previously
-     *  a reference, it cannot be modified.
-     *  @param A is the matrix to decompose.
-     *  @param withU if true, we save the left housolder transforms
-     *  in U_.
-     *  @param withV if true, we save the right housolder transforms
-     *  in V_.
-     **/    
-    void setData( Array const& A, bool withU = true, bool withV = true);
+    bool runImpl();
     /** Computing the diagonalization of a bi-diagonal matrix
      *  @param D the diagonal of the matrix
      *  @param F the subdiagonal of the matrix
@@ -189,10 +191,8 @@ class Svd : public ISvd<Svd<Array> >
   private:
     /// Values of the Sub-diagonal
     Vector F_;
-    /// Initialize the containers
-    void init();
     /// Svd main steps
-    bool compSvd();
+    bool computeSvd();
     /// Compute U (if withU_ is true)
     void compU();
     /// Compute V (if withV_ is true)
@@ -220,28 +220,16 @@ Svd<Array>& Svd<Array>::operator=(const Svd &S)
 
 /* run the Svd */
 template<class Array>
-bool Svd<Array>::run()
+bool Svd<Array>::runImpl()
 {
-  init();             // initialize (U_) and dimensions
-  compSvd();          // compute the svd
+  if (!computeSvd()) return false;
   return true;
-}
-/* Private functions. */
-/* initialization of the Svd. */
-template<class Array>
-void Svd<Array>::init()
-{
-  // If the container is empty, set default
-  if (U_.empty()) { return;}
-  // if U_ is just a copy of A, translate begin to 1
-  // if U_ is a ref on A, this can generate an error
-  U_.shift(1,1);
 }
 
 
 /* Main method for the svd computation. */
 template<class Array>
-bool Svd<Array>::compSvd()
+bool Svd<Array>::computeSvd()
 {
   // if the container is empty, there is nothing to do
   if (U_.empty())
@@ -249,6 +237,10 @@ bool Svd<Array>::compSvd()
     norm_ = 0.0;
     return true;
   }
+  int beginRow = U_.beginRows(), beginCol = U_.beginCols();
+  // if U_ is just a copy of A, translate begin to 1
+  // if U_ is a ref on A, this can generate an error
+  U_.shift(1,1);
   // Bidiagonalize (U_)
   norm_ = bidiag(U_, D_, F_);
   // right householder vectors are in upper part of U_
@@ -261,29 +253,14 @@ bool Svd<Array>::compSvd()
   if (withU_) { compU();}
   // Diagonalize
   bool error = diag(D_, F_, U_, V_, withU_, withV_, norm_);
-  // Compute the true inf norm
-  norm_ = D_[1];
-  // Compute the rank
-  rank_ = 0;
-  for (int i=D_.begin(); i<D_.end(); i++)
-    if (norm_+D_[i] != norm_) { rank_++;}
-    else break;
   // The sub diagonal is now zero
   F_.resize(0,0);
+  U_.shift(beginRow, beginCol);
+  D_.shift(beginCol);
+  V_.shift(beginCol); // U_*D_.diagonalize()*VT_ will work
   return error;
 }
 
-
-/* New computation of the Svd. */
-template<class Array>
-void Svd<Array>::setData( Array const& A, bool withU, bool withV)
-{
-  V_.resize(0,0), D_.resize(0,0);
-  // create U_
-  U_ = A;           // Copy A in U_
-  withU_ = withU;   // copy withU_ value
-  withV_ = withV;   // copy withV_ value
-}
 
 /* Bidiagonalization of the matrix M. */
 template<class Array>

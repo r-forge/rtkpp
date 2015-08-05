@@ -58,17 +58,17 @@ struct Online<Array, Real>
   };
   /** default constructor*/
   inline Online(): mean_(), variance_(), iter_(0)
-  { STK_STATICASSERT(value_, YOU_CANNOT_USED_THIS_TYPE_OF_DATA_WITH_THIS_OBJECT);
+  { STK_STATIC_ASSERT(value_, YOU_CANNOT_USED_THIS_TYPE_OF_DATA_WITH_THIS_OBJECT);
     release();
   }
   /** constructor for one dimensional arrays */
   inline Online(Range const& range): mean_(range), variance_(range), iter_(0)
-  { STK_STATICASSERT(value_, YOU_CANNOT_USED_THIS_TYPE_OF_DATA_WITH_THIS_OBJECT);
+  { STK_STATIC_ASSERT(value_, YOU_CANNOT_USED_THIS_TYPE_OF_DATA_WITH_THIS_OBJECT);
     release();
   }
   /** constructor for two dimensional arrays */
   inline Online(Range const& rows, Range const& cols): mean_(rows, cols), variance_(rows, cols), iter_(0)
-  { STK_STATICASSERT(value_, YOU_CANNOT_USED_THIS_TYPE_OF_DATA_WITH_THIS_OBJECT);
+  { STK_STATIC_ASSERT(value_, YOU_CANNOT_USED_THIS_TYPE_OF_DATA_WITH_THIS_OBJECT);
     release();
   }
   /** copy constructor */

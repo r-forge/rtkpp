@@ -112,7 +112,7 @@ class SymEigen : public ISymEigen<SymEigen<SquareArray> >
     template<class Derived>
     SymEigen( ArrayBase<Derived> const& data)
             : Base(data)
-            , JOBZ_('V'), RANGE_('A'), UPLO_('U')
+            , jobz_('V'), RANGE_('A'), UPLO_('U')
             , VL_(0.0), VU_(0.0), IL_(0), IU_(0)
     {}
     /** @brief copy constructor
@@ -120,7 +120,7 @@ class SymEigen : public ISymEigen<SymEigen<SquareArray> >
      */
     inline SymEigen( SymEigen const& eigen)
                    : Base(eigen)
-                   , JOBZ_(eigen.JOBZ_), RANGE_(eigen.RANGE_), UPLO_(eigen.UPLO_)
+                   , jobz_(eigen.jobz_), RANGE_(eigen.RANGE_), UPLO_(eigen.UPLO_)
                    , VL_(eigen.VL_), VU_(eigen.VU_), IL_(eigen.IL_), IU_(eigen.IU_)
      {}
     /** Destructor. */
@@ -128,7 +128,7 @@ class SymEigen : public ISymEigen<SymEigen<SquareArray> >
     /** @param jobz If jobz ='N': Compute eigenvalues only; If jobz = 'V': Compute
      * eigenvalues and eigenvectors.
      **/
-    inline void setJobz(char jobz) { JOBZ_ = jobz;}
+    inline void setJobz(char jobz) { jobz_ = jobz;}
     /** @param range range of the eigenvalues to be found.
      *  If range = 'A': all eigenvalues will be found.
      *  If range = 'V': all eigenvalues in the half-open interval  (VL_,VU_] will be found.
@@ -187,7 +187,7 @@ class SymEigen : public ISymEigen<SymEigen<SquareArray> >
      *
      * @param[in] n The order of the matrix A.  N >= 0.
      *
-     * @param[in,out] a Real array, dimension (LDA, N)
+     * @param[in,out] a Real array, dimension (lda, N)
      * @verbatim
      * On entry, the symmetric matrix A.  If UPLO_ = 'U', the leading
      * N-by-N upper triangular part of A contains the upper  triangular part
@@ -197,7 +197,7 @@ class SymEigen : public ISymEigen<SymEigen<SquareArray> >
      * (if UPLO_='U') of A, including the diagonal, is destroyed.
      * @endverbatim
      *
-     * @param[in] lda The leading dimension of the array A.  LDA >= max(1,N).
+     * @param[in] lda The leading dimension of the array A.  lda >= max(1,N).
      *
      * @param[in] vl,vu
      * @verbatim
@@ -208,7 +208,7 @@ class SymEigen : public ISymEigen<SymEigen<SquareArray> >
      *
      * @param[in] il, iu
      * @verbatim
-     *  INTEGER If RANGE_='I', the indices (in ascending order)
+     *  Integer If RANGE_='I', the indices (in ascending order)
      *  of the smallest and largest eigenvalues to be returned.
      *  1 <= IL_ <= IU_ <= NL, if NL > 0; IL_ = 1 and IU_ = 0 if NL = 0. Not
      *  referenced if RANGE_ = 'A' or 'V'.
@@ -253,10 +253,10 @@ class SymEigen : public ISymEigen<SymEigen<SquareArray> >
      * @param[out] z
      * @verbatim
      *  array, dimension (LDZ, max(1,M))
-     *  If  JOBZ_ = 'V', then if INFO = 0, the first M columns of Z contain
+     *  If  jobz_ = 'V', then if info = 0, the first M columns of Z contain
      *  the orthonormal eigenvectors of the matrix A corresponding
      *  to  the selected eigenvalues, with the i-th column of Z holding
-     *  the eigenvector associated with W(i).  If JOBZ_ = 'N', then Z is
+     *  the eigenvector associated with W(i).  If jobz_ = 'N', then Z is
      *  not  referenced.   Note:  the  user  must  ensure that at least
      *  max(1,M) columns are supplied in the array Z; if RANGE_  =  'V',
      *  the exact value of M is not known in advance and an upper bound
@@ -265,7 +265,7 @@ class SymEigen : public ISymEigen<SymEigen<SquareArray> >
      *
      * @param[in] ldz
      * @verbatim
-     *  The leading dimension of the array Z.  LDZ >= 1, and if JOBZ_  =
+     *  The leading dimension of the array Z.  LDZ >= 1, and if jobz_  =
      *  'V', LDZ >= max(1,N).
      * @endverbatim
      *
@@ -276,40 +276,40 @@ class SymEigen : public ISymEigen<SymEigen<SquareArray> >
      *  nonzero only in elements ISUPPZ( 2*i-1 ) through ISUPPZ( 2*i ).
      * @endverbatim
      *
-     * @param[in,out] work Real array, dimension (MAX(1,LWORK))
+     * @param[in,out] work Real array, dimension (MAX(1,lWork))
      * @verbatim
-     *   On exit, if INFO = 0, WORK(1) returns the optimal LWORK.
+     *   On exit, if info = 0, work(1) returns the optimal lWork.
      * @endverbatim
      *
-     * @param[in] lwork The  dimension  of  the array WORK
+     * @param[in] lWork The  dimension  of  the array work
      * @verbatim
-     *  LWORK >= max(1,26*N). For optimal efficiency, LWORK >= (NB+6)*N, where
+     *  lWork >= max(1,26*N). For optimal efficiency, lWork >= (NB+6)*N, where
      *  NB is the max of the  blocksize for SSYTRD and SORMTR returned by ILAENV.
-     *  If LWORK = -1, then a workspace query is assumed; the routine only
-     *  calculates  the  optimal  sizes  of  the WORK and IWORK arrays,
-     *  returns these values as the first entries of the WORK and IWORK
-     *  arrays,  and  no  error  message  related to LWORK or LIWORK is
+     *  If lWork = -1, then a workspace query is assumed; the routine only
+     *  calculates  the  optimal  sizes  of  the work and iWork arrays,
+     *  returns these values as the first entries of the work and iWork
+     *  arrays,  and  no  error  message  related to lWork or LiWork is
      *  issued by XERBLA.
      * @endverbatim
      *
-     * @param[in,out] iwork array, dimension (MAX(1,LIWORK))
+     * @param[in,out] iwork array, dimension (MAX(1,LiWork))
      * @verbatim
-     *  On exit, if INFO = 0, IWORK(1) returns the optimal LWORK.
+     *  On exit, if info = 0, iWork(1) returns the optimal lWork.
      * @endverbatim
      *
-     * @param[in] liwork The dimension of the array IWORK.
+     * @param[in] liwork The dimension of the array iWork.
      * @verbatim
-     *  LIWORK >=  max(1,10*N). If LIWORK  =  -1, then a workspace query is
-     *  assumed; the routine only calculates the optimal sizes of the WORK and
-     *  IWORK arrays, returns these values as the first entries of the WORK and
-     *  IWORK arrays, and no error message related  to  LWORK  or  LIWORK  is
+     *  LiWork >=  max(1,10*N). If LiWork  =  -1, then a workspace query is
+     *  assumed; the routine only calculates the optimal sizes of the work and
+     *  iWork arrays, returns these values as the first entries of the work and
+     *  iWork arrays, and no error message related  to  lWork  or  LiWork  is
      *  issued by XERBLA.
      * @endverbatim
      *
      * @return info
      * @verbatim
      *  = 0:  successful exit
-     *  < 0:  if INFO = -i, the i-th argument had an illegal value
+     *  < 0:  if info = -i, the i-th argument had an illegal value
      *  > 0:  Internal error
      * @endverbatim
      */
@@ -318,11 +318,11 @@ class SymEigen : public ISymEigen<SymEigen<SquareArray> >
                     , Real vl, Real vu, int il, int iu
                     , Real abstol, int *m, Real *w
                     , Real *z, int ldz, int *isuppz
-                    , Real *work, int lwork, int *iwork, int liwork
+                    , Real *work, int lWork, int *iwork, int liwork
                     );
   private:
     /** Lapack pptions */
-    char JOBZ_, RANGE_, UPLO_;
+    char jobz_, RANGE_, UPLO_;
     Real VL_, VU_;
     int IL_, IU_;
 };
@@ -337,7 +337,7 @@ class SymEigen : public ISymEigen<SymEigen<SquareArray> >
 template<class SquareArray>
 inline SymEigen<SquareArray>::SymEigen( SquareArray const& data, bool ref)
                                       : Base(data)
-                                      , JOBZ_('V'), RANGE_('A'), UPLO_('U')
+                                      , jobz_('V'), RANGE_('A'), UPLO_('U')
                                       , VL_(0.0), VU_(0.0), IL_(0), IU_(0)
 {}
 /* @brief Constructor
@@ -347,7 +347,7 @@ inline SymEigen<SquareArray>::SymEigen( SquareArray const& data, bool ref)
 template<>
 inline SymEigen<CSquareX>::SymEigen( CSquareX const& data, bool ref)
                                    : Base(data, ref)
-                                   , JOBZ_('V'), RANGE_('A'), UPLO_('U')
+                                   , jobz_('V'), RANGE_('A'), UPLO_('U')
                                    , VL_(0.0), VU_(0.0), IL_(0), IU_(0)
 {}
 
@@ -371,23 +371,23 @@ bool SymEigen<SquareArray>::runImpl()
   /* set default behavior */
   Real absTol = 0.0; // let Lapack chose the correct tolerance
   // get optimal size necessary for work
-  Real work; // work is just one place, get the optimal size for WORK
-  int iwork; // iwork is just on place, get the optimal size for IWORK
-  int lwork =-1, liwork =-1; // workspace variable
+  Real work; // work is just one place, get the optimal size for work
+  int iwork; // iwork is just on place, get the optimal size for iWork
+  int lWork =-1, liwork =-1; // workspace variable
 
   int info = 1;
 #ifdef STK_ALGEBRA_DEBUG
   stk_cout << _T("Data dimensions: ") << data_.rows() << " " << data_.cols() << "\n";
   stk_cout << _T("eigenValues_ dimensions: ") << eigenValues_.rows() << " " << eigenValues_.cols() << "\n";
   stk_cout << _T("eigenVectors_ dimensions: ") << eigenVectors_.rows() << " " << eigenVectors_.cols() << "\n";
-  stk_cout << _T("Options: ") << JOBZ_ << " " << RANGE_ << " " << UPLO_ << "\n";
+  stk_cout << _T("Options: ") << jobz_ << " " << RANGE_ << " " << UPLO_ << "\n";
 #endif
-  info = syevr( JOBZ_, RANGE_, UPLO_
+  info = syevr( jobz_, RANGE_, UPLO_
               , range_.size(), data_.p_data(), range_.size()
               , VL_, VU_, IL_, IU_
               , absTol, &rank_,  eigenValues_.p_data()
               , eigenVectors_.p_data(), range_.size(), this->SupportEigenVectors_.p_data()
-              , &work, lwork, &iwork, liwork);
+              , &work, lWork, &iwork, liwork);
   // check any error
   if (info!=0)
   {
@@ -402,18 +402,18 @@ bool SymEigen<SquareArray>::runImpl()
   stk_cout << _T("Size needed:") << (int)work << " " << iwork << " " << "\n";
 #endif
   // get results and allocate space
-  lwork = (int)work;
+  lWork = (int)work;
   liwork = iwork;
-  Real* p_work = new Real[lwork];
+  Real* p_work = new Real[lWork];
   int* p_iwork = new int[liwork];
 
   // Call SYEVR with the optimal block size
-  info = syevr( JOBZ_, RANGE_, UPLO_
+  info = syevr( jobz_, RANGE_, UPLO_
               , range_.size(), data_.p_data(), range_.size()
               , VL_, VU_, IL_, IU_
               , absTol, &rank_, eigenValues_.p_data()
               , eigenVectors_.p_data(), range_.size(), this->SupportEigenVectors_.p_data()
-              , p_work, lwork, p_iwork, liwork);
+              , p_work, lWork, p_iwork, liwork);
   // recover memory
   delete[] p_work;
   delete[] p_iwork;
@@ -421,7 +421,9 @@ bool SymEigen<SquareArray>::runImpl()
   // finalize
   data_.shift(range_.begin());
   eigenVectors_.shift(range_.begin());
+//  stk_cout << _T("eigenValues_  (before shift) =\n") << eigenValues_ << "\n";
   eigenValues_.shift(range_.begin());
+//  stk_cout << _T("eigenValues_  (after shift) =\n") << eigenValues_ << "\n";
   this->SupportEigenVectors_.shift(range_.begin());
   this->finalizeStep();
   // return the result of the computation
@@ -442,7 +444,7 @@ int SymEigen<SquareArray>::syevr( char jobz, char range, char uplo
                    , Real vl, Real vu, int il, int iu
                    , Real abstol, int *m, Real *w
                    , Real *z, int ldz, int *isuppz
-                   , Real *work, int lwork, int *iwork, int liwork
+                   , Real *work, int lWork, int *iwork, int liwork
                    )
 {
   int info = 0;
@@ -450,11 +452,11 @@ int SymEigen<SquareArray>::syevr( char jobz, char range, char uplo
 #ifdef STKREALAREFLOAT
   ssyevr_(&jobz, &range, &uplo, &n, a, &lda, &vl, &vu, &il,
           &iu, &abstol, m, w, z, &ldz, isuppz, work,
-          &lwork, iwork, &liwork, &info);
+          &lWork, iwork, &liwork, &info);
 #else
   dsyevr_(&jobz, &range, &uplo, &n, a, &lda, &vl, &vu, &il,
           &iu, &abstol, m, w, z, &ldz, isuppz, work,
-          &lwork, iwork, &liwork, &info);
+          &lWork, iwork, &liwork, &info);
 #endif
 #endif
   return info;

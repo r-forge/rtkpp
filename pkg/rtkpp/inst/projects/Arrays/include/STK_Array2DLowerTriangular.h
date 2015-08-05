@@ -186,6 +186,16 @@ class Array2DLowerTriangular : public IArray2D< Array2DLowerTriangular<Type_> >
      *  @param v the value to set
      **/
     inline Array2DLowerTriangular& operator=(Type const& v){ return LowBase::setValue(v);}
+    /** New beginning index for the object.
+     *  @param beg first index of the container
+     **/
+    inline void shift1D(int beg)
+    { Base::shift(beg, beg);}
+    /** New size for the container.
+     *  @param I range of the columns and rows of the container
+     **/
+    inline Array2DLowerTriangular& resize1D( Range const& I)
+    { Base::resize(I, I); return *this;}
 };
 
 } // namespace STK

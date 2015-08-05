@@ -175,6 +175,16 @@ class Array2DUpperTriangular : public IArray2D< Array2DUpperTriangular<Type_> >
     { return LowBase::assign(T);}
     /** Operator = : overwrite with a constant value. */
     inline Array2DUpperTriangular& operator=(Type const& v) { return LowBase::setValue(v);}
+    /** New beginning index for the object.
+     *  @param beg first index of the container
+     **/
+    inline void shift1D(int beg)
+    { Base::shift(beg, beg);}
+    /** New size for the container.
+     *  @param I range of the columns and rows of the container
+     **/
+    inline Array2DUpperTriangular& resize1D( Range const& I)
+    { Base::resize(I, I); return *this;}
 };
 
 } // namespace STK

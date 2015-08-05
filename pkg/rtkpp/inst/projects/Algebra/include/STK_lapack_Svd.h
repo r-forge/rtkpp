@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2013  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -8,7 +8,7 @@
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR a PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
 
     You should have received a copy of the GNU Lesser General Public
@@ -36,18 +36,22 @@
 #ifndef STK_LAPACK_SVD_H
 #define STK_LAPACK_SVD_H
 
-//#include "STK_ISvd.h"
+#include <Arrays/include/STK_CArray.h>
+#include <Arrays/include/STK_CArrayVector.h>
+#include "STK_ISvd.h"
 
 #ifdef STKUSELAPACK
 
 extern "C"
 {
 #ifdef STKREALAREFLOAT
-/** LAPACK routine in float to compute the SVD decomposition */
-extern void sgeqrf_(int* M, int* N, float* A, int* LDA, float* TAU, float* WORK, int* LWORK, int* INFO );
+/* LAPACK routine in float to compute the SVD decomposition */
+void sgesdd_( char *jobz, int *M, int *N, float *A, int *lda, float *S, float *U, int* ldu
+            , float *vt, int *ldvt, float *work, int *lWork, int *iwork, int *info);
 #else
-/** LAPACK routine in double to compute the SVD decomposition */
-extern void dgeqrf_(int* M, int* N, double* A, int* LDA, double* TAU, double* WORK, int* LWORK, int* INFO );
+/* LAPACK routine in double to compute the SVD decomposition */
+void dgesdd_( char *jobz, int *M, int *N, double *A, int *lda, double *S, double *U, int* ldu
+            , double *vt, int *ldvt, double *work, int *lWork, int *iwork, int *info);
 #endif
 }
 
@@ -55,6 +59,27 @@ extern void dgeqrf_(int* M, int* N, double* A, int* LDA, double* TAU, double* WO
 
 namespace STK
 {
+
+namespace lapack
+{
+class Svd;
+}
+
+namespace hidden
+{
+/** @ingroup hidden
+ *  Specialization for the Svd class.
+ **/
+template<>
+struct AlgebraTraits< lapack::Svd >
+{
+  typedef CArrayXX ArrayU;
+  typedef CVectorX ArrayD;
+  typedef CArrayXX ArrayV;
+};
+
+} // namespace hidden
+
 
 namespace lapack
 {
@@ -67,104 +92,245 @@ namespace lapack
 class Svd : public ISvd<Svd>
 {
   public:
-    typedef ISvd<Svd> Base;
+    typedef ISvd< Svd > Base;
+    typedef typename CArrayXX::Col ColVector;
+    typedef typename CArrayXX::Row RowVector;
+    using Base::U_;
+    using Base::D_;
+    using Base::V_;
+    using Base::withU_;
+    using Base::withV_;
+    using Base::nrowU;
+    using Base::ncolU;
+    using Base::ncolV;
+    using Base::norm_;
+    using Base::rank_;
+
     /** Default constructor.
-     *  @param data the matrix to decompose
-     *  @param ref true if we overwrite A
+     *  @param A the matrix to decompose
+     *  @param ref if true, U_ is a reference of A.
+     *  @param withU if @c true save the left housolder transforms in @c U_.
+     *  @param withV if @c true save the right housolder transforms in @c V_.
      **/
-    inline Svd( ArrayXX const&  data, bool ref = false): Base(data, ref) {}
-    /** @brief Constructor
-     *  @param data reference on a matrix expression
+    inline Svd( CArrayXX const&  A, bool ref = false, bool withU= true, bool withV= true)
+              : Base(A, ref, withU, withV)
+              , jobz_( (withU|withV) ? 'O':'N') {}
+    /** constructor with other kind of array/expression
+     *  @param A the matrix/expression to decompose.
+     *  @param withU if @c true save the left housolder transforms in @c U_.
+     *  @param withV if @c true save the right housolder transforms in @c V_.
      */
-    template<class Derived>
-    Svd( ArrayBase<Derived> const& data): Base(data){}
+    template<class OtherArray>
+    inline Svd( ArrayBase<OtherArray> const& A, bool withU= true, bool withV= true)
+              : Base(A, withU, withV)
+              , jobz_( (withU|withV) ? 'O':'N') {}
     /** Copy constructor.
-     *  @param decomp the decomposition  to copy
+     *  @param decomp the decomposition to copy
      **/
-    inline Svd( Svd const& decomp): Base(decomp) {}
+    inline Svd( Svd const& decomp): Base(decomp), jobz_(decomp.jobz_) {}
     /** virtual destructor */
     inline virtual ~Svd() {}
+    /** @return the option chosen for the svd */
+    char jobz() const { return jobz_;}
+    /** set the option chosen for the svd */
+    void setJobz(char jobz) { jobz_ = jobz;}
     /** @brief clone pattern */
     inline virtual Svd* clone() const { return new Svd(*this);}
     /** Operator = : overwrite the Svd with decomp. */
     inline Svd& operator=(Svd const& decomp)
     {
       Base::operator=(decomp);
+      jobz_ = decomp.jobz_;
       return *this;
     }
-    /** @brief Run qr decomposition
-     *  Launch geqrf LAPACK routine to perform the qr decomposition.
-     *  @return @c true if no error occur, @c false otherwise
-     */
+    /** @brief Run svd decomposition */
     bool runImpl();
 
   protected:
-    /** wrapper of the LAPACK DGESVDF routine. Compute the Svd decomposition
+    /** wrapper of the LAPACK DGESDD routine. Compute the Svd decomposition
      *  of a matrix.
      *
-     * @param[in] m The number of rows of the matrix A.  M >= 0.
+     * @verbatim
+     * DGESDD computes the singular value decomposition (SVD) of a real
+     * m-by-n matrix a, optionally computing the left and right singular
+     * vectors.  If singular vectors are desired, it uses a
+     * divide-and-conquer algorithm.
      *
-     * @param[in] n The number of columns of the matrix A.  N >= 0.
+     * The SVD is written
      *
-     * @param[in,out] a Real array, dimension (LDA, N)
-     * \verbatim
-     *     On entry, the M-by-N matrix A.
-     *     On exit, the elements on and above the diagonal of the array
-     *     contain the min(M,N)-by-N upper trapezoidal matrix R (R is
-     *     upper triangular if m >= n); the elements below the diagonal,
-     *     with the array TAU, represent the orthogonal matrix Q as a
-     *     product of min(m,n) elementary reflectors (see Further Details).
-     * \endverbatim
+     *      a = u * SIGMA * transpose(v)
      *
-     * @param[in] lda The leading dimension of the array A.  LDA >= max(1,M).
+     * where SIGMA is an m-by-n matrix which is zero except for its
+     * min(m,n) diagonal elements, u is an m-by-m orthogonal matrix, and
+     * v is an n-by-n orthogonal matrix. The diagonal elements of SIGMA
+     * are the singular values of a; they are real and non-negative, and
+     * are returned in descending order. The first min(m,n) columns of
+     * u and v are the left and right singular vectors of a.
      *
-     * @param[out] tau Real array, dimension min(M,N)
-     * The scalar factors of the elementary reflectors (see Further Details).
+     * Note that the routine returns vt = v**T, not v.
      *
-     * @param[in,out] work Real array, dimension (MAX(1,LWORK))
-     * \verbatim
-     *   On exit, if INFO = 0, WORK(1) returns the optimal LWORK.
-     * \endverbatim
+     * @endverbatim
      *
-     * @param[in] lwork The  dimension  of  the array WORK
-     * \verbatim
-     *  LWORK >= max(1,N).
-     *  For optimum performance LWORK >= N*NB, where NB is the optimal blocksize.
+     *  Arguments:
+     *  ==========
      *
-     *  If LWORK = -1, then a workspace query is assumed; the routine
-     *  only calculates the optimal size of the WORK array, returns
-     *  this value as the first entry of the WORK array, and no error
-     *  message related to LWORK is issued by XERBLA.
-     * \endverbatim
+     * @param[in] jobz
+     * @verbatim
+     *          jobz is Char*1
+     *          Specifies options for computing all or part of the matrix u:
+     *          = 'A':  all m columns of u and all n rows of v**T are
+     *                  returned in the arrays u and vt;
+     *          = 'S':  the first min(m,n) columns of u and the first
+     *                  min(m,n) rows of v**T are returned in the arrays U
+     *                  and vt;
+     *          = 'O':  If m >= n, the first n columns of u are overwritten
+     *                  on the array a and all rows of v**T are returned in
+     *                  the array vt;
+     *                  otherwise, all columns of u are returned in the
+     *                  array u and the first m rows of v**T are overwritten
+     *                  in the array a;
+     *          = 'N':  no columns of u or rows of v**T are computed.
+     * @endverbatim
+     *
+     * @param[in] m
+     * @verbatim
+     *          m is Integer
+     *          The number of rows of the input matrix a.  m >= 0.
+     * @endverbatim
+     *
+     * @param[in] n
+     * @verbatim
+     *          n is Integer
+     *          The number of columns of the input matrix a.  n >= 0.
+     * @endverbatim
+     *
+     * @param[in,out] a
+     * @verbatim
+     *          a is STK::Real array, dimension (lda,n)
+     *          On entry, the m-by-n matrix a.
+     *          On exit,
+     *          if jobz = 'O',  a is overwritten with the first n columns
+     *                          of u (the left singular vectors, stored
+     *                          columnwise) if m >= n;
+     *                          a is overwritten with the first m rows
+     *                          of v**T (the right singular vectors, stored
+     *                          rowwise) otherwise.
+     *          if jobz .ne. 'O', the contents of a are destroyed.
+     * @endverbatim
+     *
+     * @param[in] lda
+     * @verbatim
+     *          lda is Integer
+     *          The leading dimension of the array a.  lda >= max(1,m).
+     * @endverbatim
+     *
+     * @param[out] s
+     * @verbatim
+     *          s is STK::Real array, dimension (min(m,n))
+     *          The singular values of a, sorted so that s[i] >= s[i+1].
+     * @endverbatim
+     *
+     * @param[out] u
+     * @verbatim
+     *          u is STK::Real array, dimension (ldu,ucol)
+     *          ucol = m if jobz = 'A' or jobz = 'O' and m < n;
+     *          ucol = min(m,n) if jobz = 'S'.
+     *          If jobz = 'A' or jobz = 'O' and m < n, u contains the m-by-m
+     *          orthogonal matrix u;
+     *          if jobz = 'S', u contains the first min(m,n) columns of u
+     *          (the left singular vectors, stored columnwise);
+     *          if jobz = 'O' and m >= n, or jobz = 'N', u is not referenced.
+     * @endverbatim
+     *
+     * @param[in] ldu
+     * @verbatim
+     *          ldu is Integer
+     *          The leading dimension of the array U.  ldu >= 1; if
+     *          jobz = 'S' or 'A' or jobz = 'O' and m < n, ldu >= m.
+     * @endverbatim
+     *
+     * @param[out] vt
+     * @verbatim
+     *          vt is STK::Real array, dimension (ldvt,n)
+     *          If jobz = 'A' or jobz = 'O' and m >= n, vt contains the
+     *          N-by-N orthogonal matrix v**T;
+     *          if jobz = 'S', vt contains the first min(m,n) rows of
+     *          v**T (the right singular vectors, stored rowwise);
+     *          if jobz = 'O' and m < n, or jobz = 'N', vt is not referenced.
+     * @endverbatim
+     *
+     * @param[in] ldvt
+     * @verbatim
+     *          ldvt is Integer
+     *          The leading dimension of the array vt.  ldvt >= 1; if
+     *          jobz = 'A' or jobz = 'O' and m >= n, ldvt >= n;
+     *          if jobz = 'S', ldvt >= min(m,n).
+     * @endverbatim
+     *
+     * @param[out] work
+     * @verbatim
+     *          work is STK::Real array, dimension (MAX(1,lWork))
+     *          On exit, if info = 0, work(1) returns the optimal lWork;
+     * @endverbatim
+     *
+     * @param[in] lWork
+     * @verbatim
+     *          lWork is Integer
+     *          The dimension of the array work. lWork >= 1.
+     *          If jobz = 'N',
+     *            lWork >= 3*min(m,n) + max(max(m,n),7*min(m,n)).
+     *          If jobz = 'O',
+     *            lWork >= 3*min(m,n) +
+     *                     max(max(m,n),5*min(m,n)*min(m,n)+4*min(m,n)).
+     *          If jobz = 'S' or 'A'
+     *            lWork >= min(m,n)*(6+4*min(m,n))+max(m,n)
+     *          For good performance, lWork should generally be larger.
+     *          If lWork = -1 but other input arguments are legal, work(1)
+     *          returns the optimal lWork.
+     * @endverbatim
+     *
+     * @param[out] iWork
+     * @verbatim
+     *          iWork is Integer array, dimension (8*min(m,n))
+     * @endverbatim
      *
      * @return info
-     * \verbatim
-     *  = 0:  successful exit
-     *  < 0:  if INFO = -i, the i-th argument had an illegal value
-     * \endverbatim
-     *
      * @verbatim
-     *  Further Details
-     *  ===============
-     *
-     *  The matrix Q is represented as a product of elementary reflectors
-     *
-     *     Q = H(1) H(2) . . . H(k), where k = min(m,n).
-     *
-     *  Each H(i) has the form
-     *
-     *     H(i) = I - tau * v * v'
-     *
-     *  where tau is a real scalar, and v is a real vector with
-     *  v(1:i-1) = 0 and v(i) = 1; v(i+1:m) is stored on exit in A(i+1:m,i),
-     *  and tau in TAU(i).
+     *          info is Integer
+     *          = 0:  successful exit.
+     *          < 0:  if info = -i, the i-th argument had an illegal value.
+     *          > 0:  DBDSDC did not converge, updating process failed.
      * @endverbatim
-     */
-    int geqrf(int m, int n, Real* a, int lda, Real* tau, Real *work, int lwork);
+     *
+     *  Authors:
+     *  ========
+     *
+     * @author Univ. of Tennessee
+     * @author Univ. of California Berkeley
+     * @author Univ. of Colorado Denver
+     * @author NAG Ltd.
+     *
+     * Contributors:
+     * ============
+     *
+     *     Ming Gu and Huan Ren, Computer Science Division, University of
+     *     California at Berkeley, USA
+     *
+     **/
+    static int gesdd( char jobz, int m, int n
+                    , Real *a, int lda, Real *s, Real *u, int ldu, Real *vt, int ldvt
+                    , Real *work, int lWork, int *iWork
+                    );
+  private:
+     /** option */
+     char jobz_;
+     /** compute the svd decomposition. a contains either u, vt (if jobz_=='O')
+      *  or is destroyed at the end of the oputput. */
+     bool computeSvd(CArrayXX& a, CArrayXX& u, CVectorX& s, CArrayXX& v);
 };
 
 
-/** @} */
+/* @} */
 
 } // namespace lapack
 

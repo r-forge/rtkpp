@@ -296,13 +296,13 @@ class BinaryOperator : public BinaryOperatorBase< BinaryOp, Lhs, Rhs >
                          , rows_(lhs_.beginRows(), (sizeRows_ != UnknownSize) ? sizeRows_ : lhs_.sizeRows())
                          , cols_(lhs_.beginCols(), (sizeCols_ != UnknownSize) ? sizeCols_ : lhs_.sizeCols())
     { // FIXME : not safe. Add more test in the 1D case at compile time (and runtime ?)
-      STK_STATICASSERT_BINARY_OPERATOR_MISMATCH( isValid_ );
-      STK_STATICASSERT_COLS_DIMENSIONS_MISMATCH(!( (int(Lhs::sizeCols_) != UnknownSize)
+      STK_STATIC_ASSERT_BINARY_OPERATOR_MISMATCH( isValid_ );
+      STK_STATIC_ASSERT_COLS_DIMENSIONS_MISMATCH(!( (int(Lhs::sizeCols_) != UnknownSize)
                                                &&  (int(Rhs::sizeCols_) != UnknownSize)
                                                &&  (int(Lhs::sizeCols_) != int(Rhs::sizeCols_))
                                                &&  (isRes2D_)
                                                  ));
-      STK_STATICASSERT_ROWS_DIMENSIONS_MISMATCH(!( (int(Lhs::sizeRows_) != UnknownSize)
+      STK_STATIC_ASSERT_ROWS_DIMENSIONS_MISMATCH(!( (int(Lhs::sizeRows_) != UnknownSize)
                                                &&  (int(Rhs::sizeRows_) != UnknownSize)
                                                &&  (int(Lhs::sizeRows_) != int(Rhs::sizeRows_))
                                                &&  (isRes2D_)

@@ -183,6 +183,16 @@ class Array2D : public IArray2D< Array2D<Type_> >
      *  @param v the value to set
      **/
     inline Array2D& operator=( Type const& v) { return LowBase::setValue(v);}
+    /** New beginning index for the object.
+     *  @param beg first index of the container
+     **/
+    inline void shift1D(int beg)
+    { Base::shift(beg, beg);}
+    /** New size for the container.
+     *  @param I range of the columns and rows of the container
+     **/
+    inline Array2D& resize1D( Range const& I)
+    { Base::resize(I, I); return *this;}
     /** Swapping the pos1 row and the pos2 row.
      *  @param pos1,pos2 position of the rows to swap
      **/

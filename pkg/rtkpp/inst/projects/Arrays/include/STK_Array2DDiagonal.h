@@ -161,13 +161,11 @@ class Array2DDiagonal : public IArray2D< Array2DDiagonal<Type_> >
      **/
     inline void shift1D(int beg)
     { Base::shift(beg, beg);}
-
     /** New size for the container.
      *  @param I range of the columns and rows of the container
      **/
     inline Array2DDiagonal& resize1D( Range const& I)
     { Base::resize(I, I); return *this;}
-
     /** Insert n rows and column at the given position to the container.
      *  @param pos position to insert the Rows and Cols
      *  @param n number of Rows and Cols insert

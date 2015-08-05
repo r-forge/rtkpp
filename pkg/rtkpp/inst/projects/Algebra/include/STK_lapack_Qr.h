@@ -47,10 +47,10 @@ extern "C"
 {
 #ifdef STKREALAREFLOAT
 /** LAPACK routine in float to compute the QR decomposition */
-extern void sgeqrf_(int* M, int* N, float* A, int* LDA, float* TAU, float* WORK, int* LWORK, int* INFO );
+extern void sgeqrf_(int* M, int* N, float* A, int* lda, float* TAU, float* work, int* lWork, int* info );
 #else
 /** LAPACK routine in double to compute the QR decomposition */
-extern void dgeqrf_(int* M, int* N, double* A, int* LDA, double* TAU, double* WORK, int* LWORK, int* INFO );
+extern void dgeqrf_(int* M, int* N, double* A, int* lda, double* TAU, double* work, int* lWork, int* info );
 #endif
 }
 
@@ -129,7 +129,7 @@ class Qr : public IQr<Qr >
      *
      * @param[in] n The number of columns of the matrix A.  N >= 0.
      *
-     * @param[in,out] a Real array, dimension (LDA, N)
+     * @param[in,out] a Real array, dimension (lda, N)
      * \verbatim
      *     On entry, the M-by-N matrix A.
      *     On exit, the elements on and above the diagonal of the array
@@ -139,31 +139,31 @@ class Qr : public IQr<Qr >
      *     product of min(m,n) elementary reflectors (see Further Details).
      * \endverbatim
      *
-     * @param[in] lda The leading dimension of the array A.  LDA >= max(1,M).
+     * @param[in] lda The leading dimension of the array A.  lda >= max(1,M).
      *
      * @param[out] tau Real array, dimension min(M,N)
      * The scalar factors of the elementary reflectors (see Further Details).
      *
-     * @param[in,out] work Real array, dimension (MAX(1,LWORK))
+     * @param[in,out] work Real array, dimension (MAX(1,lWork))
      * \verbatim
-     *   On exit, if INFO = 0, WORK(1) returns the optimal LWORK.
+     *   On exit, if info = 0, work(1) returns the optimal lWork.
      * \endverbatim
      *
-     * @param[in] lwork The  dimension  of  the array WORK
+     * @param[in] lWork The  dimension  of  the array work
      * \verbatim
-     *  LWORK >= max(1,N).
-     *  For optimum performance LWORK >= N*NB, where NB is the optimal blocksize.
+     *  lWork >= max(1,N).
+     *  For optimum performance lWork >= N*NB, where NB is the optimal blocksize.
      *
-     *  If LWORK = -1, then a workspace query is assumed; the routine
-     *  only calculates the optimal size of the WORK array, returns
-     *  this value as the first entry of the WORK array, and no error
-     *  message related to LWORK is issued by XERBLA.
+     *  If lWork = -1, then a workspace query is assumed; the routine
+     *  only calculates the optimal size of the work array, returns
+     *  this value as the first entry of the work array, and no error
+     *  message related to lWork is issued by XERBLA.
      * \endverbatim
      *
      * @return info
      * \verbatim
      *  = 0:  successful exit
-     *  < 0:  if INFO = -i, the i-th argument had an illegal value
+     *  < 0:  if info = -i, the i-th argument had an illegal value
      * \endverbatim
      *
      * @verbatim
@@ -183,7 +183,7 @@ class Qr : public IQr<Qr >
      *  and tau in TAU(i).
      * @endverbatim
      */
-    static int geqrf(int m, int n, Real* a, int lda, Real* tau, Real *work, int lwork);
+    static int geqrf(int m, int n, Real* a, int lda, Real* tau, Real *work, int lWork);
 
   private:
     /** private method for computing the Qr decomposition using a CArrayXX array */

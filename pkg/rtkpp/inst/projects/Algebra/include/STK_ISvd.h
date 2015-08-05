@@ -36,11 +36,11 @@
 #ifndef STK_ISVD_H
 #define STK_ISVD_H
 
-#include "Sdk/include/STK_IRunner.h"
-#include "Sdk/include/STK_IRecursiveTemplate.h"
-#include "Arrays/include/STK_Array2D.h"
-#include "Arrays/include/STK_Array2DSquare.h"
-#include "Arrays/include/STK_Array2DDiagonal.h"
+#include <Sdk/include/STK_IRunner.h>
+#include <Sdk/include/STK_IRecursiveTemplate.h>
+#include <STKernel/include/STK_Real.h>
+
+#include "STK_Algebra_Util.h"
 
 namespace STK
 {
@@ -62,26 +62,40 @@ template<class Derived>
 class ISvd  : public IRunnerBase, public IRecursiveTemplate<Derived>
 {
   protected:
-    typedef typename hidden::AlgebraTraits<Derived>::Array Array;
+    typedef typename hidden::AlgebraTraits<Derived>::ArrayU ArrayU;
+    typedef typename hidden::AlgebraTraits<Derived>::ArrayD ArrayD;
+    typedef typename hidden::AlgebraTraits<Derived>::ArrayV ArrayV;
+    typedef TransposeOperator<ArrayV> ArrayVT;
     /** Default constructor
      *  @param A the matrix to decompose.
      *  @param ref if true, U_ is a reference of A.
      *  @param withU if @c true save the left housolder transforms in @c U_.
      *  @param withV if @c true save the right housolder transforms in @c V_.
      **/
-    ISvd( Array const& A, bool ref, bool withU = true, bool withV = true)
-        : U_(A, ref), V_(), D_(), withU_(withU), withV_(withV), norm_(0), rank_(0)
+    inline ISvd( ArrayU const& A, bool ref, bool withU = true, bool withV = true)
+        : U_(A, ref), V_(), VT_(V_), D_()
+        , withU_(withU), withV_(withV), norm_(0), rank_(0)
+    {}
+    /** constructor with other kind of array/expression
+     *  @param A the matrix/expression to decompose.
+     *  @param withU if @c true save the left housolder transforms in @c U_.
+     *  @param withV if @c true save the right housolder transforms in @c V_.
+     */
+    template<class OtherDerived>
+    inline ISvd( ArrayBase<OtherDerived> const& A, bool withU = true, bool withV = true)
+               : U_(A), V_(), VT_(V_), D_()
+               , withU_(withU), withV_(withV), norm_(0), rank_(0)
     {}
     /** Copy Constructor
      *  @param S the Svd to copy
      **/
-    ISvd( ISvd const& S)
-        : U_(S.U_, S.U_.isRef()), V_(S.V_), D_(S.D_)
+    inline ISvd( ISvd const& S)
+        : U_(S.U_, S.U_.isRef()), V_(S.V_), VT_(V_), D_(S.D_)
         , withU_(S.withU_), withV_(S.withV_)
         , norm_(S.norm_), rank_(S.rank_)
     {}
     /** destructor. */
-    virtual ~ISvd() {}
+    inline virtual ~ISvd() {}
     /** Operator = : overwrite the ISvd with S.
      *  @param S the Svd to copy
      **/
@@ -92,11 +106,27 @@ class ISvd  : public IRunnerBase, public IRecursiveTemplate<Derived>
       norm_ = S.norm_; rank_ = S.rank_;
       return *this;
     }
+    /** Finalize any operations that have to be done after the computation
+     *  of the decomposition
+     **/
+    virtual void finalize()
+    {
+      // Compute the true max norm
+      norm_ = D_.front();
+      // Compute the rank
+      rank_ = 0;
+      for (int i=D_.begin(); i<D_.end(); i++)
+        if (norm_+D_[i] != norm_) { rank_++;}
+        else break;
+
+    }
   public:
     /// @return the number of rows of U_
     inline int nrowU() const { return U_.sizeRows();}
     /// @return the number of columns of U_
     inline int ncolU() const { return U_.sizeCols();}
+    /// @return the number of columns of D_
+    inline int nrowD() const { return D_.sizeRows();}
     /// @return the number of columns of D_
     inline int ncolD() const { return D_.sizeCols();}
     /// @return the number of rows of V_
@@ -108,19 +138,49 @@ class ISvd  : public IRunnerBase, public IRecursiveTemplate<Derived>
     /// @return the rank of the matrix
     inline int rank()  const { return rank_;}
     /// @return U
-    inline Array const& getU() const { return U_;}
+    inline ArrayU const& getU() const { return U_;}
     /// @return  V
-    inline ArraySquareX const& getV() const { return V_;}
+    inline ArrayV const& getV() const { return V_;}
+    /// @return  V
+    inline ArrayVT const& getVT() const { return VT_;}
     /// @return D
-    inline ArrayDiagonalX const&  getD() const { return D_;}
-    
+    inline ArrayD const&  getD() const { return D_;}
+    /** implement the run method */
+    virtual bool run()
+    {
+      if (U_.empty()) { return true;}
+      // compute Svd decomposition
+      if (!this->asDerived().runImpl()) return false;
+      finalize();
+      return true;
+    }
+    /** Compute the svd of the Array A and copy the data
+     *  see the corresponding constructor Take care that if U_ was previously
+     *  a reference, it cannot be modified.
+     *  @param A is the matrix to decompose.
+     *  @param withU if true, we save the left housolder transforms
+     *  in U_.
+     *  @param withV if true, we save the right housolder transforms
+     *  in V_.
+     **/
+    template<class OtherArray>
+    void setData( OtherArray const& A, bool withU = true, bool withV = true)
+    {
+      U_ = A;           // Copy A in U_
+      withU_ = withU;   // copy withU_ value
+      withV_ = withV;   // copy withV_ value
+      V_.resize(0,0), D_.resize(0);
+    }
+
   protected:
     /// U_ matrix
-    Array U_;
-    /// V_ square matrix
-    ArraySquareX V_;
+    ArrayU U_;
+    /// V_ matrix
+    ArrayV V_;
+    /// transposed V_
+    ArrayVT VT_;
     /// Diagonal array of the singular values
-    ArrayDiagonalX D_;
+    ArrayD D_;
     /// Compute U_ ?
     bool withU_;
     /// Compute V_ ?

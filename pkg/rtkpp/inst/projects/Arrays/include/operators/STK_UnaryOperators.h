@@ -45,7 +45,6 @@ template<typename UnaryOp, typename Lhs> class UnaryOperator;
 
 namespace hidden
 {
-
 /** @ingroup hidden
  *  @brief Traits class for the unary operators
  */
@@ -54,11 +53,11 @@ struct Traits< UnaryOperator <UnaryOp, Lhs> >
 {
   enum
   {
-      structure_ = Lhs::structure_,
-      orient_    = Lhs::orient_,
-      sizeRows_  = Lhs::sizeRows_,
-      sizeCols_  = Lhs::sizeCols_,
-      storage_   = Lhs::storage_
+      structure_ = Traits<Lhs>::structure_,
+      orient_    = Traits<Lhs>::orient_,
+      sizeRows_  = Traits<Lhs>::sizeRows_,
+      sizeCols_  = Traits<Lhs>::sizeCols_,
+      storage_   = Traits<Lhs>::storage_
   };
   typedef RowOperator<UnaryOperator <UnaryOp, Lhs> > Row;
   typedef ColOperator<UnaryOperator <UnaryOp, Lhs> > Col;
@@ -112,8 +111,8 @@ class UnaryOperator  : public UnaryOperatorBase< UnaryOp, Lhs >, public TRef<1>
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
 
-    inline UnaryOperator( Lhs const& rhs, UnaryOp const& functor = UnaryOp())
-                        : Base(), lhs_(rhs), functor_(functor)
+    inline UnaryOperator( Lhs const& lhs, UnaryOp const& functor = UnaryOp())
+                        : Base(), lhs_(lhs), functor_(functor)
     {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return lhs_.rows();}
@@ -134,7 +133,7 @@ class UnaryOperator  : public UnaryOperatorBase< UnaryOp, Lhs >, public TRef<1>
     inline int sizeColsImpl() const { return lhs_.sizeCols();}
 
     /** @return the left hand side expression */
-    inline Lhs const& rhs() const { return lhs_; }
+    inline Lhs const& lhs() const { return lhs_; }
     /** @return the functor representing the unary operation */
     inline UnaryOp const& functor() const { return functor_; }
 
@@ -162,15 +161,15 @@ class UnaryOperatorBase : public ExprBase< UnaryOperator<UnaryOp, Lhs> >
      *  @param j index of the column
      **/
     inline ReturnType elt2Impl(int i, int j) const
-    { return this->asDerived().functor()(this->asDerived().rhs().elt(i, j));}
+    { return this->asDerived().functor()(this->asDerived().lhs().elt(i, j));}
     /** @return the ith element of the operator
      *  @param i index of the ith element
      **/
     inline ReturnType elt1Impl(int i) const
-    { return this->asDerived().functor()(this->asDerived().rhs().elt(i));}
+    { return this->asDerived().functor()(this->asDerived().lhs().elt(i));}
     /** @return the element of the operator */
     inline ReturnType elt0Impl() const
-    { return this->asDerived().functor()(this->asDerived().rhs().elt());}
+    { return this->asDerived().functor()(this->asDerived().lhs().elt());}
 };
 
 } // namespace STK

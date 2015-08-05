@@ -51,6 +51,58 @@
 
 namespace STK
 {
+
+namespace hidden
+{
+template<class Derived, int Structure_ = Derived::structure_>
+struct CheckArray;
+
+template<class Derived>
+struct CheckArray<Derived, Arrays::array2D_>
+{
+  static inline bool resize(Derived const& array, Range const& I, Range const& J)
+  { return (array.rows() == I && array.cols() == J) ? false : true;}
+  static inline bool shift(Derived const& array, int beginRow, int beginCol)
+  { return (array.beginRows() == beginRow && array.beginCols() == beginCol) ? false : true;}
+  static inline bool resize(Derived const& array, Range const& I)
+  { return (array.rows() == I && array.cols() == I) ? false : true;}
+  static inline bool shift(Derived const& array, int begin)
+  { return (array.beginRows() == begin && array.beginCols() == begin) ? false : true;}
+};
+template<class Derived>
+struct CheckArray<Derived, Arrays::upper_triangular_>
+{
+  static inline bool resize(Derived const& array, Range const& I, Range const& J)
+  { return (array.rows() == I && array.cols() == J) ? false : true;}
+  static inline bool shift(Derived const& array, int beginRow, int beginCol)
+  { return (array.beginRows() == beginRow && array.beginCols() == beginCol) ? false : true;}
+  static inline bool resize(Derived const& array, Range const& I)
+  { return (array.rows() == I && array.cols() == I) ? false : true;}
+  static inline bool shift(Derived const& array, int begin)
+  { return (array.beginRows() == begin && array.beginCols() == begin) ? false : true;}
+};
+template<class Derived>
+struct CheckArray<Derived, Arrays::lower_triangular_>
+{
+  static inline bool resize(Derived const& array, Range const& I, Range const& J)
+  { return (array.rows() == I && array.cols() == J) ? false : true;}
+  static inline bool shift(Derived const& array, int beginRow, int beginCol)
+  { return (array.beginRows() == beginRow && array.beginCols() == beginCol) ? false : true;}
+  static inline bool resize(Derived const& array, Range const& I)
+  { return (array.rows() == I && array.cols() == I) ? false : true;}
+  static inline bool shift(Derived const& array, int begin)
+  { return (array.beginRows() == begin && array.beginCols() == begin) ? false : true;}
+};
+
+template<class Derived, int Structure_>
+struct CheckArray
+{
+  static inline bool resize(Derived const& array, Range const& I)
+  { return (array.range() == I) ? false : true;}
+  static inline bool shift(Derived const& array, int begin)
+  { return (array.begin() == begin) ? false : true;}
+};
+}
 /** @class ICArray
   * @ingroup Arrays
   *
@@ -79,7 +131,6 @@ class ICArray : public ArrayBase<Derived>
     typedef typename hidden::Traits<Derived>::SubArray SubArray;
 
     typedef typename hidden::Traits<Derived>::Allocator Allocator;
-
     enum
     {
       structure_ = hidden::Traits<Derived>::structure_,
@@ -88,6 +139,7 @@ class ICArray : public ArrayBase<Derived>
       sizeCols_  = hidden::Traits<Derived>::sizeCols_,
       storage_   = hidden::Traits<Derived>::storage_
     };
+    typedef hidden::CheckArray<Derived, structure_> Checker;
     /** Type of the Range for the rows */
     typedef TRange<sizeRows_> RowRange;
     /** Type of the Range for the columns */
@@ -255,18 +307,24 @@ class ICArray : public ArrayBase<Derived>
      **/
     Derived& shift(int beginRows, int beginCols)
     {
-      if((this->beginRows() == beginRows) && (this->beginCols()==beginCols)) return this->asDerived();
+      STK_STATIC_ASSERT( (structure_ == (int)Arrays::array2D_)
+                      ||(structure_ == (int)Arrays::lower_triangular_)
+                      ||(structure_ == (int)Arrays::upper_triangular_)
+                      ,YOU_CANNOT_USED_THIS_METHOD_WITH_THIS_KIND_OF_ARRAY);
+      if (!Checker::shift(this->asDerived(), beginRows, beginCols)) return this->asDerived();
       if (this->isRef())
       { STKRUNTIME_ERROR_2ARG(ICArray::shift,beginRows,beginCols,cannot operate on reference);}
       allocator_.shift(beginRows, beginCols);
       return this->asDerived();
     }
     /** shift the Array.
-     *  @param firstIdx first index of the vector/point
+     *  @param firstIdx first index of the vector/point/diagonal/square array.
+     *  @note if this method is used with arrays, upper triangular and lower triangular
+     *  arrays, both indexes will be shifted.
      **/
     Derived& shift(int firstIdx)
     {
-      if((this->beginRows() == firstIdx)&&(this->beginCols() == firstIdx)) return this->asDerived();
+      if (!Checker::shift(this->asDerived(), firstIdx)) return this->asDerived();
       if (this->isRef())
       { STKRUNTIME_ERROR_1ARG(ICArray::shift,firstIdx,cannot operate on reference);}
       allocator_.shift(firstIdx);
@@ -277,19 +335,26 @@ class ICArray : public ArrayBase<Derived>
      **/
     Derived& resize(Range const& I, Range const& J)
     {
-      if((this->rows() == I) && (this->cols()==J)) return this->asDerived();
+      STK_STATIC_ASSERT( (structure_ == (int)Arrays::array2D_)
+                      ||(structure_ == (int)Arrays::lower_triangular_)
+                      ||(structure_ == (int)Arrays::upper_triangular_)
+                      ,YOU_CANNOT_USED_THIS_METHOD_WITH_THIS_KIND_OF_ARRAY);
+      if (!Checker::resize(this->asDerived(), I, J))
+        return this->asDerived();
       if (this->isRef())
       { STKRUNTIME_ERROR_2ARG(ICArray::resize,I,J,cannot operate on reference);}
       allocator_.resize(I.size(), J.size());
       allocator_.shift(I.begin(), J.begin());
       return this->asDerived();
     }
-    /** Resize the vector.
+    /** Resize the vector/point/diagonal/square array.
      *  @param I Range of the vector
+     *  @note if this method is used with arrays, upper triangular and lower triangular
+     *  arrays, both ranges will be resized.
      **/
     Derived& resize(Range const& I)
     {
-      if (this->range() == I) return this->asDerived();
+      if (!Checker::resize(this->asDerived(), I)) return this->asDerived();
       if (this->isRef())
       { STKRUNTIME_ERROR_1ARG(ICArray::resize,I,cannot operate on reference);}
       allocator_.resize(I.size());

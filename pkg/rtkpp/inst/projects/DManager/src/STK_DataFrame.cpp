@@ -490,7 +490,7 @@ void DataFrame::writeDataFrame( ostream& os, int const& left
   // get the csv
   ReadWriteCsv* pData = csv.p_readWriteCsv();
   // set delimiters to blank
-  pData->setDelimiters(STRING_BLANK);
+  pData->setDelimiters(_T(" "));
   // write the csv
   pData->writeSelection(os, beginRows(), lastIdxRows(), left, right);
 }

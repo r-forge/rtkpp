@@ -152,7 +152,7 @@ struct MixtureParametersSet
   /** resize 1D containers */
   inline void resize(Range const& range)
   {
-    STK_STATICASSERT_ONE_DIMENSION_ONLY(TypeParam);
+    STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(TypeParam);
     for (int k= stat_param_.begin(); k < stat_param_.end(); ++k)
     {
       param_[k].resize(range);

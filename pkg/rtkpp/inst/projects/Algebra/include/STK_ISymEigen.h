@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2007  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -93,7 +93,7 @@ class ISymEigen : public IRunnerBase, public IRecursiveTemplate<Derived>
              , eigenValues_(data.size(), 0.)
              , SupportEigenVectors_(2*data.size(), 0)
     {
-      STK_STATICASSERT(OtherDerived::structure_==(int)Arrays::square_,YOU_HAVE_TO_USE_A_SQUARE_MATRIX_IN_THIS_METHOD)
+      STK_STATIC_ASSERT(OtherDerived::structure_==(int)Arrays::square_,YOU_HAVE_TO_USE_A_SQUARE_MATRIX_IN_THIS_METHOD)
     }
     /** Copy constructor.
      *  @param eigen the EigenValue to copy
@@ -124,13 +124,13 @@ class ISymEigen : public IRunnerBase, public IRecursiveTemplate<Derived>
       return *this;
     }
     /** @return the range of the matrix */
-    inline Real range()  const { return norm_;}
+    inline Range const& range()  const { return range_;}
     /** @return the trace norm of the matrix */
-    inline Real norm()  const { return norm_;}
+    inline Real const& norm()  const { return norm_;}
     /** @return the rank of the matrix */
-    inline int rank()  const { return rank_;}
+    inline int const& rank()  const { return rank_;}
     /** @return the determinant of the Array */
-    inline Real det()  const { return det_;}
+    inline Real const& det()  const { return det_;}
     /**  @return the rotation matrix */
     inline CSquareX const& rotation() const{ return eigenVectors_;}
     /**  @return the rotation matrix */
@@ -144,7 +144,7 @@ class ISymEigen : public IRunnerBase, public IRecursiveTemplate<Derived>
     template<class ArraySquare>
     ArraySquare& ginv(ArraySquare& res)
     {
-      STK_STATICASSERT(ArraySquare::structure_==(int)Arrays::square_,YOU_HAVE_TO_USE_A_SQUARE_MATRIX_IN_THIS_METHOD)
+      STK_STATIC_ASSERT(ArraySquare::structure_==(int)Arrays::square_,YOU_HAVE_TO_USE_A_SQUARE_MATRIX_IN_THIS_METHOD)
       // create pseudo inverse matrix
       res.resize(eigenVectors_.range());
       res = 0;
@@ -161,7 +161,7 @@ class ISymEigen : public IRunnerBase, public IRecursiveTemplate<Derived>
     template<class OtherDerived>
     void setData( ExprBase<OtherDerived> const& data)
     {
-      STK_STATICASSERT(OtherDerived::structure_==(int)Arrays::square_,YOU_HAVE_TO_USE_A_SQUARE_MATRIX_IN_THIS_METHOD)
+      STK_STATIC_ASSERT(OtherDerived::structure_==(int)Arrays::square_,YOU_HAVE_TO_USE_A_SQUARE_MATRIX_IN_THIS_METHOD)
       norm_ = 0.; rank_ = 0; det_ = 0.; range_ = data.range();
       eigenVectors_ = data;
       eigenValues_.resize(range_);

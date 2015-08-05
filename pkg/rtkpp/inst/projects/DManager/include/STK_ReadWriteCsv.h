@@ -759,7 +759,7 @@ void TReadWriteCsv<Type>::writeSelection( ostream& os, int top, int bottom, int 
     }
     os << std::setw(int(format[right])) << std::right
        << Proxy<String>(str_data_[right].name())
-       << STRING_NL;
+       << _T("\n");
   }
   // write data
   for(int irow = top; irow<=bottom; irow++)
@@ -782,7 +782,7 @@ void TReadWriteCsv<Type>::writeSelection( ostream& os, int top, int bottom, int 
     }
     catch(...) // if an error occur, we put NA value
     { os << std::setw(format[right]) << std::right << stringNa;}
-    os << STRING_NL;
+    os << _T("\n");
   }
 }
 

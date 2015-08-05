@@ -44,13 +44,13 @@ namespace lapack
 bool Qr::computeQr(CArrayXX& a, CVectorX& tau)
 {
   // start qr iterations
-  int lwork =-1, m = a.sizeRows(), n= a.sizeCols();
+  int lWork =-1, m = a.sizeRows(), n= a.sizeCols();
   int info;
   Real iwork;
   Real *p_work;
 
   // get size for work
-  info = geqrf(m, n, a.p_data(), m, tau.p_data(), &iwork, lwork);
+  info = geqrf(m, n, a.p_data(), m, tau.p_data(), &iwork, lWork);
   // check any error
   if (info!=0)
   {
@@ -62,9 +62,9 @@ bool Qr::computeQr(CArrayXX& a, CVectorX& tau)
     return false;
   }
   // create
-  lwork = (int)iwork;
-  p_work = new Real[lwork];
-  info = geqrf(m, n, a.p_data(), m, tau.p_data(), p_work, lwork);
+  lWork = (int)iwork;
+  p_work = new Real[lWork];
+  info = geqrf(m, n, a.p_data(), m, tau.p_data(), p_work, lWork);
   // release working set
   delete[] p_work;
   // check any error
@@ -105,15 +105,15 @@ bool Qr::runImpl()
   return true;
 }
 
-inline int Qr::geqrf(int m, int n, Real* a, int lda, Real* tau, Real *work, int lwork)
+inline int Qr::geqrf(int m, int n, Real* a, int lda, Real* tau, Real *work, int lWork)
 {
   int info = 1;
 
 #ifdef STKUSELAPACK
 #ifdef STKREALAREFLOAT
-  sgeqrf_(&m, &n, a, &lda, tau, work, &lwork, &info);
+  sgeqrf_(&m, &n, a, &lda, tau, work, &lWork, &info);
 #else
-  dgeqrf_(&m, &n, a, &lda, tau, work, &lwork, &info);
+  dgeqrf_(&m, &n, a, &lda, tau, work, &lWork, &info);
 #endif
 #endif
 

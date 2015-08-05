@@ -161,7 +161,7 @@ class ArrayBase :  public ExprBase<Derived>
     /** @return the jth column of this in the range I*/
     inline SubCol col(Range const& I, int j) const
     {
-      STK_STATICASSERT_TWO_DIMENSIONS_ONLY(Derived)
+      STK_STATIC_ASSERT_TWO_DIMENSIONS_ONLY(Derived)
 #ifdef STK_BOUNDS_CHECK
       if (this->beginRows() > I.begin())
       { STKOUT_OF_RANGE_2ARG(ArrayBase::col, I, j, beginRows() > I.begin());}
@@ -177,7 +177,7 @@ class ArrayBase :  public ExprBase<Derived>
     /** @return the sub array with the column in the range J */
     inline SubArray col(Range const& J) const
     {
-      STK_STATICASSERT_TWO_DIMENSIONS_ONLY(Derived)
+      STK_STATIC_ASSERT_TWO_DIMENSIONS_ONLY(Derived)
 #ifdef STK_BOUNDS_CHECK
       if (this->beginCols() > J.begin())
       { STKOUT_OF_RANGE_1ARG(ArrayBase::col, J, beginCols() > J.begin());}
@@ -200,25 +200,25 @@ class ArrayBase :  public ExprBase<Derived>
     /** @return the ith row of this in the range J */
     inline SubRow row(int i, Range const& J) const
     {
-      STK_STATICASSERT_TWO_DIMENSIONS_ONLY(Derived)
+      STK_STATIC_ASSERT_TWO_DIMENSIONS_ONLY(Derived)
       return this->asDerived().rowImpl(i,J);
     }
     /** @return the sub array with the rows in the range J */
     inline SubArray row(Range const& I) const
     {
-      STK_STATICASSERT_TWO_DIMENSIONS_ONLY(Derived)
+      STK_STATIC_ASSERT_TWO_DIMENSIONS_ONLY(Derived)
       return this->asDerived().rowImpl(I);
     }
     /** @return the sub-array (I,J)*/
     inline SubArray sub(Range const& I, Range const& J) const
     {
-      STK_STATICASSERT_TWO_DIMENSIONS_ONLY(Derived)
+      STK_STATIC_ASSERT_TWO_DIMENSIONS_ONLY(Derived)
       return this->asDerived().subImpl(I, J);
     }
     /** @return the sub-vector in the range I*/
     inline SubVector sub(Range const& I) const
     {
-      STK_STATICASSERT_ONE_DIMENSION_ONLY(Derived)
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived)
       return this->asDerived().subImpl(I);
     }
     /** @return the element (i,j) of the 2D container.
@@ -260,7 +260,7 @@ class ArrayBase :  public ExprBase<Derived>
      **/
     inline Type& elt(int i)
     {
-      STK_STATICASSERT_ONE_DIMENSION_ONLY(Derived)
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived)
 #ifdef STK_BOUNDS_CHECK
       if (this->begin() > i)
       { STKOUT_OF_RANGE_1ARG(ArrayBase::elt, i, beginRows() > i);}
@@ -274,7 +274,7 @@ class ArrayBase :  public ExprBase<Derived>
      **/
     inline Type const& elt(int i) const
     {
-      STK_STATICASSERT_ONE_DIMENSION_ONLY(Derived)
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived)
 #ifdef STK_BOUNDS_CHECK
       if (this->begin() > i)
       { STKOUT_OF_RANGE_1ARG(ArrayBase::elt, i, beginRows() > i);}
@@ -286,13 +286,13 @@ class ArrayBase :  public ExprBase<Derived>
     /** @return a reference on the number */
     inline Type& elt()
     {
-      STK_STATICASSERT_ZERO_DIMENSION_ONLY(Derived)
+      STK_STATIC_ASSERT_ZERO_DIMENSION_ONLY(Derived)
       return this->asDerived().elt0Impl();
     }
     /** @return a constant reference on the number */
     inline Type const& elt() const
     {
-      STK_STATICASSERT_ZERO_DIMENSION_ONLY(Derived)
+      STK_STATIC_ASSERT_ZERO_DIMENSION_ONLY(Derived)
       return this->asDerived().elt0Impl();
     }
     // overloaded operators
@@ -340,25 +340,25 @@ class ArrayBase :  public ExprBase<Derived>
     /** @return the first element */
     inline Type& front()
     {
-      STK_STATICASSERT_ONE_DIMENSION_ONLY(Derived)
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived)
       return elt(this->begin());
     }
     /** @return the last element */
     inline Type& back()
     {
-      STK_STATICASSERT_ONE_DIMENSION_ONLY(Derived)
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived)
       return elt(this->lastIdx());
     }
     /** @return the first element */
     inline Type const& front() const
     {
-      STK_STATICASSERT_ONE_DIMENSION_ONLY(Derived)
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived)
       return elt(this->begin());
     }
     /** @return the last element */
     inline Type const& back() const
     {
-      STK_STATICASSERT_ONE_DIMENSION_ONLY(Derived)
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived)
       return elt(this->lastIdx());
     }
     /** Convenient operator to set the coefficients of a matrix.

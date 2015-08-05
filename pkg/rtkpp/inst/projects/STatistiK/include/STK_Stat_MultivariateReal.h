@@ -74,7 +74,7 @@ class Multivariate<Array, Real> : public IRunnerUnsupervised< Array, typename Ar
     Multivariate(): Runner()
                   , nbSamples_(0), nbVar_(0)
                   , min_(), max_(), mean_(), var_(), cov_()
-  { STK_STATICASSERT(value_, YOU_CANNOT_USED_THIS_TYPE_OF_DATA_WITH_THIS_OBJECT);}
+  { STK_STATIC_ASSERT(value_, YOU_CANNOT_USED_THIS_TYPE_OF_DATA_WITH_THIS_OBJECT);}
     /** Constructor.
      *  @param data a reference on the data set
      **/
@@ -82,7 +82,7 @@ class Multivariate<Array, Real> : public IRunnerUnsupervised< Array, typename Ar
                 : Runner(&data)
                 , nbSamples_(data.sizeRows()), nbVar_(data.sizeCols())
                 , min_(), max_(), mean_(), var_(), cov_()
-    { STK_STATICASSERT(value_, YOU_CANNOT_USED_THIS_TYPE_OF_DATA_WITH_THIS_OBJECT);}
+    { STK_STATIC_ASSERT(value_, YOU_CANNOT_USED_THIS_TYPE_OF_DATA_WITH_THIS_OBJECT);}
     /** Constructor.
      *  @param p_data a pointer on the data set
      **/
@@ -91,7 +91,7 @@ class Multivariate<Array, Real> : public IRunnerUnsupervised< Array, typename Ar
                 , nbSamples_((p_data) ? p_data->sizeRows() : 0)
                 , nbVar_((p_data) ? p_data->sizeCols() : 0)
                 , min_(), max_(), mean_(), var_(), cov_()
-    { STK_STATICASSERT(value_, YOU_CANNOT_USED_THIS_TYPE_OF_DATA_WITH_THIS_OBJECT);}
+    { STK_STATIC_ASSERT(value_, YOU_CANNOT_USED_THIS_TYPE_OF_DATA_WITH_THIS_OBJECT);}
     /** copy constructor.
      *  @param stat the statistics to copy
      **/

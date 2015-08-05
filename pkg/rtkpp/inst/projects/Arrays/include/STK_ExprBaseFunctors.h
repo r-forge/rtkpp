@@ -311,7 +311,7 @@ struct ApplyFunctor
     typedef Type resultByRowType;
     /// constructor
     inline ApplyFunctor( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived())
-    { STK_STATICASSERT_VECTOR_ONLY(Derived);}
+    { STK_STATIC_ASSERT_VECTOR_ONLY(Derived);}
     /** apply without argument*/
     inline Type operator()() { return Funct(lhs_)();}
     /** apply with an option argument*/
@@ -335,7 +335,7 @@ struct ApplyWeightedFunctor
     typedef Type resultByRowType;
     /// constructor
     inline ApplyWeightedFunctor( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived())
-    { STK_STATICASSERT_VECTOR_ONLY(Derived);}
+    { STK_STATIC_ASSERT_VECTOR_ONLY(Derived);}
     /** apply with weights*/
     template<typename Weights>
     inline Type operator()(ExprBase<Weights> const& w) { return Funct(lhs_)(w);}

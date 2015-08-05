@@ -106,7 +106,7 @@ template<class ArrayB, class ArrayA>
 template<class Weights>
 bool MultiLeastSquare<ArrayB, ArrayA>::runImpl(Weights const& weights)
 {
-  STK_STATICASSERT_ONE_DIMENSION_ONLY(Weights);
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Weights);
   // compute a'a
   ArraySquareX prod = a_.transpose() * weights.diagonalize() * a_;
   // compute (a'a)^{-1}

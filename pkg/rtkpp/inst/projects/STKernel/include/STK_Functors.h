@@ -281,7 +281,7 @@ struct LessThanOp
 {
   enum { NbParam_ = 1 };
   typedef bool result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type;
 
   inline LessThanOp(const LessThanOp& other) : other_(other.other_) { }
   inline LessThanOp(Type other) : other_(other) { }
@@ -296,7 +296,7 @@ struct LeqThanOp
 {
   enum { NbParam_ = 1 };
   typedef bool result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline LeqThanOp(LeqThanOp const& other) : other_(other.other_)
   {}
@@ -314,7 +314,7 @@ struct GreaterThanOp
 {
   enum { NbParam_ = 1 };
   typedef bool result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline GreaterThanOp(const GreaterThanOp& other) : other_(other.other_) { }
   inline GreaterThanOp(Type other) : other_(other) { }
@@ -329,7 +329,7 @@ struct GeqThanOp
 {
   enum { NbParam_ = 1 };
   typedef bool result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline GeqThanOp(const GeqThanOp& other) : other_(other.other_) { }
   inline GeqThanOp(Type other) : other_(other) { }
@@ -344,7 +344,7 @@ struct EqualThanOp
 {
   enum { NbParam_ = 1 };
   typedef bool result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline EqualThanOp(const EqualThanOp& other) : other_(other.other_) { }
   inline EqualThanOp(Type other) : other_(other) { }
@@ -359,7 +359,7 @@ struct NotEqualThanOp
 {
   enum { NbParam_ = 1 };
   typedef bool result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline NotEqualThanOp(const NotEqualThanOp& other) : other_(other.other_) { }
   inline NotEqualThanOp(Type other) : other_(other) { }
@@ -374,7 +374,7 @@ struct IsNaOp
 {
   enum { NbParam_ = 1 };
   typedef bool result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline result_type const operator()(param1_type value1) const
   { return Arithmetic<param1_type>::isNA(value1);}
@@ -387,7 +387,7 @@ struct NegOp
 {
   enum { NbParam_ = 1 };
   typedef bool result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline result_type const operator()(param1_type value1) const
   { return !value1;}
@@ -400,7 +400,7 @@ struct IsFiniteOp
 {
   enum { NbParam_ = 1 };
   typedef bool result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline result_type const operator()(param1_type value1) const
   { return Arithmetic<param1_type>::isFinite(value1);}
@@ -413,7 +413,7 @@ struct IsInfiniteOp
 {
   enum { NbParam_ = 1 };
   typedef bool result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type;
 
   inline result_type const operator()(param1_type value1) const
   { return Arithmetic<param1_type>::isInfinite(value1);}
@@ -426,7 +426,7 @@ struct OppositeOp
 {
   enum { NbParam_ = 1 };
   typedef Type result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline result_type const operator()(param1_type a) const
   { return -a; }
@@ -440,7 +440,7 @@ struct AbsOp
 {
   enum { NbParam_ = 1 };
   typedef Type result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline result_type const operator()(param1_type a) const
   { return std::abs(a); }
@@ -453,7 +453,7 @@ struct ExpOp
 {
   enum { NbParam_ = 1 };
   typedef Type result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline result_type const operator()(param1_type a) const {return std::exp(a);}
 };
@@ -465,7 +465,7 @@ struct LogOp
 {
   enum { NbParam_ = 1 };
   typedef Type result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline result_type const operator()(param1_type a) const {return std::log(a);}
 };
@@ -528,7 +528,7 @@ struct SafeOp
 {
   enum { NbParam_ = 1 };
   typedef Type result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline SafeOp(Type const other = Type()) : other_(other) {}
   inline SafeOp( SafeOp const& other) : other_(other.other_) {}
@@ -544,7 +544,7 @@ struct SafeInverseOp
 {
   enum { NbParam_ = 1 };
   typedef Type result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline SafeInverseOp(Type const tol = Arithmetic<Type>::epsilon()) : tol_(tol) {}
   inline SafeInverseOp( SafeInverseOp const& other) : tol_(other.tol_) {}
@@ -586,7 +586,7 @@ struct QuotientOp : public QuotientBaseOp<Type, hidden::isInt<Type>::yes >
 {
   enum { NbParam_ = 1 };
   typedef Type result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline QuotientOp(param1_type other) : QuotientBaseOp<Type, hidden::isInt<Type>::yes >(other) {}
 };
@@ -598,11 +598,26 @@ struct AddOp
 {
   enum { NbParam_ = 1 };
   typedef Type result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline AddOp(const AddOp& other) : other_(other.other_) { }
   inline AddOp(Type other) : other_(other) { }
   inline result_type const operator() (param1_type a) const { return a + other_; }
+  const result_type other_;
+};
+/** @ingroup Functors
+  * @brief Template functor to add a number to a fixed other one
+  */
+template<typename Type>
+struct AddOppositeOp
+{
+  enum { NbParam_ = 1 };
+  typedef Type result_type;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
+
+  inline AddOppositeOp(const AddOppositeOp& other) : other_(other.other_) { }
+  inline AddOppositeOp(Type other) : other_(other) { }
+  inline result_type const operator() (param1_type a) const { return other_ - a; }
   const result_type other_;
 };
 /** @ingroup Functors
@@ -612,7 +627,7 @@ template<typename Type> struct SqrtOp
 {
   enum { NbParam_ = 1 };
   typedef Type result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline result_type const operator()(param1_type a) const { return std::sqrt(a); }
 };
@@ -623,7 +638,7 @@ template<typename Type> struct CosOp
 {
   enum { NbParam_ = 1 };
   typedef Type result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline result_type const operator() (param1_type a) const { return std::cos(a); }
 };
@@ -634,7 +649,7 @@ template<typename Type> struct SinOp
 {
   enum { NbParam_ = 1 };
   typedef Type const result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline result_type const operator() (param1_type a) const { return std::sin(a); }
 };
@@ -645,7 +660,7 @@ template<typename Type> struct TanOp
 {
   enum { NbParam_ = 1 };
   typedef Type result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline result_type const operator() (param1_type a) const { return std::tan(a); }
 };
@@ -656,7 +671,7 @@ template<typename Type> struct AcosOp
 {
   enum { NbParam_ = 1 };
   typedef Type result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline result_type const operator() (param1_type a) const { return std::acos(a); }
 };
@@ -667,7 +682,7 @@ template<typename Type> struct AsinOp
 {
   enum { NbParam_ = 1 };
   typedef Type result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline result_type const operator() (param1_type a) const { return std::asin(a); }
 };
@@ -679,7 +694,7 @@ struct PowOp
 {
   enum { NbParam_ = 1 };
   typedef Type result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline PowOp(PowOp const& other) : exponent_(other.exponent_) {}
   inline PowOp(Type exponent) : exponent_(exponent) {}
@@ -694,7 +709,7 @@ struct InverseOp
 {
   enum { NbParam_ = 1 };
   typedef Type result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline result_type const operator() (param1_type a) const { return Type(1)/a; }
 };
@@ -706,7 +721,7 @@ struct SquareOp
 {
   enum { NbParam_ = 1 };
   typedef Type result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline result_type const operator() (param1_type a) const { return a*a; }
 };
@@ -719,7 +734,7 @@ struct CubeOp
 {
   enum { NbParam_ = 1 };
   typedef Type result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline result_type const operator() (param1_type a) const { return a*a*a; }
 };
@@ -731,7 +746,7 @@ struct CastOp
 {
   enum { NbParam_ = 1 };
   typedef OtherType result_type;
-  typedef Type param1_type ;
+  typedef typename hidden::RemoveConst<Type>::Type const& param1_type ;
 
   inline result_type const operator() (param1_type a) const
   { return static_cast<OtherType>(a); }

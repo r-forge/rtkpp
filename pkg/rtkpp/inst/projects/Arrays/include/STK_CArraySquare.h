@@ -182,28 +182,6 @@ class CArraySquare
     template<class OtherDerived>
     inline CArraySquare( ExprBase<OtherDerived> const& T): Base(T.size(), T.size())
     { LowBase::operator=(T);}
-    /** resize the Array.
-     *  @param I, J range of the rows and columns
-     **/
-    CArraySquare& resize(Range const& I, Range const& J)
-    { return Base::resize(I,I);}
-    /** shift the Array.
-     *  @param beginRows,beginCols  first indexes of the rows and columns
-     **/
-    CArraySquare& shift(int beginRows, int beginCols)
-    {
-      if (beginRows != beginCols)
-        STKRUNTIME_ERROR_2ARG(CArraySquare,beginRows,beginCols,beginRows!=beginCols);
-      return Base::shift(beginRows,beginCols);
-    }
-    /** Shift the square Array.
-     *  @param beg first index of the array
-     **/
-    CArraySquare& shift(int beg) { return Base::shift(beg,beg);}
-    /** Resize the square Array.
-     *  @param I Range of the vector
-     **/
-    CArraySquare& resize(Range const& I) { return Base::resize(I,I);}
     /** destructor. */
     inline ~CArraySquare() {}
     /** operator= : set the container to a constant value.

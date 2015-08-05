@@ -532,6 +532,13 @@ struct resizeSelector
   static void run(Lhs& dst, ExprBase<Rhs> const& src )
   { dst.resize(src.rows(), src.cols());}
 };
+/** specialization for the square_ case */
+template< typename Lhs, typename Rhs>
+struct resizeSelector<Lhs, Rhs, Arrays::square_>
+{
+  static void run(Lhs& dst, ExprBase<Rhs> const& src )
+  { dst.resize(src.range());}
+};
 /** specialization for the diagonal_ case */
 template< typename Lhs, typename Rhs>
 struct resizeSelector<Lhs, Rhs, Arrays::diagonal_>
@@ -554,6 +561,14 @@ struct resizeSelector<Lhs, Rhs, Arrays::point_>
   { dst.resize(src.range());}
 };
 
+/** specialization for the number_ case */
+template< typename Lhs, typename Rhs>
+struct resizeSelector<Lhs, Rhs, Arrays::number_>
+{
+  static void run(Lhs& dst, ExprBase<Rhs> const& src )
+  { /* nothing to do */;}
+};
+
 }  // namespace hidden
 
 /* @brief assign src to this
@@ -564,14 +579,14 @@ Derived& ArrayBase<Derived>::assign(ExprBase<Rhs> const& rhs)
 {
   enum
   {
-    rhs_struct_ = hidden::Traits<Rhs>::structure_
+    rhs_structure_ = hidden::Traits<Rhs>::structure_
   , rhs_orient_ = hidden::Traits<Rhs>::orient_
   , rhs_sizeRows_ = hidden::Traits<Rhs>::sizeRows_
   , rhs_sizeCols_ = hidden::Traits<Rhs>::sizeCols_
   };
-   STK_STATICASSERT(CORRECT_ASSIGN((Arrays::Structure)structure_, (Arrays::Structure)rhs_struct_),YOU_TRIED_TO_ASSIGN_A_NOT_COMPATIBLE_ARRAY);
+   STK_STATIC_ASSERT(CORRECT_ASSIGN((Arrays::Structure)structure_, (Arrays::Structure)rhs_structure_),YOU_TRIED_TO_ASSIGN_A_NOT_COMPATIBLE_ARRAY);
   // choose the correct way to resize if necessary
-  hidden::resizeSelector<Derived, Rhs, structure_>::run(this->asDerived(), rhs.asDerived());
+  hidden::resizeSelector<Derived, Rhs, rhs_structure_>::run(this->asDerived(), rhs.asDerived());
   // choose the correct way to copy
   hidden::CopycatSelector<Derived, Rhs,  orient_>::run(this->asDerived(), rhs.asDerived());
   return this->asDerived();

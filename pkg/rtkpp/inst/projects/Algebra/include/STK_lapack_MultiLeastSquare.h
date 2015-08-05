@@ -46,7 +46,7 @@
 
 extern "C"
 {
-/** lapcak routine computing the optimal block size */
+/** lapack routine computing the optimal block size */
 int ilaenv_(int *, char *, char *, int *, int *,int *, int *);
 
 #ifdef STKREALAREFLOAT
@@ -54,13 +54,13 @@ int ilaenv_(int *, char *, char *, int *, int *,int *, int *);
 extern
 int sgelsd_( int *m, int *n, int *nrhs
            , float *a, int *lda, float *b, int *ldb, float *s, float *rcond
-           , int *rank, float *work, int *lwork
+           , int *rank, float *work, int *lWork
            , int *iwork, int *info);
 #else
 /** LAPACK routine in double to compute the least square solution */
 extern int dgelsd_( int *m, int *n, int *nrhs
                   , double *a, int *lda, double *b, int *ldb, double *s, double *rcond
-                  , int *rank, double *work, int *lwork
+                  , int *rank, double *work, int *lWork
                   , int *iwork, int *info);
 #endif
 }
@@ -180,36 +180,36 @@ class MultiLeastSquare: public ILeastSquare< MultiLeastSquare<ArrayB, ArrayA> >
      *  @param[out] rank The effective rank of A, i.e., the number of singular values
      *  which are greater than RCOND*S(1).
      *
-     *  @param[out] work On exit, if INFO = 0, WORK(1) returns the optimal LWORK.
+     *  @param[out] work On exit, if info = 0, work(1) returns the optimal lWork.
      *
-     *  @param[in] lwork The dimension of the array @c work. @c lwork must be at least 1.
+     *  @param[in] lWork The dimension of the array @c work. @c lWork must be at least 1.
      *  @verbatim
      *    The exact minimum amount of workspace needed depends on M, N and NRHS.
-     *    As long as LWORK is at least 12*N + 2*N*SMLSIZ + 8*N*NLVL + N*NRHS + (SMLSIZ+1)**2,
+     *    As long as lWork is at least 12*N + 2*N*SMLSIZ + 8*N*NLVL + N*NRHS + (SMLSIZ+1)**2,
      *    if M is greater than or equal to N or 12*M + 2*M*SMLSIZ + 8*M*NLVL + M*NRHS + (SMLSIZ+1)**2,
      *    if M is less than N, the code will execute correctly.
      *    SMLSIZ is returned by ILAENV and is equal to the maximum size of
      *    the subproblems at the bottom of the computation tree (usually about 25),
      *    and NLVL = MAX( 0, INT( LOG_2( MIN( M,N )/(SMLSIZ+1) ) ) + 1 )
-     *    For good performance, LWORK should generally be larger.
-     *    If LWORK = -1, then a workspace query is assumed; the routine only
-     *    calculates the optimal size of the WORK array, returns this value as the
-     *    first entry of the WORK array, and no error message related to LWORK is
+     *    For good performance, lWork should generally be larger.
+     *    If lWork = -1, then a workspace query is assumed; the routine only
+     *    calculates the optimal size of the work array, returns this value as the
+     *    first entry of the work array, and no error message related to lWork is
      *    issued by XERBLA.
      *  @endverbatim
      *
-     *  @param iwork  array of integer of dimension (MAX(1,LIWORK))
+     *  @param iwork  array of integer of dimension (MAX(1,LiWork))
      *  @verbatim
-     *    LIWORK >= 3 * MINMN * NLVL + 11 * MINMN, where MINMN = MIN( M,N ).
-     *    On exit, if INFO = 0, IWORK(1) returns the minimum LIWORK
+     *    LiWork >= 3 * MINMN * NLVL + 11 * MINMN, where MINMN = MIN( M,N ).
+     *    On exit, if info = 0, iWork(1) returns the minimum LiWork
      *  @endverbatim
      *
-     *  @return INFO
+     *  @return info
      *  @verbatim
      *    = 0:  successful exit
-     *    < 0:  if INFO = -i, the i-th argument had an illegal value.
+     *    < 0:  if info = -i, the i-th argument had an illegal value.
      *    > 0:  the algorithm for computing the SVD failed to converge;
-     *    if INFO = i, i off-diagonal elements of an intermediate bidiagonal
+     *    if info = i, i off-diagonal elements of an intermediate bidiagonal
      *    form did not converge to zero.
      *  @endverbatim
      *
@@ -227,7 +227,7 @@ class MultiLeastSquare: public ILeastSquare< MultiLeastSquare<ArrayB, ArrayA> >
                     , Real *b, int ldb
                     , Real *s
                     , Real *rcond, int* rank
-                    , Real *work, int lwork, int* iwork);
+                    , Real *work, int lWork, int* iwork);
 
   protected:
     /** condition number used for determining the effective rank of A */
@@ -262,7 +262,7 @@ template<class ArrayB, class ArrayA>
 template<class Weights>
 bool MultiLeastSquare<ArrayB, ArrayA>::runImpl(Weights const& w)
 {
-  STK_STATICASSERT_ONE_DIMENSION_ONLY(Weights);
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Weights);
   Range brows = (b_.sizeRows()< a_.sizeCols()) ? a_.cols() : b_.rows();
   // local arrays, b is resized if necessary
   CArrayXX a(w.sqrt().diagonalize() * a_), b(brows, b_.cols());
@@ -307,13 +307,13 @@ bool MultiLeastSquare<ArrayB, ArrayA>::computeLS(CArrayXX& b, CArrayXX& a)
   s_.shift(0);
   // get sizes
   Real wkopt;
-  int lwork = -1, iwkopt;
+  int lWork = -1, iwkopt;
   int info = gelsd( m, n, nrhs
                   , a.p_data(), lda
                   , b.p_data(), ldb
                   , s_.p_data()
                   , &rcond_, &rank_
-                  , &wkopt, lwork, &iwkopt);
+                  , &wkopt, lWork, &iwkopt);
   if( info != 0 )
   {
     if (info>0)
@@ -324,8 +324,8 @@ bool MultiLeastSquare<ArrayB, ArrayA>::computeLS(CArrayXX& b, CArrayXX& a)
     return false;
   }
   // get working sizes
-  lwork = (int)wkopt;
-  Real* work = new Real[lwork];
+  lWork = (int)wkopt;
+  Real* work = new Real[lWork];
   int* iwork = new int[iwkopt];
   // Solve the least square problem
   info = gelsd( m, n, nrhs
@@ -333,7 +333,7 @@ bool MultiLeastSquare<ArrayB, ArrayA>::computeLS(CArrayXX& b, CArrayXX& a)
               , b.p_data(), ldb
               , s_.p_data()
               , &rcond_, &rank_
-              , work, lwork, iwork);
+              , work, lWork, iwork);
   delete[] iwork;
   delete[] work;
   if( info != 0 )
@@ -359,14 +359,14 @@ int MultiLeastSquare<ArrayB, ArrayA>::gelsd( int m, int n, int nrhs
                                            , Real * b, int ldb
                                            , Real * s
                                            , Real *rcond, int *rank
-                                           , Real *work, int lwork, int* iwork)
+                                           , Real *work, int lWork, int* iwork)
 {
   int info = 1;
 #ifdef STKUSELAPACK
 #ifdef STKREALAREFLOAT
-  sgelsd_( &m, &n, &nrhs, a, &lda, b, &ldb, s, rcond, rank, work, &lwork, iwork, &info);
+  sgelsd_( &m, &n, &nrhs, a, &lda, b, &ldb, s, rcond, rank, work, &lWork, iwork, &info);
 #else
-  dgelsd_( &m, &n, &nrhs, a, &lda, b, &ldb, s, rcond, rank, work, &lwork, iwork, &info);
+  dgelsd_( &m, &n, &nrhs, a, &lda, b, &ldb, s, rcond, rank, work, &lWork, iwork, &info);
 #endif
 #endif
   return info;

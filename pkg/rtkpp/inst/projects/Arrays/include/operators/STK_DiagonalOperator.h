@@ -57,8 +57,12 @@ struct Traits< DiagonalizeOperator <Lhs> >
   {
     structure_ = Arrays::diagonal_,
     orient_    = Lhs::orient_,
-    sizeRows_  = ((Lhs::sizeRows_ != UnknownSize)&&(Lhs::sizeRows_!= 1)) ?  Lhs::sizeRows_  : UnknownSize,
-    sizeCols_  = ((Lhs::sizeCols_ != UnknownSize)&&(Lhs::sizeCols_!= 1)) ?  Lhs::sizeCols_  : UnknownSize,
+    sizeRows_  = ( (Lhs::sizeRows_ != UnknownSize) && (Lhs::structure_!= (int)Arrays::point_) )
+                 ?  Lhs::sizeRows_  : UnknownSize,
+    sizeCols_  = ( (Lhs::sizeCols_ != UnknownSize) && (Lhs::structure_!= (int)Arrays::vector_) )
+                 ?  Lhs::sizeCols_  : UnknownSize,
+    // this is safe as we can use diagonalize operator only on 1D container
+    size_      = (sizeRows_ != UnknownSize) ? sizeRows_ : sizeCols_,
     storage_   = Lhs::storage_
   };
   typedef RowOperator<DiagonalizeOperator < Lhs> > Row;
@@ -101,8 +105,7 @@ class DiagonalizeOperator  : public DiagonalizeOperatorBase< Lhs >, public TRef<
         sizeRows_  = hidden::Traits< DiagonalizeOperator<Lhs> >::sizeRows_,
         sizeCols_  = hidden::Traits< DiagonalizeOperator<Lhs> >::sizeCols_,
         storage_   = hidden::Traits< DiagonalizeOperator<Lhs> >::storage_,
-        // this is safe as we can use diagonalize operator only on 1D container
-        size_      = (sizeRows_ != UnknownSize) ? sizeRows_ : sizeCols_
+        size_      = hidden::Traits< DiagonalizeOperator<Lhs> >::size_
     };
     /** Type of the Range for the rows */
     typedef TRange<size_> RowRange;
@@ -111,18 +114,11 @@ class DiagonalizeOperator  : public DiagonalizeOperatorBase< Lhs >, public TRef<
     /** Constructor */
     inline DiagonalizeOperator( Lhs const& lhs)
                        : Base(), lhs_(lhs)
-                       , rows_(lhs_.beginRows(), (size_ != UnknownSize) ? size_ : lhs_.size())
-                       , cols_(lhs_.beginCols(), (size_ != UnknownSize) ? size_ : lhs_.size())
+                       , rows_(lhs_.range())
+                       , cols_(lhs_.range())
     {
-      STK_STATICASSERT_ONE_DIMENSION_ONLY(Lhs);
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Lhs);
     }
-    /** @return the first index */
-    inline int beginImpl() const { return lhs_.begin();}
-    /** @return the ending index */
-    inline int endImpl() const { return lhs_.end();}
-    /** @return the number of elements */
-    inline int sizeImpl() const { return lhs_.size();}
-
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the first index of the rows */
@@ -247,13 +243,6 @@ class DiagonalOperator  : public DiagonalOperatorBase< Lhs >, public TRef<1>
       if (lhs.rows()!=lhs.cols())
         STKRUNTIME_ERROR_NO_ARG(DiagonalOperatorBase,lhs.rows()!=lhs.cols());
     }
-    /** @return the first index of the rows */
-    inline int beginImpl() const { return range_.beginRows();}
-    /** @return the ending index of the rows */
-    inline int endImpl() const { return range_.end();}
-    /** @return the number of rows */
-    inline int sizeImpl() const { return range_.size();}
-
     /**  @return the range of the rows */
     inline DiagRange const& rowsImpl() const { return range_;}
     /** @return the first index of the rows */

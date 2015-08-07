@@ -161,34 +161,34 @@ class CArray: public ICArray < CArray<Type_, SizeRows_, SizeCols_, Orient_> >
     };
 
     /** Default constructor. */
-    inline CArray() : Base() {}
+    CArray() : Base() {}
     /** constructor with specified dimension.
      *  @param sizeRows, sizeCols size of the rows and columns
      **/
-    inline CArray( int sizeRows, int sizeCols): Base(sizeRows, sizeCols) {}
+    CArray( int sizeRows, int sizeCols): Base(sizeRows, sizeCols) {}
     /** constructor with specified ranges.
      *  @param rows, cols range of the rows and columns
      **/
-    inline CArray( Range rows, Range cols): Base(rows.size(), cols.size())
+    CArray( Range rows, Range cols): Base(rows.size(), cols.size())
     { this->shift(rows.begin(), cols.begin());}
     /** constructor with specified size, initialization with a constant.
      *  @param sizeRows, sizeCols size of the rows and columns
      *  @param v initial value of the container
      **/
-    inline CArray( int sizeRows, int sizeCols, Type const& v)
+    CArray( int sizeRows, int sizeCols, Type const& v)
                  : Base(sizeRows, sizeCols, v)
     {}
     /** constructor with specified ranges, initialization with a constant.
      *  @param rows, cols range of the rows and columns
      *  @param v initial value of the container
      **/
-    inline CArray( Range rows, Range cols, Type const& v): Base(rows.size(), cols.size(), v)
+    CArray( Range rows, Range cols, Type const& v): Base(rows.size(), cols.size(), v)
     { this->shift(rows.begin(), cols.begin());}
     /** Copy constructor
      *  @param T the container to copy
      *  @param ref true if T is wrapped
      **/
-    inline CArray( CArray const& T, bool ref=false): Base(T, ref) {}
+    CArray( CArray const& T, bool ref=false): Base(T, ref) {}
     /** Copy constructor by reference, ref_=1.
      *  @param T the container to wrap
      *  @param I,J range of the rows and columns to wrap
@@ -200,32 +200,32 @@ class CArray: public ICArray < CArray<Type_, SizeRows_, SizeCols_, Orient_> >
      *  @param q pointer on the array
      *  @param sizeRows, sizeCols size of the rows and columns
      **/
-    inline CArray( Type* const& q, int sizeRows, int sizeCols): Base(q, sizeRows, sizeCols) {}
+    CArray( Type* const& q, int sizeRows, int sizeCols): Base(q, sizeRows, sizeCols) {}
     /** constructor by reference.
      *  @param allocator the allocator to wrap
      **/
     template<class OtherAllocator>
-    inline CArray( ITContainer2D<OtherAllocator> const& allocator): Base(allocator.asDerived()) {}
+    CArray( ITContainer2D<OtherAllocator> const& allocator): Base(allocator.asDerived()) {}
     /** Copy constructor using an expression.
      *  @param T the container to wrap
      **/
     template<class OtherDerived>
-    inline CArray( ExprBase<OtherDerived> const& T): Base(T.sizeRows(), T.sizeCols()) { LowBase::operator=(T);}
+    CArray( ExprBase<OtherDerived> const& T): Base(T.sizeRows(), T.sizeCols()) { LowBase::operator=(T);}
     /** destructor. */
-    inline ~CArray() {}
+    ~CArray() {}
     /** operator= : set the container to a constant value.
      *  @param v the value to set
      **/
-    inline CArray& operator=(Type const& v) { return LowBase::setValue(v);}
+    CArray& operator=(Type const& v) { return LowBase::setValue(v);}
     /** operator = : overwrite this with the Right hand side rhs.
      *  @param rhs the container to copy
      **/
     template<class Rhs>
-    inline CArray& operator=(ExprBase<Rhs> const& rhs) { return LowBase::assign(rhs.asDerived());}
+    CArray& operator=(ExprBase<Rhs> const& rhs) { return LowBase::assign(rhs.asDerived());}
     /** operator = : overwrite the CArray with the Right hand side rhs.
      *  @param rhs the container to copy
      **/
-    inline CArray& operator=(CArray const& rhs) { return LowBase::assign(rhs);}
+    CArray& operator=(CArray const& rhs) { return LowBase::assign(rhs);}
 };
 
 /** @ingroup Arrays

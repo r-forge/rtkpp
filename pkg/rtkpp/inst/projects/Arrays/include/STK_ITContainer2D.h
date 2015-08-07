@@ -47,11 +47,12 @@ namespace STK
 /** @ingroup Arrays
  *  @brief Interface base class for 2D containers.
  *
- *  The IContainer2D class is the base class for all two-dimensional containers.
+ *  The IContainer2D class is the base class for all two-dimensional containers
+ *  storing data and which cannot be part of an expression.
  *  A two-dimensional container is defined by an horizontal range of index
  *  for the columns and a vertical range of index for the rows.
  *
- *  This Interface base class store the ranges and allow to derived classes to
+ *  This Interface base class stores the ranges and allows to derived classes to
  *  manipulate these ranges.
  **/
 template<int SizeRows_, int SizeCols_>
@@ -63,116 +64,116 @@ class IContainer2D
     /** Type of the Range for the columns */
     typedef TRange<SizeCols_> ColRange;
 
-    /** @return the range of the columns */
-    inline ColRange const& cols() const { return cols_;}
-    /** @return the index of the first column */
-    inline int beginCols() const { return cols_.begin();}
-    /** @return the ending index of the columns */
-    inline int endCols() const { return cols_.end();}
-    /** @return the number of column */
-    inline int sizeCols() const { return cols_.size();}
-
-    /** @return the range of the rows */
-    inline RowRange const& rows() const { return rows_;}
-    /** @return the index of the first row */
-    inline int beginRows() const { return rows_.begin();}
-    /** @return the ending index of rows */
-    inline int endRows() const { return rows_.end();}
-    /** @return the number of rows */
-    inline int sizeRows() const { return rows_.size();}
-
-    /** @return the index of the last column */
-    inline int lastIdxCols() const { return cols_.lastIdx();}
-    /** @return the index of the last row */
-    inline int lastIdxRows() const { return rows_.lastIdx();}
-
-    /** @return @c true if the container is empty, @c false otherwise */
-    inline bool empty() const { return (cols_.empty() || rows_.empty());}
-
-  protected:
     /** Default constructor. cols_ = 1:0 and rows_ = 1:0. */
-    inline IContainer2D() : rows_(), cols_() {}
+    IContainer2D(): rows_(), cols_() {}
     /** Constructor with specified ranges
      *  @param I the vertical range
      *  @param J the horizontal range
      **/
-    inline IContainer2D( RowRange const& I, ColRange const& J) : rows_(I), cols_(J) {}
+    IContainer2D( RowRange const& I, ColRange const& J): rows_(I), cols_(J) {}
     /** Copy constructor
      *  @param T the container to copy
      **/
-    inline IContainer2D( IContainer2D const& T) : rows_(T.rows_), cols_(T.cols_) {}
+    IContainer2D( IContainer2D const& T): rows_(T.rows_), cols_(T.cols_) {}
     /** destructor. **/
-    inline ~IContainer2D() {}
+    ~IContainer2D() {}
 
+    /** @return the columns range */
+    ColRange const& cols() const { return cols_;}
+    /** @return the index of the first column */
+    int beginCols() const { return cols_.begin();}
+    /** @return the ending index of the columns */
+    int endCols() const { return cols_.end();}
+    /** @return the number of column */
+    int sizeCols() const { return cols_.size();}
+
+    /** @return the range of the rows */
+    RowRange const& rows() const { return rows_;}
+    /** @return the index of the first row */
+    int beginRows() const { return rows_.begin();}
+    /** @return the ending index of rows */
+    int endRows() const { return rows_.end();}
+    /** @return the number of rows */
+    int sizeRows() const { return rows_.size();}
+
+    /** @return the index of the last column */
+    int lastIdxCols() const { return cols_.lastIdx();}
+    /** @return the index of the last row */
+    int lastIdxRows() const { return rows_.lastIdx();}
+
+    /** @return @c true if the container is empty, @c false otherwise */
+    bool empty() const { return (cols_.empty() || rows_.empty());}
+
+  protected:
     /** Set the first index of the rows and columns.
      *  @param rbeg, cbeg the first index of the rows and columns
      **/
-    inline void shift( int rbeg, int cbeg) { rows_.shift(rbeg); cols_.shift(cbeg);}
+    void shift( int rbeg, int cbeg) { rows_.shift(rbeg); cols_.shift(cbeg);}
     /** Set the ranges of the container.
      *  @param I,J the vertical and horizontal range
      **/
-    inline void setRanges(RowRange const& I = RowRange(), ColRange const& J = ColRange())
+    void setRanges(RowRange const& I = RowRange(), ColRange const& J = ColRange())
     { rows_ = I; cols_ =J;}
     /** Set the range of the number of rows.
      *  @param I the range of the rows number
      **/
-    inline void setRows( RowRange const& I = RowRange()) { rows_ = I;}
+    void setRows( RowRange const& I = RowRange()) { rows_ = I;}
     /** Set the first index of the rows.
      *  @param beg the first index of the rows
      **/
-    inline void shiftBeginRows( int beg) { rows_.shift(beg);}
+    void shiftBeginRows( int beg) { rows_.shift(beg);}
     /** Increment the range of the number of rows.
      *  @param inc the increment to apply
      **/
-    inline void incRangeRows( int inc) { rows_.inc(inc);}
+    void incRangeRows( int inc) { rows_.inc(inc);}
     /** Increment the first index of the number of rows.
      *  @param inc the increment to apply
      **/
-    inline void incFirstIdxRows( int inc) { rows_.incFirst(inc);}
+    void incFirstIdxRows( int inc) { rows_.incFirst(inc);}
     /** Decrement the first index of the number of rows.
      *  @param dec the decrement to apply
      **/
-    inline void decFirstIdxRows( int dec) { rows_.decFirst(dec);}
+    void decFirstIdxRows( int dec) { rows_.decFirst(dec);}
     /** Increment the end of the number of rows.
      *  @param inc the increment to apply
      **/
-    inline void incLastIdxRows( int inc) { rows_.incLast(inc);}
+    void incLastIdxRows( int inc) { rows_.incLast(inc);}
     /** Decrement the end of the number of rows.
      *  @param dec the decrement to apply
      **/
-    inline void decLastIdxRows( int dec) { rows_.decLast(dec);}
-    /** Set the range of the columns.
-     * @param J the range of the cols number
+    void decLastIdxRows( int dec) { rows_.decLast(dec);}
+    /** Set the columns range.
+     * @param J the columns range
      **/
-    inline void setCols( ColRange const& J = ColRange()) { cols_ = J;}
-    /** Shift the first index of the columns to beg.
+    void setCols( ColRange const& J = ColRange()) { cols_ = J;}
+    /** Shift the columns first index to beg.
      *  @param beg the new first index
      **/
-    inline void shiftBeginCols( int beg) { cols_.shift(beg);}
-    /** Increment the range of the number of columns.
-     *  @param inc the increment to applycmake cl
+    void shiftBeginCols( int beg) { cols_.shift(beg);}
+    /** Increment the columns range.
+     *  @param inc the increment to apply the range
      **/
-    inline void incRangeCols( int inc) { cols_.inc(inc);}
-    /** increment the first index of the number of columns.
+    void incRangeCols( int inc) { cols_.inc(inc);}
+    /** increment the first index of the columns.
      *  @param inc the increment to apply
      **/
-    inline void incbeginCols( int inc) { cols_.incFirst(inc);}
-    /** Decrement the first index of the columns.
+    void incbeginCols( int inc) { cols_.incFirst(inc);}
+    /** Decrement the columns first index.
      *  @param dec the decrement to apply
      **/
-    inline void decbeginCols( int dec) { cols_.decFirst(dec);}
+    void decbeginCols( int dec) { cols_.decFirst(dec);}
     /** Increment the last index of the columns.
      *  @param inc the increment to apply
      **/
-    inline void incLastIdxCols( int inc)  { cols_.incLast(inc);}
+    void incLastIdxCols( int inc)  { cols_.incLast(inc);}
     /** Decrement the last index of the columns.
      *  @param dec the decrement to apply
      **/
-    inline void decLastIdxCols( int dec) { cols_.decLast(dec);}
+    void decLastIdxCols( int dec) { cols_.decLast(dec);}
     /** exchange this container with T
-     * @param T the container to exchange with this
+     *  @param T the container to exchange with this
      **/
-     inline void exchange(IContainer2D& T)
+     void exchange(IContainer2D& T)
      {
        std::swap(T.rows_, this->rows_ );
        std::swap(T.cols_, this->cols_ );
@@ -204,8 +205,8 @@ class IContainer2D
  * {...}
  * </code>
  *
- * The pseudo virtual function defined in this interface have the
- * following definition:
+ * Functions used in this interface and to implement in
+ * derived class if necessary have the following definitions:
  * @code
  *   Type& elt2Impl(int i, int j);
  *   Type const& elt2Impl(int i, int j) const;
@@ -216,9 +217,22 @@ class IContainer2D
  *   void shiftImpl(int beg);
  *   Derived& resizeImpl(int size);
  *   resize2Impl(sizeRows, sizeCols);
+ *
+ *   // If derived class is a vector_ or a point_
  *   SubVector sub1Impl(Range const& I);
  * @endcode
- * All these methods have to be implemented in the Derived classes.
+ *
+ * Constructors allowing to get sub-part of an array/vector/point used in
+ * this interface and  to implement in derived class if necessary have the
+ * following definitions:
+ * @code
+ *   Row(Derived, Range(i,1), cols();
+ *   Col(Derived, rows(), Range(j,1));
+ *   SubRow(Derived, Range(i,1), J);
+ *   SubCol(Derived, I, Range(j,1));
+ *   SubArray(Derived, I, J)
+ * @endcode
+ *
  *
  * @sa CAllocator
  *
@@ -257,23 +271,23 @@ class ITContainer2D : public IContainer2D< hidden::Traits<Derived>::sizeRows_, h
 
   protected:
     /** Default constructor.*/
-    inline ITContainer2D() : Base2D(), Base() {}
+    ITContainer2D() : Base2D(), Base() {}
     /** constructor with specified Range.
      *  @param I,J range of the rows and columns
      **/
-    inline ITContainer2D( Range const& I, Range const& J) : Base2D(I, J), Base() {}
+    ITContainer2D( Range const& I, Range const& J) : Base2D(I, J), Base() {}
     /** Copy constructor.
      *  @param T the container to copy
      **/
-    inline ITContainer2D( ITContainer2D const& T) : Base2D(T), Base() {}
+    ITContainer2D( ITContainer2D const& T) : Base2D(T), Base() {}
     /** destructor. */
-    inline ~ITContainer2D() {}
+    ~ITContainer2D() {}
 
   public:
     /** @return the range of the effectively stored elements in the column. */
-    inline Range rangeRowsInCol(int) const { return this->rows();}
+    Range rangeRowsInCol(int) const { return this->rows();}
     /** @return the range of the effectively stored elements in the row. */
-    inline Range rangeColsInRow(int) const { return this->cols();}
+    Range rangeColsInRow(int) const { return this->cols();}
     /** @return the element (i,j) of the 2D container.
      *  @param i, j index of the row and of the column
      **/
@@ -325,56 +339,56 @@ class ITContainer2D : public IContainer2D< hidden::Traits<Derived>::sizeRows_, h
      *  @param i index of the row
      *  @return a reference on the ith row
      **/
-    inline Row row(int i) const
+    Row row(int i) const
     { return Row(this->asDerived(), Range(i,1), this->cols());}
     /** Access to the row (i,J) of the Allocator.
      *  @param i,J index of the row and range of the columns
      *  @return a reference on the ith row
      **/
-    inline SubRow row(int i, Range const& J) const
+    SubRow row(int i, Range const& J) const
     { return SubRow(this->asDerived(), Range(i,1), J);}
     /** Access to the jth column of the Allocator.
      *  @param j index of the column
      *  @return a reference on the jth column
      **/
-    inline Col col(int j) const
+    Col col(int j) const
     { return Col(this->asDerived(), this->rows(), Range(j,1));}
     /** Access to the column (I,j) of the Allocator.
      *  @param I,j range of the rows and index of the column
      *  @return a reference on the jth column
      **/
-    inline SubCol col(Range const& I, int j) const
+    SubCol col(Range const& I, int j) const
     { return SubCol(this->asDerived(), I, Range(j,1));}
     /** Access to the sub-part (I,J) of the Allocator.
      *  @param I,J range of the rows and columns
      *  @return a reference on a sub-part of the Allocator
      **/
-    inline SubArray sub(Range const& I, Range const& J) const
+    SubArray sub(Range const& I, Range const& J) const
     { return SubArray(this->asDerived(), I, J);}
     /** Access to a sub-vector. For 1D allocators only.
      *  @param I range of the rows
      *  @return a reference on a sub-part of the Allocaor
      **/
-    inline SubVector sub(Range const& I) const
+    SubVector sub(Range const& I) const
     { return this->asDerived().sub1Impl(I);}
     /** shift the first indexes of the allocator.
      *  @param firstRow, firstCol indexes of the first row and first column
      **/
-    inline void shift( int firstRow, int firstCol)
+    void shift( int firstRow, int firstCol)
     { this->asDerived().shift2Impl(firstRow, firstCol);}
     /** resize the allocator
      *  @param sizeRows, sizeCols size of the rows and columns
      **/
-    inline Derived& resize(int sizeRows, int sizeCols)
+    Derived& resize(int sizeRows, int sizeCols)
     { return this->asDerived().resize2Impl(sizeRows, sizeCols);}
     /** shift the first indexes of the vector or point.
      *  @param beg the index of the first row or column
      **/
-    inline void shift(int beg) { this->asDerived().shift1Impl(beg);}
+    void shift(int beg) { this->asDerived().shift1Impl(beg);}
     /** Resize the vector or the point
      *  @param size the size to set to the vector
      **/
-    inline Derived& resize(int size)
+    Derived& resize(int size)
     { return this->asDerived().resize1Impl(size);}
     /** @param pos1, pos2 position of the first and second columns to swap */
     void swapCols(int pos1, int pos2)

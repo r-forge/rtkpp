@@ -110,27 +110,27 @@ class IArray1D  : public ITContainer1D<Derived>
 
   public:
     /**  @return the range of the rows of the container */
-    inline RowRange const& rows() const  { return this->range();}
+    RowRange const& rows() const  { return this->range();}
      /** @return the index of the first element */
-    inline int beginRows() const { return this->begin();}
+    int beginRows() const { return this->begin();}
     /**  @return the ending index of the elements */
-    inline int endRows() const { return this->end();}
+    int endRows() const { return this->end();}
     /**  @return the size of the container */
-    inline int sizeRows() const  { return this->size();}
+    int sizeRows() const  { return this->size();}
 
     /** @return the Horizontal range (1 column) */
-    inline ColRange cols() const { return ColRange(1);}
+    ColRange cols() const { return ColRange(1);}
     /** @return the index of the first column */
-    inline int beginCols() const { return baseIdx;}
+    int beginCols() const { return baseIdx;}
     /**  @return the index of the ending column */
-    inline int endCols() const  { return baseIdx+1;}
+    int endCols() const  { return baseIdx+1;}
     /** @return the number of columns */
-    inline int sizeCols() const  { return 1;};
+    int sizeCols() const  { return 1;};
 
     /**  @return the index of the last element */
-    inline int lastIdxRows() const  { return this->lastIdx();}
+    int lastIdxRows() const  { return this->lastIdx();}
     /**  @return the index of the last element */
-    inline int lastIdxCols() const  { return baseIdx;}
+    int lastIdxCols() const  { return baseIdx;}
 
     /** access to one element.
      *  @param pos index of the element
@@ -162,7 +162,7 @@ class IArray1D  : public ITContainer1D<Derived>
      * - call @c popBack if three will be less elements
      * @param I the range to set to the List1D
      **/
-    inline Derived& resizeImpl(Range const& I)
+    Derived& resizeImpl(Range const& I)
     {
       // check if there is something to do
       if ( this->range() == I) return this->asDerived();
@@ -179,7 +179,7 @@ class IArray1D  : public ITContainer1D<Derived>
     }
     /** @return the maximum possible number of elements without
      *  reallocation. */
-    inline int capacity() const { return capacity_;}
+    int capacity() const { return capacity_;}
     /** reserve internal memory for at least size elements.
      *  @param size number of elements to reserve
      **/
@@ -337,13 +337,13 @@ class IArray1D  : public ITContainer1D<Derived>
     /** STL compatibility : push front an element.
      *  @param v value to append
      **/
-    inline void push_front(Type const& v)
+    void push_front(Type const& v)
     { insert(Range(this->begin(), 0), v);}
 
     /** STL compatibility : append an element v.
      *  @param v value to append
      **/
-    inline void push_back(Type const& v)
+    void push_back(Type const& v)
     {
       this->pushBack();
       this->back() = v;
@@ -405,7 +405,7 @@ class IArray1D  : public ITContainer1D<Derived>
      *  reallocation.
      *  @param capacity capacity of the container
      **/
-    inline void setCapacity(int const& capacity =0)
+    void setCapacity(int const& capacity =0)
     { capacity_ = capacity;}
     /** function for memory allocation and initialization.
      *  This method will free all allocated memory owned by this

@@ -40,18 +40,18 @@
 /// utility macro allowing to construct binary operators
 #define MAKE_BINARY_OPERATOR(OPERATOR, FUNCTOR) \
   template<typename Rhs> \
-  inline BinaryOperator< FUNCTOR<Type, typename hidden::Traits<Rhs>::Type>, Derived, Rhs> const \
+  BinaryOperator< FUNCTOR<Type, typename hidden::Traits<Rhs>::Type>, Derived, Rhs> const \
   (OPERATOR)( ExprBase<Rhs> const& other) const \
   { return BinaryOperator<FUNCTOR<Type, typename hidden::Traits<Rhs>::Type>, Derived, Rhs>(this->asDerived(), other.asDerived()) ;}
 
 /// utility macro allowing to construct unary operators
 #define MAKE_UNARY_OPERATOR_NOARG(FUNCTION, FUNCTOR) \
-  inline UnaryOperator<FUNCTOR<Type>, Derived> const FUNCTION() const \
+  UnaryOperator<FUNCTOR<Type>, Derived> const FUNCTION() const \
   { return UnaryOperator<FUNCTOR<Type>, Derived>(this->asDerived()); }
 
 /// utility macro allowing to construct unary operators
 #define MAKE_UNARY_OPERATOR_1ARG(FUNCTION, FUNCTOR) \
-  inline UnaryOperator<FUNCTOR<Type>, Derived> const FUNCTION(Type const number) const \
+  UnaryOperator<FUNCTOR<Type>, Derived> const FUNCTION(Type const number) const \
   { return UnaryOperator<FUNCTOR<Type>, Derived>(this->asDerived(), FUNCTOR<Type>(number)); }
 
 
@@ -92,9 +92,9 @@ class ExprBase : public ITContainer<Derived, hidden::Traits<Derived>::structure_
 {
   protected:
     /** Default constructor */
-    inline ExprBase() : Base() {}
+    ExprBase() : Base() {}
     /** destructor */
-    inline ~ExprBase() {}
+    ~ExprBase() {}
 
   public:
     typedef ITContainer<Derived> Base;
@@ -204,93 +204,93 @@ class ExprBase : public ITContainer<Derived, hidden::Traits<Derived>::structure_
     Type const maxEltSafe() const;
 
     /** @return the sum of all the elements of this using a Visitor*/
-    inline Type const sum() const;
+    Type const sum() const;
     /** @return safely the sum of all the elements of this */
-    inline Type const sumSafe() const;
+    Type const sumSafe() const;
     /** @return the norm of this*/
-    inline Type const norm() const;
+    Type const norm() const;
     /** @return the norm of this*/
-    inline Type const normSafe() const;
+    Type const normSafe() const;
     /** @return the square norm of this*/
-    inline Type const norm2() const;
+    Type const norm2() const;
     /** @return the square norm of this*/
-    inline Type const norm2Safe() const;
+    Type const norm2Safe() const;
     /** @return the infinite norm of this*/
-    inline Type const normInf() const;
+    Type const normInf() const;
 
     /** @return the mean of all the elements of this*/
-    inline Type const mean() const;
+    Type const mean() const;
     /** @return safely the mean of all the elements of this*/
-    inline Type const meanSafe() const;
+    Type const meanSafe() const;
     /** @return the variance of all the elements of this*/
-    inline Type const variance() const;
+    Type const variance() const;
     /** @return the variance of all the elements of this*/
-    inline Type const varianceSafe() const;
+    Type const varianceSafe() const;
     /** @return the variance with given mean of all the elements of this*/
-    inline Type const variance(Type const& mean) const;
+    Type const variance(Type const& mean) const;
     /** @return safely the variance with given mean of all the elements of this*/
-    inline Type const varianceSafe(Type const& mean) const;
+    Type const varianceSafe(Type const& mean) const;
 
     /** @return the weighted sum of all the elements of this using a Visitor
      *  @note will only work with row-vectors or col-vectors
      **/
     template<typename Rhs>
-    inline Type const wsum(ExprBase<Rhs> const& weights) const;
+    Type const wsum(ExprBase<Rhs> const& weights) const;
     /** @return the safely weighted sum of all the elements of this
      *  @note will only work with row-vectors or col-vectors
      **/
     template<typename Rhs>
-    inline Type const wsumSafe(ExprBase<Rhs> const& weights) const;
+    Type const wsumSafe(ExprBase<Rhs> const& weights) const;
     /** @return the weighted norm of this
      *  @note will only work with row-vectors or col-vectors
      **/
     template<typename Rhs>
-    inline Type const wnorm(ExprBase<Rhs> const& weights) const;
+    Type const wnorm(ExprBase<Rhs> const& weights) const;
     /** @return the weighted norm of this
      *  @note will only work with row-vectors or col-vectors
      **/
     template<typename Rhs>
-    inline Type const wnormSafe(ExprBase<Rhs> const& weights) const;
+    Type const wnormSafe(ExprBase<Rhs> const& weights) const;
     /** @return the weighted square norm of this
      *  @note will only work with row-vectors or col-vectors
      **/
     template<typename Rhs>
-    inline Type const wnorm2(ExprBase<Rhs> const& weights) const;
+    Type const wnorm2(ExprBase<Rhs> const& weights) const;
     /** @return the weighted square norm of this
      *  @note will only work with row-vectors or col-vectors
      **/
     template<typename Rhs>
-    inline Type const wnorm2Safe(ExprBase<Rhs> const& weights) const;
+    Type const wnorm2Safe(ExprBase<Rhs> const& weights) const;
     /** @return the weighted mean of all the elements of this
      *  @note will only work with row-vectors or col-vectors
      **/
     template<typename Rhs>
-    inline Type const wmean(ExprBase<Rhs> const& weights) const;
+    Type const wmean(ExprBase<Rhs> const& weights) const;
     /** @return the safely weighted mean of all the elements of this
      *  @note will only work with row-vectors or col-vectors
      **/
     template<typename Rhs>
-    inline Type const wmeanSafe(ExprBase<Rhs> const& weights) const;
+    Type const wmeanSafe(ExprBase<Rhs> const& weights) const;
     /** @return the weighted variance of all the elements of this
      *  @note will only work with row-vectors or col-vectors
      **/
     template<typename Rhs>
-    inline Type const wvariance(ExprBase<Rhs> const& weights) const;
+    Type const wvariance(ExprBase<Rhs> const& weights) const;
     /** @return the weighted variance of all the elements of this
      *  @note will only work with row-vectors or col-vectors
      **/
     template<typename Rhs>
-    inline Type const wvarianceSafe(ExprBase<Rhs> const& weights) const;
+    Type const wvarianceSafe(ExprBase<Rhs> const& weights) const;
     /** @return the variance with given mean of all the elements of this
      *  @note will only work with row-vectors or col-vectors
      **/
     template<typename Rhs>
-    inline Type const wvariance(Type const& mean, ExprBase<Rhs> const& weights) const;
+    Type const wvariance(Type const& mean, ExprBase<Rhs> const& weights) const;
     /** @return safely the variance with given mean of all the elements of this
      *  @note will only work with row-vectors or col-vectors
      **/
     template<typename Rhs>
-    inline Type const wvarianceSafe(Type const& mean, ExprBase<Rhs> const& weights) const;
+    Type const wvarianceSafe(Type const& mean, ExprBase<Rhs> const& weights) const;
     // Visitors terminated
     //--------------------
 
@@ -385,58 +385,58 @@ class ExprBase : public ITContainer<Derived, hidden::Traits<Derived>::structure_
 
     // handle the case number + expression
     /** @return an expression of number + this */
-    friend inline UnaryOperator<AddOp<Type>, Derived> const
+    friend UnaryOperator<AddOp<Type>, Derived> const
     operator+(Type const number, ExprBase<Derived> const& other)
     { return other.asDerived() + number;}
     /** @return an expression of number - this */
-    inline UnaryOperator<AddOp<Type>, Derived> const
+    UnaryOperator<AddOp<Type>, Derived> const
     operator-(Type const number) const
     { return UnaryOperator<AddOp<Type>, Derived>(this->asDerived(), AddOp<Type>(-number));}
     /** @return a safe value of this */
-    inline UnaryOperator<SafeOp<Type>, Derived> const safe(Type const number = Type()) const
+    UnaryOperator<SafeOp<Type>, Derived> const safe(Type const number = Type()) const
     { return UnaryOperator<SafeOp<Type>, Derived>(this->asDerived(), SafeOp<Type>(number)); }
     // friends
     // handle the case number - expression
-    friend inline UnaryOperator<AddOppositeOp<Type>, Derived > const
+    friend UnaryOperator<AddOppositeOp<Type>, Derived > const
     operator-(Type const number, ExprBase<Derived> const& other)
     { return UnaryOperator<AddOppositeOp<Type>, Derived>(other.asDerived(), AddOppositeOp<Type>(number));}
     // handle the case number * expression
-    inline friend UnaryOperator< MultipleOp<Type>, Derived> const
+    friend UnaryOperator< MultipleOp<Type>, Derived> const
     operator*(Type const number, ExprBase<Derived> const& other)
     { return other.asDerived()*number; }
     // templated
     /** @return an expression of *this with the  Type type casted to  OtherType. */
     template<typename CastedType>
-    inline UnaryOperator<CastOp<Type, CastedType>, Derived> const cast() const
+    UnaryOperator<CastOp<Type, CastedType>, Derived> const cast() const
     { return UnaryOperator<CastOp<Type, CastedType>, Derived>(this->asDerived());}
     /** @return an expression of funct0 to this. */
     template< template<typename> class OtherOperator>
-    inline UnaryOperator<OtherOperator<Type>, Derived> const funct0() const
+    UnaryOperator<OtherOperator<Type>, Derived> const funct0() const
     { return UnaryOperator<OtherOperator<Type>, Derived>(this->asDerived());}
     /** @return an expression of funct1 to this. */
     template< template<typename> class OtherOperator>
-    inline UnaryOperator<OtherOperator<Type>, Derived> const funct1(Type const number) const
+    UnaryOperator<OtherOperator<Type>, Derived> const funct1(Type const number) const
     { return UnaryOperator<OtherOperator<Type>, Derived>(this->asDerived(), OtherOperator<Type>(number));}
 
     /** @return the transposed expression of this. */
-    inline TransposeOperator<Derived> transpose() const
+    TransposeOperator<Derived> transpose() const
     { return TransposeOperator<Derived> (this->asDerived());}
 
     /** @return the diagonal expression of this (work only for 1D expressions). */
-    inline DiagonalizeOperator<Derived> diagonalize() const
+    DiagonalizeOperator<Derived> diagonalize() const
     { return DiagonalizeOperator<Derived> (this->asDerived());}
     /** @return the diagonal of this expression (work only for square expressions). */
-    inline DiagonalOperator<Derived> diagonal() const
+    DiagonalOperator<Derived> diagonal() const
     { return DiagonalOperator<Derived> (this->asDerived());}
 
     /** @return the j-th column of this. */
-    inline ColOperator<Derived> col(int j) const
+    ColOperator<Derived> col(int j) const
     { return ColOperator<Derived> (this->asDerived(), j);}
     /** @return the i-th row of this. */
-    inline RowOperator<Derived> row(int i) const
+    RowOperator<Derived> row(int i) const
     { return RowOperator<Derived> (this->asDerived(), i);}
     /** @return the sub-vector(I) of this. */
-    inline SubOperator<Derived> sub(Range I) const
+    SubOperator<Derived> sub(Range I) const
     { return SubOperator<Derived> (this->asDerived(), I);}
 
     /** @returns the dot product of this with other.

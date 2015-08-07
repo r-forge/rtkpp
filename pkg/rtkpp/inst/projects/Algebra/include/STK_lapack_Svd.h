@@ -93,8 +93,8 @@ class Svd : public ISvd<Svd>
 {
   public:
     typedef ISvd< Svd > Base;
-    typedef typename CArrayXX::Col ColVector;
-    typedef typename CArrayXX::Row RowVector;
+    typedef CArrayXX::Col ColVector;
+    typedef CArrayXX::Row RowVector;
     using Base::U_;
     using Base::D_;
     using Base::V_;

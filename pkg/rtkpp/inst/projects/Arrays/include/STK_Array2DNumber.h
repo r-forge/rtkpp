@@ -165,15 +165,15 @@ class Array2DNumber : public IArray2D< Array2DNumber<Type_> >
      *  @param T the container to copy
      **/
     template<class Rhs>
-    inline Array2DNumber& operator=(ExprBase<Rhs> const& T) { return LowBase::operator=(T);}
+    Array2DNumber& operator=(ExprBase<Rhs> const& T) { return LowBase::operator=(T);}
     /** operator = : overwrite the CArray with the Right hand side T.
      *  @param T the container to copy
      **/
-    inline Array2DNumber& operator=(const Array2DNumber &T) { return LowBase::assign(T);}
+    Array2DNumber& operator=(const Array2DNumber &T) { return LowBase::assign(T);}
     /** set the container to a constant value.
      *  @param v the value to set
      **/
-    inline Array2DNumber& operator=(Type const& v) { return LowBase::setValue(v);}
+    Array2DNumber& operator=(Type const& v) { return LowBase::setValue(v);}
 };
 
 } // namespace STK

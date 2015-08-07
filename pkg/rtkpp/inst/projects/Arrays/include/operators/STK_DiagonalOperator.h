@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2012  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -112,7 +112,7 @@ class DiagonalizeOperator  : public DiagonalizeOperatorBase< Lhs >, public TRef<
     /** Type of the Range for the columns */
     typedef TRange<size_> ColRange;
     /** Constructor */
-    inline DiagonalizeOperator( Lhs const& lhs)
+    DiagonalizeOperator( Lhs const& lhs)
                        : Base(), lhs_(lhs)
                        , rows_(lhs_.range())
                        , cols_(lhs_.range())
@@ -120,25 +120,12 @@ class DiagonalizeOperator  : public DiagonalizeOperatorBase< Lhs >, public TRef<
       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Lhs);
     }
     /**  @return the range of the rows */
-    inline RowRange const& rowsImpl() const { return rows_;}
-    /** @return the first index of the rows */
-    inline int beginRowsImpl() const { return rows_.begin();}
-    /** @return the ending index of the rows */
-    inline int endRowsImpl() const { return rows_.end();}
-    /** @return the number of rows */
-    inline int sizeRowsImpl() const { return rows_.size();}
-
+    RowRange const& rowsImpl() const { return rows_;}
     /** @return the range of the Columns */
-    inline ColRange const& colsImpl() const { return cols_;}
-    /** @return the first index of the columns */
-    inline int beginColsImpl() const { return cols_.begin();}
-    /** @return the ending index of the columns */
-    inline int endColsImpl() const { return cols_.end();}
-    /** @return the number of columns */
-    inline int sizeColsImpl() const { return cols_.size();}
+    ColRange const& colsImpl() const { return cols_;}
 
     /** @return the left hand side expression */
-    inline Lhs const& lhs() const { return lhs_; }
+    Lhs const& lhs() const { return lhs_; }
 
   protected:
     Lhs const& lhs_;
@@ -157,19 +144,19 @@ class DiagonalizeOperatorBase : public ExprBase< DiagonalizeOperator< Lhs> >
     typedef ExprBase< Derived > Base;
     typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
     /** constructor. */
-    inline DiagonalizeOperatorBase() : Base() {}
+    DiagonalizeOperatorBase() : Base() {}
     /** @return the element (i,j) of the expression.
      *  @param i, j index of the row and of the column
      **/
-    inline ReturnType elt2Impl(int i, int j) const
+    ReturnType elt2Impl(int i, int j) const
     { return (this->asDerived().lhs().elt(i, j));}
     /** @return the element ith element of the expression
      *  @param i index of the ith element
      **/
-    inline ReturnType elt1Impl(int i) const
+    ReturnType elt1Impl(int i) const
     { return (this->asDerived().lhs().elt(i));}
     /** accesses to the element of the expression */
-    inline ReturnType elt0Impl() const
+    ReturnType elt0Impl() const
     { return (this->asDerived().lhs().elt());}
 };
 
@@ -236,7 +223,7 @@ class DiagonalOperator  : public DiagonalOperatorBase< Lhs >, public TRef<1>
     typedef TRange<size_> DiagRange;
 
     /** Constructor */
-    inline DiagonalOperator( Lhs const& lhs)
+    DiagonalOperator( Lhs const& lhs)
                        : Base(), lhs_(lhs)
                        , range_( lhs_.beginRows(), (size_ != UnknownSize) ? size_ : lhs_.sizeRows())
     {
@@ -244,25 +231,11 @@ class DiagonalOperator  : public DiagonalOperatorBase< Lhs >, public TRef<1>
         STKRUNTIME_ERROR_NO_ARG(DiagonalOperatorBase,lhs.rows()!=lhs.cols());
     }
     /**  @return the range of the rows */
-    inline DiagRange const& rowsImpl() const { return range_;}
-    /** @return the first index of the rows */
-    inline int beginRowsImpl() const { return range_.begin();}
-    /** @return the ending index of the rows */
-    inline int endRowsImpl() const { return range_.end();}
-    /** @return the number of rows */
-    inline int sizeRowsImpl() const { return range_.size();}
-
+    DiagRange const& rowsImpl() const { return range_;}
     /** @return the range of the Columns */
-    inline DiagRange const& colsImpl() const { return range_;}
-    /** @return the first index of the columns */
-    inline int beginColsImpl() const { return range_.begin();}
-    /** @return the ending index of the columns */
-    inline int endColsImpl() const { return range_.end();}
-    /** @return the number of columns */
-    inline int sizeColsImpl() const { return range_.size();}
-
+    DiagRange const& colsImpl() const { return range_;}
     /** @return the left hand side expression */
-    inline Lhs const& lhs() const { return lhs_; }
+    Lhs const& lhs() const { return lhs_; }
 
   protected:
     Lhs const& lhs_;
@@ -280,19 +253,19 @@ class DiagonalOperatorBase : public ExprBase< DiagonalOperator< Lhs> >
     typedef ExprBase< Derived > Base;
     typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
     /** constructor. */
-    inline DiagonalOperatorBase() : Base() {}
+    DiagonalOperatorBase() : Base() {}
     /** @return the element (i,j) of the expression.
      *  @param i, j index of the row and of the column
      **/
-    inline ReturnType elt2Impl(int i, int j) const
+    ReturnType elt2Impl(int i, int j) const
     { return (this->asDerived().lhs().elt(i, j));}
     /** @return the element ith element of the transposed expression
      *  @param i index of the ith element
      **/
-    inline ReturnType elt1Impl(int i) const
+    ReturnType elt1Impl(int i) const
     { return (this->asDerived().lhs().elt(i,i));}
     /** accesses to the element of the transposed expression */
-    inline ReturnType elt0Impl() const
+    ReturnType elt0Impl() const
     { return (this->asDerived().lhs().elt());}
 };
 

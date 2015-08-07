@@ -950,7 +950,7 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
       this->rangeCols_[pos] = I;
     }
     /** vertical memory deallocation.
-     *  @param J the range of the columns to liberate.
+     *  @param J the columns range to liberate.
      **/
     void freeCols(Range const& J)
     {

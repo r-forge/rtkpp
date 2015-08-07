@@ -53,13 +53,13 @@ namespace hidden
   */
 template <class Visitor, int Structure_> struct GetIdx;
 template <class Visitor> struct GetIdx<Visitor, Arrays::vector_>
-{ inline static int idx(Visitor const& visitor) { return visitor.row_;};};
+{ static int idx(Visitor const& visitor) { return visitor.row_;};};
 
 template <class Visitor> struct GetIdx<Visitor, Arrays::point_>
-{ inline static int idx(Visitor const& visitor) { return visitor.col_;};};
+{ static int idx(Visitor const& visitor) { return visitor.col_;};};
 
 template <class Visitor> struct GetIdx<Visitor, Arrays::diagonal_>
-{ inline static int idx(Visitor const& visitor) { return visitor.col_;};};
+{ static int idx(Visitor const& visitor) { return visitor.col_;};};
 
 
 /** @ingroup hidden
@@ -72,7 +72,7 @@ struct EltVisitor2DBase
   EltVisitor2DBase() : row_(baseIdx), col_(baseIdx), res_(Arithmetic<Type>::NA()) {};
   int row_, col_;
   Type res_;
-  inline return_type result() const { return res_;}
+  return_type result() const { return res_;}
 };
 
 /** @ingroup hidden
@@ -85,7 +85,7 @@ struct MinEltVisitor : EltVisitor2DBase<Type>
 {
   MinEltVisitor() : EltVisitor2DBase<Type>()
   { this->res_ = Arithmetic<Type>::max(); }
-  inline void operator()( Type const& value, int i, int j)
+  void operator()( Type const& value, int i, int j)
   {
     if (value < this->res_)
     { this->res_ = value; this->row_ = i; this->col_ = j;}
@@ -103,7 +103,7 @@ struct MinEltSafeVisitor : EltVisitor2DBase<Type>
 {
   MinEltSafeVisitor() : EltVisitor2DBase<Type>()
   { this->res_ = Arithmetic<Type>::max(); }
-  inline void operator()( Type const& value, int i, int j)
+  void operator()( Type const& value, int i, int j)
   {
     if (Arithmetic<Type>::isFinite(value) && (value < this->res_))
     { this->res_ = value; this->row_ = i; this->col_ = j;}
@@ -117,9 +117,9 @@ struct MinEltSafeVisitor : EltVisitor2DBase<Type>
 template <typename Type>
 struct MaxEltVisitor : EltVisitor2DBase<Type>
 {
-  inline MaxEltVisitor(): EltVisitor2DBase<Type>()
+  MaxEltVisitor(): EltVisitor2DBase<Type>()
   { this->res_ = -Arithmetic<Type>::max(); }
-  inline void operator() ( Type const& value, int i, int j)
+  void operator() ( Type const& value, int i, int j)
   {
     if (value > this->res_)
     { this->res_ = value; this->row_ = i; this->col_ = j;}
@@ -133,9 +133,9 @@ struct MaxEltVisitor : EltVisitor2DBase<Type>
 template <typename Type>
 struct MaxEltSafeVisitor : EltVisitor2DBase<Type>
 {
-  inline MaxEltSafeVisitor(): EltVisitor2DBase<Type>()
+  MaxEltSafeVisitor(): EltVisitor2DBase<Type>()
   { this->res_ = -Arithmetic<Type>::max(); }
-  inline void operator() ( Type const& value, int i, int j)
+  void operator() ( Type const& value, int i, int j)
   {
     if (Arithmetic<Type>::isFinite(value))
       if(value > this->res_)
@@ -153,11 +153,11 @@ struct MinVisitor
   typedef Type return_type;
   Type res_;
   MinVisitor(): res_(Arithmetic<Type>::max()) {}
-  inline void operator() ( Type const& value, int i, int j)
+  void operator() ( Type const& value, int i, int j)
   { res_ = std::min(res_,value);}
-  inline void operator() ( Type const& value, int i)
+  void operator() ( Type const& value, int i)
   { res_ = std::min(res_,value);}
-  inline return_type result() const { return res_;}
+  return_type result() const { return res_;}
 };
 /** @ingroup hidden
  *  @brief Visitor computing safely the min of all the coefficients of the Array
@@ -170,15 +170,15 @@ struct MinSafeVisitor
   typedef Type return_type;
   Type res_;
   MinSafeVisitor(): res_(Arithmetic<Type>::max()) {}
-  inline void operator() ( Type const& value, int i, int j)
+  void operator() ( Type const& value, int i, int j)
   {  if (Arithmetic<Type>::isFinite(value))
     {res_ = std::min(res_,value);}
   }
-  inline void operator() ( Type const& value, int i)
+  void operator() ( Type const& value, int i)
   { if (Arithmetic<Type>::isFinite(value))
     { res_ = std::min(res_,value);}
   }
-  inline return_type result() const { return res_;}
+  return_type result() const { return res_;}
 };
 /** @ingroup hidden
  *  @brief Visitor computing the max of all the coefficients of the Array
@@ -191,11 +191,11 @@ struct MaxVisitor
   typedef Type return_type;
   Type res_;
   MaxVisitor(): res_(-Arithmetic<Type>::max()) {}
-  inline void operator() ( Type const& value, int i, int j)
+  void operator() ( Type const& value, int i, int j)
   { res_ = std::max(res_,value);}
-  inline void operator() ( Type const& value, int i)
+  void operator() ( Type const& value, int i)
   { res_ = std::max(res_,value);}
-  inline return_type result() const { return res_;}
+  return_type result() const { return res_;}
 };
 /** @ingroup hidden
  *  @brief Visitor computing safely the max of all the coefficients of the Array
@@ -208,15 +208,15 @@ struct MaxSafeVisitor
   typedef Type return_type;
   Type res_;
   MaxSafeVisitor(): res_(-Arithmetic<Type>::max()) {}
-  inline void operator() ( Type const& value, int i, int j)
+  void operator() ( Type const& value, int i, int j)
   { if (Arithmetic<Type>::isFinite(value))
     { res_ = std::max(res_,value);}
   }
-  inline void operator() ( Type const& value, int i)
+  void operator() ( Type const& value, int i)
   { if (Arithmetic<Type>::isFinite(value))
     { res_ = std::max(res_,value);}
   }
-  inline return_type result() const { return res_;}
+  return_type result() const { return res_;}
 };
 /** @ingroup hidden
  *  @brief Visitor computing the sum of all the coefficients of the Array
@@ -229,11 +229,11 @@ struct SumVisitor
   typedef Type return_type;
   Type res_;
   SumVisitor(): res_(Type(0)) {}
-  inline void operator() ( Type const& value, int i, int j)
+  void operator() ( Type const& value, int i, int j)
   { res_ += value;}
-  inline void operator() ( Type const& value, int i)
+  void operator() ( Type const& value, int i)
   { res_ += value;}
-  inline return_type result() const { return res_;}
+  return_type result() const { return res_;}
 };
 /** @ingroup hidden
  *  @brief Visitor computing the mean of all the coefficients of the Array
@@ -247,11 +247,11 @@ struct MeanVisitor
   Type res_;
   int nb_;
   MeanVisitor(): res_(Type(0)), nb_(0) {}
-  inline void operator() ( Type const& value, int i, int j)
+  void operator() ( Type const& value, int i, int j)
   { res_ += value; nb_++;}
-  inline void operator() ( Type const& value, int i)
+  void operator() ( Type const& value, int i)
   { res_ += value; nb_++;}
-  inline return_type result() const { return nb_ == 0  ? Arithmetic<Type>::NA() : res_/nb_;}
+  return_type result() const { return nb_ == 0  ? Arithmetic<Type>::NA() : res_/nb_;}
 };
 /** @ingroup hidden
  *  @brief Visitor computing safely the mean of all the coefficients of the Array
@@ -265,17 +265,17 @@ struct MeanSafeVisitor
   Type res_;
   int nb_;
   MeanSafeVisitor(): res_(Type(0)), nb_(0) {}
-  inline void operator() ( Type const& value, int i, int j)
+  void operator() ( Type const& value, int i, int j)
   {
     if (Arithmetic<Type>::isFinite(value))
     {  res_ += value; nb_++;}
   }
-  inline void operator() ( Type const& value, int i)
+  void operator() ( Type const& value, int i)
   {
     if (Arithmetic<Type>::isFinite(value))
     {  res_ += value; nb_++;}
   }
-  inline return_type result() const { return nb_ == 0  ? Arithmetic<Type>::NA() : res_/nb_;}
+  return_type result() const { return nb_ == 0  ? Arithmetic<Type>::NA() : res_/nb_;}
 };
 /** @ingroup hidden
  *  @brief Visitor counting the number of not-zero element in an array
@@ -294,11 +294,11 @@ struct CountVisitor
   typedef int return_type;
   int res_;
   CountVisitor(): res_(0) {}
-  inline void operator() ( Type const& value, int i, int j)
+  void operator() ( Type const& value, int i, int j)
   { if (value) ++res_;}
-  inline void operator() ( Type const& value, int i)
+  void operator() ( Type const& value, int i)
   { if (value) ++res_;}
-  inline return_type result() const { return res_;}
+  return_type result() const { return res_;}
 };
 
 /** @ingroup hidden
@@ -317,11 +317,11 @@ struct AllVisitor
   typedef bool return_type;
   bool res_;
   AllVisitor(): res_(true) {}
-  inline void operator() ( Type const& value, int i, int j)
+  void operator() ( Type const& value, int i, int j)
   { res_ &= (value);}
-  inline void operator() ( Type const& value, int i)
+  void operator() ( Type const& value, int i)
   { res_ &= (value);}
-  inline return_type result() const { return res_;}
+  return_type result() const { return res_;}
 };
 /** @ingroup hidden
  *  @brief Visitor checking if at least, one element of an array is different
@@ -339,11 +339,11 @@ struct AnyVisitor
   typedef bool return_type;
   bool res_;
   AnyVisitor(): res_(false) {}
-  inline void operator() ( Type const& value, int i, int j)
+  void operator() ( Type const& value, int i, int j)
   { res_ |= (value);}
-  inline void operator() ( Type const& value, int i)
+  void operator() ( Type const& value, int i)
   { res_ |= (value);}
-  inline return_type result() const { return res_;}
+  return_type result() const { return res_;}
 };
 
 /** @ingroup hidden
@@ -354,7 +354,7 @@ struct AnyVisitor
 template <typename Type>
 struct RandUnifApplier
 {
-  inline void operator() ( Type& value)
+  void operator() ( Type& value)
   { value = Type(Law::generator.randUnif());}
 };
 
@@ -365,7 +365,7 @@ struct RandUnifApplier
 template <typename Type>
 struct RandGaussApplier
 {
-  inline void operator() ( Type& value)
+  void operator() ( Type& value)
   { value = Type(Law::generator.randGauss());}
 };
 
@@ -376,7 +376,7 @@ template <typename Type>
 struct RandApplier
 {
   RandApplier( Law::IUnivLaw<Type> const& law):law_(law){}
-  inline void operator() ( Type& value)
+  void operator() ( Type& value)
   { value = law_.rand();}
   Law::IUnivLaw<Type> const& law_;
 };
@@ -388,8 +388,8 @@ template <typename Type>
 struct ValueApplier
 {
   Type value_;
-  inline ValueApplier(Type const& value) : value_(value) {};
-  inline void operator() ( Type& value)
+  ValueApplier(Type const& value) : value_(value) {};
+  void operator() ( Type& value)
   { value = value_;}
 };
 

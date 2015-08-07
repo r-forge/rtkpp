@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2013  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -233,54 +233,42 @@ class IConstArray: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, hi
 
   protected:
     /** default constructor */
-    inline IConstArray(): Base2D(), Base() {}
+    IConstArray(): Base2D(), Base() {}
     /** constructor with specified dimension */
-    inline IConstArray(Range const& rows, Range const& cols) : Base2D(rows, cols), Base() {}
+    IConstArray(Range const& rows, Range const& cols) : Base2D(rows, cols), Base() {}
     /** destructor */
-    inline ~IConstArray() {}
+    ~IConstArray() {}
 
   public:
-    /**@return the Horizontal range */
-    inline ColRange const& colsImpl() const { return Base2D::cols();}
-    /** @return the index of the first column */
-    inline int beginColsImpl() const { return Base2D::beginCols();}
-    /**  @return the ending index of columns */
-    inline int endColsImpl() const { return Base2D::endCols();}
-    /** @return the number of columns */
-    inline int sizeColsImpl() const { return Base2D::sizeCols();}
-    /**@return the Horizontal range */
-    inline ColRange const& cols() const { return Base2D::cols();}
-    /** @return the index of the first column */
-    inline int beginCols() const { return Base2D::beginCols();}
-    /**  @return the ending index of columns */
-    inline int endCols() const { return Base2D::endCols();}
-    /** @return the number of columns */
-    inline int sizeCols() const { return Base2D::sizeCols();}
+    /** @return the Vertical range */
+    RowRange const& rowsImpl() const { return Base2D::rows();}
+    /** @return the Vertical range */
+    RowRange const& rows() const { return Base2D::rows();}
+    /** @return the index of the first row */
+    int beginRows() const { return Base2D::beginRows();}
+    /** @return the ending index of the rows */
+    int endRows() const { return Base2D::endRows();}
+    /** @return the number of rows */
+    int sizeRows() const { return Base2D::sizeRows();}
 
-    /** @return the Vertical range */
-    inline RowRange const& rowsImpl() const { return Base2D::rows();}
-    /** @return the index of the first row */
-    inline int beginRowsImpl() const { return Base2D::beginRows();}
-    /** @return the ending index of the rows */
-    inline int endRowsImpl() const { return Base2D::endRows();}
-    /** @return the number of rows */
-    inline int sizeRowsImpl() const { return Base2D::sizeRows();}
-    /** @return the Vertical range */
-    inline RowRange const& rows() const { return Base2D::rows();}
-    /** @return the index of the first row */
-    inline int beginRows() const { return Base2D::beginRows();}
-    /** @return the ending index of the rows */
-    inline int endRows() const { return Base2D::endRows();}
-    /** @return the number of rows */
-    inline int sizeRows() const { return Base2D::sizeRows();}
+    /**@return the Horizontal range */
+    ColRange const& colsImpl() const { return Base2D::cols();}
+    /**@return the Horizontal range */
+    ColRange const& cols() const { return Base2D::cols();}
+    /** @return the index of the first column */
+    int beginCols() const { return Base2D::beginCols();}
+    /**  @return the ending index of columns */
+    int endCols() const { return Base2D::endCols();}
+    /** @return the number of columns */
+    int sizeCols() const { return Base2D::sizeCols();}
 
     /**  @return the index of the last column */
-    inline int lastIdxCols() const { return Base2D::lastIdxCols();}
+    int lastIdxCols() const { return Base2D::lastIdxCols();}
     /** @return the index of the last row */
-    inline int lastIdxRows() const { return Base2D::lastIdxRows();}
+    int lastIdxRows() const { return Base2D::lastIdxRows();}
 
     /**  @return @c true if the container is empty, @c false otherwise */
-    inline bool empty() const { return Base2D::empty();}
+    bool empty() const { return Base2D::empty();}
 };
 
 /**@ingroup Arrays
@@ -328,12 +316,12 @@ class Identity : public IConstArray<Identity<Type_, Size_> >
      *  @param i index of the row
      *  @param j index of the column
      **/
-    inline ReturnType elt2Impl(int i, int j) const
+    ReturnType elt2Impl(int i, int j) const
     { return (i==j ? Type(1) : Type(0));}
     /** @return the element ith element of the identity matrix
      *  @param i index of the ith element
      **/
-    inline ReturnType elt1Impl(int i) const { return Type(1);}
+    ReturnType elt1Impl(int i) const { return Type(1);}
 };
 
 /**@ingroup Arrays
@@ -381,7 +369,7 @@ class Square : public IConstArray<Square<Type_, Size_> >
      *  @param i index of the row
      *  @param j index of the column
      **/
-    inline ReturnType elt2Impl(int i, int j) const { return (Type(1));}
+    ReturnType elt2Impl(int i, int j) const { return (Type(1));}
 };
 
 /**@ingroup Arrays
@@ -431,7 +419,7 @@ class Array : public IConstArray<Array<Type_, SizeRows_, SizeCols_> >
      *  @param i index of the row
      *  @param j index of the column
      **/
-    inline ReturnType elt2Impl(int i, int j) const { return (Type(1));}
+    ReturnType elt2Impl(int i, int j) const { return (Type(1));}
 };
 
 /**@ingroup Arrays
@@ -481,7 +469,7 @@ class UpperTriangular : public IConstArray<UpperTriangular<Type_, SizeRows_, Siz
      *  @param i index of the row
      *  @param j index of the column
      **/
-    inline ReturnType elt2Impl(int i, int j) const { return (Type(1));}
+    ReturnType elt2Impl(int i, int j) const { return (Type(1));}
 };
 
 /**@ingroup Arrays
@@ -531,7 +519,7 @@ class LowerTriangular : public IConstArray<LowerTriangular<Type_, SizeRows_, Siz
      *  @param i index of the row
      *  @param j index of the column
      **/
-    inline ReturnType elt2Impl(int i, int j) const { return (Type(1));}
+    ReturnType elt2Impl(int i, int j) const { return (Type(1));}
 };
 
 /**@ingroup Arrays
@@ -575,12 +563,12 @@ class Point : public IConstArray<Point<Type_, Size_> >
     /** @return the j-th element  of the constant row-vector.
      *  @param j index of the element
      **/
-    inline ReturnType elt1Impl(int j) const { return (Type(1));}
+    ReturnType elt1Impl(int j) const { return (Type(1));}
     /** @return the element (i,j) of the constant row-vector.
      *  @param i index of the row
      *  @param j index of the column
      **/
-    inline ReturnType elt2Impl(int i, int j) const { return (Type(1));}
+    ReturnType elt2Impl(int i, int j) const { return (Type(1));}
 };
 
 /**@ingroup Arrays
@@ -624,12 +612,11 @@ class Vector : public IConstArray<Vector<Type_, Size_> >
     /** @return the i-th element of the constant vector.
      *  @param i index of the element
      **/
-    inline ReturnType elt1Impl(int i) const { return (Type(1));}
+    ReturnType elt1Impl(int i) const { return (Type(1));}
     /** @return the element (i,j) of the constant vector.
-     *  @param i index of the row
-     *  @param j index of the column
+     *  @param i,j row and column indexes
      **/
-    inline ReturnType elt2Impl(int i, int j) const { return (Type(1));}
+    ReturnType elt2Impl(int i, int j) const { return (Type(1));}
 };
 
 

@@ -51,8 +51,8 @@ template<class Type>
 struct Panel
 {
   Type panel[blockSize*panelSize];
-  inline Type const& operator[](int i) const { return panel[i];}
-  inline Type& operator[](int i) { return panel[i];}
+  Type const& operator[](int i) const { return panel[i];}
+  Type& operator[](int i) { return panel[i];}
 };
 
 /** @ingroup hidden
@@ -62,8 +62,8 @@ template<class Type>
 struct Block
 {
   Type block[blockSize*blockSize];
-  inline Type const& operator[](int i) const { return block[i];}
-  inline Type& operator[](int i) { return block[i];}
+  Type const& operator[](int i) const { return block[i];}
+  Type& operator[](int i) { return block[i];}
 };
 
 /** @ingroup hidden
@@ -73,8 +73,8 @@ template<class Type>
 struct RawVec
 {
   Type vec[panelSize];
-  inline Type const& operator[](int i) const { return vec[i];}
-  inline Type& operator[](int i) { return vec[i];}
+  Type const& operator[](int i) const { return vec[i];}
+  Type& operator[](int i) { return vec[i];}
 };
 
 /** @ingroup hidden

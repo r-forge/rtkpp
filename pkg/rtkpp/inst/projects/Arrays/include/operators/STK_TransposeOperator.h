@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2012  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -141,28 +141,15 @@ class TransposeOperator  : public TransposeOperatorBase< Lhs >, public TRef<1>
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
     /** Constructor */
-    inline TransposeOperator( Lhs const& lhs) : Base(), lhs_(lhs) {}
+    TransposeOperator( Lhs const& lhs) : Base(), lhs_(lhs) {}
 
     /**  @return the range of the rows */
-    inline RowRange const& rowsImpl() const { return lhs_.cols();}
-    /** @return the first index of the rows */
-    inline int beginRowsImpl() const { return lhs_.beginCols();}
-    /** @return the ending index of the rows */
-    inline int endRowsImpl() const { return lhs_.endCols();}
-    /** @return the number of rows */
-    inline int sizeRowsImpl() const { return lhs_.sizeCols();}
-
+    RowRange const& rowsImpl() const { return lhs_.cols();}
     /** @return the range of the Columns */
-    inline ColRange const& colsImpl() const { return lhs_.rows();}
-    /** @return the first index of the columns */
-    inline int beginColsImpl() const { return lhs_.beginRows();}
-    /** @return the ending index of the columns */
-    inline int endColsImpl() const { return lhs_.endRows();}
-    /** @return the number of columns */
-    inline int sizeColsImpl() const { return lhs_.sizeRows();}
+    ColRange const& colsImpl() const { return lhs_.rows();}
 
     /** @return the left hand side expression */
-    inline Lhs const& lhs() const { return lhs_; }
+    Lhs const& lhs() const { return lhs_; }
 
   protected:
     Lhs const& lhs_;
@@ -180,19 +167,19 @@ class TransposeOperatorBase : public ExprBase< TransposeOperator<Lhs> >
     typedef typename hidden::Traits<Derived>::Type Type;
     typedef typename hidden::Traits<Derived>::ReturnType ReturnType;
     /** constructor. */
-    inline TransposeOperatorBase() : Base() {}
+    TransposeOperatorBase() : Base() {}
     /** @return the element (i,j) of the transposed expression.
      *  @param i, j index of the row and of the column
      **/
-    inline ReturnType elt2Impl(int i, int j) const
+    ReturnType elt2Impl(int i, int j) const
     { return (this->asDerived().lhs().elt(j, i));}
     /** @return the element ith element of the transposed expression
      *  @param i index of the ith element
      **/
-    inline ReturnType elt1Impl(int i) const
+    ReturnType elt1Impl(int i) const
     { return (this->asDerived().lhs().elt(i));}
     /** accesses to the element of the transposed expression */
-    inline ReturnType elt0Impl() const
+    ReturnType elt0Impl() const
     { return (this->asDerived().lhs().elt());}
 };
 

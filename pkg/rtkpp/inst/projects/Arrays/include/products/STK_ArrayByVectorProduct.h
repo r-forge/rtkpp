@@ -49,14 +49,14 @@ template<typename Type>
 struct MultImpl
 {
   /** multiplication of two vectors */
-  static inline Type vectorByVector(Type const* p_lhs, Type const* p_rhs)
+  static Type vectorByVector(Type const* p_lhs, Type const* p_rhs)
   {
     Type sum = Type(0);
     for (int k=0; k< vectorSize; ++k) sum += p_lhs[k] * p_rhs[k];
     return(sum);
   }
   /** multiplication of two vectors */
-  static inline Type PanelByVector(Type const* p_lhs, Type const* p_rhs)
+  static Type PanelByVector(Type const* p_lhs, Type const* p_rhs)
   {
     Type sum = Type(0);
     for (int k=0; k< vectorSize; ++k) sum += p_lhs[k] * p_rhs[k];

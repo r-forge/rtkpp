@@ -94,7 +94,7 @@ ostream& out1D( ostream& os, ITContainer1D<Array> const& V)
  *  @param V the Array/Expression to write
  **/
 template<class Array>
-inline ostream& operator<<(ostream& s, ITContainer<Array> const& V)
+ostream& operator<<(ostream& s, ITContainer<Array> const& V)
 { return out2D<Array>(s,V);}
 
 /** @ingroup Arrays

@@ -47,7 +47,7 @@ namespace STK
   * @code
   * struct MyVisitor {
   *   // called for all  coefficients
-  *   inline void operator() (Type const& value, Index i, Index j);
+  *   void operator() (Type const& value, Index i, Index j);
   * };
   * @endcode
   *

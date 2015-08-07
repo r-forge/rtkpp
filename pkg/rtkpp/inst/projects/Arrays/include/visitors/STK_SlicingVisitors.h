@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2007  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -130,7 +130,7 @@ class VisitorByCol : public VisitorByColBase< Derived, Visitor >, public TRef<1>
     typedef TRange<sizeCols_> ColRange;
 
     /** constructor */
-    inline VisitorByCol( Derived const& lhs) : lhs_(lhs), result_(1,lhs_.sizeCols())
+    VisitorByCol( Derived const& lhs) : lhs_(lhs), result_(1,lhs_.sizeCols())
     {
       result_.shift(lhs_.beginCols());
       for (int j= lhs_.beginCols(); j < lhs_.endCols(); ++j)
@@ -140,27 +140,14 @@ class VisitorByCol : public VisitorByColBase< Derived, Visitor >, public TRef<1>
       }
     }
     /**  @return the range of the rows */
-    inline RowRange const& rowsImpl() const { return result_.rows();}
-    /** @return the first index of the rows */
-    inline int beginRowsImpl() const { return(result_.beginRows());}
-    /** @return the ending index of the rows */
-    inline int endRowsImpl() const { return(result_.endRows());}
-    /** @return the number of rows */
-    inline int sizeRowsImpl() const { return(result_.sizeRows());}
-
-    /** @return the range of the columns */
-    inline ColRange const& colsImpl() const { return result_.cols();}
-    /** @return the first index of the columns */
-    inline int beginColsImpl() const { return(result_.beginCols());}
-    /** @return the ending index of the columns */
-    inline int endColsImpl() const { return(result_.endCols());}
-    /** @return the number of columns */
-    inline int sizeColsImpl() const { return result_.sizeCols();}
+    RowRange const& rowsImpl() const { return result_.rows();}
+    /** @return the columns range */
+    ColRange const& colsImpl() const { return result_.cols();}
 
     /** @return the left hand side expression */
-    inline Derived const& lhs() const { return lhs_; }
+    Derived const& lhs() const { return lhs_; }
     /** @return the result */
-    inline Allocator const& result() const { return result_; }
+    Allocator const& result() const { return result_; }
 
   protected:
     Derived const& lhs_;
@@ -180,7 +167,7 @@ class VisitorByColBase : public ExprBase< VisitorByCol<Derived, Visitor> >
     typedef typename Base::Type Type;
 
     /** constructor. */
-    inline VisitorByColBase() : Base() {}
+    VisitorByColBase() : Base() {}
     /** access to the element (i,j) */
     inline Type const& elt2Impl(int i, int j) const
     { return this->asDerived().result().elt(i,j);}
@@ -256,7 +243,7 @@ class VisitorByRow : public VisitorByRowBase< Derived, Visitor >, public TRef<1>
     typedef TRange<sizeCols_> ColRange;
 
     /** constructor */
-    inline VisitorByRow( Derived const& lhs) : lhs_(lhs), result_(lhs_.sizeRows(), 1)
+    VisitorByRow( Derived const& lhs) : lhs_(lhs), result_(lhs_.sizeRows(), 1)
     {
       result_.shift(lhs_.beginRows());
       for (int i= lhs_.beginRows(); i < lhs_.endRows(); ++i)
@@ -266,27 +253,14 @@ class VisitorByRow : public VisitorByRowBase< Derived, Visitor >, public TRef<1>
       }
     }
     /**  @return the range of the rows */
-    inline RowRange const& rowsImpl() const { return result_.rows();}
-    /** @return the first index of the rows */
-    inline int beginRowsImpl() const { return(result_.beginRows());}
-    /** @return the ending index of the rows */
-    inline int endRowsImpl() const { return(result_.endRows());}
-    /** @return the number of rows */
-    inline int sizeRowsImpl() const { return(result_.sizeRows());}
-
-    /** @return the range of the columns */
-    inline ColRange const& colsImpl() const { return result_.cols();}
-    /** @return the first index of the columns */
-    inline int beginColsImpl() const { return(result_.beginCols());}
-    /** @return the ending index of the columns */
-    inline int endColsImpl() const { return(result_.endCols());}
-    /** @return the number of columns */
-    inline int sizeColsImpl() const { return result_.sizeCols();}
+    RowRange const& rowsImpl() const { return result_.rows();}
+    /** @return the columns range */
+    ColRange const& colsImpl() const { return result_.cols();}
 
     /** @return the left hand side expression */
-    inline Derived const& lhs() const { return lhs_; }
+    Derived const& lhs() const { return lhs_; }
     /** @return the result */
-    inline Allocator const& result() const { return result_; }
+    Allocator const& result() const { return result_; }
 
   protected:
     Derived const& lhs_;
@@ -306,7 +280,7 @@ class VisitorByRowBase : public ExprBase< VisitorByRow<Derived, Visitor> >
     typedef typename Base::Type Type;
 
     /** constructor. */
-    inline VisitorByRowBase() : Base() {}
+    VisitorByRowBase() : Base() {}
     /** access to the element (i,j) */
     inline Type const& elt2Impl(int i, int j) const
     { return this->asDerived().result().elt(i,j);}
@@ -328,13 +302,13 @@ struct ApplyVisitor
   typedef typename Visitor<Type_>::return_type Type;
   typedef Type Result;
   /** constructor */
-  inline ApplyVisitor( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived())
+  ApplyVisitor( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived())
   {
     Visitor<Type_> visit;
     lhs_.visit(visit);
   }
   /** overload cast operator */
-  inline operator Type () const { return result_;}
+  operator Type () const { return result_;}
   protected:
     Derived const& lhs_;
   private:

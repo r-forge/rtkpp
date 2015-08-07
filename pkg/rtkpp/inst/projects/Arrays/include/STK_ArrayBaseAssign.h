@@ -73,13 +73,13 @@ struct Copycat;
 template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::array2D_, Arrays::array2D_>
 {
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   {
     for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
       for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
       { lhs.elt(i, j) = rhs.elt(i, j);}
   }
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   {
     for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
       for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
@@ -91,13 +91,13 @@ struct Copycat<  Derived,  Rhs, Arrays::array2D_, Arrays::array2D_>
 template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::array2D_, Arrays::square_>
 {
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   {
     for (int i = rhs.begin(); i< rhs.end(); ++i)
       for (int j = rhs.begin(); j < rhs.end(); ++j)
       { lhs.elt(i, j) = rhs.elt(i, j);}
   }
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   {
     for (int j = rhs.begin(); j < rhs.lend(); ++j)
       for (int i = rhs.begin(); i< rhs.end(); ++i)
@@ -110,12 +110,12 @@ template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::array2D_, Arrays::diagonal_>
 {
   typedef typename hidden::Traits<Derived>::Type Type;
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   {
     lhs.setValue(Type(0));
     for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i,i) = rhs.elt(i);}
   }
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   {
     lhs.setValue(Type(0));
     for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i,i) = rhs.elt(i);}
@@ -127,7 +127,7 @@ template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::array2D_,   Arrays::lower_triangular_>
 {
   typedef typename hidden::Traits<Derived>::Type Type;
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   {
     const int end = std::min(rhs.endRows(), rhs.endCols());
     for (int j = rhs.beginCols(); j < end; ++j)
@@ -138,7 +138,7 @@ struct Copycat<  Derived,  Rhs, Arrays::array2D_,   Arrays::lower_triangular_>
     for (int j= end; j < rhs.endCols(); ++j)
       for (int i = rhs.beginRows(); i < rhs.endRows(); ++i) { lhs.elt(i,j) = Type(0);}
   }
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   {
     const int end = std::min(rhs.endRows(), rhs.endCols());
     for (int i = rhs.beginRows(); i < end; ++i)
@@ -156,7 +156,7 @@ template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::array2D_, Arrays::upper_triangular_>
 {
   typedef typename hidden::Traits<Derived>::Type Type;
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   {
     const int end = std::min(rhs.endRows(), rhs.endCols());
     for (int j = rhs.beginCols(); j < end; ++j)
@@ -167,7 +167,7 @@ struct Copycat<  Derived,  Rhs, Arrays::array2D_, Arrays::upper_triangular_>
     for (int j= end; j < rhs.endCols(); ++j)
       for (int i = rhs.beginRows(); i < rhs.endRows(); ++i) { lhs.elt(i,j) = rhs.elt(i, j);}
   }
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   {
     const int end = std::min(lhs.endRows(), lhs.endCols());
     for (int i = rhs.beginRows(); i < end; ++i)
@@ -184,13 +184,13 @@ struct Copycat<  Derived,  Rhs, Arrays::array2D_, Arrays::upper_triangular_>
 template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::array2D_, Arrays::vector_>
 {
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   {
     int j = rhs.beginCols();
     for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
     { lhs.elt(i, j) = rhs.elt(i);}
   }
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   {
     int j = rhs.beginCols();
     for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
@@ -202,13 +202,13 @@ struct Copycat<  Derived,  Rhs, Arrays::array2D_, Arrays::vector_>
 template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::array2D_, Arrays::point_>
 {
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   {
     int i = rhs.beginRows();
     for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
     { lhs.elt(i, j) = rhs.elt(j);}
   }
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   {
     int i = rhs.beginRows();
     for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
@@ -221,13 +221,13 @@ struct Copycat<  Derived,  Rhs, Arrays::array2D_, Arrays::point_>
 template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::square_, Arrays::array2D_>
 {
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   {
     for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
       for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
       { lhs.elt(i, j) = rhs.elt(i, j);}
   }
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   {
     for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
       for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
@@ -239,13 +239,13 @@ struct Copycat<  Derived,  Rhs, Arrays::square_, Arrays::array2D_>
 template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::square_, Arrays::square_>
 {
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   {
     for (int j = rhs.begin(); j < rhs.end(); ++j)
       for (int i = rhs.begin(); i< rhs.end(); ++i)
       { lhs.elt(i, j) = rhs.elt(i, j);}
   }
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   {
     for (int i = rhs.begin(); i< rhs.end(); ++i)
       for (int j = rhs.begin(); j < rhs.end(); ++j)
@@ -258,13 +258,13 @@ template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::square_, Arrays::diagonal_>
 {
   typedef typename hidden::Traits<Derived>::Type Type;
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   {
     lhs.setValue(Type(0));
     const int end = std::min(lhs.endRows(), lhs.endCols());
     for (int i = rhs.beginRows(); i < end; ++i) { lhs.elt(i,i) = rhs.elt(i);}
   }
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   {
     lhs.setValue(Type(0));
     const int end = std::min(lhs.endRows(), lhs.endCols());
@@ -277,7 +277,7 @@ template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::square_,   Arrays::lower_triangular_>
 {
   typedef typename hidden::Traits<Derived>::Type Type;
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   {
     const int end = std::min(rhs.endRows(), rhs.endCols());
     for (int j = rhs.beginCols(); j < end; ++j)
@@ -288,7 +288,7 @@ struct Copycat<  Derived,  Rhs, Arrays::square_,   Arrays::lower_triangular_>
     for (int j= end; j < rhs.endCols(); ++j)
       for (int i = rhs.beginRows(); i < rhs.endRows(); ++i) { lhs.elt(i,j) = Type(0);}
   }
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   {
     const int end = std::min(rhs.endRows(), rhs.endCols());
     for (int i = rhs.beginRows(); i < end; ++i)
@@ -306,7 +306,7 @@ template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::square_, Arrays::upper_triangular_>
 {
   typedef typename hidden::Traits<Derived>::Type Type;
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   {
     const int end = std::min(rhs.endRows(), rhs.endCols());
     for (int j = rhs.beginCols(); j < end; ++j)
@@ -317,7 +317,7 @@ struct Copycat<  Derived,  Rhs, Arrays::square_, Arrays::upper_triangular_>
     for (int j= end; j < rhs.endCols(); ++j)
       for (int i = rhs.beginRows(); i < rhs.endRows(); ++i) { lhs.elt(i,j) = rhs.elt(i, j);}
   }
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   {
     const int end = std::min(lhs.endRows(), lhs.endCols());
     for (int i = rhs.beginRows(); i < end; ++i)
@@ -336,14 +336,14 @@ template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::lower_triangular_, Arrays::lower_triangular_>
 {
   typedef typename hidden::Traits<Derived>::Type Type;
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   {
     const int end = std::min(rhs.endRows(), rhs.endCols());
     for (int j = rhs.beginCols(); j < end; ++j)
       for (int i=j; i < rhs.endRows(); ++i)
       { lhs.elt(i,j) = rhs.elt(i, j);}
   }
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   {
     const int end = std::min(rhs.endRows(), rhs.endCols());
     for (int i = rhs.beginRows(); i < end; ++i)
@@ -361,7 +361,7 @@ template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::upper_triangular_, Arrays::upper_triangular_>
 {
   typedef typename hidden::Traits<Derived>::Type Type;
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   {
     const int end = std::min(rhs.endRows(), rhs.endCols());
     for (int j = rhs.beginCols(); j < end; ++j)
@@ -371,7 +371,7 @@ struct Copycat<  Derived,  Rhs, Arrays::upper_triangular_, Arrays::upper_triangu
     for (int j= end; j < rhs.endCols(); ++j)
       for (int i = rhs.beginRows(); i < rhs.endRows(); ++i) { lhs.elt(i,j) = rhs.elt(i, j);}
   }
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   {
     const int last = std::min(lhs.lastIdxRows(), lhs.lastIdxCols());
     for (int i = rhs.beginRows(); i <= last; ++i)
@@ -385,9 +385,9 @@ struct Copycat<  Derived,  Rhs, Arrays::upper_triangular_, Arrays::upper_triangu
 template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::diagonal_, Arrays::diagonal_>
 {
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
 };
 
@@ -395,9 +395,9 @@ struct Copycat<  Derived,  Rhs, Arrays::diagonal_, Arrays::diagonal_>
 template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::diagonal_, Arrays::vector_>
 {
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
 };
 
@@ -405,9 +405,9 @@ struct Copycat<  Derived,  Rhs, Arrays::diagonal_, Arrays::vector_>
 template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::diagonal_, Arrays::point_>
 {
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
 };
 
@@ -416,9 +416,9 @@ struct Copycat<  Derived,  Rhs, Arrays::diagonal_, Arrays::point_>
 template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::vector_, Arrays::diagonal_>
 {
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
 };
 
@@ -426,18 +426,18 @@ struct Copycat<  Derived,  Rhs, Arrays::vector_, Arrays::diagonal_>
 template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::vector_, Arrays::vector_>
 {
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
 };
 // vector <- point
 template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::vector_, Arrays::point_>
 {
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
 };
 
@@ -446,9 +446,9 @@ struct Copycat<  Derived,  Rhs, Arrays::vector_, Arrays::point_>
 template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::point_, Arrays::diagonal_>
 {
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
 };
 
@@ -456,18 +456,18 @@ struct Copycat<  Derived,  Rhs, Arrays::point_, Arrays::diagonal_>
 template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::point_, Arrays::vector_>
 {
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
 };
 // vector <- point
 template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::point_, Arrays::point_>
 {
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
 };
 
@@ -477,9 +477,9 @@ struct Copycat<  Derived,  Rhs, Arrays::point_, Arrays::point_>
 template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::number_, Arrays::number_>
 {
-  inline static void runByCol(Derived& lhs, Rhs const& rhs )
+  static void runByCol(Derived& lhs, Rhs const& rhs )
   { lhs.elt() = rhs.elt();}
-  inline static void runByRow(Derived& lhs, Rhs const& rhs )
+  static void runByRow(Derived& lhs, Rhs const& rhs )
   { lhs.elt() = rhs.elt();}
 };
 
@@ -503,7 +503,7 @@ struct CopycatSelector< Derived, Rhs, Arrays::by_col_>
   { tstructure_ = hidden::Traits<Derived>::structure_
   , sstructure_ = hidden::Traits<Rhs>::structure_
   };
-  inline static void run(Derived& lhs, Rhs const& rhs )
+  static void run(Derived& lhs, Rhs const& rhs )
   { Copycat<Derived, Rhs, tstructure_, sstructure_>::runByCol(lhs, rhs );}
 };
 
@@ -515,7 +515,7 @@ struct CopycatSelector< Derived, Rhs, Arrays::by_row_>
   { tstructure_ = hidden::Traits<Derived>::structure_
   , sstructure_ = hidden::Traits<Rhs>::structure_
   };
-  inline static void run(Derived& lhs, Rhs const& rhs )
+  static void run(Derived& lhs, Rhs const& rhs )
   { Copycat<Derived, Rhs, tstructure_, sstructure_>::runByRow(lhs, rhs );}
 };
 

@@ -129,35 +129,35 @@ class CArrayPoint : public ICArray < CArrayPoint<Type_, SizeCols_, Orient_> >
     };
 
     /** Default constructor. */
-    inline CArrayPoint(): Base() {}
+    CArrayPoint(): Base() {}
     /** constructor with specified dimension.
      *  @param sizeCols range of the columns
      **/
-    inline CArrayPoint( int sizeCols): Base(1, sizeCols) {}
+    CArrayPoint( int sizeCols): Base(1, sizeCols) {}
     /** constructor with specified ranges.
      *  @param range range of the rows and columns
      **/
-    inline CArrayPoint( Range range): Base(1, range.size())
+    CArrayPoint( Range range): Base(1, range.size())
     { this->shift(range.begin());}
     /** constructor with specified size, initialization with a constant.
      *  @param sizeCols size of the columns
      *  @param v initial value of the container
      **/
-    inline CArrayPoint( int sizeCols, Type const& v): Base(1, sizeCols, v) {}
+    CArrayPoint( int sizeCols, Type const& v): Base(1, sizeCols, v) {}
     /** constructor with specified ranges, initialization with a constant.
      *  @param range range of the columns
      *  @param v initial value of the container
      **/
-    inline CArrayPoint( Range range, Type const& v): Base(1, range.size(), v)
+    CArrayPoint( Range range, Type const& v): Base(1, range.size(), v)
     { this->shift(range.begin());}
     /** Copy constructor
      *  @param T the container to copy
      *  @param ref true if T is wrapped
      **/
-    inline CArrayPoint( CArrayPoint const& T, bool ref=false): Base(T, ref) {}
+    CArrayPoint( CArrayPoint const& T, bool ref=false): Base(T, ref) {}
     /** constructor by reference, ref_=1.
      *  @param T the container to wrap
-     *  @param J the range of the columns to wrap
+     *  @param J the columns range to wrap
      **/
     CArrayPoint( CArrayPoint const& T, Range const& J)
                : Base(T, T.rows(), J) {}
@@ -174,34 +174,34 @@ class CArrayPoint : public ICArray < CArrayPoint<Type_, SizeCols_, Orient_> >
      *  @param q pointer on the array
      *  @param nbCol number of columns
      **/
-    inline CArrayPoint( Type* const& q, int nbCol): Base(q, 1, nbCol) {}
+    CArrayPoint( Type* const& q, int nbCol): Base(q, 1, nbCol) {}
     /** constructor by reference.
      *  @param allocator the allocator to wrap
      **/
     template<class OtherAllocator>
-    inline CArrayPoint( ITContainer2D<OtherAllocator> const& allocator)
+    CArrayPoint( ITContainer2D<OtherAllocator> const& allocator)
                       : Base(allocator.asDerived())
     {}
     /** Copy constructor using an expression.
      *  @param T the container to wrap
      **/
     template<class OtherDerived>
-    inline CArrayPoint( ExprBase<OtherDerived> const& T): Base(1,T.size()) { LowBase::operator=(T);}
+    CArrayPoint( ExprBase<OtherDerived> const& T): Base(1,T.size()) { LowBase::operator=(T);}
     /** destructor. */
-    inline ~CArrayPoint() {}
+    ~CArrayPoint() {}
     /** operator= : set the container to a constant value.
      *  @param v the value to set
      **/
-    inline CArrayPoint& operator=(Type const& v) { return LowBase::setValue(v);}
+    CArrayPoint& operator=(Type const& v) { return LowBase::setValue(v);}
     /** operator = : overwrite the CArrayPoint with the Right hand side T.
      *  @param T the container to copy
      **/
     template<class Rhs>
-    inline CArrayPoint& operator=( ExprBase<Rhs> const& T) { return LowBase::assign(T);}
+    CArrayPoint& operator=( ExprBase<Rhs> const& T) { return LowBase::assign(T);}
     /** operator = : overwrite the CArray with the Right hand side rhs.
      *  @param rhs the container to copy
      **/
-    inline CArrayPoint& operator=(CArrayPoint rhs) { return LowBase::assign(rhs);}
+    CArrayPoint& operator=(CArrayPoint rhs) { return LowBase::assign(rhs);}
 };
 
 } // namespace STK

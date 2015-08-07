@@ -62,7 +62,7 @@ class AllocatorBase: public IContainerRef
     typedef TRange<Size> AllocRange;
 
     /** Default constructor. */
-    inline AllocatorBase() : IContainerRef(false)
+    AllocatorBase() : IContainerRef(false)
                            , p_data_(0)
                            , rangeData_()
     {}
@@ -78,13 +78,13 @@ class AllocatorBase: public IContainerRef
      *  @param T : the array to copy
      *  @param ref : is this a wrapper of T ?
      **/
-    inline AllocatorBase( AllocatorBase const& T, bool ref = false)
+    AllocatorBase( AllocatorBase const& T, bool ref = false)
                         : IContainerRef(ref)
                         , p_data_(ref ? T.p_data_: 0)
                         , rangeData_(T.rangeData_)
     {/* derived class have to copy the data if ref==false */}
     template<int OtherSize>
-    inline AllocatorBase( AllocatorBase<Type, OtherSize> const& T, bool ref = false)
+    AllocatorBase( AllocatorBase<Type, OtherSize> const& T, bool ref = false)
                         : IContainerRef(ref)
                         , p_data_(ref ? T.p_data(): 0)
                         , rangeData_(T.rangeData())
@@ -95,7 +95,7 @@ class AllocatorBase: public IContainerRef
      *  @param I range of the data wrapped
      *  @param ref is this a wrapper ?
      **/
-    inline AllocatorBase( Type* const& q, Range const& I, bool ref)
+    AllocatorBase( Type* const& q, Range const& I, bool ref)
                         : IContainerRef(ref)
                         , p_data_(ref ? q : 0)
                         , rangeData_(I)
@@ -107,7 +107,7 @@ class AllocatorBase: public IContainerRef
      *  @param size of the data to wrap
      *  @param ref is this a wrapper ?
      **/
-    inline AllocatorBase( Type* const& q, int size, bool ref)
+    AllocatorBase( Type* const& q, int size, bool ref)
                         : IContainerRef(ref)
                         , p_data_(ref ? q : 0)
                         , rangeData_(Range(0,size-1))
@@ -117,23 +117,23 @@ class AllocatorBase: public IContainerRef
     ~AllocatorBase() { free(); }
 
     /** @return the range of the data*/
-    inline AllocRange const& rangeData() const { return rangeData_;}
+    AllocRange const& rangeData() const { return rangeData_;}
     /** @return the first index of the data. */
-    inline int firstData() const { return rangeData_.begin();}
+    int firstData() const { return rangeData_.begin();}
     /**@return the ending index of the data */
-    inline int endData() const { return rangeData_.end();}
+    int endData() const { return rangeData_.end();}
    /**@return the last index of the data */
-    inline int lastData() const { return rangeData_.lastIdx();}
+    int lastData() const { return rangeData_.lastIdx();}
     /** @return the size of the data */
-    inline int sizeData() const { return rangeData_.size();}
+    int sizeData() const { return rangeData_.size();}
     /** @return a pointer on the constant data set*/
-    inline Type* const& p_data() const { return p_data_;}
+    Type* const& p_data() const { return p_data_;}
     /** @return a pointer on the data set */
-    inline Type* p_data() { return p_data_;}
+    Type* p_data() { return p_data_;}
     /** Get the const element number pos.
      *  @param pos the position of the element we get 
      **/
-    inline Type const& data( int pos) const
+    Type const& data( int pos) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (pos < firstData())
@@ -146,7 +146,7 @@ class AllocatorBase: public IContainerRef
     /** Get the element number pos.
      *  @param pos the position of the element we get 
      **/
-    inline Type& data(int pos)
+    Type& data(int pos)
     {
 #ifdef STK_BOUNDS_CHECK
       if (pos < firstData())
@@ -186,14 +186,14 @@ class AllocatorBase: public IContainerRef
     /** swap two elements of the Allocator.
      *  @param pos1, pos2 the positions of the first and second element
      **/
-    inline void swap(int pos1, int pos2)
+    void swap(int pos1, int pos2)
     { std::swap(p_data_[pos1], p_data_[pos2]);}
     /** @brief copy the Allocator T by value.
      *  The memory is free and the Allocator T is physically copied in this.
      *  @param T the allocator to copy by value
      *  @return a copy of this
      **/
-    inline AllocatorBase& copy( AllocatorBase const& T)
+    AllocatorBase& copy( AllocatorBase const& T)
     {
       // allocate memory if necessary
       malloc(T.rangeData_);
@@ -213,7 +213,7 @@ class AllocatorBase: public IContainerRef
      *
      *  @param T the allocator to copy as reference
      **/
-    inline AllocatorBase& move( AllocatorBase const& T)
+    AllocatorBase& move( AllocatorBase const& T)
     {
       if (this == &T) return *this;
       free();
@@ -244,7 +244,7 @@ class AllocatorBase: public IContainerRef
      *  @param rangeData the range of the data
      *  @param ref is p_data_ a wrapper ?
      **/
-    inline void setPtrData( Type* p_data,  Range const& rangeData, bool ref)
+    void setPtrData( Type* p_data,  Range const& rangeData, bool ref)
     { p_data_ = p_data; rangeData_ = rangeData; this->setRef(ref);}
 
   private:
@@ -252,15 +252,15 @@ class AllocatorBase: public IContainerRef
      *  to the end-user.
      *  @param p_data the address to set
      **/
-    inline void setPtrData( Type* p_data = 0) { p_data_ = p_data;}
+    void setPtrData( Type* p_data = 0) { p_data_ = p_data;}
     /** Set the index of the first data : this method is not destined
      *  to the end-user.
      *  @param rangeData the range of the data to set
      **/
-    inline void setRangeData( Range const& rangeData = Range())
+    void setRangeData( Range const& rangeData = Range())
     { rangeData_ = rangeData;}
     /** Set array members to default values. */
-    inline void setDefault()
+    void setDefault()
     {
       setPtrData();
       setRangeData();
@@ -268,7 +268,7 @@ class AllocatorBase: public IContainerRef
     /** Increment the address of the data.
      *  @param inc the increment to apply
      **/
-    inline void incPtrData( int const& inc)
+    void incPtrData( int const& inc)
     {
       if (p_data_) { p_data_ += inc;}
       rangeData_.dec(inc);
@@ -276,7 +276,7 @@ class AllocatorBase: public IContainerRef
     /** Decrement the address of the data.
      *  @param dec the increment to apply
      **/
-    inline void decPtrData( int const& dec)
+    void decPtrData( int const& dec)
     {
       if (p_data_) { p_data_ -= dec;}
       rangeData_.inc(dec);

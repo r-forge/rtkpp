@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2012  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -105,7 +105,7 @@ class DotProduct : public ExprBase< DotProduct<Lhs, Rhs> >
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
 
-    inline DotProduct( const Lhs& lhs, const Rhs& rhs)
+    DotProduct( const Lhs& lhs, const Rhs& rhs)
                      : lhs_(lhs), rhs_(rhs)
                      , result_()
     {
@@ -115,31 +115,19 @@ class DotProduct : public ExprBase< DotProduct<Lhs, Rhs> >
       result_.elt() = lhs.dot(rhs);
     }
     /**  @return the range of the rows */
-    inline RowRange const& rowsImpl() const { return result_.rows();}
-    /** @return the beginning of the rows */
-    inline int beginRowsImpl() const { return result_.beginRows();}
-    /** @return the end of the rows */
-    inline int endRowsImpl() const { return result_.endRows();}
-    /** @return the number of rows */
-    inline int sizeRowsImpl() const { return result_.sizeRows();}
-    /** @return the range of the columns */
-    inline ColRange const& colsImpl() const { return result_.cols();}
-    /** @return the beginning of the columns */
-    inline int beginColsImpl() const { return result_.beginCols();}
-    /** @return the end of the columns */
-    inline int endColsImpl() const { return result_.endCols();}
-    /** @return the number of columns */
-    inline int sizeColsImpl() const { return result_.sizeCols();}
+    RowRange const& rowsImpl() const { return result_.rows();}
+    /** @return the columns range */
+    ColRange const& colsImpl() const { return result_.cols();}
 
     /** access to the element */
-    inline ReturnType elt0Impl() const { return result_.elt();}
+    ReturnType elt0Impl() const { return result_.elt();}
 
     /** @return the left hand side expression */
-    inline Lhs const& lhs() const { return lhs_; }
+    Lhs const& lhs() const { return lhs_; }
     /** @return the right hand side nested expression */
-    inline Rhs const& rhs() const { return rhs_; }
+    Rhs const& rhs() const { return rhs_; }
     /** @return the result */
-    inline Allocator const& result() const { return result_; }
+    Allocator const& result() const { return result_; }
 
   protected:
     Lhs const& lhs_;

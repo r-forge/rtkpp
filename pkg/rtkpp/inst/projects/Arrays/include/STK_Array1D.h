@@ -99,33 +99,33 @@ class Array1D : public IArray1D< Array1D<Type, Size_> >
     /** Type for the Array1DBase Class. */
     typedef IArray1D< Array1D<Type, Size_> > Base;
     /** Default constructor. */
-    inline Array1D() : Base(){}
+    Array1D() : Base(){}
     /** constructor with a specified Range
      *  @param I range of the container
      **/
-    inline Array1D( Range const& I) : Base(I) {}
+    Array1D( Range const& I) : Base(I) {}
     /** Misc constructor with beg and end, initialization with a constant.
      *  @param I range of the container
      *  @param v initial value of the container
      **/
-    inline Array1D( Range const& I, Type const& v) : Base(I, v) {}
+    Array1D( Range const& I, Type const& v) : Base(I, v) {}
     /** Copy constructor
      *  @param T the container to copy
      *  @param ref true if T is wrapped
      **/
-    inline Array1D( const Array1D &T, bool ref =false) : Base(T, ref) {}
+    Array1D( const Array1D &T, bool ref =false) : Base(T, ref) {}
     /** constructor by reference, ref_=1.
      *  @param T the container to wrap
      *  @param I range of the data to wrap
      **/
-    inline Array1D( Array1D const& T, Range const& I) : Base(T, I) {}
+    Array1D( Array1D const& T, Range const& I) : Base(T, I) {}
     /** Wrapper constructor : the container is a reference of a C-Array.
      *  @param q pointer on data
      *  @param I range of the data
      **/
-    inline Array1D( Type* q, Range const& I) : Base(q, I) {}
+    Array1D( Type* q, Range const& I) : Base(q, I) {}
     /** destructor: allocated memory is liberated by AllocatorBase base class. */
-    inline ~Array1D() {}
+    ~Array1D() {}
     /** operator = : overwrite the Array1D with T.
      *  We resize the object if this and T does not have the same size
      *  but if they have the same size, we don't modify the range

@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2012  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -111,31 +111,18 @@ class UnaryOperator  : public UnaryOperatorBase< UnaryOp, Lhs >, public TRef<1>
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
 
-    inline UnaryOperator( Lhs const& lhs, UnaryOp const& functor = UnaryOp())
+    UnaryOperator( Lhs const& lhs, UnaryOp const& functor = UnaryOp())
                         : Base(), lhs_(lhs), functor_(functor)
     {}
     /**  @return the range of the rows */
-    inline RowRange const& rowsImpl() const { return lhs_.rows();}
-    /** @return the first index of the rows */
-    inline int beginRowsImpl() const { return lhs_.beginRows();}
-    /** @return the ending index of the rows */
-    inline int endRowsImpl() const { return lhs_.endRows();}
-    /** @return the number of rows */
-    inline int sizeRowsImpl() const { return lhs_.sizeRows();}
-
+    RowRange const& rowsImpl() const { return lhs_.rows();}
     /** @return the range of the Columns */
-    inline ColRange const& colsImpl() const { return lhs_.cols();}
-    /** @return the first index of the columns */
-    inline int beginColsImpl() const { return lhs_.beginCols();}
-    /** @return the ending index of the columns */
-    inline int endColsImpl() const { return lhs_.endCols();}
-    /** @return the number of columns */
-    inline int sizeColsImpl() const { return lhs_.sizeCols();}
+    ColRange const& colsImpl() const { return lhs_.cols();}
 
     /** @return the left hand side expression */
-    inline Lhs const& lhs() const { return lhs_; }
+    Lhs const& lhs() const { return lhs_; }
     /** @return the functor representing the unary operation */
-    inline UnaryOp const& functor() const { return functor_; }
+    UnaryOp const& functor() const { return functor_; }
 
   protected:
     Lhs const& lhs_;
@@ -155,20 +142,20 @@ class UnaryOperatorBase : public ExprBase< UnaryOperator<UnaryOp, Lhs> >
     typedef typename hidden::Traits<Derived>::ReturnType ReturnType;
 
     /** constructor. */
-    inline UnaryOperatorBase() : Base() {}
+    UnaryOperatorBase() : Base() {}
     /** @return the element (i,j) of the operator.
      *  @param i index of the row
      *  @param j index of the column
      **/
-    inline ReturnType elt2Impl(int i, int j) const
+    ReturnType elt2Impl(int i, int j) const
     { return this->asDerived().functor()(this->asDerived().lhs().elt(i, j));}
     /** @return the ith element of the operator
      *  @param i index of the ith element
      **/
-    inline ReturnType elt1Impl(int i) const
+    ReturnType elt1Impl(int i) const
     { return this->asDerived().functor()(this->asDerived().lhs().elt(i));}
     /** @return the element of the operator */
-    inline ReturnType elt0Impl() const
+    ReturnType elt0Impl() const
     { return this->asDerived().functor()(this->asDerived().lhs().elt());}
 };
 

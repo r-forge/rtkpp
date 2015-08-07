@@ -125,7 +125,7 @@ struct ApplyFunctorByCol
   typedef Array2DPoint<Type> resultByColType;
 
   /** constructor */
-  inline ApplyFunctorByCol( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived()) {}
+  ApplyFunctorByCol( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived()) {}
   /** @return the applied functor by column */
   resultByColType operator()()
   {
@@ -168,7 +168,7 @@ struct ApplyWeightedFunctorByCol
   typedef Array2DPoint<Type> resultByColType;
 
   /** constructor */
-  inline ApplyWeightedFunctorByCol( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived()) {}
+  ApplyWeightedFunctorByCol( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived()) {}
   template<class Weights>
   resultByColType operator()(ExprBase<Weights> const& w)
   {
@@ -218,7 +218,7 @@ struct ApplyFunctorByRow
   typedef Array2DVector<Type> resultByRowType;
 
   /** constructor */
-  inline ApplyFunctorByRow( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived()) {}
+  ApplyFunctorByRow( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived()) {}
   resultByRowType operator()()
   {
     resultByRowType res(lhs_.rows());
@@ -257,9 +257,9 @@ struct ApplyWeightedFunctorByRow
   typedef Array2DVector<Type> resultByRowType;
 
   /** constructor */
-  inline ApplyWeightedFunctorByRow( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived()) {}
+  ApplyWeightedFunctorByRow( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived()) {}
   template<typename Weights>
-  inline resultByRowType operator()(ExprBase<Weights> const& w)
+  resultByRowType operator()(ExprBase<Weights> const& w)
   {
     resultByRowType res_(lhs_.rows());
     for (int i= lhs_.beginRows(); i < lhs_.endRows(); ++i)
@@ -310,14 +310,14 @@ struct ApplyFunctor
     typedef Type resultByColType;
     typedef Type resultByRowType;
     /// constructor
-    inline ApplyFunctor( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived())
+    ApplyFunctor( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived())
     { STK_STATIC_ASSERT_VECTOR_ONLY(Derived);}
     /** apply without argument*/
-    inline Type operator()() { return Funct(lhs_)();}
+    Type operator()() { return Funct(lhs_)();}
     /** apply with an option argument*/
-    inline Type operator()(bool option) { return Funct(lhs_)(option);}
+    Type operator()(bool option) { return Funct(lhs_)(option);}
     /** apply with a value and an option argument*/
-    inline Type operator()(Type const& value, bool option)
+    Type operator()(Type const& value, bool option)
     { return Funct(lhs_)(value, option);}
 
   protected:
@@ -334,18 +334,18 @@ struct ApplyWeightedFunctor
     typedef Type resultByColType;
     typedef Type resultByRowType;
     /// constructor
-    inline ApplyWeightedFunctor( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived())
+    ApplyWeightedFunctor( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived())
     { STK_STATIC_ASSERT_VECTOR_ONLY(Derived);}
     /** apply with weights*/
     template<typename Weights>
-    inline Type operator()(ExprBase<Weights> const& w) { return Funct(lhs_)(w);}
+    Type operator()(ExprBase<Weights> const& w) { return Funct(lhs_)(w);}
     /** apply with weight and an option argument*/
     template<typename Weights>
-    inline Type operator()(ExprBase<Weights> const& w, bool option)
+    Type operator()(ExprBase<Weights> const& w, bool option)
     { return Funct(lhs_)(w, option);}
     /** apply with weight, a value and an option argument*/
     template<typename Weights>
-    inline Type operator()(ExprBase<Weights> const& w, Type const& value, bool option)
+    Type operator()(ExprBase<Weights> const& w, Type const& value, bool option)
     { return Funct(lhs_)(w, value, option);}
 
   protected:

@@ -463,40 +463,27 @@ class ArrayByDiagonalProduct : public ExprBase< ArrayByDiagonalProduct<Lhs, Rhs>
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
 
-    inline ArrayByDiagonalProduct( const Lhs& lhs, const Rhs& rhs)
+    ArrayByDiagonalProduct( const Lhs& lhs, const Rhs& rhs)
                                   : Base(), lhs_(lhs), rhs_(rhs)
     {
       if (lhs.cols() != rhs.rows())
       { STKRUNTIME_ERROR_NO_ARG(ArrayByDiagonalProduct, sizes mismatch);}
     }
     /**  @return the range of the rows */
-    inline RowRange const& rowsImpl() const { return lhs_.rows();}
-    /** @return the first index of the rows */
-    inline int beginRowsImpl() const { return(lhs_.beginRows());}
-    /** @return the ending index of the rows */
-    inline int endRowsImpl() const { return(lhs_.endRows());}
-    /** @return the number of rows */
-    inline int sizeRowsImpl() const { return lhs_.sizeRows();}
+    RowRange const& rowsImpl() const { return lhs_.rows();}
+    /** @return the columns range */
+    ColRange const& colsImpl() const { return rhs_.cols();}
 
-    /** @return the range of the columns */
-    inline ColRange const& colsImpl() const { return rhs_.cols();}
-    /** @return the first index of the columns */
-    inline int beginColsImpl() const { return(rhs_.beginCols());}
-    /** @return the ending index of the columns */
-    inline int endColsImpl() const { return(rhs_.endCols());}
-    /** @return the number of columns */
-    inline int sizeColsImpl() const { return rhs_.sizeCols();}
-
-    inline ReturnType elt2Impl(int i, int j) const { return lhs_.elt(i,j)*rhs_.elt(j);}
+    ReturnType elt2Impl(int i, int j) const { return lhs_.elt(i,j)*rhs_.elt(j);}
     /** access to the ith element */
-    inline ReturnType elt1Impl(int i) const { return lhs_.elt(i)*rhs_.elt(i);}
+    ReturnType elt1Impl(int i) const { return lhs_.elt(i)*rhs_.elt(i);}
     /** access to the element */
-    inline ReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
+    ReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
 
     /** @return the left hand side expression */
-    inline Lhs const& lhs() const { return lhs_; }
+    Lhs const& lhs() const { return lhs_; }
     /** @return the right hand side nested expression */
-    inline Rhs const& rhs() const { return rhs_; }
+    Rhs const& rhs() const { return rhs_; }
 
   protected:
     Lhs const& lhs_;
@@ -525,41 +512,28 @@ class DiagonalByArrayProduct : public ExprBase< DiagonalByArrayProduct<Lhs, Rhs>
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
 
-    inline DiagonalByArrayProduct( const Lhs& lhs, const Rhs& rhs)
+    DiagonalByArrayProduct( const Lhs& lhs, const Rhs& rhs)
                                  : Base(), lhs_(lhs), rhs_(rhs)
     {
       if (lhs.cols() != rhs.rows())
       { STKRUNTIME_ERROR_NO_ARG(DiagonalByArrayProduct, sizes mismatch);}
     }
     /**  @return the range of the rows */
-    inline RowRange const& rowsImpl() const { return lhs_.rows();}
-    /** @return the first index of the rows */
-    inline int beginRowsImpl() const { return(lhs_.beginRows());}
-    /** @return the ending index of the rows */
-    inline int endRowsImpl() const { return(lhs_.endRows());}
-    /** @return the number of rows */
-    inline int sizeRowsImpl() const { return lhs_.sizeRows();}
-
-    /** @return the range of the columns */
-    inline ColRange const& colsImpl() const { return rhs_.cols();}
-    /** @return the first index of the columns */
-    inline int beginColsImpl() const { return(rhs_.beginCols());}
-    /** @return the ending index of the columns */
-    inline int endColsImpl() const { return(rhs_.endCols());}
-    /** @return the number of columns */
-    inline int sizeColsImpl() const { return rhs_.sizeCols();}
+    RowRange const& rowsImpl() const { return lhs_.rows();}
+    /** @return the columns range */
+    ColRange const& colsImpl() const { return rhs_.cols();}
 
     /** access to the element (i,j) */
-    inline ReturnType elt2Impl(int i, int j) const { return lhs_.elt(i)*rhs_.elt(i,j);}
+    ReturnType elt2Impl(int i, int j) const { return lhs_.elt(i)*rhs_.elt(i,j);}
     /** access to the ith element */
-    inline ReturnType elt1Impl(int i) const { return lhs_.elt(i)*rhs_.elt(i);}
+    ReturnType elt1Impl(int i) const { return lhs_.elt(i)*rhs_.elt(i);}
     /** access to the element */
-    inline ReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
+    ReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
 
     /** @return the left hand side expression */
-    inline Lhs const& lhs() const { return lhs_; }
+    Lhs const& lhs() const { return lhs_; }
     /** @return the right hand side nested expression */
-    inline Rhs const& rhs() const { return rhs_; }
+    Rhs const& rhs() const { return rhs_; }
 
   protected:
     Lhs const& lhs_;
@@ -589,7 +563,7 @@ class PointByArrayProduct : public ExprBase< PointByArrayProduct<Lhs, Rhs> >
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
 
-    inline PointByArrayProduct( const Lhs& lhs, const Rhs& rhs)
+    PointByArrayProduct( const Lhs& lhs, const Rhs& rhs)
                               : Base(), lhs_(lhs), rhs_(rhs)
                               , result_(1, rhs.sizeCols(), Type(0))
     {
@@ -599,36 +573,23 @@ class PointByArrayProduct : public ExprBase< PointByArrayProduct<Lhs, Rhs> >
       hidden::ProductDispatcher<Lhs, Rhs, Allocator>::run(lhs, rhs, result_);
     }
     /**  @return the range of the rows */
-    inline RowRange const& rowsImpl() const { return result_.rows();}
-    /** @return the first index of the rows */
-    inline int beginRowsImpl() const { return result_.beginRows();}
-    /** @return the ending index of the rows */
-    inline int endRowsImpl() const { return result_.endRows();}
-    /** @return the size of the vector */
-    inline int sizeRowsImpl() const { return 1;}
-
-    /** @return the range of the columns */
-    inline ColRange const& colsImpl() const { return result_.cols();}
-    /** @return the first index of the columns */
-    inline int beginColsImpl() const { return result_.beginCols();}
-    /** @return the ending index of the columns */
-    inline int endColsImpl() const { return result_.endCols();}
-    /** @return the fixed size type if available to enable compile time optimizations */
-    inline int sizeColsImpl() const { return result_.sizeCols();}
+    RowRange const& rowsImpl() const { return result_.rows();}
+    /** @return the columns range */
+    ColRange const& colsImpl() const { return result_.cols();}
 
     /** @return the element (i,j) */
-    inline ReturnType elt2Impl(int i, int j) const { return result_.elt(i, j);}
+    ReturnType elt2Impl(int i, int j) const { return result_.elt(i, j);}
     /** @return the ith element */
-    inline ReturnType elt1Impl(int i) const { return result_.elt(i);}
+    ReturnType elt1Impl(int i) const { return result_.elt(i);}
     /** @return the element */
-    inline ReturnType elt0Impl() const { return result_.elt();}
+    ReturnType elt0Impl() const { return result_.elt();}
 
     /** @return the left hand side expression */
-    inline Lhs const& lhs() const { return lhs_; }
+    Lhs const& lhs() const { return lhs_; }
     /** @return the right hand side nested expression */
-    inline Rhs const& rhs() const { return rhs_; }
+    Rhs const& rhs() const { return rhs_; }
     /** @return the right hand side nested expression */
-    inline Rhs const& result() const { return result_; }
+    Rhs const& result() const { return result_; }
 
   protected:
     Lhs const& lhs_;
@@ -662,7 +623,7 @@ class ArrayByVectorProduct : public ExprBase< ArrayByVectorProduct<Lhs, Rhs> >
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
 
-    inline ArrayByVectorProduct( const Lhs& lhs, const Rhs& rhs)
+    ArrayByVectorProduct( const Lhs& lhs, const Rhs& rhs)
                               : Base(), lhs_(lhs), rhs_(rhs)
                               , result_(lhs.sizeRows(), 1, Type(0))
     {
@@ -672,36 +633,23 @@ class ArrayByVectorProduct : public ExprBase< ArrayByVectorProduct<Lhs, Rhs> >
       hidden::ProductDispatcher<Lhs, Rhs, Allocator>::run(lhs, rhs, result_);
     }
     /**  @return the range of the rows */
-    inline RowRange const& rowsImpl() const { return result_.rows();}
-    /** @return the first index of the rows */
-    inline int beginRowsImpl() const { return(result_.beginRows());}
-    /** @return the ending index of the rows */
-    inline int endRowsImpl() const { return(result_.endRows());}
-    /** @return the number of rows */
-    inline int sizeRowsImpl() const { return result_.sizeRows();}
-
-    /** @return the range of the columns */
-    inline ColRange const& colsImpl() const { return result_.cols();}
-    /** @return the first index of the columns */
-    inline int beginColsImpl() const { return(result_.beginCols());}
-    /** @return the ending index of the columns */
-    inline int endColsImpl() const { return(result_.endCols());}
-    /** @return the number of columns */
-    inline int sizeColsImpl() const { return int(1);}
+    RowRange const& rowsImpl() const { return result_.rows();}
+    /** @return the columns range */
+    ColRange const& colsImpl() const { return result_.cols();}
 
     /** @return the element (i,j) */
-    inline ReturnType elt2Impl(int i, int j) const { return result_.elt(i, j);}
+    ReturnType elt2Impl(int i, int j) const { return result_.elt(i, j);}
     /** @return the ith element */
-    inline ReturnType elt1Impl(int i) const { return result_.elt(i);}
+    ReturnType elt1Impl(int i) const { return result_.elt(i);}
     /** @return the element */
-    inline ReturnType elt0Impl() const { return result_.elt();}
+    ReturnType elt0Impl() const { return result_.elt();}
 
     /** @return the left hand side expression */
-    inline Lhs const& lhs() const { return lhs_; }
+    Lhs const& lhs() const { return lhs_; }
     /** @return the right hand side nested expression */
-    inline Rhs const& rhs() const { return rhs_; }
+    Rhs const& rhs() const { return rhs_; }
     /** @return the right hand side nested expression */
-    inline Rhs const& result() const { return result_; }
+    Rhs const& result() const { return result_; }
 
   protected:
     Lhs const& lhs_;
@@ -733,36 +681,23 @@ class VectorByPointProduct : public ExprBase< VectorByPointProduct<Lhs, Rhs> >
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
 
-    inline VectorByPointProduct( const Lhs& lhs, const Rhs& rhs)
+    VectorByPointProduct( const Lhs& lhs, const Rhs& rhs)
                                : Base(), lhs_(lhs), rhs_(rhs)
     {}
     /**  @return the range of the rows */
-    inline RowRange const& rowsImpl() const { return lhs_.rows();}
-    /** @return the first index of the rows */
-    inline int beginRowsImpl() const { return(lhs_.beginRows());}
-    /** @return the ending index of the rows */
-    inline int endRowsImpl() const { return(lhs_.endRows());}
-    /** @return the number of rows */
-    inline int sizeRowsImpl() const { return lhs_.sizeRows();}
-
-    /** @return the range of the columns */
-    inline ColRange const& colsImpl() const { return rhs_.cols();}
-    /** @return the first index of the columns */
-    inline int beginColsImpl() const { return(rhs_.beginCols());}
-    /** @return the ending index of the columns */
-    inline int endColsImpl() const { return(rhs_.endCols());}
-    /** @return the number of columns */
-    inline int sizeColsImpl() const { return rhs_.sizeCols();}
+    RowRange const& rowsImpl() const { return lhs_.rows();}
+    /** @return the columns range */
+    ColRange const& colsImpl() const { return rhs_.cols();}
 
     /** @return the element (i,j) */
-    inline ReturnType elt2Impl(int i, int j) const { return lhs_.elt(i)*rhs_.elt(j);}
+    ReturnType elt2Impl(int i, int j) const { return lhs_.elt(i)*rhs_.elt(j);}
     /** @return the element */
-    inline ReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
+    ReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
 
     /** @return the left hand side expression */
-    inline Lhs const& lhs() const { return lhs_; }
+    Lhs const& lhs() const { return lhs_; }
     /** @return the right hand side expression */
-    inline Rhs const& rhs() const { return rhs_; }
+    Rhs const& rhs() const { return rhs_; }
 
   protected:
     Lhs const& lhs_;
@@ -803,7 +738,7 @@ class ArrayByArrayProduct : public ArrayByArrayProductBase< Lhs, Rhs >, public T
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
 
-    inline ArrayByArrayProduct( const Lhs& lhs, const Rhs& rhs)
+    ArrayByArrayProduct( const Lhs& lhs, const Rhs& rhs)
                               : Base(), lhs_(lhs), rhs_(rhs)
                               , result_(lhs.sizeRows(), rhs.sizeCols(), Type(0))
     {
@@ -815,29 +750,16 @@ class ArrayByArrayProduct : public ArrayByArrayProductBase< Lhs, Rhs >, public T
                 : hidden::ProductDispatcher<Lhs, Rhs, Allocator>::runbp(lhs, rhs, result_);
     }
     /**  @return the range of the rows */
-    inline RowRange const& rowsImpl() const { return lhs_.rows();}
-    /** @return the first index of the rows */
-    inline int beginRowsImpl() const { return(lhs_.beginRows());}
-    /** @return the ending index of the rows */
-    inline int endRowsImpl() const { return(lhs_.endRows());}
-    /** @return the number of rows */
-    inline int sizeRowsImpl() const { return(lhs_.sizeRows());}
-
-    /** @return the range of the columns */
-    inline ColRange const& colsImpl() const { return rhs_.cols();}
-    /** @return the first index of the columns */
-    inline int beginColsImpl() const { return(rhs_.beginCols());}
-    /** @return the ending index of the columns */
-    inline int endColsImpl() const { return(rhs_.endCols());}
-    /** @return the number of columns */
-    inline int sizeColsImpl() const { return rhs_.sizeCols();}
+    RowRange const& rowsImpl() const { return lhs_.rows();}
+    /** @return the columns range */
+    ColRange const& colsImpl() const { return rhs_.cols();}
 
     /** @return the left hand side expression */
-    inline Lhs const& lhs() const { return lhs_; }
+    Lhs const& lhs() const { return lhs_; }
     /** @return the right hand side nested expression */
-    inline Rhs const& rhs() const { return rhs_; }
+    Rhs const& rhs() const { return rhs_; }
     /** @return the result */
-    inline Allocator const& result() const { return result_; }
+    Allocator const& result() const { return result_; }
 
   protected:
     Lhs const& lhs_;
@@ -861,7 +783,7 @@ class ArrayByArrayProductBase : public ExprBase< ArrayByArrayProduct<Lhs, Rhs> >
     typedef typename hidden::Traits<Derived>::ReturnType ReturnType;
 
     /** constructor. */
-    inline ArrayByArrayProductBase() : Base() {}
+    ArrayByArrayProductBase() : Base() {}
     /** access to the element (i,j) */
     inline Type const& elt2Impl(int i, int j) const
     { return this->asDerived().result().elt(i,j);}

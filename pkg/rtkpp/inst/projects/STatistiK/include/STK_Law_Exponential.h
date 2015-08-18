@@ -133,7 +133,27 @@ class Exponential : public IUnivLaw<Real>
     Real scale_;
 };
 
+#ifdef IS_RTKPP_LIB
 
+inline Real Exponential::rand() const { return ::Rf_rexp(scale_);}
+inline Real Exponential::pdf( Real const& x) const { return ::Rf_dexp(x, scale_, false);}
+inline Real Exponential::lpdf( Real const& x) const { return ::Rf_dexp(x, scale_, true);}
+inline Real Exponential::cdf( Real const& t) const { return ::Rf_pexp(t, scale_, true, false);}
+inline Real Exponential::icdf( Real const& p) const { return ::Rf_qexp(p , scale_, true, false);}
+
+// static
+inline Real Exponential::rand( Real const& scale)
+{ return ::Rf_rexp(scale);}
+inline Real Exponential::pdf(Real const& x, Real const& scale)
+{ return ::Rf_dexp(x, scale, false);}
+inline Real Exponential::lpdf(Real const& x, Real const& scale)
+{ return ::Rf_dexp(x, scale, true);}
+inline Real Exponential::cdf(Real const& t, Real const& scale)
+{ return ::Rf_pexp(t, scale, true, false);}
+inline Real Exponential::icdf(Real const& p, Real const& scale)
+{ return ::Rf_qexp(p, scale, true, false);}
+
+#endif
 } // namespace Law
 
 } // namespace STK

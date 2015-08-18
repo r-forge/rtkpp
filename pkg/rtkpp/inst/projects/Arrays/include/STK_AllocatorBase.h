@@ -84,7 +84,7 @@ class AllocatorBase: public IContainerRef
                         , rangeData_(T.rangeData_)
     {/* derived class have to copy the data if ref==false */}
     template<int OtherSize>
-    AllocatorBase( AllocatorBase<Type, OtherSize> const& T, bool ref = false)
+    inline AllocatorBase( AllocatorBase<Type, OtherSize> const& T, bool ref = false)
                         : IContainerRef(ref)
                         , p_data_(ref ? T.p_data(): 0)
                         , rangeData_(T.rangeData())
@@ -119,21 +119,21 @@ class AllocatorBase: public IContainerRef
     /** @return the range of the data*/
     AllocRange const& rangeData() const { return rangeData_;}
     /** @return the first index of the data. */
-    int firstData() const { return rangeData_.begin();}
+    inline int firstData() const { return rangeData_.begin();}
     /**@return the ending index of the data */
-    int endData() const { return rangeData_.end();}
+    inline int endData() const { return rangeData_.end();}
    /**@return the last index of the data */
-    int lastData() const { return rangeData_.lastIdx();}
+    inline int lastData() const { return rangeData_.lastIdx();}
     /** @return the size of the data */
-    int sizeData() const { return rangeData_.size();}
+    inline int sizeData() const { return rangeData_.size();}
     /** @return a pointer on the constant data set*/
-    Type* const& p_data() const { return p_data_;}
+    inline Type* const& p_data() const { return p_data_;}
     /** @return a pointer on the data set */
-    Type* p_data() { return p_data_;}
+    inline Type* p_data() { return p_data_;}
     /** Get the const element number pos.
      *  @param pos the position of the element we get 
      **/
-    Type const& data( int pos) const
+    inline Type const& data( int pos) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (pos < firstData())
@@ -146,7 +146,7 @@ class AllocatorBase: public IContainerRef
     /** Get the element number pos.
      *  @param pos the position of the element we get 
      **/
-    Type& data(int pos)
+    inline Type& data(int pos)
     {
 #ifdef STK_BOUNDS_CHECK
       if (pos < firstData())

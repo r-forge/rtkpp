@@ -326,6 +326,8 @@ class GammaBridge: public IMixtureBridge< GammaBridge<Id,Data> >
     typedef IMixtureBridge< GammaBridge<Id,Data> > Base;
     // type of Mixture
     typedef typename hidden::MixtureBridgeTraits< GammaBridge<Id,Data> >::Mixture Mixture;
+    typedef typename hidden::MixtureBridgeTraits< GammaBridge<Id,Data> >::ParamHandler ParamHandler;
+    typedef typename hidden::MixtureBridgeTraits< GammaBridge<Id,Data> >::Parameters Parameters;
     // type of data
     typedef typename Data::Type Type;
     // class of mixture
@@ -333,12 +335,10 @@ class GammaBridge: public IMixtureBridge< GammaBridge<Id,Data> >
     {
       idMixtureClass_ = Clust::Gamma_
     };
-    // parameters type to get
-    typedef typename Clust::MixtureTraits<Mixture>::Param Param;
-
     typedef std::vector<std::pair<int,int> >::const_iterator ConstIterator;
     using Base::mixture_;
     using Base::p_data_;
+    using Base::p_tik;
 
     /** default constructor. Remove the missing values from the data set and
      *  initialize the mixture by setting the data set.
@@ -374,11 +374,14 @@ class GammaBridge: public IMixtureBridge< GammaBridge<Id,Data> >
       p_bridge->mixture_.setData(p_bridge->p_data_->dataij());
       return p_bridge;
     }
-    /** This function is used in order to get the current values of the
-     *  parameters.
+    /** This function is used in order to get the current values of the parameters.
      *  @param params the array with the parameters of the mixture.
      */
-    virtual void getParameters(ArrayXX& params) const;
+    void getParameters(Parameters& params) const;
+    /** This function can be used to write summary of parameters to the output stream.
+     *  @param os Stream where you want to write the summary of parameters.
+     */
+    virtual void writeParameters(ostream& os) const;
 
   private:
     /** This function will be used for the imputation of the missing data
@@ -419,7 +422,7 @@ void GammaBridge<Id, Data>::removeMissing()
 }
 
 template<int Id, class Data>
-void GammaBridge<Id, Data>::getParameters(ArrayXX& params) const
+void GammaBridge<Id, Data>::getParameters(Parameters& params) const
 {
   int nbClust = this->nbCluster();
   params.resize(2*nbClust, mixture_.p_data()->cols());
@@ -432,6 +435,25 @@ void GammaBridge<Id, Data>::getParameters(ArrayXX& params) const
     }
   }
 }
+
+template<int Id, class Data>
+void GammaBridge<Id, Data>::writeParameters(ostream& os) const
+{
+    Array2DPoint<Real> a(mixture_.p_data()->cols()), b(mixture_.p_data()->cols());
+    for (int k= p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
+    {
+      // store shape and scale values in an array for a nice output
+      for (int j=mixture_.p_data()->beginCols();  j < mixture_.p_data()->endCols(); ++j)
+      {
+        a[j] = mixture_.shape(k,j);
+        b[j] = mixture_.scale(k,j);
+      }
+      os << _T("---> Component ") << k << _T("\n");
+      os << _T("shape = ") << a;
+      os << _T("scale = ") << b;
+    }
+}
+
 
 } // namespace STK
 

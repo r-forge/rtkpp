@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004  Serge Iovleff
+/*     Copyright (C) 2004-2014  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -35,21 +35,19 @@
 #define STK_LINEARAAMODEL_H
 
 #include "STK_GaussianAAModel.h"
-#include "Sdk/include/STK_IRunner.h"
-#include "Reduct/include/STK_ILinearReduct.h"
-#include "Regress/include/STK_MultidimRegression.h"
-#include "Arrays/include/STK_Array2D.h"
-#include "Arrays/include/STK_Array2DSquare.h"
-#include "Arrays/include/STK_Array2D_Functors.h"
+#include <Sdk/include/STK_IRunner.h>
+#include <Reduct/include/STK_ILinearReduct.h>
+#include <Regress/include/STK_MultidimRegression.h>
+#include <Arrays/include/STK_Array2D.h>
+#include <Arrays/include/STK_Array2DSquare.h>
+#include <Arrays/include/STK_Array2D_Functors.h>
+#include <Algebra/include/STK_GramSchmidt.h>
+#include <STatistiK/include/STK_Law_Normal.h>
 
 #ifdef STK_AAMODELS_VERBOSE
-#include "Arrays/include/STK_Display.h"
+#include <Arrays/include/STK_Display.h>
 #endif
 
-#include "Algebra/include/STK_GramSchmidt.h"
-#include "STatistiK/include/STK_Law_Normal.h"
-
-#include "../include/STK_LinearAAModel.h"
 
 namespace STK
 {

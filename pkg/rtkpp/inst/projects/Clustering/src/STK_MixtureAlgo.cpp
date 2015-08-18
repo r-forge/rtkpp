@@ -65,8 +65,8 @@ bool CEMAlgo::run()
 #endif
         return false;
       }
-      p_model_->pStep();
       p_model_->imputationStep();
+      p_model_->pStep();
       p_model_->mStep();
       Real nb = p_model_->eStep();
       if (nb<threshold_)
@@ -108,6 +108,7 @@ bool CEMAlgo::run()
 bool EMAlgo::run()
 {
 #ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("----------------------------\n");
   stk_cout << _T("Entering EMAlgo::run() with:\n")
            << _T("nbIterMax_ = ") << nbIterMax_ << _T("\n")
            << _T("epsilon_ = ") << epsilon_ << _T("\n");
@@ -119,8 +120,8 @@ bool EMAlgo::run()
     int iter;
     for (iter = 0; iter < nbIterMax_; iter++)
     {
-      p_model_->pStep();
       p_model_->imputationStep();
+      p_model_->pStep();
       p_model_->mStep();
       Real nb = p_model_->eStep();
       if (nb<threshold_)
@@ -163,7 +164,7 @@ bool EMAlgo::run()
 bool SEMAlgo::run()
 {
 #ifdef STK_MIXTURE_VERY_VERBOSE
-  stk_cout << _T("---------------------------------\n");
+  stk_cout << _T("-----------------------------\n");
   stk_cout << _T("Entering SEMAlgo::run() with:\n")
            << _T("nbIterMax_ = ") << nbIterMax_ << _T("\n")
            << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
@@ -200,7 +201,7 @@ bool SEMAlgo::run()
       p_model_->storeIntermediateResults(iter+1); // store current parameters
     }
 #ifdef STK_MIXTURE_VERBOSE
-    stk_cout << _T("In SEMAlgo::run() iteration ") << iter << _T("terminated.\n")
+    stk_cout << _T("In SEMAlgo::run() iterations terminated.\n")
              << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
 #endif
   }
@@ -224,7 +225,7 @@ bool SEMAlgo::run()
   else
   { p_model_->releaseIntermediateResults();}
 #ifdef STK_MIXTURE_VERY_VERBOSE
-  stk_cout << _T("Terminating SEMAlgo::run()\n") << error();
+  stk_cout << _T("Terminating SEMAlgo::run()\n");
   stk_cout << _T("--------------------------\n");
 #endif
   return result;
@@ -236,13 +237,11 @@ bool SemiSEMAlgo::run()
   stk_cout << _T("---------------------------------\n");
   stk_cout << _T("Entering SemiSEMAlgo::run() with:\n")
            << _T("nbIterMax_ = ") << nbIterMax_ << _T("\n")
-           << _T("epsilon_ = ")  << epsilon_ << _T("\n")
            << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
 #endif
   bool result = true;
   try
   {
-//    Real currentLnLikelihood = p_model_->lnLikelihood();
     int iter;
     for (iter = 0; iter < nbIterMax_; ++iter)
     {
@@ -286,8 +285,193 @@ bool SemiSEMAlgo::run()
   else
   { p_model_->releaseIntermediateResults();}
 #ifdef STK_MIXTURE_VERY_VERBOSE
-  stk_cout << _T("Terminating SemiSEMAlgo::run()\n") << error();
+  stk_cout << _T("Terminating SemiSEMAlgo::run()\n");
   stk_cout << _T("------------------------------\n");
+#endif
+  return result;
+}
+
+bool EMPredict::run()
+{
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("-------------------------------\n");
+  stk_cout << _T("Entering EMPredict::run() with:\n")
+           << _T("nbIterMax_ = ") << nbIterMax_ << _T("\n")
+           << _T("epsilon_ = ") << epsilon_ << _T("\n");
+#endif
+  bool result = true;
+  try
+  {
+    Real currentLnLikelihood = p_model_->lnLikelihood();
+    int iter;
+    for (iter = 0; iter < nbIterMax_; iter++)
+    {
+      p_model_->imputationStep();
+      Real nb = p_model_->eStep();
+      if (nb<threshold_)
+      {
+        msg_error_ = STKERROR_1ARG(EMPredict::run,nb,Not enough individuals after eStep\n);
+#ifdef STK_MIXTURE_VERBOSE
+        stk_cout << _T("An error occur in SEMPredict::run():\n") << msg_error_ << _T("\n");
+#endif
+        result = false;
+        break;
+      }
+      Real lnLikelihood = p_model_->lnLikelihood();
+      // no abs as the likelihood should increase
+      if ( (lnLikelihood - currentLnLikelihood) < epsilon_)
+      {
+#ifdef STK_MIXTURE_VERY_VERBOSE
+        stk_cout << _T("Terminating EMPredict::run() with:\n")
+                 << _T("iter = ") << iter << _T("\n")
+                 << _T("delta = ") << lnLikelihood - currentLnLikelihood << _T("\n");
+#endif
+        break;
+      }
+      currentLnLikelihood = lnLikelihood;
+    }
+#ifdef STK_MIXTURE_VERBOSE
+    stk_cout << _T("In EMPredict::run() iteration ") << iter << _T("terminated.\n")
+             << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
+#endif
+  }
+  catch (Clust::exceptions const& error)
+  {
+    msg_error_ = Clust::exceptionToString(error);
+#ifdef STK_MIXTURE_VERBOSE
+    stk_cout << _T("An error occur in EMPredict::run():\n") << msg_error_ << _T("\n");
+#endif
+    result = false;
+  }
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("Terminating EMAlgo::run()\n");
+  stk_cout << _T("-------------------------\n");
+#endif
+  return result;
+}
+
+bool SEMPredict::run()
+{
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("--------------------------------\n");
+  stk_cout << _T("Entering SEMPredict::run() with:\n")
+           << _T("nbIterMax_ = ") << nbIterMax_ << _T("\n")
+           << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
+#endif
+  bool result = true;
+  try
+  {
+    int iter;
+    for (iter = 0; iter < nbIterMax_; ++iter)
+    {
+      Real nb = p_model_->sStep(); // simulate labels
+      if (nb<threshold_)
+      {
+        msg_error_ = STKERROR_1ARG(SEMPredict::run,nb,Not enough individuals after sStep\n);
+#ifdef STK_MIXTURE_VERBOSE
+        stk_cout << _T("An error occur in SEMPredict::run():\n") << msg_error_ << _T("\n");
+#endif
+        result = false;
+        break;
+      }
+      p_model_->samplingStep(); // simulate missing values
+      nb = p_model_->eStep();   // update tik and lnLikelihood
+      if (nb<threshold_)
+      {
+        msg_error_ = STKERROR_1ARG(SEMPredict::run,nb,Not enough individuals after eStep\n);
+#ifdef STK_MIXTURE_VERBOSE
+        stk_cout << _T("An error occur in SEMPredict::run():\n") << msg_error_ << _T("\n");
+#endif
+        return false;
+        break;
+      }
+      p_model_->storeIntermediateResults(iter+1); // store current parameters
+    }
+#ifdef STK_MIXTURE_VERBOSE
+    stk_cout << _T("In SEMPredict::run() iterations terminated.\n")
+             << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
+#endif
+  }
+  catch (Clust::exceptions const& error)
+  {
+    msg_error_ = Clust::exceptionToString(error);
+#ifdef STK_MIXTURE_VERBOSE
+    stk_cout << _T("An error occur in SEMPredict::run(): ") << msg_error_ << _T("\n");
+#endif
+    result = false;
+  }
+  if (result)
+  {
+    // set averaged parameters
+    p_model_->setParameters();
+#ifdef STK_MIXTURE_VERY_VERBOSE
+    stk_cout << _T("\nIn SEMAlgo::run(), setParameters done.\n")
+             << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
+#endif
+  }
+  else
+  { p_model_->releaseIntermediateResults();}
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("Terminating SEMAlgo::run()\n");
+  stk_cout << _T("--------------------------\n");
+#endif
+  return result;
+}
+
+bool SemiSEMPredict::run()
+{
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("---------------------------------\n");
+  stk_cout << _T("Entering SemiSEMAlgo::run() with:\n")
+           << _T("nbIterMax_ = ") << nbIterMax_ << _T("\n")
+           << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
+#endif
+  bool result = true;
+  try
+  {
+    int iter;
+    for (iter = 0; iter < nbIterMax_; ++iter)
+    {
+      p_model_->samplingStep();
+      Real nb = p_model_->eStep();
+      if (nb<threshold_)
+      {
+        msg_error_ = STKERROR_1ARG(SemiSEMPredict::run,nb,Not enough individuals after eStep\n);
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("An exception occur in SemiSEMPredict::run(): ") << msg_error_ << _T("\n");
+#endif
+        result = false;
+        break;
+      }
+      p_model_->storeIntermediateResults(iter+1); // store current parameters
+    }
+#ifdef STK_MIXTURE_VERBOSE
+    stk_cout << _T("In SemiSEMPredict::run() iterations terminated.\n")
+             << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
+#endif
+  }
+  catch (Clust::exceptions const& error)
+  {
+    msg_error_ = Clust::exceptionToString(error);
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("An exception occur in SemiSEMPredict::run(): ") << msg_error_ << _T("\n");
+#endif
+    result = false;
+  }
+  // set averaged parameters
+  if (result)
+  {
+    p_model_->setParameters();
+#ifdef STK_MIXTURE_VERY_VERBOSE
+    stk_cout << _T("\nIn SemiSEMPredict::run(), setParameters done.\n")
+             << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
+#endif
+  }
+  else
+  { p_model_->releaseIntermediateResults();}
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("Terminating SemiSEMPredict::run()\n");
+  stk_cout << _T("---------------------------------\n");
 #endif
   return result;
 }

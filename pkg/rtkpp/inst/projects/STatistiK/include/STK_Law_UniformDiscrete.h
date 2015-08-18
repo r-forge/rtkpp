@@ -36,6 +36,7 @@
 #define STK_LAW_UNIFORMDISCRETE_H
 
 #include "STK_Law_IUnivLaw.h"
+#include "../include/STK_Law_Util.h"
 #include <STKernel/include/STK_Integer.h>
 #include <Sdk/include/STK_Macros.h>
 
@@ -147,6 +148,95 @@ class UniformDiscrete : public IUnivLaw<int>
   private:
     Real n_;
 };
+
+/* Generate a pseudo UniformDiscrete random variate. */
+inline int UniformDiscrete::rand() const
+{ return a_ + int(generator.rand(double(b_ - a_)));}
+/* Give the value of the pdf at x.
+ *  @param x a real value
+ **/
+inline Real UniformDiscrete::pdf( int const& x) const
+{
+  if (!Arithmetic<Real>::isFinite(x) ) return x;
+  if ((x < a_)||(x > b_)) return 0.;
+  return 1./n_;
+}
+/* Give the value of the log-pdf at x.
+ *  @param x a real value
+ **/
+inline Real UniformDiscrete::lpdf( int const& x) const
+{
+  if (!Arithmetic<Real>::isFinite(x) ) return x;
+  if ((x < a_)||(x > b_)) return -Arithmetic<Real>::infinity();
+  return -std::log(n_);
+}
+/* The cumulative distribution function is
+ * \f[
+ *  F(t; a,b)= \frac{t - a}{b-a}
+ * \f]
+ *  @param t a real value
+ **/
+inline Real UniformDiscrete::cdf( Real const& t) const
+{
+  if (!Arithmetic<Real>::isFinite(t) ) return t;
+  if (t <= a_) return 0.;
+  if (t >= b_) return 1.;
+  return (b_ - (int)t)/n_;
+}
+
+/* The inverse cumulative distribution function is
+ * \f[
+ * F^{-1}(p; \lambda) = p (b-a) + a.
+ * \f]
+ *  @param p a probability
+ **/
+inline int UniformDiscrete::icdf( Real const& p) const
+{
+  // check parameter
+  if ((p > 1.) || (p < 0.))
+    STKDOMAIN_ERROR_1ARG(Exponential::icdf,p,invalid argument);
+
+  if (!Arithmetic<Real>::isFinite(p) ) return p;
+  if (p == 1.) return b_;
+  if (p == 0.) return a_;
+  return(int)((1.-p) * a_ + p * b_);
+}
+
+/* Generate a pseudo UniformDiscrete random variate with the specified
+ *  parameter.
+ *  @param scale the scale of the distribution
+ **/
+inline int UniformDiscrete::rand( int a, int b)
+{ return a + int(generator.rand(double(b - a)));}
+
+/* Give the value of the pdf at x.
+ *  @param x a real value
+ *  @param scale the scale of the distribution
+ **/
+inline Real UniformDiscrete::pdf( Real const& x, int a, int b)
+{
+  if (!Arithmetic<Real>::isFinite(x) ) return x;
+  if ((x < a)||(x > b)) return 0.;
+  return 1./(b-a);
+}
+
+/* Give the value of the log-pdf at x.
+ *  @param x a real value
+ *  @param scale the scale of the distribution
+ **/
+inline Real UniformDiscrete::lpdf( Real const& x, int a, int b)
+{
+  if (!Arithmetic<Real>::isFinite(x) ) return x;
+  if ((x < a)||(x > b)) return -Arithmetic<Real>::infinity();
+  return -std::log(b-a);
+}
+
+inline Real UniformDiscrete::cdf(const Real& t, int a, int b)
+{ return (b - t)/(b-a);}
+
+
+int UniformDiscrete::icdf(const Real& p, int a, int b)
+{ return (int)((1.-p) * a + p * b);}
 
 } // namespace Law
 

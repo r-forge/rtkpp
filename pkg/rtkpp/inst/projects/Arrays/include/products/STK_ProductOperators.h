@@ -470,15 +470,15 @@ class ArrayByDiagonalProduct : public ExprBase< ArrayByDiagonalProduct<Lhs, Rhs>
       { STKRUNTIME_ERROR_NO_ARG(ArrayByDiagonalProduct, sizes mismatch);}
     }
     /**  @return the range of the rows */
-    RowRange const& rowsImpl() const { return lhs_.rows();}
+    inline RowRange const& rowsImpl() const { return lhs_.rows();}
     /** @return the columns range */
-    ColRange const& colsImpl() const { return rhs_.cols();}
+    inline ColRange const&colsImpl() const { return rhs_.cols();}
 
-    ReturnType elt2Impl(int i, int j) const { return lhs_.elt(i,j)*rhs_.elt(j);}
+    inline ReturnType elt2Impl(int i, int j) const { return lhs_.elt(i,j)*rhs_.elt(j);}
     /** access to the ith element */
-    ReturnType elt1Impl(int i) const { return lhs_.elt(i)*rhs_.elt(i);}
+    inline ReturnType elt1Impl(int i) const { return lhs_.elt(i)*rhs_.elt(i);}
     /** access to the element */
-    ReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
+    inline ReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
 
     /** @return the left hand side expression */
     Lhs const& lhs() const { return lhs_; }
@@ -519,16 +519,16 @@ class DiagonalByArrayProduct : public ExprBase< DiagonalByArrayProduct<Lhs, Rhs>
       { STKRUNTIME_ERROR_NO_ARG(DiagonalByArrayProduct, sizes mismatch);}
     }
     /**  @return the range of the rows */
-    RowRange const& rowsImpl() const { return lhs_.rows();}
+    inline RowRange const& rowsImpl() const { return lhs_.rows();}
     /** @return the columns range */
-    ColRange const& colsImpl() const { return rhs_.cols();}
+    inline ColRange const&colsImpl() const { return rhs_.cols();}
 
     /** access to the element (i,j) */
-    ReturnType elt2Impl(int i, int j) const { return lhs_.elt(i)*rhs_.elt(i,j);}
+    inline ReturnType elt2Impl(int i, int j) const { return lhs_.elt(i)*rhs_.elt(i,j);}
     /** access to the ith element */
-    ReturnType elt1Impl(int i) const { return lhs_.elt(i)*rhs_.elt(i);}
+    inline ReturnType elt1Impl(int i) const { return lhs_.elt(i)*rhs_.elt(i);}
     /** access to the element */
-    ReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
+    inline ReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
 
     /** @return the left hand side expression */
     Lhs const& lhs() const { return lhs_; }
@@ -573,16 +573,16 @@ class PointByArrayProduct : public ExprBase< PointByArrayProduct<Lhs, Rhs> >
       hidden::ProductDispatcher<Lhs, Rhs, Allocator>::run(lhs, rhs, result_);
     }
     /**  @return the range of the rows */
-    RowRange const& rowsImpl() const { return result_.rows();}
+    inline RowRange const& rowsImpl() const { return result_.rows();}
     /** @return the columns range */
-    ColRange const& colsImpl() const { return result_.cols();}
+    inline ColRange const&colsImpl() const { return result_.cols();}
 
     /** @return the element (i,j) */
-    ReturnType elt2Impl(int i, int j) const { return result_.elt(i, j);}
+    inline ReturnType elt2Impl(int i, int j) const { return result_.elt(i, j);}
     /** @return the ith element */
-    ReturnType elt1Impl(int i) const { return result_.elt(i);}
+    inline ReturnType elt1Impl(int i) const { return result_.elt(i);}
     /** @return the element */
-    ReturnType elt0Impl() const { return result_.elt();}
+    inline ReturnType elt0Impl() const { return result_.elt();}
 
     /** @return the left hand side expression */
     Lhs const& lhs() const { return lhs_; }
@@ -633,16 +633,16 @@ class ArrayByVectorProduct : public ExprBase< ArrayByVectorProduct<Lhs, Rhs> >
       hidden::ProductDispatcher<Lhs, Rhs, Allocator>::run(lhs, rhs, result_);
     }
     /**  @return the range of the rows */
-    RowRange const& rowsImpl() const { return result_.rows();}
+    inline RowRange const& rowsImpl() const { return result_.rows();}
     /** @return the columns range */
-    ColRange const& colsImpl() const { return result_.cols();}
+    inline ColRange const&colsImpl() const { return result_.cols();}
 
     /** @return the element (i,j) */
-    ReturnType elt2Impl(int i, int j) const { return result_.elt(i, j);}
+    inline ReturnType elt2Impl(int i, int j) const { return result_.elt(i, j);}
     /** @return the ith element */
-    ReturnType elt1Impl(int i) const { return result_.elt(i);}
+    inline ReturnType elt1Impl(int i) const { return result_.elt(i);}
     /** @return the element */
-    ReturnType elt0Impl() const { return result_.elt();}
+    inline ReturnType elt0Impl() const { return result_.elt();}
 
     /** @return the left hand side expression */
     Lhs const& lhs() const { return lhs_; }
@@ -685,14 +685,14 @@ class VectorByPointProduct : public ExprBase< VectorByPointProduct<Lhs, Rhs> >
                                : Base(), lhs_(lhs), rhs_(rhs)
     {}
     /**  @return the range of the rows */
-    RowRange const& rowsImpl() const { return lhs_.rows();}
+    inline RowRange const& rowsImpl() const { return lhs_.rows();}
     /** @return the columns range */
-    ColRange const& colsImpl() const { return rhs_.cols();}
+    inline ColRange const&colsImpl() const { return rhs_.cols();}
 
     /** @return the element (i,j) */
-    ReturnType elt2Impl(int i, int j) const { return lhs_.elt(i)*rhs_.elt(j);}
+    inline ReturnType elt2Impl(int i, int j) const { return lhs_.elt(i)*rhs_.elt(j);}
     /** @return the element */
-    ReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
+    inline ReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
 
     /** @return the left hand side expression */
     Lhs const& lhs() const { return lhs_; }
@@ -750,9 +750,9 @@ class ArrayByArrayProduct : public ArrayByArrayProductBase< Lhs, Rhs >, public T
                 : hidden::ProductDispatcher<Lhs, Rhs, Allocator>::runbp(lhs, rhs, result_);
     }
     /**  @return the range of the rows */
-    RowRange const& rowsImpl() const { return lhs_.rows();}
+    inline RowRange const& rowsImpl() const { return lhs_.rows();}
     /** @return the columns range */
-    ColRange const& colsImpl() const { return rhs_.cols();}
+    inline ColRange const&colsImpl() const { return rhs_.cols();}
 
     /** @return the left hand side expression */
     Lhs const& lhs() const { return lhs_; }

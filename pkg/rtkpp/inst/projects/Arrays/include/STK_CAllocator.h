@@ -137,7 +137,7 @@ class OrientedCAllocator<Derived, Arrays::by_col_>: public ITContainer2D<Derived
     { if (!ref) allocator_.copy(A.allocator_);}
     /** Reference constructor */
     template<class OtherDerived>
-    OrientedCAllocator( OrientedCAllocator<OtherDerived, Arrays::by_col_> const& A
+    inline OrientedCAllocator( OrientedCAllocator<OtherDerived, Arrays::by_col_> const& A
                              , Range const& I, Range const& J)
                              : Base(I, J), ldx_(A.ldx()), allocator_(A.allocator(), true)  {}
     /** wrapper constructor for 0 based C-Array*/
@@ -149,11 +149,11 @@ class OrientedCAllocator<Derived, Arrays::by_col_>: public ITContainer2D<Derived
     ~OrientedCAllocator() {}
 
   public:
-    Type* p_data() { return allocator_.p_data();}
-    Type const* p_data() const { return allocator_.p_data();}
+    inline Type* p_data() { return allocator_.p_data();}
+    inline Type const* p_data() const { return allocator_.p_data();}
     bool isRef() const { return allocator_.isRef();}
-    Allocator& allocator() { return allocator_;}
-    Allocator const& allocator() const { return allocator_;}
+    inline Allocator& allocator() { return allocator_;}
+    inline Allocator const& allocator() const { return allocator_;}
 
     /** @return the index of the allocator*/
     int ldx() const { return ldx_;}
@@ -249,7 +249,7 @@ class OrientedCAllocator<Derived, Arrays::by_row_>: public ITContainer2D<Derived
     { if (!ref) allocator_.copy(A.allocator_);}
     /** Reference constructor */
     template<class OtherDerived>
-    OrientedCAllocator( OrientedCAllocator<OtherDerived, Arrays::by_row_> const& A
+    inline OrientedCAllocator( OrientedCAllocator<OtherDerived, Arrays::by_row_> const& A
                              , Range const& I, Range const& J)
                              : Base(I, J), ldx_(A.ldx()), allocator_(A.allocator(), true)
     {}
@@ -262,11 +262,11 @@ class OrientedCAllocator<Derived, Arrays::by_row_>: public ITContainer2D<Derived
     ~OrientedCAllocator() {}
 
   public:
-    Type* p_data() { return allocator_.p_data();}
-    Type const* p_data() const { return allocator_.p_data();}
+    inline Type* p_data() { return allocator_.p_data();}
+    inline Type const* p_data() const { return allocator_.p_data();}
     bool isRef() const { return allocator_.isRef();}
-    Allocator& allocator() { return allocator_;}
-    Allocator const& allocator() const { return allocator_;}
+    inline Allocator& allocator() { return allocator_;}
+    inline Allocator const& allocator() const { return allocator_;}
 
     /** @return the index of the allocator*/
     int ldx() const { return ldx_;}
@@ -356,7 +356,7 @@ class StructuredCAllocator: public OrientedCAllocator<Derived, hidden::Traits<De
     StructuredCAllocator( StructuredCAllocator const& A, bool ref): Base(A, ref) {}
     /** Reference constructor */
     template<class OtherDerived, int OtherSizeRows_, int OtherSizeCols_>
-    StructuredCAllocator( StructuredCAllocator<OtherDerived, OtherSizeRows_, OtherSizeCols_> const& A
+    inline StructuredCAllocator( StructuredCAllocator<OtherDerived, OtherSizeRows_, OtherSizeCols_> const& A
                                , Range const& I, Range const& J)
                                : Base(A, I, J)
     {}
@@ -423,7 +423,7 @@ class StructuredCAllocator<Derived, 1, SizeCols_>
     {}
     /** Reference constructor */
     template<class OtherDerived, int OtherSizeRows_, int OtherSizeCols_>
-    StructuredCAllocator( StructuredCAllocator<OtherDerived, OtherSizeRows_, OtherSizeCols_> const& A
+    inline StructuredCAllocator( StructuredCAllocator<OtherDerived, OtherSizeRows_, OtherSizeCols_> const& A
                                , Range const& I, Range const& J)
                                : Base(A, I, J), row_(I.begin())
     {}
@@ -518,7 +518,7 @@ class StructuredCAllocator<Derived, SizeRows_, 1>
     {}
     /** Reference constructor */
     template<class OtherDerived, int OtherSizeRows_, int OtherSizeCols_>
-    StructuredCAllocator( StructuredCAllocator<OtherDerived, OtherSizeRows_, OtherSizeCols_> const& A
+    inline StructuredCAllocator( StructuredCAllocator<OtherDerived, OtherSizeRows_, OtherSizeCols_> const& A
                                , Range const& I, Range const& J)
                                : Base(A, I, J)
                                , col_(J.begin())
@@ -616,7 +616,7 @@ class StructuredCAllocator<Derived, 1, 1>
     {}
     /** Reference constructor */
     template<class OtherDerived, int OtherSizeRows_, int OtherSizeCols_>
-    StructuredCAllocator( StructuredCAllocator<OtherDerived, OtherSizeRows_, OtherSizeCols_> const& A
+    inline StructuredCAllocator( StructuredCAllocator<OtherDerived, OtherSizeRows_, OtherSizeCols_> const& A
                                , Range const& I, Range const& J)
                                : Base(A, I, J)
                                , row_(I.begin()), col_(J.begin())
@@ -700,7 +700,7 @@ class CAllocator: public StructuredCAllocator<CAllocator<Type_, SizeRows_, SizeC
     CAllocator( CAllocator const& A, bool ref = true): Base(A, ref)
     { if (!ref) { allocator_.copy(A.allocator_);} }
     template< int OtherSizeRows_, int OtherSizeCols_>
-    CAllocator( CAllocator<Type, OtherSizeRows_, OtherSizeCols_, Orient_> const& A
+    inline CAllocator( CAllocator<Type, OtherSizeRows_, OtherSizeCols_, Orient_> const& A
                      , Range const& I, Range const& J)
                      : Base(A, I, J)
     {}
@@ -760,7 +760,7 @@ class CAllocator<Type_, UnknownSize, UnknownSize, Orient_>
      *  @param I,J range of the rows and columns to wrap.
      **/
     template< int OtherSizeRows_, int OtherSizeCols_>
-    CAllocator( CAllocator<Type, OtherSizeRows_, OtherSizeCols_, Orient_> const& A
+    inline CAllocator( CAllocator<Type, OtherSizeRows_, OtherSizeCols_, Orient_> const& A
                      , Range const& I, Range const& J)
                      : Base(A, I, J)
     {}
@@ -841,7 +841,7 @@ class CAllocator<Type_, SizeRows_, UnknownSize, Orient_>
                      : Base(A, ref)
     { if (!ref) { allocator_.copy(A.allocator_);}}
     template< int OtherSizeRows_, int OtherSizeCols_>
-    CAllocator( CAllocator<Type, OtherSizeRows_, OtherSizeCols_, Orient_> const& A
+    inline CAllocator( CAllocator<Type, OtherSizeRows_, OtherSizeCols_, Orient_> const& A
                      , Range const& I, Range const& J)
                      : Base(A, I, J)
     {}
@@ -917,7 +917,7 @@ class CAllocator<Type_, UnknownSize, SizeCols_, Orient_>
 
     /** wrap other allocator */
     template< int OtherSizeRows_, int OtherSizeCols_>
-    CAllocator( CAllocator<Type, OtherSizeRows_, OtherSizeCols_, Orient_> const& A
+    inline CAllocator( CAllocator<Type, OtherSizeRows_, OtherSizeCols_, Orient_> const& A
                      , Range const& I, Range const& J)
                      : Base(A, I, J)
     {}

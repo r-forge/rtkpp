@@ -81,6 +81,9 @@ struct MixtureParameters
                           : param_(param.param_)
                           , stat_param_(param.stat_param_)
   {}
+  /** copy operator */
+  inline MixtureParameters& operator=( MixtureParameters const& other)
+  { param_ = other.param_; return *this; }
   /** get all parameters */
   inline TypeParam const&  operator()() const { return param_;}
   /** get parameters */

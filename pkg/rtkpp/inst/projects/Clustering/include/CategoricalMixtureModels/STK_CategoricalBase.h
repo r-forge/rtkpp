@@ -44,6 +44,18 @@ namespace STK
 {
 
 /** @ingroup Clustering
+ *  Base class for the categorical models Parameter Handler
+ **/
+template<class Derived>
+struct CategoricalHandlerBase: public IRecursiveTemplate<Derived>
+{
+  /** @return the probability of the kth cluster, jth variable, lth modality */
+  inline Real const& proba(int k, int j, int l) const { return this->asDerived().probaImpl(k,j,l);}
+  /** @return the probability of the kth cluster for the jth variable */
+  inline VectorX proba(int k, int j) const { return this->asDerived().probaImpl(k,j);}
+};
+
+/** @ingroup Clustering
  *  Base class for the Categorical models
  **/
 template<class Derived>
@@ -71,17 +83,17 @@ class CategoricalBase : public IMixtureModel<Derived >
     /** @return the array with the number of modalities of each columns in data set */
     inline PointXi const& nbModalities() const { return nbModalities_;}
     /** @return the range of the modalities */
-    inline Range  const& modalities() const { return modalities_;}
+    inline Range const& modalities() const { return modalities_;}
     /** @return the probability of the kth cluster, jth variable, lth modality */
-    inline Real proba(int k, int j, int l) const { return this->asDerived().probaImpl(k,j,l);}
+    inline Real proba(int k, int j, int l) const { return param_.probaImpl(k,j,l);}
     /** @return the probability of the kth cluster for the jth variable */
-    inline VectorX proba(int k, int j) const { return this->asDerived().probaImpl(k,j);}
+    inline VectorX proba(int k, int j) const { return param_.probaImpl(k,j);}
     /** Initialize the model. Resize the probability arrays of each component.*/
     void initializeModelImpl()
     {
       // compute the maximal number of modalities
       nbModalities_.resize(p_data()->cols());
-      int amin = Arithmetic<int>::max(), amax = Arithmetic<Real>::min();
+      int amin = Arithmetic<int>::max(), amax = Arithmetic<int>::min();
       for (int j= p_data()->beginCols(); j < p_data()->endCols(); ++j)
       {
         int min = p_data()->col(j).minElt(), max = p_data()->col(j).maxElt();
@@ -101,26 +113,6 @@ class CategoricalBase : public IMixtureModel<Derived >
      * @param i,j,k indexes of the data to simulate */
     inline Real rand(int i, int j, int k) const
     { return Law::Categorical::rand(proba(k,j));}
-    /** get the parameters of the model in an array of size (K * L) * d.
-     *  @param params the parameters of the model
-     **/
-    void getParameters(ArrayXX& params) const;
-    /** Write the parameters on the output stream os */
-    void writeParameters(ostream& os) const
-    {
-      ArrayXX p(modalities_, p_data()->cols());
-      for (int k= p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
-      {
-        // store proba values in an array for a nice output
-        for (int j= p.beginCols();  j < p.endCols(); ++j)
-        {
-          for (int l= modalities_.begin(); l < modalities_.end(); ++l)
-          { p(l, j) = proba(k,j,l);}
-        }
-        os << _T("---> Component ") << k << _T("\n");
-        os << _T("probabilities =\n") << p  << _T("\n");
-      }
-    }
 
   protected:
     /** Array with the number of modalities of each columns of the data set */
@@ -145,26 +137,6 @@ int CategoricalBase<Derived>::impute(int i, int j) const
     if (pmax < p) { pmax = p; lmax = l;}
   }
   return lmax;
-}
-
-/* get the parameters of the model
- *  @param params the parameters of the model
- **/
-template<class Derived>
-void CategoricalBase<Derived>::getParameters(ArrayXX& params) const
-{
-  int nbCluster    = this->nbCluster();
-  int nbModalities = modalities_.size();
-
-  params.resize(nbModalities * nbCluster, p_data()->cols());
-  for (int k = 0; k < nbCluster; ++k)
-  {
-    for (int j = p_data()->beginCols(); j < p_data()->endCols(); ++j)
-    {
-      for (int l = 0; l < nbModalities; ++l)
-      { params(baseIdx+k * nbModalities + l, j) = proba(baseIdx+k, j, modalities_.begin() + l);}
-    }
-  }
 }
 
 

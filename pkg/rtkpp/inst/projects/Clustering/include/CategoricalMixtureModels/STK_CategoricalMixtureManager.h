@@ -97,10 +97,32 @@ class CategoricalMixtureManager : public IMixtureManager<DataHandler>
       {
         // Categorical models
         case Clust::Categorical_pjk_:
-          { static_cast<MixtureBridge_pjk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_pjk*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Categorical_pk_:
-          { static_cast<MixtureBridge_pk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_pk*>(p_mixture)->getParameters(param);}
+        break;
+        default: // idModel is not implemented
+        break;
+      }
+    }
+    /** set the parameters from an IMixture.
+     *  @param p_mixture pointer on the mixture
+     *  @param param the array with the parameters to set
+     **/
+    virtual void setParameters(IMixture* p_mixture, ArrayXX const& param)
+    {
+      Clust::Mixture idModel = getIdModel(p_mixture->idName());
+      if (idModel == Clust::unknown_mixture_) return;
+      // up-cast... (Yes it's bad....;)...)
+      switch (idModel)
+      {
+        // Categorical models
+        case Clust::Categorical_pjk_:
+        { static_cast<MixtureBridge_pjk*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Categorical_pk_:
+        { static_cast<MixtureBridge_pk*>(p_mixture)->setParameters(param);}
         break;
         default: // idModel is not implemented
         break;

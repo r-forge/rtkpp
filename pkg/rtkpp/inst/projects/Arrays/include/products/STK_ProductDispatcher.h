@@ -52,6 +52,14 @@ template < class Lhs, class Rhs, class Result
          , int RhsStructure_ = hidden::Traits<Rhs>::structure_ >
 struct ProductDispatcher
 {
+  enum
+  {
+    // structure_ = Traits<Result>::structure_,
+    sizeRows_  = Traits<Result>::sizeRows_,
+    sizeCols_  = Traits<Result>::sizeCols_,
+    orient_    = Traits<Result>::orient_,
+    storage_   = Traits<Result>::storage_
+  };
   typedef MultCoefImpl<Lhs, Rhs, Result> MultCoeff;
 
   static void runbp(Lhs const& lhs, Rhs const& rhs, Result& res )
@@ -78,42 +86,84 @@ struct ProductDispatcher
 template <class Lhs, class Rhs, class Result>
 struct ProductDispatcher<Lhs, Rhs, Result, Arrays::array2D_, Arrays::array2D_>
 {
+  enum
+  {
+    structure_ = Arrays::array2D_,
+    sizeRows_  = Traits<Result>::sizeRows_,
+    sizeCols_  = Traits<Result>::sizeCols_,
+    orient_    = Traits<Result>::orient_,
+    storage_   = Traits<Result>::storage_
+  };
   static void runbp(Lhs const& lhs, Rhs const& rhs, Result& res )
-  { bp<Lhs,Rhs,Result>::run(lhs, rhs, res);}
+  { bp<Lhs,Rhs,Result,orient_>::run(lhs, rhs, res);}
   static void runpb(Lhs const& lhs, Rhs const& rhs, Result& res )
-  { pb<Lhs,Rhs,Result>::run(lhs, rhs, res);}
+  { bp<Lhs,Rhs,Result,orient_>::run(lhs, rhs, res);}
 };
 
 template <class Lhs, class Rhs, class Result>
 struct ProductDispatcher<Lhs, Rhs, Result, Arrays::array2D_, Arrays::square_>
 {
+  enum
+  {
+    structure_ = Arrays::array2D_,
+    sizeRows_  = Traits<Result>::sizeRows_,
+    sizeCols_  = Traits<Result>::sizeCols_,
+    orient_    = Traits<Result>::orient_,
+    storage_   = Traits<Result>::storage_
+  };
   static void runbp(Lhs const& lhs, Rhs const& rhs, Result& res )
-  { bp<Lhs,Rhs,Result>::run(lhs, rhs, res);}
+  { bp<Lhs,Rhs,Result,orient_>::run(lhs, rhs, res);}
   static void runpb(Lhs const& lhs, Rhs const& rhs, Result& res )
-  { pb<Lhs,Rhs,Result>::run(lhs, rhs, res);}
+  { bp<Lhs,Rhs,Result,orient_>::run(lhs, rhs, res);}
 };
 
 template <class Lhs, class Rhs, class Result>
 struct ProductDispatcher<Lhs, Rhs, Result, Arrays::square_, Arrays::square_>
 {
+  enum
+  {
+    structure_ = Arrays::square_,
+    sizeRows_  = Traits<Result>::sizeRows_,
+    sizeCols_  = Traits<Result>::sizeCols_,
+    orient_    = Traits<Result>::orient_,
+    storage_   = Traits<Result>::storage_
+  };
   static void runbp(Lhs const& lhs, Rhs const& rhs, Result& res )
-  { bp<Lhs,Rhs,Result>::run(lhs, rhs, res);}
+  {
+    bp<Lhs,Rhs,Result,orient_>::run(lhs, rhs, res);
+  }
   static void runpb(Lhs const& lhs, Rhs const& rhs, Result& res )
-  { pb<Lhs,Rhs,Result>::run(lhs, rhs, res);}
+  { bp<Lhs,Rhs,Result,orient_>::run(lhs, rhs, res);}
 };
 
 template <class Lhs, class Rhs, class Result>
 struct ProductDispatcher<Lhs, Rhs, Result, Arrays::square_, Arrays::array2D_>
 {
+  enum
+  {
+    structure_ = Arrays::array2D_,
+    sizeRows_  = Traits<Result>::sizeRows_,
+    sizeCols_  = Traits<Result>::sizeCols_,
+    orient_    = Traits<Result>::orient_,
+    storage_   = Traits<Result>::storage_
+  };
   static void runbp(Lhs const& lhs, Rhs const& rhs, Result& res )
-  { bp<Lhs,Rhs,Result>::run(lhs, rhs, res);}
+  { bp<Lhs,Rhs,Result, orient_>::run(lhs, rhs, res);}
   static void runpb(Lhs const& lhs, Rhs const& rhs, Result& res )
-  { pb<Lhs,Rhs,Result>::run(lhs, rhs, res);}
+  { bp<Lhs,Rhs,Result,orient_>::run(lhs, rhs, res);}
 };
 
 template <class Lhs, class Rhs, class Result>
 struct ProductDispatcher<Lhs, Rhs, Result, Arrays::array2D_, Arrays::vector_>
 {
+  enum
+  {
+    structure_ = Arrays::vector_,
+    sizeRows_  = Traits<Result>::sizeRows_,
+    sizeCols_  = Traits<Result>::sizeCols_,
+    orient_    = Traits<Result>::orient_,
+    storage_   = Traits<Result>::storage_
+  };
   static void run(Lhs const& lhs, Rhs const& rhs, Result& res )
   { bv<Lhs,Rhs,Result>::run(lhs, rhs, res);}
 };
@@ -121,6 +171,14 @@ struct ProductDispatcher<Lhs, Rhs, Result, Arrays::array2D_, Arrays::vector_>
 template <class Lhs, class Rhs, class Result>
 struct ProductDispatcher<Lhs, Rhs, Result, Arrays::square_, Arrays::vector_>
 {
+  enum
+  {
+    structure_ = Arrays::vector_,
+    sizeRows_  = Traits<Result>::sizeRows_,
+    sizeCols_  = Traits<Result>::sizeCols_,
+    orient_    = Traits<Result>::orient_,
+    storage_   = Traits<Result>::storage_
+  };
   static void run(Lhs const& lhs, Rhs const& rhs, Result& res )
   { bv<Lhs,Rhs,Result>::run(lhs, rhs, res);}
 };
@@ -128,6 +186,14 @@ struct ProductDispatcher<Lhs, Rhs, Result, Arrays::square_, Arrays::vector_>
 template <class Lhs, class Rhs, class Result, int lhsStructure_>
 struct ProductDispatcher<Lhs, Rhs, Result, lhsStructure_, Arrays::vector_>
 {
+  enum
+  {
+    structure_ = Arrays::vector_,
+    sizeRows_  = Traits<Result>::sizeRows_,
+    sizeCols_  = Traits<Result>::sizeCols_,
+    orient_    = Traits<Result>::orient_,
+    storage_   = Traits<Result>::storage_
+  };
   typedef MultCoefImpl<Lhs, Rhs, Result> MultCoeff;
   static void run(Lhs const& lhs, Rhs const& rhs, Result& res )
   {
@@ -140,6 +206,14 @@ struct ProductDispatcher<Lhs, Rhs, Result, lhsStructure_, Arrays::vector_>
 template <class Lhs, class Rhs, class Result, int RhsStructure_>
 struct ProductDispatcher<Lhs, Rhs, Result, Arrays::point_, RhsStructure_>
 {
+  enum
+  {
+    structure_ = Arrays::point_,
+    sizeRows_  = Traits<Result>::sizeRows_,
+    sizeCols_  = Traits<Result>::sizeCols_,
+    orient_    = Traits<Result>::orient_,
+    storage_   = Traits<Result>::storage_
+  };
   typedef MultCoefImpl<Lhs, Rhs, Result> MultCoeff;
   static void run(Lhs const& lhs, Rhs const& rhs, Result& res )
   {
@@ -151,6 +225,14 @@ struct ProductDispatcher<Lhs, Rhs, Result, Arrays::point_, RhsStructure_>
 template <class Lhs, class Rhs, class Result>
 struct ProductDispatcher<Lhs, Rhs, Result, Arrays::point_, Arrays::array2D_>
 {
+  enum
+  {
+    structure_ = Arrays::point_,
+    sizeRows_  = Traits<Result>::sizeRows_,
+    sizeCols_  = Traits<Result>::sizeCols_,
+    orient_    = Traits<Result>::orient_,
+    storage_   = Traits<Result>::storage_
+  };
   static void run(Lhs const& lhs, Rhs const& rhs, Result& res )
   { vb<Lhs,Rhs,Result>::run(lhs, rhs, res);}
 };
@@ -158,6 +240,14 @@ struct ProductDispatcher<Lhs, Rhs, Result, Arrays::point_, Arrays::array2D_>
 template <class Lhs, class Rhs, class Result>
 struct ProductDispatcher<Lhs, Rhs, Result, Arrays::point_, Arrays::square_>
 {
+  enum
+  {
+    structure_ = Arrays::point_,
+    sizeRows_  = Traits<Result>::sizeRows_,
+    sizeCols_  = Traits<Result>::sizeCols_,
+    orient_    = Traits<Result>::orient_,
+    storage_   = Traits<Result>::storage_
+  };
   static void run(Lhs const& lhs, Rhs const& rhs, Result& res )
   { vb<Lhs,Rhs,Result>::run(lhs, rhs, res);}
 };

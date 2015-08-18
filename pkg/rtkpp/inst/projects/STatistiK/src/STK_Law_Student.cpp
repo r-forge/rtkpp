@@ -32,10 +32,9 @@
  *  @brief In this file we implement the Student probability distribution.
  **/
 
-#include "../include/STK_Law_Student.h"
 
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
+#ifndef IS_RTKPP_LIB
+#include "../include/STK_Law_Student.h"
 #endif
 
 namespace STK
@@ -43,20 +42,7 @@ namespace STK
 
 namespace Law
 {
-#ifdef IS_RTKPP_LIB
-
-/*inline*/ Real Student::rand() const{ return R::rt(df_);}
-/*inline*/ Real Student::pdf(Real const& x) const { return R::dt(x, df_, false);}
-/*inline*/ Real Student::lpdf(Real const& x) const { return R::dt(x, df_, true);}
-/*inline*/ Real Student::cdf(Real const& t) const { return R::pt(t, df_, true, false);}
-/*inline*/ Real Student::icdf(Real const& p) const { return R::qt(p, df_, true, false);}
-/*inline*/ Real Student::rand( int df) { return R::rt(df);}
-/*inline*/ Real Student::pdf(Real const& x, int df) { return R::dt(x, df, false);}
-/*inline*/ Real Student::lpdf(Real const& x, int df) { return R::dt(x, df, true);}
-/*inline*/ Real Student::cdf(Real const& t, int df) { return R::pt(t, df, true, false);}
-/*inline*/ Real Student::icdf(Real const& p, int df) { return R::qt(p, df, true, false);}
-
-#else
+#ifndef IS_RTKPP_LIB
 
 /* @return a pseudo Student random variate. */
 Real Student::rand() const

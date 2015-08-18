@@ -110,27 +110,27 @@ class IArray1D  : public ITContainer1D<Derived>
 
   public:
     /**  @return the range of the rows of the container */
-    RowRange const& rows() const  { return this->range();}
+    inline RowRange const& rows() const  { return this->range();}
      /** @return the index of the first element */
-    int beginRows() const { return this->begin();}
+    inline int beginRows() const { return this->begin();}
     /**  @return the ending index of the elements */
-    int endRows() const { return this->end();}
+    inline int endRows() const { return this->end();}
     /**  @return the size of the container */
-    int sizeRows() const  { return this->size();}
+    inline int sizeRows() const  { return this->size();}
 
     /** @return the Horizontal range (1 column) */
     ColRange cols() const { return ColRange(1);}
     /** @return the index of the first column */
-    int beginCols() const { return baseIdx;}
+    inline int beginCols() const { return baseIdx;}
     /**  @return the index of the ending column */
-    int endCols() const  { return baseIdx+1;}
+    inline int endCols() const  { return baseIdx+1;}
     /** @return the number of columns */
-    int sizeCols() const  { return 1;};
+    inline int sizeCols() const  { return 1;};
 
     /**  @return the index of the last element */
-    int lastIdxRows() const  { return this->lastIdx();}
+    inline int lastIdxRows() const  { return this->lastIdx();}
     /**  @return the index of the last element */
-    int lastIdxCols() const  { return baseIdx;}
+    inline int lastIdxCols() const  { return baseIdx;}
 
     /** access to one element.
      *  @param pos index of the element

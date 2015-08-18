@@ -62,7 +62,7 @@ struct Traits< DotProduct < Lhs, Rhs> >
   };
   typedef typename Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
   typedef typename RemoveConst<Type>::Type const& ReturnType;
-  typedef CAllocator<Type, sizeRows_, sizeCols_, (Arrays::Orientation)orient_> Allocator;
+  typedef CAllocator<Type, sizeRows_, sizeCols_, (bool)orient_> Allocator;
 };
 
 } // end namespace hidden
@@ -115,12 +115,12 @@ class DotProduct : public ExprBase< DotProduct<Lhs, Rhs> >
       result_.elt() = lhs.dot(rhs);
     }
     /**  @return the range of the rows */
-    RowRange const& rowsImpl() const { return result_.rows();}
+    inline RowRange const& rowsImpl() const { return result_.rows();}
     /** @return the columns range */
-    ColRange const& colsImpl() const { return result_.cols();}
+    inline ColRange const&colsImpl() const { return result_.cols();}
 
     /** access to the element */
-    ReturnType elt0Impl() const { return result_.elt();}
+    inline ReturnType elt0Impl() const { return result_.elt();}
 
     /** @return the left hand side expression */
     Lhs const& lhs() const { return lhs_; }

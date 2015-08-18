@@ -81,7 +81,7 @@ template <int Id> struct ParametersHandler;
  * @sa IMixtureModelBase, IRecursiveTemplate
  **/
 template<class Derived>
-class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBase
+class IMixtureModel: public IRecursiveTemplate<Derived>, public IMixtureModelBase
 {
   public:
     typedef typename Clust::MixtureTraits<Derived>::Array Array;
@@ -116,8 +116,13 @@ class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBa
     /** @return a pointer on the current data set */
     inline Array const* p_data() const { return p_dataij_;}
     /** @return the parameter handler of the model */
-    inline ParamHandler const& getParameters() const { return param_;}
+    inline ParamHandler const& paramHandler() const { return param_;}
 
+    /** set the parameter handler of the model */
+    inline void setParamHandler(ParamHandler const& param) { param_ = param;}
+    /** set the parmater handler using an array/expression storing the values */
+    template<class Array>
+    inline void setParamHandler(ExprBase<Array> const& param) { param_ = param;}
     /** @brief Set the data set.
      *  Setting a (new) data set will trigger the initialization process of the model.
      *  @param data the data set to set
@@ -179,6 +184,9 @@ class IMixtureModel : public IRecursiveTemplate<Derived>, public IMixtureModelBa
     { return this->asDerived().rand(i, j, Law::Categorical::rand(p_tik()->row(i)));}
 
   protected:
+    /** @return the parameter handler of the model */
+    inline ParamHandler& paramHandler() { return param_;}
+
     /** @brief Initialize the model before its first use.
      * This function is triggered when data set is set.
      * In this interface, the @c initializeModel() method

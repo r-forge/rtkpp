@@ -187,7 +187,7 @@ class TReadWriteCsv
      **/
     inline int sizeRow( int icol) const { return str_data_.at(icol).size();}
     /** @return the first index of the samples. */
-    int beginRows() const
+    inline int beginRows() const
     {
       if (size()<= 0) return baseIdx;
       int retVal = firstRow(begin());
@@ -196,7 +196,7 @@ class TReadWriteCsv
       return retVal;
     }
     /** @return the ending index of the samples. */
-    int endRows() const
+    inline int endRows() const
     {
       if (size()<= 0) return baseIdx;
       int retVal = lastRow(begin());
@@ -205,7 +205,7 @@ class TReadWriteCsv
       return retVal;
     }
     /** @return the size of the samples. */
-    int sizeRows() const
+    inline int sizeRows() const
     {
       if (size()<= 0) return 0;
       int retVal = sizeRow(begin());
@@ -214,7 +214,7 @@ class TReadWriteCsv
       return retVal;
     }
     /** @return the last index of the samples. */
-    int lastIdxRows() const
+    inline int lastIdxRows() const
     {
       if (size()<= 0) return baseIdx-1;
       int retVal = lastRow(begin());

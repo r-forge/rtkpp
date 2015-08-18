@@ -42,11 +42,10 @@
 
 #define STK_CREATE_MIXTURE(Data, Bridge) \
           Data* p_data = new Data(idData); \
-          registerMixtureData(p_data); \
           p_handler()->getData(idData, p_data->dataij_, p_data->nbVariable_ ); \
           p_data->initialize(); \
-          Bridge* p_bridge = new Bridge( p_data, idData, nbCluster);  \
-          return p_bridge;
+          registerMixtureData(p_data); \
+          return new Bridge( p_data, idData, nbCluster);
 
 namespace STK
 {
@@ -82,7 +81,7 @@ class PoissonMixtureManager : public IMixtureManager<DataHandler>
     typedef PoissonBridge<Clust::Poisson_ljlk_, DataInt> MixtureBridge_ljlk;
 
     /** Default constructor, need an instance of a DataHandler.  */
-    PoissonMixtureManager(DataHandler const& handler) : Base(&handler) {}
+    PoissonMixtureManager(DataHandler const& handler): Base(&handler) {}
     /** destructor */
     virtual ~PoissonMixtureManager() {}
     /** get the parameters from an IMixture.
@@ -98,13 +97,38 @@ class PoissonMixtureManager : public IMixtureManager<DataHandler>
       {
         // Poisson models
         case Clust::Poisson_ljk_:
-        { static_cast<MixtureBridge_ljk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_ljk*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Poisson_lk_:
-        { static_cast<MixtureBridge_lk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_lk*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Poisson_ljlk_:
-        { static_cast<MixtureBridge_ljlk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_ljlk*>(p_mixture)->getParameters(param);}
+        break;
+        default: // idModel is not implemented
+        break;
+      }
+    }
+    /** set the parameters to an IMixture.
+     *  @param p_mixture pointer on the mixture
+     *  @param param the array with the parameters to set
+     **/
+    virtual void setParameters(IMixture* p_mixture, ArrayXX const& param) const
+    {
+      Clust::Mixture idModel = getIdModel(p_mixture->idName());
+      if (idModel == Clust::unknown_mixture_) return;
+      // up-cast... (Yes it's bad....;)...)
+      switch (idModel)
+      {
+        // Poisson models
+        case Clust::Poisson_ljk_:
+        { static_cast<MixtureBridge_ljk*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Poisson_lk_:
+        { static_cast<MixtureBridge_lk*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Poisson_ljlk_:
+        { static_cast<MixtureBridge_ljlk*>(p_mixture)->setParameters(param);}
         break;
         default: // idModel is not implemented
         break;

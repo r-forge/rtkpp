@@ -32,13 +32,9 @@
  *  @brief In this file we implement the Cauchy distribution.
  **/
 
-
-#include "../include/STK_Law_Cauchy.h"
-
 #ifndef IS_RTKPP_LIB
+#include "../include/STK_Law_Cauchy.h"
 #include "../include/STK_Law_Util.h"
-#else
-#include <Rcpp.h>
 #endif
 
 
@@ -48,28 +44,7 @@ namespace STK
 namespace Law
 {
 
-#ifdef IS_RTKPP_LIB
-
-/*  Generate a pseudo Cauchy random variate. */
-/*inline*/ Real Cauchy::rand() const { return R::rcauchy(mu_, scale_);}
-/*inline*/ Real Cauchy::pdf( Real const& x) const { return R::dcauchy(x,mu_, scale_, false);}
-/*inline*/ Real Cauchy::lpdf( Real const& x) const { return R::dcauchy(x,mu_, scale_, true);}
-/*inline*/ Real Cauchy::cdf( Real const& t) const { return R::pcauchy(t, mu_, scale_, true, false);}
-/*inline*/ Real Cauchy::icdf( Real const& p) const { return R::qcauchy(p , mu_, scale_, true, false);}
-
-// static
-/*inline*/ Real Cauchy::rand( Real const& mu, Real const& scale)
-{ return R::rcauchy(mu, scale);}
-/*inline*/ Real Cauchy::pdf(Real const& x, Real const& mu, Real const& scale)
-{ return R::dcauchy(x,mu, scale, false);}
-/*inline*/ Real Cauchy::lpdf(Real const& x, Real const& mu, Real const& scale)
-{ return R::dcauchy(x,mu, scale, true);}
-/*inline*/ Real Cauchy::cdf(Real const& t, Real const& mu, Real const& scale)
-{ return R::pcauchy(t, mu, scale, true, false);}
-/*inline*/ Real Cauchy::icdf(Real const& p, Real const& mu, Real const& scale)
-{ return R::qcauchy(p , mu, scale, true, false);}
-
-#else
+#ifndef IS_RTKPP_LIB
 
 /*  Generate a pseudo Cauchy random variate. */
 Real Cauchy::rand() const

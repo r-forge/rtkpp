@@ -52,7 +52,6 @@ struct MixtureTraits< Poisson_ljk<_Array> >
 {
   typedef _Array                  Array;
   typedef typename Array::Type    Type;
-  typedef Array2D<Real>           Param;
   typedef ParametersHandler<Clust::Poisson_ljk_> ParamHandler;
 };
 
@@ -60,14 +59,43 @@ struct MixtureTraits< Poisson_ljk<_Array> >
 
 /** Specialization of the ParametersHandler struct for Poisson_ljk model */
 template <>
-struct ParametersHandler<Clust::Poisson_ljk_>
+struct ParametersHandler<Clust::Poisson_ljk_>: public PoissonHandlerBase<  ParametersHandler<Clust::Poisson_ljk_> >
 {
   /** Array of the rates */
   MixtureParametersSet<PointX> lambda_;
+  /** @return the value of lambda of the kth cluster and jth variable */
+  inline Real const& lambdaImpl(int k, int j) const { return lambda_[k][j];}
+  /** copy operator */
+  inline ParametersHandler& operator=( ParametersHandler const& other)
+  { lambda_ = other.lambda_; return *this; }
+  /** copy operator using an array/expression storing the values */
+  template<class Array>
+  inline ParametersHandler& operator=( ExprBase<Array> const& param)
+  {
+    for (int k= param.beginRows(); k < param.endRows(); ++k)
+    {
+      for (int j= param.beginCols();  j < param.endCols(); ++j)
+      { lambda_[k][j] = param(k, j);}
+    }
+    return *this;
+  }
+
   /** default constructor */
-  ParametersHandler(int nbCluster): lambda_(nbCluster) {}
+  inline ParametersHandler(int nbCluster): lambda_(nbCluster) {}
   /** copy constructor */
-  ParametersHandler(ParametersHandler const& model): lambda_(model.lambda_) {}
+  inline ParametersHandler(ParametersHandler const& model): lambda_(model.lambda_) {}
+  /** Initialize the parameters with an array/expression of value */
+  template<class Array>
+  inline ParametersHandler(int nbCluster, ExprBase<Array> const& param): lambda_(nbCluster)
+  {
+    lambda_.resize(param.cols());
+    for (int k= param.beginRows(); k < param.endRows(); ++k)
+    {
+      for (int j= param.beginCols();  j < param.endCols(); ++j)
+      { lambda_[k][j] = param(k, j);}
+    }
+  }
+
   /** Initialize the parameters of the model.
    *  This function initialize the parameter lambda and the statistics.
    **/
@@ -117,8 +145,6 @@ class Poisson_ljk : public PoissonBase<Poisson_ljk<Array> >
     Poisson_ljk( Poisson_ljk const& model) : Base(model) {}
     /** destructor */
     ~Poisson_ljk() {}
-    /** @return the value of lambda of the kth cluster and jth variable */
-    inline Real lambdaImpl(int k, int j) const { return param_.lambda_[k][j];}
     /** @return the value of the probability of the i-th sample in the k-th component.
      *  @param i,k indexes of the sample and of the component
      **/

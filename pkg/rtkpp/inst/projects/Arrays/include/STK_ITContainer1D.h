@@ -73,13 +73,13 @@ class IContainer1D
     /**  @return the range of the container */
     Range1D const& range() const  { return range_;}
     /** @return the index of the first element */
-    int begin() const { return range_.begin();}
+    inline int begin() const { return range_.begin();}
     /**  @return the ending index of the elements */
-    int end() const { return range_.end();}
+    inline int end() const { return range_.end();}
     /**  @return the size of the container */
-    int size() const  { return range_.size();}
+    inline int size() const  { return range_.size();}
     /**  @return the index of the last element */
-    int lastIdx() const  { return range_.lastIdx();}
+    inline int lastIdx() const  { return range_.lastIdx();}
 
     /** Is there some data ?
      *  @return @c true if the container is empty, @c false otherwise
@@ -217,15 +217,15 @@ class ITContainer1D : public IContainer1D< hidden::Traits<Derived>::size_ >
     /** @return the element ith element
      *  @param i index of the ith element
      **/
-    Type& operator[](int i) { return elt(i);}
+    inline Type& operator[](int i) { return elt(i);}
     /** @return a constant reference on the ith  element
      *  @param i index of the ith element
      **/
-    Type const& operator[](int i) const { return elt(i);}
+    inline Type const& operator[](int i) const { return elt(i);}
     /** @return safely the jth element
      *  @param i index of the element
      **/
-    Type& at(int i)
+    inline Type& at(int i)
     {
       if (this->asDerived().begin() > i)
       { STKOUT_OF_RANGE_1ARG(ITContainer1D::at, i, begin() > i);}
@@ -248,7 +248,7 @@ class ITContainer1D : public IContainer1D< hidden::Traits<Derived>::size_ >
      *  @param I the range of the elements
      *  @return a reference container with the elements of this in the range I
      **/
-    SubVector sub(Range const& I) const
+    inline SubVector sub(Range const& I) const
     {
 #ifdef STK_BOUNDS_CHECK
       if ((I.begin()<begin()))
@@ -260,13 +260,13 @@ class ITContainer1D : public IContainer1D< hidden::Traits<Derived>::size_ >
     }
 
     /** @return a reference on the first element. */
-    Type& front() { return elt(begin());}
+    inline Type& front() { return elt(begin());}
     /** @return a constant reference on the first element */
-    Type const& front() const { return elt(begin());}
+    inline Type const& front() const { return elt(begin());}
     /** @return a reference on the last element */
-    Type& back() { return elt(lastIdx());}
+    inline Type& back() { return elt(lastIdx());}
     /** @return a constant reference on the last element */
-    Type const& back() const { return elt(lastIdx());}
+    inline Type const& back() const { return elt(lastIdx());}
 
     /**  @param beg the index of the first column to set */
     void shift(int beg) { this->asDerived().shiftImpl(beg);}

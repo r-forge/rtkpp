@@ -113,10 +113,10 @@ class KernelMixtureManager : public IMixtureManager<DataHandler>
       {
         // Kernel models
         case Clust::KernelGaussian_sk_:
-        { static_cast<MixtureKernelGaussianBridge_sk const*>(p_mixture)->setDim(dim);}
+        { static_cast<MixtureKernelGaussianBridge_sk*>(p_mixture)->setDim(dim);}
         break;
         case Clust::KernelGaussian_s_:
-        { static_cast<MixtureKernelGaussianBridge_s const*>(p_mixture)->setDim(dim);}
+        { static_cast<MixtureKernelGaussianBridge_s*>(p_mixture)->setDim(dim);}
         break;
         default: // idModel is not implemented
         break;
@@ -135,10 +135,32 @@ class KernelMixtureManager : public IMixtureManager<DataHandler>
       {
         // Kernel models
         case Clust::KernelGaussian_sk_:
-        { static_cast<MixtureKernelGaussianBridge_sk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureKernelGaussianBridge_sk*>(p_mixture)->getParameters(param);}
         break;
         case Clust::KernelGaussian_s_:
-        { static_cast<MixtureKernelGaussianBridge_s const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureKernelGaussianBridge_s*>(p_mixture)->getParameters(param);}
+        break;
+        default: // idModel is not implemented
+        break;
+      }
+    }
+    /** set the parameters from an IMixture.
+     *  @param p_mixture pointer on the mixture
+     *  @param param the array with the parameters to set
+     **/
+    virtual void setParameters(IMixture* p_mixture, ArrayXX const& param) const
+    {
+      if (!p_mixture) return;
+      Clust::Mixture idModel = getIdModel(p_mixture->idName());
+      // up-cast... (Yes it's bad....;)...)
+      switch (idModel)
+      {
+        // Kernel models
+        case Clust::KernelGaussian_sk_:
+        { static_cast<MixtureKernelGaussianBridge_sk*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::KernelGaussian_s_:
+        { static_cast<MixtureKernelGaussianBridge_s*>(p_mixture)->setParameters(param);}
         break;
         default: // idModel is not implemented
         break;

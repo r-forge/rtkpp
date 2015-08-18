@@ -47,12 +47,10 @@ namespace Clust
 {
 /** @ingroup Clustering
  *  Traits class for the Categorical_pjk traits policy. */
-template<class _Array>
-struct MixtureTraits< Categorical_pjk<_Array> >
+template<class Array_>
+struct MixtureTraits< Categorical_pjk<Array_> >
 {
-  typedef _Array Array;
-  typedef typename Array::Type Type;
-  typedef Array2D<Real>        Param;
+  typedef Array_ Array;
   typedef ParametersHandler<Clust::Categorical_pjk_> ParamHandler;
 };
 
@@ -61,12 +59,55 @@ struct MixtureTraits< Categorical_pjk<_Array> >
 
 /** Specialization of the ParametersHandler struct for Categorical_pk model */
 template <>
-struct ParametersHandler<Clust::Categorical_pjk_>
+struct ParametersHandler<Clust::Categorical_pjk_>: public CategoricalHandlerBase<  ParametersHandler<Clust::Categorical_pjk_> >
 {
+  /** Vector and statistics of the probabilities */
+  MixtureParametersSet<ArrayXX> proba_;
+  /** @return the probability of the kth cluster, jth variable, lth modality */
+  inline Real const& probaImpl(int k, int j, int l) const { return proba_[k](l,j);}
+  /** @return the probability law of the kth cluster for the jth variable */
+  inline VectorX probaImpl(int k, int j) const { return proba_[k].col(j);}
+  /** copy operator */
+  inline ParametersHandler& operator=( ParametersHandler const& other)
+  { proba_ = other.proba_; return *this; }
+  /** copy operator using an array/expression storing the values */
+  template<class Array>
+  inline ParametersHandler& operator=( ExprBase<Array> const& param)
+  {
+    int nbModalities = param.sizeRows()/proba_().size();
+    for (int k1= proba_().begin(), k2= param.beginRows(); k1 < proba_().end(); k1++, k2+=nbModalities)
+    {
+      Range rangeModalities = proba_[k1].rows();
+      for (int j= param.beginCols();  j< param.endCols(); ++j)
+      {
+        for (int l1 = rangeModalities.begin(), l2= 0; l1 < rangeModalities.end(); ++l1, l2++)
+        { proba_[k1](l1, j) = param(k2 + l2, j);}
+      }
+    }
+    return *this;
+  }
+
   /** default constructor */
-  ParametersHandler(int nbCluster):proba_(nbCluster) {}
+  ParametersHandler(int nbCluster): proba_(nbCluster) {}
   /** copy constructor */
   ParametersHandler(ParametersHandler const& model):proba_(model.proba_) {}
+  /** Initialize the parameters with an array/expression of value */
+  template<class Array>
+  ParametersHandler( int nbCluster, ExprBase<Array> const& param)
+                   : proba_(nbCluster)
+  {
+    int nbModalities = param.sizeRows()/nbCluster;
+    proba_.resize(nbModalities, param.cols());
+    for (int k2= param.beginRows(), k= param.beginRows(); k2 < param.endRows(); k2+=nbModalities, k++)
+    {
+      for (int j= param.beginCols();  j< param.endCols(); ++j)
+      {
+        for (int l= 0; l < nbModalities; ++l)
+        { proba_[k](baseIdx+l, j) = param(k2 + l, j);}
+      }
+    }
+  }
+
   /** Initialize the parameters of the model.
    *  This function initialize the parameter proba and the statistics.
    **/
@@ -87,8 +128,6 @@ struct ParametersHandler<Clust::Categorical_pjk_>
   { proba_.releaseIntermediateResults();}
   /** set the parameters stored in stat_proba_ and release stat_proba_. */
   inline void setParameters() { proba_.setParameters();}
-  /** Vector and statistics of the probabilities */
-  MixtureParametersSet<ArrayXX> proba_;
 };
 
 /** @ingroup Clustering
@@ -118,10 +157,6 @@ class Categorical_pjk : public CategoricalBase<Categorical_pjk<Array> >
     Categorical_pjk( Categorical_pjk const& model): Base(model) {}
     /** destructor */
     inline ~Categorical_pjk() {}
-    /** @return the probability of the kth cluster, jth variable, lth modality */
-    inline Real probaImpl(int k, int j, int l) const { return param_.proba_[k](l,j);}
-    /** @return the probability law of the kth cluster for the jth variable */
-    inline VectorX probaImpl(int k, int j) const { return param_.proba_[k].col(j);}
     /** @return the value of the probability of the i-th sample in the k-th component.
      *  @param i,k indexes of the sample and of the component
      **/

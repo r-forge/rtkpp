@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2012  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -59,6 +59,8 @@ class ArrayBase :  public ExprBase<Derived>
   public:
     typedef ExprBase<Derived> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
+    typedef typename hidden::Traits<Derived>::ReturnType ReturnType;
+
     typedef typename hidden::Traits<Derived>::Row Row;
     typedef typename hidden::Traits<Derived>::Col Col;
     typedef typename hidden::Traits<Derived>::SubRow SubRow;
@@ -134,32 +136,32 @@ class ArrayBase :  public ExprBase<Derived>
     Derived& operator=( Derived const& rhs) { return assign(rhs);}
     /** @return the matrix or vector obtained by evaluating this expression */
     template<typename Rhs>
-    Derived& operator=( ExprBase<Rhs> const& rhs) { return assign(rhs.asDerived());}
+    inline Derived& operator=( ExprBase<Rhs> const& rhs) { return assign(rhs.asDerived());}
     /** Adding a Rhs to this. */
     template<typename Rhs>
-    Derived& operator+=( ExprBase<Rhs> const& other);
+    inline Derived& operator+=( ExprBase<Rhs> const& other);
     /** subtract a Rhs to this. */
     template<typename Rhs>
-    Derived& operator-=( ExprBase<Rhs> const& other);
+    inline Derived& operator-=( ExprBase<Rhs> const& other);
     /** divide this by Rhs. */
     template<typename Rhs>
-    Derived& operator/=( ExprBase<Rhs> const& other);
+    inline Derived& operator/=( ExprBase<Rhs> const& other);
     /** multiply this by Rhs. */
     template<typename Rhs>
-    Derived& operator*=( ExprBase<Rhs> const& other);
+    inline Derived& operator*=( ExprBase<Rhs> const& other);
     /** Adding a constant to this. */
-    Derived& operator+=( Type const& other);
+    inline Derived& operator+=( Type const& other);
     /** Substract a constant to this. */
-    Derived& operator-=( Type const& other);
+    inline Derived& operator-=( Type const& other);
     /** product of this by a constant. */
-    Derived& operator*=( Type const& other);
+    inline Derived& operator*=( Type const& other);
     /** dividing this by a constant. */
-    Derived& operator/=( Type const& other);
+    inline Derived& operator/=( Type const& other);
 
     /** @return the jth column of this */
-    Col col(int j) const { return this->asDerived().colImpl(j);}
+    inline Col col(int j) const { return this->asDerived().colImpl(j);}
     /** @return the jth column of this in the range I*/
-    SubCol col(Range const& I, int j) const
+    inline SubCol col(Range const& I, int j) const
     {
       STK_STATIC_ASSERT_TWO_DIMENSIONS_ONLY(Derived)
 #ifdef STK_BOUNDS_CHECK
@@ -175,7 +177,7 @@ class ArrayBase :  public ExprBase<Derived>
       return this->asDerived().colImpl(I, j);
     }
     /** @return the sub array with the column in the range J */
-    SubArray col(Range const& J) const
+    inline SubArray col(Range const& J) const
     {
       STK_STATIC_ASSERT_TWO_DIMENSIONS_ONLY(Derived)
 #ifdef STK_BOUNDS_CHECK
@@ -187,7 +189,7 @@ class ArrayBase :  public ExprBase<Derived>
       return this->asDerived().colImpl(J);
     }
     /** @return the ith row of this */
-    Row row(int i) const
+    inline Row row(int i) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (this->beginRows() > i)
@@ -198,25 +200,25 @@ class ArrayBase :  public ExprBase<Derived>
       return this->asDerived().rowImpl(i);
     }
     /** @return the ith row of this in the range J */
-    SubRow row(int i, Range const& J) const
+    inline SubRow row(int i, Range const& J) const
     {
       STK_STATIC_ASSERT_TWO_DIMENSIONS_ONLY(Derived)
       return this->asDerived().rowImpl(i,J);
     }
     /** @return the sub array with the rows in the range J */
-    SubArray row(Range const& I) const
+    inline SubArray row(Range const& I) const
     {
       STK_STATIC_ASSERT_TWO_DIMENSIONS_ONLY(Derived)
       return this->asDerived().rowImpl(I);
     }
     /** @return the sub-array (I,J)*/
-    SubArray sub(Range const& I, Range const& J) const
+    inline SubArray sub(Range const& I, Range const& J) const
     {
       STK_STATIC_ASSERT_TWO_DIMENSIONS_ONLY(Derived)
       return this->asDerived().subImpl(I, J);
     }
     /** @return the sub-vector in the range I*/
-    SubVector sub(Range const& I) const
+    inline SubVector sub(Range const& I) const
     {
       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived)
       return this->asDerived().subImpl(I);
@@ -299,64 +301,64 @@ class ArrayBase :  public ExprBase<Derived>
     /** @return a reference on the ith element
      *  @param i index of the ith element
      **/
-    Type& operator[](int i) { return elt(i);}
+    inline Type& operator[](int i) { return elt(i);}
     /** @return the ith element
      *  @param i index of the ith element
      **/
-    Type const& operator[](int i) const { return elt(i);}
+    inline Type const& operator[](int i) const { return elt(i);}
     /** @return the ith element
      *  @param I range to get
      **/
-    SubVector operator[](Range const& I) const { return sub(I);}
+    inline SubVector operator[](Range const& I) const { return sub(I);}
     /** @return a reference on the element (i,j) of the 2D container.
      *  @param i, j indexes of the row and of the column
      **/
-    Type& operator()(int i, int j) { return elt(i,j);}
+    inline Type& operator()(int i, int j) { return elt(i,j);}
     /** @return a constant reference on the element (i,j) of the 2D container.
      *  @param i,j indexes of the row and column
      **/
-    Type const& operator()(int i, int j) const { return elt(i,j);}
+    inline Type const& operator()(int i, int j) const { return elt(i,j);}
     /** @return a constant reference on the number */
-    Type const& operator()() const { return elt();}
+    inline Type const& operator()() const { return elt();}
     /** @return the number */
-    Type& operator()() { return elt();}
+    inline Type& operator()() { return elt();}
     /** @param I range of the index of the rows
      *  @param j index of the column
      *  @return a Vertical container containing the column @c j of this
      *  in the range @c I
      **/
-    SubCol operator()(Range const& I, int j) const { return col(I, j);}
+    inline SubCol operator()(Range const& I, int j) const { return col(I, j);}
     /** @param i index of the row
      *  @param J range of the columns
      *  @return an Horizontal container containing the row @c i of this
      *  in the range @c J
      **/
-    SubRow operator()(int i, Range const& J) const { return row(i, J);}
+    inline SubRow operator()(int i, Range const& J) const { return row(i, J);}
     /** @param I,J range of the rows and of the columns
      *  @return a 2D container containing this in the range @c I, @c J
      **/
-    SubArray operator()(Range const& I, Range const& J) const { return sub(I, J);}
+    inline SubArray operator()(Range const& I, Range const& J) const { return sub(I, J);}
     //
     /** @return the first element */
-    Type& front()
+    inline Type& front()
     {
       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived)
       return elt(this->begin());
     }
     /** @return the last element */
-    Type& back()
+    inline Type& back()
     {
       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived)
       return elt(this->lastIdx());
     }
     /** @return the first element */
-    Type const& front() const
+    inline Type const& front() const
     {
       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived)
       return elt(this->begin());
     }
     /** @return the last element */
-    Type const& back() const
+    inline Type const& back() const
     {
       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived)
       return elt(this->lastIdx());

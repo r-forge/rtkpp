@@ -182,14 +182,14 @@ class ICArray : public ArrayBase<Derived>
      *  @param I,J range of the rows and columns to wrap
      **/
     template<class OtherAllocator>
-    ICArray( ITContainer2D<OtherAllocator> const& allocator, Range const& I, Range const& J)
-           : Base(), allocator_(allocator.asDerived(), I, J)
+    inline ICArray( ITContainer2D<OtherAllocator> const& allocator, Range const& I, Range const& J)
+                  : Base(), allocator_(allocator.asDerived(), I, J)
     {}
     /** constructor by reference, ref_=1.
      *  @param allocator with the data
      **/
     template< class OtherAllocator>
-    ICArray( ITContainer2D<OtherAllocator> const& allocator)
+    inline ICArray( ITContainer2D<OtherAllocator> const& allocator)
                   : Base(), allocator_(allocator.asDerived(), true)
     {}
     /**  destructor */
@@ -197,21 +197,21 @@ class ICArray : public ArrayBase<Derived>
 
   public:
     /** @return the Horizontal range */
-    ColRange const& colsImpl() const { return allocator_.cols();};
+    inline ColRange const&colsImpl() const { return allocator_.cols();};
     /** @return the Vertical range */
-    RowRange const& rowsImpl() const { return allocator_.rows();}
+    inline RowRange const& rowsImpl() const { return allocator_.rows();}
 
     /** @return @c true if the container is empty, @c false otherwise */
-     bool empty() const { return allocator_.empty();}
+    bool empty() const { return allocator_.empty();}
     /** @return @c true if *this is reference container, @c false otherwise */
     bool isRef() const { return allocator_.isRef();}
 
     /** Get a constant reference on the main allocator. */
-    Allocator const& allocator() const { return allocator_;}
+    inline Allocator const& allocator() const { return allocator_;}
     /** Get the constant main pointer. */
-    Type const* p_data() const { return allocator_.p_data();}
+    inline Type const* p_data() const { return allocator_.p_data();}
     /** Get the writable main pointer. */
-    Type* p_data() { return allocator_.p_data();}
+    inline Type* p_data() { return allocator_.p_data();}
 
     /** implement the const element accessor */
     inline Type& elt2Impl( int i, int j) { return allocator_.elt(i, j);}
@@ -229,24 +229,24 @@ class ICArray : public ArrayBase<Derived>
     inline Type const& elt0Impl() const { return allocator_.elt();}
 
     /** implement the row operator using a reference on the row of the allocator */
-    Row rowImpl(int i) const { return  Row( allocator_.row(i));}
+    inline Row rowImpl(int i) const { return  Row( allocator_.row(i));}
     /** implement the row operator using a reference on the row of the allocator */
-    SubRow rowImpl(int i, Range const& J) const { return SubRow( allocator_.row( i, J));}
+    inline SubRow rowImpl(int i, Range const& J) const { return SubRow( allocator_.row( i, J));}
 
     /** implement the col operator using a reference on the column of the allocator */
-    Col colImpl(int j) const { return  Col( allocator_.col(j));}
+    inline Col colImpl(int j) const { return  Col( allocator_.col(j));}
     /** implement the col operator using a reference on the column of the allocator */
-    SubCol colImpl(Range const& I, int j) const { return SubCol( allocator_.col( I, j));}
+    inline SubCol colImpl(Range const& I, int j) const { return SubCol( allocator_.col( I, j));}
 
     /** implement the row operator using a reference on the rows of the allocator */
-    SubArray rowImpl(Range const& I) const { return SubArray( allocator_.sub(I, this->cols()));}
+    inline SubArray rowImpl(Range const& I) const { return SubArray( allocator_.sub(I, this->cols()));}
     /** implement the col operator using a reference on the columns of the allocator */
-    SubArray colImpl(Range const& J) const { return SubArray( allocator_.sub( this->rows(), J));}
+    inline SubArray colImpl(Range const& J) const { return SubArray( allocator_.sub( this->rows(), J));}
     /** implement the sub operator for 2D arrays using a reference on the column of the allocator */
-    SubArray subImpl(Range const& I, Range const& J) const { return SubArray(allocator_.sub(I, J));}
+    inline SubArray subImpl(Range const& I, Range const& J) const { return SubArray(allocator_.sub(I, J));}
 
     /** implement the sub operator for 1D arrays using a reference on the raw/column of the allocator */
-    SubVector subImpl( Range const& J) const { return SubVector( allocator_.sub(J));}
+    inline SubVector subImpl( Range const& J) const { return SubVector( allocator_.sub(J));}
 
     /** swap two elements: only for vectors an points. */
     void swap(int i, int  j) { std::swap(this->elt(i), this->elt(j)); }

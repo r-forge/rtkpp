@@ -28,18 +28,15 @@
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
 
-/** @file STK_Law_Bernoulli.cpp
- *  @brief In this file we implement the Beta class.
+/** @file STK_Law_Beta.cpp
+ *  @brief In this file we implement the Beta distibution law.
  **/
 
 
-#include "../include/STK_Law_Beta.h"
-
 #ifndef IS_RTKPP_LIB
+#include "../include/STK_Law_Beta.h"
 #include "../include/STK_Law_Gamma.h"
 #include <Analysis/include/STK_Funct_betaRatio.h>
-#else
-#include <Rcpp.h>
 #endif
 
 //
@@ -48,26 +45,7 @@ namespace STK
 namespace Law
 {
 
-#ifdef IS_RTKPP_LIB
-
-/*  Generate a pseudo Beta random variate. */
-/*inline*/ Real Beta::rand() const { return R::rbeta(alpha_, beta_);}
-/*inline*/ Real Beta::pdf( Real const& x) const { return R::dbeta(x,alpha_, beta_, false);}
-/*inline*/ Real Beta::lpdf( Real const& x) const { return R::dbeta(x,alpha_, beta_, true);}
-/*inline*/ Real Beta::cdf( Real const& t) const { return R::pbeta(t, alpha_, beta_, true, false);}
-/*inline*/ Real Beta::icdf( Real const& p) const { return R::qbeta(p , alpha_, beta_, true, false);}
-/*inline*/ Real Beta::rand( Real const& alpha, Real const& beta) { return R::rbeta(alpha, beta);}
-// static
-/*inline*/ Real Beta::pdf(const Real& x, const Real& alpha, const Real& beta)
-{ return R::dbeta(x,alpha, beta, false);}
-/*inline*/ Real Beta::lpdf(const Real& x, const Real& alpha, const Real& beta)
-{ return R::dbeta(x,alpha, beta, true);}
-/*inline*/ Real Beta::cdf(const Real& t, const Real& alpha, const Real& beta)
-{ return R::pbeta(t, alpha, beta, true, false);}
-/*inline*/ Real Beta::icdf(const Real& p, const Real& alpha, const Real& beta)
-{ return R::qbeta(p , alpha, beta, true, false);}
-
-#else
+#ifndef IS_RTKPP_LIB
 
 /*  Generate a pseudo Beta random variate. */
 Real Beta::rand() const

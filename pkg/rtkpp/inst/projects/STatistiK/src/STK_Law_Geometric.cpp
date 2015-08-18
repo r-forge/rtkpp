@@ -32,10 +32,9 @@
  *  @brief In this file we implement the Geometric distribution.
  **/
 
-#include "../include/STK_Law_Geometric.h"
 
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
+#ifndef IS_RTKPP_LIB
+#include "../include/STK_Law_Geometric.h"
 #endif
 
 namespace STK
@@ -44,31 +43,7 @@ namespace STK
 namespace Law
 {
 
-#ifdef IS_RTKPP_LIB
-
-
-/*inline*/ Integer Geometric::rand() const { return R::rgeom(prob_);}
-/*inline*/ Real Geometric::pdf(Integer const& x) const
-{ return R::dgeom((double)x, prob_, false);}
-/*inline*/ Real Geometric::lpdf(Integer const& x) const
-{ return R::dgeom((double)x, prob_, true);}
-/*inline*/ Real Geometric::cdf(Real const& t) const
-{ return R::pgeom(t, prob_, true, false);}
-/*inline*/ Integer Geometric::icdf(Real const& p) const
-{ return R::qgeom(p, prob_, true, false);}
-
-/*inline*/ Integer Geometric::rand(Real const& prob)
-{ return (Integer)R::rgeom(prob);}
-/*inline*/ Real Geometric::pdf(Integer x, Real const& prob)
-{ return R::dgeom((double)x, prob, false);}
-/*inline*/ Real Geometric::lpdf(Integer x, Real const& prob)
-{ return R::dgeom((double)x, prob, true);}
-/*inline*/ Real Geometric::cdf(Real const& t, Real const& prob)
-{ return R::pgeom(t, prob, true, false);}
-/*inline*/ Integer Geometric::icdf(Real const& p, Real const& prob)
-{ return (Integer)R::qgeom(p, prob, true, false);}
-
-#else
+#ifndef IS_RTKPP_LIB
 
 /* @return a geometric random variate . */
 Integer Geometric::rand() const

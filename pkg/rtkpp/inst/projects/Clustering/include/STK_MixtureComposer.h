@@ -62,6 +62,11 @@ class IMixture;
  *
  * The MixtureComposer class is a final class implementing the features requested
  * by the interface class IMixtureComposer.
+ *
+ * It uses injection dependency in order to create/release mixture and
+ * get/set parameters of a mixture. The class responsible of the injection is
+ * derived from an STK::IMixtureManager.
+ * @sa IMixtureComposer, IMixtureManager, PoissonMixtureManager, DiagGaussianMixtureManager, GammaMixtureManager, CategoricalMixtureManager
  **/
 class MixtureComposer : public IMixtureComposer
 {
@@ -186,9 +191,17 @@ class MixtureComposer : public IMixtureComposer
      *  @param idData the Id of the data we want the parameters
      *  @param param the structure which will receive the parameters
      **/
-    template<class ParametersManager, class Param>
-    void getParameters(ParametersManager const& manager, String const& idData, Param& param) const
+    template<class DataHandler, class Parameters>
+    void getParameters(IMixtureManager<DataHandler> const& manager, String const& idData, Parameters& param) const
     { manager.getParameters(getMixture(idData), param);}
+    /** Utility method allowing to set the parameters to a specific mixture.
+     *  @param manager the manager with the responsibility of the parameters
+     *  @param idData the Id of the data we want to set the parameters
+     *  @param param the structure which contains the parameters
+     **/
+    template<class DataHandler, class Parameters>
+    void setParameters(IMixtureManager<DataHandler> const& manager, String const& idData, Parameters const& param)
+    { manager.setParameters(getMixture(idData), param);}
 
   protected:
     /** @brief Create the composer using existing data handler and mixtures.

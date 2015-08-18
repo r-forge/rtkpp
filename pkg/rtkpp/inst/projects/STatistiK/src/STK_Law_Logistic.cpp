@@ -32,10 +32,8 @@
  *  @brief In this file we define the Logistic probability law class.
  **/
 
+#ifndef IS_RTKPP_LIB
 #include "../include/STK_Law_Logistic.h"
-
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
 #endif
 
 namespace STK
@@ -43,31 +41,7 @@ namespace STK
 namespace Law
 {
 
-#ifdef IS_RTKPP_LIB
-
-/*inline*/ Real Logistic::rand() const
-{ return R::rlogis(mu_, scale_);}
-/*inline*/ Real Logistic::pdf( Real const& x) const
-{ return R::dlogis(x, mu_, scale_, false);}
-/*inline*/ Real Logistic::lpdf( Real const& x) const
-{ return R::dlogis(x, mu_, scale_, true);}
-/*inline*/ Real Logistic::cdf( Real const& t) const
-{ return R::plogis(t, mu_, scale_, true, false);}
-/*inline*/ Real Logistic::icdf( Real const& p) const
-{ return R::qlogis(p, mu_, scale_, true, false);}
-
-/*inline*/ Real Logistic::rand( Real const& mu, Real const& scale)
-{ return R::rlogis(mu, scale);}
-/*inline*/ Real Logistic::pdf( Real const& x, Real const& mu, Real const& scale)
-{ return R::dlogis(x, mu, scale, false);}
-/*inline*/ Real Logistic::lpdf( Real const& x, Real const& mu, Real const& scale)
-{ return R::dlogis(x, mu, scale, true);}
-/*inline*/ Real Logistic::cdf( Real const& t, Real const& mu, Real const& scale)
-{ return R::plogis(t, mu, scale, true, false);}
-/*inline*/ Real Logistic::icdf( Real const& p, Real const& mu, Real const& scale)
-{ return R::qlogis(p, mu, scale, true, false);}
-
-#else
+#ifndef IS_RTKPP_LIB
 
 /* @brief Generate a pseudo logisticized Logistic random variate.
  *

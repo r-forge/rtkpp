@@ -128,6 +128,27 @@ class ChiSquared : public IUnivLaw<Real>
     int df_;
 };
 
+#ifdef IS_RTKPP_LIB
+
+/* @return a pseudo ChiSquared random variate. */
+inline Real ChiSquared::rand() const
+{ return ::Rf_rchisq(df_);}
+/* @return the value of the pdf
+ *  @param x a positive real value
+ **/
+inline Real ChiSquared::pdf(const Real& x) const { return ::Rf_dchisq(x, df_, false);}
+inline Real ChiSquared::lpdf(const Real& x) const { return ::Rf_dchisq(x, df_, true);}
+inline Real ChiSquared::cdf(const Real& t) const { return ::Rf_pchisq(t, df_, true, false);}
+inline Real ChiSquared::icdf(const Real& p) const { return ::Rf_qchisq(p, df_, true, false);}
+
+inline Real ChiSquared::rand(int df){ return ::Rf_rchisq(df);}
+inline Real ChiSquared::pdf(const Real& x, int df) { return ::Rf_dchisq(x, df, false);}
+inline Real ChiSquared::lpdf(const Real& x, int df) { return ::Rf_dchisq(x, df, true);}
+inline Real ChiSquared::cdf(const Real& t, int df) { return ::Rf_pchisq(t, df, true, false);}
+inline Real ChiSquared::icdf(const Real& p, int df) { return ::Rf_qchisq(p, df, true, false);}
+
+#endif
+
 } // namespace Law
 
 } // namespace STK

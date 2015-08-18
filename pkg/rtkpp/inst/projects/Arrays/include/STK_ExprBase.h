@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2012  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -40,18 +40,18 @@
 /// utility macro allowing to construct binary operators
 #define MAKE_BINARY_OPERATOR(OPERATOR, FUNCTOR) \
   template<typename Rhs> \
-  BinaryOperator< FUNCTOR<Type, typename hidden::Traits<Rhs>::Type>, Derived, Rhs> const \
+  inline BinaryOperator< FUNCTOR<Type, typename hidden::Traits<Rhs>::Type>, Derived, Rhs> const \
   (OPERATOR)( ExprBase<Rhs> const& other) const \
   { return BinaryOperator<FUNCTOR<Type, typename hidden::Traits<Rhs>::Type>, Derived, Rhs>(this->asDerived(), other.asDerived()) ;}
 
 /// utility macro allowing to construct unary operators
 #define MAKE_UNARY_OPERATOR_NOARG(FUNCTION, FUNCTOR) \
-  UnaryOperator<FUNCTOR<Type>, Derived> const FUNCTION() const \
+  inline UnaryOperator<FUNCTOR<Type>, Derived> const FUNCTION() const \
   { return UnaryOperator<FUNCTOR<Type>, Derived>(this->asDerived()); }
 
 /// utility macro allowing to construct unary operators
 #define MAKE_UNARY_OPERATOR_1ARG(FUNCTION, FUNCTOR) \
-  UnaryOperator<FUNCTOR<Type>, Derived> const FUNCTION(Type const number) const \
+  inline UnaryOperator<FUNCTOR<Type>, Derived> const FUNCTION(Type const number) const \
   { return UnaryOperator<FUNCTOR<Type>, Derived>(this->asDerived(), FUNCTOR<Type>(number)); }
 
 
@@ -385,58 +385,58 @@ class ExprBase : public ITContainer<Derived, hidden::Traits<Derived>::structure_
 
     // handle the case number + expression
     /** @return an expression of number + this */
-    friend UnaryOperator<AddOp<Type>, Derived> const
+    inline friend UnaryOperator<AddOp<Type>, Derived> const
     operator+(Type const number, ExprBase<Derived> const& other)
     { return other.asDerived() + number;}
     /** @return an expression of number - this */
-    UnaryOperator<AddOp<Type>, Derived> const
+    inline UnaryOperator<AddOp<Type>, Derived> const
     operator-(Type const number) const
     { return UnaryOperator<AddOp<Type>, Derived>(this->asDerived(), AddOp<Type>(-number));}
     /** @return a safe value of this */
-    UnaryOperator<SafeOp<Type>, Derived> const safe(Type const number = Type()) const
+    inline UnaryOperator<SafeOp<Type>, Derived> const safe(Type const number = Type()) const
     { return UnaryOperator<SafeOp<Type>, Derived>(this->asDerived(), SafeOp<Type>(number)); }
     // friends
     // handle the case number - expression
-    friend UnaryOperator<AddOppositeOp<Type>, Derived > const
+    inline friend UnaryOperator<AddOppositeOp<Type>, Derived > const
     operator-(Type const number, ExprBase<Derived> const& other)
     { return UnaryOperator<AddOppositeOp<Type>, Derived>(other.asDerived(), AddOppositeOp<Type>(number));}
     // handle the case number * expression
-    friend UnaryOperator< MultipleOp<Type>, Derived> const
+    inline friend UnaryOperator< MultipleOp<Type>, Derived> const
     operator*(Type const number, ExprBase<Derived> const& other)
     { return other.asDerived()*number; }
     // templated
     /** @return an expression of *this with the  Type type casted to  OtherType. */
     template<typename CastedType>
-    UnaryOperator<CastOp<Type, CastedType>, Derived> const cast() const
+    inline UnaryOperator<CastOp<Type, CastedType>, Derived> const cast() const
     { return UnaryOperator<CastOp<Type, CastedType>, Derived>(this->asDerived());}
     /** @return an expression of funct0 to this. */
     template< template<typename> class OtherOperator>
-    UnaryOperator<OtherOperator<Type>, Derived> const funct0() const
+    inline UnaryOperator<OtherOperator<Type>, Derived> const funct0() const
     { return UnaryOperator<OtherOperator<Type>, Derived>(this->asDerived());}
     /** @return an expression of funct1 to this. */
     template< template<typename> class OtherOperator>
-    UnaryOperator<OtherOperator<Type>, Derived> const funct1(Type const number) const
+    inline UnaryOperator<OtherOperator<Type>, Derived> const funct1(Type const number) const
     { return UnaryOperator<OtherOperator<Type>, Derived>(this->asDerived(), OtherOperator<Type>(number));}
 
     /** @return the transposed expression of this. */
-    TransposeOperator<Derived> transpose() const
+    inline TransposeOperator<Derived> transpose() const
     { return TransposeOperator<Derived> (this->asDerived());}
 
     /** @return the diagonal expression of this (work only for 1D expressions). */
-    DiagonalizeOperator<Derived> diagonalize() const
+    inline DiagonalizeOperator<Derived> diagonalize() const
     { return DiagonalizeOperator<Derived> (this->asDerived());}
     /** @return the diagonal of this expression (work only for square expressions). */
-    DiagonalOperator<Derived> diagonal() const
+    inline DiagonalOperator<Derived> diagonal() const
     { return DiagonalOperator<Derived> (this->asDerived());}
 
     /** @return the j-th column of this. */
-    ColOperator<Derived> col(int j) const
+    inline ColOperator<Derived> col(int j) const
     { return ColOperator<Derived> (this->asDerived(), j);}
     /** @return the i-th row of this. */
-    RowOperator<Derived> row(int i) const
+    inline RowOperator<Derived> row(int i) const
     { return RowOperator<Derived> (this->asDerived(), i);}
     /** @return the sub-vector(I) of this. */
-    SubOperator<Derived> sub(Range I) const
+    inline SubOperator<Derived> sub(Range I) const
     { return SubOperator<Derived> (this->asDerived(), I);}
 
     /** @returns the dot product of this with other.

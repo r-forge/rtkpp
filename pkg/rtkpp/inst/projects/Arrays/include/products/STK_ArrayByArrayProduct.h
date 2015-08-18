@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2012  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -40,17 +40,20 @@ namespace STK
 {
 namespace hidden
 {
+template<typename Lhs, typename Rhs, typename Result, bool Orient_> struct bp;
+
 /** @ingroup hidden
- * Methods to use for C=AB with A divided in blocks and B divided in panels.
- * The structure bp contains only static method and typedef and should normally
- * not be used directly.
+ *  Methods to use for C=AB with A divided in blocks and B divided in panels.
+ *  The structure bp contains only static method and typedef and should normally
+ *  not be used directly.
  **/
 template<typename Lhs, typename Rhs, typename Result>
-struct bp
+struct bp<Lhs, Rhs, Result, (bool)Arrays::by_row_>
 {
   typedef typename Result::Type Type;
   typedef hidden::MultImpl<Type> Cmult;
   typedef hidden::MultCoefImpl<Lhs, Rhs, Result> MultCoeff;
+
   /** Main method for Matrices multiplication implementation.
    *  @note res have been resized and initialized to zero outside this method.
    **/
@@ -59,77 +62,111 @@ struct bp
 #ifdef STK_DEBUG
      stk_cout << _T("Entering bp::run()\n");
 #endif
+    // check small sizes
+    switch (lhs.sizeRows())
+    {
+      case 0:
+        return; break;
+      case 1:
+        MultCoeff::mult1RowOuterCol(lhs, rhs, res, lhs.beginRows());
+        return; break;
+      case 2:
+        MultCoeff::mult2RowOuterCol(lhs, rhs, res, lhs.beginRows());
+        return; break;
+      case 3:
+        MultCoeff::mult3RowOuterCol(lhs, rhs, res, lhs.beginRows());
+        return; break;
+      default: break;
+    }
+    switch (rhs.sizeCols())
+    {
+      case 0:
+        return; break;
+      case 1:
+        MultCoeff::mult1ColOuterCol(lhs, rhs, res, rhs.beginCols());
+        return; break;
+      case 2:
+        MultCoeff::mult2ColOuterCol(lhs, rhs, res, rhs.beginCols());
+        return; break;
+      case 3:
+        MultCoeff::mult3ColOuterCol(lhs, rhs, res, rhs.beginCols());
+        return; break;
+      default: break;
+    }
     // compute dimensions
     int nbInnerLoop = lhs.sizeCols()/blockSize; // = rhs.sizeRows()/blockSize;
-    int nbBlocks = lhs.sizeRows()/blockSize;
-    int nbPanels = rhs.sizeCols()/panelSize;
+    int nbBlocks    = lhs.sizeRows()/blockSize;
+    int nbPanels    = rhs.sizeCols()/panelSize;
     // remaining sizes in the matrices
     int pSize = rhs.sizeCols() - panelSize*nbPanels;
     int bSize = lhs.sizeRows() - blockSize*nbBlocks;
     int tSize = lhs.sizeCols() - blockSize*nbInnerLoop;
-               // = rhs.sizeRows() -  rhs.sizeRows()/blockSize
+              // = rhs.sizeRows() -  rhs.sizeRows()/blockSize
     int iLastRow = lhs.beginRows() + nbBlocks * blockSize;
     int jLastCol = rhs.beginCols() + nbPanels * panelSize;
     int kLastPos = lhs.beginCols() + blockSize * nbInnerLoop;
-    // create panels and blocks
-    Panel<Type>* tabPanel = new Panel<Type>[nbPanels+1];
-    Block<Type>* tabBlock = new Block<Type>[nbBlocks+1];
-    // start blocks by panel
-    for (int k = 0; k<nbInnerLoop; ++k)
+    if (nbInnerLoop)
     {
-      int kPos = lhs.beginCols() + k * blockSize;
-      for (int i = 0; i<nbBlocks; ++i)
+      // create panels and blocks
+      Panel<Type>* tabPanel = new Panel<Type>[nbPanels+1];
+      Block<Type>* tabBlock = new Block<Type>[nbBlocks+1];
+      // start blocks by panel
+      for (int k = 0; k<nbInnerLoop; ++k)
       {
-        int iRow = lhs.beginRows() + i * blockSize;
-        arrayToBlock( lhs, tabBlock[i], iRow, kPos);
-      }
-      arrayToBlock( lhs, tabBlock[nbBlocks], iLastRow, kPos, bSize);
-      for (int j = 0; j<nbPanels; ++j)
-      {
-        int jCol = rhs.beginCols() + j*panelSize;
-        arrayToPanel( rhs, tabPanel[j], kPos, jCol);
-      }
-      arrayToPanel( rhs, tabPanel[nbPanels], kPos, jLastCol, pSize);
+        int kPos = lhs.beginCols() + k * blockSize;
+        for (int i = 0; i<nbBlocks; ++i)
+        {
+          int iRow = lhs.beginRows() + i * blockSize;
+          arrayToBlock( lhs, tabBlock[i], iRow, kPos);
+        }
+        arrayToBlock( lhs, tabBlock[nbBlocks], iLastRow, kPos, bSize);
+        for (int j = 0; j<nbPanels; ++j)
+        {
+          int jCol = rhs.beginCols() + j*panelSize;
+          arrayToPanel( rhs, tabPanel[j], kPos, jCol);
+        }
+        arrayToPanel( rhs, tabPanel[nbPanels], kPos, jLastCol, pSize);
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-      for (int i = 0; i<nbBlocks; ++i)
-      {
-        int iRow = lhs.beginRows() + i * blockSize;
+        for (int i = 0; i<nbBlocks; ++i)
+        {
+          int iRow = lhs.beginRows() + i * blockSize;
+          for (int j = 0; j<nbPanels; ++j)
+          {
+            int jCol = rhs.beginCols() + j * panelSize;
+            blockByPanel( tabBlock[i], tabPanel[j], res, iRow, jCol);
+          }
+        }
+        for (int i = 0; i<nbBlocks; ++i)
+        {
+          int iRow = lhs.beginRows() + i * blockSize;
+          blockByPanel( tabBlock[i], tabPanel[nbPanels], res, iRow, jLastCol, pSize);
+        }
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
         for (int j = 0; j<nbPanels; ++j)
         {
           int jCol = rhs.beginCols() + j * panelSize;
-          blockByPanel( tabBlock[i], tabPanel[j], res, iRow, jCol);
+          blockByPanel( tabBlock[nbBlocks], tabPanel[j], res, iLastRow, jCol, panelSize, bSize);
         }
-      }
-      for (int i = 0; i<nbBlocks; ++i)
-      {
-        int iRow = lhs.beginRows() + i * blockSize;
-        blockByPanel( tabBlock[i], tabPanel[nbPanels], res, iRow, jLastCol, pSize);
-      }
-#ifdef _OPENMP
-#pragma omp parallel for
-#endif
-      for (int j = 0; j<nbPanels; ++j)
-      {
-        int jCol = rhs.beginCols() + j * panelSize;
-        blockByPanel( tabBlock[nbBlocks], tabPanel[j], res, iLastRow, jCol, panelSize, bSize);
-      }
-      blockByPanel( tabBlock[nbBlocks], tabPanel[nbPanels], res, iLastRow, jLastCol, pSize, bSize);
-    }
-    delete[] tabBlock;
-    delete[] tabPanel;
+        blockByPanel( tabBlock[nbBlocks], tabPanel[nbPanels], res, iLastRow, jLastCol, pSize, bSize);
+      } // InnerLoop
+      delete[] tabBlock;
+      delete[] tabPanel;
+    } // if IneerLoop
     // treat the remaining rows, columns
     switch (tSize)
     {
       case 1:
-        MultCoeff::mult1(lhs, rhs, res, kLastPos, kLastPos);
+        MultCoeff::mult1Col(lhs, rhs, res, kLastPos, kLastPos);
         break;
       case 2:
-        MultCoeff::mult2(lhs, rhs, res, kLastPos, kLastPos);
+        MultCoeff::mult2Col(lhs, rhs, res, kLastPos, kLastPos);
         break;
       case 3:
-        MultCoeff::mult3(lhs, rhs, res, kLastPos, kLastPos);
+        MultCoeff::mult3Col(lhs, rhs, res, kLastPos, kLastPos);
         break;
       default:
         break;
@@ -255,7 +292,7 @@ struct bp
  * not be used directly.
  **/
 template<typename Lhs, typename Rhs, typename Result>
-struct pb
+struct bp<Lhs, Rhs, Result, (bool)Arrays::by_col_>
 {
   typedef typename Result::Type Type;
   typedef hidden::MultImpl<Type> Cmult;
@@ -265,6 +302,37 @@ struct pb
    **/
   static void run(Lhs const& lhs, Rhs const& rhs, Result& res)
   {
+    // check small sizes
+    switch (lhs.sizeRows())
+    {
+      case 0:
+        return; break;
+      case 1:
+        MultCoeff::mult1RowOuterRow(lhs, rhs, res, lhs.beginRows());
+        return; break;
+      case 2:
+        MultCoeff::mult2RowOuterRow(lhs, rhs, res, lhs.beginRows());
+        return; break;
+      case 3:
+        MultCoeff::mult3RowOuterRow(lhs, rhs, res, lhs.beginRows());
+        return; break;
+      default: break;
+    }
+    switch (rhs.sizeCols())
+    {
+      case 0:
+        return; break;
+      case 1:
+        MultCoeff::mult1ColOuterRow(lhs, rhs, res, rhs.beginCols());
+        return; break;
+      case 2:
+        MultCoeff::mult2ColOuterRow(lhs, rhs, res, rhs.beginCols());
+        return; break;
+      case 3:
+        MultCoeff::mult3ColOuterRow(lhs, rhs, res, rhs.beginCols());
+        return; break;
+      default: break;
+    }
     // compute dimensions
     int nbInnerLoop = lhs.sizeCols()/blockSize; // = rhs.sizeRows()/blockSize;
     int nbBlocks = rhs.sizeCols()/blockSize;
@@ -279,62 +347,65 @@ struct pb
     int lastRow = lhs.beginRows() + panelSize * nbPanels;
     int lastPos = rhs.beginRows() + blockSize * nbInnerLoop;
 
-    // create panels
-    Panel<Type>* tabPanel = new Panel<Type>[nbPanels+1];
-    Block<Type>* tabBlock = new Block<Type>[nbBlocks+1];
-    // start blocks by panel
-    for (int k = 0; k<nbInnerLoop; ++k)
+    if (nbInnerLoop)
     {
-      int kPos = rhs.beginRows() + k * blockSize;
-      // get panels
-      for (int i = 0, iRow= lhs.beginRows(); i<nbPanels; ++i, iRow+= panelSize)
-      { arrayToPanel( lhs, tabPanel[i], iRow, kPos);}
-      arrayToPanel( lhs, tabPanel[nbPanels], lastRow, kPos, pSize);
-      // get blocks
-      for (int j = 0, jCol = rhs.beginCols(); j<nbBlocks; ++j, jCol+=blockSize)
-      { arrayToBlock( rhs, tabBlock[j], kPos, jCol);}
-      arrayToBlock( rhs, tabBlock[nbBlocks], kPos, lastCol, bSize);
-      // perform the products blocks * panel
+      // create panels
+      Panel<Type>* tabPanel = new Panel<Type>[nbPanels+1];
+      Block<Type>* tabBlock = new Block<Type>[nbBlocks+1];
+      // start blocks by panel
+      for (int k = 0; k<nbInnerLoop; ++k)
+      {
+        int kPos = rhs.beginRows() + k * blockSize;
+        // get panels
+        for (int i = 0, iRow= lhs.beginRows(); i<nbPanels; ++i, iRow+= panelSize)
+        { arrayToPanel( lhs, tabPanel[i], iRow, kPos);}
+        arrayToPanel( lhs, tabPanel[nbPanels], lastRow, kPos, pSize);
+        // get blocks
+        for (int j = 0, jCol = rhs.beginCols(); j<nbBlocks; ++j, jCol+=blockSize)
+        { arrayToBlock( rhs, tabBlock[j], kPos, jCol);}
+        arrayToBlock( rhs, tabBlock[nbBlocks], kPos, lastCol, bSize);
+        // perform the products blocks * panel
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-      for (int j = 0; j<nbBlocks; ++j)
-      {
-        int jCol = rhs.beginCols() + j * blockSize;
+        for (int j = 0; j<nbBlocks; ++j)
+        {
+          int jCol = rhs.beginCols() + j * blockSize;
+          for (int i = 0; i<nbPanels; ++i)
+          {
+            int iRow = lhs.beginRows() + i * panelSize;
+            panelByBlock( tabPanel[i], tabBlock[j], res, iRow, jCol);
+          }
+        }
+        for (int j = 0; j<nbBlocks; ++j)
+        {
+          int jCol = rhs.beginCols() + j * blockSize;
+          panelByBlock( tabPanel[nbPanels], tabBlock[j], res, lastRow, jCol, pSize);
+        }
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
         for (int i = 0; i<nbPanels; ++i)
         {
-          int iRow = lhs.beginRows() + i * panelSize;
-          panelByBlock( tabPanel[i], tabBlock[j], res, iRow, jCol);
+          int iRow= lhs.beginRows() + i * panelSize;
+          panelByBlock( tabPanel[i],  tabBlock[nbBlocks], res, iRow, lastCol, panelSize, bSize);
         }
-      }
-      for (int j = 0; j<nbBlocks; ++j)
-      {
-        int jCol = rhs.beginCols() + j * blockSize;
-        panelByBlock( tabPanel[nbPanels], tabBlock[j], res, lastRow, jCol, pSize);
-      }
-#ifdef _OPENMP
-#pragma omp parallel for
-#endif
-      for (int i = 0; i<nbPanels; ++i)
-      {
-        int iRow= lhs.beginRows() + i * panelSize;
-        panelByBlock( tabPanel[i],  tabBlock[nbBlocks], res, iRow, lastCol, panelSize, bSize);
-      }
-      panelByBlock( tabPanel[nbPanels],  tabBlock[nbBlocks], res, lastRow, lastCol, pSize, bSize);
-    } // k loop
-    delete[] tabPanel;
-    delete[] tabBlock;
+        panelByBlock( tabPanel[nbPanels],  tabBlock[nbBlocks], res, lastRow, lastCol, pSize, bSize);
+      } // k loop
+      delete[] tabPanel;
+      delete[] tabBlock;
+    }
     // treat the remaining rows, columns
     switch (tSize)
     {
       case 1:
-        MultCoeff::mult1(lhs, rhs, res, lastPos, lastPos);
+        MultCoeff::mult1Col(lhs, rhs, res, lastPos, lastPos);
         break;
       case 2:
-        MultCoeff::mult2(lhs, rhs, res, lastPos, lastPos);
+        MultCoeff::mult2Col(lhs, rhs, res, lastPos, lastPos);
         break;
       case 3:
-        MultCoeff::mult3(lhs, rhs, res, lastPos, lastPos);
+        MultCoeff::mult3Col(lhs, rhs, res, lastPos, lastPos);
         break;
       default:
         break;

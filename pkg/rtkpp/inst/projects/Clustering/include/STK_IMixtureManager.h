@@ -49,10 +49,11 @@ namespace STK
  *
  *  A mixture manager is a factory class for injection dependency in the
  *  STK++ derived class of the IMixtureComposer. It handles all the creation
- *  and initialization stuff needed by the mixture models. It allow to get the
- *  parameters and imputed missing values.
+ *  and initialization stuff needed by the mixture models. It allows to get the
+ *  parameters and imputed missing values from specific mixtures. It allows also
+ *  to set the parameters to a specific mixture.
  *
- *  @tparam DataHandler is any concrete class from the interface DataHandlerBase
+ *  @tparam DataHandler any concrete class from the interface IDataHandler
  */
 template<class DataHandler>
 class IMixtureManager
@@ -99,38 +100,30 @@ class IMixtureManager
      *  @param idData name of the data set to release
      **/
     void releaseMixtureData(String const& idData);
-    /** get the parameters from an IMixture.
-     *  @param p_mixture pointer on the mixture
-     *  @param data the array to return with the parameters
-     **/
-    virtual void getParameters(IMixture* p_mixture, ArrayXX& data) const =0;
-
+    // templated methods
     /** get the missing values of a data set.
      *  @param idData Id name of the data set attached to the mixture
      *  @param data the array to return with the missing values
      **/
     template<typename Type>
-    void getMissingValues( String const& idData, std::vector< std::pair< std::pair<int,int>, Type > >& data) const
-    {
-      typedef typename hidden::DataHandlerTraits<DataHandler, Type>::Data DataType;
-      typedef MixtureData<DataType> MixtureDataType;
-
-      IMixtureData* p_data = getMixtureData(idData);
-      // up-cast... (Yes it's bad....;)...)
-      if (p_data)
-      { static_cast<MixtureDataType const*>(p_data)->getMissingValues(data);}
-    }
+    void getMissingValues( String const& idData, std::vector< std::pair< std::pair<int,int>, Type > >& data) const;
     /** get the wrapper for any kind of data set using its Id
      *  @param idData Id name of the data set attached to the mixture
      *  @return a constant reference on the array with the data set
      **/
     template<typename Type>
-    typename hidden::DataHandlerTraits<DataHandler, Type>::Data const& getData( String const& idData) const
-    {
-      typedef typename hidden::DataHandlerTraits<DataHandler, Type>::Data DataType;
-      typedef MixtureData<DataType> MixtureDataType;
-      return static_cast<MixtureDataType const*>(getMixtureData(idData))->dataij_;
-    }
+    typename hidden::DataHandlerTraits<DataHandler, Type>::Data const& getData( String const& idData) const;
+    // pure virtual methods
+    /** get the parameters from an IMixture.
+     *  @param p_mixture pointer on the mixture
+     *  @param data the array to return with the parameters
+     **/
+    virtual void getParameters(IMixture* p_mixture, ArrayXX& data) const =0;
+    /** set the parameters from an IMixture.
+     *  @param p_mixture pointer on the mixture
+     *  @param data the array with the parameters to set
+     **/
+    virtual void setParameters(IMixture* p_mixture, ArrayXX const& data) const =0;
 
   protected:
     /** Utility lookup function allowing to find a MixtureData from its idData
@@ -249,6 +242,34 @@ IMixtureData* IMixtureManager<DataHandler>::getMixtureData( String const& idData
   return 0;
 }
 
+/** get the missing values of a data set.
+ *  @param idData Id name of the data set attached to the mixture
+ *  @param data the array to return with the missing values
+ **/
+template<class DataHandler>
+template<typename Type>
+void IMixtureManager<DataHandler>::getMissingValues( String const& idData, std::vector< std::pair< std::pair<int,int>, Type > >& data) const
+{
+  typedef typename hidden::DataHandlerTraits<DataHandler, Type>::Data DataType;
+  typedef MixtureData<DataType> MixtureDataType;
+
+  IMixtureData* p_data = getMixtureData(idData);
+  // up-cast... (Yes it's bad....;)...)
+  if (p_data)
+  { static_cast<MixtureDataType const*>(p_data)->getMissingValues(data);}
+}
+/** get the wrapper for any kind of data set using its Id
+ *  @param idData Id name of the data set attached to the mixture
+ *  @return a constant reference on the array with the data set
+ **/
+template<class DataHandler>
+template<typename Type>
+typename hidden::DataHandlerTraits<DataHandler, Type>::Data const& IMixtureManager<DataHandler>::getData( String const& idData) const
+{
+  typedef typename hidden::DataHandlerTraits<DataHandler, Type>::Data DataType;
+  typedef MixtureData<DataType> MixtureDataType;
+  return static_cast<MixtureDataType const*>(getMixtureData(idData))->dataij_;
+}
 } // namespace STK
 
 

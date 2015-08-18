@@ -32,10 +32,9 @@
  *  @brief In this file we implement the HyperGeometric distribution.
  **/
 
-#include "../include/STK_Law_HyperGeometric.h"
 
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
+#ifndef IS_RTKPP_LIB
+#include "../include/STK_Law_HyperGeometric.h"
 #endif
 
 namespace STK
@@ -44,32 +43,7 @@ namespace STK
 namespace Law
 {
 
-#ifdef IS_RTKPP_LIB
-
-
-/*inline*/ Integer HyperGeometric::rand() const
-{ return R::rhyper(nbSuccesses_, nbFailures_, nbDraws_);}
-/*inline*/ Real HyperGeometric::pdf(Integer const& x) const
-{ return R::dhyper((double)x, nbSuccesses_, nbFailures_, nbDraws_, false);}
-/*inline*/ Real HyperGeometric::lpdf(Integer const& x) const
-{ return R::dhyper((double)x, nbSuccesses_, nbFailures_, nbDraws_, true);}
-/*inline*/ Real HyperGeometric::cdf(Real const& t) const
-{ return R::phyper(t, nbSuccesses_, nbFailures_, nbDraws_, true, false);}
-/*inline*/ Integer HyperGeometric::icdf(Real const& p) const
-{ return R::qhyper(p, nbSuccesses_, nbFailures_, nbDraws_, true, false);}
-
-/*inline*/ Integer HyperGeometric::rand( int nbSuccesses, int nbFailures, int nbDraws)
-{ return (Integer)R::rhyper(nbSuccesses, nbFailures, nbDraws);}
-/*inline*/ Real HyperGeometric::pdf(Integer x, int nbSuccesses, int nbFailures, int nbDraws)
-{ return R::dhyper((double)x, nbSuccesses, nbFailures, nbDraws, false);}
-/*inline*/ Real HyperGeometric::lpdf(Integer x, int nbSuccesses, int nbFailures, int nbDraws)
-{ return R::dhyper((double)x, nbSuccesses, nbFailures, nbDraws, true);}
-/*inline*/ Real HyperGeometric::cdf(Real const& t, int nbSuccesses, int nbFailures, int nbDraws)
-{ return R::phyper(t, nbSuccesses, nbFailures, nbDraws, true, false);}
-/*inline*/ Integer HyperGeometric::icdf(Real const& p, int nbSuccesses, int nbFailures, int nbDraws)
-{ return (Integer)R::qhyper(p, nbSuccesses, nbFailures, nbDraws, true, false);}
-
-#else
+#ifndef IS_RTKPP_LIB
 
 /* @return a random hypergeometric variate. */
 Integer HyperGeometric::rand() const

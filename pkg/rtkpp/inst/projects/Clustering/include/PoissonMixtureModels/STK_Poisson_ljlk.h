@@ -52,7 +52,6 @@ struct MixtureTraits< Poisson_ljlk<_Array> >
 {
   typedef _Array                  Array;
   typedef typename Array::Type    Type;
-  typedef Array2D<Real>           Param;
   typedef ParametersHandler<Clust::Poisson_ljlk_> ParamHandler;
 };
 
@@ -60,22 +59,46 @@ struct MixtureTraits< Poisson_ljlk<_Array> >
 
 /** Specialization of the ParametersHandler struct for Poisson_ljlk model */
 template <>
-struct ParametersHandler<Clust::Poisson_ljlk_>
+struct ParametersHandler<Clust::Poisson_ljlk_>: public PoissonHandlerBase<  ParametersHandler<Clust::Poisson_ljlk_> >
 {
   /** Array of the class rates */
   MixtureParametersSet<Real> lambdak_;
   /** Array of the variables rates */
   MixtureParameters<PointX> lambdaj_;
+  /** @return the value of lambda of the kth cluster and jth variable */
+  inline Real lambdaImpl(int k, int j) const { return lambdak_[k] * lambdaj_()[j];}
+  /** copy operator */
+  inline ParametersHandler& operator=( ParametersHandler const& other)
+  { lambdaj_ = other.lambdaj_; lambdak_ = other.lambdak_; return *this; }
+  /** copy operator using an array/expression storing the values */
+  template<class Array>
+  inline ParametersHandler& operator=( ExprBase<Array> const& param)
+  {
+    lambdak_() = Stat::meanByRow(param.asDerived());
+    lambdaj_() = Stat::mean(param.asDerived());
+    return *this;
+  }
+
   /** default constructor. All lambdas are initialized to 1. */
-  inline ParametersHandler( int nbCluster)
-                          : lambdak_(nbCluster), lambdaj_()
-  {}
+  inline ParametersHandler( int nbCluster): lambdak_(nbCluster), lambdaj_() {}
   /** copy constructor.
    * @param param the parameters to copy.
    **/
   inline ParametersHandler( ParametersHandler const& param)
                           : lambdak_(param.lambdak_), lambdaj_(param.lambdaj_)
   {}
+  /** Initialize the parameters with an array/expression of value */
+  template<class Array>
+  inline ParametersHandler(int nbCluster, ExprBase<Array> const& param): lambdak_(nbCluster), lambdaj_()
+  {
+#ifdef STK_MIXTURE_DEBUG
+      if (param.rows()!=nbCluster)
+      { STKRUNTIME_ERROR_1ARG(ParametersHandler::ParametersHandler,nbCluster,bad dimension in setParameters);}
+#endif
+    lambdaj_.resize(param.cols());
+    lambdak_() = Stat::meanByRow(param.asDerived());
+    lambdaj_() = Stat::mean(param.asDerived());
+  }
   /** destructor */
   inline ~ParametersHandler() {}
   /** Initialize the parameters of the model. */
@@ -127,9 +150,6 @@ class Poisson_ljlk : public PoissonBase<Poisson_ljlk<Array> >
                 : Base(model) {}
     /** destructor */
     inline ~Poisson_ljlk() {}
-    /** @return the value of lambda of the kth cluster and jth variable */
-    /** @return the value of lambda of the kth cluster and jth variable */
-    inline Real lambdaImpl(int k, int j) const { return param_.lambdak_[k] * param_.lambdaj_()[j];}
     /** @return the value of the probability of the i-th sample in the k-th component.
      *  @param i,k indexes of the sample and of the component
      **/

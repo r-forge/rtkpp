@@ -121,11 +121,13 @@ template<typename Lhs> class TransposeOperatorBase;
   * don't have to name TransposeOperator type explicitly.
   */
 template< typename Lhs>
-class TransposeOperator  : public TransposeOperatorBase< Lhs >, public TRef<1>
+class TransposeOperator: public ExprBase< TransposeOperator<Lhs> >, public TRef<1>
 {
   public:
-    typedef TransposeOperatorBase< Lhs > Base;
+    typedef ExprBase< TransposeOperator<Lhs> > Base;
     typedef typename hidden::Traits< TransposeOperator<Lhs> >::Type Type;
+    typedef typename hidden::Traits< TransposeOperator<Lhs> >::ReturnType ReturnType;
+
     typedef typename hidden::Traits< TransposeOperator<Lhs> >::Row Row;
     typedef typename hidden::Traits< TransposeOperator<Lhs> >::Col Col;
     enum
@@ -141,46 +143,28 @@ class TransposeOperator  : public TransposeOperatorBase< Lhs >, public TRef<1>
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
     /** Constructor */
-    TransposeOperator( Lhs const& lhs) : Base(), lhs_(lhs) {}
+    inline TransposeOperator( Lhs const& lhs) : Base(), lhs_(lhs) {}
 
     /**  @return the range of the rows */
-    RowRange const& rowsImpl() const { return lhs_.cols();}
+    inline RowRange const& rowsImpl() const { return lhs_.cols();}
     /** @return the range of the Columns */
-    ColRange const& colsImpl() const { return lhs_.rows();}
+    inline ColRange const&colsImpl() const { return lhs_.rows();}
 
     /** @return the left hand side expression */
     Lhs const& lhs() const { return lhs_; }
-
-  protected:
-    Lhs const& lhs_;
-};
-
-/** @ingroup Arrays
-  * @brief implement the access to the elements in the (2D) general case.
-  **/
-template< typename Lhs>
-class TransposeOperatorBase : public ExprBase< TransposeOperator<Lhs> >
-{
-  public:
-    typedef TransposeOperator<Lhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits<Derived>::Type Type;
-    typedef typename hidden::Traits<Derived>::ReturnType ReturnType;
-    /** constructor. */
-    TransposeOperatorBase() : Base() {}
     /** @return the element (i,j) of the transposed expression.
      *  @param i, j index of the row and of the column
      **/
-    ReturnType elt2Impl(int i, int j) const
-    { return (this->asDerived().lhs().elt(j, i));}
+    inline ReturnType elt2Impl(int i, int j) const { return (lhs_.elt(j, i));}
     /** @return the element ith element of the transposed expression
      *  @param i index of the ith element
      **/
-    ReturnType elt1Impl(int i) const
-    { return (this->asDerived().lhs().elt(i));}
-    /** accesses to the element of the transposed expression */
-    ReturnType elt0Impl() const
-    { return (this->asDerived().lhs().elt());}
+    inline ReturnType elt1Impl(int i) const { return (lhs_.elt(i));}
+    /** access to the element of the transposed expression */
+    inline ReturnType elt0Impl() const { return (lhs_.elt());}
+
+  protected:
+    Lhs const& lhs_;
 };
 
 } // namespace STK

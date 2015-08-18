@@ -41,11 +41,10 @@
 
 #define STK_CREATE_MIXTURE(Data, Bridge) \
           Data* p_data = new Data(idData); \
-          registerMixtureData(p_data); \
           p_handler()->getData(idData, p_data->dataij_, p_data->nbVariable_ ); \
           p_data->initialize(); \
-          Bridge* p_bridge = new Bridge( p_data, idData, nbCluster);  \
-          return p_bridge;
+          registerMixtureData(p_data); \
+          return new Bridge( p_data, idData, nbCluster);
 
 namespace STK
 {
@@ -98,16 +97,44 @@ class DiagGaussianMixtureManager : public IMixtureManager<DataHandler>
       {
         // Gaussian models
         case Clust::Gaussian_sjk_:
-        { static_cast<MixtureBridge_sjk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_sjk*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Gaussian_sk_:
-        { static_cast<MixtureBridge_sk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_sk*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Gaussian_sj_:
-        { static_cast<MixtureBridge_sj const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_sj*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Gaussian_s_:
-        { static_cast<MixtureBridge_s const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_s*>(p_mixture)->getParameters(param);}
+        break;
+        default: // idModel is not implemented
+        break;
+      }
+    }
+    /** set the parameters from an IMixture.
+     *  @param p_mixture pointer on the mixture
+     *  @param param the array with the parameters to set
+     **/
+    virtual void setParameters(IMixture* p_mixture, ArrayXX const& param) const
+    {
+      Clust::Mixture idModel = getIdModel(p_mixture->idName());
+      if (idModel == Clust::unknown_mixture_) return;
+      // up-cast... (Yes it's bad....;)...)
+      switch (idModel)
+      {
+        // Gaussian models
+        case Clust::Gaussian_sjk_:
+        { static_cast<MixtureBridge_sjk*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Gaussian_sk_:
+        { static_cast<MixtureBridge_sk*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Gaussian_sj_:
+        { static_cast<MixtureBridge_sj*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Gaussian_s_:
+        { static_cast<MixtureBridge_s*>(p_mixture)->setParameters(param);}
         break;
         default: // idModel is not implemented
         break;

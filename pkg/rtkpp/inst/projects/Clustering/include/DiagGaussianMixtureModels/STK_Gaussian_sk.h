@@ -51,8 +51,7 @@ template<class _Array>
 struct MixtureTraits< Gaussian_sk<_Array> >
 {
   typedef _Array Array;
-  typedef typename Array::Type Type;
-  typedef Array2D<Real>        Param;
+
   typedef ParametersHandler<Clust::Gaussian_sk_> ParamHandler;
 };
 
@@ -60,37 +59,71 @@ struct MixtureTraits< Gaussian_sk<_Array> >
 
 /** Specialization of the ParametersHandler struct for Gaussian_sk model */
 template <>
-struct ParametersHandler<Clust::Gaussian_sk_>
+struct ParametersHandler<Clust::Gaussian_sk_>: public DiagGaussianHandlerBase<  ParametersHandler<Clust::Gaussian_sk_> >
 {
-    /** RowVector and statistics of the means */
-    MixtureParametersSet<PointX> mean_;
-    /** standard deviation and statistics */
-    MixtureParametersSet<Real> sigma_;
-    /** default constructor */
-    ParametersHandler(int nbCluster): mean_(nbCluster), sigma_(nbCluster) {}
-    /** copy constructor */
-    ParametersHandler(ParametersHandler const& model): mean_(model.mean_), sigma_(model.sigma_) {}
-    /** Initialize the parameters of the model.
-     *  This function initialize the parameters and the statistics.
-     **/
-    void resize(Range const& range)
+  /** RowVector and statistics of the means */
+  MixtureParametersSet<PointX> mean_;
+  /** standard deviation and statistics */
+  MixtureParametersSet<Real> sigma_;
+  /** @return the mean of the kth cluster and jth variable */
+  inline Real const& meanImpl(int k, int j) const { return mean_[k][j];}
+  /** @return the standard deviation of the kth cluster and jth variable */
+  inline Real const& sigmaImpl(int k, int j) const { return sigma_[k];}
+  /** copy operator */
+  inline ParametersHandler& operator=( ParametersHandler const& other)
+  { mean_ = other.mean_; sigma_ = other.sigma_; return *this;}
+  /** copy operator using an array/expression storing the values */
+  template<class Array>
+  inline ParametersHandler& operator=( ExprBase<Array> const& param)
+  {
+    for (int k2= param.beginRows(), k= param.beginRows(); k2 < param.endRows(); k2+=2, k++)
     {
-      mean_.resize(range);
-      mean_.initialize(0.);
-      sigma_.initialize(1.);
+      for (int j= param.beginCols();  j< param.endCols(); ++j)
+      { mean_[k][j]  = param(k2, j);}
+      sigma_[k] = param.row(k2+1).mean();
     }
-    /** Store the intermediate results of the Mixture.
-     *  @param iteration Provides the iteration number beginning after the burn-in period.
-     **/
-    inline void storeIntermediateResults(int iteration)
-    { mean_.storeIntermediateResults(iteration); sigma_.storeIntermediateResults(iteration);}
-    /** Release the stored results. This is usually used if the estimation
-     *  process failed.
-     **/
-    inline void releaseIntermediateResults()
-    { mean_.releaseIntermediateResults(); sigma_.releaseIntermediateResults();}
-    /** set the parameters stored in stat_proba_ and release stat_proba_. */
-    inline void setParameters() { mean_.setParameters(); sigma_.setParameters();}
+    return *this;
+  }
+
+  /** default constructor */
+  ParametersHandler(int nbCluster): mean_(nbCluster), sigma_(nbCluster) {}
+  /** copy constructor */
+  ParametersHandler(ParametersHandler const& model): mean_(model.mean_), sigma_(model.sigma_) {}
+  /** Initialize the parameters with an array/expression of value */
+  template<class Array>
+  inline ParametersHandler( int nbCluster, ExprBase<Array> const& param)
+                          : mean_(nbCluster), sigma_(nbCluster)
+  {
+    mean_.resize(param.cols());
+    for (int k2= param.beginRows(), k= param.beginRows(); k2 < param.endRows(); k2+=2, k++)
+    {
+      for (int j= param.beginCols();  j< param.endCols(); ++j)
+      { mean_[k][j]  = param(k2, j);}
+      sigma_[k] = param.row(k2+1).mean();
+    }
+  }
+
+  /** Initialize the parameters of the model.
+   *  This function initialize the parameters and the statistics.
+   **/
+  void resize(Range const& range)
+  {
+    mean_.resize(range);
+    mean_.initialize(0.);
+    sigma_.initialize(1.);
+  }
+  /** Store the intermediate results of the Mixture.
+   *  @param iteration Provides the iteration number beginning after the burn-in period.
+   **/
+  inline void storeIntermediateResults(int iteration)
+  { mean_.storeIntermediateResults(iteration); sigma_.storeIntermediateResults(iteration);}
+  /** Release the stored results. This is usually used if the estimation
+   *  process failed.
+   **/
+  inline void releaseIntermediateResults()
+  { mean_.releaseIntermediateResults(); sigma_.releaseIntermediateResults();}
+  /** set the parameters stored in stat_proba_ and release stat_proba_. */
+  inline void setParameters() { mean_.setParameters(); sigma_.setParameters();}
 };
 
 /** @ingroup Clustering
@@ -121,10 +154,6 @@ class Gaussian_sk : public DiagGaussianBase<Gaussian_sk<Array> >
     inline Gaussian_sk( Gaussian_sk const& model) : Base(model) {}
     /** destructor */
     inline ~Gaussian_sk() {}
-    /** @return the mean of the kth cluster and jth variable */
-    inline Real meanImpl(int k, int j) const { return param_.mean_[k][j];}
-    /** @return the standard deviation of the kth cluster and jth variable */
-    inline Real sigmaImpl(int k, int j) const { return param_.sigma_[k];}
     /** @return the value of the probability of the i-th sample in the k-th component.
      *  @param i,k indexes of the sample and of the component
      **/

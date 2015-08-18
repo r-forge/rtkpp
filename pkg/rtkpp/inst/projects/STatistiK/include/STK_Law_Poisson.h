@@ -157,6 +157,29 @@ class Poisson: public IUnivLaw<int>
     Real lambda_;
 };
 
+#ifdef IS_RTKPP_LIB
+
+/* @return a Poisson random variate . */
+inline int Poisson::rand() const { return (int)::Rf_rpois(lambda_);}
+inline Real Poisson::pdf(int const& x) const { return ::Rf_dpois((double)x, lambda_, false);}
+inline Real Poisson::lpdf(int const& x) const { return ::Rf_dpois((double)x, lambda_, true);}
+inline Real Poisson::cdf(Real const& t) const { return ::Rf_ppois(t, lambda_, true, false);}
+inline int Poisson::icdf(Real const& p) const { return (int)::Rf_qpois(p, lambda_, true, false);}
+
+/* static */
+inline int Poisson::rand(Real const& lambda)
+{return (int)::Rf_rpois(lambda);}
+inline Real Poisson::pdf(int const& x, Real const& lambda)
+{ return ::Rf_dpois((double)x, lambda, false);}
+inline Real Poisson::lpdf(int const& x, Real const& lambda)
+{ return ::Rf_dpois((double)x, lambda, true);}
+inline Real Poisson::cdf(Real const& t, Real const& lambda)
+{ return ::Rf_ppois(t, lambda, true, false);}
+inline int Poisson::icdf(Real const& p, Real const& lambda)
+{ return (int)::Rf_qpois(p, lambda, true, false);}
+
+#endif
+
 } // namespace Law
 
 } // namespace STK

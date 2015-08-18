@@ -32,10 +32,9 @@
  *  @brief In this file we define the NegativeBinomial distribution.
  **/
 
-#include "../include/STK_Law_NegativeBinomial.h"
 
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
+#ifndef IS_RTKPP_LIB
+#include "../include/STK_Law_NegativeBinomial.h"
 #endif
 
 namespace STK
@@ -43,31 +42,7 @@ namespace STK
 namespace Law
 {
 
-#ifdef IS_RTKPP_LIB
-
-/*inline*/ Integer NegativeBinomial::rand() const
-{ return R::rnbinom(size_, prob_);}
-/*inline*/ Real NegativeBinomial::pdf(Integer const& x) const
-{ return R::dnbinom((double)x, size_, prob_, false);}
-/*inline*/ Real NegativeBinomial::lpdf(Integer const& x) const
-{ return R::dnbinom((double)x, size_, prob_, true);}
-/*inline*/ Real NegativeBinomial::cdf(Real const& t) const
-{ return R::pnbinom(t, size_, prob_, true, false);}
-/*inline*/ Integer NegativeBinomial::icdf(Real const& p) const
-{ return (Integer)R::qnbinom(p, size_, prob_, true, false);}
-
-/*inline*/ Integer NegativeBinomial::rand(int size, Real const& prob)
-{ return R::rnbinom(size, prob);}
-/*inline*/ Real NegativeBinomial::pdf(Integer x, int size, Real const& prob)
-{ return R::dnbinom((double)x, size, prob, false);}
-/*inline*/ Real NegativeBinomial::lpdf(Integer x, int size, Real const& prob)
-{ return R::dnbinom((double)x, size, prob, true);}
-/*inline*/ Real NegativeBinomial::cdf(Real const& t, int size, Real const& prob)
-{ return R::pnbinom(t, size, prob , true, false);}
-/*inline*/ Integer NegativeBinomial::icdf(Real const& p, int size, Real const& prob)
-{ return (Integer)R::qnbinom(p, size, prob , true, false);}
-
-#else
+#ifndef IS_RTKPP_LIB
 
 /* @return a Integer random variate . */
 Integer NegativeBinomial::rand() const

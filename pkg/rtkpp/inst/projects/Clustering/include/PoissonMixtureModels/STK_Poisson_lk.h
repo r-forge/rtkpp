@@ -52,7 +52,6 @@ struct MixtureTraits< Poisson_lk<_Array> >
 {
   typedef _Array                  Array;
   typedef typename Array::Type    Type;
-  typedef Array2D<Real>           Param;
   typedef ParametersHandler<Clust::Poisson_lk_> ParamHandler;
 };
 
@@ -60,20 +59,37 @@ struct MixtureTraits< Poisson_lk<_Array> >
 
 /** Specialization of the ParametersHandler struct for Poisson_lk model */
 template <>
-struct ParametersHandler<Clust::Poisson_lk_>
+struct ParametersHandler<Clust::Poisson_lk_>: public PoissonHandlerBase<  ParametersHandler<Clust::Poisson_lk_> >
 {
   /** Array of the rates */
   MixtureParametersSet<Real> lambda_;
+  /** @return the value of lambda of the kth cluster and jth variable */
+  inline Real const& lambdaImpl(int k, int j) const { return lambda_[k];}
+  /** copy operator */
+  inline ParametersHandler& operator=( ParametersHandler const& other)
+  { lambda_ = other.lambda_; return *this; }
+  /** copy operator using an array/expression storing the values */
+  template<class Array>
+  inline ParametersHandler& operator=( ExprBase<Array> const& param)
+  {
+    for (int k= param.beginRows(); k < param.endRows(); ++k)
+    { lambda_[k] = param.row(k).mean();}
+    return *this;
+  }
+
   /** default constructor. All lambdas are initialized to 1. */
-  inline ParametersHandler( int nbCluster)
-                          : lambda_(nbCluster)
-  {}
+  inline ParametersHandler( int nbCluster): lambda_(nbCluster){}
   /** copy constructor.
    * @param param the parameters to copy.
    **/
-  inline ParametersHandler( ParametersHandler const& param)
-                          : lambda_(param.lambda_)
-  {}
+  inline ParametersHandler( ParametersHandler const& param): lambda_(param.lambda_){}
+  /** Initialize the parameters with an array/expression of value */
+  template<class Array>
+  inline ParametersHandler(int nbCluster, ExprBase<Array> const& param): lambda_(nbCluster)
+  {
+    for (int k= param.beginRows(); k < param.endRows(); ++k)
+    { lambda_[k] = param.row(k).mean();}
+  }
   /** destructor */
   inline ~ParametersHandler() {}
   /** Initialize the parameters of the model.

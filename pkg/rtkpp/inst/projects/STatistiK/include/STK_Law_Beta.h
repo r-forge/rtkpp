@@ -121,6 +121,25 @@ class Beta : public IUnivLaw<Real>
     Real beta_;
 };
 
+#ifdef IS_RTKPP_LIB
+/*  Generate a pseudo Beta random variate. */
+inline Real Beta::rand() const { return ::Rf_rbeta(alpha_, beta_);}
+inline Real Beta::pdf( Real const& x) const { return ::Rf_dbeta(x,alpha_, beta_, (int)false);}
+inline Real Beta::lpdf( Real const& x) const { return ::Rf_dbeta(x,alpha_, beta_, (int)true);}
+inline Real Beta::cdf( Real const& t) const { return ::Rf_pbeta(t, alpha_, beta_, (int)true, (int)false);}
+inline Real Beta::icdf( Real const& p) const { return ::Rf_qbeta(p , alpha_, beta_, (int)true, (int)false);}
+inline Real Beta::rand( Real const& alpha, Real const& beta) { return ::Rf_rbeta(alpha, beta);}
+// static
+inline Real Beta::pdf(const Real& x, const Real& alpha, const Real& beta)
+{ return ::Rf_dbeta(x,alpha, beta, (int)false);}
+inline Real Beta::lpdf(const Real& x, const Real& alpha, const Real& beta)
+{ return ::Rf_dbeta(x,alpha, beta, (int)true);}
+inline Real Beta::cdf(const Real& t, const Real& alpha, const Real& beta)
+{ return ::Rf_pbeta(t, alpha, beta, (int)true, (int)false);}
+inline Real Beta::icdf(const Real& p, const Real& alpha, const Real& beta)
+{ return ::Rf_qbeta(p , alpha, beta, (int)true, (int)false);}
+
+#endif
 } // namespace Law
 
 } // namespace STK

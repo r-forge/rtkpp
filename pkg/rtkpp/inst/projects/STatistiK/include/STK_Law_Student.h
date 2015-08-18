@@ -137,6 +137,21 @@ class Student : public IUnivLaw<Real>
     int df_;
 };
 
+#ifdef IS_RTKPP_LIB
+
+inline Real Student::rand() const{ return ::Rf_rt(df_);}
+inline Real Student::pdf(Real const& x) const { return ::Rf_dt(x, df_, false);}
+inline Real Student::lpdf(Real const& x) const { return ::Rf_dt(x, df_, true);}
+inline Real Student::cdf(Real const& t) const { return ::Rf_pt(t, df_, true, false);}
+inline Real Student::icdf(Real const& p) const { return ::Rf_qt(p, df_, true, false);}
+inline Real Student::rand( int df) { return ::Rf_rt(df);}
+inline Real Student::pdf(Real const& x, int df) { return ::Rf_dt(x, df, false);}
+inline Real Student::lpdf(Real const& x, int df) { return ::Rf_dt(x, df, true);}
+inline Real Student::cdf(Real const& t, int df) { return ::Rf_pt(t, df, true, false);}
+inline Real Student::icdf(Real const& p, int df) { return ::Rf_qt(p, df, true, false);}
+
+#endif
+
 } // namespace Law
 
 } // namespace STK

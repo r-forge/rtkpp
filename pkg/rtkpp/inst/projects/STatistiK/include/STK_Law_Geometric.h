@@ -145,6 +145,31 @@ class Geometric: public IUnivLaw<Integer>
     Real prob_;
 };
 
+#ifdef IS_RTKPP_LIB
+
+
+inline Integer Geometric::rand() const { return ::Rf_rgeom(prob_);}
+inline Real Geometric::pdf(Integer const& x) const
+{ return ::Rf_dgeom((double)x, prob_, false);}
+inline Real Geometric::lpdf(Integer const& x) const
+{ return ::Rf_dgeom((double)x, prob_, true);}
+inline Real Geometric::cdf(Real const& t) const
+{ return ::Rf_pgeom(t, prob_, true, false);}
+inline Integer Geometric::icdf(Real const& p) const
+{ return ::Rf_qgeom(p, prob_, true, false);}
+
+inline Integer Geometric::rand(Real const& prob)
+{ return (Integer)::Rf_rgeom(prob);}
+inline Real Geometric::pdf(Integer x, Real const& prob)
+{ return ::Rf_dgeom((double)x, prob, false);}
+inline Real Geometric::lpdf(Integer x, Real const& prob)
+{ return ::Rf_dgeom((double)x, prob, true);}
+inline Real Geometric::cdf(Real const& t, Real const& prob)
+{ return ::Rf_pgeom(t, prob, true, false);}
+inline Integer Geometric::icdf(Real const& p, Real const& prob)
+{ return (Integer)::Rf_qgeom(p, prob, true, false);}
+
+#endif
 } // namespace Law
 
 } // namespace STK

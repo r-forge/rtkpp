@@ -85,7 +85,7 @@ struct MinEltVisitor : EltVisitor2DBase<Type>
 {
   MinEltVisitor() : EltVisitor2DBase<Type>()
   { this->res_ = Arithmetic<Type>::max(); }
-  void operator()( Type const& value, int i, int j)
+  inline void operator()( Type const& value, int i, int j)
   {
     if (value < this->res_)
     { this->res_ = value; this->row_ = i; this->col_ = j;}
@@ -103,7 +103,7 @@ struct MinEltSafeVisitor : EltVisitor2DBase<Type>
 {
   MinEltSafeVisitor() : EltVisitor2DBase<Type>()
   { this->res_ = Arithmetic<Type>::max(); }
-  void operator()( Type const& value, int i, int j)
+  inline void operator()( Type const& value, int i, int j)
   {
     if (Arithmetic<Type>::isFinite(value) && (value < this->res_))
     { this->res_ = value; this->row_ = i; this->col_ = j;}

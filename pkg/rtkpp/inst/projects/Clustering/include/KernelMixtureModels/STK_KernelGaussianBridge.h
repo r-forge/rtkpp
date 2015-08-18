@@ -115,12 +115,14 @@ class KernelGaussianBridge: public IMixtureBridge< KernelGaussianBridge<Id,Data>
   public:
     typedef IMixtureBridge< KernelGaussianBridge<Id,Data> > Base;
     typedef typename hidden::MixtureBridgeTraits< KernelGaussianBridge<Id,Data> >::Mixture Mixture;
-    typedef typename Clust::MixtureTraits<Mixture>::Param Param;
+    typedef typename hidden::MixtureBridgeTraits< KernelGaussianBridge<Id,Data> >::ParamHandler ParamHandler;
+    typedef typename hidden::MixtureBridgeTraits< KernelGaussianBridge<Id,Data> >::Parameters Parameters;
     typedef typename Data::Type Type;
 
     // parameters type to get
     using Base::mixture_;
     using Base::p_data_;
+    using Base::p_tik;
     using Base::tik;
     using Base::nk;
 
@@ -179,7 +181,11 @@ class KernelGaussianBridge: public IMixtureBridge< KernelGaussianBridge<Id,Data>
      *  in an Array2D.
      *  @param param the array with the parameters of the mixture.
      */
-    void getParameters(Param& param) const { mixture_.getParameters(param);}
+    void getParameters(Parameters& param) const;
+    /** This function can be used to write summary of parameters to the output stream.
+     *  @param out Stream where you want to write the summary of parameters.
+     */
+    virtual void writeParameters(std::ostream& out) const;
 
   private:
     /** Compute the intermediate results dik */
@@ -222,6 +228,28 @@ class KernelGaussianBridge: public IMixtureBridge< KernelGaussianBridge<Id,Data>
     /** Array of the intermediate results dik */
     ArrayXX dik_;
 };
+template<int Id, class Data>
+void KernelGaussianBridge<Id, Data>::getParameters(Parameters& param) const
+{
+  param.resize(this->nbCluster(), 2);
+  for (int k= param.beginCols(); k < param.endCols(); ++k)
+  {
+    param(k, baseIdx  ) = std::sqrt(mixture_.paramHandler().sigma2(k));
+    param(k, baseIdx+1) = mixture_.paramHandler().dim(k);
+  }
+}
+
+/* Write the parameters on the output stream os */
+template<int Id, class Data>
+void KernelGaussianBridge<Id, Data>::writeParameters(ostream& os) const
+{
+  for (int k= p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
+  {
+    os << _T("---> Component ") << k << _T("\n");
+    os << _T("sigma = ") << std::sqrt(mixture_.paramHandler().sigma2(k)) << _T("\n");
+    os << _T("dim = ")   << mixture_.paramHandler().dim_[k] << _T("\n");
+  }
+}
 
 } // namespace STK
 

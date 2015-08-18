@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2013 Serge Iovleff
+/*     Copyright (C) 2004-2015 Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -156,6 +156,8 @@ class DiagGaussianBridge: public IMixtureBridge< DiagGaussianBridge<Id,Data> >
     typedef IMixtureBridge< DiagGaussianBridge<Id,Data> > Base;
     // type of Mixture
     typedef typename hidden::MixtureBridgeTraits< DiagGaussianBridge<Id,Data> >::Mixture Mixture;
+    typedef typename hidden::MixtureBridgeTraits< DiagGaussianBridge<Id,Data> >::ParamHandler ParamHandler;
+    typedef typename hidden::MixtureBridgeTraits< DiagGaussianBridge<Id,Data> >::Parameters Parameters;
     // type of data
     typedef typename Data::Type Type;
     // class of mixture
@@ -163,12 +165,10 @@ class DiagGaussianBridge: public IMixtureBridge< DiagGaussianBridge<Id,Data> >
     {
       idMixtureClass_ = Clust::Gaussian_
     };
-    // parameters type to get
-    typedef typename Clust::MixtureTraits<Mixture>::Param Param;
-
     typedef std::vector<std::pair<int,int> >::const_iterator ConstIterator;
     using Base::mixture_;
     using Base::p_data_;
+    using Base::p_tik;
 
     /** default constructor. Remove the missing values from the data set and
      *  initialize the mixture by setting the data set.
@@ -208,7 +208,9 @@ class DiagGaussianBridge: public IMixtureBridge< DiagGaussianBridge<Id,Data> >
      *  parameters in an array.
      *  @param[out] params the array with the parameters of the mixture.
      */
-    void getParameters(ArrayXX& params) const;
+    void getParameters(Parameters& params) const;
+    /** Write the parameters on the output stream os */
+    void writeParameters(ostream& os) const;
 
   private:
     /** This function will be used for the imputation of the missing data
@@ -249,19 +251,37 @@ void DiagGaussianBridge<Id, Data>::removeMissing()
 }
 
 template<int Id, class Data>
-void DiagGaussianBridge<Id, Data>::getParameters(ArrayXX& params) const
+void DiagGaussianBridge<Id, Data>::getParameters(Parameters& params) const
 {
   int nbClust = this->nbCluster();
   params.resize(2*nbClust, mixture_.p_data()->cols());
   for (int k= 0; k < nbClust; ++k)
   {
-    for (int j= mixture_.p_data()->beginCols();  j< mixture_.p_data()->endCols(); ++j)
+    for (int j= params.beginCols();  j< params.endCols(); ++j)
     {
       params(baseIdx+2*k  , j) = mixture_.mean(baseIdx + k, j);
       params(baseIdx+2*k+1, j) = mixture_.sigma(baseIdx + k, j);
     }
   }
 }
+
+/** Write the parameters on the output stream os */
+template<int Id, class Data>
+void DiagGaussianBridge<Id, Data>::writeParameters(ostream& os) const
+{
+  PointX m(mixture_.p_data()->cols());
+  PointX s(mixture_.p_data()->cols());
+  for (int k= p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
+  {
+    // store sigma values in an array for a nice output
+    for (int j= s.begin();  j < s.end(); ++j)
+    { m[j] = mixture_.mean(k,j); s[j] = mixture_.sigma(k,j);}
+    os << _T("---> Component ") << k << _T("\n");
+    os << _T("mean = ") << m;
+    os << _T("sigma = ")<< s;
+  }
+}
+
 
 } // namespace STK
 

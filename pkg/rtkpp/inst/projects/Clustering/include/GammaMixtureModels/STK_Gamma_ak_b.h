@@ -50,12 +50,10 @@ namespace Clust
 {
 /** @ingroup Clustering
  *  Traits class for the Gamma_ak_b traits policy. */
-template<class _Array>
-struct MixtureTraits< Gamma_ak_b<_Array> >
+template<class Array_>
+struct MixtureTraits< Gamma_ak_b<Array_> >
 {
-  typedef _Array Array;
-  typedef typename Array::Type Type;
-  typedef Array2D<Real>  Param;
+  typedef Array_ Array;
   typedef ParametersHandler<Clust::Gamma_ak_b_> ParamHandler;
 };
 
@@ -63,19 +61,60 @@ struct MixtureTraits< Gamma_ak_b<_Array> >
 
 /** Specialization of the ParametersHandler struct for Gamma_ak_b model */
 template <>
-struct ParametersHandler<Clust::Gamma_ak_b_>: public ParametersHandlerGammaBase
+struct ParametersHandler<Clust::Gamma_ak_b_>: public ParametersHandlerGammaBase<  ParametersHandler<Clust::Gamma_ak_b_> >
 {
   typedef ParametersHandlerGammaBase Base;
  /** shape parameters and statistics */
   MixtureParametersSet<Real> shape_;
   /** scale parameters and statistics */
   MixtureParameters<Real> scale_;
+  /** @return the shape of the kth cluster and jth variable */
+  inline Real const& shapeImpl(int k, int j) const { return shape_[k];}
+  /** @return the scale of the kth cluster and jth variable */
+  inline Real const& scaleImpl(int k, int j) const { return scale_();}
+  /** copy operator */
+  inline ParametersHandler& operator=( ParametersHandler const& other)
+  { Base::operator =(other);
+    shape_ = other.shape_; scale_ = other.scale_;
+    return *this;
+  }
+  /** copy operator using an array/expression storing the values */
+  template<class Array>
+  inline ParametersHandler& operator=( ExprBase<Array> const& param)
+  {
+    int nbCluster = mean_().size();
+    scale_() = 0.;
+    for (int k2= param.beginRows(), k= param.beginRows(); k2 < param.endRows(); k2+=2, k++)
+    {
+      for (int j= param.beginCols();  j< param.endCols(); ++j)
+      { scale_() += param(k2+1, j);}
+      shape_[k] = param.row(k2).mean();
+    }
+    scale_() /= (nbCluster*param.sizeCols());
+    return *this;
+  }
+
   /** default constructor */
   ParametersHandler( int nbCluster)
                    : Base(nbCluster), shape_(nbCluster), scale_() {}
   /** copy constructor */
   ParametersHandler( ParametersHandler const& model)
                    : Base(model),shape_(model.shape_), scale_(model.scale_) {}
+  /** Initialize the parameters with an array/expression of value */
+  template<class Array>
+  inline ParametersHandler( int nbCluster, ExprBase<Array> const& param)
+                          : Base(nbCluster), shape_(nbCluster), scale_()
+  {
+    Base::resize(param.cols());
+    scale_() = 0.;
+    for (int k2= param.beginRows(), k= param.beginRows(); k2 < param.endRows(); k2+=2, k++)
+    {
+      for (int j= param.beginCols();  j< param.endCols(); ++j)
+      { scale_() += param(k2+1, j);}
+      shape_[k] = param.row(k2).mean();
+    }
+    scale_() /= (nbCluster*param.sizeCols());
+  }
   /** destructor */
   inline ~ParametersHandler() {}
   /** Initialize the parameters of the model.
@@ -131,10 +170,6 @@ class Gamma_ak_b : public GammaBase<Gamma_ak_b<Array> >
     inline Gamma_ak_b( Gamma_ak_b const& model): Base(model) {}
     /** destructor */
     inline ~Gamma_ak_b() {}
-    /** @return the shape of the kth cluster and jth variable */
-    inline Real shapeImpl(int k, int j) const { return param_.shape_[k];}
-    /** @return the scale of the kth cluster and jth variable */
-    inline Real scaleImpl(int k, int j) const { return param_.scale_();}
     /** @return the value of the probability of the i-th sample in the k-th component.
      *  @param i,k indexes of the sample and of the component
      **/
@@ -177,7 +212,6 @@ void Gamma_ak_b<Array>::randomInit()
   param_.scale_() = Law::Exponential::rand(value/(this->nbSample()));
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Gamma_ak_b<Array>::randomInit done\n");
-  this->writeParameters(stk_cout);
 #endif
 }
 

@@ -72,10 +72,6 @@ struct Traits< DiagonalizeOperator <Lhs> >
 };
 } // end namespace hidden
 
-// forward declaration
-template<typename Lhs> class DiagonalizeOperatorBase;
-template<typename Lhs> class DiagonalOperatorBase;
-
 /** @ingroup Arrays
  *  @class DiagonalizeOperator
   *
@@ -91,11 +87,13 @@ template<typename Lhs> class DiagonalOperatorBase;
   * don't have to name DiagonalizeOperator type explicitly.
   */
 template< typename Lhs>
-class DiagonalizeOperator  : public DiagonalizeOperatorBase< Lhs >, public TRef<1>
+class DiagonalizeOperator: public ExprBase< DiagonalizeOperator< Lhs> >, public TRef<1>
 {
   public:
-    typedef DiagonalizeOperatorBase< Lhs > Base;
+    typedef ExprBase< DiagonalizeOperator< Lhs> > Base;
     typedef typename hidden::Traits< DiagonalizeOperator<Lhs> >::Type Type;
+    typedef typename hidden::Traits< DiagonalizeOperator<Lhs> >::ReturnType ReturnType;
+
     typedef typename hidden::Traits< DiagonalizeOperator<Lhs> >::Row Row;
     typedef typename hidden::Traits< DiagonalizeOperator<Lhs> >::Col Col;
     enum
@@ -112,7 +110,7 @@ class DiagonalizeOperator  : public DiagonalizeOperatorBase< Lhs >, public TRef<
     /** Type of the Range for the columns */
     typedef TRange<size_> ColRange;
     /** Constructor */
-    DiagonalizeOperator( Lhs const& lhs)
+    inline DiagonalizeOperator( Lhs const& lhs)
                        : Base(), lhs_(lhs)
                        , rows_(lhs_.range())
                        , cols_(lhs_.range())
@@ -120,12 +118,23 @@ class DiagonalizeOperator  : public DiagonalizeOperatorBase< Lhs >, public TRef<
       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Lhs);
     }
     /**  @return the range of the rows */
-    RowRange const& rowsImpl() const { return rows_;}
+    inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the range of the Columns */
-    ColRange const& colsImpl() const { return cols_;}
+    inline ColRange const&colsImpl() const { return cols_;}
 
     /** @return the left hand side expression */
-    Lhs const& lhs() const { return lhs_; }
+    inline Lhs const& lhs() const { return lhs_; }
+
+    /** @return the element (i,j) of the expression.
+     *  @param i, j index of the row and of the column
+     **/
+    inline ReturnType elt2Impl(int i, int j) const { return (lhs_.elt(i, j));}
+    /** @return the element ith element of the expression
+     *  @param i index of the ith element
+     **/
+    inline ReturnType elt1Impl(int i) const { return (lhs_.elt(i));}
+    /** accesses to the element of the expression */
+    inline ReturnType elt0Impl() const { return (lhs_.elt());}
 
   protected:
     Lhs const& lhs_;
@@ -133,32 +142,6 @@ class DiagonalizeOperator  : public DiagonalizeOperatorBase< Lhs >, public TRef<
     ColRange cols_;
 };
 
-/** @ingroup Arrays
-  * @brief implement the access to the elements in the (2D) general case.
-  **/
-template< typename Lhs>
-class DiagonalizeOperatorBase : public ExprBase< DiagonalizeOperator< Lhs> >
-{
-  public:
-    typedef DiagonalizeOperator<Lhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
-    /** constructor. */
-    DiagonalizeOperatorBase() : Base() {}
-    /** @return the element (i,j) of the expression.
-     *  @param i, j index of the row and of the column
-     **/
-    ReturnType elt2Impl(int i, int j) const
-    { return (this->asDerived().lhs().elt(i, j));}
-    /** @return the element ith element of the expression
-     *  @param i index of the ith element
-     **/
-    ReturnType elt1Impl(int i) const
-    { return (this->asDerived().lhs().elt(i));}
-    /** accesses to the element of the expression */
-    ReturnType elt0Impl() const
-    { return (this->asDerived().lhs().elt());}
-};
 
 // forward declaration
 template< typename Array> class DiagonalOperator;
@@ -202,11 +185,13 @@ struct Traits< DiagonalOperator <Lhs> >
   * don't have to name DiagonalOperator type explicitly.
   */
 template< typename Lhs>
-class DiagonalOperator  : public DiagonalOperatorBase< Lhs >, public TRef<1>
+class DiagonalOperator: public ExprBase< DiagonalOperator< Lhs> >, public TRef<1>
 {
   public:
-    typedef DiagonalOperatorBase< Lhs > Base;
+    typedef ExprBase< DiagonalOperator< Lhs> > Base;
     typedef typename hidden::Traits< DiagonalOperator<Lhs> >::Type Type;
+    typedef typename hidden::Traits< DiagonalOperator<Lhs> >::ReturnType ReturnType;
+
     typedef typename hidden::Traits< DiagonalOperator<Lhs> >::Row Row;
     typedef typename hidden::Traits< DiagonalOperator<Lhs> >::Col Col;
     enum
@@ -223,52 +208,35 @@ class DiagonalOperator  : public DiagonalOperatorBase< Lhs >, public TRef<1>
     typedef TRange<size_> DiagRange;
 
     /** Constructor */
-    DiagonalOperator( Lhs const& lhs)
-                       : Base(), lhs_(lhs)
-                       , range_( lhs_.beginRows(), (size_ != UnknownSize) ? size_ : lhs_.sizeRows())
+    inline DiagonalOperator( Lhs const& lhs)
+                           : Base(), lhs_(lhs)
+                           , range_( lhs_.beginRows(), (size_ != UnknownSize) ? size_ : lhs_.sizeRows())
     {
       if (lhs.rows()!=lhs.cols())
         STKRUNTIME_ERROR_NO_ARG(DiagonalOperatorBase,lhs.rows()!=lhs.cols());
     }
     /**  @return the range of the rows */
-    DiagRange const& rowsImpl() const { return range_;}
+    inline DiagRange const& rowsImpl() const { return range_;}
     /** @return the range of the Columns */
-    DiagRange const& colsImpl() const { return range_;}
+    inline DiagRange const& colsImpl() const { return range_;}
     /** @return the left hand side expression */
-    Lhs const& lhs() const { return lhs_; }
+    inline Lhs const& lhs() const { return lhs_; }
+
+    /** @return the element (i,j) of the expression.
+     *  @param i, j index of the row and of the column
+     **/
+    inline ReturnType elt2Impl(int i, int j) const { return (this->asDerived().lhs().elt(i, j));}
+    /** @return the element ith element of the transposed expression
+     *  @param i index of the ith element
+     **/
+    inline ReturnType elt1Impl(int i) const { return (this->asDerived().lhs().elt(i,i));}
+    /** accesses to the element of the transposed expression */
+    inline ReturnType elt0Impl() const { return (this->asDerived().lhs().elt());}
 
   protected:
     Lhs const& lhs_;
     DiagRange range_;
 };
-
-/** @ingroup Arrays
-  * @brief implement the access to the elements in the (2D) general case.
-  **/
-template< typename Lhs>
-class DiagonalOperatorBase : public ExprBase< DiagonalOperator< Lhs> >
-{
-  public:
-    typedef DiagonalOperator<Lhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
-    /** constructor. */
-    DiagonalOperatorBase() : Base() {}
-    /** @return the element (i,j) of the expression.
-     *  @param i, j index of the row and of the column
-     **/
-    ReturnType elt2Impl(int i, int j) const
-    { return (this->asDerived().lhs().elt(i, j));}
-    /** @return the element ith element of the transposed expression
-     *  @param i index of the ith element
-     **/
-    ReturnType elt1Impl(int i) const
-    { return (this->asDerived().lhs().elt(i,i));}
-    /** accesses to the element of the transposed expression */
-    ReturnType elt0Impl() const
-    { return (this->asDerived().lhs().elt());}
-};
-
 
 } // namespace STK
 

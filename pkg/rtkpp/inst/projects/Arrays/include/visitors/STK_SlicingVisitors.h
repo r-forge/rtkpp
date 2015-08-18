@@ -140,9 +140,9 @@ class VisitorByCol : public VisitorByColBase< Derived, Visitor >, public TRef<1>
       }
     }
     /**  @return the range of the rows */
-    RowRange const& rowsImpl() const { return result_.rows();}
+    inline RowRange const& rowsImpl() const { return result_.rows();}
     /** @return the columns range */
-    ColRange const& colsImpl() const { return result_.cols();}
+    inline ColRange const&colsImpl() const { return result_.cols();}
 
     /** @return the left hand side expression */
     Derived const& lhs() const { return lhs_; }
@@ -253,9 +253,9 @@ class VisitorByRow : public VisitorByRowBase< Derived, Visitor >, public TRef<1>
       }
     }
     /**  @return the range of the rows */
-    RowRange const& rowsImpl() const { return result_.rows();}
+    inline RowRange const& rowsImpl() const { return result_.rows();}
     /** @return the columns range */
-    ColRange const& colsImpl() const { return result_.cols();}
+    inline ColRange const&colsImpl() const { return result_.cols();}
 
     /** @return the left hand side expression */
     Derived const& lhs() const { return lhs_; }

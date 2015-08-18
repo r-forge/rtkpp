@@ -54,7 +54,6 @@ template<>
 struct MixtureTraits< KernelGaussian_sk >
 {
   typedef ArrayXX Array;
-  typedef ArrayXX Param;
   typedef typename Array::Type       Type;
   typedef ParametersHandler<KernelGaussian_sk_>  ParamHandler;
 };
@@ -65,105 +64,164 @@ template<>
 struct MixtureTraits< KernelGaussian_s >
 {
   typedef ArrayXX Array;
-  typedef ArrayXX Param;
   typedef typename Array::Type       Type;
   typedef ParametersHandler<KernelGaussian_s_>  ParamHandler;
 };
 
 } // namespace Clust
+/** @ingroup Clustering
+ *  Base class for the Kernel models
+ **/
+template<class Derived>
+struct KernelHandlerBase: public IRecursiveTemplate<Derived>
+{
+  /** @return the value of lambda of the kth cluster and jth variable */
+  inline Real const& sigma2(int k) const { return this->asDerived().sigma2Impl(k);}
+  /** @return the value of lambda of the kth cluster and jth variable */
+  inline Real const& dim(int k) const { return this->asDerived().dimImpl(k);}
+};
+
 
 /** Specialization of the ParametersHandler struct for KernelGaussian_sk models*/
 template <>
-struct ParametersHandler<Clust::KernelGaussian_sk_>
+struct ParametersHandler<Clust::KernelGaussian_sk_>: public KernelHandlerBase<  ParametersHandler<Clust::KernelGaussian_sk_> >
 {
+  /** standard deviation and statistics */
+  MixtureParametersSet<Real> sigma2_;
+    /** vector of the standard deviations */
+  /** standard deviation and statistics */
+  PointX dim_;
+  /** @return the value of lambda of the kth cluster and jth variable */
+  inline Real const& sigma2Impl(int k) const { return sigma2_[k];}
+  /** @return the value of lambda of the kth cluster and jth variable */
+  inline Real const& dimImpl(int k) const { return dim_[k];}
+  /** copy operator */
+  inline ParametersHandler& operator=( ParametersHandler const& other)
+  {
+    sigma2_ = other.sigma2_;
+    dim_    = other.dim_;
+    return *this;
+  }
+  /** copy operator using an array/expression storing the values */
+  template<class Array>
+  inline ParametersHandler& operator=( ExprBase<Array> const& param)
+  {
+    for (int k= param.beginRows(); k < param.endRows(); k++)
+    { sigma2_[k] = param(k, baseIdx);
+      dim_[k]    = param(k, baseIdx+1);
+    }
+    return *this;
+  }
+
   /** default constructor */
-  inline ParametersHandler(int nbCluster): sigma2_(nbCluster, 1.), stat_sigma2_(nbCluster)
-                                         , dim_(nbCluster, 1.), stat_dim_(nbCluster)
+  inline ParametersHandler(int nbCluster): sigma2_(nbCluster), dim_(nbCluster)
   {}
   /** copy constructor.
    * @param param the parameters to copy.
    **/
   inline ParametersHandler( ParametersHandler const& param)
                           : sigma2_(param.sigma2_)
-                          , stat_sigma2_(param.stat_sigma2_)
                           , dim_(param.dim_)
-                          , stat_dim_(param.stat_dim_)
   {}
+  /** Initialize the parameters with an array/expression of value */
+  template<class Array>
+  inline ParametersHandler( int nbCluster, ExprBase<Array> const& param)
+                          : sigma2_(nbCluster)
+                          , dim_(nbCluster)
+  {
+    for (int k2= param.beginRows(), k= param.beginRows(); k2 < param.endRows(); k2+=2, k++)
+    { sigma2_[k] = param(k, baseIdx);
+      dim_[k]    = param(k, baseIdx+1);
+    }
+  }
   /** destructor */
   inline ~ParametersHandler() {}
   /** Store the intermediate results of the Mixture.
    *  @param iteration Provides the iteration number beginning after the burn-in period.
    **/
   inline void storeIntermediateResults(int iteration)
-  { stat_sigma2_.update(sigma2_); stat_dim_.update(dim_);}
+  { sigma2_.storeIntermediateResults(iteration); }
   /** Release the stored results. This is usually used if the estimation
    *  process failed.
    **/
   inline void releaseIntermediateResults()
-  { stat_sigma2_.release(); stat_dim_.release();}
+  { sigma2_.releaseIntermediateResults(); }
   /** set the parameters stored in stat_proba_ and release stat_proba_. */
   inline void setParameters()
-  {
-    sigma2_ = stat_sigma2_.mean_;
-    stat_sigma2_.release();
-    dim_ = stat_dim_.mean_;
-    stat_dim_.release();
-  }
-  /** vector of the standard deviations */
-  PointX sigma2_;
-  /** Array of the statistics */
-  Stat::Online<PointX, Real> stat_sigma2_;
-  /** vector of the dimensions */
-  PointX dim_;
-  /** Array of the statistics */
-  Stat::Online<PointX, Real> stat_dim_;
+  { sigma2_.setParameters();}
 };
 
 /** Specialization of the ParametersHandler struct for KernelGaussian_s models*/
 template <>
-struct ParametersHandler<Clust::KernelGaussian_s_>
+struct ParametersHandler<Clust::KernelGaussian_s_>: public KernelHandlerBase<  ParametersHandler<Clust::KernelGaussian_s_> >
 {
-  /** default constructor */
-  inline ParametersHandler(int nbCluster): sigma2_(1.), stat_sigma2_()
-                                         , dim_(nbCluster, 1.), stat_dim_(nbCluster)
-  {}
-  /** copy constructor.
-   * @param param the parameters to copy.
-   **/
-  inline ParametersHandler( ParametersHandler const& param)
-                          : sigma2_(param.sigma2_)
-                          , stat_sigma2_(param.stat_sigma2_)
-                          , dim_(param.dim_)
-                          , stat_dim_(param.stat_dim_)
-  {}
-  /** destructor */
-  inline ~ParametersHandler() {}
-  /** Store the intermediate results of the Mixture.
-   *  @param iteration Provides the iteration number beginning after the burn-in period.
-   **/
-  inline void storeIntermediateResults(int iteration)
-  { stat_sigma2_.update(sigma2_); stat_dim_.update(dim_);}
-  /** Release the stored results. This is usually used if the estimation
-   *  process failed.
-   **/
-  inline void releaseIntermediateResults()
-  { stat_sigma2_.release(); stat_dim_.release();}
-  /** set the parameters stored in stat_proba_ and release stat_proba_. */
-  inline void setParameters()
-  {
-    sigma2_ = stat_sigma2_.mean_;
-    stat_sigma2_.release();
-    dim_ = stat_dim_.mean_;
-    stat_dim_.release();
-  }
   /** value of the standard deviation */
   Real sigma2_;
   /** Array of the statistics */
   Stat::Online<Real, Real> stat_sigma2_;
   /** vector of the dimensions */
   PointX dim_;
-  /** Array of the statistics */
-  Stat::Online<PointX, Real> stat_dim_;
+  /** copy operator */
+  inline ParametersHandler& operator=( ParametersHandler const& other)
+  { sigma2_ = other.sigma2_; dim_ = other.dim_;
+    stat_sigma2_ = other.stat_sigma2_;
+    return *this;
+  }
+  /** copy operator using an array/expression storing the values */
+  template<class Array>
+  inline ParametersHandler& operator=( ExprBase<Array> const& param)
+  {
+    for (int k= param.beginRows(); k < param.endRows(); k++)
+    { sigma2_ = param.col(baseIdx).mean();
+      dim_[k] = param(k, baseIdx+1);
+    }
+    return *this;
+  }
+
+  /** @return the value of lambda of the kth cluster and jth variable */
+  inline Real const& sigma2Impl(int k) const { return sigma2_;}
+  /** @return the value of lambda of the kth cluster and jth variable */
+  inline Real const& dimImpl(int k) const { return dim_[k];}
+
+  /** default constructor */
+  inline ParametersHandler(int nbCluster): sigma2_(1.), stat_sigma2_(), dim_(nbCluster, 1.)
+  {}
+  /** copy constructor.
+   * @param param the parameters to copy.
+   **/
+  inline ParametersHandler( ParametersHandler const& param)
+                          : sigma2_(param.sigma2_)
+                          , stat_sigma2_(param.stat_sigma2_)
+                          , dim_(param.dim_)
+  {}
+  /** Initialize the parameters with an array/expression of value */
+  template<class Array>
+  inline ParametersHandler( int nbCluster, ExprBase<Array> const& param)
+                          : sigma2_(), stat_sigma2_(), dim_(nbCluster)
+  {
+    for (int k= param.beginRows(); k < param.endRows(); k++)
+    { sigma2_ = param.col(baseIdx).mean();
+      dim_[k] = param(k, baseIdx+1);
+    }
+  }
+  /** destructor */
+  inline ~ParametersHandler() {}
+  /** Store the intermediate results of the Mixture.
+   *  @param iteration Provides the iteration number beginning after the burn-in period.
+   **/
+  inline void storeIntermediateResults(int iteration)
+  { stat_sigma2_.update(sigma2_); }
+  /** Release the stored results. This is usually used if the estimation
+   *  process failed.
+   **/
+  inline void releaseIntermediateResults()
+  { stat_sigma2_.release(); }
+  /** set the parameters stored in stat_proba_ and release stat_proba_. */
+  inline void setParameters()
+  {
+    sigma2_ = stat_sigma2_.mean_;
+    stat_sigma2_.release();
+  }
 };
 
 /** @ingroup Clustering
@@ -218,10 +276,6 @@ class KernelGaussian_sk : public IMixtureModel<KernelGaussian_sk >
     inline Real impute(int i, int j) const { return 0.;}
     /** @return a simulated value for the jth variable of the ith sample */
     inline Real rand(int i, int j, int k) const { return 0.;}
-    /** get the parameters */
-    void getParameters(ArrayXX& param) const;
-    /** Write the parameters on the output stream os */
-    void writeParameters(ostream& os) const;
     /** Initialize randomly the variances of the Gaussian kernel mixture. */
     void randomInit();
     /** update the variances. */
@@ -282,16 +336,47 @@ class KernelGaussian_s : public IMixtureModel<KernelGaussian_s >
     inline Real impute(int i, int j) const { return 0.;}
     /** @return a simulated value for the jth variable of the ith sample */
     inline Real rand(int i, int j, int k) const { return 0.;}
-    /** get the parameters */
-    void getParameters(ArrayXX& param) const;
-    /** Write the parameters on the output stream os */
-    void writeParameters(ostream& os) const;
     /** Initialize randomly the variances of the Gaussian kernel mixture. */
     void randomInit();
     /** update the variances. */
     bool mStep();
 };
 
+/* Initialize randomly the parameters of the Gaussian mixture. */
+inline void KernelGaussian_sk::randomInit()
+{
+  param_.sigma2_() = sum( p_data()->prod(*p_tik()) )/ (*p_nk() * param_.dim_)
+                 + PointX(p_tik()->cols()).rand(Law::Normal(0, 0.05)).abs();
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("KernelGaussian_sk::randomInit() done\n");
+#endif
+}
+
+/* Compute the weighted means and the weighted standard deviations. */
+inline bool KernelGaussian_sk::mStep()
+{
+  param_.sigma2_() =  sum( p_data()->prod(*p_tik()) )/ (*p_nk() * param_.dim_);
+  return true;
+}
+
+/* Initialize randomly the parameters of the Gaussian mixture. */
+inline void KernelGaussian_s::randomInit()
+{
+  // compute the standard deviation
+  param_.sigma2_ = p_data()->prod(*p_tik()).sum()/(this->nbSample() * param_.dim_.sum())
+                 + std::abs(Law::generator.randGauss(0, 0.05));
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("KernelGaussian_s::randomInit() done\n");
+#endif
+}
+
+/* Compute the weighted means and the weighted standard deviations. */
+inline bool KernelGaussian_s::mStep()
+{
+  param_.sigma2_ =  ( p_data()->prod( *p_tik() ) ).sum()/(this->nbSample() * param_.dim_.sum());
+  if (param_.sigma2_ <= 0.)  return false;
+  return true;
+}
 
 } // namespace STK
 

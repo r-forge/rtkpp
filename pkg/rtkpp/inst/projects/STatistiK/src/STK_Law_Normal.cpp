@@ -32,11 +32,9 @@
  *  @brief In this file we implement the Normal distribution.
  **/
 
-#include "../include/STK_Law_Normal.h"
 
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
-#else
+#ifndef IS_RTKPP_LIB
+#include "../include/STK_Law_Normal.h"
 #include "../include/STK_Law_Util.h"
 #include <Analysis/include/STK_Funct_raw.h>
 
@@ -83,28 +81,7 @@ namespace Law
 {
 
 
-#ifdef IS_RTKPP_LIB
-
-/*  Generate a pseudo Normal random variate. */
-/*inline*/ Real Normal::rand() const { return R::rnorm(mu_, sigma_);}
-/*inline*/ Real Normal::pdf( Real const& x) const { return R::dnorm(x, mu_, sigma_, false);}
-/*inline*/ Real Normal::lpdf( Real const& x) const { return R::dnorm(x, mu_, sigma_, true);}
-/*inline*/ Real Normal::cdf( Real const& t) const { return R::pnorm(t, mu_, sigma_, true, false);}
-/*inline*/ Real Normal::icdf( Real const& p) const { return R::qnorm(p , mu_, sigma_, true, false);}
-
-// static
-/*inline*/ Real Normal::rand( Real const& mu, Real const& scale)
-{ return R::rnorm(mu, scale);}
-/*inline*/ Real Normal::pdf(Real const& x, Real const& mu, Real const& scale)
-{ return R::dnorm(x,mu, scale, false);}
-/*inline*/ Real Normal::lpdf(Real const& x, Real const& mu, Real const& scale)
-{ return R::dnorm(x,mu, scale, true);}
-/*inline*/ Real Normal::cdf(Real const& t, Real const& mu, Real const& scale)
-{ return R::pnorm(t, mu, scale, true, false);}
-/*inline*/ Real Normal::icdf(Real const& p, Real const& mu, Real const& scale)
-{ return R::qnorm(p , mu, scale, true, false);}
-
-#else /* not IS_RTKPP_LIB */
+#ifndef IS_RTKPP_LIB
 
 /*  Generate a pseudo Normal random variate. */
 Real Normal::rand() const

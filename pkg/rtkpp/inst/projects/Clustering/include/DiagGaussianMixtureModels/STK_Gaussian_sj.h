@@ -51,8 +51,7 @@ template<class _Array>
 struct MixtureTraits< Gaussian_sj<_Array> >
 {
   typedef _Array Array;
-  typedef typename Array::Type Type;
-  typedef Array2D<Real>        Param;
+
   typedef ParametersHandler<Clust::Gaussian_sj_> ParamHandler;
 };
 
@@ -60,17 +59,61 @@ struct MixtureTraits< Gaussian_sj<_Array> >
 
 /** Specialization of the ParametersHandler struct for Gaussian_sj model */
 template <>
-struct ParametersHandler<Clust::Gaussian_sj_>
+struct ParametersHandler<Clust::Gaussian_sj_>: public DiagGaussianHandlerBase<  ParametersHandler<Clust::Gaussian_sj_> >
 {
     /** RowVector and statistics of the means */
     MixtureParametersSet<PointX> mean_;
     /** standard deviation and statistics */
     MixtureParameters<PointX> sigma_;
+    /** @return the mean of the kth cluster and jth variable */
+    inline Real const& meanImpl(int k, int j) const { return mean_[k][j];}
+    /** @return the standard deviation of the kth cluster and jth variable */
+    inline Real const& sigmaImpl(int k, int j) const { return sigma_()[j];}
+    /** copy operator */
+    inline ParametersHandler& operator=( ParametersHandler const& other)
+    { mean_ = other.mean_; sigma_ = other.sigma_; return *this;}
+    /** copy operator using an array/expression storing the values */
+    template<class Array>
+    inline ParametersHandler& operator=( ExprBase<Array> const& param)
+    {
+      int nbCluster = mean_().size();
+      sigma_.initialize(0.);
+      for (int j= param.beginCols();  j< param.endCols(); ++j)
+      {
+        for (int k1= param.beginRows(), k2= param.beginRows(); k2 < param.endRows(); k2+=2, k1++)
+        {
+          mean_[k1][j]  = param(k2  , j);
+          sigma_()[j] += param(k2+1, j);
+        }
+        sigma_()[j] /= nbCluster;
+      }
+      return *this;
+    }
+
     /** default constructor */
     ParametersHandler(int nbCluster): mean_(nbCluster), sigma_() {}
     /** copy constructor */
     ParametersHandler(ParametersHandler const& model): mean_(model.mean_), sigma_(model.sigma_) {}
-    /** Initialize the parameters of the model.
+    /** Initialize the parameters with an array/expression of value */
+    template<class Array>
+    inline ParametersHandler( int nbCluster, ExprBase<Array> const& param)
+                            : mean_(nbCluster), sigma_()
+    {
+      mean_.resize(param.cols());
+      sigma_.resize(param.cols());
+      sigma_.initialize(0.);
+      for (int j= param.beginCols();  j< param.endCols(); ++j)
+      {
+        for (int k2= param.beginRows(), k= param.beginRows(); k2 < param.endRows(); k2+=2, k++)
+        {
+          mean_[k][j]  = param(k2  , j);
+          sigma_()[j] += param(k2+1, j);
+        }
+        sigma_()[j] /= nbCluster;
+      }
+    }
+
+   /** Initialize the parameters of the model.
      *  This function initialize the parameters and the statistics.
      **/
     void resize(Range const& range)
@@ -123,10 +166,6 @@ class Gaussian_sj : public DiagGaussianBase<Gaussian_sj<Array> >
     {}
     /** destructor */
     inline ~Gaussian_sj() {}
-    /** @return the mean of the kth cluster and jth variable */
-    inline Real meanImpl(int k, int j) const { return param_.mean_[k][j];}
-    /** @return the standard deviation of the kth cluster and jth variable */
-    inline Real sigmaImpl(int k, int j) const { return param_.sigma_()[j];}
     /** @return the value of the probability of the i-th sample in the k-th component.
      *  @param i,k indexes of the sample and of the component
      **/

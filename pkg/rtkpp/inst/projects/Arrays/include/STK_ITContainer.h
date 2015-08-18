@@ -135,47 +135,47 @@ class ITContainerBase: public IRecursiveTemplate<Derived>, hidden::NoAssignOpera
 
   public:
     /** @return the columns range */
-    ColRange const& cols() const { return this->asDerived().colsImpl();};
+    inline ColRange const&cols() const { return this->asDerived().colsImpl();};
     /**  @return the index of the first column */
-    int beginCols() const { return cols().begin();}
+    inline int beginCols() const { return cols().begin();}
     /**  @return the ending index of the columns */
-    int endCols() const { return cols().end();}
+    inline int endCols() const { return cols().end();}
     /** @return the Horizontal size (the number of column) */
-    int sizeCols() const { return cols().size();}
+    inline int sizeCols() const { return cols().size();}
 
     /** @return the range of the rows */
-    RowRange const& rows() const { return this->asDerived().rowsImpl();}
+    inline RowRange const& rows() const { return this->asDerived().rowsImpl();}
     /** @return the index of the first row*/
-    int beginRows() const { return rows().begin();}
+    inline int beginRows() const { return rows().begin();}
     /** @return the ending index of the rows*/
-    int endRows() const { return rows().end();}
+    inline int endRows() const { return rows().end();}
     /** @return the Vertical size (the number of rows) */
-    int sizeRows() const { return rows().size();}
+    inline int sizeRows() const { return rows().size();}
 
     // for backward compatibility
     /** @return the index of the first column */
-    int firstIdxCols() const { return beginCols();}
+    inline int firstIdxCols() const { return beginCols();}
     /** @return the index of the first row */
-    int firstIdxRows() const { return beginRows();}
+    inline int firstIdxRows() const { return beginRows();}
     /** @return the index of the last column */
-    int lastIdxCols() const { return endCols()-1;}
+    inline int lastIdxCols() const { return endCols()-1;}
     /** @return the index of the last row */
-    int lastIdxRows() const { return endRows()-1;}
+    inline int lastIdxRows() const { return endRows()-1;}
 
     /** @return the range of the effectively stored elements in the column. */
-    Range rangeRowsInCol(int) const { return rows();}
+    inline RowRange const& rangeRowsInCol(int) const { return rows();}
     /** @return the range of the effectively stored elements in the row. */
-    Range rangeColsInRow(int) const { return cols();}
+    inline ColRange const& rangeColsInRow(int) const { return cols();}
 
     /** @return @c true if the container is empty, @c false otherwise */
     bool empty() const { return (sizeCols()<=0 || sizeRows()<=0);}
 
     /** @return the size of the container (the number of rows by the number of columns */
-    int sizeArray() const { return sizeRows()*sizeCols();}
+    inline int sizeArray() const { return sizeRows()*sizeCols();}
     /** @return a constant reference on element (i,j) of the 2D container
      *  @param i,j indexes of the row and of the column
      **/
-    ReturnType elt(int i, int j) const
+    inline ReturnType elt(int i, int j) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (this->beginRows() > i)
@@ -192,7 +192,7 @@ class ITContainerBase: public IRecursiveTemplate<Derived>, hidden::NoAssignOpera
     /** @return safely a constant value of the element (i,j) of the 2D container.
      *  @param i,j indexes of the row and column
      **/
-    ReturnType operator()(int i, int j) const
+    inline ReturnType operator()(int i, int j) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (this->beginRows() > i)
@@ -209,15 +209,15 @@ class ITContainerBase: public IRecursiveTemplate<Derived>, hidden::NoAssignOpera
     /** @return the constant ith element
      *  @param i index of the ith element
      **/
-    ReturnType elt(int i) const { return this->asDerived().elt1Impl(i);}
+    inline ReturnType elt(int i) const { return this->asDerived().elt1Impl(i);}
     /** @return the ith element
      *  @param i index of the ith element
      **/
-    ReturnType operator[](int i) const { return this->asDerived().elt1Impl(i);}
+    inline ReturnType operator[](int i) const { return this->asDerived().elt1Impl(i);}
     /** @return a value on the number */
-    ReturnType elt() const { return this->asDerived().elt0Impl();}
+    inline ReturnType elt() const { return this->asDerived().elt0Impl();}
     /** @return a constant reference on the number */
-    ReturnType operator()() const { return this->asDerived().elt0Impl();}
+    inline ReturnType operator()() const { return this->asDerived().elt0Impl();}
     /** @return safely the constant element (i, j).
      *  @param i,j indexes of the row and column
      **/
@@ -342,19 +342,19 @@ class ITContainer<Derived, Arrays::square_> : public ITContainerBase<Derived>
 
   public:
     /** @return the range of the square container. */
-    RowRange const& range() const { return this->rows();}
+    inline RowRange const& range() const { return this->rows();}
     /** @return the first index of the square container. */
-    int begin() const { return range().begin();}
+    inline int begin() const { return range().begin();}
     /** @return the ending index of the square container. */
-    int end() const { return range().end();}
+    inline int end() const { return range().end();}
     /** @return the size of the rows and columns of the container. */
-    int size() const { return range().size();}
+    inline int size() const { return range().size();}
 
     // for backward compatibility
     /** @return the first index of the square container */
-    int firstIdx() const { return this->beginRows();}
+    inline int firstIdx() const { return this->beginRows();}
     /** @return the last index of the square container. */
-    int lastIdx() const { return this->endRows()-1;}
+    inline int lastIdx() const { return this->endRows()-1;}
 
     Type trace() const
     {
@@ -384,12 +384,12 @@ class ITContainer<Derived, Arrays::lower_triangular_> : public ITContainerBase<D
     /** @return the Range of the effectively stored elements in the column @c icol.
      *  @param icol the number of the column to compute the range
      **/
-    Range rangeRowsInCol( int icol) const
+    inline Range rangeRowsInCol( int icol) const
     { return Range(icol, this->lastIdxRows(), 0);}
     /** compute the range of the effectively stored elements in the row @c irow.
      *  @param irow the index of the row
      **/
-    Range rangeColsInRow( int irow) const
+    inline Range rangeColsInRow( int irow) const
     { return Range(this->beginCols(), std::min(irow, this->lastIdxCols()), 0);}
     /** @return safely the constant element (i, j).
      *  @param i,j indexes of the row and column
@@ -522,29 +522,34 @@ class ITContainer<Derived, Arrays::diagonal_> : public ITContainerBase<Derived>
 
   public:
     /** @return the range of the diagonal container. */
-    RowRange const& range() const { return this->rows();}
+    inline RowRange const& range() const { return this->rows();}
     /** @return the index of the first element */
-    int begin() const { return range().begin();}
+    inline int begin() const { return range().begin();}
     /**  @return the ending index of the elements */
-    int end() const  { return range().end();}
+    inline int end() const  { return range().end();}
     /**  @return the size of the vector */
-    int size() const  { return range().size();}
+    inline int size() const  { return range().size();}
 
     // for backward compatibility
     /** @return the first index of the diagonal container */
-    int firstIdx() const { return begin();}
+    inline int firstIdx() const { return begin();}
     /** @return the last index of the diagonal container. */
-    int lastIdx() const { return end()-1;}
+    inline int lastIdx() const { return end()-1;}
 
+//    /** @return the Range of the column pos. */
+//    inline TRange<1> rangeRowsInCol(int pos) const { return TRange<1>(pos);}
+//    /** @return the Range of the row pos. */
+//    inline TRange<1> rangeColsInRow(int pos) const { return TRange<1>(pos);}
     /** @return the Range of the column pos. */
-    Range rangeRowsInCol(int pos) const { return Range(pos,1);}
+    inline Range rangeRowsInCol(int pos) const { return Range(pos,1);}
     /** @return the Range of the row pos. */
-    Range rangeColsInRow(int pos) const { return Range(pos,1);}
+    inline Range rangeColsInRow(int pos) const { return Range(pos,1);}
+
 
     /** @return the first element */
-    ReturnType front() const { return this->elt(firstIdx());}
+    inline ReturnType front() const { return this->elt(firstIdx());}
     /** @return the last element */
-    ReturnType back() const { return this->elt(lastIdx());}
+    inline ReturnType back() const { return this->elt(lastIdx());}
 
     /** @return safely the constant element (i, j).
      *  @param i,j indexes of the rows and columns
@@ -564,7 +569,7 @@ class ITContainer<Derived, Arrays::diagonal_> : public ITContainerBase<Derived>
     /** @return safely the constant ith diagonal element.
      *  @param i index of the diagonal element
      **/
-    Type at(int i) const
+    ReturnType at(int i) const
     {
       if (this->begin() > i)
       { STKOUT_OF_RANGE_1ARG(ITContainer::at, i, begin() > i);}
@@ -637,27 +642,27 @@ class ITContainer<Derived, Arrays::vector_> : public ITContainerBase<Derived>
 
   public:
     /** @return the range of the container */
-    RowRange const& range() const  { return Base::rows();}
+    inline RowRange const& range() const  { return Base::rows();}
     /** @return the index of the first element */
-    int begin() const { return range().begin();}
+    inline int begin() const { return range().begin();}
     /**  @return the ending index of the elements */
-    int end() const  { return range().end();}
+    inline int end() const  { return range().end();}
     /**  @return the size of the vector */
-    int size() const  { return range().size();}
+    inline int size() const  { return range().size();}
 
     // for backward compatibility
     /** @return the first index of the vector */
-    int firstIdx() const { return begin();}
+    inline int firstIdx() const { return begin();}
     /** @return the last index of the vector */
-    int lastIdx() const { return end()-1;}
+    inline int lastIdx() const { return end()-1;}
 
     /** @return the index of the column of the vector */
-    int colIdx() const { return this->beginCols();}
+    inline int colIdx() const { return this->beginCols();}
 
     /** @return the first element */
-    ReturnType front() const { return this->elt(firstIdx());}
+    inline ReturnType front() const { return this->elt(firstIdx());}
     /** @return the last element */
-    ReturnType back() const { return this->elt(lastIdx());}
+    inline ReturnType back() const { return this->elt(lastIdx());}
 };
 
 /** @ingroup Arrays
@@ -691,27 +696,27 @@ class ITContainer<Derived, Arrays::point_> : public ITContainerBase<Derived>
 
   public:
     /** @return the range of the container */
-    ColRange const& range() const  { return this->asDerived().cols();}
+    inline ColRange const&range() const  { return this->asDerived().cols();}
     /** @return the index of the first element */
-    int begin() const { return range().begin();}
+    inline int begin() const { return range().begin();}
     /**  @return the ending index of the elements */
-    int end() const  { return range().end();}
+    inline int end() const  { return range().end();}
     /**  @return the size of the container */
-    int size() const  { return range().size();}
+    inline int size() const  { return range().size();}
 
     /** @return the index of the row of the point */
-    int rowIdx() const { return this->beginRows();}
+    inline int rowIdx() const { return this->beginRows();}
 
     // for backward compatibility
     /** @return the first index of the point */
-    int firstIdx() const { return begin();}
+    inline int firstIdx() const { return begin();}
     /** @return the last index of the vector */
-    int lastIdx() const { return end()-1;}
+    inline int lastIdx() const { return end()-1;}
 
     /** @return the first element */
-    ReturnType front() const { return this->elt(firstIdx());}
+    inline ReturnType front() const { return this->elt(firstIdx());}
     /** @return the last element */
-    ReturnType back() const { return this->elt(lastIdx());}
+    inline ReturnType back() const { return this->elt(lastIdx());}
 };
 /** @ingroup Arrays
  *  Specialization for number_ */
@@ -731,7 +736,7 @@ class ITContainer<Derived, Arrays::number_> : public ITContainerBase<Derived>
 
   public:
     /**  @return the size of the container */
-    int size() const  { return 1;}
+    inline int size() const  { return 1;}
     /** Conversion to scalar */
     operator ReturnType const() const {return this->asDerived().elt0Impl();}
 };

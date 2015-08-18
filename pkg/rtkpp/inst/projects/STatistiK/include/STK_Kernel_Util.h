@@ -70,14 +70,30 @@ enum kernelType
  *  @return the kernrlType represented by the String @c type. If the string
  *  does not match any known name, the @c unknown_kernel_ type is returned.
  **/
-kernelType stringToKernelType( std::string const& type);
+inline kernelType stringToKernelType( std::string const& type)
+{
+  if (toUpperString(type) == toUpperString(_T("exponential"))) return exponential_;
+  if (toUpperString(type) == toUpperString(_T("gaussian"))) return gaussian_;
+  if (toUpperString(type) == toUpperString(_T("linear"))) return linear_;
+  if (toUpperString(type) == toUpperString(_T("polynomial"))) return polynomial_;
+  if (toUpperString(type) == toUpperString(_T("rationalQuadratic"))) return rationalQuadratic_;
+  return unknown_kernel_;
+}
 
 /** @ingroup Kernel
  *  convert a kernelType to a String.
  *  @param type the type of kernelType we want to convert
  *  @return the string associated to this type.
  **/
-std::string kernelTypeToString( kernelType const& type);
+inline String kernelTypeToString( kernelType const& type)
+{
+  if (type == exponential_) return String(_T("exponential"));
+  if (type == gaussian_) return String(_T("gaussian"));
+  if (type == linear_) return String(_T("linear"));
+  if (type == polynomial_) return String(_T("polynomial"));
+  if (type == rationalQuadratic_) return String(_T("rationalQuadratic"));
+  return String(_T("unknown"));
+}
 
 } // namespace Kernel
 

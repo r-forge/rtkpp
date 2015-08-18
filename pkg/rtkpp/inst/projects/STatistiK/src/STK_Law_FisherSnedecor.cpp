@@ -32,10 +32,9 @@
  *  @brief In this file we implement the FisherSnedecor probability distribution.
  **/
 
-#include "../include/STK_Law_FisherSnedecor.h"
 
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
+#ifndef IS_RTKPP_LIB
+#include "../include/STK_Law_FisherSnedecor.h"
 #endif
 
 
@@ -45,31 +44,7 @@ namespace STK
 namespace Law
 {
 
-#ifdef IS_RTKPP_LIB
-
-/*inline*/ Real FisherSnedecor::rand() const
-{ return R::rf(df1_, df2_);}
-/*inline*/ Real FisherSnedecor::pdf(Real const& x) const
-{ return R::df(x, df1_, df2_, false);}
-/*inline*/ Real FisherSnedecor::lpdf(Real const& x) const
-{ return R::df(x, df1_, df2_, true);}
-/*inline*/ Real FisherSnedecor::cdf(Real const& t) const
-{ return R::pf(t, df1_, df2_, true, false);}
-/*inline*/ Real FisherSnedecor::icdf(Real const& p) const
-{ return R::qf(p, df1_, df2_, true, false);}
-
-/*inline*/ Real FisherSnedecor::rand( int df1, int df2)
-{ return R::rf(df1, df2);}
-/*inline*/ Real FisherSnedecor::pdf(Real const& x, int df1, int df2)
-{ return R::df(x, df1, df2, false);}
-/*inline*/ Real FisherSnedecor::lpdf(Real const& x, int df1, int df2)
-{ return R::df(x, df1, df2, true);}
-/*inline*/ Real FisherSnedecor::cdf(Real const& t, int df1, int df2)
-{  return R::pf(t, df1, df2, true, false);}
-/*inline*/ Real FisherSnedecor::icdf(Real const& p, int df1, int df2)
-{  return R::qf(p, df1, df2, true, false);}
-
-#else
+#ifndef IS_RTKPP_LIB
 
 /* @return a pseudo FisherSnedecor random variate. */
 Real FisherSnedecor::rand() const

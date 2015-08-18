@@ -39,7 +39,6 @@ namespace STK
 {
 
 // forward declaration
-template< typename Derived> class SlicingOperatorBase;
 template< typename Array> class RowOperator;
 template< typename Array> class ColOperator;
 // only for vectors, points and the like
@@ -72,15 +71,6 @@ template<> struct RowTraits<Arrays::vector_>
 template<> struct RowTraits<Arrays::number_>
 { enum { structure_ = Arrays::number_}; };
 
-} // end namespace hidden
-
-// forward declaration
-template< typename Lhs> class RowOperatorBase;
-template< typename Lhs> class ColOperatorBase;
-
-
-namespace hidden
-{
 /** @ingroup hidden
  *  @brief Traits class for the row operator
  */
@@ -115,11 +105,12 @@ struct Traits< RowOperator <Lhs> >
   * don't have to name RowOperator type explicitly.
   */
 template< typename Lhs>
-class RowOperator: public RowOperatorBase< Lhs>, public TRef<1>
+class RowOperator: public ExprBase< RowOperator< Lhs> >, public TRef<1>
 {
   public:
-    typedef RowOperatorBase< Lhs> Base;
-    typedef typename hidden::Traits< RowOperator<Lhs> >::Type Type;
+    typedef ExprBase< RowOperator< Lhs> > Base;
+    typedef typename hidden::Traits< RowOperator< Lhs> >::Type Type;
+    typedef typename hidden::Traits< RowOperator< Lhs> >::ReturnType ReturnType;
     enum
     {
         structure_ = hidden::Traits< RowOperator<Lhs> >::structure_,
@@ -134,44 +125,21 @@ class RowOperator: public RowOperatorBase< Lhs>, public TRef<1>
     typedef TRange<sizeCols_> ColRange;
 
     /** Constructor */
-    RowOperator( Lhs const& lhs, int i)
-                      : Base(i), lhs_(lhs), rows_(i,1), cols_(lhs_.rangeColsInRow(i)) {}
+    inline RowOperator( Lhs const& lhs, int i)
+                      : Base(), i_(i), lhs_(lhs), rows_(i,1), cols_(lhs_.rangeColsInRow(i)) {}
     /** Copy constructor */
     RowOperator( RowOperator const& row, bool ref)
-                      : Base(row), lhs_(row.lhs_), rows_(row.rows_), cols_(row.cols_) {}
+               : Base(row), i_(row.i_), lhs_(row.lhs_), rows_(row.rows_), cols_(row.cols_) {}
     /**  @return the range of the rows */
-    RowRange const& rowsImpl() const { return rows_;}
+    inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the range of the Columns */
-    ColRange const& colsImpl() const { return cols_;}
-
+    inline ColRange const& colsImpl() const { return cols_;}
     /** @return the left hand side expression */
     Lhs const& lhs() const { return lhs_; }
-
-  protected:
-    Lhs const& lhs_;
-    RowRange rows_;
-    ColRange cols_;
-};
-
-/** @ingroup Arrays
-  * @brief implement the access to the elements in the general case.
-  **/
-template< typename Lhs>
-class RowOperatorBase: public ExprBase< RowOperator< Lhs> >
-{
-  public:
-    typedef RowOperator<Lhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits< Derived >::Type Type;
-    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
-    /** constructor. */
-    RowOperatorBase(int i) : Base(), i_(i) {}
-    /** copy constructor. */
-    RowOperatorBase(RowOperatorBase const& row) : Base(), i_(row.i_) {}
     /** @return the element (i,j)
      *  @param i, j index of the row and column
      **/
-    ReturnType elt2Impl(int i, int j) const
+    inline ReturnType elt2Impl(int i, int j) const
     {
 #ifdef STK_DEBUG
       if (i != i_)
@@ -182,14 +150,18 @@ class RowOperatorBase: public ExprBase< RowOperator< Lhs> >
     /** @return the element jth element
      *  @param j index of the jth element
      **/
-    ReturnType elt1Impl(int j) const
+    inline ReturnType elt1Impl(int j) const
     { return (this->asDerived().lhs().elt(i_, j));}
     /** accesses to the element */
-    ReturnType elt0Impl() const
+    inline ReturnType elt0Impl() const
     { return (this->asDerived().lhs().elt());}
   protected:
     int i_;
+    Lhs const& lhs_;
+    RowRange rows_;
+    ColRange cols_;
 };
+
 
 namespace hidden
 {
@@ -228,11 +200,12 @@ struct Traits< ColOperator <Lhs> >
   * don't have to name ColOperator type explicitly.
   */
 template< typename Lhs>
-class ColOperator: public ColOperatorBase< Lhs>, public TRef<1>
+class ColOperator: public ExprBase< ColOperator< Lhs> >, public TRef<1>
 {
   public:
-    typedef ColOperatorBase< Lhs> Base;
+    typedef ExprBase< ColOperator< Lhs> > Base;
     typedef typename hidden::Traits< ColOperator<Lhs> >::Type Type;
+    typedef typename hidden::Traits< ColOperator<Lhs> >::ReturnType ReturnType;
     enum
     {
         structure_ = hidden::Traits< ColOperator<Lhs> >::structure_,
@@ -247,62 +220,44 @@ class ColOperator: public ColOperatorBase< Lhs>, public TRef<1>
     typedef TRange<sizeCols_> ColRange;
 
     /** Constructor */
-    ColOperator( Lhs const& lhs, int j)
-                      : Base(j), lhs_(lhs), rows_(lhs_.rangeRowsInCol(j)), cols_(j,1) {}
+    inline ColOperator( Lhs const& lhs, int j)
+                      : Base(), j_(j), lhs_(lhs), rows_(lhs_.rangeRowsInCol(j)), cols_(j,1) {}
     /** Copy constructor */
     ColOperator( ColOperator const& col, bool ref)
-                      : Base(col), lhs_(col.lhs_), rows_(col.rows_), cols_(col.cols_) {}
+               : Base(col), j_(col.j_), lhs_(col.lhs_), rows_(col.rows_), cols_(col.cols_) {}
     /**  @return the range of the rows */
-    RowRange const& rowsImpl() const { return rows_;}
+    inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the columns range */
-    ColRange const& colsImpl() const { return cols_;}
+    inline ColRange const& colsImpl() const { return cols_;}
 
     /** @return the left hand side expression */
-    Lhs const& lhs() const { return lhs_; }
-
-  protected:
-    Lhs const& lhs_;
-    RowRange rows_;
-    ColRange cols_;
-};
-
-/** @ingroup Arrays
-  * @brief implement the access to the elements in the general case.
-  **/
-template< typename Lhs>
-class ColOperatorBase : public ExprBase< ColOperator< Lhs> >
-{
-  public:
-    typedef ColOperator<Lhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits< Derived >::Type Type;
-    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
-    /** constructor. */
-    ColOperatorBase(int j) : Base(), j_(j) {}
-    /** copy constructor. */
-    ColOperatorBase(ColOperatorBase const& col) : Base(), j_(col.j_) {}
-    /** @return the element (i,j)
-     *  @param i, j indexes of the row and column
+    inline Lhs const& lhs() const { return lhs_; }
+    /** @return the ith element
+     *  @param i,j indexes of the element
      **/
-    ReturnType elt2Impl(int i, int j) const
+    inline ReturnType elt2Impl(int i, int j) const
     {
 #ifdef STK_DEBUG
       if (j != j_)
       { STKRUNTIME_ERROR_2ARG(ColOperatorBase::elt2Impl,i,j,column index is not valid);}
 #endif
-      return (this->asDerived().lhs().elt(i, j_));
+      return (lhs_.elt(i, j_));
     }
     /** @return the element ith element
      *  @param i index of the ith element
      **/
-    ReturnType elt1Impl(int i) const
-    { return (this->asDerived().lhs().elt(i, j_));}
-    /** accesses to the element */
-    ReturnType elt0Impl() const
-    { return (this->asDerived().lhs().elt());}
+    inline ReturnType elt1Impl(int i) const
+    { return (lhs_.elt(i, j_));}
+    /** access to the element */
+    inline ReturnType elt0Impl() const { return (lhs_.elt(j_));}
+
   protected:
     int j_;
+    Lhs const& lhs_;
+    RowRange rows_;
+    ColRange cols_;
 };
+
 
 namespace hidden
 {
@@ -362,23 +317,21 @@ class SubOperator: public ExprBase< SubOperator<Lhs, Orient_> >, public TRef<1>
     typedef TRange<UnknownSize> ColRange;
 
     /** Constructor */
-    SubOperator( Lhs const& lhs, Range const& I, Range const& J)
+    inline SubOperator( Lhs const& lhs, Range const& I, Range const& J)
                       : Base(), lhs_(lhs), rows_(I), cols_(J) {}
     /**  @return the range of the rows */
-    RowRange const& rowsImpl() const { return rows_;}
+    inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the range of the Columns */
-    ColRange const& colsImpl() const { return cols_;}
+    inline ColRange const&colsImpl() const { return cols_;}
 
     /** @return the left hand side expression */
     Lhs const& lhs() const { return lhs_; }
     /** @return the element ith element
      *  @param i index of the ith element
      **/
-    ReturnType elt1Impl(int i) const
-    { return (this->asDerived().lhs().elt1Impl(i));}
+    inline ReturnType elt1Impl(int i) const { return (lhs_.elt1Impl(i));}
     /** accesses to the element */
-    ReturnType elt0Impl() const
-    { return (this->asDerived().lhs().elt());}
+    inline ReturnType elt0Impl() const { return (lhs_.elt());}
 
   protected:
     Lhs const& lhs_;
@@ -402,7 +355,8 @@ class SubOperator: public ExprBase< SubOperator<Lhs, Orient_> >, public TRef<1>
   * don't have to name SubOperator type explicitly.
   */
 template< typename Lhs>
-class SubOperator<Lhs, Arrays::vector_ > : public ExprBase< SubOperator<Lhs, Arrays::vector_> >, public TRef<1>
+class SubOperator<Lhs, Arrays::vector_ >: public ExprBase< SubOperator<Lhs, Arrays::vector_> >
+                                        , public TRef<1>
 {
   public:
     typedef ExprBase< SubOperator<Lhs, Arrays::vector_> > Base;
@@ -422,23 +376,20 @@ class SubOperator<Lhs, Arrays::vector_ > : public ExprBase< SubOperator<Lhs, Arr
     typedef TRange<1> ColRange;
 
     /** Constructor */
-    SubOperator( Lhs const& lhs, Range const& I) : Base(), lhs_(lhs), rows_(I) {}
+    inline SubOperator( Lhs const& lhs, Range const& I) : Base(), lhs_(lhs), rows_(I) {}
     /**  @return the range of the rows */
-    RowRange const& rowsImpl() const { return rows_;}
+    inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the range of the Columns */
-    ColRange const& colsImpl() const { return lhs_.cols();}
-    /** @return the first column index of the sub expression */
+    inline ColRange const& colsImpl() const { return lhs_.cols();}
 
     /** @return the left hand side expression */
     Lhs const& lhs() const { return lhs_; }
     /** @return the element ith element
      *  @param i index of the ith element
      **/
-    ReturnType elt1Impl(int i) const
-    { return (this->asDerived().lhs().elt1Impl(i));}
+    inline ReturnType elt1Impl(int i) const { return (lhs_.elt1Impl(i));}
     /** accesses to the element */
-    ReturnType elt0Impl() const
-    { return (this->asDerived().lhs().elt());}
+    inline ReturnType elt0Impl() const { return (lhs_.elt());}
 
   protected:
     Lhs const& lhs_;
@@ -481,56 +432,27 @@ class SubOperator<Lhs, Arrays::point_ > : public ExprBase< SubOperator<Lhs, Arra
     /** Type of the Range for the columns */
     typedef TRange<UnknownSize> ColRange;
     /** Constructor */
-    SubOperator( Lhs const& lhs, Range const& J) : Base(), lhs_(lhs), cols_(J) {}
+    inline SubOperator( Lhs const& lhs, Range const& J) : Base(), lhs_(lhs), cols_(J) {}
     /**  @return the range of the rows */
-    RowRange const& rowsImpl() const { return lhs_.rows();}
+    inline RowRange const& rowsImpl() const { return lhs_.rows();}
     /** @return the range of the Columns */
-    ColRange const& colsImpl() const { return cols_;}
+    inline ColRange const& colsImpl() const { return cols_;}
 
     /** @return the left hand side expression */
     Lhs const& lhs() const { return lhs_; }
     /** @return the element ith element
      *  @param i index of the ith element
      **/
-    ReturnType elt1Impl(int i) const
+    inline ReturnType elt1Impl(int i) const
     { return (this->asDerived().lhs().elt1Impl(i));}
     /** accesses to the element */
-    ReturnType elt0Impl() const
+    inline ReturnType elt0Impl() const
     { return (this->asDerived().lhs().elt());}
 
   protected:
     Lhs const& lhs_;
     ColRange cols_;
 };
-
-/** @ingroup Arrays
-  * @brief implement the access to the elements in the general case.
-  **/
-template< typename Lhs>
-class SubOperatorBase : public ExprBase< SubOperator< Lhs> >
-{
-  public:
-    typedef SubOperator<Lhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits< Derived >::Type Type;
-    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
-    /** constructor. */
-    SubOperatorBase() : Base() {}
-    /** @return the element (i,j)
-     *  @param i, j indexes of the row and column
-     **/
-    ReturnType elt2Impl(int i, int j) const
-    { return (this->asDerived().lhs().elt(i, j));}
-    /** @return the element ith element
-     *  @param i index of the ith element
-     **/
-    ReturnType elt1Impl(int i) const
-    { return (this->asDerived().lhs().elt(i));}
-    /** accesses to the element */
-    ReturnType elt0Impl() const
-    { return (this->asDerived().lhs().elt());}
-};
-
 
 } // namespace STK
 

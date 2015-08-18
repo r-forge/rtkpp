@@ -313,11 +313,11 @@ struct ApplyFunctor
     ApplyFunctor( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived())
     { STK_STATIC_ASSERT_VECTOR_ONLY(Derived);}
     /** apply without argument*/
-    Type operator()() { return Funct(lhs_)();}
+    inline Type operator()() { return Funct(lhs_)();}
     /** apply with an option argument*/
-    Type operator()(bool option) { return Funct(lhs_)(option);}
+    inline Type operator()(bool option) { return Funct(lhs_)(option);}
     /** apply with a value and an option argument*/
-    Type operator()(Type const& value, bool option)
+    inline Type operator()(Type const& value, bool option)
     { return Funct(lhs_)(value, option);}
 
   protected:
@@ -338,14 +338,14 @@ struct ApplyWeightedFunctor
     { STK_STATIC_ASSERT_VECTOR_ONLY(Derived);}
     /** apply with weights*/
     template<typename Weights>
-    Type operator()(ExprBase<Weights> const& w) { return Funct(lhs_)(w);}
+    inline Type operator()(ExprBase<Weights> const& w) { return Funct(lhs_)(w);}
     /** apply with weight and an option argument*/
     template<typename Weights>
-    Type operator()(ExprBase<Weights> const& w, bool option)
+    inline Type operator()(ExprBase<Weights> const& w, bool option)
     { return Funct(lhs_)(w, option);}
     /** apply with weight, a value and an option argument*/
     template<typename Weights>
-    Type operator()(ExprBase<Weights> const& w, Type const& value, bool option)
+    inline Type operator()(ExprBase<Weights> const& w, Type const& value, bool option)
     { return Funct(lhs_)(w, value, option);}
 
   protected:

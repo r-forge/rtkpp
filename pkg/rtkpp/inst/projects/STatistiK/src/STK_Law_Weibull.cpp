@@ -32,9 +32,8 @@
  *  @brief In this file we implement the Weibull probability distribution.
  **/
 
+#ifndef IS_RTKPP_LIB
 #include "../include/STK_Law_Weibull.h"
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
 #endif
 
 namespace STK
@@ -43,31 +42,7 @@ namespace STK
 namespace Law
 {
 
-#ifdef IS_RTKPP_LIB
-
-/*inline*/ Real Weibull::rand() const
-{ return R::rweibull(k_, lambda_);}
-/*inline*/ Real Weibull::pdf(Real const& x) const
-{ return R::dweibull(x, k_, lambda_, false);}
-/*inline*/ Real Weibull::lpdf(Real const& x) const
-{ return R::dweibull(x, k_, lambda_, true);}
-/*inline*/ Real Weibull::cdf(Real const& t) const
-{ return R::pweibull(t, k_, lambda_, true, false);}
-/*inline*/ Real Weibull::icdf(Real const& p) const
-{ return R::qweibull(p, k_, lambda_, true, false);}
-
-/*inline*/ Real Weibull::rand( Real const& k, Real const& lambda)
-{ return R::rweibull(k, lambda);}
-/*inline*/ Real Weibull::pdf(Real const& x, Real const& k, Real const& lambda)
-{ return R::dweibull(x, k, lambda, false);}
-/*inline*/ Real Weibull::lpdf(Real const& x, Real const& k, Real const& lambda)
-{ return R::dweibull(x, k, lambda, true);}
-/*inline*/ Real Weibull::cdf(Real const& t, Real const& k, Real const& lambda)
-{ return R::pweibull(t, k, lambda, true, false);}
-/*inline*/ Real Weibull::icdf( Real const& p, Real const& k, Real const& lambda)
-{ return R::qweibull(p, k, lambda, true, false);}
-
-#else
+#ifndef IS_RTKPP_LIB
 
 /* @return a pseudo Weibull random variate. */
 Real Weibull::rand() const

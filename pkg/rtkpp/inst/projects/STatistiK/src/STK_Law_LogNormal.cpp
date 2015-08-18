@@ -32,10 +32,9 @@
  *  @brief In this file we implement the LogNormal probability law class.
  **/
 
-#include "../include/STK_Law_LogNormal.h"
 
-#ifdef IS_RTKPP_LIB
-#include <Rcpp.h>
+#ifndef IS_RTKPP_LIB
+#include "../include/STK_Law_LogNormal.h"
 #endif
 
 namespace STK
@@ -44,31 +43,7 @@ namespace STK
 namespace Law
 {
 
-#ifdef IS_RTKPP_LIB
-
-/*inline*/ Real LogNormal::rand() const
-{ return R::rlnorm(mu_, sigma_);}
-/*inline*/ Real LogNormal::pdf( Real const& x) const
-{ return R::dlnorm(x, mu_, sigma_, false);}
-/*inline*/ Real LogNormal::lpdf( Real const& x) const
-{ return R::dlnorm(x, mu_, sigma_, true);}
-/*inline*/ Real LogNormal::cdf( Real const& t) const
-{ return R::plnorm(t, mu_, sigma_, true, false);}
-/*inline*/ Real LogNormal::icdf( Real const& p) const
-{ return R::qlnorm(p, mu_, sigma_, true, false);}
-
-/*inline*/ Real LogNormal::rand( Real const& mu, Real const& sigma)
-{ return R::rlnorm(mu, sigma);}
-/*inline*/ Real LogNormal::pdf( Real const& x, Real const& mu, Real const& sigma)
-{ return R::dlnorm(x, mu, sigma, false);}
-/*inline*/ Real LogNormal::lpdf( Real const& x, Real const& mu, Real const& sigma)
-{ return R::dlnorm(x, mu, sigma, true);}
-/*inline*/ Real LogNormal::cdf( Real const& t, Real const& mu, Real const& sigma)
-{ return R::plnorm(t, mu, sigma, true, false);}
-/*inline*/ Real LogNormal::icdf( Real const& p, Real const& mu, Real const& sigma)
-{ return R::qlnorm(p, mu, sigma, true, false);}
-
-#else
+#ifndef IS_RTKPP_LIB
 
 /* @brief Generate a pseudo log-normalized LogNormal random variate.
  *

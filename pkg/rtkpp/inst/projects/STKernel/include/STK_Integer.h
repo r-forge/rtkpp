@@ -78,8 +78,8 @@ struct Arithmetic<Integer>  : public std::numeric_limits<Integer>
    **/
   static inline bool isNA(Integer const& x) throw()
   { return (x==std::numeric_limits<Integer>::min());}
-  /** We are using the maximal value (positive or negative) of the Integer
-    * type for NA values. */
+  /** We are using the minimal value of the Integer type for NA values, thus
+   *  we add one in order to compute the available minimal value. */
   static inline Integer min() throw() { return std::numeric_limits<Integer>::min() +1; }
   /** @return @c true if x is  infinite : always false for Integer.
    *  @param x the Integer number to test.

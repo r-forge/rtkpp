@@ -44,9 +44,10 @@ namespace STK
 namespace hidden
 {
 /** @ingroup hidden
- *  MixtureBridgeTraits class for bridged mixtures
+ *  MixtureBridgeTraits struct for bridged mixtures
  **/
 template<class Derived> struct MixtureBridgeTraits;
+
 }
 
 /** @ingroup Clustering
@@ -67,13 +68,13 @@ class IMixtureBridge: public IMixture, public IRecursiveTemplate<Derived>
 {
   public:
     typedef std::vector<std::pair<int,int> >::const_iterator ConstIterator;
-    // type of Mixture
     typedef typename hidden::MixtureBridgeTraits<Derived>::Mixture Mixture;
     typedef typename hidden::MixtureBridgeTraits<Derived>::Data Data;
-    typedef typename Clust::MixtureTraits<Mixture>::Param Param;
-    // class of mixture
+    typedef typename hidden::MixtureBridgeTraits<Derived>::Parameters Parameters;
+    typedef typename hidden::MixtureBridgeTraits<Derived>::ParamHandler ParamHandler;
     enum
     {
+      // class of mixture
       idMixtureClass_ = hidden::MixtureBridgeTraits<Derived>::idMixtureClass_
     };
 
@@ -135,11 +136,6 @@ class IMixtureBridge: public IMixture, public IRecursiveTemplate<Derived>
      *  @return Number of variables
      */
     virtual int nbVariable() const { return mixture_.nbVariable();}
-    /** This function can be used to write summary of parameters to the output stream.
-     * @param out Stream where you want to write the summary of parameters.
-     */
-    virtual void writeParameters(std::ostream& out) const
-    { mixture_.writeParameters(out);}
     /** @brief This function should be used to store any intermediate results
      * during various iterations after the burn-in period.
      * @param iteration Provides the iteration number beginning after the burn-in
@@ -173,11 +169,21 @@ class IMixtureBridge: public IMixture, public IRecursiveTemplate<Derived>
      */
     virtual void samplingStep();
 
-    /** This function can be used in order to get the current values of the
-     *  parameters.
-     *  @param param the array with the parameters of the mixture.
+    /** @return the structure storing the current values of the parameters. */
+    ParamHandler const& paramHandler() const { return mixture_.paramHandler();}
+    /** set the parameter handler (current values) of the model */
+    void setParamHandler(ParamHandler const& param) { mixture_.setParamHandler(param);}
+    /** This function is used in order to set the current values of the
+     *  parameters to the paramHandler of the mixture.
+     *  @param param the array/expression with the parameters of the mixture to
+     *  store in the ParamHandler.
      */
-    void getParameters(Param& param) const { mixture_.getParameters(param);}
+    template<class Array>
+    void setParameters( Array const& param)
+    {
+//      ParamHandler handler(this->nbCluster(), param);
+      mixture_.setParamHandler(param);
+    }
 
   protected:
     /** protected constructor to use in order to create a bridge.

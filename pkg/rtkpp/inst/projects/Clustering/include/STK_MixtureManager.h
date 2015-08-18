@@ -55,7 +55,8 @@
 namespace STK
 {
 /** @ingroup Clustering
- *  @brief A mixture manager is a factory class for injection dependency in the
+ *  @class MixtureManager
+ *  @brief [DEPRECATED] A mixture manager is a factory class for injection dependency in the
  *  STK++ derived class of the MixtureComposer class.
  *
  *  It allows to handle all the creation and initialization stuff needed by the
@@ -132,74 +133,160 @@ class MixtureManager : public IMixtureManager<DataHandler>
       {
         // gamma models
         case Clust::Gamma_ajk_bjk_:
-        { static_cast<MixtureBridge_ajk_bjk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_ajk_bjk*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Gamma_ajk_bk_:
-        { static_cast<MixtureBridge_ajk_bk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_ajk_bk*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Gamma_ajk_bj_:
-        { static_cast<MixtureBridge_ajk_bj const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_ajk_bj*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Gamma_ajk_b_:
-        { static_cast<MixtureBridge_ajk_b const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_ajk_b*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Gamma_ak_bjk_:
-        { static_cast<MixtureBridge_ak_bjk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_ak_bjk*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Gamma_ak_bk_:
-        { static_cast<MixtureBridge_ak_bk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_ak_bk*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Gamma_ak_bj_:
-        { static_cast<MixtureBridge_ak_bj const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_ak_bj*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Gamma_ak_b_:
-        { static_cast<MixtureBridge_ak_b const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_ak_b*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Gamma_aj_bjk_:
-        { static_cast<MixtureBridge_aj_bjk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_aj_bjk*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Gamma_aj_bk_:
-        { static_cast<MixtureBridge_aj_bk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_aj_bk*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Gamma_a_bjk_:
-        { static_cast<MixtureBridge_a_bjk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_a_bjk*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Gamma_a_bk_:
-        { static_cast<MixtureBridge_a_bk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_a_bk*>(p_mixture)->getParameters(param);}
         break;
         // Gaussian models
         case Clust::Gaussian_sjk_:
-        { static_cast<MixtureBridge_sjk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_sjk*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Gaussian_sk_:
-        { static_cast<MixtureBridge_sk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_sk*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Gaussian_sj_:
-        { static_cast<MixtureBridge_sj const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_sj*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Gaussian_s_:
-        { static_cast<MixtureBridge_s const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_s*>(p_mixture)->getParameters(param);}
         break;
         // Categorical models
         case Clust::Categorical_pjk_:
-        { static_cast<MixtureBridge_pjk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_pjk*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Categorical_pk_:
-        { static_cast<MixtureBridge_pk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_pk*>(p_mixture)->getParameters(param);}
         break;
         // Poisson models
         case Clust::Poisson_ljk_:
-        { static_cast<MixtureBridge_ljk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_ljk*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Poisson_lk_:
-        { static_cast<MixtureBridge_lk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_lk*>(p_mixture)->getParameters(param);}
         break;
         case Clust::Poisson_ljlk_:
-        { static_cast<MixtureBridge_ljlk const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureBridge_ljlk*>(p_mixture)->getParameters(param);}
         break;
         // Kernel models
         case Clust::KernelGaussian_sk_:
-        { static_cast<MixtureKernelGaussianBridge const*>(p_mixture)->getParameters(param);}
+        { static_cast<MixtureKernelGaussianBridge*>(p_mixture)->getParameters(param);}
+        break;
+        default: // idModel is not implemented
+        break;
+      }
+    }
+    /** set the parameters to an IMixture.
+     *  @param p_mixture pointer on the mixture
+     *  @param param the array to return with the parameters
+     **/
+    void setParameters(IMixture* p_mixture, ArrayXX const& param) const
+    {
+      Clust::Mixture idModel = getIdModel(p_mixture->idName());
+      if (idModel == Clust::unknown_mixture_) return;
+      // up-cast... (Yes it's bad....;)...)
+      switch (idModel)
+      {
+        // gamma models
+        case Clust::Gamma_ajk_bjk_:
+        { static_cast<MixtureBridge_ajk_bjk*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Gamma_ajk_bk_:
+        { static_cast<MixtureBridge_ajk_bk*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Gamma_ajk_bj_:
+        { static_cast<MixtureBridge_ajk_bj*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Gamma_ajk_b_:
+        { static_cast<MixtureBridge_ajk_b*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Gamma_ak_bjk_:
+        { static_cast<MixtureBridge_ak_bjk*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Gamma_ak_bk_:
+        { static_cast<MixtureBridge_ak_bk*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Gamma_ak_bj_:
+        { static_cast<MixtureBridge_ak_bj*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Gamma_ak_b_:
+        { static_cast<MixtureBridge_ak_b*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Gamma_aj_bjk_:
+        { static_cast<MixtureBridge_aj_bjk*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Gamma_aj_bk_:
+        { static_cast<MixtureBridge_aj_bk*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Gamma_a_bjk_:
+        { static_cast<MixtureBridge_a_bjk*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Gamma_a_bk_:
+        { static_cast<MixtureBridge_a_bk*>(p_mixture)->setParameters(param);}
+        break;
+        // Gaussian models
+        case Clust::Gaussian_sjk_:
+        { static_cast<MixtureBridge_sjk*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Gaussian_sk_:
+        { static_cast<MixtureBridge_sk*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Gaussian_sj_:
+        { static_cast<MixtureBridge_sj*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Gaussian_s_:
+        { static_cast<MixtureBridge_s*>(p_mixture)->setParameters(param);}
+        break;
+        // Categorical models
+        case Clust::Categorical_pjk_:
+        { static_cast<MixtureBridge_pjk*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Categorical_pk_:
+        { static_cast<MixtureBridge_pk*>(p_mixture)->setParameters(param);}
+        break;
+        // Poisson models
+        case Clust::Poisson_ljk_:
+        { static_cast<MixtureBridge_ljk*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Poisson_lk_:
+        { static_cast<MixtureBridge_lk*>(p_mixture)->setParameters(param);}
+        break;
+        case Clust::Poisson_ljlk_:
+        { static_cast<MixtureBridge_ljlk*>(p_mixture)->setParameters(param);}
+        break;
+        // Kernel models
+        case Clust::KernelGaussian_sk_:
+        { static_cast<MixtureKernelGaussianBridge*>(p_mixture)->setParameters(param);}
         break;
         default: // idModel is not implemented
         break;

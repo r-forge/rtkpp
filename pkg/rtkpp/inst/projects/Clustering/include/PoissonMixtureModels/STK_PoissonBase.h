@@ -41,10 +41,20 @@
 namespace STK
 {
 /** @ingroup Clustering
+ *  Base class for the Poisson models Parameter Handler
+ **/
+template<class Derived>
+struct PoissonHandlerBase: public IRecursiveTemplate<Derived>
+{
+  /** @return the value of lambda of the kth cluster and jth variable */
+  inline Real lambda(int k, int j) const { return this->asDerived().lambdaImpl(k,j);}
+};
+
+/** @ingroup Clustering
  *  Base class for the Poisson models
  **/
 template<class Derived>
-class PoissonBase : public IMixtureModel<Derived >
+class PoissonBase: public IMixtureModel<Derived >
 {
   public:
     typedef IMixtureModel<Derived > Base;
@@ -66,7 +76,7 @@ class PoissonBase : public IMixtureModel<Derived >
 
   public:
     /** @return the value of lambda of the kth cluster and jth variable */
-    inline Real lambda(int k, int j) const { return this->asDerived().lambdaImpl(k,j);}
+    inline Real lambda(int k, int j) const { return param_.lambda(k,j);}
     /** Initialize the parameters of the model. */
     void initializeModelImpl() { param_.resize(p_data()->cols());}
     /** @return a value to impute for the jth variable of the ith sample*/
@@ -83,38 +93,7 @@ class PoissonBase : public IMixtureModel<Derived >
      **/
     inline Real rand(int i, int j, int k) const
     { return Law::Poisson::rand(lambda(k,j));}
-    /** get the parameters of the model
-     *  @param params the array to fill with the parameters of the model
-     **/
-    void getParameters(ArrayXX& params) const;
-    /** Write the parameters on the output stream os */
-    void writeParameters(ostream& os) const;
 };
-
-/* Write the parameters on the output stream os */
-template<class Derived>
-void PoissonBase<Derived>::writeParameters(ostream& os) const
-{
-  ArrayXX params;
-  getParameters(params);
-  for (int k= params.beginRows(); k < params.endRows(); ++k)
-  {
-    os << _T("---> Component ") << k << _T("\n");
-    os << _T("lambda = ") << params.row(k);
-  }
-}
-
-/*get the parameters of the model*/
-template<class Derived>
-void PoissonBase<Derived>::getParameters(ArrayXX& params) const
-{
-  params.resize(nbCluster(), p_data()->cols());
-  for (int k= params.beginRows(); k < params.endRows(); ++k)
-  {
-    for (int j= p_data()->beginCols();  j < p_data()->endCols(); ++j)
-    { params(k, j) = lambda(k,j);}
-  }
-}
 
 } // namespace STK
 

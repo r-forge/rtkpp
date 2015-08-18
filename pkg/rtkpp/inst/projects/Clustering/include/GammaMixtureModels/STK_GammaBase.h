@@ -90,15 +90,25 @@ class invPsi : public IFunction<invPsi >
 
 } // namespace hidden
 
-/**base class of the ParametersHandler struct for Gamma models */
-struct ParametersHandlerGammaBase
+/** base class of the Gamma models Parameter Handler */
+template<class Derived>
+struct ParametersHandlerGammaBase: public IRecursiveTemplate<Derived>
 {
+  /** @return the mean of the kth cluster and jth variable */
+  inline Real const& shape(int k, int j) const { return this->asDerived().shapeImpl(k,j);}
+  /** @return the mean of the kth cluster and jth variable */
+  inline Real const& scale(int k, int j) const { return this->asDerived().scaleImpl(k,j);}
+
   /** mean and statistics of the means */
   MixtureParametersSet<PointX> mean_;
   /** mean and statistics of the log-means */
   MixtureParametersSet<PointX> meanLog_;
   /** standard deviation and statistics */
   MixtureParametersSet<PointX> variance_;
+  /** copy operator */
+  inline ParametersHandlerGammaBase& operator=( Derived const& other)
+  { mean_ = other.mean_; meanLog_ = other.meanLog_; variance_ = other.variance_; return *this; }
+
   /** default constructor */
   ParametersHandlerGammaBase( int nbCluster)
                             : mean_(nbCluster), meanLog_(nbCluster), variance_(nbCluster) {}
@@ -146,10 +156,10 @@ class GammaBase : public IMixtureModel<Derived >
     inline ~GammaBase() {}
 
   public:
-    /** @return the mean of the kth cluster and jth variable */
-    inline Real shape(int k, int j) const { return this->asDerived().shapeImpl(k,j);}
-    /** @return the mean of the kth cluster and jth variable */
-    inline Real scale(int k, int j) const { return this->asDerived().scaleImpl(k,j);}
+    /** @return the shape of the kth cluster and jth variable */
+    inline Real shape(int k, int j) const { return param_.shape(k,j);}
+    /** @return the scale of the kth cluster and jth variable */
+    inline Real scale(int k, int j) const { return param_.scale(k,j);}
     /** Initialize the parameters of the model. */
     void initializeModelImpl() { param_.resize(p_data()->cols());}
     /** @return a value to impute for the jth variable of the ith sample*/
@@ -166,12 +176,6 @@ class GammaBase : public IMixtureModel<Derived >
      **/
     inline Real rand(int i, int j, int k) const
     { return Law::Gamma::rand(shape(k,j), scale(k,j));}
-    /** get the parameters of the model
-     *  @param params the array to fill with the parameters of the model
-     **/
-    void getParameters(Array2D<Real>& params) const;
-    /** Write the parameters on the output stream os */
-    void writeParameters(ostream& os) const;
 
   protected:
     /** compute the Q(theta) value. */
@@ -187,41 +191,6 @@ class GammaBase : public IMixtureModel<Derived >
     /** get the mean of the weighted variances of the kth cluster. */
     inline Real variancek( int k) { return param_.variance_[k].mean();}
 };
-
-/*get the parameters of the model*/
-template<class Derived>
-void GammaBase<Derived>::getParameters(Array2D<Real>& params) const
-{
-  int nbClust = this->nbCluster();
-  params.resize(2*nbClust, p_data()->cols());
-  for (int k= 0; k < nbClust; ++k)
-  {
-    for (int j= p_data()->beginCols();  j < p_data()->endCols(); ++j)
-    {
-      params(2*k+  baseIdx, j) = shape(k,j);
-      params(baseIdx+2*k+1, j) = scale(k,j);
-    }
-  }
-}
-
-/* Write the parameters on the output stream os */
-template<class Derived>
-void GammaBase<Derived>::writeParameters(ostream& os) const
-{
-    Array2DPoint<Real> a(p_data()->cols()), b(p_data()->cols());
-    for (int k= p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
-    {
-      // store shape and scale values in an array for a nice output
-      for (int j= p_data()->beginCols();  j < p_data()->endCols(); ++j)
-      {
-        a[j] = shape(k,j);
-        b[j] = scale(k,j);
-      }
-      os << _T("---> Component ") << k << _T("\n");
-      os << _T("shape = ") << a;
-      os << _T("scale = ") << b;
-    }
-}
 
 /* compute safely the weighted moments of a gamma law. */
 template<class Derived>

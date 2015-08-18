@@ -70,36 +70,36 @@ class IContainer2D
      *  @param I the vertical range
      *  @param J the horizontal range
      **/
-    IContainer2D( RowRange const& I, ColRange const& J): rows_(I), cols_(J) {}
+    inline IContainer2D( RowRange const& I, ColRange const& J): rows_(I), cols_(J) {}
     /** Copy constructor
      *  @param T the container to copy
      **/
-    IContainer2D( IContainer2D const& T): rows_(T.rows_), cols_(T.cols_) {}
+    inline IContainer2D( IContainer2D const& T): rows_(T.rows_), cols_(T.cols_) {}
     /** destructor. **/
     ~IContainer2D() {}
 
     /** @return the columns range */
-    ColRange const& cols() const { return cols_;}
+    inline ColRange const&cols() const { return cols_;}
     /** @return the index of the first column */
-    int beginCols() const { return cols_.begin();}
+    inline int beginCols() const { return cols_.begin();}
     /** @return the ending index of the columns */
-    int endCols() const { return cols_.end();}
+    inline int endCols() const { return cols_.end();}
     /** @return the number of column */
-    int sizeCols() const { return cols_.size();}
+    inline int sizeCols() const { return cols_.size();}
 
     /** @return the range of the rows */
-    RowRange const& rows() const { return rows_;}
+    inline RowRange const& rows() const { return rows_;}
     /** @return the index of the first row */
-    int beginRows() const { return rows_.begin();}
+    inline int beginRows() const { return rows_.begin();}
     /** @return the ending index of rows */
-    int endRows() const { return rows_.end();}
+    inline int endRows() const { return rows_.end();}
     /** @return the number of rows */
-    int sizeRows() const { return rows_.size();}
+    inline int sizeRows() const { return rows_.size();}
 
     /** @return the index of the last column */
-    int lastIdxCols() const { return cols_.lastIdx();}
+    inline int lastIdxCols() const { return cols_.lastIdx();}
     /** @return the index of the last row */
-    int lastIdxRows() const { return rows_.lastIdx();}
+    inline int lastIdxRows() const { return rows_.lastIdx();}
 
     /** @return @c true if the container is empty, @c false otherwise */
     bool empty() const { return (cols_.empty() || rows_.empty());}
@@ -275,19 +275,19 @@ class ITContainer2D : public IContainer2D< hidden::Traits<Derived>::sizeRows_, h
     /** constructor with specified Range.
      *  @param I,J range of the rows and columns
      **/
-    ITContainer2D( Range const& I, Range const& J) : Base2D(I, J), Base() {}
+    inline ITContainer2D( Range const& I, Range const& J) : Base2D(I, J), Base() {}
     /** Copy constructor.
      *  @param T the container to copy
      **/
-    ITContainer2D( ITContainer2D const& T) : Base2D(T), Base() {}
+    inline ITContainer2D( ITContainer2D const& T) : Base2D(T), Base() {}
     /** destructor. */
     ~ITContainer2D() {}
 
   public:
     /** @return the range of the effectively stored elements in the column. */
-    Range rangeRowsInCol(int) const { return this->rows();}
+    RowRange const& rangeRowsInCol(int) const { return this->rows();}
     /** @return the range of the effectively stored elements in the row. */
-    Range rangeColsInRow(int) const { return this->cols();}
+    ColRange const& rangeColsInRow(int) const { return this->cols();}
     /** @return the element (i,j) of the 2D container.
      *  @param i, j index of the row and of the column
      **/
@@ -339,37 +339,37 @@ class ITContainer2D : public IContainer2D< hidden::Traits<Derived>::sizeRows_, h
      *  @param i index of the row
      *  @return a reference on the ith row
      **/
-    Row row(int i) const
+    inline Row row(int i) const
     { return Row(this->asDerived(), Range(i,1), this->cols());}
     /** Access to the row (i,J) of the Allocator.
      *  @param i,J index of the row and range of the columns
      *  @return a reference on the ith row
      **/
-    SubRow row(int i, Range const& J) const
+    inline SubRow row(int i, Range const& J) const
     { return SubRow(this->asDerived(), Range(i,1), J);}
     /** Access to the jth column of the Allocator.
      *  @param j index of the column
      *  @return a reference on the jth column
      **/
-    Col col(int j) const
+    inline Col col(int j) const
     { return Col(this->asDerived(), this->rows(), Range(j,1));}
     /** Access to the column (I,j) of the Allocator.
      *  @param I,j range of the rows and index of the column
      *  @return a reference on the jth column
      **/
-    SubCol col(Range const& I, int j) const
+    inline SubCol col(Range const& I, int j) const
     { return SubCol(this->asDerived(), I, Range(j,1));}
     /** Access to the sub-part (I,J) of the Allocator.
      *  @param I,J range of the rows and columns
      *  @return a reference on a sub-part of the Allocator
      **/
-    SubArray sub(Range const& I, Range const& J) const
+    inline SubArray sub(Range const& I, Range const& J) const
     { return SubArray(this->asDerived(), I, J);}
     /** Access to a sub-vector. For 1D allocators only.
      *  @param I range of the rows
      *  @return a reference on a sub-part of the Allocaor
      **/
-    SubVector sub(Range const& I) const
+    inline SubVector sub(Range const& I) const
     { return this->asDerived().sub1Impl(I);}
     /** shift the first indexes of the allocator.
      *  @param firstRow, firstCol indexes of the first row and first column

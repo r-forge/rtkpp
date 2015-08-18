@@ -42,11 +42,10 @@
 
 #define STK_CREATE_MIXTURE(Data, Bridge) \
           Data* p_data = new Data(idData); \
-          registerMixtureData(p_data); \
           p_handler()->getData(idData, p_data->dataij_, p_data->nbVariable_ ); \
           p_data->initialize(); \
-          Bridge* p_bridge = new Bridge( p_data, idData, nbCluster);  \
-          return p_bridge;
+          registerMixtureData(p_data); \
+          return new Bridge( p_data, idData, nbCluster);
 
 namespace STK
 {
@@ -110,7 +109,7 @@ class CategoricalMixtureManager : public IMixtureManager<DataHandler>
      *  @param p_mixture pointer on the mixture
      *  @param param the array with the parameters to set
      **/
-    virtual void setParameters(IMixture* p_mixture, ArrayXX const& param)
+    virtual void setParameters(IMixture* p_mixture, ArrayXX const& param) const
     {
       Clust::Mixture idModel = getIdModel(p_mixture->idName());
       if (idModel == Clust::unknown_mixture_) return;
@@ -149,13 +148,12 @@ class CategoricalMixtureManager : public IMixtureManager<DataHandler>
     {
       switch (idModel)
       {
-        // Categorical models
         case Clust::Categorical_pjk_:
-        { STK_CREATE_MIXTURE(MixtureDataInt, MixtureBridge_pjk)}
-        break;
+          { STK_CREATE_MIXTURE(MixtureDataInt, MixtureBridge_pjk)}
+          break;
         case Clust::Categorical_pk_:
-        { STK_CREATE_MIXTURE(MixtureDataInt, MixtureBridge_pk)}
-        break;
+          { STK_CREATE_MIXTURE(MixtureDataInt, MixtureBridge_pk)}
+          break;
         default:
           return 0; // 0 if idModel is not implemented
           break;

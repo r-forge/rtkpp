@@ -62,8 +62,10 @@ class IMixture
     /** Virtual destructor. */
     virtual ~IMixture();
 
-    /** @return the Idname of the mixture */
+    /** @return the Idname of the mixture [DEPRECATED] */
     inline std::string const& idName() const { return idData_;}
+    /** @return the Id data of the mixture */
+    inline std::string const& idData() const { return idData_;}
     /** @return Number of cluster. */
     inline int nbCluster() const  { return nbCluster_;}
     /** @return A constant pointer on the composer. */

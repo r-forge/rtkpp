@@ -111,7 +111,7 @@ void IMixtureComposer::randomClassInit()
 void IMixtureComposer::randomFuzzyInit()
 {
 #ifdef STK_MIXTURE_VERBOSE
-  stk_cout << _T("Entering IMixtureComposer::randomFuzzyInit()\n");
+  stk_cout << _T("Entering IMixtureComposer::randomFuzzyInit(). state= ") << state() << _T("\n");
 #endif
   if (state() < 2) { initializeStep();}
   if (randomFuzzyTik()<2) throw(Clust::randomFuzzyInitFail_);

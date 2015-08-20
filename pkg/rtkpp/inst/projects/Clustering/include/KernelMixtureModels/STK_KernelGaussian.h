@@ -345,17 +345,29 @@ class KernelGaussian_s : public IMixtureModel<KernelGaussian_s >
 /* Initialize randomly the parameters of the Gaussian mixture. */
 inline void KernelGaussian_sk::randomInit()
 {
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("Entering KernelGaussian_sk::randomInit()\n");
+#endif
   param_.sigma2_() = sum( p_data()->prod(*p_tik()) )/ (*p_nk() * param_.dim_)
                  + PointX(p_tik()->cols()).rand(Law::Normal(0, 0.05)).abs();
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("KernelGaussian_sk::randomInit() done\n");
+#ifdef STK_MIXTURE_DEBUG
+  stk_cout << param_.sigma2_() << "\n";
+#endif
 #endif
 }
 
 /* Compute the weighted means and the weighted standard deviations. */
 inline bool KernelGaussian_sk::mStep()
 {
+#ifdef STK_MIXTURE_DEBUG
+  stk_cout << _T("Entering KernelGaussian_sk::mStep()\n");
+#endif
   param_.sigma2_() =  sum( p_data()->prod(*p_tik()) )/ (*p_nk() * param_.dim_);
+#ifdef STK_MIXTURE_DEBUG
+  stk_cout << param_.sigma2_() << "\n";
+#endif
   return true;
 }
 

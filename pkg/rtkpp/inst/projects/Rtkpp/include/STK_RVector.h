@@ -156,10 +156,14 @@ class RVector : public ArrayBase< RVector<Type_> >, public TRef<1>
     inline Row rowImpl(int i) const { return Row(this->asDerived(), i);}
     /** @return the i-th row of this. */
     inline SubVector sub(Range I) const { return SubVector(this->asDerived(), I);}
-    /** @return the ith element of the operator
+    /** @return a constant reference on ith element
      *  @param i index of the ith element
      **/
     inline Type const& elt1Impl(int i) const { return static_cast<Type const&>(vector_[i]);}
+    /** @return the ith element of the operator
+     *  @param i index of the ith element
+     **/
+    inline Type& elt1Impl(int i) { return static_cast<Type&>(vector_[i]);}
     /** overwrite the RVector with vec using Rcpp::operator=.
      *  @param vec the vector to copy
      **/

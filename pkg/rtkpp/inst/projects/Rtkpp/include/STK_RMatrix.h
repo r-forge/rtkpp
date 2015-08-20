@@ -160,11 +160,11 @@ class RMatrix : public ArrayBase< RMatrix<Type_> >, public TRef<1>
     inline Col colImpl(int j) const { return Col(this->asDerived(), j);}
     /** @return the i-th row of this. */
     inline Row rowImpl(int i) const { return Row(this->asDerived(), i);}
-   /** @return a constant reference on element (i,j) of the 2D container
+   /** @return a constant reference on element (i,j)
      *  @param i, j indexes of the row and of the column
      **/
     inline Type const& elt2Impl(int i, int j) const { return static_cast<Type const&>(matrix_(i,j));}
-    /** @return a reference on the element (i,j) of the 2D container.
+    /** @return a reference on the element (i,j)
      *  @param i, j indexes of the row and of the column
      **/
     inline Type& elt2Impl(int i, int j) { return (matrix_(i,j));}

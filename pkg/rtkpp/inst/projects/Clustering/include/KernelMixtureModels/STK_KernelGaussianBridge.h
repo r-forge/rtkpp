@@ -232,7 +232,7 @@ template<int Id, class Data>
 void KernelGaussianBridge<Id, Data>::getParameters(Parameters& param) const
 {
   param.resize(this->nbCluster(), 2);
-  for (int k= param.beginCols(); k < param.endCols(); ++k)
+  for (int k= param.beginRows(); k < param.endRows(); ++k)
   {
     param(k, baseIdx  ) = std::sqrt(mixture_.paramHandler().sigma2(k));
     param(k, baseIdx+1) = mixture_.paramHandler().dim(k);
@@ -247,7 +247,7 @@ void KernelGaussianBridge<Id, Data>::writeParameters(ostream& os) const
   {
     os << _T("---> Component ") << k << _T("\n");
     os << _T("sigma = ") << std::sqrt(mixture_.paramHandler().sigma2(k)) << _T("\n");
-    os << _T("dim = ")   << mixture_.paramHandler().dim_[k] << _T("\n");
+    os << _T("dim = ")   << mixture_.paramHandler().dim(k) << _T("\n");
   }
 }
 

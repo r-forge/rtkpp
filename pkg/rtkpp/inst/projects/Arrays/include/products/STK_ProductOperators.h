@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2012  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -463,7 +463,7 @@ class ArrayByDiagonalProduct : public ExprBase< ArrayByDiagonalProduct<Lhs, Rhs>
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
 
-    ArrayByDiagonalProduct( const Lhs& lhs, const Rhs& rhs)
+    inline ArrayByDiagonalProduct( const Lhs& lhs, const Rhs& rhs)
                                   : Base(), lhs_(lhs), rhs_(rhs)
     {
       if (lhs.cols() != rhs.rows())
@@ -481,9 +481,9 @@ class ArrayByDiagonalProduct : public ExprBase< ArrayByDiagonalProduct<Lhs, Rhs>
     inline ReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
 
     /** @return the left hand side expression */
-    Lhs const& lhs() const { return lhs_; }
+    inline Lhs const& lhs() const { return lhs_; }
     /** @return the right hand side nested expression */
-    Rhs const& rhs() const { return rhs_; }
+    inline Rhs const& rhs() const { return rhs_; }
 
   protected:
     Lhs const& lhs_;
@@ -512,7 +512,7 @@ class DiagonalByArrayProduct : public ExprBase< DiagonalByArrayProduct<Lhs, Rhs>
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
 
-    DiagonalByArrayProduct( const Lhs& lhs, const Rhs& rhs)
+    inline DiagonalByArrayProduct( const Lhs& lhs, const Rhs& rhs)
                                  : Base(), lhs_(lhs), rhs_(rhs)
     {
       if (lhs.cols() != rhs.rows())
@@ -531,9 +531,9 @@ class DiagonalByArrayProduct : public ExprBase< DiagonalByArrayProduct<Lhs, Rhs>
     inline ReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
 
     /** @return the left hand side expression */
-    Lhs const& lhs() const { return lhs_; }
+    inline Lhs const& lhs() const { return lhs_; }
     /** @return the right hand side nested expression */
-    Rhs const& rhs() const { return rhs_; }
+    inline Rhs const& rhs() const { return rhs_; }
 
   protected:
     Lhs const& lhs_;
@@ -563,7 +563,7 @@ class PointByArrayProduct : public ExprBase< PointByArrayProduct<Lhs, Rhs> >
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
 
-    PointByArrayProduct( const Lhs& lhs, const Rhs& rhs)
+    inline PointByArrayProduct( const Lhs& lhs, const Rhs& rhs)
                               : Base(), lhs_(lhs), rhs_(rhs)
                               , result_(1, rhs.sizeCols(), Type(0))
     {
@@ -585,9 +585,9 @@ class PointByArrayProduct : public ExprBase< PointByArrayProduct<Lhs, Rhs> >
     inline ReturnType elt0Impl() const { return result_.elt();}
 
     /** @return the left hand side expression */
-    Lhs const& lhs() const { return lhs_; }
+    inline Lhs const& lhs() const { return lhs_; }
     /** @return the right hand side nested expression */
-    Rhs const& rhs() const { return rhs_; }
+    inline Rhs const& rhs() const { return rhs_; }
     /** @return the right hand side nested expression */
     Rhs const& result() const { return result_; }
 
@@ -645,11 +645,11 @@ class ArrayByVectorProduct : public ExprBase< ArrayByVectorProduct<Lhs, Rhs> >
     inline ReturnType elt0Impl() const { return result_.elt();}
 
     /** @return the left hand side expression */
-    Lhs const& lhs() const { return lhs_; }
+    inline Lhs const& lhs() const { return lhs_; }
     /** @return the right hand side nested expression */
-    Rhs const& rhs() const { return rhs_; }
+    inline Rhs const& rhs() const { return rhs_; }
     /** @return the right hand side nested expression */
-    Rhs const& result() const { return result_; }
+    inline Allocator const& result() const { return result_; }
 
   protected:
     Lhs const& lhs_;
@@ -695,9 +695,9 @@ class VectorByPointProduct : public ExprBase< VectorByPointProduct<Lhs, Rhs> >
     inline ReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
 
     /** @return the left hand side expression */
-    Lhs const& lhs() const { return lhs_; }
+    inline Lhs const& lhs() const { return lhs_; }
     /** @return the right hand side expression */
-    Rhs const& rhs() const { return rhs_; }
+    inline Rhs const& rhs() const { return rhs_; }
 
   protected:
     Lhs const& lhs_;
@@ -738,7 +738,7 @@ class ArrayByArrayProduct : public ArrayByArrayProductBase< Lhs, Rhs >, public T
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
 
-    ArrayByArrayProduct( const Lhs& lhs, const Rhs& rhs)
+    inline ArrayByArrayProduct( const Lhs& lhs, const Rhs& rhs)
                               : Base(), lhs_(lhs), rhs_(rhs)
                               , result_(lhs.sizeRows(), rhs.sizeCols(), Type(0))
     {
@@ -755,11 +755,11 @@ class ArrayByArrayProduct : public ArrayByArrayProductBase< Lhs, Rhs >, public T
     inline ColRange const&colsImpl() const { return rhs_.cols();}
 
     /** @return the left hand side expression */
-    Lhs const& lhs() const { return lhs_; }
+    inline Lhs const& lhs() const { return lhs_; }
     /** @return the right hand side nested expression */
-    Rhs const& rhs() const { return rhs_; }
+    inline Rhs const& rhs() const { return rhs_; }
     /** @return the result */
-    Allocator const& result() const { return result_; }
+    inline Allocator const& result() const { return result_; }
 
   protected:
     Lhs const& lhs_;
@@ -783,7 +783,7 @@ class ArrayByArrayProductBase : public ExprBase< ArrayByArrayProduct<Lhs, Rhs> >
     typedef typename hidden::Traits<Derived>::ReturnType ReturnType;
 
     /** constructor. */
-    ArrayByArrayProductBase() : Base() {}
+    inline ArrayByArrayProductBase() : Base() {}
     /** access to the element (i,j) */
     inline Type const& elt2Impl(int i, int j) const
     { return this->asDerived().result().elt(i,j);}

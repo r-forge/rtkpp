@@ -114,7 +114,7 @@ class ExprBase : public ITContainer<Derived, hidden::Traits<Derived>::structure_
      *  @param visitor the visitor to run
      **/
     template<typename Visitor>
-    typename Visitor::return_type visit(Visitor& visitor) const;
+    typename Visitor::ReturnType visit(Visitor& visitor) const;
     /** @brief compute the number of non-zero element in an expression.
      *  For example
      *  @code

@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2012  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -62,7 +62,7 @@ template<class Type>
 struct Block
 {
   Type block[blockSize*blockSize];
-      inline Type const& operator[](int i) const { return block[i];}
+  inline Type const& operator[](int i) const { return block[i];}
   Type& operator[](int i) { return block[i];}
 };
 
@@ -73,7 +73,7 @@ template<class Type>
 struct RawVec
 {
   Type vec[panelSize];
-      inline Type const& operator[](int i) const { return vec[i];}
+  inline Type const& operator[](int i) const { return vec[i];}
   Type& operator[](int i) { return vec[i];}
 };
 
@@ -240,7 +240,7 @@ struct MultCoefImpl
 
   /** multiplication with one sized vectors */
   static void mult1Col( Lhs const& lhs, Rhs const& rhs, Result& res
-                   , int lhsCol, int rhsRow)
+                      , int lhsCol, int rhsRow)
   {
     for (int i=lhs.beginRows(); i< lhs.endRows(); ++i)
       for (int j=rhs.beginCols(); j< rhs.endCols(); ++j)
@@ -248,7 +248,7 @@ struct MultCoefImpl
   }
   /** multiplication with two sized vectors */
   static void mult2Col( Lhs const& lhs, Rhs const& rhs, Result& res
-                   , int lhsCol, int rhsRow)
+                      , int lhsCol, int rhsRow)
   {
     for (int i=lhs.beginRows(); i< lhs.endRows(); ++i)
       for (int j=rhs.beginCols(); j< rhs.endCols(); ++j)
@@ -257,7 +257,7 @@ struct MultCoefImpl
   }
   /** multiplication with three sized vectors */
   static void mult3Col( Lhs const& lhs, Rhs const& rhs, Result& res
-                   , int lhsCol, int rhsRow)
+                      , int lhsCol, int rhsRow)
   {
     for (int i=lhs.beginRows(); i< lhs.endRows(); ++i)
       for (int j=rhs.beginCols(); j< rhs.endCols(); ++j)
@@ -265,8 +265,6 @@ struct MultCoefImpl
                       + lhs.elt(i, lhsCol+1) * rhs.elt(rhsRow+1, j)
                       + lhs.elt(i, lhsCol+2) * rhs.elt(rhsRow+2, j);
   }
-
-
   /** multiplication with one sized vectors */
   static void multVec1( Lhs const& lhs, Rhs const& rhs, Result& res
                       , int lhsCol, int rhsRow)
@@ -322,4 +320,4 @@ struct MultCoefImpl
 
 } // namespace STK
 
-#endif /* STK_PRODUCTIMPL_H */
+#endif /* STK_PRODUCTRAW_H */

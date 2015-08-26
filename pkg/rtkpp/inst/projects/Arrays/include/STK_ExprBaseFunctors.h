@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2012  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as
@@ -125,7 +125,7 @@ struct ApplyFunctorByCol
   typedef Array2DPoint<Type> resultByColType;
 
   /** constructor */
-  ApplyFunctorByCol( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived()) {}
+  inline ApplyFunctorByCol( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived()) {}
   /** @return the applied functor by column */
   resultByColType operator()()
   {
@@ -168,7 +168,7 @@ struct ApplyWeightedFunctorByCol
   typedef Array2DPoint<Type> resultByColType;
 
   /** constructor */
-  ApplyWeightedFunctorByCol( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived()) {}
+  inline ApplyWeightedFunctorByCol( ExprBase<Derived> const& lhs): lhs_(lhs.asDerived()) {}
   template<class Weights>
   resultByColType operator()(ExprBase<Weights> const& w)
   {
@@ -218,7 +218,7 @@ struct ApplyFunctorByRow
   typedef Array2DVector<Type> resultByRowType;
 
   /** constructor */
-  ApplyFunctorByRow( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived()) {}
+  inline ApplyFunctorByRow( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived()) {}
   resultByRowType operator()()
   {
     resultByRowType res(lhs_.rows());
@@ -257,9 +257,9 @@ struct ApplyWeightedFunctorByRow
   typedef Array2DVector<Type> resultByRowType;
 
   /** constructor */
-  ApplyWeightedFunctorByRow( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived()) {}
+  inline ApplyWeightedFunctorByRow( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived()) {}
   template<typename Weights>
-  resultByRowType operator()(ExprBase<Weights> const& w)
+  resultByRowType operator()( ExprBase<Weights> const& w)
   {
     resultByRowType res_(lhs_.rows());
     for (int i= lhs_.beginRows(); i < lhs_.endRows(); ++i)
@@ -310,7 +310,7 @@ struct ApplyFunctor
     typedef Type resultByColType;
     typedef Type resultByRowType;
     /// constructor
-    ApplyFunctor( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived())
+    inline ApplyFunctor( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived())
     { STK_STATIC_ASSERT_VECTOR_ONLY(Derived);}
     /** apply without argument*/
     inline Type operator()() { return Funct(lhs_)();}
@@ -334,7 +334,7 @@ struct ApplyWeightedFunctor
     typedef Type resultByColType;
     typedef Type resultByRowType;
     /// constructor
-    ApplyWeightedFunctor( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived())
+    inline ApplyWeightedFunctor( ExprBase<Derived> const& lhs): lhs_(lhs.asDerived())
     { STK_STATIC_ASSERT_VECTOR_ONLY(Derived);}
     /** apply with weights*/
     template<typename Weights>

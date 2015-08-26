@@ -80,8 +80,8 @@ template<typename Derived, template<class> class Visitor>
 struct Traits< VisitorByCol <Derived, Visitor> >
 {
   typedef typename Derived::Type Type_;
-  typedef typename Visitor<Type_>::return_type Type;
-  typedef Type ReturnType;
+  typedef typename Visitor<Type_>::Type Type;
+  typedef typename Visitor<Type_>::ReturnType ReturnType;
 
   typedef RowOperator< VisitorByCol <Derived, Visitor> > Row;
   typedef ColOperator< VisitorByCol <Derived, Visitor> > Col;
@@ -112,7 +112,8 @@ class VisitorByCol : public VisitorByColBase< Derived, Visitor >, public TRef<1>
 {
   public:
     typedef typename Derived::Type Type_;
-    typedef typename Visitor<Type_>::return_type Type;
+    typedef typename Visitor<Type_>::Type Type;
+    typedef typename Visitor<Type_>::ReturnType ReturnType;
 
     typedef typename hidden::Traits< VisitorByCol<Derived, Visitor> >::Allocator Allocator;
     typedef VisitorByCol Result;
@@ -145,9 +146,9 @@ class VisitorByCol : public VisitorByColBase< Derived, Visitor >, public TRef<1>
     inline ColRange const&colsImpl() const { return result_.cols();}
 
     /** @return the left hand side expression */
-    Derived const& lhs() const { return lhs_; }
+    inline Derived const& lhs() const { return lhs_; }
     /** @return the result */
-    Allocator const& result() const { return result_; }
+    inline Allocator const& result() const { return result_; }
 
   protected:
     Derived const& lhs_;
@@ -167,7 +168,7 @@ class VisitorByColBase : public ExprBase< VisitorByCol<Derived, Visitor> >
     typedef typename Base::Type Type;
 
     /** constructor. */
-    VisitorByColBase() : Base() {}
+    inline VisitorByColBase() : Base() {}
     /** access to the element (i,j) */
     inline Type const& elt2Impl(int i, int j) const
     { return this->asDerived().result().elt(i,j);}
@@ -193,8 +194,8 @@ template<typename Derived, template<class> class Visitor>
 struct Traits< VisitorByRow <Derived, Visitor> >
 {
   typedef typename Derived::Type Type_;
-  typedef typename Visitor<Type_>::return_type Type;
-  typedef Type ReturnType;
+  typedef typename Visitor<Type_>::Type Type;
+  typedef typename Visitor<Type_>::Type ReturnType;
 
   typedef RowOperator< VisitorByRow <Derived, Visitor> > Row;
   typedef ColOperator< VisitorByRow <Derived, Visitor> > Col;
@@ -226,7 +227,9 @@ class VisitorByRow : public VisitorByRowBase< Derived, Visitor >, public TRef<1>
 {
   public:
     typedef typename Derived::Type Type_;
-    typedef typename Visitor<Type_>::return_type Type;
+    typedef typename Visitor<Type_>::Type Type;
+    typedef typename Visitor<Type_>::ReturnType ReturnType;
+
     typedef typename hidden::Traits< VisitorByRow<Derived, Visitor> >::Allocator Allocator;
     typedef VisitorByRow Result;
     enum
@@ -243,7 +246,7 @@ class VisitorByRow : public VisitorByRowBase< Derived, Visitor >, public TRef<1>
     typedef TRange<sizeCols_> ColRange;
 
     /** constructor */
-    VisitorByRow( Derived const& lhs) : lhs_(lhs), result_(lhs_.sizeRows(), 1)
+    VisitorByRow( Derived const& lhs): lhs_(lhs), result_(lhs_.sizeRows(), 1)
     {
       result_.shift(lhs_.beginRows());
       for (int i= lhs_.beginRows(); i < lhs_.endRows(); ++i)
@@ -258,9 +261,9 @@ class VisitorByRow : public VisitorByRowBase< Derived, Visitor >, public TRef<1>
     inline ColRange const&colsImpl() const { return result_.cols();}
 
     /** @return the left hand side expression */
-    Derived const& lhs() const { return lhs_; }
+    inline Derived const& lhs() const { return lhs_; }
     /** @return the result */
-    Allocator const& result() const { return result_; }
+    inline Allocator const& result() const { return result_; }
 
   protected:
     Derived const& lhs_;
@@ -280,7 +283,7 @@ class VisitorByRowBase : public ExprBase< VisitorByRow<Derived, Visitor> >
     typedef typename Base::Type Type;
 
     /** constructor. */
-    VisitorByRowBase() : Base() {}
+    inline VisitorByRowBase() : Base() {}
     /** access to the element (i,j) */
     inline Type const& elt2Impl(int i, int j) const
     { return this->asDerived().result().elt(i,j);}
@@ -299,16 +302,17 @@ template<typename Derived, template<class> class Visitor>
 struct ApplyVisitor
 {
   typedef typename Derived::Type Type_;
-  typedef typename Visitor<Type_>::return_type Type;
+  typedef typename Visitor<Type_>::Type Type;
   typedef Type Result;
+
   /** constructor */
-  ApplyVisitor( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived())
+  inline ApplyVisitor( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived())
   {
     Visitor<Type_> visit;
     lhs_.visit(visit);
   }
   /** overload cast operator */
-  operator Type () const { return result_;}
+  inline operator Type () const { return result_;}
   protected:
     Derived const& lhs_;
   private:

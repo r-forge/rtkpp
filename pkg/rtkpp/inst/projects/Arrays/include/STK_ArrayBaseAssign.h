@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2012  Serge Iovleff
+/*     Copyright (C) 2004-2015  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -477,9 +477,9 @@ struct Copycat<  Derived,  Rhs, Arrays::point_, Arrays::point_>
 template < typename Derived, typename Rhs>
 struct Copycat<  Derived,  Rhs, Arrays::number_, Arrays::number_>
 {
-  static void runByCol(Derived& lhs, Rhs const& rhs )
+  inline static void runByCol(Derived& lhs, Rhs const& rhs )
   { lhs.elt() = rhs.elt();}
-  static void runByRow(Derived& lhs, Rhs const& rhs )
+  inline static void runByRow(Derived& lhs, Rhs const& rhs )
   { lhs.elt() = rhs.elt();}
 };
 
@@ -503,7 +503,7 @@ struct CopycatSelector< Derived, Rhs, Arrays::by_col_>
   { tstructure_ = hidden::Traits<Derived>::structure_
   , sstructure_ = hidden::Traits<Rhs>::structure_
   };
-  static void run(Derived& lhs, Rhs const& rhs )
+  inline static void run(Derived& lhs, Rhs const& rhs )
   { Copycat<Derived, Rhs, tstructure_, sstructure_>::runByCol(lhs, rhs );}
 };
 
@@ -515,7 +515,7 @@ struct CopycatSelector< Derived, Rhs, Arrays::by_row_>
   { tstructure_ = hidden::Traits<Derived>::structure_
   , sstructure_ = hidden::Traits<Rhs>::structure_
   };
-  static void run(Derived& lhs, Rhs const& rhs )
+  inline static void run(Derived& lhs, Rhs const& rhs )
   { Copycat<Derived, Rhs, tstructure_, sstructure_>::runByRow(lhs, rhs );}
 };
 
@@ -529,35 +529,35 @@ struct resizeSelector;
 template< typename Lhs, typename Rhs, int TStructure_>
 struct resizeSelector
 {
-  static void run(Lhs& dst, ExprBase<Rhs> const& src )
+  inline static void run(Lhs& dst, ExprBase<Rhs> const& src )
   { dst.resize(src.rows(), src.cols());}
 };
 /** specialization for the square_ case */
 template< typename Lhs, typename Rhs>
 struct resizeSelector<Lhs, Rhs, Arrays::square_>
 {
-  static void run(Lhs& dst, ExprBase<Rhs> const& src )
+  inline static void run(Lhs& dst, ExprBase<Rhs> const& src )
   { dst.resize(src.range());}
 };
 /** specialization for the diagonal_ case */
 template< typename Lhs, typename Rhs>
 struct resizeSelector<Lhs, Rhs, Arrays::diagonal_>
 {
-  static void run(Lhs& dst, ExprBase<Rhs> const& src )
+  inline static void run(Lhs& dst, ExprBase<Rhs> const& src )
   { dst.resize(src.range());}
 };
 /** specialization for the vector_ case */
 template< typename Lhs, typename Rhs>
 struct resizeSelector<Lhs, Rhs, Arrays::vector_>
 {
-  static void run(Lhs& dst, ExprBase<Rhs> const& src )
+  inline static void run(Lhs& dst, ExprBase<Rhs> const& src )
   { dst.resize(src.range());}
 };
 /** specialization for the point_ case */
 template< typename Lhs, typename Rhs>
 struct resizeSelector<Lhs, Rhs, Arrays::point_>
 {
-  static void run(Lhs& dst, ExprBase<Rhs> const& src )
+  inline static void run(Lhs& dst, ExprBase<Rhs> const& src )
   { dst.resize(src.range());}
 };
 
@@ -565,7 +565,7 @@ struct resizeSelector<Lhs, Rhs, Arrays::point_>
 template< typename Lhs, typename Rhs>
 struct resizeSelector<Lhs, Rhs, Arrays::number_>
 {
-  static void run(Lhs& dst, ExprBase<Rhs> const& src )
+  inline static void run(Lhs& dst, ExprBase<Rhs> const& src )
   { /* nothing to do */;}
 };
 
@@ -575,7 +575,7 @@ struct resizeSelector<Lhs, Rhs, Arrays::number_>
  **/
 template<class Derived>
 template<class Rhs>
-Derived& ArrayBase<Derived>::assign(ExprBase<Rhs> const& rhs)
+inline Derived& ArrayBase<Derived>::assign(ExprBase<Rhs> const& rhs)
 {
   enum
   {
@@ -595,7 +595,7 @@ Derived& ArrayBase<Derived>::assign(ExprBase<Rhs> const& rhs)
 /* Adding a Rhs to this. */
 template<class Derived>
 template<typename Rhs>
-Derived&  ArrayBase<Derived>::operator+=( ExprBase<Rhs> const& rhs)
+inline Derived&  ArrayBase<Derived>::operator+=( ExprBase<Rhs> const& rhs)
 {
   this->asDerived() = this->asDerived() + rhs;
   return this->asDerived();
@@ -603,7 +603,7 @@ Derived&  ArrayBase<Derived>::operator+=( ExprBase<Rhs> const& rhs)
 /* subtract a Rhs to this. */
 template<class Derived>
 template<typename Rhs>
-Derived&  ArrayBase<Derived>::operator-=( ExprBase<Rhs> const& rhs)
+inline Derived&  ArrayBase<Derived>::operator-=( ExprBase<Rhs> const& rhs)
 {
   this->asDerived() = this->asDerived() - rhs;
   return this->asDerived();
@@ -611,7 +611,7 @@ Derived&  ArrayBase<Derived>::operator-=( ExprBase<Rhs> const& rhs)
 
 template<class Derived>
 template<typename Rhs>
-Derived&  ArrayBase<Derived>::operator/=( ExprBase<Rhs> const& rhs)
+inline Derived&  ArrayBase<Derived>::operator/=( ExprBase<Rhs> const& rhs)
 {
   this->asDerived() = this->asDerived() / rhs;
   return this->asDerived();
@@ -619,7 +619,7 @@ Derived&  ArrayBase<Derived>::operator/=( ExprBase<Rhs> const& rhs)
 /* mult a Rhs to this. */
 template<class Derived>
 template<typename Rhs>
-Derived&  ArrayBase<Derived>::operator*=( ExprBase<Rhs> const& rhs)
+inline Derived&  ArrayBase<Derived>::operator*=( ExprBase<Rhs> const& rhs)
 {
   this->asDerived() = this->asDerived() * rhs;
   return this->asDerived();
@@ -627,28 +627,28 @@ Derived&  ArrayBase<Derived>::operator*=( ExprBase<Rhs> const& rhs)
 
 /* Adding a constant to this. */
 template<class Derived>
-Derived& ArrayBase<Derived>::operator+=( Type const& value)
+inline Derived& ArrayBase<Derived>::operator+=( Type const& value)
 {
   this->asDerived() = this->asDerived() + value;
   return this->asDerived();
 }
 /* Substract a constant to this. */
 template<class Derived>
-Derived& ArrayBase<Derived>::operator-=( Type const& value)
+inline Derived& ArrayBase<Derived>::operator-=( Type const& value)
 {
   this->asDerived() = this->asDerived() - value;
   return this->asDerived();
 }
 /* product of this by a constant. */
 template<class Derived>
-Derived& ArrayBase<Derived>::operator*=( Type const& value)
+inline Derived& ArrayBase<Derived>::operator*=( Type const& value)
 {
   this->asDerived() = this->asDerived() * value;
   return this->asDerived();
 }
 /* dividing this by a constant. */
 template<class Derived>
-Derived& ArrayBase<Derived>::operator/=( Type const& value)
+inline Derived& ArrayBase<Derived>::operator/=( Type const& value)
 {
   this->asDerived() = this->asDerived() / value;
   return this->asDerived();

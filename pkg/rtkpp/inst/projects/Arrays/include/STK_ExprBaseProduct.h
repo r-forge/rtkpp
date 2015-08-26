@@ -174,7 +174,7 @@ struct ProductReturnType
 template<typename Derived>
 template<typename Rhs>
 typename ProductReturnType<Derived, Rhs>::ReturnType const
-ExprBase<Derived>::operator*( ExprBase<Rhs> const& other) const
+inline ExprBase<Derived>::operator*( ExprBase<Rhs> const& other) const
 {
   enum
   {

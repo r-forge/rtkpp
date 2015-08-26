@@ -317,7 +317,7 @@ class BinaryOperator : public BinaryOperatorBase< BinaryOp, Lhs, Rhs >
     /**  @return the range of the columns */
     inline ColRange const& colsImpl() const { return cols_;}
     /**  @return the range */
-    Range range() const { return this->asDerived().lhs().range();}
+    inline Range range() const { return this->asDerived().lhs().range();}
 
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_; }

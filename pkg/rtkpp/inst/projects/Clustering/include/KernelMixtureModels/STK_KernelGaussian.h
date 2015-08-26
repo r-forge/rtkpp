@@ -129,7 +129,7 @@ struct ParametersHandler<Clust::KernelGaussian_sk_>: public KernelHandlerBase<  
                           : sigma2_(nbCluster)
                           , dim_(nbCluster)
   {
-    for (int k2= param.beginRows(), k= param.beginRows(); k2 < param.endRows(); k2+=2, k++)
+    for (int k= param.beginRows(); k < param.endRows(); k++)
     { sigma2_[k] = param(k, baseIdx);
       dim_[k]    = param(k, baseIdx+1);
     }
@@ -365,6 +365,7 @@ inline bool KernelGaussian_sk::mStep()
   stk_cout << _T("Entering KernelGaussian_sk::mStep()\n");
 #endif
   param_.sigma2_() =  sum( p_data()->prod(*p_tik()) )/ (*p_nk() * param_.dim_);
+  //if ((param_.sigma2_() <= 0.).any()) return false; // not work with Array1D
 #ifdef STK_MIXTURE_DEBUG
   stk_cout << param_.sigma2_() << "\n";
 #endif

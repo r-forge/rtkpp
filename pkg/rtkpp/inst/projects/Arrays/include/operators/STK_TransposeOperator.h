@@ -151,7 +151,7 @@ class TransposeOperator: public ExprBase< TransposeOperator<Lhs> >, public TRef<
     inline ColRange const&colsImpl() const { return lhs_.rows();}
 
     /** @return the left hand side expression */
-    Lhs const& lhs() const { return lhs_; }
+    inline Lhs const& lhs() const { return lhs_; }
     /** @return the element (i,j) of the transposed expression.
      *  @param i, j index of the row and of the column
      **/

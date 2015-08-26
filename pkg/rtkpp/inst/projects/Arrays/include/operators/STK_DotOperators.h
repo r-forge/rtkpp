@@ -105,7 +105,7 @@ class DotProduct : public ExprBase< DotProduct<Lhs, Rhs> >
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
 
-    DotProduct( const Lhs& lhs, const Rhs& rhs)
+    inline DotProduct( const Lhs& lhs, const Rhs& rhs)
                      : lhs_(lhs), rhs_(rhs)
                      , result_()
     {
@@ -117,17 +117,17 @@ class DotProduct : public ExprBase< DotProduct<Lhs, Rhs> >
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return result_.rows();}
     /** @return the columns range */
-    inline ColRange const&colsImpl() const { return result_.cols();}
+    inline ColRange const& colsImpl() const { return result_.cols();}
 
     /** access to the element */
     inline ReturnType elt0Impl() const { return result_.elt();}
 
     /** @return the left hand side expression */
-    Lhs const& lhs() const { return lhs_; }
+    inline Lhs const& lhs() const { return lhs_; }
     /** @return the right hand side nested expression */
-    Rhs const& rhs() const { return rhs_; }
+    inline Rhs const& rhs() const { return rhs_; }
     /** @return the result */
-    Allocator const& result() const { return result_; }
+    inline Allocator const& result() const { return result_; }
 
   protected:
     Lhs const& lhs_;

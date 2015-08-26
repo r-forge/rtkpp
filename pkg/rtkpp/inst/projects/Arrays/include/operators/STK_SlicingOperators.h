@@ -128,14 +128,14 @@ class RowOperator: public ExprBase< RowOperator< Lhs> >, public TRef<1>
     inline RowOperator( Lhs const& lhs, int i)
                       : Base(), i_(i), lhs_(lhs), rows_(i,1), cols_(lhs_.rangeColsInRow(i)) {}
     /** Copy constructor */
-    RowOperator( RowOperator const& row, bool ref)
-               : Base(row), i_(row.i_), lhs_(row.lhs_), rows_(row.rows_), cols_(row.cols_) {}
+    inline RowOperator( RowOperator const& row, bool ref)
+                      : Base(row), i_(row.i_), lhs_(row.lhs_), rows_(row.rows_), cols_(row.cols_) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the range of the Columns */
     inline ColRange const& colsImpl() const { return cols_;}
     /** @return the left hand side expression */
-    Lhs const& lhs() const { return lhs_; }
+    inline Lhs const& lhs() const { return lhs_; }
     /** @return the element (i,j)
      *  @param i, j index of the row and column
      **/
@@ -150,11 +150,10 @@ class RowOperator: public ExprBase< RowOperator< Lhs> >, public TRef<1>
     /** @return the element jth element
      *  @param j index of the jth element
      **/
-    inline ReturnType elt1Impl(int j) const
-    { return (this->asDerived().lhs().elt(i_, j));}
+    inline ReturnType elt1Impl(int j) const { return (this->asDerived().lhs().elt(i_, j));}
     /** accesses to the element */
-    inline ReturnType elt0Impl() const
-    { return (this->asDerived().lhs().elt());}
+    inline ReturnType elt0Impl() const { return (this->asDerived().lhs().elt());}
+
   protected:
     int i_;
     Lhs const& lhs_;
@@ -223,8 +222,8 @@ class ColOperator: public ExprBase< ColOperator< Lhs> >, public TRef<1>
     inline ColOperator( Lhs const& lhs, int j)
                       : Base(), j_(j), lhs_(lhs), rows_(lhs_.rangeRowsInCol(j)), cols_(j,1) {}
     /** Copy constructor */
-    ColOperator( ColOperator const& col, bool ref)
-               : Base(col), j_(col.j_), lhs_(col.lhs_), rows_(col.rows_), cols_(col.cols_) {}
+    inline ColOperator( ColOperator const& col, bool ref)
+                      : Base(col), j_(col.j_), lhs_(col.lhs_), rows_(col.rows_), cols_(col.cols_) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the columns range */
@@ -246,8 +245,7 @@ class ColOperator: public ExprBase< ColOperator< Lhs> >, public TRef<1>
     /** @return the element ith element
      *  @param i index of the ith element
      **/
-    inline ReturnType elt1Impl(int i) const
-    { return (lhs_.elt(i, j_));}
+    inline ReturnType elt1Impl(int i) const { return (lhs_.elt(i, j_));}
     /** access to the element */
     inline ReturnType elt0Impl() const { return (lhs_.elt(j_));}
 
@@ -325,7 +323,7 @@ class SubOperator: public ExprBase< SubOperator<Lhs, Orient_> >, public TRef<1>
     inline ColRange const&colsImpl() const { return cols_;}
 
     /** @return the left hand side expression */
-    Lhs const& lhs() const { return lhs_; }
+    inline Lhs const& lhs() const { return lhs_; }
     /** @return the element ith element
      *  @param i index of the ith element
      **/
@@ -383,7 +381,7 @@ class SubOperator<Lhs, Arrays::vector_ >: public ExprBase< SubOperator<Lhs, Arra
     inline ColRange const& colsImpl() const { return lhs_.cols();}
 
     /** @return the left hand side expression */
-    Lhs const& lhs() const { return lhs_; }
+    inline Lhs const& lhs() const { return lhs_; }
     /** @return the element ith element
      *  @param i index of the ith element
      **/
@@ -439,7 +437,7 @@ class SubOperator<Lhs, Arrays::point_ > : public ExprBase< SubOperator<Lhs, Arra
     inline ColRange const& colsImpl() const { return cols_;}
 
     /** @return the left hand side expression */
-    Lhs const& lhs() const { return lhs_; }
+    inline Lhs const& lhs() const { return lhs_; }
     /** @return the element ith element
      *  @param i index of the ith element
      **/

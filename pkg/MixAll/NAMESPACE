@@ -7,15 +7,18 @@ export(clusterAlgo
       ,clusterGammaNames
       ,clusterCategoricalNames
       ,clusterPoissonNames
+      ,clusterKernelNames
       ,clusterValidGammaNames
       ,clusterValidCategoricalNames
       ,clusterValidPoissonNames
       ,clusterValidDiagGaussianNames
+      ,clusterValidKernelNames
       ,clusterDiagGaussian
       ,clusterGamma
       ,clusterCategorical
       ,clusterPoisson
       ,clusterHeterogeneous
+      ,clusterKernel
       )
 
 exportClasses(ClusterAlgo
@@ -32,6 +35,8 @@ exportClasses(ClusterAlgo
              ,ClusterPoissonComponent
              ,ClusterPoisson
              ,ClusterHeterogeneous
+             ,ClusterKernelComponent
+             ,ClusterKernel
              )
 
 exportMethods(print)
@@ -41,6 +46,10 @@ exportMethods(summary)
 exportMethods(missingValues)
 
 import(rtkpp)
-importFrom(methods,show)
+
+importFrom("methods", "show")
+importFrom("graphics", "close.screen", "hist", "lines", "par", "screen", "split.screen")
+importFrom("methods", "callNextMethod", "new", "validObject")
+importFrom("stats", "cov.wt", "dgamma", "dnorm", "dpois")
 
 useDynLib(MixAll)

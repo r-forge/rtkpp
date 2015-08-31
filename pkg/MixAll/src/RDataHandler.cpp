@@ -35,9 +35,6 @@
 #include "RTKpp.h"
 #include "RDataHandler.h"
 
-/* default constructor */
-RDataHandler::RDataHandler() : STK::IDataHandler(), nbSample_(0), nbVariable_(0) {}
-
 bool RDataHandler::addType(std::string const& idData, int Rtype)
 {
   // parse descriptor file
@@ -49,7 +46,7 @@ bool RDataHandler::addType(std::string const& idData, int Rtype)
   {
      if (ret.first->second != Rtype)
      {
-#ifdef STK_DEBUG
+#ifdef RTK_DEBUG
        stk_cerr << _T("In RDataHandler::addType, existing idData with a different Rtype.\n");
 #endif
        return false;

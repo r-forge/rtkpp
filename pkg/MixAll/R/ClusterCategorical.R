@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-#     Copyright (C) 2012-2014  Serge Iovleff, University Lille 1, Inria
+#     Copyright (C) 2012-2015  Serge Iovleff, University Lille 1, Inria
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as
@@ -29,9 +29,9 @@ NULL
 #' Create an instance of the [\code{\linkS4class{ClusterCategorical}}] class
 #'
 #' This function computes the optimal Categorical mixture model according
-#' to the [\code{criterion}] among the list of model given in [\code{modelNames}]
-#' and the number of clusters given in [\code{nbCluster}], using the strategy
-#' specified in [\code{strategy}].
+#' to the \code{criterion} among the list of model given in \code{modelNames}
+#' and the number of clusters given in \code{nbCluster}, using the strategy
+#' specified in \code{strategy}.
 #'
 #' @param data frame or matrix containing the data. Rows correspond to observations
 #' and columns correspond to variables. If the data set contains NA values, they
@@ -40,21 +40,24 @@ NULL
 #' @param modelNames [\code{\link{vector}}] of model names to run. By default
 #' the categorical models "categorical_pk_pjk" and "categorical_p_pjk" are estimated.
 #' @param strategy a [\code{\linkS4class{ClusterStrategy}}] object containing
-#' the strategy to run. clusterStrategy() method by default.
+#' the strategy to run. [\code{\link{clusterStrategy}}]() method by default.
 #' @param criterion character defining the criterion to select the best model.
 #' The best model is the one with the lowest criterion value.
 #' Possible values: "BIC", "AIC", "ICL". Default is "ICL".
-#' @param nbCore integer defining the number of processor to use (default is 1, 0 for all).
+#' @param nbCore integer defining the number of processors to use (default is 1, 0 for all).
 #'
 #' @examples
 #' ## A quantitative example with the birds data set
 #' data(birds)
 #' ## add 10 missing values
 #' x = as.matrix(birds); n <- nrow(x); p <- ncol(x);
-#' indexes <- matrix(c(round(runif(5,1,n)), round(runif(5,1,p))), ncol=2); 
+#' indexes <- matrix(c(round(runif(5,1,n)), round(runif(5,1,p))), ncol=2);
 #' x[indexes] <- NA;
 #' ## estimate model (using fast strategy, results may be misleading)
-#' model <- clusterCategorical(data=x, nbCluster=2:3, strategy = clusterFastStrategy())
+#' model <- clusterCategorical( data=x, nbCluster=2:3
+#'                            , modelNames=c( "categorical_pk_pjk", "categorical_p_pjk")
+#'                            , strategy = clusterFastStrategy()
+#'                            )
 #'
 #' ## use graphics functions
 #' \dontrun{
@@ -75,7 +78,7 @@ NULL
 #' @export
 #'
 clusterCategorical <- function( data, nbCluster=2
-                              , modelNames=c( "categorical_pk_pjk", "categorical_p_pjk")
+                              , modelNames=c( "categorical_pk_pjk")
                               , strategy=clusterFastStrategy()
                               , criterion="ICL"
                               , nbCore = 1)
@@ -96,7 +99,6 @@ clusterCategorical <- function( data, nbCluster=2
   if (ncol(data) <= 1) {stop("Error: empty data set or not enough columns (must be greater than 1 for Categorical variables)\n")}
 
   # check modelNames
-  if (is.null(modelNames)) { modelNames = c( "categorical_pk_pjk", "categorical_p_pjk")}
   if (!clusterValidCategoricalNames(modelNames))
   { stop("modelNames is not valid. See ?CategoricalNames for the list of valid model names\n")}
 
@@ -122,13 +124,13 @@ clusterCategorical <- function( data, nbCluster=2
 #-----------------------------------------------------------------------
 #' Definition of the [\code{\linkS4class{ClusterCategoricalComponent}}] class
 #'
-#' This class defines a categorical component of a mixture Model. It inherits
+#' This class defines a categorical component of a mixture model. It inherits
 #' from [\code{\linkS4class{IClusterComponent}}].
 #'
-#' @slot plkj Array with the probability of the jth variable in the kth cluster to be l.
+#' @slot plkj Array with the probability for the jth variable in the kth cluster to be l.
 #' @slot nbModalities Integer with the (maximal) number of modalities of the categorical data.
 #' @slot levels list with the original levels of the variables
-#' 
+#'
 #' @seealso [\code{\linkS4class{IClusterComponent}}] class
 #'
 #' @examples
@@ -254,7 +256,7 @@ setMethod(
 #-----------------------------------------------------------------------
 #' Definition of the [\code{\linkS4class{ClusterCategorical}}] class
 #'
-#' This class defines a categorical mixture Model. Inherits from the
+#' This class defines a categorical mixture model. It inherits from the
 #'[\code{\linkS4class{IClusterModelBase}}] class. A categorical mixture model is
 #' a mixture model of the form
 #'
@@ -265,7 +267,7 @@ setMethod(
 #' }
 #' The probabilities can be assumed equal between all variables in order to
 #' reduce the number of parameters.
-#' 
+#'
 #' @slot component  A [\code{\linkS4class{ClusterCategoricalComponent}}] with the
 #' probabilities of the categorical component
 #'
@@ -400,9 +402,9 @@ setMethod(
 #' @seealso \code{\link{plot}}
 #' @examples
 #'   ## the car data set
+#' \dontrun{
 #'   data(car)
 #'   model <- clusterCategorical(car, 3, strategy = clusterFastStrategy())
-#' \dontrun{
 #'   plot(model)
 #'   }
 #'

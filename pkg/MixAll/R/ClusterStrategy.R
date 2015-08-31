@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-#     Copyright (C) 2012-2014  Serge Iovleff, University Lille 1, Inria
+#     Copyright (C) 2012-2015  Serge Iovleff, University Lille 1, Inria
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as
@@ -114,11 +114,11 @@ clusterStrategy <- function( nbTry =1
 clusterSemiSEMStrategy <- function()
 {
   # create init
-  initMethod = clusterInit("class", 3, "SemiSEM", 20, 0.01);
+  initMethod = clusterInit("class", 5, "SemiSEM", 20, 0);
   # create shortAlgo
-  shortAlgo = clusterAlgo("SemiSEM", 100, 0.01);
+  shortAlgo = clusterAlgo("SemiSEM", 50, 0);
   # create longAlgo
-  longAlgo = clusterAlgo("SemiSEM", 1000, 0.01);
+  longAlgo = clusterAlgo("SemiSEM", 400, 0);
   # create strategy
   new("ClusterStrategy", nbTry= 2, nbShortRun= 5, initMethod= initMethod, shortAlgo= shortAlgo, longAlgo= longAlgo);
 }

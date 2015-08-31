@@ -42,7 +42,9 @@
  *  @param nbCluster a vector with the number of clusters to test
  *  @param modelNames a vector of string with the model names to try
  */
-RcppExport SEXP clusterMixture( SEXP model, SEXP nbCluster, SEXP modelNames, SEXP strategy, SEXP critName, SEXP nbCore )
+RcppExport SEXP clusterMixture( SEXP model, SEXP nbCluster, SEXP modelNames
+                              , SEXP strategy, SEXP critName
+                              , SEXP nbCore )
 {
   BEGIN_RCPP
 
@@ -70,8 +72,78 @@ RcppExport SEXP clusterMixture( SEXP model, SEXP nbCluster, SEXP modelNames, SEX
 
 /** @param model ClusterDiagModel S4 class
  *  @param nbCluster a vector with the number of clusters to test
+ *  @param modelNames a vector of string with the model names to try
  */
-RcppExport SEXP clusterMixtureHeterogene( SEXP model, SEXP nbCluster, SEXP strategy, SEXP critName, SEXP nbCore  )
+RcppExport SEXP clusterKernelMixture( SEXP model, SEXP nbCluster, SEXP modelNames
+                                    , SEXP strategy, SEXP critName
+                                    , SEXP nbCore )
+{
+  BEGIN_RCPP
+
+#ifdef _OPENMP
+  int cores = Rcpp::as<int>(nbCore);
+  if (cores >= 1) { omp_set_num_threads(cores);}
+#endif
+
+  Rcpp::S4 s4_model(model);
+  // build Gram matrix
+  Rcpp::CharacterVector r_kernelName = s4_model.slot("kernelName");
+  Rcpp::DoubleVector r_kernelParameters = s4_model.slot("kernelParameters");
+  std::string kernelName = Rcpp::as<std::string>(r_kernelName[0]);
+  STK::Real param1, param2;
+  switch (r_kernelParameters.length())
+  {
+    case 0:
+      param1 = 1.; param2 = 0.;
+      break;
+    case 1:
+      param1 = r_kernelParameters[0]; param2 = 0.;
+      break;
+    default:
+      param1 = r_kernelParameters[0]; param2 =  r_kernelParameters[1];
+      break;
+  }
+  Rcpp::S4 s4_component = s4_model.slot("component");
+  STK::RMatrix<double> data = s4_component.slot("data");
+  // build gram matrix and overwrite solt data with it
+  STK::Kernel::IKernelBase<STK::RMatrix<double> >* p_kernel;
+  switch (STK::Kernel::stringToKernelType(kernelName))
+  {
+    case STK::Kernel::exponential_:
+      p_kernel = new STK::Kernel::Exponential<STK::RMatrix<double> >(data, param1);
+      break;
+    case STK::Kernel::gaussian_:
+      p_kernel = new STK::Kernel::Gaussian<STK::RMatrix<double> >(data, param1);
+      break;
+    case STK::Kernel::linear_:
+      p_kernel = new STK::Kernel::Linear<STK::RMatrix<double> >(data);
+      break;
+    case STK::Kernel::polynomial_:
+      p_kernel = new STK::Kernel::Polynomial<STK::RMatrix<double> >(data, param1, param2);
+      break;
+    case STK::Kernel::rationalQuadratic_:
+      p_kernel = new STK::Kernel::RationalQuadratic<STK::RMatrix<double> >(data, param1);
+      break;
+    default:
+      return Rcpp::wrap(false);
+      break;
+  }
+  if (!p_kernel->run()) { delete p_kernel; return Rcpp::wrap(false);}
+  s4_component.slot("data") = STK::wrap(p_kernel->gram());
+  delete p_kernel;
+  // create a launcher
+  ClusterLauncher launcher(model, nbCluster, modelNames, strategy, critName);
+  // return result
+  return Rcpp::wrap(launcher.run());
+
+  END_RCPP
+}
+
+/** @param model ClusterDiagModel S4 class
+ *  @param nbCluster a vector with the number of clusters to test
+ */
+RcppExport SEXP clusterMixtureHeterogene( SEXP model, SEXP nbCluster
+                                        , SEXP strategy, SEXP critName, SEXP nbCore  )
 {
   BEGIN_RCPP
 

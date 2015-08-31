@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*  Copyright (C) 2004-2014  Serge Iovleff, University Lille 1, Inria
+/*  Copyright (C) 2004-2015  Serge Iovleff, University Lille 1, Inria
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as
@@ -73,9 +73,21 @@ class ClusterLauncher : public STK::IRunnerBase
     /** vector with the model names to try */
     Rcpp::CharacterVector v_modelNames_;
     /** character string with the model selection criterion name */
-    std::string           critName_;
+    std::string           criterion_;
 
   private:
+    /** Select the best model among the modelNames and nbCluster given.
+     *  @return the value of the best criteria.
+     **/
+    STK::Real selectSingleBestModel();
+    /** Select the best model among the modelNames and nbCluster given.
+     *  @return the value of the best criteria.
+     **/
+    STK::Real selectHeteroBestModel();
+    /** create the mixtures in the given composer */
+    void createMixtures(STK::MixtureComposer* p_composer);
+    /** create the kernel mixtures in the given composer */
+    void createKernelMixtures(STK::MixtureComposer* p_composer);
     /** get the parameters */
     void getParameters(Rcpp::S4& s4_component, std::string const& idData);
     /** get the diagonal Gaussian parameters */
@@ -86,23 +98,28 @@ class ClusterLauncher : public STK::IRunnerBase
     void getGammaParameters(Rcpp::S4& s4_component, std::string const& idData);
     /** get the gamma parameters */
     void getCategoricalParameters(Rcpp::S4& s4_component, std::string const& idData);
+    /** get the kernel parameters */
+    void getKernelParameters(Rcpp::S4& s4_component, std::string const& idData);
 
     /** data handler */
     RDataHandler handler_;
-    /** manager */
-    STK::MixtureManager<RDataHandler> manager_;
+
+    /** diagonal Gaussian mixture models manager */
+    STK::DiagGaussianMixtureManager<RDataHandler> diagGaussianManager_;
+    /** Poisson mixture models manager */
+    STK::PoissonMixtureManager<RDataHandler> poissonManager_;
+    /** gamma mixture models manager */
+    STK::GammaMixtureManager<RDataHandler> gammaManager_;
+    /** categorical mixture models manager */
+    STK::CategoricalMixtureManager<RDataHandler> categoricalManager_;
+    /** kernel mixture models manager */
+    STK::KernelMixtureManager<RDataHandler> kernelManager_;
+
     /** pointer on the main composer */
     STK::IMixtureComposer* p_composer_;
+
     /** Is the model with heterogeneous data ? */
     bool isHeterogeneous_;
-    /** Select the best model among the modelNames and nbCluster given.
-     *  @return the value of the best criteria.
-     **/
-    STK::Real selectSingleBestModel();
-    /** Select the best model among the modelNames and nbCluster given.
-     *  @return the value of the best criteria.
-     **/
-    STK::Real selectHeteroBestModel();
 };
 
 #endif /* CLUSTERLAUNCHER_H */

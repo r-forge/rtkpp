@@ -29,8 +29,8 @@ NULL
 #' Create an instance of the [\code{\linkS4class{ClusterHeterogeneous}}] class
 #'
 #' This function computes the optimal heterogeneous mixture model according
-#' to the [\code{criterion}] among the number of clusters given in
-#' [\code{nbCluster}], using the strategy specified in [\code{strategy}].
+#' to the \code{criterion} among the number of clusters given in
+#' \code{nbCluster} using the strategy specified in [\code{strategy}].
 #'
 #' @param data [\code{list}] containing the data sets (matrices and/or data.frames).
 #' If the data sets contains NA values, they will be estimated during the
@@ -56,7 +56,7 @@ NULL
 #'
 #' ## get summary
 #' summary(model)
-#' 
+#'
 #' ## print model
 #' \dontrun{
 #' print(model)
@@ -147,7 +147,7 @@ clusterHeterogeneous <- function( data, modelNames, nbCluster=2
 #' The density functions (or probability distribution functions)
 #' \deqn{h(.|\lambda_{lk},\alpha_l)}
 #' can be any implemented model (Gaussian, Poisson,...).
-#'  
+#'
 #' @slot ldata  a list of IClusterComponent.
 #' @seealso [\code{\linkS4class{IClusterModelBase}}] class
 #'

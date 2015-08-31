@@ -41,7 +41,7 @@ NULL
 #' poisson models are estimated.  All the model names are given by
 #' the method [\code{\link{clusterPoissonNames}}].
 #' @param strategy a [\code{\linkS4class{ClusterStrategy}}] object containing
-#' the strategy to run. clusterStrategy() method by default.
+#' the strategy to run. [\code{\link{clusterStrategy}}]() method by default.
 #' @param criterion character defining the criterion to select the best model.
 #' The best model is the one with the lowest criterion value.
 #' Possible values: "BIC", "AIC", "ICL". Default is "ICL".
@@ -368,11 +368,10 @@ setMethod(
 #' @seealso \code{\link{plot}}
 #' @examples
 #'   ## for quantitative case
+#' \dontrun{
 #'   data(DebTrivedi)
 #'   dt <- DebTrivedi[, c(1, 6,8, 15)]
-
 #'   model <- clusterPoisson(iris[1:4], 3, strategy = clusterFastStrategy())
-#' \dontrun{
 #'   plot(model)
 #'   plot(model, c(1,2))
 #'   }

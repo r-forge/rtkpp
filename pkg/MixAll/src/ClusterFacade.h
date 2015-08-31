@@ -61,8 +61,8 @@ class ClusterFacade : public STK::IRunnerBase
     /** set model in case it is needed after construction */
     inline void setModel(STK::IMixtureComposer*& p_model) {p_model_ = p_model;};
     /** create a FullStrategy
-     *  @param R_strategy the strategy defined in the R environment */
-    void createFullStrategy(Rcpp::S4 R_strategy);
+     *  @param s4_strategy the strategy defined in the R environment */
+    void createFullStrategy(Rcpp::S4 s4_strategy);
     /** run the strategy */
     bool run();
 

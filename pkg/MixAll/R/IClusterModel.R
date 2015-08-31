@@ -228,7 +228,7 @@ setMethod(
 #'
 setClass(
   Class="IClusterComponent",
-  representation( data = "matrix", missing = "matrix", modelName = "character","VIRTUAL"),
+  representation( data = "matrix", missing = "matrix", modelName = "character", "VIRTUAL"),
   validity=function(object)
   {
 # called too soon when Component is part of an other S4 class

@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-#     Copyright (C) 2012-2014  Serge Iovleff, University Lille 1, Inria
+#     Copyright (C) 2012-2015  Serge Iovleff, University Lille 1, Inria
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as
@@ -29,8 +29,9 @@ NULL
 #' Create an instance of the [\code{\linkS4class{ClusterGamma}}] class
 #'
 #' This function computes the optimal gamma mixture model according
-#' to the [\code{criterion}] among the list of model given in [\code{modelNames}]
-#' and the number of clusters given in [\code{nbCluster}], using the strategy specified in [\code{strategy}].
+#' to the \code{criterion} among the list of model given in \code{modelNames}
+#' and the number of clusters given in \code{nbCluster}, using the strategy
+#' specified in \code{strategy}.
 #'
 #' @param data frame or matrix containing the data. Rows correspond to observations
 #' and columns correspond to variables. If the data set contains NA values, they
@@ -40,7 +41,7 @@ NULL
 #' gamma models with free shape are estimated.  All the model names are given by
 #' the method [\code{\link{clusterGammaNames}}].
 #' @param strategy a [\code{\linkS4class{ClusterStrategy}}] object containing
-#' the strategy to run. clusterStrategy() method by default.
+#' the strategy to run. [\code{\link{clusterStrategy}}]() method by default.
 #' @param criterion character defining the criterion to select the best model.
 #' The best model is the one with the lowest criterion value.
 #' Possible values: "BIC", "AIC", "ICL". Default is "ICL".
@@ -56,7 +57,7 @@ NULL
 #'
 #' ## use graphics functions
 #' model <- clusterGamma( data=x, nbCluster=2:3
-#'                      , modelNames=clusterGammaNames(prop = "equal", scaleBetweenCluster="free")
+#'                      , modelNames="gamma_pk_ajk_bjk"
 #'                      , strategy = clusterFastStrategy())
 #'
 #' \dontrun{
@@ -77,7 +78,7 @@ NULL
 #' @export
 #'
 clusterGamma <- function( data, nbCluster=2
-                        , modelNames= clusterGammaNames()
+                        , modelNames= "gamma_pk_ajk_bjk"
                         , strategy=clusterFastStrategy()
                         , criterion="ICL"
                         , nbCore = 1)
@@ -98,7 +99,6 @@ clusterGamma <- function( data, nbCluster=2
   if (ncol(data) < 1) {stop("Error: empty data set")}
 
   # check modelNames
-  if (is.null(modelNames)) { modelNames = clusterGammaNames()}
   if (!clusterValidGammaNames(modelNames))
   { stop("modelNames is not valid. See ?clusterGammaNames for the list of valid model names")}
 
@@ -127,9 +127,9 @@ clusterGamma <- function( data, nbCluster=2
 #' This class defines a gamma component of a mixture Model. It inherits
 #' from [\code{\linkS4class{IClusterComponent}}].
 #'
-#' @slot shape  Matrix with the shape of the jth variable in the kth cluster.
-#' @slot scale  Matrix with the scale of the jth variable in the kth cluster.
-#' 
+#' @slot shape  Matrix with the shapes of the jth variable in the kth cluster.
+#' @slot scale  Matrix with the scales of the jth variable in the kth cluster.
+#'
 #' @seealso [\code{\linkS4class{IClusterComponent}}] class
 #'
 #' @examples
@@ -248,11 +248,11 @@ setMethod(
 #'   =\sum_{k=1}^K p_k \prod_{j=1}^d \gamma(x_j;a_{jk},b_{jk}) \\
 #'    \quad {x} \in {R}^d.
 #' }
-#' Constraints can be added to the shape and/or scale in order to reduce the number
+#' Constraints can be added to the shapes and/or scales in order to reduce the number
 #' of parameters.
-#'  
+#'
 #' @slot component  A [\code{\linkS4class{ClusterGammaComponent}}] with the
-#' shape and the scale of the component mixture model.
+#' shapes and the scales of the component mixture model.
 #' @seealso [\code{\linkS4class{IClusterModelBase}}] class
 #'
 #' @examples
@@ -386,11 +386,11 @@ setMethod(
 #' @seealso \code{\link{plot}}
 #' @examples
 #'   ## for quantitative case
+#' \dontrun{
 #'   data(iris)
 #'   model <- clusterGamma( data=iris[1:4], nbCluster=3
 #'                        , modelNames=clusterGammaNames(prop = "equal")
 #'                        , strategy = clusterFastStrategy())
-#' \dontrun{
 #'   plot(model)
 #'   plot(model, c(1,3))
 #'   plot(model, c("Sepal.Length","Sepal.Width"))

@@ -63,18 +63,19 @@ struct DataHandlerTraits< ::RDataHandler, Type>
 class RDataHandler : public STK::IDataHandler
 {
   public:
-    typedef STK::IDataHandler::InfoMap InfoMap;
+    typedef STK::IDataHandler Base;
+    typedef Base::InfoMap InfoMap;
     typedef std::map<std::string, int> InfoType;
     /** default constructor */
-    RDataHandler();
-    /** constructor with a Matrix data set
+    inline RDataHandler(): Base(), nbSample_(0), nbVariable_(0) {}
+    /** constructor with a R-Matrix data set
      *  @param data a R Matrix with elements of type type
      *  @note cannot be passed as const& due to a bug from the Rcpop side (fixed
      *  in the next release of Rcpp).
      **/
     template<int Rtype>
     inline RDataHandler( Rcpp::Matrix<Rtype> const& data, std::string idData, std::string const& idModel )
-                       : STK::IDataHandler()
+                       : Base()
     {
       data_.push_back(data, idData);
       addInfo(idData, idModel);
@@ -82,6 +83,13 @@ class RDataHandler : public STK::IDataHandler
       nbSample_ = data.rows();
       nbVariable_ = data.cols();
     }
+    /** destructor */
+    inline ~RDataHandler() {}
+    /** @return the number of sample (the number of rows of the data) */
+    inline int nbSample() const { return nbSample_;}
+    /** @return the number of variables (the number of columns of the data) */
+    inline int nbVariable() const { return nbVariable_;}
+
     /** Add a Matrix to the existing data sets
      *  @param idData Id of the data set
      *  @param idModel Id of the model to use
@@ -99,13 +107,6 @@ class RDataHandler : public STK::IDataHandler
         nbVariable_ += data.cols();
       }
     }
-    /** destructor */
-    inline virtual ~RDataHandler() {}
-    /** @return the number of sample (the number of rows of the data) */
-    inline virtual int nbSample() const { return nbSample_;}
-    /** @return the number of variables (the number of columns of the data) */
-    inline virtual int nbVariable() const { return nbVariable_;}
-
     /** return in an RMatrix the (cloned) data with the given idData */
     template<typename Type>
     void getData(std::string const& idData, STK::RMatrix<Type>& data, int& nbVariable) const
@@ -118,6 +119,7 @@ class RDataHandler : public STK::IDataHandler
       data.setMatrix(Rcpp::clone(Rdata));
       nbVariable = data.sizeCols();
     }
+
   private:
     /** @brief Add the Rtype associated to a data set identified by an Id.
      *  @param idData can be any string given by the user

@@ -36,12 +36,16 @@
 #'
 #' The available functionalities are:
 #' \enumerate{
-#'    \item the clusterDiagGaussian method allowing to discover group structures in
-#' multivariate data sets using diagonal Gaussian multidimensional models (8 models).
-#'    \item the clusterGamma method allowing to discover group structures in
-#' multivariate data sets using gamma multidimensional models (24 models).
-#'    \item the clusterPoisson method allowing to discover group structures in
-#' multivariate data sets using poisson multidimensional models (8 models).
+#'    \item the \link{clusterDiagGaussian} method allowing to discover group structures in
+#' multivariate quantitative data sets using diagonal Gaussian multidimensional models (8 models).
+#'    \item the \link{clusterCategorical} method allowing to discover group structures in
+#' multivariate discrete data sets using categorical multidimensional models (24 models).
+#'    \item the \link{clusterGamma} method allowing to discover group structures in
+#' multivariate quantitative positive data sets using gamma multidimensional models (24 models).
+#'    \item the \link{clusterPoisson} method allowing to discover group structures in
+#' multivariate counting data sets using Poisson multidimensional models (8 models).
+#'    \item the \link{clusterKernel} method allowing to discover group structures in
+#' any data sets using kernel trick (4 models).
 #'    \item the clusterHeterogeneous method allowing to discover group structures in
 #' heterogeneous data sets.
 #'  }
@@ -88,6 +92,19 @@ NULL
 #'
 #' @examples
 #'   data(DebTrivedi)
+NULL
+
+
+#' Quantitative Data: bullsEye 
+#'
+#' Generated  data  set  containing  two  clusters  with  untypical  ring
+#' shapes (circles)
+#' @name bullsEye
+#' @docType data
+#' @keywords datasets
+#'
+#' @examples
+#'   data(bullsEye)
 NULL
 
 #' Quantitative data: Old Faithful Geyser

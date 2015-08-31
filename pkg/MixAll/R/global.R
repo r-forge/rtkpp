@@ -37,9 +37,16 @@
 #' @exportMethod missingValues
 #'
 #' @examples
-#'   data(geyser)
-#'   model <- clusterDiagGaussian(geyser,3)
-#'   missingValues(model)
+#' \dontrun{
+#' ## add 10 missing values as random
+#' data(geyser)
+#' x = as.matrix(geyser); n <- nrow(x); p <- ncol(x);
+#' indexes <- matrix(c(round(runif(5,1,n)), round(runif(5,1,p))), ncol=2);
+#' x[indexes] <- NA;
+#' ## estimate model (using fast strategy, results may be misleading)
+#' model <- clusterDiagGaussian(data=x, nbCluster=2:3, strategy = clusterFastStrategy())
+#' missingValues(model)
+#' }
 setGeneric(
     name = "missingValues",
     function(x)

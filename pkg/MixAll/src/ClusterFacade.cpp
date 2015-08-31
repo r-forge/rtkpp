@@ -39,14 +39,14 @@ ClusterFacade::~ClusterFacade() { if (p_strategy_) delete p_strategy_;}
 
 
 /* create a FullStrategy */
-void ClusterFacade::createFullStrategy(Rcpp::S4 R_strategy)
+void ClusterFacade::createFullStrategy(Rcpp::S4 s4_strategy)
 {
   // get fields of the strategies
-  int nbTry = R_strategy.slot("nbTry");
-  int nbShortRun = R_strategy.slot("nbShortRun");
-  Rcpp::S4 R_initMethod = R_strategy.slot("initMethod");
-  Rcpp::S4 R_shortAlgo = R_strategy.slot("shortAlgo");
-  Rcpp::S4 R_longAlgo = R_strategy.slot("longAlgo");
+  int nbTry = s4_strategy.slot("nbTry");
+  int nbShortRun = s4_strategy.slot("nbShortRun");
+  Rcpp::S4 R_initMethod = s4_strategy.slot("initMethod");
+  Rcpp::S4 R_shortAlgo = s4_strategy.slot("shortAlgo");
+  Rcpp::S4 R_longAlgo = s4_strategy.slot("longAlgo");
 
   // get fields of the initMethod
   std::string method = R_initMethod.slot("method");
@@ -84,14 +84,13 @@ bool ClusterFacade::run()
   bool flag = false;
   if (p_strategy_)
   {
-    // just check if the model is fresh or has been used
-    if (p_strategy_->run()) { flag = true;}
-    else { msg_error_ = p_strategy_->error();}
-    p_model_->imputationStep();
-    p_model_->finalizeStep();
+    flag = p_strategy_->run();
+    if (!flag) { msg_error_ = p_strategy_->error();}
+    p_model_->imputationStep(); // impute the missing values
+    p_model_->finalizeStep();   // finalize any model stuff needed
   }
   else
-  { msg_error_ = STKERROR_NO_ARG(MixtureFacade::run(),strategy is not set);}
+  { msg_error_ = STKERROR_NO_ARG(ClusterFacade::run(),strategy is not set);}
   return flag;
 }
 

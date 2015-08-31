@@ -100,3 +100,21 @@ setMethod(
   c("ClusterPoisson"),
   function(x) { return(missingValues(x@component));}
 )
+
+#' @rdname missingValues-methods
+#' @aliases missingValues,ClusterKernelComponent-method
+setMethod(
+    "missingValues",
+    c("ClusterKernelComponent"),
+    function(x)
+    {
+      return(NULL)
+    }
+)
+#' @rdname missingValues-methods
+#' @aliases missingValues,ClusterKernel-method
+setMethod(
+    "missingValues",
+    c("ClusterKernel"),
+    function(x) { return(NULL);}
+)

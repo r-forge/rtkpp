@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-#     Copyright (C) 2012-2014  Serge Iovleff, University Lille 1, Inria
+#     Copyright (C) 2012-2015  Serge Iovleff, University Lille 1, Inria
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as
@@ -49,8 +49,7 @@
 #' @param algo String with the initialisation algorithm.
 #' Possible values: "EM", "CEM", "SEM", "SemiSEM". Default value is "EM".
 #' @param nbIteration Integer defining the number of iteration in \code{algo}.
-#' nbIteration must be a positive integer. Default values is 20. Not used if
-#' \code{algo} = NULL.
+#' nbIteration must be a positive integer. Default values is 20. if .
 #' @param epsilon threshold to use in order to stop the iterations. Default value is 0.01.
 #'
 #' @examples
@@ -61,7 +60,36 @@
 #' @author Serge Iovleff
 #' @export
 clusterInit <- function( method="class", nbInit=5,  algo = "EM", nbIteration=20, epsilon=0.01)
-{ return(new("ClusterInit", nbInit=nbInit, algo=new("ClusterAlgo", algo, nbIteration, epsilon)))}
+{
+  # check criterion
+  if(sum(method %in% c("random","class","fuzzy")) != 1)
+  { stop("method is not valid. See ?clusterInit for the list of valid method")}
+  
+  # check nbInit
+  if( nbInit < 1 ) # can't be zero
+  {stop("nbInit must be strictly greater than 0.");}
+  
+  # check algo
+  if ( sum(algo %in% c("EM","SEM","CEM","SemiSEM")) != 1 )
+  {  stop("algo is not valid. See ?clusterInit for the list of available algorithms.")}
+  # check nbIteration
+  if (!is.numeric(nbIteration))
+  {stop("nbIteration must be an integer.")}
+  if (round(nbIteration)!= nbIteration)
+  {stop("nbIteration must be an integer.")}
+  if( nbIteration < 0 ) # can be zero (no iterations)
+  { stop("nbIteration must be positive or zero.")}
+  # check epsilon
+  if (algo != "SEM" && algo != "SemiSEM")
+  {
+    if (!is.double(epsilon) )
+    {  stop("epsilon must be a scalar.")}
+    if( epsilon < 0.)
+    {  stop("epsilon must be positive.")}
+  }
+  
+  return(new("ClusterInit", nbInit=nbInit, algo=new("ClusterAlgo", algo, nbIteration, epsilon)))
+}
 
 
 #' Constructor of the [\code{\linkS4class{ClusterInit}}] class
@@ -124,7 +152,7 @@ setClass(
 setMethod(
   f="initialize",
   signature=c("ClusterInit"),
-  definition=function(.Object,method="class",nbInit = 5,algo= clusterAlgo("SEM", 20, 0))
+  definition=function(.Object,method="class",nbInit = 5,algo= clusterAlgo("EM", 20, 0))
   {
     # for method
     if(missing(method)) {.Object@method<-"class"}
@@ -133,7 +161,7 @@ setMethod(
     if( missing(nbInit) ){ .Object@nbInit<-5 }
     else{.Object@nbInit<-nbInit}
     # for algo
-    if(missing(algo)){ .Object@algo<-clusterAlgo("SEM", 20, 0.1) }
+    if(missing(algo)){ .Object@algo<-clusterAlgo("EM", 20, 0.01) }
     else{.Object@algo<-algo}
     # validate
     validObject(.Object)
@@ -168,8 +196,8 @@ setMethod(
   function(object){
     cat("****************************************\n")
     cat("*** MixAll ClusterInit:\n")
-    cat("* method              = ", object@method, "\n")
-    cat("* number of init      = ", object@nbInit, "\n")
+    cat("* method               = ", object@method, "\n")
+    cat("* number of init       = ", object@nbInit, "\n")
     cat("* algorithm            = ", object@algo@algo, "\n")
     cat("* number of iterations = ", object@algo@nbIteration, "\n")
     cat("* epsilon              = ", object@algo@epsilon, "\n")

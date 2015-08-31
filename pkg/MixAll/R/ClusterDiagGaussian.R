@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-#     Copyright (C) 2012-2014  Serge Iovleff, University Lille 1, Inria
+#     Copyright (C) 2012-2015  Serge Iovleff, University Lille 1, Inria
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as
@@ -29,8 +29,9 @@ NULL
 #' Create an instance of the [\code{\linkS4class{ClusterDiagGaussian}}] class
 #'
 #' This function computes the optimal diagonal Gaussian mixture model according
-#' to the [\code{criterion}] among the list of model given in [\code{modelNames}]
-#' and the number of clusters given in [\code{nbCluster}], using the strategy specified in [\code{strategy}].
+#' to the \code{criterion} among the list of model given in \code{modelNames}
+#' and the number of clusters given in \code{nbCluster}, using the strategy
+#' specified in \code{strategy}.
 #'
 #' @param data frame or matrix containing the data. Rows correspond to observations
 #' and columns correspond to variables. If the data set contains NA values, they
@@ -40,21 +41,24 @@ NULL
 #' Gaussian models are estimated. All the model names are given by the method
 #' [\code{\link{clusterDiagGaussianNames}}].
 #' @param strategy a [\code{\linkS4class{ClusterStrategy}}] object containing
-#' the strategy to run. clusterStrategy() method by default.
+#' the strategy to run. [\code{\link{clusterStrategy}}]() method by default.
 #' @param criterion character defining the criterion to select the best model.
 #' The best model is the one with the lowest criterion value.
 #' Possible values: "BIC", "AIC", "ICL". Default is "ICL".
-#' @param nbCore integer defining the number of processor to use (default is 1, 0 for all).
+#' @param nbCore integer defining the number of processors to use (default is 1, 0 for all).
 #'
 #' @examples
 #' ## A quantitative example with the famous geyser data set
 #' data(geyser)
 #' ## add 10 missing values as random
 #' x = as.matrix(geyser); n <- nrow(x); p <- ncol(x);
-#' indexes <- matrix(c(round(runif(5,1,n)), round(runif(5,1,p))), ncol=2); 
+#' indexes <- matrix(c(round(runif(5,1,n)), round(runif(5,1,p))), ncol=2);
 #' x[indexes] <- NA;
 #' ## estimate model (using fast strategy, results may be misleading)
-#' model <- clusterDiagGaussian(data=x, nbCluster=2:3, strategy = clusterFastStrategy())
+#' model <- clusterDiagGaussian( data=x, nbCluster=2:3
+#'                             , modelNames=c( "gaussian_pk_sjk")
+#'                             , strategy = clusterFastStrategy()
+#'                             )
 #'
 #' ## use graphics functions
 #' \dontrun{
@@ -108,11 +112,7 @@ clusterDiagGaussian <- function( data, nbCluster=2
   model = new("ClusterDiagGaussian", data)
   model@strategy = strategy;
   # start estimation of the models
-  ResFlag <- FALSE;
-  if (length(nbCluster) >0)
-  {
-    resFlag = .Call("clusterMixture", model, nbCluster, modelNames, strategy, criterion, nbCore, PACKAGE="MixAll");
-  }
+  resFlag = .Call("clusterMixture", model, nbCluster, modelNames, strategy, criterion, nbCore, PACKAGE="MixAll");
   # set names
   if (resFlag != TRUE ) {cat("WARNING: An error occur during the clustering process");}
   colnames(model@component@mean)  <- colnames(model@component@data);
@@ -123,12 +123,12 @@ clusterDiagGaussian <- function( data, nbCluster=2
 #-----------------------------------------------------------------------
 #' Definition of the [\code{\linkS4class{ClusterDiagGaussianComponent}}] class
 #'
-#' This class defines a diagonal Gaussian component of a mixture Model. It inherits
+#' This class defines a diagonal Gaussian component of a mixture model. It inherits
 #' from [\code{\linkS4class{IClusterComponent}}].
 #'
 #' @slot mean  Matrix with the mean of the jth variable in the kth cluster.
 #' @slot sigma  Matrix with the standard deviation of the jth variable in the kth cluster.
-#' 
+#'
 #' @seealso [\code{\linkS4class{IClusterComponent}}] class
 #'
 #' @examples
@@ -252,7 +252,7 @@ setMethod(
 #' }
 #' Some constraints can be added to the variances in order to reduce the number
 #' of parameters.
-#'  
+#'
 #' @slot component  A [\code{\linkS4class{ClusterDiagGaussianComponent}}] with the
 #' mean and standard deviation of the diagonal mixture model.
 #' @seealso [\code{\linkS4class{IClusterModelBase}}] class
@@ -387,9 +387,9 @@ setMethod(
 #' @seealso \code{\link{plot}}
 #' @examples
 #'   ## the famous iris data set
+#' \dontrun{
 #'   data(iris)
 #'   model <- clusterDiagGaussian(iris[1:4], 3, strategy = clusterFastStrategy())
-#' \dontrun{
 #'   plot(model)
 #'   plot(model, c(1,3))
 #'   plot(model, c("Sepal.Length","Sepal.Width"))

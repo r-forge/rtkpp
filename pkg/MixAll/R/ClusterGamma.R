@@ -29,7 +29,7 @@ NULL
 #' Create an instance of the [\code{\linkS4class{ClusterGamma}}] class
 #'
 #' This function computes the optimal gamma mixture model according
-#' to the \code{criterion} among the list of model given in \code{modelNames}
+#' to the \code{criterion} among the list of model given in \code{models}
 #' and the number of clusters given in \code{nbCluster}, using the strategy
 #' specified in \code{strategy}.
 #'
@@ -37,7 +37,7 @@ NULL
 #' and columns correspond to variables. If the data set contains NA values, they
 #' will be estimated during the estimation process.
 #' @param nbCluster  [\code{\link{vector}}] listing the number of clusters to test.
-#' @param modelNames [\code{\link{vector}}] of model names to run. By default all
+#' @param models [\code{\link{vector}}] of model names to run. By default all
 #' gamma models with free shape are estimated.  All the model names are given by
 #' the method [\code{\link{clusterGammaNames}}].
 #' @param strategy a [\code{\linkS4class{ClusterStrategy}}] object containing
@@ -57,7 +57,7 @@ NULL
 #'
 #' ## use graphics functions
 #' model <- clusterGamma( data=x, nbCluster=2:3
-#'                      , modelNames="gamma_pk_ajk_bjk"
+#'                      , models="gamma_pk_ajk_bjk"
 #'                      , strategy = clusterFastStrategy())
 #'
 #' \dontrun{
@@ -78,7 +78,7 @@ NULL
 #' @export
 #'
 clusterGamma <- function( data, nbCluster=2
-                        , modelNames= "gamma_pk_ajk_bjk"
+                        , models= "gamma_pk_ajk_bjk"
                         , strategy=clusterFastStrategy()
                         , criterion="ICL"
                         , nbCore = 1)
@@ -98,9 +98,9 @@ clusterGamma <- function( data, nbCluster=2
   if (nrow(data) <= 3*nbClusterMax) {stop("There is not enough individuals (rows) in the data set")}
   if (ncol(data) < 1) {stop("Error: empty data set")}
 
-  # check modelNames
-  if (!clusterValidGammaNames(modelNames))
-  { stop("modelNames is not valid. See ?clusterGammaNames for the list of valid model names")}
+  # check models
+  if (!clusterValidGammaNames(models))
+  { stop("models is not valid. See ?clusterGammaNames for the list of valid model names")}
 
   # check strategy
   if(class(strategy)[1] != "ClusterStrategy")
@@ -112,7 +112,7 @@ clusterGamma <- function( data, nbCluster=2
   model@strategy = strategy;
 
   # start estimation of the models
-  resFlag = .Call("clusterMixture", model, nbCluster, modelNames, strategy, criterion, nbCore, PACKAGE="MixAll")
+  resFlag = .Call("clusterMixture", model, nbCluster, models, strategy, criterion, nbCore, PACKAGE="MixAll")
 
   # set names
   if (resFlag != 1) {cat("WARNING: An error occur during the clustering process")}
@@ -389,7 +389,7 @@ setMethod(
 #' \dontrun{
 #'   data(iris)
 #'   model <- clusterGamma( data=iris[1:4], nbCluster=3
-#'                        , modelNames=clusterGammaNames(prop = "equal")
+#'                        , models=clusterGammaNames(prop = "equal")
 #'                        , strategy = clusterFastStrategy())
 #'   plot(model)
 #'   plot(model, c(1,3))

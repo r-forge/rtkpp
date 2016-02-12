@@ -5,7 +5,7 @@
 library(MixAll)
 data(iris)
 
-gauss_model <- clusterDiagGaussian( iris[1:4], nbCluster = 3, modelNames= c("gaussian_pk_sjk")
+gauss_model <- clusterDiagGaussian( iris[1:4], nbCluster = 3, models= c("gaussian_pk_sjk")
                                   , strategy = clusterFastStrategy())
 
 data<-gauss_model@component@data

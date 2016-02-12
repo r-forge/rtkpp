@@ -72,8 +72,8 @@ MixAll.date <- packageDescription("MixAll")$Date
 \newcommand{\scalprod}[2]{\left\langle#1,#2\right\rangle}
 
 %---------------------------------------------------------
-\title{\pkg{MixAll}: Clustering Heterogenous data with Missing Values}
-\Plaintitle{MixAll: Clustering Heterogenous data with Missing Values}
+\title{\pkg{MixAll}: Clustering Mixed data with Missing Values}
+\Plaintitle{MixAll: Clustering Mixed data with Missing Values}
 \Shorttitle{MixAll: Clustering data}
 
 \Abstract{
@@ -81,7 +81,7 @@ MixAll.date <- packageDescription("MixAll")$Date
   that can be accessed from \proglang{R} \citep{R:Main} using the \pkg{MixAll}
   package. It is possible to cluster Gaussian, gamma, categorical,
   Poisson, kernel mixture models or a combination of these models in case of
-  heterogeneous data. Moreover, if there is missing values in the original
+  mixed data. Moreover, if there is missing values in the original
   data set, these missing values will be imputed during the estimation
   process. These imputations can be biased estimators or Monte-Carlo estimators
   of the Maximum A Posteriori (MAP) values depending of the algorithm used.
@@ -128,10 +128,10 @@ There is five kinds of generative models implemented:
   \item the kernel mixture models (4 models), see sections
   \ref{subsec:Kernel} and \ref{subsec:clustKernel}.
 \end{enumerate}
-and a special model called "heterogeneous" mixture model allowing to cluster
-heterogeneous data set using conditional independance between the different
-kind of data, see sections \ref{subsec:Heterogeneous} and
-\ref{subsec:clustHeterogeneous}.
+and a special model called "mixed data" mixture model allowing to cluster
+mixed data sets using conditional independance between the different
+kinds of data, see sections \ref{subsec:MixedData} and
+\ref{subsec:clustMixedData}.
 
 These models and the estimation algorithms can take into account missing
 values. It is thus possible to use these models in order to cluster, but
@@ -773,11 +773,11 @@ where $c$  represents the shift of the kernel (default value 0)
 and $d$ represents the degree (defaut value 1).
 \end{itemize}
 
-\subsection{Heterogeneous Mixture Models}
-\label{subsec:Heterogeneous}
+\subsection{Mixed Data Mixture Models}
+\label{subsec:MixedData}
 
-Heterogeneous mixture models are special models allowing to cluster
-heterogeneous data sets assuming conditional independency. More precisely, assume
+Mixed Data mixture models are special models allowing to cluster
+mixed data sets assuming conditional independency. More precisely, assume
 that the observation space is of the form $ \X = \X_1 \times \X_2 \times\ldots\X_L$.
 Then it is assumed that each ${\bx}_i$ arises from a mixture probability
 distribution with density
@@ -798,7 +798,7 @@ Cluster analysis can be performed with the functions
 \item \code{clusterPoisson} for Poisson mixture models,
 \item \code{clusterGamma} for gamma mixture models,
 \item \code{clusterKernel} for kernel mixture models,
-\item \code{clusterHeterogeneous} for Heterogeneous mixture models.
+\item \code{clusterMixedData} for MixedData mixture models.
 \end{enumerate}
 
 These functions have a common set of parameters with default values given
@@ -846,7 +846,7 @@ Input Parameter & Description \\
 \hline
 \code{data} & Matrix or data frame\\
 \hline
-\code{modelNames} & A \code{vector} object defining the list of models to
+\code{models} & A \code{vector} object defining the list of models to
 estimate.  Call \code{clusterDiagGaussianNames()} by default
 (see \ref{subsec:DiagGaussian}).\\
 \hline
@@ -890,7 +890,7 @@ Input Parameter & Description \\
 \hline
 \code{data} & Matrix or data frame\\
 \hline
-\code{modelNames} & A \code{vector} defining the models to estimate. Call
+\code{models} & A \code{vector} defining the models to estimate. Call
 \code{clusterCatgoricalNames()} by default (see \ref{subsec:Categorical}).\\
 \hline
 \end{tabular}
@@ -932,7 +932,7 @@ Input Parameter & Description \\
 \hline
 \code{data} & Matrix or data frame\\
 \hline
-\code{modelNames} & A \code{vector} defining the models to estimate. Call
+\code{models} & A \code{vector} defining the models to estimate. Call
 \code{clusterGammaNames()} by default (see \ref{subsec:Gamma}).\\
 \hline
 \end{tabular}
@@ -970,7 +970,7 @@ Input Parameter & Description \\
 \hline
 \code{data} & Matrix or data frame\\
 \hline
-\code{modelNames} & A \code{vector} defining the models to estimate. Call
+\code{models} & A \code{vector} defining the models to estimate. Call
 \code{clusterPoissonNames()} by default (see \ref{subsec:Poisson}).\\
 \hline
 \end{tabular}
@@ -1006,7 +1006,7 @@ Input Parameter & Description \\
 \hline
 \code{data} & Matrix or data frame\\
 \hline
-\code{modelNames} & A \code{vector} defining the models to estimate. Call
+\code{models} & A \code{vector} defining the models to estimate. Call
 \code{clusterKernelNames()} by default (see \ref{subsec:Kernel}).\\
 \hline
 \code{kernelName} & A \code{string} defining the kernel to use. Use
@@ -1025,18 +1025,18 @@ $1$ by default.\\
 
 <<fig=TRUE>>=
 data(bullsEye)
-model <- clusterKernel( data=bullsEye[,1:2], nbCluster=2, modelNames = "kernelGaussian_pk_s", strategy = clusterFastStrategy())
+model <- clusterKernel( data=bullsEye[,1:2], nbCluster=2, models = "kernelGaussian_pk_s", strategy = clusterFastStrategy())
 summary(model)
 plot(model)
 @
-\subsection{Clustering Heterogeneous data sets}
-\label{subsec:clustHeterogeneous}
+\subsection{Clustering Mixed data sets}
+\label{subsec:clustMixedData}
 
-Heterogeneous data sets can be clustered using the \code{clusterHeterogeneous}
-function. The original heterogeneous data set has to be splited in multiple
+Mixed data sets can be clustered using the \code{clusterMixedData}
+function. The original mixed data set has to be splited in multiple
 homogeneous data sets and each one associated to a mixture model name.
 
-In Table~\ref{tab:clusterHeterogeneous} the reader will find a summary of all
+In Table~\ref{tab:clusterMixedData} the reader will find a summary of all
 the specific input parameters of this function with its default value.
 \begin{table}[H]
 \centering
@@ -1047,13 +1047,13 @@ Input Parameter & Description \\
 \code{data} & A \code{list} containing the homogeneous data sets (matrices
 and/or data.frames). All the data sets must have the same number of rows. \\
 \hline
-\code{modelNames} & A \code{vector} of character and of same length than data
-containing the model names to fit to each data set (see \ref{subsec:Heterogeneous}).\\
+\code{models} & A \code{vector} of character and of same length than data
+containing the model names to fit to each data set (see \ref{subsec:MixedData}).\\
 \hline
 \end{tabular}
-\caption{List of all the specific parameters of the \code{clusterHeterogeneous}
+\caption{List of all the specific parameters of the \code{clusterMixedData}
 function.}
-\label{tab:clusterHeterogeneous}
+\label{tab:clusterMixedData}
 \end{table}
 
 <<fig=TRUE>>=
@@ -1061,13 +1061,13 @@ data(HeartDisease.cat)
 data(HeartDisease.cont)
 ldata = list(HeartDisease.cat,HeartDisease.cont);
 lnames = c("categorical_pk_pjk","gaussian_pk_sjk")
-model <- clusterHeterogeneous(ldata, lnames, nbCluster=3, strategy = clusterFastStrategy())
+model <- clusterMixedData(ldata, lnames, nbCluster=3, strategy = clusterFastStrategy())
 summary(model)
 missingValues(model)
 plot(model)
 @
 
-Heterogeneous mixture models are plotted using the \emph{logistic latent
+MixedData mixture models are plotted using the \emph{logistic latent
 representation}.
 
 

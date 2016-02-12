@@ -34,32 +34,37 @@
  **/
 
 
-#ifndef CLUSTERFACADE_H
-#define CLUSTERFACADE_H
+#ifndef STK_CLUSTERFACADE_H
+#define STK_CLUSTERFACADE_H
 
+#include <RTKpp.h>
+#include <Clustering.h>
+
+namespace STK
+{
 /** facade design pattern.
  * The ClusterFacade allow to create the strategy for estimating a mixture model
  * with less effort
  **/
-class ClusterFacade : public STK::IRunnerBase
+class ClusterFacade : public IRunnerBase
 {
   public:
     /** constructor.
      * @param p_model a reference on the current model
      **/
-    inline ClusterFacade( STK::IMixtureComposer*& p_model)
-                        : STK::IRunnerBase(), p_model_(p_model), p_strategy_(0)
+    inline ClusterFacade( IMixtureComposer*& p_model)
+                        : IRunnerBase(), p_model_(p_model), p_strategy_(0)
     {}
     /** copy constructor.
      *  @param facade the facade to copy
      **/
     inline ClusterFacade( ClusterFacade const& facade)
-                        : STK::IRunnerBase(), p_model_(facade.p_model_), p_strategy_(facade.p_strategy_)
+                        : IRunnerBase(), p_model_(facade.p_model_), p_strategy_(facade.p_strategy_)
     {}
     /** destructor. */
     virtual ~ClusterFacade();
     /** set model in case it is needed after construction */
-    inline void setModel(STK::IMixtureComposer*& p_model) {p_model_ = p_model;};
+    inline void setModel(IMixtureComposer*& p_model) {p_model_ = p_model;};
     /** create a FullStrategy
      *  @param s4_strategy the strategy defined in the R environment */
     void createFullStrategy(Rcpp::S4 s4_strategy);
@@ -68,9 +73,11 @@ class ClusterFacade : public STK::IRunnerBase
 
   protected:
     /** the mixture model to estimate */
-    STK::IMixtureComposer*& p_model_;
+    IMixtureComposer*& p_model_;
     /** the strategy to use in order to estimate the mixture model */
-    STK::IMixtureStrategy* p_strategy_;
+    IMixtureStrategy* p_strategy_;
 };
 
-#endif /* CLUSTERFACADE_H */
+} // namespace STK
+
+#endif /* STK_CLUSTERFACADE_H */

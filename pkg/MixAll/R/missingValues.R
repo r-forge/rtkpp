@@ -7,7 +7,7 @@
 #' @aliases missingValues,ClusterDiagGaussian-method
 setMethod(
   "missingValues",
-  c("ClusterHeterogeneous"),
+  c("ClusterMixedData"),
   function(x)
   {
     nbData <- length(x@ldata)

@@ -33,11 +33,16 @@
  **/
 
 
-#ifndef RDATAHANDLER_H_
-#define RDATAHANDLER_H_
+#ifndef STK_RDATAHANDLER_H
+#define STK_RDATAHANDLER_H
+
+#include <RTKpp.h>
+#include <Clustering.h>
 
 // forward declaration
-class RDataHandler;
+namespace STK
+{ class RDataHandler;
+}
 
 namespace STK
 {
@@ -47,23 +52,26 @@ namespace hidden
  *  Specialization of the  DataHandlerTraits for DataHandler
  **/
 template<typename Type>
-struct DataHandlerTraits< ::RDataHandler, Type>
+struct DataHandlerTraits< STK::RDataHandler, Type>
 {
-  typedef STK::RMatrix<Type> Data;
+  typedef RMatrix<Type> Data;
 };
 
 } // namespace hidden
 
 } // namespace STK
 
+namespace STK
+{
+
 /** @ingroup DManager
  *  The RDataHandler class allow to store various Rcpp::Matrix in a
  *  Rcpp::List with the corresponding InfoMap and InfoType.
  */
-class RDataHandler : public STK::IDataHandler
+class RDataHandler: public IDataHandler
 {
   public:
-    typedef STK::IDataHandler Base;
+    typedef IDataHandler Base;
     typedef Base::InfoMap InfoMap;
     typedef std::map<std::string, int> InfoType;
     /** default constructor */
@@ -109,11 +117,11 @@ class RDataHandler : public STK::IDataHandler
     }
     /** return in an RMatrix the (cloned) data with the given idData */
     template<typename Type>
-    void getData(std::string const& idData, STK::RMatrix<Type>& data, int& nbVariable) const
+    void getData(std::string const& idData, RMatrix<Type>& data, int& nbVariable) const
     {
       enum
       {
-        Rtype_ = STK::hidden::RcppTraits<Type>::Rtype_
+        Rtype_ = hidden::RcppTraits<Type>::Rtype_
       };
       Rcpp::Matrix<Rtype_> Rdata = data_[idData];
       data.setMatrix(Rcpp::clone(Rdata));
@@ -142,4 +150,6 @@ class RDataHandler : public STK::IDataHandler
     int nbVariable_;
 };
 
-#endif /* RDATAHANDLER_H_ */
+} // namespace STK
+
+#endif /* STK_RDATAHANDLER_H */

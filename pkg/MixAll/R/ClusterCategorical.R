@@ -29,7 +29,7 @@ NULL
 #' Create an instance of the [\code{\linkS4class{ClusterCategorical}}] class
 #'
 #' This function computes the optimal Categorical mixture model according
-#' to the \code{criterion} among the list of model given in \code{modelNames}
+#' to the \code{criterion} among the list of model given in \code{models}
 #' and the number of clusters given in \code{nbCluster}, using the strategy
 #' specified in \code{strategy}.
 #'
@@ -37,7 +37,7 @@ NULL
 #' and columns correspond to variables. If the data set contains NA values, they
 #' will be estimated during the estimation process.
 #' @param nbCluster  [\code{\link{vector}}] listing the number of clusters to test.
-#' @param modelNames [\code{\link{vector}}] of model names to run. By default
+#' @param models [\code{\link{vector}}] of model names to run. By default
 #' the categorical models "categorical_pk_pjk" and "categorical_p_pjk" are estimated.
 #' @param strategy a [\code{\linkS4class{ClusterStrategy}}] object containing
 #' the strategy to run. [\code{\link{clusterStrategy}}]() method by default.
@@ -55,7 +55,7 @@ NULL
 #' x[indexes] <- NA;
 #' ## estimate model (using fast strategy, results may be misleading)
 #' model <- clusterCategorical( data=x, nbCluster=2:3
-#'                            , modelNames=c( "categorical_pk_pjk", "categorical_p_pjk")
+#'                            , models=c( "categorical_pk_pjk", "categorical_p_pjk")
 #'                            , strategy = clusterFastStrategy()
 #'                            )
 #'
@@ -78,7 +78,7 @@ NULL
 #' @export
 #'
 clusterCategorical <- function( data, nbCluster=2
-                              , modelNames=c( "categorical_pk_pjk")
+                              , models=c( "categorical_pk_pjk")
                               , strategy=clusterFastStrategy()
                               , criterion="ICL"
                               , nbCore = 1)
@@ -98,9 +98,9 @@ clusterCategorical <- function( data, nbCluster=2
   if (nrow(data) <= 3*nbClusterMax) {stop("There is not enough individuals (rows) in the data set\n")}
   if (ncol(data) <= 1) {stop("Error: empty data set or not enough columns (must be greater than 1 for Categorical variables)\n")}
 
-  # check modelNames
-  if (!clusterValidCategoricalNames(modelNames))
-  { stop("modelNames is not valid. See ?CategoricalNames for the list of valid model names\n")}
+  # check models
+  if (!clusterValidCategoricalNames(models))
+  { stop("models is not valid. See ?CategoricalNames for the list of valid model names\n")}
 
   # check strategy
   if(class(strategy)[1] != "ClusterStrategy")
@@ -112,7 +112,7 @@ clusterCategorical <- function( data, nbCluster=2
   model@strategy = strategy;
 
   # start estimation of the models
-  resFlag = .Call("clusterMixture", model, nbCluster, modelNames, strategy, criterion, nbCore, PACKAGE="MixAll")
+  resFlag = .Call("clusterMixture", model, nbCluster, models, strategy, criterion, nbCore, PACKAGE="MixAll")
   # set names
   # dimnames(model@plkj) <- list(NULL, colnames(model@component@data), NULL) # not working
   # should be done on the C++ side

@@ -36,7 +36,7 @@ NULL
 #' and columns correspond to variables.
 #' @param dim integer giving the dimension of the Gaussian density. Default is 10.
 #' @param nbCluster  [\code{\link{vector}}] listing the number of clusters to test.
-#' @param modelNames [\code{\link{vector}}] of model names to run. By default only
+#' @param models [\code{\link{vector}}] of model names to run. By default only
 #' "kernelGaussian_pk_s" is estimated. All the model names are given by the method
 #' [\code{\link{clusterKernelNames}}].
 #' @param kernelName string with a kernel name. Possible values:
@@ -56,8 +56,7 @@ NULL
 #' data(bullsEye)
 #' ## estimate model (using fast strategy, results may be misleading)
 #' model <- clusterKernel( data=bullsEye[,1:2], nbCluster=2:3
-#'                       , modelNames= "kernelGaussian_pk_s"
-#'                       , strategy = clusterFastStrategy()
+#'                       , models= "kernelGaussian_pk_s"
 #'                       )
 #'
 #' ## use graphics functions
@@ -77,9 +76,11 @@ NULL
 #' @export
 #'
 clusterKernel <- function( data, dim = 10, nbCluster=2
-                         , modelNames= "kernelGaussian_pk_s"
-                         , kernelName = "gaussian", kernelParameters = 1.
-                         , strategy=clusterStrategy(), criterion="ICL"
+                         , models= "kernelGaussian_pk_s"
+                         , kernelName = "gaussian"
+                         , kernelParameters = 1.
+                         , strategy=clusterStrategy()
+                         , criterion="ICL"
                          , nbCore = 1)
 {
   # check nbCluster
@@ -90,29 +91,24 @@ clusterKernel <- function( data, dim = 10, nbCluster=2
   { stop("The number of clusters must be greater or equal to 1")}
   
   # check data
-  if (missing(data))
-  {stop("data is mandatory in clusterKernel")}
-  data = as.matrix(data)
+  if (missing(data)) { stop("data is mandatory in clusterKernel")}
+  data <- as.matrix(data)
   if (nrow(data) <= 3*nbClusterMax)
   { stop("There is not enough individuals (rows) in the data set")}
   if (ncol(data) < 1) {stop("Error: empty data set")}
   # check dim
   if (dim < 1)
   { stop("The dimension must be greater or equal to 1")}
-
   # check criterion
   if(sum(criterion %in% c("BIC","AIC", "ICL")) != 1)
   { stop("criterion is not valid. See ?clusterKernel for the list of valid criterion")}
-
-  # check modelNames
-  if (!clusterValidKernelNames(modelNames))
-  { stop("modelNames is not valid. See ?clusterKernelNames for the list of valid model names")}
-
+  # check models
+  if (!clusterValidKernelNames(models))
+  { stop("models is not valid. See ?clusterKernelNames for the list of valid model names")}
   # check kernelName
   if(sum(kernelName %in% c("gaussian","polynomial", "exponential")) != 1)
   { stop("kernelName is not valid. See ?clusterKernel for the list of valid kernel name")}
   if (is.null(kernelParameters)) { kernelParameters = c(1)}
-
   # check strategy
   if(class(strategy)[1] != "ClusterStrategy")
   {stop("strategy is not a ClusterStrategy class (must be an instance of the class ClusterStrategy).")}
@@ -126,7 +122,7 @@ clusterKernel <- function( data, dim = 10, nbCluster=2
   if (length(nbCluster) >0)
   {
     # start estimation of the models
-    resFlag = .Call("clusterKernelMixture", model, nbCluster, modelNames, strategy, criterion, nbCore, PACKAGE="MixAll")
+    resFlag = .Call("clusterKernelMixture", model, nbCluster, models, strategy, criterion, nbCore, PACKAGE="MixAll")
   }
   if (resFlag != TRUE ) {cat("WARNING: An error occur during the clustering process");}
   model
@@ -140,6 +136,9 @@ clusterKernel <- function( data, dim = 10, nbCluster=2
 #'
 #' @slot dim  Vector with the dimension of the kth cluster
 #' @slot sigma  Vector with the standard deviation in the kth cluster.
+#' @slot rawData can be used to save the original data set as the slot data
+#' from [\code{\linkS4class{IClusterComponent}}] will be overwrite by the gram
+#' matrix.
 #'
 #' @seealso [\code{\linkS4class{IClusterComponent}}] class
 #'
@@ -155,7 +154,7 @@ clusterKernel <- function( data, dim = 10, nbCluster=2
 #'
 setClass(
   Class="ClusterKernelComponent",
-  representation( sigma = "vector", dim = "vector"),
+  representation( sigma = "vector", dim = "vector", rawData = "matrix"),
   contains=c("IClusterComponent"),
   validity=function(object)
   {
@@ -166,7 +165,7 @@ setClass(
     return(TRUE)
   }
 )
-#' Initialize an instance of a MixAll S4 class.
+#' Initialize an instance of a ClusterKernelComponent S4 class.
 #'
 #' Initialization method of the [\code{\linkS4class{ClusterKernelComponent}}] class.
 #' Used internally in the 'MixAll' package.
@@ -176,18 +175,22 @@ setClass(
 setMethod(
     f="initialize",
     signature=c("ClusterKernelComponent"),
-    definition=function( .Object, data=matrix(nrow=0, ncol=0), dim =10, nbCluster=2, modelName="kernelGaussian_pk_sk")
+    definition=function( .Object, rawData, dim =10, nbCluster=2, modelName="kernelGaussian_pk_sk")
     {
-      # for data
-      if(missing(data)) { {stop("There is not enough individuals (rows) in the data set")}}
+      # check data
+      if(missing(rawData)) { stop("rawData is mandatory in ClusterKernelComponent"); }
       # check model name
-      if (!clusterValidKernelNames(modelName)) { stop("modelName is invalid");}
+      if(is.null(modelName)) { modelName="kernelGaussian_pk_sk";}
+      else
+      { if(!clusterValidKernelNames(modelName)) { stop("modelName is invalid");} }
+      # for dim
+      if(is.null(dim)) { dim = 10; }
       # call base class initialize
-      .Object <- callNextMethod(.Object, data, modelName)
+      .Object <- callNextMethod(.Object, rawData, modelName)
       # create slots
-      nbVariable    = ncol(.Object@data);
-      .Object@sigma = rep(1., nbCluster);
-      .Object@dim   = rep(dim, nbCluster);
+      .Object@sigma   = rep(1., nbCluster);
+      .Object@dim     = rep(dim, nbCluster);
+      .Object@rawData = .Object@data;
       # validate
       validObject(.Object)
       return(.Object)
@@ -293,7 +296,7 @@ setClass(
   validity=function(object)
   {
     if (length(object@component@dim)!=object@nbCluster)
-    {stop("mean must have nbCluster length.")}
+    {stop("dim must have nbCluster length.")}
     if (length(object@component@sigma)!=object@nbCluster)
     {stop("sigma must have nbCluster length.")}
     if (!clusterValidKernelNames(object@component@modelName))
@@ -315,20 +318,20 @@ setClass(
 setMethod(
     f="initialize",
     signature=c("ClusterKernel"),
-    definition=function(.Object, data=matrix(nrow=0, ncol=0), dim= 10
+    definition=function(.Object, data, dim= 10
                        , kernelName = "gaussian", kernelParameters = NULL
                        , nbCluster=2, modelName="kernelGaussian_pk_sk")
     {
       # for data
       if(missing(data)) {stop("data is mandatory in ClusterKernel.")}
-      .Object@rawData = as.matrix(data);
+      .Object@rawData <- as.matrix(data);
       # initialize fields
-      .Object@kernelName = kernelName;
+      .Object@kernelName <- kernelName;
       if (is.null(kernelParameters)) {.Object@kernelParameters = 1;}
       else                           {.Object@kernelParameters = kernelParameters;}
       # initialize component
       .Object@component = new("ClusterKernelComponent", data, dim, nbCluster, modelName);
-      .Object <- callNextMethod(.Object, nrow(.Object@component@data), nbCluster);
+      .Object <- callNextMethod(.Object, nrow(.Object@rawData), nbCluster);
       # validate
       validObject(.Object);
       return(.Object);
@@ -397,7 +400,8 @@ setMethod(
 #' using the estimated parameters and partition.
 #'
 #' @param x an object of class [\code{\linkS4class{ClusterKernel}}]
-#' @param y not used.
+#' @param y a list of variables to plot (subset). Variables names or indices.
+#' If missing all the variables are represented.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @importFrom graphics plot
@@ -408,10 +412,13 @@ setMethod(
 #'
 #' @seealso \code{\link{plot}}
 #' @examples
-#'  ## the famous iris data set
 #' \dontrun{
-#'   data(iris)
-#'   model <- clusterKernel(iris[1:4], 3, strategy = clusterFastStrategy())
+#'  ## the bull eyes data set
+#'   data(bullsEye)
+#'   model <- clusterKernel( bullsEye[,1:2]
+#'                         , 2
+#'                         , models= "kernelGaussian_pk_s"
+#'                         )
 #'   plot(model)
 #'   }
 #'
@@ -419,9 +426,9 @@ setMethod(
     f="plot",
     signature=c("ClusterKernel"),
     function(x, y, ...)
-    { # use generic plot
+    {
       # total number of variable in the data set
-      nbVariable = ncol(x@rawData);
+      nbVariable = ncol(x@component@rawData);
       # no y => display all variables
       if (missing(y)) { y=1:nbVariable; }
       else # perform some check
@@ -429,12 +436,12 @@ setMethod(
         if (is.numeric(y)) # numbers of the columns to plot are given
         {
           if (max(y)>nbVariable)
-            stop("In .clusterPlot, y indices mismatch the data dimension")
+            stop("In plot, y indices mismatch the data dimension")
         }
         else # names of the variables to plot are given
         {
           if ( sum(y %in% colnames(x@rawData))!= length(y) )
-          { stop(cat("In .clusterPlot, unknown variable: ", paste(y[which(!(y %in% colnames(model@rawData)))]),"\n"))}
+          { stop(cat("In plot, unknown variables: ", paste(y[which(!(y %in% colnames(x@rawData)))]),"\n"))}
         }
       }
       # scatter plot

@@ -17,7 +17,7 @@ export(clusterAlgo
       ,clusterGamma
       ,clusterCategorical
       ,clusterPoisson
-      ,clusterHeterogeneous
+      ,clusterMixedData
       ,clusterKernel
       )
 
@@ -34,7 +34,7 @@ exportClasses(ClusterAlgo
              ,ClusterCategorical
              ,ClusterPoissonComponent
              ,ClusterPoisson
-             ,ClusterHeterogeneous
+             ,ClusterMixedData
              ,ClusterKernelComponent
              ,ClusterKernel
              )
@@ -45,7 +45,7 @@ exportMethods(show)
 exportMethods(summary)
 exportMethods(missingValues)
 
-import(rtkpp)
+import(rtkore)
 
 importFrom("methods", "show")
 importFrom("graphics", "close.screen", "hist", "lines", "par", "screen", "split.screen")

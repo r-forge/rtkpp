@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-#     Copyright (C) 2012-2014  Serge Iovleff, University Lille 1, Inria
+#     Copyright (C) 2012-2016  Serge Iovleff, University Lille 1, Inria
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as
@@ -26,20 +26,24 @@
 NULL
 
 #-----------------------------------------------------------------------
-#' Create an instance of the [\code{\linkS4class{ClusterHeterogeneous}}] class
+#' Create an instance of the [\code{\linkS4class{ClusterMixedData}}] class
 #'
-#' This function computes the optimal heterogeneous mixture model according
+#' This function computes the optimal mixture model for mixed data according
 #' to the \code{criterion} among the number of clusters given in
 #' \code{nbCluster} using the strategy specified in [\code{strategy}].
 #'
 #' @param data [\code{list}] containing the data sets (matrices and/or data.frames).
-#' If the data sets contains NA values, they will be estimated during the
-#' estimation process.
-#' @param modelNames [\code{vector}] of character and of same length than data
-#' containing the model names to fit to each data set.
-#' @param nbCluster  [\code{\link{vector}}] listing the number of clusters to test.
+#' If data sets contain NA values, these missing values will be estimated during
+#' the estimation process.
+#' @param models either a [\code{vector}] of character or a [\code{list}] of
+#' same length than data. If \code{models} is a vector, it contains the model
+#' names to use in order to fit each data set. If \code{models} is a list, it
+#' must be of the form 
+#' \code{models = list( modelName, dim, kernelName, modelParameters) }
+#' Only modelName is required.
+#' @param nbCluster [\code{\link{vector}}] with the number of clusters to test.
 #' @param strategy a [\code{\linkS4class{ClusterStrategy}}] object containing
-#' the strategy to run. clusterStrategy() method by default.
+#' the strategy to run. Default is clusterStrategy().
 #' @param criterion character defining the criterion to select the best model.
 #' The best model is the one with the lowest criterion value.
 #' Possible values: "BIC", "AIC", "ICL". Default is "ICL".
@@ -52,31 +56,29 @@ NULL
 #' ## with default values
 #' ldata = list(HeartDisease.cat,HeartDisease.cont);
 #' lnames = c("categorical_pk_pjk","gaussian_pk_sjk")
-#' model <- clusterHeterogeneous(ldata, lnames, nbCluster=2:5, strategy = clusterFastStrategy())
+#' model <- clusterMixedData(ldata, lnames, nbCluster=2:5, strategy = clusterFastStrategy())
 #'
 #' ## get summary
 #' summary(model)
 #'
-#' ## print model
-#' \dontrun{
-#' print(model)
-#' }
 #' ## get estimated missing values
 #' missingValues(model)
 #'
-#' ## use graphics functions
 #' \dontrun{
+#' ## print model
+#' print(model)
+#' ## use graphics functions
 #' plot(model)
 #' }
 #'
-#' @return An instance of the [\code{\linkS4class{ClusterHeterogeneous}}] class.
+#' @return An instance of the [\code{\linkS4class{ClusterMixedData}}] class.
 #' @author Serge Iovleff
 #' @export
 #'
-clusterHeterogeneous <- function( data, modelNames, nbCluster=2
-                                , strategy=clusterFastStrategy()
-                                , criterion="ICL"
-                                , nbCore = 1)
+clusterMixedData <- function( data, models, nbCluster=2
+                            , strategy=clusterFastStrategy()
+                            , criterion="ICL"
+                            , nbCore = 1)
 {
   # check nbCluster
   nbClusterModel = length(nbCluster);
@@ -85,61 +87,106 @@ clusterHeterogeneous <- function( data, modelNames, nbCluster=2
   if (nbClusterMin < 1) { stop("The number of clusters must be greater or equal to 1")}
   # check criterion
   if(sum(criterion %in% c("BIC","AIC", "ICL")) != 1)
-  { stop("criterion is not valid. See ?clusterHeterogeneous for the list of valid criterion")}
+  { stop("criterion is not valid. See ?clusterMixedData for the list of valid criterion")}
   # check strategy
   if(class(strategy)[1] != "ClusterStrategy")
   {stop("strategy is not a Cluster Stategy class (must be an instance of the class ClusterStrategy).")}
   validObject(strategy);
 
-  # check data and modelNames
+  # check data and models
   if (!is.list(data)) { stop("data must be a list");}
-  if (!is.vector(modelNames)) { stop("modelNames must be a vector of character");}
-  if (length(data) != length(modelNames)) { stop("data and modelNames must be equal lengths");}
+  if (!is.vector(models)) { stop("models must be a vector of character");}
+  if (length(data) != length(models)) { stop("data and models must be of equal lengths");}
   # create list of component
   ldata <- vector("list", length(data));
   for (i in 1:length(data))
   {
-    if(clusterValidCategoricalNames(modelNames[i]) )
-    { ldata[[i]] <- new("ClusterCategoricalComponent", data[[i]], nbClusterMin, modelNames[i]);}
-    else
+    # get the name of the model and the parameters for the kernel if it is a list
+    if (is.list(models))
     {
-      if( clusterValidGammaNames(modelNames[i]) )
-      { ldata[[i]] <- new("ClusterGammaComponent", data[[i]], nbClusterMin, modelNames[i]);}
-      else
-      {
-        if( clusterValidDiagGaussianNames(modelNames[i]) )
-        { ldata[[i]] <- new("ClusterDiagGaussianComponent", data[[i]], nbClusterMin, modelNames[i]);}
-        else
-        stop("invalid model name");
-      }
+      param <- models[[i]];
+      modelName <- param$modelName
     }
-  }
+    else # otherwise param and modelName are the same
+    {
+      param <- models[i];
+      modelName <- models[i];
+    }
+    # check if it is a Categorical model 
+    if( clusterValidCategoricalNames(modelName) )
+    { ldata[[i]] <- new("ClusterCategoricalComponent", data[[i]], nbClusterMin, modelName);}
+    else 
+    {  # check if it is a Gamma model
+      if( clusterValidGammaNames(modelName) )
+      { ldata[[i]] <- new("ClusterGammaComponent", data[[i]], nbClusterMin, modelName);}
+      else
+      { # check if it is a diagonal Gaussian model
+        if( clusterValidDiagGaussianNames(modelName) )
+        { ldata[[i]] <- new("ClusterDiagGaussianComponent", data[[i]], nbClusterMin, modelName);}
+        else
+        {
+          if( clusterKernelNames(modelName) )
+          {
+            # check if it is kernel mixture model
+            if (is.list(param)) # param has to be a list
+            {
+              kernelName = param$kernelName
+              kernelParameters = param$kernelParameters
+              dim = param$dim
+              # check values
+              if(is.null(modelName)) { modelName="kernelGaussian_pk_sk";}
+              if(is.null(dim)) { dim = 10; }
+              if(is.null(kernelParameters)) { kernelParameters = c(); }
+            }
+            else
+            {
+              kernelName = "kernelGaussian_pk_sk"
+              kernelParameters = c()
+              dim = 10
+            }
+            # create component
+            component <- new("ClusterKernelComponent", data[[i]], dim= dim, nbCluster= nbClusterMin, modelName= modelName);
+            # compute gram matrix
+            resFlag  <- .Call("clusterKernelCompute", component, kernelName, kernelParameters, PACKAGE="MixAll");
+            if (!resFlag) { stop("error in gram matrix computation");}
+            # restore original data set and update ldata list
+            component@rawData <- data[[i]];
+            ldata[[i]] <- component;
+          }
+          else
+          {
+            stop("invalid model name");
+          }
+        } # else diag Gaussian
+      } # else gamma
+    } # else categorical
+  } # for i
   # Create model
-  model = new("ClusterHeterogeneous", ldata)
+  model = new("ClusterMixedData", ldata)
   model@strategy = strategy;
   # start estimation of the models
   resFlag  <- FALSE;
   if (length(nbCluster) >0)
   {
-   resFlag = .Call("clusterMixtureHeterogene", model, nbCluster, strategy, criterion, nbCore, PACKAGE="MixAll");
+   resFlag = .Call("clusterMixedData", model, nbCluster, strategy, criterion, nbCore, PACKAGE="MixAll");
   }
   # set names
   if (resFlag != TRUE) {cat("WARNING: An error occurs during the clustering process");}
   for (i in 1:length(data))
   {
-    if(clusterValidCategoricalNames(modelNames[i]))
+    if(clusterValidCategoricalNames(models[i]))
     { dim(model@ldata[[i]]@plkj) <- c(model@ldata[[i]]@nbModalities, model@nbCluster, ncol(model@ldata[[i]]@data))}
   }
   model
 }
 
 #-----------------------------------------------------------------------
-#' Definition of the [\code{\linkS4class{ClusterHeterogeneous}}] class
+#' Definition of the [\code{\linkS4class{ClusterMixedData}}] class
 #'
-#' This class defines an Heterogeneous mixture Model.
+#' This class defines an MixedData mixture Model.
 #'
 #' This class inherits from the [\code{\linkS4class{IClusterModelBase}}] class.
-#' An heterogeneous model is a mixture model of the form:
+#' A model for mixed data is a mixture model of the form:
 #' \deqn{
 #' f({{x}}_i=({{x}}_{1i}, {{x}}_{2i},\ldots {{x}}_{Li})|\theta)
 #' = \sum_{k=1}^K p_k \prod_{l=1}^L h({{x}}_{li}| \lambda_{lk},\alpha_l).
@@ -152,17 +199,17 @@ clusterHeterogeneous <- function( data, modelNames, nbCluster=2
 #' @seealso [\code{\linkS4class{IClusterModelBase}}] class
 #'
 #' @examples
-#' getSlots("ClusterHeterogeneous")
+#' getSlots("ClusterMixedData")
 #'
 #' @author Serge Iovleff
 #'
-#' @name ClusterHeterogeneous
-#' @rdname ClusterHeterogeneous-class
-#' @aliases ClusterHeterogeneous-class
-#' @exportClass ClusterHeterogeneous
+#' @name ClusterMixedData
+#' @rdname ClusterMixedData-class
+#' @aliases ClusterMixedData-class
+#' @exportClass ClusterMixedData
 #'
 setClass(
-    Class="ClusterHeterogeneous",
+    Class="ClusterMixedData",
     representation( ldata = "list"),
     contains=c("IClusterModelBase"),
     validity=function(object)
@@ -180,18 +227,18 @@ setClass(
 
 #' Initialize an instance of a MixAll S4 class.
 #'
-#' Initialization method of the [\code{\linkS4class{ClusterHeterogeneous}}] class.
+#' Initialization method of the [\code{\linkS4class{ClusterMixedData}}] class.
 #' Used internally in the 'MixAll' package.
 #'
 #' @rdname initialize-methods
 #' @keywords internal
 setMethod(
     f="initialize",
-    signature=c("ClusterHeterogeneous"),
+    signature=c("ClusterMixedData"),
     definition=function(.Object, ldata =list(), nbCluster=2)
     {
       # for data
-      if(missing(ldata)) {stop("ldata is mandatory in ClusterHeterogeneous.")}
+      if(missing(ldata)) {stop("ldata is mandatory in ClusterMixedData.")}
       nbData = length(ldata)
       if (nbData == 0) {stop("At least on data set must be given.")}
       .Object@ldata <- ldata;
@@ -205,11 +252,11 @@ setMethod(
 )
 
 #' @rdname print-methods
-#' @aliases print print,ClusterHeterogeneous-method
+#' @aliases print print,ClusterMixedData-method
 #'
 setMethod(
   f="print",
-  signature=c("ClusterHeterogeneous"),
+  signature=c("ClusterMixedData"),
   function(x,...){
     cat("****************************************\n")
     callNextMethod()
@@ -241,10 +288,10 @@ setMethod(
 )
 
 #' @rdname show-methods
-#' @aliases show-ClusterHeterogeneous,ClusterHeterogeneous,ClusterHeterogeneous-method
+#' @aliases show-ClusterMixedData,ClusterMixedData,ClusterMixedData-method
 setMethod(
     f="show",
-    signature=c("ClusterHeterogeneous"),
+    signature=c("ClusterMixedData"),
     function(object)
     {
       cat("****************************************\n")
@@ -283,10 +330,10 @@ setMethod(
 )
 
 #' @rdname summary-methods
-#' @aliases summary summary,ClusterHeterogeneous-method
+#' @aliases summary summary,ClusterMixedData-method
 setMethod(
     f="summary",
-    signature=c("ClusterHeterogeneous"),
+    signature=c("ClusterMixedData"),
     function(object, ...)
     {
       cat("**************************************************************\n")
@@ -295,19 +342,19 @@ setMethod(
     }
 )
 
-#' Plotting of a class [\code{\linkS4class{ClusterHeterogeneous}}]
+#' Plotting of a class [\code{\linkS4class{ClusterMixedData}}]
 #'
-#' Plotting data from a [\code{\linkS4class{ClusterHeterogeneous}}] object
+#' Plotting data from a [\code{\linkS4class{ClusterMixedData}}] object
 #' using the estimated parameters and partition.
 #'
-#' @param x an object of class [\code{\linkS4class{ClusterHeterogeneous}}]
+#' @param x an object of class [\code{\linkS4class{ClusterMixedData}}]
 #' @param y a number between 1 and K-1.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @importFrom graphics plot
-#' @aliases plot-ClusterHeterogeneous
+#' @aliases plot-ClusterMixedData
 #' @docType methods
-#' @rdname plot-ClusterHeterogeneous-method
+#' @rdname plot-ClusterMixedData-method
 #' @export
 #'
 #' @seealso \code{\link{plot}}
@@ -315,13 +362,13 @@ setMethod(
 #' \dontrun{
 #'   ## the car data set
 #'   data(car)
-#'   model <- clusterHeterogeneous(car, 3, strategy = clusterFastStrategy())
+#'   model <- clusterMixedData(car, 3, strategy = clusterFastStrategy())
 #'   plot(model)
 #'   }
 #'
 setMethod(
     f="plot",
-    signature=c("ClusterHeterogeneous"),
+    signature=c("ClusterMixedData"),
     function(x, y, ...)
     {
       # total number of cluster in the data set

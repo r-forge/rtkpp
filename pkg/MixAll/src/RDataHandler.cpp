@@ -32,8 +32,10 @@
  *  @brief In this file we implement the RDataHandler class.
  **/
 
-#include "RTKpp.h"
-#include "RDataHandler.h"
+#include "../inst/projects/MixAll/RDataHandler.h"
+
+namespace STK
+{
 
 bool RDataHandler::addType(std::string const& idData, int Rtype)
 {
@@ -55,3 +57,5 @@ bool RDataHandler::addType(std::string const& idData, int Rtype)
   return true;
 }
 
+
+} // namespace STK

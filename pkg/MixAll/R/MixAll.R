@@ -22,8 +22,8 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
-#' MixAll allows to estimate parametric mixture models with heterogeneous data
-#' set and missing data.
+#' MixAll allows to estimate parametric mixture models with mixed data
+#' sets and missing data.
 #'
 #' This package contains methods allowing R users to use the clustering methods
 #' of the STK++ library.
@@ -46,8 +46,8 @@
 #' multivariate counting data sets using Poisson multidimensional models (8 models).
 #'    \item the \link{clusterKernel} method allowing to discover group structures in
 #' any data sets using kernel trick (4 models).
-#'    \item the clusterHeterogeneous method allowing to discover group structures in
-#' heterogeneous data sets.
+#'    \item the \link{clusterMixedData} method allowing to discover group structures in
+#' mixed data sets.
 #'  }
 #'
 #' \tabular{ll}{

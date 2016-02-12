@@ -35,22 +35,23 @@
  **/
 
 
-#include "RTKpp.h"
-#include "ClusterLauncher.h"
-#include "ClusterFacade.h"
+#include "../inst/projects/MixAll/ClusterLauncher.h"
+#include "../inst/projects/MixAll/ClusterFacade.h"
 
 using namespace Rcpp;
 
+namespace STK
+{
 /* facade design pattern.
  * The ClusterLauncher allow to create the strategy for estimating a mixture model
  * with less effort
  **/
-ClusterLauncher::ClusterLauncher( SEXP model, SEXP nbCluster, SEXP modelNames, SEXP strategy, SEXP critName )
+ClusterLauncher::ClusterLauncher( SEXP model, SEXP nbCluster, SEXP models, SEXP strategy, SEXP critName )
                                 : IRunnerBase()
                                 , s4_model_(model)
                                 , s4_strategy_(strategy)
                                 , v_nbCluster_(nbCluster)
-                                , v_modelNames_(modelNames)
+                                , v_models_(models)
                                 , criterion_(Rcpp::as<std::string>(critName))
                                 , handler_()
                                 , diagGaussianManager_(handler_)
@@ -59,7 +60,7 @@ ClusterLauncher::ClusterLauncher( SEXP model, SEXP nbCluster, SEXP modelNames, S
                                 , categoricalManager_(handler_)
                                 , kernelManager_(handler_)
                                 , p_composer_(0)
-                                , isHeterogeneous_(false)
+                                , isMixedData_(false)
 {}
 /* facade design pattern.
  * The ClusterLauncher allow to create the strategy for estimating a mixture model
@@ -70,7 +71,7 @@ ClusterLauncher::ClusterLauncher( SEXP model, SEXP nbCluster, SEXP strategy, SEX
                                 , s4_model_(model)
                                 , s4_strategy_(strategy)
                                 , v_nbCluster_(nbCluster)
-                                , v_modelNames_()
+                                , v_models_()
                                 , criterion_(Rcpp::as<std::string>(critName))
                                 , handler_()
                                 , diagGaussianManager_(handler_)
@@ -79,7 +80,7 @@ ClusterLauncher::ClusterLauncher( SEXP model, SEXP nbCluster, SEXP strategy, SEX
                                 , categoricalManager_(handler_)
                                 , kernelManager_(handler_)
                                 , p_composer_(0)
-                                , isHeterogeneous_(true)
+                                , isMixedData_(true)
 {}
 /* destructor. */
 ClusterLauncher::~ClusterLauncher() { if (p_composer_) delete p_composer_;}
@@ -89,7 +90,7 @@ bool ClusterLauncher::run()
 {
   // compute the best model
   STK::Real initCriter = s4_model_.slot("criterion");
-  STK::Real criter = (isHeterogeneous_) ? selectHeteroBestModel()
+  STK::Real criter = (isMixedData_) ? selectMixedBestModel()
                                         : selectSingleBestModel();
 
   // get result common part of the estimated model
@@ -139,10 +140,10 @@ STK::Real ClusterLauncher::selectSingleBestModel()
     ClusterFacade facade(p_current);
     facade.createFullStrategy(s4_strategy_);
     // loop over all the models
-    for (int l=0; l <v_modelNames_.size(); ++l)
+    for (int l=0; l <v_models_.size(); ++l)
     {
       std::string idData = "model" + STK::typeToString<int>(l);
-      std::string idModel(as<std::string>(v_modelNames_[l]));
+      std::string idModel(as<std::string>(v_models_[l]));
       // transform R model names to STK++ model names
       // check have been done on the R side so.... Let's go
       bool freeProp;
@@ -195,8 +196,8 @@ STK::Real ClusterLauncher::selectSingleBestModel()
   return STK::Arithmetic<STK::Real>::max();
 }
 
-/* select best heterogeneous model */
-STK::Real ClusterLauncher::selectHeteroBestModel()
+/* select best mixed data model */
+STK::Real ClusterLauncher::selectMixedBestModel()
 {
   // list of the component
   Rcpp::List s4_list =s4_model_.slot("ldata");
@@ -289,7 +290,7 @@ void ClusterLauncher::createMixtures(STK::MixtureComposer* p_composer)
   createKernelMixtures(p_composer);
 }
 
-/** create the kernel mixtures in the given composer */
+/* create the kernel mixtures in the given composer */
 void ClusterLauncher::createKernelMixtures(STK::MixtureComposer* p_composer)
 {
   typedef STK::MixtureComposer::ConstMixtIterator ConstMixtIterator;
@@ -304,18 +305,11 @@ void ClusterLauncher::createKernelMixtures(STK::MixtureComposer* p_composer)
     if (STK::Clust::mixtureToMixtureClass(typeModel) == STK::Clust::Kernel_)
     {
       Rcpp::S4 s4_component = s4_model_.slot("component");
-      if (s4_component.hasSlot("dim"))
-      {
-        STK::RVector<double> dim((SEXP)s4_component.slot("dim"));
-        kernelManager_.setDim(p_composer->getMixture(idData), dim[0]);
-      }
-      else
-      {
-        kernelManager_.setDim(p_composer->getMixture(idData), 10);
-      }
+      STK::RVector<double> dim((SEXP)s4_component.slot("dim"));
+      double kdim = (dim.size()>0) ? dim[0] : 10;
+      kernelManager_.setDim(p_composer->getMixture(idData), kdim);
     }
   }
-
 }
 
 /* fill the s4_component with the parameters */
@@ -378,8 +372,8 @@ void ClusterLauncher::getKernelParameters(Rcpp::S4& s4_component, std::string co
   // save results in s4_model
   s4_component.slot("sigma") = Rcpp::wrap(param.col(0));
   s4_component.slot("dim")   = Rcpp::wrap(param.col(1));
-  // get data
-  s4_component.slot("data") = kernelManager_.getData<double>(idData).matrix();
+  // get data -- not necessary for kernels--
+  //s4_component.slot("data") = kernelManager_.getData<double>(idData).matrix();
 }
 
 /* get the diagonal Gaussian parameters */
@@ -429,4 +423,5 @@ void ClusterLauncher::getCategoricalParameters(Rcpp::S4& s4_component, std::stri
   s4_component.slot("data") = categoricalManager_.getData<int>(idData).matrix();
 }
 
+} // namespace STK
 

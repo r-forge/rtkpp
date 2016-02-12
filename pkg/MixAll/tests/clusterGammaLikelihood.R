@@ -5,7 +5,7 @@
 library(MixAll)
 data(iris)
 
-gamma_model <- clusterGamma( iris[1:4], nbCluster = 3, modelNames = c("gamma_pk_ajk_bjk")
+gamma_model <- clusterGamma( iris[1:4], nbCluster = 3, models = c("gamma_pk_ajk_bjk")
                            , strategy = clusterFastStrategy())
 
 data<-gamma_model@component@data

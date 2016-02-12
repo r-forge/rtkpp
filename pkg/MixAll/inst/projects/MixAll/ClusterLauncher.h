@@ -35,22 +35,25 @@
  **/
 
 
-#ifndef CLUSTERLAUNCHER_H
-#define CLUSTERLAUNCHER_H
+#ifndef STK_CLUSTERLAUNCHER_H
+#define STK_CLUSTERLAUNCHER_H
 
 #include "RDataHandler.h"
+
+namespace STK
+{
 
 /**The ClusterLauncher allow to create the strategy for estimating a mixture model
  * with less effort
  **/
-class ClusterLauncher : public STK::IRunnerBase
+class ClusterLauncher : public IRunnerBase
 {
   public:
     /** constructor.
      * @param model a reference on the current model
      * @param strategy the strategy defined in R
      **/
-    ClusterLauncher( SEXP model, SEXP nbCluster, SEXP modelNames, SEXP strategy, SEXP critName );
+    ClusterLauncher( SEXP model, SEXP nbCluster, SEXP models, SEXP strategy, SEXP critName );
     /** constructor with a list of component.
      * @param model a reference on the current model
      * @param strategy the strategy defined in R
@@ -71,23 +74,26 @@ class ClusterLauncher : public STK::IRunnerBase
     /** vector with the number of cluster to try */
     Rcpp::IntegerVector   v_nbCluster_;
     /** vector with the model names to try */
-    Rcpp::CharacterVector v_modelNames_;
+    Rcpp::CharacterVector v_models_;
     /** character string with the model selection criterion name */
     std::string           criterion_;
 
   private:
-    /** Select the best model among the modelNames and nbCluster given.
+    /** Select the best model among the models and nbCluster given.
      *  @return the value of the best criteria.
      **/
-    STK::Real selectSingleBestModel();
-    /** Select the best model among the modelNames and nbCluster given.
+    Real selectSingleBestModel();
+    /** Select the best model among the models and nbCluster given.
      *  @return the value of the best criteria.
      **/
-    STK::Real selectHeteroBestModel();
+    Real selectMixedBestModel();
     /** create the mixtures in the given composer */
-    void createMixtures(STK::MixtureComposer* p_composer);
-    /** create the kernel mixtures in the given composer */
-    void createKernelMixtures(STK::MixtureComposer* p_composer);
+    void createMixtures(MixtureComposer* p_composer);
+    /** create the kernel mixtures in the given composer. We have to
+     * use a workaround for this kind of model as they need an extra parameter
+     * (the dimension) to be given
+     **/
+    void createKernelMixtures(MixtureComposer* p_composer);
     /** get the parameters */
     void getParameters(Rcpp::S4& s4_component, std::string const& idData);
     /** get the diagonal Gaussian parameters */
@@ -105,21 +111,23 @@ class ClusterLauncher : public STK::IRunnerBase
     RDataHandler handler_;
 
     /** diagonal Gaussian mixture models manager */
-    STK::DiagGaussianMixtureManager<RDataHandler> diagGaussianManager_;
+    DiagGaussianMixtureManager<RDataHandler> diagGaussianManager_;
     /** Poisson mixture models manager */
-    STK::PoissonMixtureManager<RDataHandler> poissonManager_;
+    PoissonMixtureManager<RDataHandler> poissonManager_;
     /** gamma mixture models manager */
-    STK::GammaMixtureManager<RDataHandler> gammaManager_;
+    GammaMixtureManager<RDataHandler> gammaManager_;
     /** categorical mixture models manager */
-    STK::CategoricalMixtureManager<RDataHandler> categoricalManager_;
+    CategoricalMixtureManager<RDataHandler> categoricalManager_;
     /** kernel mixture models manager */
-    STK::KernelMixtureManager<RDataHandler> kernelManager_;
+    KernelMixtureManager<RDataHandler> kernelManager_;
 
     /** pointer on the main composer */
-    STK::IMixtureComposer* p_composer_;
+    IMixtureComposer* p_composer_;
 
-    /** Is the model with heterogeneous data ? */
-    bool isHeterogeneous_;
+    /** Is the model with mixed data ? */
+    bool isMixedData_;
 };
 
-#endif /* CLUSTERLAUNCHER_H */
+} // namespace STK
+
+#endif /* STK_CLUSTERLAUNCHER_H */

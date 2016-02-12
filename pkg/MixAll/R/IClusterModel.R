@@ -36,7 +36,7 @@ NULL
 #'    \quad {x} \in J.
 #' }
 #' where h can be either a pdf, a discrete probability, (homogeneous case)
-#' or a product of arbitrary pdf and discrete probabilities (heterogeneous case).
+#' or a product of arbitrary pdf and discrete probabilities (mixed data case).
 #'
 #' @slot nbSample  Integer with the number of samples of the model.
 #' @slot nbCluster Integer with the number of cluster of the model.
@@ -134,7 +134,7 @@ setClass(
 setMethod(
   f="initialize",
   signature=c("IClusterModelBase"),
-  definition=function(.Object, nbSample=0, nbCluster=0)
+  definition=function(.Object, nbSample, nbCluster)
   {
     # for nbSample
     if(missing(nbSample)) { stop("nbSample is mandatory in IClusterModelBase.")}

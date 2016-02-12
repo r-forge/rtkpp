@@ -32,8 +32,10 @@
  *  @brief In this file we implement the ClusterFacade class.
  **/
 
-#include "RTKpp.h"
-#include "ClusterFacade.h"
+#include "../inst/projects/MixAll/ClusterFacade.h"
+
+namespace STK
+{
 
 ClusterFacade::~ClusterFacade() { if (p_strategy_) delete p_strategy_;}
 
@@ -90,9 +92,9 @@ bool ClusterFacade::run()
     p_model_->finalizeStep();   // finalize any model stuff needed
   }
   else
-  { msg_error_ = STKERROR_NO_ARG(ClusterFacade::run(),strategy is not set);}
+  { msg_error_ = STKERROR_NO_ARG(ClusterFacade::run,strategy is not set);}
   return flag;
 }
 
-
+} // namespace STK
 

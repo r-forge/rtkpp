@@ -29,7 +29,7 @@ NULL
 #' Create an instance of the [\code{\linkS4class{ClusterPoisson}}] class
 #'
 #' This function computes the optimal poisson mixture model according
-#' to the [\code{criterion}] among the list of model given in [\code{modelNames}]
+#' to the [\code{criterion}] among the list of model given in [\code{models}]
 #' and the number of clusters given in [\code{nbCluster}], using the strategy
 #' specified in [\code{strategy}].
 #'
@@ -37,7 +37,7 @@ NULL
 #' and columns correspond to variables. If the data set contains NA values, they
 #' will be estimated during the estimation process.
 #' @param nbCluster  [\code{\link{vector}}] listing the number of clusters to test.
-#' @param modelNames [\code{\link{vector}}] of model names to run. By default all
+#' @param models [\code{\link{vector}}] of model names to run. By default all
 #' poisson models are estimated.  All the model names are given by
 #' the method [\code{\link{clusterPoissonNames}}].
 #' @param strategy a [\code{\linkS4class{ClusterStrategy}}] object containing
@@ -53,7 +53,7 @@ NULL
 #' dt <- DebTrivedi[1:500, c(1, 6,8, 15)]
 #'
 #' model <- clusterPoisson( data=dt, nbCluster=2
-#'                        , modelNames=clusterPoissonNames(prop = "equal")
+#'                        , models=clusterPoissonNames(prop = "equal")
 #'                        , strategy = clusterFastStrategy())
 #'
 #' ## use graphics functions
@@ -75,7 +75,7 @@ NULL
 #' @export
 #'
 clusterPoisson <- function( data, nbCluster=2
-                          , modelNames= clusterPoissonNames()
+                          , models= clusterPoissonNames()
                           , strategy=clusterFastStrategy()
                           , criterion="ICL"
                           , nbCore = 1)
@@ -95,10 +95,10 @@ clusterPoisson <- function( data, nbCluster=2
   if (nrow(data) <= 3*nbClusterMax) {stop("There is not enough individuals (rows) in the data set")}
   if (ncol(data) < 1) {stop("Error: empty data set")}
 
-  # check modelNames
-  if (is.null(modelNames)) { modelNames = clusterPoissonNames()}
-  if (!clusterValidPoissonNames(modelNames))
-  { stop("modelNames is not valid. See ?clusterPoissonNames for the list of valid model names")}
+  # check models
+  if (is.null(models)) { models = clusterPoissonNames()}
+  if (!clusterValidPoissonNames(models))
+  { stop("models is not valid. See ?clusterPoissonNames for the list of valid model names")}
 
   # check strategy
   if(class(strategy)[1] != "ClusterStrategy")
@@ -110,7 +110,7 @@ clusterPoisson <- function( data, nbCluster=2
   model@strategy = strategy;
 
   # start estimation of the models
-  resFlag = .Call("clusterMixture", model, nbCluster, modelNames, strategy, criterion, nbCore, PACKAGE="MixAll")
+  resFlag = .Call("clusterMixture", model, nbCluster, models, strategy, criterion, nbCore, PACKAGE="MixAll")
 
   # set names
   if (resFlag != 1) {cat("WARNING: An error occur during the clustering process")}

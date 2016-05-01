@@ -1,0 +1,7 @@
+export(CxxFlags
+      ,CppFlags
+      ,LdFlags
+      )
+
+import(Rcpp)
+useDynLib(rtkore)

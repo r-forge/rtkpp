@@ -68,6 +68,7 @@ struct Traits< RVector<Type_> >
     typedef ColOperator< RMatrix<Type_> > SubCol;
     typedef SubOperator< RMatrix<Type_> > SubVector;
     typedef Void SubArray;
+    typedef Void Number;
 
     typedef Type_ Type;
     typedef Type const& ReturnType;
@@ -117,7 +118,7 @@ class RVector : public ArrayBase< RVector<Type_> >, public TRef<1>
     inline RVector(int length): vector_(length),rows_(0,length), cols_(0,1) {}
     /** Constructor */
     inline RVector( Rcpp::Vector<Rtype_> vector)
-                  : vector_(vector), rows_(), cols_(0,1) {}
+                  : vector_(vector), rows_(vector.length()), cols_(0,1) {}
     /** Constructor with SEXP. */
     inline RVector( SEXP robj)
                   : vector_(robj), rows_(0, vector_.size()), cols_(0,1) {}

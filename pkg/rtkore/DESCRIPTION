@@ -3,7 +3,7 @@ Type: Package
 Title: STK++ Core Library Integration to R using Rcpp
 Version: 1.1.0
 Encoding: UTF-8
-Date: 2016-04-30
+Date: 2016-05-30
 Authors@R: c(person("Serge", "Iovleff", role=c("aut","cre"),
     email="serge.iovleff@stkpp.org"),
     person("Parmeet", "Bhatia", role="ctb",

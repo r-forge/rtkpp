@@ -68,6 +68,7 @@ struct Traits< RMatrix<Type_> >
     typedef ColOperator< RMatrix<Type_> > SubCol;
     typedef Void SubVector;
     typedef Void SubArray;
+    typedef Void Number;
 
     typedef Type_ Type;
     typedef Type const& ReturnType;

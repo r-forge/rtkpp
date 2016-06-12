@@ -1,14 +1,14 @@
 \name{NEWS}
 \title{News for Package 'rtkore}
 
-\section{Changes in rtkore version 1.1.0 (2016-0430)}{
+\section{Changes in rtkore version 1.1.0 (2016-0530)}{
   \itemize{
     \item Adding svd decomposition using lapack in Algebra project
     \item Adding online mean ancd variance computation in STatistiK project
     \item Adding kernels classes in STatistiK project
     \item Adding class Factor allowing to use factor rather than original
     nominal data encoding in STatistiK project
-    \item Adding IMixtureModel interface class in StatModels project
+    \item Corecting many small bugs
   }
 }
 \section{Changes in rtkore version 1.0.1 (2015-1124)}{

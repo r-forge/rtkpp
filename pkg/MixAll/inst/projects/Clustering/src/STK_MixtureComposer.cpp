@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2012  Serge Iovleff
+/*     Copyright (C) 2004-2016  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -33,9 +33,8 @@
  *  @brief In this file we implement the class MixtureComposer.
  **/
 
-#include "../include/STK_IMixture.h"
 #include "../include/STK_MixtureComposer.h"
-#include "Arrays/include/STK_Display.h"
+#include <Arrays/include/STK_Display.h>
 
 namespace STK
 {
@@ -48,22 +47,13 @@ MixtureComposer::MixtureComposer( int nbSample, int nbCluster)
                                 , meanlnLikelihood_(0.)
 { setNbFreeParameter(nbCluster-1);}
 
-/* copy constructor.
+/* copy constructor.³
  *  @param composer the composer to copy
  */
 MixtureComposer::MixtureComposer( MixtureComposer const& composer)
                                 : IMixtureComposer(composer)
-                                , v_mixtures_(composer.v_mixtures_)
                                 , meanlnLikelihood_(composer.meanlnLikelihood_)
-{
-  // clone mixtures
-  for (size_t l = 0; l < v_mixtures_.size(); ++l)
-  {
-    v_mixtures_[l] = composer.v_mixtures_[l]->clone();
-    v_mixtures_[l]->setMixtureComposer(this);
-    v_mixtures_[l]->initializeStep();
-  }
-}
+{}
 
 MixtureComposer::~MixtureComposer()
 {
@@ -91,7 +81,7 @@ Real MixtureComposer::lnComponentProbability(int i, int k) const
   return sum;
 }
 
-void MixtureComposer::mStep()
+void MixtureComposer::paramUpdateStep()
 {
   for (MixtIterator it = v_mixtures_.begin() ; it != v_mixtures_.end(); ++it)
   { (*it)->paramUpdateStep();}
@@ -104,24 +94,13 @@ void MixtureComposer::writeParameters(std::ostream& os) const
   os << _T("Composer nbCluster = ") << nbCluster() << std::endl;
   os << _T("Composer nbFreeParameter = ") << nbFreeParameter() << std::endl;
   os << _T("Composer lnLikelihood = ") << lnLikelihood() << std::endl;
-  os << _T("Composer proportions = ") << *(p_pk());
+  os << _T("Composer proportions = ") << pk();
 
   for (ConstMixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
   {
-    os << _T("\nParameters of the mixture: ") << (*it)->idName() << _T("\n");
+    os << _T("\nParameters of the mixture: ") << (*it)->idData() << _T("\n");
     (*it)->writeParameters(os);
   }
-}
-
-void MixtureComposer::initializeStep()
-{
-  if (v_mixtures_.size() == 0)
-    STKRUNTIME_ERROR_NO_ARG(MixtureComposer::initializeStep,no mixture have been registered);
-  // call base class initializeStep()
-  IMixtureComposer::initializeStep();
-  // initialize registered mixtures
-  for (MixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
-  { (*it)->initializeStep();}
 }
 
 void MixtureComposer::randomInit()
@@ -129,38 +108,24 @@ void MixtureComposer::randomInit()
 #ifdef STK_MIXTURE_VERBOSE
   stk_cout << _T("Entering MixtureComposer::RandomInit()\n");
 #endif
-  if (state() < 2) { initializeStep();}
-  if (randomFuzzyTik()<2) throw(Clust::randomParamInitFail_);
+  // in case the mixture is not initialized
+  if (state() < Clust::modelInitialized_) { initializeStep();}
+  // create random tik
+  if (randomTik()<2) throw(Clust::randomParamInitFail_);
+  // compute zi
   mapStep();
+  // set random values to the parameters of the model
   for (MixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
   { (*it)->randomInit();}
+  // perform eStep
   eStep();
+  // update state of the model
   setState(Clust::modelParamInitialized_);
 #ifdef STK_MIXTURE_VERBOSE
   stk_cout << _T("MixtureComposer::RandomInit() done\n");
 #endif
 }
 
-
-// implement computeNbFreeParameters
-int MixtureComposer::computeNbFreeParameters() const
-{
-  int sum = nbCluster_-1; // proportions
-  for (ConstMixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
-  { sum+= (*it)->nbFreeParameter();}
-  return sum;
-}
-
-/* @brief compute the number of variables of the model.
- *  lookup on the mixtures and sum the nbFreeParameter.
- **/
-int MixtureComposer::computeNbVariables() const
-{
-  int sum = 0;
-  for (ConstMixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
-  { sum+= (*it)->nbVariable();}
-  return sum;
-}
 
 void MixtureComposer::imputationStep()
 {
@@ -193,10 +158,10 @@ void MixtureComposer::releaseIntermediateResults()
 }
 
 /* Utility method allowing to signal to a mixture to set its parameters */
-void MixtureComposer::setParameters()
+void MixtureComposer::setParametersStep()
 {
   for (MixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
-  { (*it)->setParameters();}
+  { (*it)->setParametersStep();}
   setLnLikelihood(meanlnLikelihood_);
   meanlnLikelihood_ = 0.;
 }
@@ -208,76 +173,20 @@ void MixtureComposer::finalizeStep()
   { (*it)->finalizeStep();}
 }
 
-/* register the mixture in the composer*/
-void MixtureComposer::registerMixture(IMixture* p_mixture)
-{
-#ifdef STK_MIXTURE_VERY_VERBOSE
-  stk_cout << _T("In MixtureComposer::registerMixture, registering mixture: ")
-           << p_mixture->idName() << _T("\n");
-#endif
-  p_mixture->setMixtureComposer(this);
-  v_mixtures_.push_back(p_mixture);
-  // update nbVariables and NbFreeParameters
-  setNbVariable(nbVariable()+p_mixture->nbVariable());
-  setNbFreeParameter(nbFreeParameter()+p_mixture->nbFreeParameter());
-}
-
 /* @brief Create the composer using existing data handler and ingredients.
  * This method is essentially used by the create() method and can be
  * reused in derived classes. */
 void MixtureComposer::createComposer( std::vector<IMixture*> const& v_mixtures)
 {
-  initializeMixtureParameters();
-  initialize(nbSample(), nbVariable());
   v_mixtures_.resize( v_mixtures.size());
   for (size_t l = 0; l < v_mixtures_.size(); ++l)
   {
     v_mixtures_[l] = v_mixtures[l]->create();
-    v_mixtures_[l]->setMixtureComposer(this);
-    v_mixtures_[l]->initializeStep();
+    v_mixtures_[l]->setMixtureModel(this);
   }
-  // compute number of free parameters and of variables
-  setNbVariable(computeNbVariables());
-  setNbFreeParameter(computeNbFreeParameters());
+  initializeStep();
 }
 
-/* Utility lookup function allowing to find a Mixture from its idData
- *  @param idData the id name of the mixture we want to get
- *  @return a pointer on the mixture
- **/
-IMixture* MixtureComposer::getMixture( String const& idData) const
-{
-  for (ConstMixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
-  { if ((*it)->idName() == idData) return (*it);}
-  return 0;
-}
-
-/* Utility lookup function allowing to find a Mixture from its idData
- *  @param idData the id name of the mixture we want to get
- *  @return a pointer on the mixture
- **/
-void MixtureComposer::releaseMixture( String const& idData)
-{
-  for (MixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
-  {
-    if ((*it)->idName() == idData)
-    {
-      // update nbVariable and nbFreeParameters
-       setNbVariable(nbVariable()-(*it)->nbVariable());
-       setNbFreeParameter(nbFreeParameter()-(*it)->nbFreeParameter());
-       // remove mixture
-       delete (*it);
-       v_mixtures_.erase(it);
-       // update log-likelihood
-       if (v_mixtures_.size() == 0)
-       { setLnLikelihood(-Arithmetic<Real>::infinity());}
-       else
-       { setLnLikelihood(computeLnLikelihood());}
-       // and break
-       break;
-    }
-  }
-}
 /* Constructor.
  * @param nbCluster,nbSample number of clusters and samples
  */

@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-#     Copyright (C) 2012-2015  Serge Iovleff, University Lille 1, Inria
+#     Copyright (C) 2012-2016  Serge Iovleff, University Lille 1, Inria
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as
@@ -40,7 +40,7 @@ NULL
 #' "kernelGaussian_pk_s" is estimated. All the model names are given by the method
 #' [\code{\link{clusterKernelNames}}].
 #' @param kernelName string with a kernel name. Possible values:
-#' "gaussian", "polynomial", "exponential". Default is "gaussian".
+#' "gaussian", "polynomial", "exponential", "linear", "hamming". Default is "gaussian".
 #' @param kernelParameters [\code{\link{vector}}] with the parameters of
 #' the chosen kernel. Default is 1.
 #' @param strategy a [\code{\linkS4class{ClusterStrategy}}] object containing
@@ -77,8 +77,7 @@ NULL
 #'
 clusterKernel <- function( data, dim = 10, nbCluster=2
                          , models= "kernelGaussian_pk_s"
-                         , kernelName = "gaussian"
-                         , kernelParameters = 1.
+                         , kernelName = "gaussian", kernelParameters = 1.
                          , strategy=clusterStrategy()
                          , criterion="ICL"
                          , nbCore = 1)
@@ -106,7 +105,7 @@ clusterKernel <- function( data, dim = 10, nbCluster=2
   if (!clusterValidKernelNames(models))
   { stop("models is not valid. See ?clusterKernelNames for the list of valid model names")}
   # check kernelName
-  if(sum(kernelName %in% c("gaussian","polynomial", "exponential")) != 1)
+  if(sum(kernelName %in% c("gaussian","polynomial", "exponential","linear","hamming")) != 1)
   { stop("kernelName is not valid. See ?clusterKernel for the list of valid kernel name")}
   if (is.null(kernelParameters)) { kernelParameters = c(1)}
   # check strategy
@@ -255,7 +254,7 @@ setMethod(
 #'
 #' This class defines a Kernel mixture Model (KMM).
 #'
-#' This class inherits from the [\code{\linkS4class{IClusterModelBase}}] class.
+#' This class inherits from the [\code{\linkS4class{IClusterModel}}] class.
 #' A Kernel mixture  model is a mixture model of the form:
 #' \deqn{
 #'   f({x}|\boldsymbol{\theta})
@@ -271,7 +270,7 @@ setMethod(
 #' @slot kernelName string with the name of the kernel to use. Possible values:
 #' "gaussian", "polynomial", "exponential". Default is "gaussian".
 #' @slot kernelParameters vector with the parameters of the kernel.
-#' @seealso [\code{\linkS4class{IClusterModelBase}}] class
+#' @seealso [\code{\linkS4class{IClusterModel}}] class
 #'
 #' @examples
 #' getSlots("ClusterKernel")
@@ -292,7 +291,7 @@ setClass(
                 , kernelName = "character"
                 , kernelParameters = "vector"
                 ),
-  contains=c("IClusterModelBase"),
+  contains=c("IClusterModel"),
   validity=function(object)
   {
     if (length(object@component@dim)!=object@nbCluster)

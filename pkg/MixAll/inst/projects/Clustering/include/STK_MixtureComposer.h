@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2012  Serge Iovleff
+/*     Copyright (C) 2004-2016  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -36,11 +36,9 @@
 #ifndef STK_MIXTURECOMPOSER_H
 #define STK_MIXTURECOMPOSER_H
 
-#include <vector>
 #include <list>
 
 #include "STK_IMixtureComposer.h"
-#include "STK_IMixtureManager.h"
 
 namespace STK
 {
@@ -68,7 +66,7 @@ class IMixture;
  * derived from an STK::IMixtureManager.
  * @sa IMixtureComposer, IMixtureManager, PoissonMixtureManager, DiagGaussianMixtureManager, GammaMixtureManager, CategoricalMixtureManager
  **/
-class MixtureComposer : public IMixtureComposer
+class MixtureComposer: public IMixtureComposer
 {
   public:
     typedef std::vector<IMixture*>::const_iterator ConstMixtIterator;
@@ -84,48 +82,23 @@ class MixtureComposer : public IMixtureComposer
     /** The registered mixtures will be deleted there.*/
     virtual ~MixtureComposer();
 
-    /** @return a constant reference on the vector of mixture */
-    inline std::vector<IMixture*> const& v_mixtures() const { return v_mixtures_;}
-    /** Utility lookup function allowing to find a Mixture from its idData
-     *  @param idData the id name of the data
-     *  @return a pointer on the mixture, NULL if the mixture is not found
-     **/
-     IMixture* getMixture( String const& idData) const;
-
     /** Create a composer, but reinitialize the mixtures parameters. */
     virtual MixtureComposer* create() const;
     /** Create a clone of the current model, with mixtures parameters preserved. */
     virtual MixtureComposer* clone() const;
     /** @return the value of the probability of the i-th sample in the k-th component.
-     *  @param i index of the sample
-     *  @param k index of the component
+     *  @param i,k indexes of the sample and components
      **/
     virtual Real lnComponentProbability(int i, int k) const;
     /** write the parameters of the model in the stream os. */
     virtual void writeParameters(ostream& os) const;
-    /** @brief compute the number of free parameters of the model.
-     *  lookup on the mixtures and sum the nbFreeParameter.
-     **/
-    int computeNbFreeParameters() const;
-    /** @brief compute the number of variables of the model.
-     *  lookup on the mixtures and sum the nbFreeParameter.
-     **/
-    int computeNbVariables() const;
 
     /** initialize randomly the parameters of the components of the model */
     virtual void randomInit();
     /** Compute the proportions and the model parameters given the current tik
      *  mixture parameters.
      **/
-    virtual void mStep();
-    /**@brief This step can be used by developer to initialize any thing which
-     * is not the model. It will be called before running the estimation
-     * algorithm. In this class, the @c initializeStep method
-     *  - Set the arrays tik_, prop_, zi_ to default values
-     *  - call the initializeStep() of all the mixtures,
-     *  This method is called in order to initialize the parameters.
-     **/
-    virtual void initializeStep();
+    virtual void paramUpdateStep();
     /** @brief Impute the missing values.
      **/
     virtual void imputationStep();
@@ -145,63 +118,11 @@ class MixtureComposer : public IMixtureComposer
     virtual void releaseIntermediateResults();
     /** @brief Utility method allowing to signal to a mixture to set its parameters.
      *  It will be called once enough intermediate results have been stored. */
-    virtual void setParameters();
+    virtual void setParametersStep();
     /**@brief This step can be used by developer to finalize any thing. It will
      *  be called only once after we finish running the estimation algorithm.
      **/
     virtual void finalizeStep();
-    /** @brief register a mixture to the composer.
-     *  When a mixture is registered, the composer:
-     *  - assign composer pointer (itself) to the mixture
-     *  - add it to v_mixtures_
-     *  - update the number of variables
-     * @param p_mixture a pointer on the mixture
-     **/
-    void registerMixture(IMixture* p_mixture);
-    /** @brief release a mixture from the composer.
-     *  When a mixture is released, the composer remove it from v_mixtures_.
-     *  @note the data set associated with the mixture is still in the manager
-     *  list of data set if you use a manager in order to register it.
-     *  @param idData the Id of the mixture to release.
-     **/
-    void releaseMixture(String const& idData);
-    /** Utility method allowing to create all the mixtures registered in the
-     *  data handler of a mixture manager and to register its.
-     *  @param manager the manager with the responsibility of the creation.
-     **/
-    template<class DataHandler>
-    void createMixture(IMixtureManager<DataHandler>& manager);
-    /** Utility method allowing to create a mixture with a given data set
-     *  and register it. The Mixture Manager will find the associated model
-     *  to use with this data set.
-     *  @param manager the manager with the responsibility of the creation.
-     *  @param idData the id name of the data to modelize.
-     **/
-    template<class DataHandler>
-    IMixture* createMixture(IMixtureManager<DataHandler>& manager, String const& idData);
-    /** Utility method allowing to release completely a mixture with its data set.
-     *  The MixtureManager will find and release the associated data set.
-     *  @param manager the manager with the responsibility of the release.
-     *  @param idData the id name of the data to modelize.
-     **/
-    template<class DataHandler>
-    void releaseMixture(IMixtureManager<DataHandler>& manager, String const& idData);
-    /** Utility method allowing to get the parameters of a specific mixture.
-     *  @param manager the manager with the responsibility of the parameters
-     *  @param idData the Id of the data we want the parameters
-     *  @param param the structure which will receive the parameters
-     **/
-    template<class DataHandler, class Parameters>
-    void getParameters(IMixtureManager<DataHandler> const& manager, String const& idData, Parameters& param) const
-    { manager.getParameters(getMixture(idData), param);}
-    /** Utility method allowing to set the parameters to a specific mixture.
-     *  @param manager the manager with the responsibility of the parameters
-     *  @param idData the Id of the data we want to set the parameters
-     *  @param param the structure which contains the parameters
-     **/
-    template<class DataHandler, class Parameters>
-    void setParameters(IMixtureManager<DataHandler> const& manager, String const& idData, Parameters const& param)
-    { manager.setParameters(getMixture(idData), param);}
 
   protected:
     /** @brief Create the composer using existing data handler and mixtures.
@@ -211,9 +132,6 @@ class MixtureComposer : public IMixtureComposer
      **/
     void createComposer( std::vector<IMixture*> const& v_mixtures_);
 
-  private:
-    /** vector of pointers to the mixtures components */
-    std::vector<IMixture*> v_mixtures_;
     /** averaged lnLikelihood values. Will be used by the
      *  storeIntermediateResults method.
      **/
@@ -232,7 +150,7 @@ class MixtureComposerFixedProp : public MixtureComposer
     /** copy constructor.
      *  @param model the model to copy
      */
-    inline MixtureComposerFixedProp( MixtureComposer const& model);
+    MixtureComposerFixedProp( MixtureComposer const& model);
     /** destructor */
     inline virtual ~MixtureComposerFixedProp() {}
     /** Create a composer, but reinitialize the mixtures parameters. */
@@ -243,63 +161,6 @@ class MixtureComposerFixedProp : public MixtureComposer
      * Let them initialized to 1/K. */
     virtual void pStep();
 };
-
-/* Utility method allowing to create all the mixtures handled by a mixture
- * manager.
- *  @param manager the manager with the responsibility of the creation.
- **/
-template<class DataHandler>
-void MixtureComposer::createMixture(IMixtureManager<DataHandler>& manager)
-{
-  typedef typename DataHandlerBase<DataHandler>::InfoMap InfoMap;
-  for ( typename InfoMap::const_iterator it=manager.p_handler()->info().begin(); it!=manager.p_handler()->info().end(); ++it)
-  {
-    IMixture* p_mixture = manager.createMixture(it->first, nbCluster());
-#ifdef STK_MIXTURE_DEBUG
-  if (!p_mixture)
-  { stk_cout << _T("In MixtureComposer::createMixture(manager) failed.\n");}
-#endif
-    if (p_mixture) registerMixture(p_mixture);
-  }
-}
-
-/* Utility method allowing to create a mixture with a given data set
- *  and register it. The Mixture Manager will find the associated model
- *  to use with this data set.
- *  @param manager the manager with the responsibility of the creation.
- *  @param idData the id name of the data to modelize.
- **/
-template<class DataHandler>
-IMixture* MixtureComposer::createMixture(IMixtureManager<DataHandler>& manager, String const& idData)
-{
-  IMixture* p_mixture = manager.createMixture( idData, nbCluster());
-#ifdef STK_MIXTURE_DEBUG
-  if (!p_mixture)
-  { stk_cout << _T("In MixtureComposer::createMixture(manager,")<< idData << _T(") failed.\n");}
-#endif
-  if (p_mixture) registerMixture(p_mixture);
-  return p_mixture;
-}
-
-/* Utility method allowing to release completely a mixture with its data set.
- *  The MixtureManager will find and release the associated data set.
- *  @param manager the manager with the responsibility of the release.
- *  @param idData the id name of the data to modelize.
- **/
-template<class DataHandler>
-void MixtureComposer::releaseMixture(IMixtureManager<DataHandler>& manager, String const& idData)
-{
-  IMixture* p_mixture = getMixture(idData);
-#ifdef STK_MIXTURE_DEBUG
-  if (!p_mixture)
-  { stk_cout << _T("In MixtureComposer::releaseMixture(manager,")<< idData << _T(") failed.\n");}
-#endif
-  if (p_mixture)
-  {
-    releaseMixture(idData);
-    manager.releaseMixtureData( idData);
-  }
-}
 
 
 } /* namespace STK */

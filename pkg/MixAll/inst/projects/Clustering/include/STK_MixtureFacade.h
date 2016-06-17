@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2013  Serge Iovleff
+/*     Copyright (C) 2004-2016  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -30,7 +30,8 @@
  **/
 
 /** @file STK_MixtureFacade.h
- *  @brief In this file we define the StrategyFacade which construct properly a mixture model.
+ *  @brief In this file we define the StrategyFacade and LearnFacade which
+ *  construct properly a way to estimate/learn a mixture model
  **/
 
 
@@ -44,11 +45,13 @@ namespace STK
 {
 
 class IMixtureComposer;
+class IMixtureLearner;
 class IMixtureStrategy;
 
-/** facade design pattern.
- * The StrategyFacade allow to create the strategy for estimating a mixture model
- * with less effort
+/** @ingroup Clustering
+ *  @brief facade design pattern.
+ *  StrategyFacade allows to create the strategy for estimating a mixture model
+ *  with less effort
  **/
 class StrategyFacade: public IRunnerBase
 {
@@ -75,7 +78,7 @@ class StrategyFacade: public IRunnerBase
                            , Clust::algoType shortAlgo, int nbShortIter, Real shortEpsilon
                            , Clust::algoType longAlgo, int nblongIter, Real longEpsilon);
     /** run the strategy */
-   virtual bool run();
+    virtual bool run();
 
   protected:
     /** the mixture model to estimate */
@@ -84,6 +87,39 @@ class StrategyFacade: public IRunnerBase
     IMixtureStrategy* p_strategy_;
 };
 
+/** @ingroup Clustering
+ *  facade design pattern.
+ *  LearnFacade allows to create the algorithms for learning a mixture model
+ *  with less effort
+ **/
+class LearnFacade: public IRunnerBase
+{
+  public:
+    /** constructor.
+     *  @param p_model a reference on the current model
+     **/
+    inline LearnFacade( IMixtureLearner* p_model)
+                      : IRunnerBase(), p_model_(p_model), p_algo_(0)
+    {}
+    /** destructor. */
+    virtual ~LearnFacade();
+    /** set model in case we want to use the strategy again
+     *  @param p_model the model to set
+     **/
+    inline void setModel(IMixtureLearner* p_model) {p_model_ = p_model;};
+    /** create an imputation algorithm */
+    void createImputeAlgo( Clust::algoLearnType algo, int nbIter, Real epsilon);
+    /** create a simulation algorithm */
+    void createSimulAlgo( Clust::algoLearnType algo,  int nblongIter);
+    /** run algorithm */
+    virtual bool run();
+
+  protected:
+    /** the mixture model to learn */
+   IMixtureLearner* p_model_;
+   /** the algorithm to use for learning */
+   IMixtureLearnAlgo* p_algo_;
+};
 
 }  // namespace STK
 

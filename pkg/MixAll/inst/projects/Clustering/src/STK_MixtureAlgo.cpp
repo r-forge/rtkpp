@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2015  Serge Iovleff, Université Lille 1, Inria
+/*     Copyright (C) 2004-2016  Serge Iovleff, Université Lille 1, Inria
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -36,12 +36,17 @@
 #include <STKernel/include/STK_Exceptions.h>
 #include "../include/STK_MixtureAlgo.h"
 #include "../include/STK_IMixtureComposer.h"
+#include "../include/STK_IMixtureLearner.h"
 
 namespace STK
 {
 // threshold_ is set to this value in order to get stability on the results
 void IMixtureAlgo::setModel(IMixtureComposer* p_model)
 { p_model_ = p_model; threshold_ = std::min(3., 0.03*p_model_->nbSample());}
+
+void IMixtureLearnAlgo::setModel(IMixtureLearner* p_model)
+{ p_model_ = p_model; }
+
 
 /* run the CEM algorithm */
 bool CEMAlgo::run()
@@ -67,7 +72,7 @@ bool CEMAlgo::run()
       }
       p_model_->imputationStep();
       p_model_->pStep();
-      p_model_->mStep();
+      p_model_->paramUpdateStep();
       Real nb = p_model_->eStep();
       if (nb<threshold_)
       {
@@ -122,7 +127,7 @@ bool EMAlgo::run()
     {
       p_model_->imputationStep();
       p_model_->pStep();
-      p_model_->mStep();
+      p_model_->paramUpdateStep();
       Real nb = p_model_->eStep();
       if (nb<threshold_)
       {
@@ -187,7 +192,7 @@ bool SEMAlgo::run()
       }
       p_model_->samplingStep(); // simulate missing values
       p_model_->pStep();        // estimate proportions
-      p_model_->mStep();        // estimate parameters
+      p_model_->paramUpdateStep();        // estimate parameters
       nb = p_model_->eStep();   // update tik and lnLikelihood
       if (nb<threshold_)
       {
@@ -216,7 +221,7 @@ bool SEMAlgo::run()
   if (result)
   {
     // set averaged parameters
-    p_model_->setParameters();
+    p_model_->setParametersStep();
 #ifdef STK_MIXTURE_VERY_VERBOSE
     stk_cout << _T("\nIn SEMAlgo::run(), setParameters done.\n")
              << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
@@ -247,7 +252,7 @@ bool SemiSEMAlgo::run()
     {
       p_model_->samplingStep();
       p_model_->pStep();
-      p_model_->mStep();
+      p_model_->paramUpdateStep();
       Real nb = p_model_->eStep();
       if (nb<threshold_)
       {
@@ -276,7 +281,7 @@ bool SemiSEMAlgo::run()
   // set averaged parameters
   if (result)
   {
-    p_model_->setParameters();
+    p_model_->setParametersStep();
 #ifdef STK_MIXTURE_VERY_VERBOSE
     stk_cout << _T("\nIn SemiSEMAlgo::run(), setParameters done.\n")
              << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
@@ -403,7 +408,7 @@ bool SEMPredict::run()
   if (result)
   {
     // set averaged parameters
-    p_model_->setParameters();
+    p_model_->setParametersStep();
 #ifdef STK_MIXTURE_VERY_VERBOSE
     stk_cout << _T("\nIn SEMAlgo::run(), setParameters done.\n")
              << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
@@ -461,7 +466,7 @@ bool SemiSEMPredict::run()
   // set averaged parameters
   if (result)
   {
-    p_model_->setParameters();
+    p_model_->setParametersStep();
 #ifdef STK_MIXTURE_VERY_VERBOSE
     stk_cout << _T("\nIn SemiSEMPredict::run(), setParameters done.\n")
              << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
@@ -472,6 +477,113 @@ bool SemiSEMPredict::run()
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Terminating SemiSEMPredict::run()\n");
   stk_cout << _T("---------------------------------\n");
+#endif
+  return result;
+}
+
+bool ImputeAlgo::run()
+{
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("--------------------------------\n");
+  stk_cout << _T("Entering ImputeAlgo::run() with:\n")
+           << _T("nbIterMax_ = ") << nbIterMax_ << _T("\n")
+           << _T("epsilon_ = ") << epsilon_ << _T("\n");
+#endif
+
+  try
+  {
+    Real currentLnLikelihood = p_model_->lnLikelihood();
+    int iter;
+    for (iter = 0; iter < nbIterMax_; iter++)
+    {
+      p_model_->imputationStep();
+      p_model_->paramUpdateStep();
+      Real lnLikelihood = p_model_->lnLikelihood();
+      // no abs as the likelihood should increase
+      if ( (lnLikelihood - currentLnLikelihood) < epsilon_)
+      {
+#ifdef STK_MIXTURE_VERY_VERBOSE
+        stk_cout << _T("Terminating ImputeAlgo::run() with:\n")
+                 << _T("iter = ") << iter << _T("\n")
+                 << _T("delta = ") << lnLikelihood - currentLnLikelihood << _T("\n");
+#endif
+        break;
+      }
+      currentLnLikelihood = lnLikelihood;
+    }
+#ifdef STK_MIXTURE_VERBOSE
+    stk_cout << _T("In ImputeAlgo::run() iteration ") << iter << _T("terminated.\n")
+             << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
+#endif
+  }
+  catch (Clust::exceptions const& error)
+  {
+    msg_error_ = Clust::exceptionToString(error);
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("An error occur in ImputeAlgo::run():\n") << msg_error_ << _T("\n");
+#endif
+    return false;
+  }
+  return true;
+}
+
+bool SimulAlgo::run()
+{
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("-------------------------------\n");
+  stk_cout << _T("Entering SimulAlgo::run() with:\n")
+           << _T("nbIterMax_ = ") << nbIterMax_ << _T("\n")
+           << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
+#endif
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("Parameters of the model\n");
+  p_model_->writeParameters(stk_cout);
+#endif
+  bool result = true;
+  try
+  {
+    int iter;
+    for (iter = 0; iter < nbIterMax_; ++iter)
+    {
+      p_model_->samplingStep(); // simulate missing values
+      p_model_->paramUpdateStep(); // estimate parameters
+      p_model_->storeIntermediateResults(iter+1); // store current parameters
+    }
+#ifdef STK_MIXTURE_VERBOSE
+    stk_cout << _T("In SimulAlgo::run() iterations terminated.\n")
+             << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
+#endif
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("Parameters of the model\n");
+  p_model_->writeParameters(stk_cout);
+#endif
+  }
+  catch (Clust::exceptions const& error)
+  {
+    msg_error_ = Clust::exceptionToString(error);
+#ifdef STK_MIXTURE_VERBOSE
+    stk_cout << _T("An error occur in SimulAlgo::run(): ") << msg_error_ << _T("\n");
+#endif
+    result = false;
+  }
+  if (result)
+  {
+    // set averaged parameters
+    p_model_->setParametersStep();
+#ifdef STK_MIXTURE_VERY_VERBOSE
+    stk_cout << _T("\nIn SimulAlgo::run(), setParameters done.\n")
+             << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
+#endif
+  }
+  else
+  { p_model_->releaseIntermediateResults();}
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("Terminating SimulAlgo::run()\n");
+  stk_cout << _T("----------------------------\n");
+#endif
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("Parameters of the model\n");
+  p_model_->writeParameters(stk_cout);
 #endif
   return result;
 }

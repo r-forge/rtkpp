@@ -132,7 +132,7 @@ struct ParametersHandler<Clust::Gaussian_s_>: public DiagGaussianHandlerBase<  P
   inline void releaseIntermediateResults()
   { mean_.releaseIntermediateResults(); sigma_.releaseIntermediateResults();}
   /** set the parameters stored in stat_proba_ and release stat_proba_. */
-  inline void setParameters() { mean_.setParameters(); sigma_.setParameters();}
+  inline void setParametersStep() { mean_.setParametersStep(); sigma_.setParametersStep();}
 };
 
 /** @ingroup Clustering
@@ -183,7 +183,7 @@ class Gaussian_s : public DiagGaussianBase<Gaussian_s<Array> >
      */
     void randomInit();
     /** Compute the weighted mean and the common standard deviation. */
-    bool mStep();
+    bool paramUpdateStep();
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable()+1;}
@@ -214,7 +214,7 @@ void Gaussian_s<Array>::randomInit()
 
 /* Compute the weighted mean and the common standard deviation. */
 template<class Array>
-bool Gaussian_s<Array>::mStep()
+bool Gaussian_s<Array>::paramUpdateStep()
 {
   // compute the means
   if (!this->updateMean()) return false;

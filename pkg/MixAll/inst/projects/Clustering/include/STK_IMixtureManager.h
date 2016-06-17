@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2015  Serge Iovleff, Université Lille 1, Inria
+/*     Copyright (C) 2004-2016  Serge Iovleff, Université Lille 1, Inria
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -37,10 +37,11 @@
 #define STK_IMIXTUREMANAGER_H
 
 #include <DManager/include/STK_DataHandlerBase.h>
-#include <Arrays/include/STK_Array2D.h>
+#include <DManager/include/STK_DataBridge.h>
+
+#include <Arrays/include/STK_Array2D.h> // for get and set parameters
 
 #include "STK_IMixture.h"
-#include "STK_MixtureData.h"
 
 namespace STK
 {
@@ -92,11 +93,11 @@ class IMixtureManager
      *  deleted.
      *  @param p_data a pointer on the data manager
      **/
-    void registerMixtureData(IDataBridge* p_data);
+    void registerDataBridge(IDataBridge* p_data);
     /** release a data manager from v_data_.
      *  @param idData name of the data set to release
      **/
-    void releaseMixtureData(String const& idData);
+    void releaseDataBridge(String const& idData);
     // templated methods
     /** get the missing values of a data set.
      *  @param idData Id name of the data set attached to the mixture
@@ -123,11 +124,11 @@ class IMixtureManager
     virtual void setParameters(IMixture* p_mixture, ArrayXX const& data) const =0;
 
   protected:
-    /** Utility lookup function allowing to find a MixtureData from its idData
+    /** Utility lookup function allowing to find a DataBridge from its idData
      *  @param idData the id name of the mixture we want to get
-     *  @return a pointer on the MixtureData
+     *  @return a pointer on the DataBridge
      **/
-    IDataBridge* getMixtureData( String const& idData) const;
+    IDataBridge* getDataBridge( String const& idData) const;
 
   private:
     /** create a concrete mixture and initialize it.
@@ -216,25 +217,25 @@ IMixture* IMixtureManager<DataHandler>::createMixture(String const& idData, int 
  *  @param p_data a pointer on the data manager
  **/
 template<class DataHandler>
-void IMixtureManager<DataHandler>::registerMixtureData(IDataBridge* p_data)
+void IMixtureManager<DataHandler>::registerDataBridge(IDataBridge* p_data)
 { v_data_.push_back(p_data);}
 /* release a data set from v_data_.
  *  @param idData name of the data set to release
  **/
 template<class DataHandler>
-void IMixtureManager<DataHandler>::releaseMixtureData(String const& idData)
+void IMixtureManager<DataHandler>::releaseDataBridge(String const& idData)
 {
   typedef std::vector<IDataBridge*>::iterator DataIterator;
   for (DataIterator it = v_data_.begin(); it != v_data_.end(); ++it)
   { if ((*it)->idData() == idData) {delete (*it); v_data_.erase(it); break;}}
 }
 
-/* Utility lookup function allowing to find a MixtureData from its idData
+/* Utility lookup function allowing to find a DataBridge from its idData
  *  @param idData the id name of the mixture we want to get
- *  @return a pointer on the MixtureData
+ *  @return a pointer on the DataBridge
  **/
 template<class DataHandler>
-IDataBridge* IMixtureManager<DataHandler>::getMixtureData( String const& idData) const
+IDataBridge* IMixtureManager<DataHandler>::getDataBridge( String const& idData) const
 {
   typedef std::vector<IDataBridge*>::const_iterator ConstDataIterator;
   for (ConstDataIterator it = v_data_.begin(); it != v_data_.end(); ++it)
@@ -251,12 +252,12 @@ template<typename Type>
 void IMixtureManager<DataHandler>::getMissingValues( String const& idData, std::vector< std::pair< std::pair<int,int>, Type > >& data) const
 {
   typedef typename hidden::DataHandlerTraits<DataHandler, Type>::Data DataType;
-  typedef MixtureData<DataType> MixtureDataType;
+  typedef DataBridge<DataType> DataBridgeType;
 
-  IDataBridge* p_data = getMixtureData(idData);
+  IDataBridge* p_data = getDataBridge(idData);
   // up-cast... (Yes it's bad....;)...)
   if (p_data)
-  { static_cast<MixtureDataType const*>(p_data)->getMissingValues(data);}
+  { static_cast<DataBridgeType const*>(p_data)->getMissingValues(data);}
 }
 /* get the wrapper for any kind of data set using its Id
  *  @param idData Id name of the data set attached to the mixture
@@ -267,8 +268,8 @@ template<typename Type>
 typename hidden::DataHandlerTraits<DataHandler, Type>::Data const& IMixtureManager<DataHandler>::getData( String const& idData) const
 {
   typedef typename hidden::DataHandlerTraits<DataHandler, Type>::Data DataType;
-  typedef MixtureData<DataType> MixtureDataType;
-  return static_cast<MixtureDataType*>(getMixtureData(idData))->dataij();
+  typedef DataBridge<DataType> DataBridgeType;
+  return static_cast<DataBridgeType*>(getDataBridge(idData))->dataij();
 }
 } // namespace STK
 

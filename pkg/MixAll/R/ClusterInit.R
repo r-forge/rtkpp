@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-#     Copyright (C) 2012-2015  Serge Iovleff, University Lille 1, Inria
+#     Copyright (C) 2012-2016  Serge Iovleff, University Lille 1, Inria
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as
@@ -70,17 +70,20 @@ clusterInit <- function( method="class", nbInit=5,  algo = "EM", nbIteration=20,
   {stop("nbInit must be strictly greater than 0.");}
   
   # check algo
-  if ( sum(algo %in% c("EM","SEM","CEM","SemiSEM")) != 1 )
+  if (!is.character(algo) )
+  { stop("algo must be a string.")}
+  algo = toupper(algo)
+  if ( sum(algo %in% c("EM","SEM","CEM","SEMISEM")) != 1 )
   {  stop("algo is not valid. See ?clusterInit for the list of available algorithms.")}
   # check nbIteration
   if (!is.numeric(nbIteration))
-  {stop("nbIteration must be an integer.")}
+  { stop("nbIteration must be an integer.")}
   if (round(nbIteration)!= nbIteration)
-  {stop("nbIteration must be an integer.")}
+  { stop("nbIteration must be an integer.")}
   if( nbIteration < 0 ) # can be zero (no iterations)
   { stop("nbIteration must be positive or zero.")}
   # check epsilon
-  if (algo != "SEM" && algo != "SemiSEM")
+  if (algo != "SEM" && algo != "SEMISEM")
   {
     if (!is.double(epsilon) )
     {  stop("epsilon must be a scalar.")}

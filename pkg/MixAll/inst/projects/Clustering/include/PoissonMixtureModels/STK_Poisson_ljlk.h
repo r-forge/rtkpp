@@ -119,7 +119,7 @@ struct ParametersHandler<Clust::Poisson_ljlk_>: public PoissonHandlerBase<  Para
   inline void releaseIntermediateResults()
   { lambdak_.releaseIntermediateResults(); lambdaj_.releaseIntermediateResults();}
   /** set the parameters stored in stat_proba_ and release stat_proba_. */
-  inline void setParameters() { lambdak_.setParameters(); lambdaj_.setParameters();}
+  inline void setParametersStep() { lambdak_.setParametersStep(); lambdaj_.setParametersStep();}
 };
 
 /** @ingroup Clustering
@@ -163,7 +163,7 @@ class Poisson_ljlk : public PoissonBase<Poisson_ljlk<Array> >
     /** Initialize randomly the parameters of the Poisson mixture. */
     void randomInit();
     /** Compute the weighted probabilities. */
-    bool mStep();
+    bool paramUpdateStep();
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()+this->nbVariable();}
@@ -186,7 +186,7 @@ void Poisson_ljlk<Array>::randomInit()
 
 /* Compute the lambdas */
 template<class Array>
-bool Poisson_ljlk<Array>::mStep()
+bool Poisson_ljlk<Array>::paramUpdateStep()
 {
   param_.lambdaj_() = (Stat::sumByRow(*p_tik()).transpose() * (*p_data()))
                      /(Stat::sumByRow(*p_tik()) * Stat::sumByRow(*p_data())).sum();

@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2014  Serge Iovleff
+/*     Copyright (C) 2004-2016  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -36,12 +36,7 @@
 #ifndef STK_IMIXTURECOMPOSER_H
 #define STK_IMIXTURECOMPOSER_H
 
-#include "StatModels/include/STK_IStatModelBase.h"
-#include "STK_Clust_Util.h"
-
-#include "Arrays/include/STK_CArrayPoint.h"
-#include "Arrays/include/STK_CArrayVector.h"
-#include "Arrays/include/STK_CArray.h"
+#include "STK_IMixtureStatModel.h"
 
 namespace STK
 {
@@ -49,29 +44,11 @@ namespace STK
 /** @ingroup Clustering
  *  @brief Base class for Mixture (composed) model.
  *
- * In statistics, a mixture model is a probabilistic model for representing
- * the presence of sub-populations within an overall population, without
- * requiring that an observed data-set should identify the sub-population to
- * which an individual observation belongs. Formally a mixture model
- * corresponds to the mixture distribution that represents the probability
- * distribution of observations in the overall population. However, while
- * problems associated with "mixture distributions" relate to deriving the
- * properties of the overall population from those of the sub-populations,
- * "mixture models" are used to make statistical inferences about the
- * properties of the sub-populations given only observations on the pooled
- * population, without sub-population-identity information.
- *
- * Some ways of implementing mixture models involve steps that attribute
- * postulated sub-population-identities to individual observations (or weights
- * towards such sub-populations), in which case these can be regarded as types
- * unsupervised learning or clustering procedures. However not all inference
- * procedures involve such steps.
- *
  * In this interface we assume there is an underline generative model that will
  * be estimated using either an EM, SEM or CEM algorithm.
  * All mixture parameters are created using the method
  * @code
- *   void initializeMixtureParameters();
+ *   void initializeParameters();
  * @endcode
  * in the constructor. They can be accessed from the mixtures using constant
  * accessors.
@@ -80,20 +57,23 @@ namespace STK
  * @code
  *   virtual IMixtureComposer* create() const = 0;
  *   virtual IMixtureComposer* clone() const = 0;
- *   virtual bool randomInit() =0;
- *   virtual void mStep() = 0;
- *   virtual Real lnComponentProbability(int i, int k) = 0;
+ *   virtual void randomInit() = 0;
+ *   virtual void paramUpdateStep() = 0;
+ *   virtual int computeNbFreeParameters() const = 0;
  * @endcode
  *
- * The virtual function that can be re-implemented in derived class for a
- * specific behavior are:
+ * The public virtual function that can be re-implemented in derived class for
+ * a specific behavior are:
  * @code
  *   virtual void initializeStep();
- *   virtual void pStep();
- *   virtual void imputationStep();
- *   virtual void samplingStep();
+ *   virtual void randomClassInit();
+ *   virtual void randomFuzzyInit();
+ *   virtual int cStep();
+ *   virtual int sStep();
+ *   virtual Real eStep();
+ *   virtual void mapStep();
  *   virtual void finalizeStep();
- *   virtual void writeParameters(std::ostream& os) const;
+ *   virtual void pStep();
  * @endcode
  *
  * @sa IMixture
@@ -102,17 +82,14 @@ namespace STK
  * the initialization method.  Don't forget to called it in the randomInit
  * implementation.
  */
-class IMixtureComposer : public IStatModelBase
+class IMixtureComposer: public IMixtureStatModel
 {
   protected:
     /** Constructor.
      * @param nbCluster,nbSample number of clusters and samples
      **/
     IMixtureComposer( int nbSample, int nbCluster);
-    /** copy constructor. If the pointer on the mixture parameters are not zero
-     *  then they are cloned.
-     *  @note if the model have not created the parameters, then the pointer are
-     *  initialized to 0.
+    /** copy constructor.
      *  @param model the model to clone
      **/
     IMixtureComposer( IMixtureComposer const& model);
@@ -121,42 +98,8 @@ class IMixtureComposer : public IStatModelBase
     /** destructor */
     virtual ~IMixtureComposer();
 
-    /** @return the number of cluster */
-    inline int nbCluster() const { return nbCluster_;}
     /** @return the state of the model*/
     inline Clust::modelState state() const { return state_;}
-
-    /** @return the proportions of each mixtures */
-    inline CPointX const& pk() const { return prop_;};
-    /** @return the tik probabilities */
-    inline CArrayXX const& tik() const { return tik_;};
-    /** @return the sum of the columns of tik = estimated proportions of individuals */
-    inline CPointX const& nk() const { return nk_;};
-    /** @return the zi class label */
-    inline CVectorXi const& zi() const { return zi_;};
-
-    /** @return a pointer on the proportions of each mixtures */
-    inline CPointX const* p_pk() const { return &prop_;};
-    /** @return a pointer on the sum of the columns of tik = estimated proportions of individuals */
-    inline CPointX const* p_nk() const { return &nk_;};
-    /** @return a pointer on the the tik probabilities */
-    inline CArrayXX const* p_tik() const { return &tik_;};
-    /** @return a pointer on the zi class labels */
-    inline CVectorXi const* p_zi() const { return &zi_;};
-
-    /** @return the computed log-likelihood of the i-th sample.
-     *  @param i index of the sample
-     **/
-    Real computeLnLikelihood(int i) const;
-    /** @return the computed likelihood of the i-th sample.
-     *  @param i index of the sample
-     **/
-    inline Real computeLikelihood(int i) const
-    { return std::exp(computeLnLikelihood(i));}
-    /** @return the computed log-likelihood. */
-    Real computeLnLikelihood() const;
-    /** @return the computed ICL criteria. */
-    Real computeICL() const;
 
     /** set the state of the model : should be used by any strategy*/
     inline void setState(Clust::modelState state) { state_ = state;}
@@ -171,110 +114,76 @@ class IMixtureComposer : public IStatModelBase
     /** Compute the proportions and the model parameters given the current tik
      *  mixture parameters.
      **/
-    virtual void mStep() = 0;
-    /** @return the value of the probability of the i-th sample in the k-th component.
-     *  @param i index of the sample
-     *  @param k index of the component
-     **/
-    virtual Real lnComponentProbability(int i, int k) const = 0;
+    virtual void paramUpdateStep() = 0;
 
     // virtual with default implementation
-    /** write the parameters of the model in the stream os. */
-    virtual void writeParameters(ostream& os) const {};
-    /** compute the number of free parameters of the model.
-     *  This method is used in IMixtureComposer::initializeStep
-     *  in order to give a value to IStatModelBase::nbFreeParameter_.
-     *  @return the number of free parameters
+    /** Replace tik by zik
+     *  @return the minimal value of individuals in a class
      **/
-    virtual int computeNbFreeParameters() const = 0;
-    /** @brief Initialize the model before at its first use.
-     *  This function can be overloaded in derived class for initialization of
-     *  the specific model parameters. It should be called prior to any used of
-     *  the class.
-     *  @sa IMixture,MixtureBridge,MixtureComposer
+    virtual int cStep();
+    /** Simulate zi accordingly to tik and replace tik by zik by calling cStep().
+     *  @return the minimal value of individuals in a class
      **/
-    virtual void initializeStep();
-
+    virtual int sStep();
+    /** compute the zi, the lnLikelihood of the current estimates
+     *  and the next value of the tik.
+     *  @return the minimal value of tk
+     **/
+    virtual Real eStep();
+    /** Compute zi using the Map estimate. */
+    virtual void mapStep();
+    /** @brief Finalize the estimation of the model.
+     *  Compute obtained lnLikelihood and set state to finalized.
+     **/
+    virtual void finalizeStep();
     /** Compute proportions using the ML estimates, default implementation. Set
      *  as virtual in case we impose fixed proportions in derived Composer.
      **/
     virtual void pStep();
-    /** @brief Impute the missing values.
-     *  Default behavior is "do nothing".
-     **/
-    inline virtual void imputationStep() {}
-    /** @brief Simulation of all the latent variables and/or missing data
-     *  excluding class labels. Default behavior is "do nothing".
-     */
-    virtual void samplingStep() {}
-    /** @brief Utility method allowing to signal to a mixture to set its parameters.
-     *  It will be called once enough intermediate results have been stored. */
-    virtual void setParameters() {}
-    /**@brief This step can be used to signal to the mixtures that they must
-     * store results. This is usually called after a burn-in phase. The composer
-     * store the current value of the log-Likelihood.
-     **/
-    virtual void storeIntermediateResults(int iteration) {}
-    /**@brief This step can be used to signal to the mixtures that they must
-     * release the stored results. This is usually called if the estimation
-     * process failed.
-     **/
-    virtual void releaseIntermediateResults() {}
-    /** @brief Finalize the estimation of the model.
-     *  The default behavior is compute current lnLikelihood.
-     **/
-    inline virtual void finalizeStep()
-    {
-      setLnLikelihood(computeLnLikelihood());
-      setState(Clust::modelFinalized_);
-    }
 
     // not virtual
+    /** @brief Initialize the model before its first use.
+     *  Initialize the values of the mixture parameters @c pk_ and @© tik_ using
+     *  virtual method @c initializeMixtureParameters() and compute @c nk_ and
+     *  @c zk_ using the virtual methods @c mapStep() and @c pStep().
+     **/
+    void initializeStep();
     /** Initialize randomly the labels zi of the model.
-     *  Initialize the model parameters using initializeStep()
-     *  and compute the tik.
+     *  Initialize the model parameters using initializeStep() if it has not
+     *  been already called. Simulate the zi, compute tik using cStep(), update
+     *  the parameters using paramUpdateStep() and terminate using eStep().
      **/
     void randomClassInit();
     /** Initialize randomly the posterior probabilities tik of the model.
      *  Initialize the model parameters and compute the tik.
      **/
     void randomFuzzyInit();
+
+  protected:
+    /** Simulate zi accordingly to tik.
+     *  @param i index of the the individual
+     **/
+    void sStep(int i);
     /** Replace tik by zik
-     *  @return the minimal value of individuals in a class
+     *  @param i index of the the individual
      **/
-    int cStep();
-    /** Simulate zi accordingly to tik and replace tik by zik by calling cStep().
-     *  @return the minimal value of individuals in a class
-     **/
-    int sStep();
-    /** compute the zi, the lnLikelihood of the current estimates
-     *  and the next value of the tik.
-     *  @return the minimal value of tk
-     **/
-    Real eStep();
+    void cStep(int i);
     /** compute one zi and the next value of the tik for i fixed
      *  @param i the individual
      *  @return the contribution of the individual i to the log-likelihood
      **/
     Real eStep(int i);
-    /** Compute zi using the Map estimate. */
-    void mapStep();
+    /** Compute zi using the Map estimate for i fixed */
+    void mapStep(int i);
 
-  protected:
-    /** number of cluster. */
-    int nbCluster_;
-    /** The proportions of each mixtures */
-    CPointX prop_;
-    /** The tik probabilities */
-    CArrayXX tik_;
-    /** The sum of the columns of tik_ */
-    CPointX nk_;
-    /** The zi class label */
-    CVectorXi zi_;
-    /** Create the mixture model parameters. */
-    void initializeMixtureParameters();
+    // virtual To be re-implemented if some labels or probabilities are known
+    /** Create the mixture model parameters pk_ and tik_.
+     *  Default implementation is to set pk_ and tik_ arrays to 1/K value. */
+    virtual void initializeMixtureParameters();
     /** generate random tik_ */
-    int randomFuzzyTik();
+    virtual int randomTik();
+    /** generate random zi_ */
+    virtual int randomZi();
 
   private:
     /** state of the model*/

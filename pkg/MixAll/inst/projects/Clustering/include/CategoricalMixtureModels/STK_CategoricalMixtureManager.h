@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2015  Serge Iovleff, Université Lille 1, Inria
+/*     Copyright (C) 2004-2016  Serge Iovleff, Université Lille 1, Inria
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -44,7 +44,7 @@
           Data* p_data = new Data(idData); \
           p_handler()->getData(idData, p_data->dataij(), p_data->nbVariable() ); \
           p_data->initialize(); \
-          registerMixtureData(p_data); \
+          registerDataBridge(p_data); \
           return new Bridge( p_data, idData, nbCluster);
 
 namespace STK
@@ -63,8 +63,8 @@ class CategoricalMixtureManager : public IMixtureManager<DataHandler>
 {
   public:
     typedef IMixtureManager<DataHandler> Base;
-    using Base::registerMixtureData;
-    using Base::getMixtureData;
+    using Base::registerDataBridge;
+    using Base::getDataBridge;
     using Base::getIdModel;
     using Base::p_handler;
 
@@ -73,7 +73,7 @@ class CategoricalMixtureManager : public IMixtureManager<DataHandler>
     // type of these containers when data is Real and Integer.
     typedef typename hidden::DataHandlerTraits<DataHandler, Integer>::Data DataInt;
     // Classes wrapping the Real and Integer containers
-    typedef MixtureData<DataInt>  MixtureDataInt;
+    typedef DataBridge<DataInt>  DataBridgeInt;
 
     // All Categorical bridges
     typedef CategoricalBridge<Clust::Categorical_pjk_, DataInt> MixtureBridge_pjk;
@@ -89,7 +89,7 @@ class CategoricalMixtureManager : public IMixtureManager<DataHandler>
      **/
     void getParameters(IMixture* p_mixture, ArrayXX& param) const
     {
-      Clust::Mixture idModel = getIdModel(p_mixture->idName());
+      Clust::Mixture idModel = getIdModel(p_mixture->idData());
       if (idModel == Clust::unknown_mixture_) return;
       // up-cast... (Yes it's bad....;)...)
       switch (idModel)
@@ -111,7 +111,7 @@ class CategoricalMixtureManager : public IMixtureManager<DataHandler>
      **/
     virtual void setParameters(IMixture* p_mixture, ArrayXX const& param) const
     {
-      Clust::Mixture idModel = getIdModel(p_mixture->idName());
+      Clust::Mixture idModel = getIdModel(p_mixture->idData());
       if (idModel == Clust::unknown_mixture_) return;
       // up-cast... (Yes it's bad....;)...)
       switch (idModel)
@@ -149,10 +149,10 @@ class CategoricalMixtureManager : public IMixtureManager<DataHandler>
       switch (idModel)
       {
         case Clust::Categorical_pjk_:
-          { STK_CREATE_MIXTURE(MixtureDataInt, MixtureBridge_pjk)}
+          { STK_CREATE_MIXTURE(DataBridgeInt, MixtureBridge_pjk)}
           break;
         case Clust::Categorical_pk_:
-          { STK_CREATE_MIXTURE(MixtureDataInt, MixtureBridge_pk)}
+          { STK_CREATE_MIXTURE(DataBridgeInt, MixtureBridge_pk)}
           break;
         default:
           return 0; // 0 if idModel is not implemented

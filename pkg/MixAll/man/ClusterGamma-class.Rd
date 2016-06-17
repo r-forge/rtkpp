@@ -6,7 +6,7 @@
 \alias{ClusterGamma-class}
 \title{Definition of the [\code{\linkS4class{ClusterGamma}}] class}
 \description{
-This class inherits from the [\code{\linkS4class{IClusterModelBase}}] class.
+This class inherits from the [\code{\linkS4class{IClusterModel}}] class.
 A gamma mixture model is a mixture model of the form:
 \deqn{
   f({x}|\boldsymbol{\theta}) \\
@@ -32,6 +32,6 @@ shapes and the scales of the component mixture model.}
 Serge Iovleff
 }
 \seealso{
-[\code{\linkS4class{IClusterModelBase}}] class
+[\code{\linkS4class{IClusterModel}}] class
 }
 

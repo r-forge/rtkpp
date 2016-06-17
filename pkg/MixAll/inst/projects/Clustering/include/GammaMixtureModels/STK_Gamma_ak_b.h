@@ -137,7 +137,7 @@ struct ParametersHandler<Clust::Gamma_ak_b_>: public ParametersHandlerGammaBase<
   inline void releaseIntermediateResults()
   { shape_.releaseIntermediateResults(); scale_.releaseIntermediateResults();}
   /** set the parameters stored in stat_proba_ and release stat_proba_. */
-  inline void setParameters() { shape_.setParameters(); scale_.setParameters();}
+  inline void setParametersStep() { shape_.setParametersStep(); scale_.setParametersStep();}
 };
 
 /** @ingroup Clustering
@@ -186,7 +186,7 @@ class Gamma_ak_b : public GammaBase<Gamma_ak_b<Array> >
      */
     void randomInit();
     /** Compute the weighted mean and the common variance. */
-    bool mStep();
+    bool paramUpdateStep();
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const { return this->nbCluster() + 1;}
 };
@@ -217,7 +217,7 @@ void Gamma_ak_b<Array>::randomInit()
 
 /* Compute the weighted mean and the common variance. */
 template<class Array>
-bool Gamma_ak_b<Array>::mStep()
+bool Gamma_ak_b<Array>::paramUpdateStep()
 {
   if (!this->moments()) { return false;}
   // start estimations of the ajk and bj
@@ -242,7 +242,7 @@ bool Gamma_ak_b<Array>::mStep()
       {
         param_.shape_[k]= x0; // use moment estimate
 #ifdef STK_MIXTURE_DEBUG
-        stk_cout << _T("ML estimation failed in Gamma_ak_bj::mStep()\n");
+        stk_cout << _T("ML estimation failed in Gamma_ak_bj::paramUpdateStep()\n");
         stk_cout << "x0 =" << x0 << _T("\n";);
         stk_cout << "f(x0) =" << f(x0) << _T("\n";);
         stk_cout << "x1 =" << x1 << _T("\n";);
@@ -264,7 +264,7 @@ bool Gamma_ak_b<Array>::mStep()
 #ifdef STK_MIXTURE_DEBUG
     if (value < qvalue)
     {
-      stk_cout << _T("In Gamma_ak_b::mStep(): mStep diverge\n");
+      stk_cout << _T("In Gamma_ak_b::paramUpdateStep(): mStep diverge\n");
       stk_cout << _T("New value =") << value << _T(", qvalue =") << qvalue << _T("\n");
     }
 #endif
@@ -274,7 +274,7 @@ bool Gamma_ak_b<Array>::mStep()
 #ifdef STK_MIXTURE_DEBUG
   if (iter == MAXITER)
   {
-    stk_cout << _T("In Gamma_ak_b::mStep(): mStep did not converge\n");
+    stk_cout << _T("In Gamma_ak_b::paramUpdateStep(): mStep did not converge\n");
     stk_cout << _T("qvalue =") << qvalue << _T("\n");
   }
 #endif

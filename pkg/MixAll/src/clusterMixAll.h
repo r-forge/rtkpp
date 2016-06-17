@@ -50,8 +50,8 @@ RcppExport SEXP clusterMixture( SEXP model, SEXP nbCluster, SEXP models
  *  @param nbCore number of core to use
  */
 RcppExport SEXP clusterMixedData( SEXP model, SEXP nbCluster
-                                        , SEXP strategy, SEXP critName
-                                        , SEXP nbCore);
+                                , SEXP strategy, SEXP critName
+                                , SEXP nbCore);
 
 /** @param model a ClusterDiagModel S4 class
  *  @param nbCluster a vector with the number of clusters to test

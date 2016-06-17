@@ -147,8 +147,8 @@ struct ParametersHandler<Clust::KernelGaussian_sk_>: public KernelHandlerBase<  
   inline void releaseIntermediateResults()
   { sigma2_.releaseIntermediateResults(); }
   /** set the parameters stored in stat_proba_ and release stat_proba_. */
-  inline void setParameters()
-  { sigma2_.setParameters();}
+  inline void setParametersStep()
+  { sigma2_.setParametersStep();}
 };
 
 /** Specialization of the ParametersHandler struct for KernelGaussian_s models*/
@@ -217,7 +217,7 @@ struct ParametersHandler<Clust::KernelGaussian_s_>: public KernelHandlerBase<  P
   inline void releaseIntermediateResults()
   { stat_sigma2_.release(); }
   /** set the parameters stored in stat_proba_ and release stat_proba_. */
-  inline void setParameters()
+  inline void setParametersStep()
   {
     sigma2_ = stat_sigma2_.mean_;
     stat_sigma2_.release();
@@ -280,7 +280,7 @@ class KernelGaussian_sk : public IMixtureModel<KernelGaussian_sk >
     /** Initialize randomly the variances of the Gaussian kernel mixture. */
     void randomInit();
     /** update the variances. */
-    bool mStep();
+    bool paramUpdateStep();
 };
 
 /** @ingroup Clustering
@@ -340,7 +340,7 @@ class KernelGaussian_s : public IMixtureModel<KernelGaussian_s >
     /** Initialize randomly the variances of the Gaussian kernel mixture. */
     void randomInit();
     /** update the variances. */
-    bool mStep();
+    bool paramUpdateStep();
 };
 
 /* Initialize randomly the parameters of the Gaussian mixture. */
@@ -360,10 +360,10 @@ inline void KernelGaussian_sk::randomInit()
 }
 
 /* Compute the weighted means and the weighted standard deviations. */
-inline bool KernelGaussian_sk::mStep()
+inline bool KernelGaussian_sk::paramUpdateStep()
 {
 #ifdef STK_MIXTURE_DEBUG
-  stk_cout << _T("Entering KernelGaussian_sk::mStep()\n");
+  stk_cout << _T("Entering KernelGaussian_sk::paramUpdateStep()\n");
 #endif
   param_.sigma2_() =  sum( p_data()->prod(*p_tik()) )/ (*p_nk() * param_.dim_);
   //if ((param_.sigma2_() <= 0.).any()) return false; // not work with Array1D
@@ -385,7 +385,7 @@ inline void KernelGaussian_s::randomInit()
 }
 
 /* Compute the weighted means and the weighted standard deviations. */
-inline bool KernelGaussian_s::mStep()
+inline bool KernelGaussian_s::paramUpdateStep()
 {
   param_.sigma2_ =  ( p_data()->prod( *p_tik() ) ).sum()/(this->nbSample() * param_.dim_.sum());
   if (param_.sigma2_ <= 0.)  return false;

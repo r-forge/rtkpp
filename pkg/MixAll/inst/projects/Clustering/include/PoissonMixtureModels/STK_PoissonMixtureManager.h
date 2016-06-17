@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2015  Serge Iovleff, Université Lille 1, Inria
+/*     Copyright (C) 2004-2016  Serge Iovleff, Université Lille 1, Inria
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -44,7 +44,7 @@
           Data* p_data = new Data(idData); \
           p_handler()->getData(idData, p_data->dataij(), p_data->nbVariable() ); \
           p_data->initialize(); \
-          registerMixtureData(p_data); \
+          registerDataBridge(p_data); \
           return new Bridge( p_data, idData, nbCluster);
 
 namespace STK
@@ -63,9 +63,9 @@ class PoissonMixtureManager : public IMixtureManager<DataHandler>
 {
   public:
     typedef IMixtureManager<DataHandler> Base;
-    using Base::getMixtureData;
+    using Base::getDataBridge;
     using Base::getIdModel;
-    using Base::registerMixtureData;
+    using Base::registerDataBridge;
     using Base::p_handler;
 
     // All data handlers will store and return a specific container for
@@ -73,7 +73,7 @@ class PoissonMixtureManager : public IMixtureManager<DataHandler>
     // type of these containers when data is Real and Integer.
     typedef typename hidden::DataHandlerTraits<DataHandler, Integer>::Data DataInt;
     // Classes wrapping the Real and Integer containers
-    typedef MixtureData<DataInt>  MixtureDataInt;
+    typedef DataBridge<DataInt>  DataBridgeInt;
 
     // All Poisson bridges
     typedef PoissonBridge<Clust::Poisson_ljk_,  DataInt> MixtureBridge_ljk;
@@ -90,7 +90,7 @@ class PoissonMixtureManager : public IMixtureManager<DataHandler>
      **/
     void getParameters(IMixture* p_mixture, ArrayXX& param) const
     {
-      Clust::Mixture idModel = getIdModel(p_mixture->idName());
+      Clust::Mixture idModel = getIdModel(p_mixture->idData());
       if (idModel == Clust::unknown_mixture_) return;
       // up-cast... (Yes it's bad....;)...)
       switch (idModel)
@@ -115,7 +115,7 @@ class PoissonMixtureManager : public IMixtureManager<DataHandler>
      **/
     virtual void setParameters(IMixture* p_mixture, ArrayXX const& param) const
     {
-      Clust::Mixture idModel = getIdModel(p_mixture->idName());
+      Clust::Mixture idModel = getIdModel(p_mixture->idData());
       if (idModel == Clust::unknown_mixture_) return;
       // up-cast... (Yes it's bad....;)...)
       switch (idModel)
@@ -158,13 +158,13 @@ class PoissonMixtureManager : public IMixtureManager<DataHandler>
       {
         // Poisson models
         case Clust::Poisson_ljk_:
-        { STK_CREATE_MIXTURE(MixtureDataInt, MixtureBridge_ljk)}
+        { STK_CREATE_MIXTURE(DataBridgeInt, MixtureBridge_ljk)}
         break;
         case Clust::Poisson_lk_:
-        { STK_CREATE_MIXTURE(MixtureDataInt, MixtureBridge_lk)}
+        { STK_CREATE_MIXTURE(DataBridgeInt, MixtureBridge_lk)}
         break;
         case Clust::Poisson_ljlk_:
-        { STK_CREATE_MIXTURE(MixtureDataInt, MixtureBridge_ljlk)}
+        { STK_CREATE_MIXTURE(DataBridgeInt, MixtureBridge_ljlk)}
         break;
         default:
           return 0; // 0 if idModel is not implemented

@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-#     Copyright (C) 2012-2015  Serge Iovleff, University Lille 1, Inria
+#     Copyright (C) 2012-2016  Serge Iovleff, University Lille 1, Inria
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as
@@ -241,7 +241,7 @@ setMethod(
 #-----------------------------------------------------------------------
 #' Definition of the [\code{\linkS4class{ClusterGamma}}] class
 #'
-#' This class inherits from the [\code{\linkS4class{IClusterModelBase}}] class.
+#' This class inherits from the [\code{\linkS4class{IClusterModel}}] class.
 #' A gamma mixture model is a mixture model of the form:
 #' \deqn{
 #'   f({x}|\boldsymbol{\theta}) \\
@@ -253,7 +253,7 @@ setMethod(
 #'
 #' @slot component  A [\code{\linkS4class{ClusterGammaComponent}}] with the
 #' shapes and the scales of the component mixture model.
-#' @seealso [\code{\linkS4class{IClusterModelBase}}] class
+#' @seealso [\code{\linkS4class{IClusterModel}}] class
 #'
 #' @examples
 #'   getSlots("ClusterGamma")
@@ -270,7 +270,7 @@ setMethod(
 setClass(
     Class="ClusterGamma",
     representation( component = "ClusterGammaComponent"),
-    contains=c("IClusterModelBase"),
+    contains=c("IClusterModel"),
     validity=function(object)
     {
       if (ncol(object@component@shape)!=ncol(object@component@data))
@@ -353,7 +353,7 @@ setMethod(
 )
 
 #' @rdname summary-methods
-#' @aliases summary summary,MixmodResults-method
+#' @aliases summary summary,ClusterGamma-method
 #'
 setMethod(
   f="summary",
@@ -366,6 +366,70 @@ setMethod(
     cat("**************************************************************\n")
   }
 )
+
+## #-----------------------------------------------------------------------
+## #' Definition of the [\code{\linkS4class{PredictGamma}}] class
+## #'
+## #' This class defines a predictor for diagonal Gaussian mixture Model.
+## #'
+## #' @slot model  A valid [\code{\linkS4class{ClusterDiagGaussian}}] class.
+## #' @slot data   A matrix with the data to predict.
+## #' @seealso [\code{\linkS4class{IClusterModel}}] class
+## #'
+## #' @examples
+## #' getSlots("PredictGamma")
+## #'
+## #' @author Serge Iovleff
+## #'
+## #' @name PredictGamma
+## #' @rdname PredictGamma-class
+## #' @aliases PredictGamma-class
+## #' @exportClass PredictGamma
+## #'
+## setClass(
+##     Class="PredictGamma",
+##     representation( model = "ClusterGamma", data = "matrix"),
+##     contains=c("IClusterPredict"),
+##     validity=function(object)
+##     {
+##       # check model
+##       if(class(object@model)[1] != "ClusterGamma")
+##       { stop("model must be an instance of ClusterGamma.")}
+##       if (!validObject(object@model)) {stop("model is not valid.")}
+##       # check data
+##       if (ncol(object@model@component@data)!= ncol(object@data))
+##       {stop("data must have the same number of column.")}
+##       return(TRUE)
+##     }
+## )
+## 
+## #' Initialize an instance of a MixAll S4 class.
+## #'
+## #' Initialization method of the [\code{\linkS4class{PredictGamma}}] class.
+## #' Used internally in the 'MixAll' package.
+## #'
+## #' @rdname initialize-methods
+## #' @keywords internal
+## setMethod(
+##     f="initialize",
+##     signature=c("PredictGamma"),
+##     definition=function(.Object, model, data)
+##     {
+##       # check model
+##       if(missing(model)) {stop("model is mandatory in PredictGamma.")}
+##       if(class(model)[1] != "ClusterDiagGaussian")
+##       { stop("model must be an instance of ClusterGamma.")}
+##       # for data
+##       if(missing(data)) {stop("data is mandatory in PredictGamma.")}
+##       # create slots
+##       .Object@model <- model
+##       .Object@data <- as.matrix(data, ncol= ncol(model@component@data))
+##       # validate
+##       .Object <- callNextMethod(.Object, nrow(.Object@data), .Object@model@nbCluster);
+##       validObject(.Object)
+##       return(.Object)
+##     }
+## )
 
 #' Plotting of a class [\code{\linkS4class{ClusterGamma}}]
 #'

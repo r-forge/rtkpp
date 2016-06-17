@@ -127,7 +127,7 @@ struct ParametersHandler<Clust::Categorical_pjk_>: public CategoricalHandlerBase
   inline void releaseIntermediateResults()
   { proba_.releaseIntermediateResults();}
   /** set the parameters stored in stat_proba_ and release stat_proba_. */
-  inline void setParameters() { proba_.setParameters();}
+  inline void setParametersStep() { proba_.setParametersStep();}
 };
 
 /** @ingroup Clustering
@@ -173,7 +173,7 @@ class Categorical_pjk : public CategoricalBase<Categorical_pjk<Array> >
     /** Initialize randomly the parameters of the Categorical mixture. */
     void randomInit();
     /** Compute the weighted probabilities. */
-    bool mStep();
+    bool paramUpdateStep();
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*((this->nbModalities_-1).sum());}
@@ -196,7 +196,7 @@ void Categorical_pjk<Array>::randomInit()
 
 /* Compute the modalities probabilities */
 template<class Array>
-bool Categorical_pjk<Array>::mStep()
+bool Categorical_pjk<Array>::paramUpdateStep()
 {
   for (int k = p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
   {

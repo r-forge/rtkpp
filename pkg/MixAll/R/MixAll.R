@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-#     Copyright (C) 2012-2014  Serge Iovleff, University Lille 1, Inria
+#     Copyright (C) 2012-2016  Serge Iovleff, University Lille 1, Inria
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as
@@ -289,8 +289,8 @@ NULL
 #'        1: upsloping,
 #'        2: flat,
 #'        3: downsloping}
-#' \item{\code{ca}}{number of major vessels (0-3) colored by flourosopy}
-#' \item{\code{thal}}{3 = normal; 6 = fixed defect; 7 = reversable defect}
+#' \item{\code{ca}}{number of major vessels (0-3) colored by flourosopy (4 missing values)}
+#' \item{\code{thal}}{3 = normal; 6 = fixed defect; 7 = reversable defect (2 missing values)}
 #' \item{\code{ num}}{diagnosis of heart disease (angiographic disease status).
 #'               0: < 50% diameter narrowing
 #'               1: > 50% diameter narrowing

@@ -32,15 +32,15 @@
  *  @brief This file include all the header files of the project Clustering.
  *
  *  @defgroup Clustering Clustering using generative models
- *  @brief The project Clustering proposes classes for modeling and estimating
+ *  @brief The project Clustering prvides classes for modeling and estimating
  *  generative mixture model.
  *
- *  The aim of this project is to define Interface and specialized classes
+ *  The aim of this project is to define @e Interfaces and specialized @e Classes
  *  in order to manipulate and estimate the parameters of any kind of
  *  generative mixture model.
  *
  *  In statistics, a mixture model is a probabilistic model for representing
- *  the presence of subpopulations within an overall population, without
+ *  the presence of sub-populations within an overall population, without
  *  requiring that an observed data-set should identify the sub-population to
  *  which an individual observation belongs. Formally a mixture model
  *  corresponds to the mixture distribution that represents the probability
@@ -68,42 +68,44 @@
 #define CLUSTERING_H
 
 
-#include "Clustering/include/GammaMixtureModels/STK_Gamma_ajk_bjk.h"
-#include "Clustering/include/GammaMixtureModels/STK_Gamma_ajk_bk.h"
-#include "Clustering/include/GammaMixtureModels/STK_Gamma_ajk_bj.h"
-#include "Clustering/include/GammaMixtureModels/STK_Gamma_ajk_b.h"
-#include "Clustering/include/GammaMixtureModels/STK_Gamma_ak_bjk.h"
-#include "Clustering/include/GammaMixtureModels/STK_Gamma_ak_bk.h"
-#include "Clustering/include/GammaMixtureModels/STK_Gamma_ak_bj.h"
-#include "Clustering/include/GammaMixtureModels/STK_Gamma_ak_b.h"
-#include "Clustering/include/GammaMixtureModels/STK_Gamma_aj_bjk.h"
-#include "Clustering/include/GammaMixtureModels/STK_Gamma_aj_bk.h"
-#include "Clustering/include/GammaMixtureModels/STK_Gamma_a_bjk.h"
-#include "Clustering/include/GammaMixtureModels/STK_Gamma_a_bk.h"
+#include "Clustering/include/GammaMixtureModels/STK_MixtureGamma_ajk_bjk.h"
+#include "Clustering/include/GammaMixtureModels/STK_MixtureGamma_ajk_bk.h"
+#include "Clustering/include/GammaMixtureModels/STK_MixtureGamma_ajk_bj.h"
+#include "Clustering/include/GammaMixtureModels/STK_MixtureGamma_ajk_b.h"
+#include "Clustering/include/GammaMixtureModels/STK_MixtureGamma_ak_bjk.h"
+#include "Clustering/include/GammaMixtureModels/STK_MixtureGamma_ak_bk.h"
+#include "Clustering/include/GammaMixtureModels/STK_MixtureGamma_ak_bj.h"
+#include "Clustering/include/GammaMixtureModels/STK_MixtureGamma_ak_b.h"
+#include "Clustering/include/GammaMixtureModels/STK_MixtureGamma_aj_bjk.h"
+#include "Clustering/include/GammaMixtureModels/STK_MixtureGamma_aj_bk.h"
+#include "Clustering/include/GammaMixtureModels/STK_MixtureGamma_a_bjk.h"
+#include "Clustering/include/GammaMixtureModels/STK_MixtureGamma_a_bk.h"
 #include "Clustering/include/GammaMixtureModels/STK_GammaMixtureManager.h"
 
-#include "Clustering/include/DiagGaussianMixtureModels/STK_Gaussian_sjk.h"
-#include "Clustering/include/DiagGaussianMixtureModels/STK_Gaussian_sk.h"
-#include "Clustering/include/DiagGaussianMixtureModels/STK_Gaussian_sj.h"
-#include "Clustering/include/DiagGaussianMixtureModels/STK_Gaussian_s.h"
+#include "Clustering/include/DiagGaussianMixtureModels/STK_MixtureGaussian_sjk.h"
+#include "Clustering/include/DiagGaussianMixtureModels/STK_MixtureGaussian_sk.h"
+#include "Clustering/include/DiagGaussianMixtureModels/STK_MixtureGaussian_sj.h"
+#include "Clustering/include/DiagGaussianMixtureModels/STK_MixtureGaussian_s.h"
 #include "Clustering/include/DiagGaussianMixtureModels/STK_DiagGaussianMixtureManager.h"
 
-#include "Clustering/include/CategoricalMixtureModels/STK_Categorical_pjk.h"
-#include "Clustering/include/CategoricalMixtureModels/STK_Categorical_pk.h"
+#include "Clustering/include/CategoricalMixtureModels/STK_MixtureCategorical_pk.h"
+#include "Clustering/include/CategoricalMixtureModels/STK_MixtureCategorical_pjk.h"
 #include "Clustering/include/CategoricalMixtureModels/STK_CategoricalMixtureManager.h"
 
-#include "Clustering/include/PoissonMixtureModels/STK_Poisson_ljk.h"
-#include "Clustering/include/PoissonMixtureModels/STK_Poisson_lk.h"
-#include "Clustering/include/PoissonMixtureModels/STK_Poisson_ljlk.h"
+#include "Clustering/include/PoissonMixtureModels/STK_MixturePoisson_ljk.h"
+#include "Clustering/include/PoissonMixtureModels/STK_MixturePoisson_lk.h"
+#include "Clustering/include/PoissonMixtureModels/STK_MixturePoisson_ljlk.h"
 #include "Clustering/include/PoissonMixtureModels/STK_PoissonMixtureManager.h"
 
-#include "Clustering/include/KernelMixtureModels/STK_KernelGaussian.h"
+#include "Clustering/include/KernelMixtureModels/STK_MixtureKernelGaussian.h"
 #include "Clustering/include/KernelMixtureModels/STK_KernelMixtureManager.h"
 
 #include "Clustering/include/STK_MixtureInit.h"
 #include "Clustering/include/STK_MixtureAlgo.h"
 #include "Clustering/include/STK_MixtureStrategy.h"
 #include "Clustering/include/STK_MixtureComposer.h"
+#include "Clustering/include/STK_MixtureLearner.h"
+#include "Clustering/include/STK_MixtureSemiLearner.h"
 #include "Clustering/include/STK_MixtureCriterion.h"
 #include "Clustering/include/STK_MixtureFacade.h"
 #include "Clustering/include/STK_MixtureManager.h"

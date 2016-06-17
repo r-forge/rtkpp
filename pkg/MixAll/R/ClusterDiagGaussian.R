@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-#     Copyright (C) 2012-2015  Serge Iovleff, University Lille 1, Inria
+#     Copyright (C) 2012-2016  Serge Iovleff, University Lille 1, Inria
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as
@@ -237,13 +237,12 @@ setMethod(
   }
 )
 
-
 #-----------------------------------------------------------------------
 #' Definition of the [\code{\linkS4class{ClusterDiagGaussian}}] class
 #'
 #' This class defines a diagonal Gaussian mixture Model.
 #'
-#' This class inherits from the [\code{\linkS4class{IClusterModelBase}}] class.
+#' This class inherits from the [\code{\linkS4class{IClusterModel}}] class.
 #' A diagonal gaussian model is a mixture model of the form:
 #' \deqn{
 #'   f({x}|\boldsymbol{\theta})
@@ -255,7 +254,7 @@ setMethod(
 #'
 #' @slot component  A [\code{\linkS4class{ClusterDiagGaussianComponent}}] with the
 #' mean and standard deviation of the diagonal mixture model.
-#' @seealso [\code{\linkS4class{IClusterModelBase}}] class
+#' @seealso [\code{\linkS4class{IClusterModel}}] class
 #'
 #' @examples
 #' getSlots("ClusterDiagGaussian")
@@ -272,7 +271,7 @@ setMethod(
 setClass(
   Class="ClusterDiagGaussian",
   representation( component = "ClusterDiagGaussianComponent"),
-  contains=c("IClusterModelBase"),
+  contains=c("IClusterModel"),
   validity=function(object)
   {
     if (nrow(object@component@mean)!=object@nbCluster)
@@ -408,3 +407,68 @@ setMethod(
 # x a vector with the point
 .dGauss <- function(x, j, k, model)
 { dnorm(x, (model@component@mean)[k, j] , (model@component@sigma)[k, j])}
+
+## #-----------------------------------------------------------------------
+## #' Definition of the [\code{\linkS4class{PredictDiagGaussian}}] class
+## #'
+## #' This class defines a predictor for diagonal Gaussian mixture Model.
+## #'
+## #' @slot model  A valid [\code{\linkS4class{ClusterDiagGaussian}}] class.
+## #' @slot data   A matrix with the data to predict.
+## #' @seealso [\code{\linkS4class{IClusterModel}}] class
+## #'
+## #' @examples
+## #' getSlots("PredictDiagGaussian")
+## #'
+## #' @author Serge Iovleff
+## #'
+## #' @name PredictDiagGaussian
+## #' @rdname PredictDiagGaussian-class
+## #' @aliases PredictDiagGaussian-class
+## #' @exportClass PredictDiagGaussian
+## #'
+## setClass(
+##     Class="PredictDiagGaussian",
+##     representation( model = "ClusterDiagGaussian", data = "matrix"),
+##     contains=c("IClusterPredict"),
+##     validity=function(object)
+##     {
+##       # check model
+##       if(class(object@model)[1] != "ClusterDiagGaussian")
+##       { stop("model must be an instance of ClusterDiagGaussian.")}
+##       if (!validObject(object@model)) {stop("model is not valid.")}
+##       # check data
+##       if (ncol(object@model@component@data)!= ncol(object@data))
+##       {stop("data must have the same number of column.")}
+##       return(TRUE)
+##     }
+## )
+## 
+## #' Initialize an instance of a MixAll S4 class.
+## #'
+## #' Initialization method of the [\code{\linkS4class{PredictDiagGaussian}}] class.
+## #' Used internally in the 'MixAll' package.
+## #'
+## #' @rdname initialize-methods
+## #' @keywords internal
+## setMethod(
+##     f="initialize",
+##     signature=c("PredictDiagGaussian"),
+##     definition=function(.Object, model, data)
+##     {
+##       # check model
+##       if(missing(model)) {stop("model is mandatory in PredictDiagGaussian.")}
+##       if(class(model)[1] != "ClusterDiagGaussian")
+##       { stop("model must be an instance of ClusterDiagGaussian.")}
+##       # for data
+##       if(missing(data)) {stop("data is mandatory in PredictDiagGaussian.")}
+##       # create slots
+##       .Object@model <- model
+##       .Object@data <- as.matrix(data, ncol= ncol(model@component@data))
+##       # validate
+##       .Object <- callNextMethod(.Object, nrow(.Object@data), .Object@model@nbCluster);
+##       validObject(.Object)
+##       return(.Object)
+##     }
+## )
+## 

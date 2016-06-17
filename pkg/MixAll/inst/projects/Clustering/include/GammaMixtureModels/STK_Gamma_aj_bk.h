@@ -141,7 +141,7 @@ struct ParametersHandler<Clust::Gamma_aj_bk_>: public ParametersHandlerGammaBase
   inline void releaseIntermediateResults()
   { shape_.releaseIntermediateResults(); scale_.releaseIntermediateResults();}
   /** set the parameters stored in stat_proba_ and release stat_proba_. */
-  inline void setParameters() { shape_.setParameters(); scale_.setParameters();}
+  inline void setParametersStep() { shape_.setParametersStep(); scale_.setParametersStep();}
 };
 
 /** @ingroup Clustering
@@ -191,7 +191,7 @@ class Gamma_aj_bk : public GammaBase< Gamma_aj_bk<Array> >
      */
     void randomInit();
     /** Compute the mStep. */
-    bool mStep();
+    bool paramUpdateStep();
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return(this->nbCluster()+this->nbVariable());}
@@ -227,7 +227,7 @@ void Gamma_aj_bk<Array>::randomInit()
 
 /* Compute the weighted mean and the common variance. */
 template<class Array>
-bool Gamma_aj_bk<Array>::mStep()
+bool Gamma_aj_bk<Array>::paramUpdateStep()
 {
   if (!this->moments()) { return false;}
   // start estimations of the ajk and bj
@@ -259,7 +259,7 @@ bool Gamma_aj_bk<Array>::mStep()
       {
         param_.shape_()[j] = x0; // use moment estimate
 #ifdef STK_MIXTURE_DEBUG
-        stk_cout << _T("ML estimation failed in Gamma_ajk_bj::mStep()\n");
+        stk_cout << _T("ML estimation failed in Gamma_ajk_bj::paramUpdateStep()\n");
         stk_cout << "x0 =" << x0 << _T("\n";);
         stk_cout << "f(x0) =" << f(x0) << _T("\n";);
         stk_cout << "x1 =" << x1 << _T("\n";);
@@ -279,7 +279,7 @@ bool Gamma_aj_bk<Array>::mStep()
 #ifdef STK_MIXTURE_VERBOSE
   if (value < qvalue)
   {
-    stk_cout << _T("In Gamma_aj_bk::mStep(): mStep diverge\n");
+    stk_cout << _T("In Gamma_aj_bk::paramUpdateStep(): mStep diverge\n");
     stk_cout << _T("New value =") << value << _T(", qvalue =") << qvalue << _T("\n");
   }
 #endif
@@ -289,7 +289,7 @@ bool Gamma_aj_bk<Array>::mStep()
 #ifdef STK_MIXTURE_VERBOSE
   if (iter == MAXITER)
   {
-    stk_cout << _T("In Gamma_aj_bk::mStep(): mStep did not converge\n");
+    stk_cout << _T("In Gamma_aj_bk::paramUpdateStep(): mStep did not converge\n");
     stk_cout << _T("qvalue =") << qvalue << _T("\n");
   }
 #endif

@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-#     Copyright (C) 2012-2014  Serge Iovleff, University Lille 1, Inria
+#     Copyright (C) 2012-2016  Serge Iovleff, University Lille 1, Inria
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as
@@ -229,7 +229,7 @@ setMethod(
 
 #' Definition of the [\code{\linkS4class{ClusterPoisson}}] class
 #'
-#' This class inherits from the [\code{\linkS4class{IClusterModelBase}}] class.
+#' This class inherits from the [\code{\linkS4class{IClusterModel}}] class.
 #' A poisson mixture model is a mixture model of the form:
 #' \deqn{
 #'   f({x}|\boldsymbol{\theta}) \\
@@ -239,7 +239,7 @@ setMethod(
 #'
 #' @slot component  A [\code{\linkS4class{ClusterPoissonComponent}}] with the
 #' lambda of the component mixture model.
-#' @seealso [\code{\linkS4class{IClusterModelBase}}] class
+#' @seealso [\code{\linkS4class{IClusterModel}}] class
 #'
 #' @examples
 #'   getSlots("ClusterPoisson")
@@ -257,7 +257,7 @@ setMethod(
 setClass(
     Class="ClusterPoisson",
     representation( component = "ClusterPoissonComponent"),
-    contains=c("IClusterModelBase"),
+    contains=c("IClusterModel"),
     validity=function(object)
     {
       if (ncol(object@component@lambda)!=ncol(object@component@data))
@@ -335,7 +335,7 @@ setMethod(
 )
 
 #' @rdname summary-methods
-#' @aliases summary summary,MixmodResults-method
+#' @aliases summary summary,ClusterPoisson-method
 #'
 setMethod(
   f="summary",
@@ -348,6 +348,70 @@ setMethod(
     cat("**************************************************************\n")
   }
 )
+
+## #-----------------------------------------------------------------------
+## #' Definition of the [\code{\linkS4class{PredictPoisson}}] class
+## #'
+## #' This class defines a predictor for diagonal Gaussian mixture Model.
+## #'
+## #' @slot model  A valid [\code{\linkS4class{ClusterDiagGaussian}}] class.
+## #' @slot data   A matrix with the data to predict.
+## #' @seealso [\code{\linkS4class{IClusterModel}}] class
+## #'
+## #' @examples
+## #' getSlots("PredictPoisson")
+## #'
+## #' @author Serge Iovleff
+## #'
+## #' @name PredictPoisson
+## #' @rdname PredictPoisson-class
+## #' @aliases PredictPoisson-class
+## #' @exportClass PredictPoisson
+## #'
+## setClass(
+##     Class="PredictPoisson",
+##     representation( model = "ClusterPoisson", data = "matrix"),
+##     contains=c("IClusterPredict"),
+##     validity=function(object)
+##     {
+##       # check model
+##       if(class(object@model)[1] != "ClusterPoisson")
+##       { stop("model must be an instance of ClusterPoisson.")}
+##       if (!validObject(object@model)) {stop("model is not valid.")}
+##       # check data
+##       if (ncol(object@model@component@data)!= ncol(object@data))
+##       {stop("data must have the same number of column.")}
+##       return(TRUE)
+##     }
+## )
+## 
+## #' Initialize an instance of a MixAll S4 class.
+## #'
+## #' Initialization method of the [\code{\linkS4class{PredictPoisson}}] class.
+## #' Used internally in the 'MixAll' package.
+## #'
+## #' @rdname initialize-methods
+## #' @keywords internal
+## setMethod(
+##     f="initialize",
+##     signature=c("PredictPoisson"),
+##     definition=function(.Object, model, data)
+##     {
+##       # check model
+##       if(missing(model)) {stop("model is mandatory in PredictPoisson.")}
+##       if(class(model)[1] != "ClusterDiagGaussian")
+##       { stop("model must be an instance of ClusterPoisson.")}
+##       # for data
+##       if(missing(data)) {stop("data is mandatory in PredictPoisson.")}
+##       # create slots
+##       .Object@model <- model
+##       .Object@data <- as.matrix(data, ncol= ncol(model@component@data))
+##       # validate
+##       .Object <- callNextMethod(.Object, nrow(.Object@data), .Object@model@nbCluster);
+##       validObject(.Object)
+##       return(.Object)
+##     }
+## )
 
 #' Plotting of a class [\code{\linkS4class{ClusterPoisson}}]
 #'

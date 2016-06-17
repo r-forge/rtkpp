@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2014  Serge Iovleff
+/*     Copyright (C) 2004-2016  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -24,84 +24,64 @@
 
 /*
  * Project:  stkpp::Clustering
- * created on: 16 oct. 2012
+ * created on: 14 nov. 2013
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  * Originally created by Parmeet Bhatia <b..._DOT_p..._AT_gmail_Dot_com>
  **/
 
-/** @file STK_IMixture.cpp
- *  @brief In this file we implement the abstract base class IMixture.
- **/
+
+/**@file STK_IMixture.h
+ * @brief define the main interface for linking specific mixture model to the
+ * composer.
+ */
+#include <string>
 
 #include "../include/STK_IMixture.h"
-#include "../include/STK_IMixtureComposer.h"
+#include "../include/STK_IMixtureStatModel.h"
 
 namespace STK
 {
 
 /* constructor */
-IMixture::IMixture( std::string const& idName, int nbCluster)
-                  : p_composer_(0), idData_(idName), nbCluster_(nbCluster)
+IMixture::IMixture( std::string const& idData)
+                  : p_composer_(0), idData_(idData)
 {}
 
 /* copy constructor */
 IMixture::IMixture( IMixture const& mixture)
                   : p_composer_(0)
                   , idData_(mixture.idData_)
-                  , nbCluster_(mixture.nbCluster_)
 {}
 /* Virtual destructor. */
 IMixture::~IMixture(){}
 
 /* set the mixture composer to the mixture */
-void IMixture::setMixtureComposer( IMixtureComposer const* p_composer) { p_composer_ = p_composer;}
+void IMixture::setMixtureModel( IMixtureStatModel const* p_composer) { p_composer_ = p_composer;}
 
 /* @return the class labels of the composer */
-int const* IMixture::classLabels() const { return p_composer_->p_zi()->p_data();}
-
+int const* IMixture::classLabels() const { return p_composer_->zi().p_data();}
 /* @return the proportions of the composer */
-Real const* IMixture::proportions() const { return p_composer_->p_pk()->p_data();}
-
+Real const* IMixture::proportions() const { return p_composer_->pk().p_data();}
 /* @return the number of sample */
 int IMixture::nbSample() const { return p_composer_->nbSample();}
-
-/* This function can be used in derived classes to get proportions from the framework.
- *  @return Pointer to proportions.
- */
-CPointX const& IMixture::pk() const { return p_composer_->pk();}
-
-/* This function can be used in derived classes to get estimated numbers
- *  of individuals from the framework.
- *  @return the estiamted numbers of individuals in each classes.
- */
-CPointX const& IMixture::nk() const { return p_composer_->nk();}
-/* This function can be used in derived classes to get posterior probabilities from the framework.
- *  @return Pointer to tik.
- */
-CArrayXX const& IMixture::tik() const { return p_composer_->tik();}
-/* This function can be used in derived classes to get class labels from the framework.
- *  @return Pointer to zi.
- */
-CArrayVector<int> const& IMixture::zi() const { return p_composer_->zi();}
-
+/* @return the number of sample */
+int IMixture::nbCluster() const { return p_composer_->nbCluster();}
 /* This function can be used in derived classes to get proportions from the framework.
  * @return Pointer to proportions.
  */
-CPointX const* IMixture::p_pk() const { return p_composer_->p_pk();}
-
+CPointX const* IMixture::p_pk() const { return &(p_composer_->pk());}
 /* This function can be used in derived classes to get proportions from the framework.
  * @return Pointer to proportions.
  */
-CPointX const* IMixture::p_nk() const { return p_composer_->p_nk();}
-
+CPointX const* IMixture::p_nk() const { return &(p_composer_->nk());}
 /* This function can be used in derived classes to get proportions from the framework.
  * @return Pointer to proportions.
  */
-CArrayXX const* IMixture::p_tik() const { return p_composer_->p_tik();}
-
+CArrayXX const* IMixture::p_tik() const { return &(p_composer_->tik());}
 /* This function can be used in derived classes to get proportions from the framework.
  * @return Pointer to proportions.
  */
-CVectorXi const* IMixture::p_zi() const { return p_composer_->p_zi();}
+CVectorXi const* IMixture::p_zi() const { return &(p_composer_->zi());}
 
 } // namespace STK
+

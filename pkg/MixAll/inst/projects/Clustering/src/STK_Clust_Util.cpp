@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2013  Serge Iovleff
+/*     Copyright (C) 2004-2016  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -61,7 +61,7 @@ namespace Clust
  **/
 initType stringToInit( std::string const& type)
 {
-  if (toUpperString(type) == toUpperString(_T("randomInit"))) return randomInit_;
+  if (toUpperString(type) == toUpperString(_T("randomInit"))) return randomParamInit_;
   if (toUpperString(type) == toUpperString(_T("randomParamInit"))) return randomParamInit_;
   if (toUpperString(type) == toUpperString(_T("randomClassInit"))) return randomClassInit_;
   if (toUpperString(type) == toUpperString(_T("randomFuzzyInit"))) return randomFuzzyInit_;
@@ -100,6 +100,30 @@ algoType stringToAlgo( std::string const& type)
   return emAlgo_;
 }
 
+/* @ingroup Clustering
+ *  Convert a String to an algoLearnType. The recognized strings are
+ * <table>
+ * <tr> <th> Algorithm     </th></tr>
+ * <tr> <td> "imputeAlgo"  </td></tr>
+ * <tr> <td> "simulAlgo"   </td></tr>
+ * <tr> <td> "impute"      </td></tr>
+ * <tr> <td> "simul"       </td></tr>
+ * </table>
+ *  @param type the type of algorithm wanted
+ *  @return the algoType corresponding (default is emAlgo)
+ *  @note The capitalized letters have no effect and if the string is not found
+ *  in the list above,the type Clust::emAlgo_ is returned.
+ **/
+algoLearnType stringToLearnAlgo( std::string const& type)
+{
+  if (toUpperString(type) == toUpperString(_T("imputeAlgo"))) return imputeAlgo_;
+  if (toUpperString(type) == toUpperString(_T("simulAlgo"))) return simulAlgo_;
+  if (toUpperString(type) == toUpperString(_T("impute"))) return imputeAlgo_;
+  if (toUpperString(type) == toUpperString(_T("simul"))) return simulAlgo_;
+  return imputeAlgo_;
+}
+
+
 
 /* @ingroup Clustering
  *  convert a TypeReduction to a String.
@@ -114,7 +138,7 @@ String exceptionToString( exceptions const& type)
   if (type == randomParamInitFail_) return String(_T("RandomParamInit fail"));
   if (type == initializeStepFail_)  return String(_T("initializeStep fail"));
   if (type == estimFail_) return String(_T("Estimation fail"));
-  if (type == mStepFail_) return String(_T("mStep fail"));
+  if (type == mStepFail_) return String(_T("run fail"));
   if (type == eStepFail_) return String(_T("eStep fail"));
   if (type == cStepFail_) return String(_T("cStep fail"));
   if (type == sStepFail_) return String(_T("sStep fail"));
@@ -128,29 +152,29 @@ String exceptionToString( exceptions const& type)
  **/
 MixtureClass mixtureToMixtureClass( Mixture const& type)
 {
-  if (type == Gamma_ajk_bjk_) return Gamma_;
-  if (type == Gamma_ajk_bk_) return Gamma_;
-  if (type == Gamma_ajk_bj_) return Gamma_;
-  if (type == Gamma_ajk_b_) return Gamma_;
-  if (type == Gamma_ak_bjk_) return Gamma_;
-  if (type == Gamma_ak_bk_) return Gamma_;
-  if (type == Gamma_ak_bj_) return Gamma_;
-  if (type == Gamma_ak_b_) return Gamma_;
-  if (type == Gamma_aj_bjk_) return Gamma_;
-  if (type == Gamma_aj_bk_) return Gamma_;
-  if (type == Gamma_a_bjk_) return Gamma_;
-  if (type == Gamma_a_bk_) return Gamma_;
-  if (type == Gaussian_sjk_) return Gaussian_;
-  if (type == Gaussian_sk_) return Gaussian_;
-  if (type == Gaussian_sj_) return Gaussian_;
-  if (type == Gaussian_s_) return Gaussian_;
-  if (type == Categorical_pjk_) return Categorical_;
-  if (type == Categorical_pk_) return Categorical_;
-  if (type == Poisson_ljk_) return Poisson_;
-  if (type == Poisson_lk_) return Poisson_;
-  if (type == Poisson_ljlk_) return Poisson_;
+  if (type == Gamma_ajk_bjk_)     return Gamma_;
+  if (type == Gamma_ajk_bk_)      return Gamma_;
+  if (type == Gamma_ajk_bj_)      return Gamma_;
+  if (type == Gamma_ajk_b_)       return Gamma_;
+  if (type == Gamma_ak_bjk_)      return Gamma_;
+  if (type == Gamma_ak_bk_)       return Gamma_;
+  if (type == Gamma_ak_bj_)       return Gamma_;
+  if (type == Gamma_ak_b_)        return Gamma_;
+  if (type == Gamma_aj_bjk_)      return Gamma_;
+  if (type == Gamma_aj_bk_)       return Gamma_;
+  if (type == Gamma_a_bjk_)       return Gamma_;
+  if (type == Gamma_a_bk_)        return Gamma_;
+  if (type == Gaussian_sjk_)      return Gaussian_;
+  if (type == Gaussian_sk_)       return Gaussian_;
+  if (type == Gaussian_sj_)       return Gaussian_;
+  if (type == Gaussian_s_)        return Gaussian_;
+  if (type == Categorical_pjk_)   return Categorical_;
+  if (type == Categorical_pk_)    return Categorical_;
+  if (type == Poisson_ljk_)       return Poisson_;
+  if (type == Poisson_lk_)        return Poisson_;
+  if (type == Poisson_ljlk_)      return Poisson_;
   if (type == KernelGaussian_sk_) return Kernel_;
-  if (type == KernelGaussian_s_) return Kernel_;
+  if (type == KernelGaussian_s_)  return Kernel_;
   return unknown_mixture_class_;
 }
 
@@ -182,8 +206,8 @@ Mixture stringToMixture( std::string const& type)
   if (toUpperString(type) == toUpperString(_T("Categorical_pk"))) return Categorical_pk_;
   if (toUpperString(type) == toUpperString(_T("Poisson_ljk"))) return Poisson_ljk_;
   if (toUpperString(type) == toUpperString(_T("Poisson_lk"))) return Poisson_lk_;
-  if (toUpperString(type) == toUpperString(_T("Poisson_ljlk"))) return Poisson_ljlk_;
-  if (toUpperString(type) == toUpperString(_T("KernelGaussian_sk"))) return KernelGaussian_sk_;
+  if (toUpperString(type) == toUpperString(_T("Poisson_ljlk")))     return Poisson_ljlk_;
+  if (toUpperString(type) == toUpperString(_T("KernelGaussian_sk")))return KernelGaussian_sk_;
   if (toUpperString(type) == toUpperString(_T("KernelGaussian_s"))) return KernelGaussian_s_;
 #ifdef STK_MIXTURE_DEBUG
   stk_cout << _T("In stringToMixture, mixture ") << type << _T(" not found.\n");
@@ -259,29 +283,29 @@ Mixture stringToMixture( std::string const& type, bool& freeProp)
  **/
 std::string mixtureToString( Mixture const& type)
 {
-  if (type == Gamma_ajk_bjk_) return String(_T("Gamma_ajk_bjk"));
-  if (type == Gamma_ajk_bk_) return String(_T("Gamma_ajk_bk"));
-  if (type == Gamma_ajk_bj_) return String(_T("Gamma_ajk_bj"));
-  if (type == Gamma_ajk_b_) return String(_T("Gamma_ajk_b"));
-  if (type == Gamma_ak_bjk_) return String(_T("Gamma_ak_bjk"));
-  if (type == Gamma_ak_bk_) return String(_T("Gamma_ak_bk"));
-  if (type == Gamma_ak_bj_) return String(_T("Gamma_ak_bj"));
-  if (type == Gamma_ak_b_) return String(_T("Gamma_ak_b"));
-  if (type == Gamma_aj_bjk_) return String(_T("Gamma_aj_bjk"));
-  if (type == Gamma_aj_bk_) return String(_T("Gamma_aj_bk"));
-  if (type == Gamma_a_bjk_) return String(_T("Gamma_a_bjk"));
-  if (type == Gamma_a_bk_) return String(_T("Gamma_a_bk"));
-  if (type == Gaussian_sjk_) return String(_T("Gaussian_sjk"));
-  if (type == Gaussian_sk_) return String(_T("Gaussian_sk"));
-  if (type == Gaussian_sj_) return String(_T("Gaussian_sj"));
-  if (type == Gaussian_s_) return String(_T("Gaussian_s"));
-  if (type == Categorical_pjk_) return String(_T("Categorical_pjk"));
-  if (type == Categorical_pk_) return String(_T("Categorical_pk"));
-  if (type == Poisson_ljk_) return String(_T("Poisson_ljk"));
-  if (type == Poisson_lk_) return String(_T("Poisson_lk"));
-  if (type == Poisson_ljlk_) return String(_T("Poisson_ljlk"));
+  if (type == Gamma_ajk_bjk_)     return String(_T("Gamma_ajk_bjk"));
+  if (type == Gamma_ajk_bk_)      return String(_T("Gamma_ajk_bk"));
+  if (type == Gamma_ajk_bj_)      return String(_T("Gamma_ajk_bj"));
+  if (type == Gamma_ajk_b_)       return String(_T("Gamma_ajk_b"));
+  if (type == Gamma_ak_bjk_)      return String(_T("Gamma_ak_bjk"));
+  if (type == Gamma_ak_bk_)       return String(_T("Gamma_ak_bk"));
+  if (type == Gamma_ak_bj_)       return String(_T("Gamma_ak_bj"));
+  if (type == Gamma_ak_b_)        return String(_T("Gamma_ak_b"));
+  if (type == Gamma_aj_bjk_)      return String(_T("Gamma_aj_bjk"));
+  if (type == Gamma_aj_bk_)       return String(_T("Gamma_aj_bk"));
+  if (type == Gamma_a_bjk_)       return String(_T("Gamma_a_bjk"));
+  if (type == Gamma_a_bk_)        return String(_T("Gamma_a_bk"));
+  if (type == Gaussian_sjk_)      return String(_T("Gaussian_sjk"));
+  if (type == Gaussian_sk_)       return String(_T("Gaussian_sk"));
+  if (type == Gaussian_sj_)       return String(_T("Gaussian_sj"));
+  if (type == Gaussian_s_)        return String(_T("Gaussian_s"));
+  if (type == Categorical_pjk_)   return String(_T("Categorical_pjk"));
+  if (type == Categorical_pk_)    return String(_T("Categorical_pk"));
+  if (type == Poisson_ljk_)       return String(_T("Poisson_ljk"));
+  if (type == Poisson_lk_)        return String(_T("Poisson_lk"));
+  if (type == Poisson_ljlk_)      return String(_T("Poisson_ljlk"));
   if (type == KernelGaussian_sk_) return String(_T("KernelGaussian_sk"));
-  if (type == KernelGaussian_s_) return String(_T("KernelGaussian_s"));
+  if (type == KernelGaussian_s_)  return String(_T("KernelGaussian_s"));
   return String(_T("unknown"));
 }
 
@@ -297,55 +321,55 @@ std::string mixtureToString(Mixture type, bool freeProp)
 {
   if (freeProp == false)
   {
-    if (type == Gamma_ajk_bjk_) return String(_T("Gamma_p_ajk_bjk"));
-    if (type == Gamma_ajk_bk_) return String(_T("Gamma_p_ajk_bk"));
-    if (type == Gamma_ajk_bj_) return String(_T("Gamma_p_ajk_bj"));
-    if (type == Gamma_ajk_b_) return String(_T("Gamma_p_ajk_b"));
-    if (type == Gamma_ak_bjk_) return String(_T("Gamma_p_ak_bjk"));
-    if (type == Gamma_ak_bk_) return String(_T("Gamma_p_ak_bk"));
-    if (type == Gamma_ak_bj_) return String(_T("Gamma_p_ak_bj"));
-    if (type == Gamma_ak_b_) return String(_T("Gamma_p_ak_b"));
-    if (type == Gamma_aj_bjk_) return String(_T("Gamma_p_aj_bjk"));
-    if (type == Gamma_aj_bk_) return String(_T("Gamma_p_aj_bk"));
-    if (type == Gamma_a_bjk_) return String(_T("Gamma_p_a_bjk"));
-    if (type == Gamma_a_bk_) return String(_T("Gamma_p_a_bk"));
-    if (type == Gaussian_sjk_) return String(_T("Gaussian_p_sjk"));
-    if (type == Gaussian_sk_) return String(_T("Gaussian_p_sk"));
-    if (type == Gaussian_sj_) return String(_T("Gaussian_p_sj"));
-    if (type == Gaussian_s_) return String(_T("Gaussian_p_s"));
-    if (type == Categorical_pjk_) return String(_T("Categorical_p_pjk"));
-    if (type == Categorical_pk_) return String(_T("Categorical_p_pk"));
-    if (type == Poisson_ljk_) return String(_T("Poisson_p_ljk"));
-    if (type == Poisson_lk_) return String(_T("Poisson_p_lk"));
-    if (type == Poisson_ljlk_) return String(_T("Poisson_p_ljlk"));
-    if (type == Poisson_ljlk_) return String(_T("Poisson_p_ljlk"));
+    if (type == Gamma_ajk_bjk_)     return String(_T("Gamma_p_ajk_bjk"));
+    if (type == Gamma_ajk_bk_)      return String(_T("Gamma_p_ajk_bk"));
+    if (type == Gamma_ajk_bj_)      return String(_T("Gamma_p_ajk_bj"));
+    if (type == Gamma_ajk_b_)       return String(_T("Gamma_p_ajk_b"));
+    if (type == Gamma_ak_bjk_)      return String(_T("Gamma_p_ak_bjk"));
+    if (type == Gamma_ak_bk_)       return String(_T("Gamma_p_ak_bk"));
+    if (type == Gamma_ak_bj_)       return String(_T("Gamma_p_ak_bj"));
+    if (type == Gamma_ak_b_)        return String(_T("Gamma_p_ak_b"));
+    if (type == Gamma_aj_bjk_)      return String(_T("Gamma_p_aj_bjk"));
+    if (type == Gamma_aj_bk_)       return String(_T("Gamma_p_aj_bk"));
+    if (type == Gamma_a_bjk_)       return String(_T("Gamma_p_a_bjk"));
+    if (type == Gamma_a_bk_)        return String(_T("Gamma_p_a_bk"));
+    if (type == Gaussian_sjk_)      return String(_T("Gaussian_p_sjk"));
+    if (type == Gaussian_sk_)       return String(_T("Gaussian_p_sk"));
+    if (type == Gaussian_sj_)       return String(_T("Gaussian_p_sj"));
+    if (type == Gaussian_s_)        return String(_T("Gaussian_p_s"));
+    if (type == Categorical_pjk_)   return String(_T("Categorical_p_pjk"));
+    if (type == Categorical_pk_)    return String(_T("Categorical_p_pk"));
+    if (type == Poisson_ljk_)       return String(_T("Poisson_p_ljk"));
+    if (type == Poisson_lk_)        return String(_T("Poisson_p_lk"));
+    if (type == Poisson_ljlk_)      return String(_T("Poisson_p_ljlk"));
+    if (type == Poisson_ljlk_)      return String(_T("Poisson_p_ljlk"));
     if (type == KernelGaussian_sk_) return String(_T("KernelGaussian_sk_p"));
-    if (type == KernelGaussian_s_) return String(_T("KernelGaussian_s_p"));
+    if (type == KernelGaussian_s_)  return String(_T("KernelGaussian_s_p"));
   }
   else
   {
-    if (type == Gamma_ajk_bjk_) return String(_T("Gamma_pk_ajk_bjk"));
-    if (type == Gamma_ajk_bk_) return String(_T("Gamma_pk_ajk_bk"));
-    if (type == Gamma_ajk_bj_) return String(_T("Gamma_pk_ajk_bj"));
-    if (type == Gamma_ajk_b_) return String(_T("Gamma_pk_ajk_b"));
-    if (type == Gamma_ak_bjk_) return String(_T("Gamma_pk_ak_bjk"));
-    if (type == Gamma_ak_bk_) return String(_T("Gamma_pk_ak_bk"));
-    if (type == Gamma_ak_bj_) return String(_T("Gamma_pk_ak_bj"));
-    if (type == Gamma_ak_b_) return String(_T("Gamma_pk_ak_b"));
-    if (type == Gamma_aj_bjk_) return String(_T("Gamma_pk_aj_bjk"));
-    if (type == Gamma_aj_bk_) return String(_T("Gamma_pk_aj_bk"));
-    if (type == Gamma_a_bjk_) return String(_T("Gamma_pk_a_bjk"));
-    if (type == Gamma_a_bk_) return String(_T("Gamma_pk_a_bk"));
-    if (type == Gaussian_sjk_) return String(_T("Gaussian_pk_sjk"));
-    if (type == Gaussian_sk_) return String(_T("Gaussian_pk_sk"));
-    if (type == Gaussian_sj_) return String(_T("Gaussian_pk_sj"));
-    if (type == Gaussian_s_) return String(_T("Gaussian_pk_s"));
-    if (type == Categorical_pjk_) return String(_T("Categorical_pk_pjk"));
-    if (type == Categorical_pk_) return String(_T("Categorical_pk_pk"));
-    if (type == Poisson_ljk_) return String(_T("Poisson_pk_ljk"));
-    if (type == Poisson_lk_) return String(_T("Poisson_pk_lk"));
-    if (type == Poisson_ljlk_) return String(_T("Poisson_pk_ljlk"));
-    if (type == KernelGaussian_sk_) return String(_T("KernelGaussian_pk_sk"));
+    if (type == Gamma_ajk_bjk_)     return String(_T("Gamma_pk_ajk_bjk"));
+    if (type == Gamma_ajk_bk_)      return String(_T("Gamma_pk_ajk_bk"));
+    if (type == Gamma_ajk_bj_)      return String(_T("Gamma_pk_ajk_bj"));
+    if (type == Gamma_ajk_b_)       return String(_T("Gamma_pk_ajk_b"));
+    if (type == Gamma_ak_bjk_)      return String(_T("Gamma_pk_ak_bjk"));
+    if (type == Gamma_ak_bk_)       return String(_T("Gamma_pk_ak_bk"));
+    if (type == Gamma_ak_bj_)       return String(_T("Gamma_pk_ak_bj"));
+    if (type == Gamma_ak_b_)        return String(_T("Gamma_pk_ak_b"));
+    if (type == Gamma_aj_bjk_)      return String(_T("Gamma_pk_aj_bjk"));
+    if (type == Gamma_aj_bk_)       return String(_T("Gamma_pk_aj_bk"));
+    if (type == Gamma_a_bjk_)       return String(_T("Gamma_pk_a_bjk"));
+    if (type == Gamma_a_bk_)        return String(_T("Gamma_pk_a_bk"));
+    if (type == Gaussian_sjk_)      return String(_T("Gaussian_pk_sjk"));
+    if (type == Gaussian_sk_)       return String(_T("Gaussian_pk_sk"));
+    if (type == Gaussian_sj_)       return String(_T("Gaussian_pk_sj"));
+    if (type == Gaussian_s_)        return String(_T("Gaussian_pk_s"));
+    if (type == Categorical_pjk_)   return String(_T("Categorical_pk_pjk"));
+    if (type == Categorical_pk_)    return String(_T("Categorical_pk_pk"));
+    if (type == Poisson_ljk_)       return String(_T("Poisson_pk_ljk"));
+    if (type == Poisson_lk_)        return String(_T("Poisson_pk_lk"));
+    if (type == Poisson_ljlk_)      return String(_T("Poisson_pk_ljlk"));
+    if (type == KernelGaussian_sk_) return String(_T("MixtureKernelGaussian_pk_sk"));
   }
   return String(_T("unknown"));
 }
@@ -383,6 +407,33 @@ IMixtureAlgo* createAlgo(Clust::algoType algo, int nbIterMax, Real epsilon)
   return p_algo;
 }
 
+/* utility function for creating an estimation algorithm
+ *  @param algo the algorithm to create
+ *  @param nbIterMax the maximal number of iteration of the algorithm
+ *  @param epsilon the tolerance of the algorithm
+ **/
+IMixtureLearnAlgo* createLearnAlgo(Clust::algoLearnType algo, int nbIterMax, Real epsilon)
+{
+  IMixtureLearnAlgo* p_algo = 0;
+  switch (algo)
+  {
+  case imputeAlgo_:
+    p_algo = new ImputeAlgo();
+    break;
+  case simulAlgo_:
+    p_algo = new SimulAlgo();
+    break;
+  default:
+    break;
+  }
+  if (p_algo)
+  {
+    p_algo->setNbIterMax(nbIterMax);
+    p_algo->setEpsilon(epsilon);
+  }
+  return p_algo;
+}
+
 /* utility function for creating a model initializer
  *  @param init the kind of initializer to create
  *  @param algo the kind of algorithm to add to the initializer
@@ -394,6 +445,12 @@ IMixtureInit* createInit(Clust::initType init,  int nbInits, Clust::algoType alg
   IMixtureInit* p_init = 0;
   switch (init)
   {
+    case Clust::noInit_:
+      p_init = 0;
+      break;
+    case Clust::randomInit_:
+      p_init = new RandomInit();
+      break;
     case Clust::randomParamInit_:
       p_init = new RandomInit();
       break;

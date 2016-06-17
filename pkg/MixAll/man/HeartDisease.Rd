@@ -29,8 +29,8 @@
        1: upsloping,
        2: flat,
        3: downsloping}
-\item{\code{ca}}{number of major vessels (0-3) colored by flourosopy}
-\item{\code{thal}}{3 = normal; 6 = fixed defect; 7 = reversable defect}
+\item{\code{ca}}{number of major vessels (0-3) colored by flourosopy (4 missing values)}
+\item{\code{thal}}{3 = normal; 6 = fixed defect; 7 = reversable defect (2 missing values)}
 \item{\code{ num}}{diagnosis of heart disease (angiographic disease status).
               0: < 50% diameter narrowing
               1: > 50% diameter narrowing

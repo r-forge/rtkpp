@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2014  Serge Iovleff
+/*     Copyright (C) 2004-2016  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -37,23 +37,24 @@
  * @brief define the main interface for linking specific mixture model to the
  * composer.
  */
-#include <string>
+
 #include <Arrays/include/STK_CArrayPoint.h>
 #include <Arrays/include/STK_CArrayVector.h>
 #include <Arrays/include/STK_CArray.h>
 
 namespace STK
 {
-class IMixtureComposer;
+
+class IMixtureStatModel;
 
 class IMixture
 {
   public:
     /**Constructor with identification character
-     * @param idName Identification string of Mixture allocated by framework.
-     * @param nbCluster number of cluster
+     * @param idData Identification string of the data associated to this mixture.
+     * The Id is provided by the framework.
      */
-    IMixture( std::string const& idName, int nbCluster);
+    IMixture( std::string const& idData);
     /**copy constructor.
      * @note The pointer on the composer is not copied and is set to 0: it have
      * to be set again.
@@ -66,13 +67,11 @@ class IMixture
     inline std::string const& idName() const { return idData_;}
     /** @return the Id data of the mixture */
     inline std::string const& idData() const { return idData_;}
-    /** @return Number of cluster. */
-    inline int nbCluster() const  { return nbCluster_;}
     /** @return A constant pointer on the composer. */
-    inline IMixtureComposer const* const p_composer() const { return p_composer_;}
+    inline IMixtureStatModel const* const p_composer() const { return p_composer_;}
 
     /** set the mixture composer to the mixture */
-    void setMixtureComposer( IMixtureComposer const* p_model);
+    void setMixtureModel( IMixtureStatModel const* p_model);
 
     /**This is a standard clone function in usual sense. It must be defined to
      * provide new object of your class with values of various parameters equal
@@ -100,7 +99,7 @@ class IMixture
     /** @brief This function should be used in order to initialize randomly the
      *  parameters of the mixture.
      */
-    virtual void randomInit() = 0;
+    virtual void randomInit()  = 0;
     /** @brief This function is equivalent to mStep and must be defined to update
      *  parameters.
      */
@@ -146,7 +145,7 @@ class IMixture
      *  intermediate results. This method will be called after the long-run and
      *  before the finalize step.
      **/
-    virtual void setParameters() {/**Do nothing by default*/}
+    virtual void setParametersStep() {/**Do nothing by default*/}
     /** @brief This step can be used by developer to finalize any thing. It will
      *  be called only once after we finish running the estimation algorithm.
      */
@@ -166,6 +165,10 @@ class IMixture
      *  @return Number of samples.
      */
     int nbSample() const;
+    /** This function can be used in derived classes to get number of classes.
+     *  @return Number of classes.
+     */
+    int nbCluster() const;
     /** This function can be used in derived classes to get class labels from the framework.
      * @return Pointer to class labels.
      */
@@ -196,34 +199,12 @@ class IMixture
      *  @return Pointer to zi.
      */
     CVectorXi const* p_zi() const;
-    /** This function can be used in derived classes to get proportions from
-     *  the framework.
-     *  @return Pointer to proportions.
-     */
-    CPointX const& pk() const;
-    /** This function can be used in derived classes to get estimated number
-     *  of individuals from the framework.
-     *  @return the numbers of individuals.
-     */
-    CPointX const& nk() const;
-    /** This function can be used in derived classes to get posterior probabilities
-     *  from the framework.
-     *  @return Pointer to tik.
-     */
-    CArrayXX const& tik() const;
-    /** This function can be used in derived classes to get class labels from
-     *  the framework.
-     *  @return Pointer to zi.
-     */
-    CVectorXi const& zi() const;
 
   private:
     /** pointer on the main composer model */
-    const IMixtureComposer* p_composer_;
+    const IMixtureStatModel* p_composer_;
     /** Id name of the mixture */
     std::string idData_;
-    /** number of cluster */
-    int nbCluster_;
 };
 
 } // namespace STK

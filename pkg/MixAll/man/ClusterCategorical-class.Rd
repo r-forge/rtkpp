@@ -6,7 +6,7 @@
 \title{Definition of the [\code{\linkS4class{ClusterCategorical}}] class}
 \description{
 This class defines a categorical mixture model. It inherits from the
-[\code{\linkS4class{IClusterModelBase}}] class. A categorical mixture model is
+[\code{\linkS4class{IClusterModel}}] class. A categorical mixture model is
 a mixture model of the form
 }
 \details{

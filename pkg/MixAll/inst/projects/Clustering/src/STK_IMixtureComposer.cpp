@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2014  Serge Iovleff
+/*     Copyright (C) 2004-2016  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -36,33 +36,27 @@
 #include <cmath>
 
 #ifdef STK_MIXTURE_DEBUG
-#include "Arrays/include/STK_Display.h"
+#include <Arrays/include/STK_Display.h>
 #endif
 
 #include "../include/STK_IMixtureComposer.h"
-#include "STatistiK/include/STK_Law_Categorical.h"
-#include "STatistiK/include/STK_Stat_Functors.h"
-#include "Arrays/include/STK_Array2DPoint.h" // for sum
+
+#include <STatistiK/include/STK_Law_Categorical.h>
+#include <STatistiK/include/STK_Stat_Functors.h>
 
 namespace STK
 {
 IMixtureComposer::IMixtureComposer( int nbSample, int nbCluster)
-                                  : IStatModelBase(nbSample)
-                                  , nbCluster_(nbCluster)
-                                  , prop_(nbCluster), tik_(nbSample, nbCluster), nk_(nbCluster), zi_(nbSample)
+                                  : IMixtureStatModel(nbSample, nbCluster)
                                   , state_(Clust::modelCreated_)
 #ifndef _OPENMP
                                   , lnComp_(nbCluster)
 #endif
-{ initializeMixtureParameters(); }
+{}
 
 /* copy constructor */
 IMixtureComposer::IMixtureComposer( IMixtureComposer const& model)
-                                  : IStatModelBase(model)
-                                  , nbCluster_(model.nbCluster_)
-                                  , prop_(model.prop_)
-                                  , tik_(model.tik_)
-                                  , zi_(model.zi_)
+                                  : IMixtureStatModel(model)
                                   , state_(model.state_)
 #ifndef _OPENMP
                                   , lnComp_(model.lnComp_)
@@ -79,12 +73,23 @@ IMixtureComposer::~IMixtureComposer() {}
  **/
 void IMixtureComposer::initializeStep()
 {
-  // (re)initialize the parameters tik, zi etc.
+  // (re)initialize the mixture parameters tik and pk. (virtual method)
   initializeMixtureParameters();
-  // (re)initialize the likelihood (others parameters are not modified)
-  setLnLikelihood(-Arithmetic<Real>::infinity());
-  // compute proportions
+  // compute nk
+  nk_  = Stat::sumByCol(tik_);
+  // (re) initialize mixtures
+  IMixtureStatModel::initializeStep();
+  // compute zi (virtual method)
+  mapStep();
+  // compute proportions pk_ (virtual method)
   pStep();
+  // (re)initialize the likelihood
+  setLnLikelihood(computeLnLikelihood());
+  // compute the number of free parameters
+  setNbFreeParameter(computeNbFreeParameters());
+  // compute number of free parameters and of variables
+  setNbVariable(computeNbVariables());
+  // update state
   setState(Clust::modelInitialized_);
 }
 
@@ -94,13 +99,15 @@ void IMixtureComposer::randomClassInit()
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Entering IMixtureComposer::randomClassInit()\n");
 #endif
-  if (state() < 2) { initializeStep();}
-  Law::Categorical law(prop_);
-  zi_.rand(law);
-  if (cStep()<2) throw(Clust::randomClassInitFail_);
-  mStep();
+  // initialize mixture model if necessary
+  if (state() < Clust::modelInitialized_) { initializeStep();}
+  // generate random zi, compute tik and nk
+  if (randomZi()<2) throw(Clust::randomClassInitFail_);
+  // update parameters
+  paramUpdateStep();
+  // compute eStep()
   eStep();
-  // model intialized
+  // model initialized
   setState(Clust::modelParamInitialized_);
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("IMixtureComposer::randomClassInit() done\n");
@@ -113,10 +120,15 @@ void IMixtureComposer::randomFuzzyInit()
 #ifdef STK_MIXTURE_VERBOSE
   stk_cout << _T("Entering IMixtureComposer::randomFuzzyInit(). state= ") << state() << _T("\n");
 #endif
-  if (state() < 2) { initializeStep();}
-  if (randomFuzzyTik()<2) throw(Clust::randomFuzzyInitFail_);
+  // initialize mixture model if necessary
+  if (state() < Clust::modelInitialized_) { initializeStep();}
+  // create random tik and compute nk
+  if (randomTik()<2) throw(Clust::randomFuzzyInitFail_);
+  // compute zi
   mapStep();
-  mStep();
+  // update paramters values
+  paramUpdateStep();
+  // eStep
   eStep();
   // model intialized
   setState(Clust::modelParamInitialized_);
@@ -128,9 +140,8 @@ void IMixtureComposer::randomFuzzyInit()
 /* cStep */
 int IMixtureComposer::cStep()
 {
-  tik_ = 0.;
   for (int i=tik_.beginRows(); i < tik_.endRows(); i++)
-  { tik_.elt(i, zi_[i]) = 1.;}
+  { cStep(i);}
   // count the number of individuals in each class
   nk_= Stat::sum(tik_);
   return nk_.minElt();
@@ -141,7 +152,7 @@ int IMixtureComposer::sStep()
 {
   // simulate zi
   for (int i = zi_.begin(); i< zi_.end(); ++i)
-  { zi_.elt(i) = Law::Categorical::rand(tik_.row(i));}
+  { sStep(i);}
   return cStep();
 }
 
@@ -168,6 +179,24 @@ Real IMixtureComposer::eStep()
   return nk_.minElt();
 }
 
+/* Compute Zi using the Map estimate, default implementation. */
+void IMixtureComposer::mapStep()
+{
+  for (int i = zi_.begin(); i< zi_.end(); ++i)
+  { mapStep(i);  }
+}
+
+/* Simulate zi accordingly to tik.
+ *  @param i index of the the individual
+ **/
+void IMixtureComposer::sStep(int i)
+{ zi_.elt(i) = Law::Categorical::rand(tik_.row(i));}
+/* Replace tik by zik
+ *  @param i index of the the individual
+ **/
+void IMixtureComposer::cStep(int i)
+{ tik_.row(i) = 0.; tik_.elt(i, zi_[i]) = 1.;}
+
 /* compute tik, default implementation. */
 Real IMixtureComposer::eStep(int i)
 {
@@ -176,7 +205,7 @@ Real IMixtureComposer::eStep(int i)
 #endif
   // get maximal element of ln(x_i,\theta_k) + ln(p_k)
   for (int k=tik_.beginCols(); k< tik_.endCols(); k++)
-  { lnComp_[k] = std::log(prop_[k])+lnComponentProbability(i,k);}
+  { lnComp_[k] = std::log(pk_[k])+lnComponentProbability(i,k);}
   int kmax;
   Real max = lnComp_.maxElt(kmax);
   // set zi_
@@ -187,73 +216,46 @@ Real IMixtureComposer::eStep(int i)
   return max + std::log( sum );
 }
 
-/* @return the computed likelihood of the i-th sample.
- *  @param i index of the sample
- **/
-Real IMixtureComposer::computeLnLikelihood(int i) const
+/* Compute Zi using the Map estimate, default implementation. */
+void IMixtureComposer::mapStep(int i)
 {
-  // get maximal value
-  CPointX lnComp(prop_.size());
-  for (int k = prop_.begin(); k< prop_.end(); ++k)
-  { lnComp[k] = std::log(prop_[k]) + lnComponentProbability(i, k);}
-  // compute result
-  Real lnCompMax = lnComp.maxElt();
-  return std::log((lnComp-lnCompMax).exp().sum())+lnCompMax;
-}
-
-/* @return the computed log-likelihood. */
-Real IMixtureComposer::computeLnLikelihood() const
-{
-  Real res = 0.0;
-  for (int i = tik().beginRows(); i< tik().endRows(); ++i)
-  { res += computeLnLikelihood(i);}
-  return res;
-}
-
-/* @return the computed ICL criteria. */
-Real IMixtureComposer::computeICL() const
-{
-  Real res = 0.0;
-  for (int j = tik().beginCols(); j< tik().endCols(); ++j)
-  { res += (tik_.col(j) * (tik_.col(j)+1e-15).log()).sum();}
-
-  return (- 2. * lnLikelihood() + nbFreeParameter() * lnNbSample() - 2. * res);
+  int k;
+  tik_.row(i).maxElt(k);
+  zi_[i] = k;
 }
 
 /* estimate the proportions and the parameters of the components of the
  *  model given the current tik/zi mixture parameters values.
  **/
-void IMixtureComposer::mStep()
+void IMixtureComposer::paramUpdateStep()
 { pStep();
   /* implement specific parameters estimation in concrete class. */
 }
 
 /* Compute prop using the ML estimate, default implementation. */
 void IMixtureComposer::pStep()
-{ prop_ = Stat::mean(tik_);}
+{ pk_ = Stat::meanByCol(tik_);}
 
-/* Compute Zi using the Map estimate, default implementation. */
-void IMixtureComposer::mapStep()
+/* @brief Finalize the estimation of the model.
+ *  The default behavior is compute current lnLikelihood.
+ **/
+void IMixtureComposer::finalizeStep()
 {
-  for (int i = zi_.begin(); i< zi_.end(); ++i)
-  {
-    int k;
-    tik_.row(i).maxElt(k);
-    zi_[i] = k;
-  }
+  setLnLikelihood(computeLnLikelihood());
+  setState(Clust::modelFinalized_);
 }
 
+
+// protected methods----------------------
 /* Create the parameters of the  mixture model. */
 void IMixtureComposer::initializeMixtureParameters()
 {
-  prop_ = 1./nbCluster_;
-  tik_  = 1./nbCluster_;
-  nk_   = Real(nbSample())/nbCluster_;
-  zi_   = baseIdx;
+  pk_  = 1./nbCluster_;
+  tik_ = 1./nbCluster_;
 }
 
 /* generate random tik_ */
-int IMixtureComposer::randomFuzzyTik()
+int IMixtureComposer::randomTik()
 {
   nk_ = 0.;
   tik_.randUnif();
@@ -261,12 +263,21 @@ int IMixtureComposer::randomFuzzyTik()
   {
     // create a reference on the i-th row
     CPointX tikRowi(tik_.row(i), true);
-    tikRowi = tikRowi * prop_;
+    tikRowi = tikRowi * pk_;
     tikRowi /= tikRowi.sum();
     nk_ += tikRowi;
   }
   return nk_.minElt();
 }
+
+/* generate random tik_ */
+int IMixtureComposer::randomZi()
+{
+  Law::Categorical law(pk_);
+  zi_.rand(law);
+  return cStep();
+}
+
 
 } // namespace STK
 

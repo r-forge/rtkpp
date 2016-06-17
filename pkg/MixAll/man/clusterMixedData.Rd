@@ -40,12 +40,12 @@ to the \code{criterion} among the number of clusters given in
 }
 \examples{
 ## A quantitative example with the heart disease data set
- data(HeartDisease.cat)
- data(HeartDisease.cont)
+data(HeartDisease.cat)
+data(HeartDisease.cont)
 ## with default values
-ldata = list(HeartDisease.cat,HeartDisease.cont);
-lnames = c("categorical_pk_pjk","gaussian_pk_sjk")
-model <- clusterMixedData(ldata, lnames, nbCluster=2:5, strategy = clusterFastStrategy())
+ldata = list(HeartDisease.cat, HeartDisease.cont);
+models = c("categorical_pk_pjk","gaussian_pk_sjk")
+model <- clusterMixedData(ldata, models, nbCluster=2:5, strategy = clusterFastStrategy())
 
 ## get summary
 summary(model)

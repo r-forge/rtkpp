@@ -22,7 +22,7 @@ and columns correspond to variables.}
 [\code{\link{clusterKernelNames}}].}
 
 \item{kernelName}{string with a kernel name. Possible values:
-"gaussian", "polynomial", "exponential". Default is "gaussian".}
+"gaussian", "polynomial", "exponential", "linear", "hamming". Default is "gaussian".}
 
 \item{kernelParameters}{[\code{\link{vector}}] with the parameters of
 the chosen kernel. Default is 1.}

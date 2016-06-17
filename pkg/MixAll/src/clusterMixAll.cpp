@@ -61,35 +61,56 @@ static bool hiddenKernelCompute( Rcpp::S4& s4_component
       param1 = r_kernelParameters[0]; param2 =  r_kernelParameters[1];
       break;
   }
-  STK::RMatrix<double> data = s4_component.slot("rawData");
   std::string kernelName = Rcpp::as<std::string>(r_kernelName[0]);
+  STK::Kernel::IKernelBase<STK::RMatrix<double> >* p_kerneld =0;
+  STK::Kernel::IKernelBase<STK::RMatrix<int> >* p_kerneli =0;
+  STK::RMatrix<double> datad;
+  STK::RMatrix<int> datai;
   // build gram matrix and overwrite solt data with it
-  STK::Kernel::IKernelBase<STK::RMatrix<double> >* p_kernel;
   switch (STK::Kernel::stringToKernelType(kernelName))
   {
     case STK::Kernel::exponential_:
-      p_kernel = new STK::Kernel::Exponential<STK::RMatrix<double> >(data, param1);
+      datad = s4_component.slot("rawData");
+      p_kerneld = new STK::Kernel::Exponential<STK::RMatrix<double> >(datad, param1);
+      if (!p_kerneld->run()) { delete p_kerneld; return Rcpp::wrap(false);}
+      s4_component.slot("data") = STK::wrap(p_kerneld->gram());
       break;
     case STK::Kernel::gaussian_:
-      p_kernel = new STK::Kernel::Gaussian<STK::RMatrix<double> >(data, param1);
+      datad = s4_component.slot("rawData");
+      p_kerneld = new STK::Kernel::Gaussian<STK::RMatrix<double> >(datad, param1);
+      if (!p_kerneld->run()) { delete p_kerneld; return Rcpp::wrap(false);}
+      s4_component.slot("data") = STK::wrap(p_kerneld->gram());
       break;
     case STK::Kernel::linear_:
-      p_kernel = new STK::Kernel::Linear<STK::RMatrix<double> >(data);
+      datad = s4_component.slot("rawData");
+      p_kerneld = new STK::Kernel::Linear<STK::RMatrix<double> >(datad);
+      if (!p_kerneld->run()) { delete p_kerneld; return Rcpp::wrap(false);}
+      s4_component.slot("data") = STK::wrap(p_kerneld->gram());
       break;
     case STK::Kernel::polynomial_:
-      p_kernel = new STK::Kernel::Polynomial<STK::RMatrix<double> >(data, param1, param2);
+      datad = s4_component.slot("rawData");
+      p_kerneld = new STK::Kernel::Polynomial<STK::RMatrix<double> >(datad, param1, param2);
+      if (!p_kerneld->run()) { delete p_kerneld; return Rcpp::wrap(false);}
+      s4_component.slot("data") = STK::wrap(p_kerneld->gram());
       break;
     case STK::Kernel::rationalQuadratic_:
-      p_kernel = new STK::Kernel::RationalQuadratic<STK::RMatrix<double> >(data, param1);
+      datad = s4_component.slot("rawData");
+      p_kerneld = new STK::Kernel::RationalQuadratic<STK::RMatrix<double> >(datad, param1);
+      if (!p_kerneld->run()) { delete p_kerneld; return Rcpp::wrap(false);}
+      s4_component.slot("data") = STK::wrap(p_kerneld->gram());
+      break;
+    case STK::Kernel::hamming_:
+      datai = s4_component.slot("rawData");
+      p_kerneli = new STK::Kernel::Hamming<STK::RMatrix<int> >(datai, param1);
+      if (!p_kerneli->run()) { delete p_kerneli; return Rcpp::wrap(false);}
+      s4_component.slot("data") = STK::wrap(p_kerneli->gram());
       break;
     default:
       return false;
       break;
   }
-  if (!p_kernel->run()) { delete p_kernel; return Rcpp::wrap(false);}
-  // overwrite data
-  s4_component.slot("data") = STK::wrap(p_kernel->gram());
-  delete p_kernel;
+  if(p_kerneld) delete p_kerneld;
+  if(p_kerneli) delete p_kerneli;
   // return result
   return true;
 }

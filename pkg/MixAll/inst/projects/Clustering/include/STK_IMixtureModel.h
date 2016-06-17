@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2015  Serge Iovleff, Université Lille 1, Inria
+/*     Copyright (C) 2004-2016  Serge Iovleff, Université Lille 1, Inria
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -38,8 +38,7 @@
 #define STK_IMIXTUREMODEL_H
 
 #include "STK_IMixtureModelBase.h"
-#include <Arrays/include/STK_Array1D.h>
-#include <Arrays/include/STK_Array2D.h>
+#include <StatModels/include/STK_Model_Util.h>
 #include <STatistiK/include/STK_Law_Categorical.h>
 
 #ifdef STK_MIXTURE_DEBUG
@@ -58,33 +57,34 @@ template <class Mixture> struct MixtureTraits;
 
 } // namespace Clust
 
-/** Parameters Handler class. All mixture models implemented has an Id defined
- *  in STK::Clust::Mixture enumeration.
+/** Parameters class. All statistical models has an unique Id defined
+ *  in STK::Model::StatisticalModels enumeration.
  **/
-template <int Id> struct ParametersHandler;
+template <int Id> struct ModelParameters;
 
 /**@ingroup Clustering
  * @brief Main interface class for mixture models.
- * At this level we create the array of Parameters.
+ * At this level we create the Parameters struct. The call to @e setData
+ * trigger the call to @e initializeModel which itself trigger a call to
+ * @e initializeModelImpl to the derived class.
  *
  * The methods to implement in derived classes are
  * @code
- * Type rand(int i, int j, int k) const;
- * Real lnComponentProbability(int i, int k) const;
- * void randomInit();
- * bool mStep();
+ *   template<class Weights>
+ *   Type impute(int i, int j, Weights const& pk) const;
+ *   Type rand(int i, int j, int k) const;
+ *   Real lnComponentProbability(int i, int k) const;
+ *   void randomInit( CArrayXX const*  p_tik, CPointX const* p_nk) ;
+ *   bool run( CArrayXX const*  p_tik, CPointX const* p_nk) ;
  * int computeNbFreeParameters() const;
  * @endcode
  *
  * The pseudo virtual methods to implement if needed in derived classes are
  * @code
- * // default implementation (do nothing) provided to all these methods
- * void initializeModelImpl();
- * bool initializeStepImpl(); // return true by default
- * void finalizeStepImpl();
- * void setParametersImpl();
- * void storeIntermediateResultsImpl(int iter);
- * void releaseIntermediateResultsImpl();
+ *   // default implementation (do nothing) provided to all these methods
+ *   void initializeModelImpl();
+ *   bool initializeStepImpl(); // return true by default
+ *   void finalizeStepImpl();
  * @endcode
  *
  * @sa IMixtureModelBase, IRecursiveTemplate
@@ -94,7 +94,7 @@ class IMixtureModel: public IRecursiveTemplate<Derived>, public IMixtureModelBas
 {
   public:
     typedef typename Clust::MixtureTraits<Derived>::Array Array;
-    typedef typename Clust::MixtureTraits<Derived>::ParamHandler ParamHandler;
+    typedef typename Clust::MixtureTraits<Derived>::Parameters Parameters;
     typedef typename Array::Type Type;
 
   protected:
@@ -125,14 +125,7 @@ class IMixtureModel: public IRecursiveTemplate<Derived>, public IMixtureModelBas
     inline IMixtureModel* create() const { return new Derived(this->nbCluster());}
     /** @return a pointer on the current data set */
     inline Array const* p_data() const { return p_dataij_;}
-    /** @return the parameter handler of the model */
-    inline ParamHandler const& paramHandler() const { return param_;}
 
-    /** set the parameter handler of the model */
-    inline void setParamHandler(ParamHandler const& param) { param_ = param;}
-    /** set the parmater handler using an array/expression storing the values */
-    template<class Array>
-    inline void setParamHandler(ExprBase<Array> const& param) { param_ = param;}
     /** @brief Set the data set.
      *  Setting a (new) data set will trigger the initialization process of the model.
      *  @param data the data set to set
@@ -147,26 +140,10 @@ class IMixtureModel: public IRecursiveTemplate<Derived>, public IMixtureModelBas
      *  is set. Thus the default behavior is @c return true.
      */
     inline bool initializeStep() { return this->asDerived().initializeStepImpl();}
-    /** Store the intermediate results of the Mixture.
-      *  @param iteration Provides the iteration number beginning after the burn-in period.
-     **/
-    inline void storeIntermediateResults(int iteration)
-    {
-      param_.storeIntermediateResults(iteration);
-      this->asDerived().storeIntermediateResultsImpl(iteration);
-    }
-    /** Release the stored results. This is usually used if the estimation
-     *  process failed.
-     **/
-    inline void releaseIntermediateResults()
-    {
-      param_.releaseIntermediateResults();
-      this->asDerived().releaseIntermediateResultsImpl();
-    }
     /** set the parameters stored in stat_proba_ and release stat_proba_. */
-    inline void setParameters()
+    inline void setParametersStep()
     {
-      param_.setParameters();
+      param_.setParametersStep();
       this->asDerived().setParametersImpl();
     }
     /** @brief This function will be called once the model is estimated.
@@ -180,23 +157,16 @@ class IMixtureModel: public IRecursiveTemplate<Derived>, public IMixtureModelBas
     inline bool initializeStepImpl() { return true;}
     /** default implementation of finalizeStepImpl (do nothing) */
     inline void finalizeStepImpl() {}
-    /** default implementation of storeIntermediateResultsImpl (do nothing) */
-    inline void storeIntermediateResultsImpl(int iteration) {}
-    /** default implementation of setParametersImpl (do nothing) */
-    inline void setParametersImpl() {}
-    /** default implementation of releaseIntermediateResultsImpl (do nothing) */
-    inline void releaseIntermediateResultsImpl() {}
 
     /** @return a simulated value for the jth variable of the ith sample
-     *  @param i,j indexes of the data to simulate
+     *  @param i,j indexes of the data to impute
+     *  @param tk the probabilities of each class for the ith individual
      **/
-    inline Type sample(int i, int j) const
-    { return this->asDerived().rand(i, j, Law::Categorical::rand(p_tik()->row(i)));}
+    template<class Weights>
+    Type sample(int i, int j, Weights const& tk) const
+    { return this->asDerived().rand(i, j, Law::Categorical::rand(tk));}
 
   protected:
-    /** @return the parameter handler of the model */
-    inline ParamHandler& paramHandler() { return param_;}
-
     /** @brief Initialize the model before its first use.
      * This function is triggered when data set is set.
      * In this interface, the @c initializeModel() method
@@ -215,8 +185,8 @@ class IMixtureModel: public IRecursiveTemplate<Derived>, public IMixtureModelBas
       // call specific model initialization stuff
       this->asDerived().initializeModelImpl();
     }
-    /** parameter handler associated with the derived mixture model */
-    ParamHandler param_;
+    /** parameters of the derived mixture model */
+    Parameters param_;
 
   private:
     /** pointer on the data set */

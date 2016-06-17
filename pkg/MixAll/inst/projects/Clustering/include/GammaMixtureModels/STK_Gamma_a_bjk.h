@@ -141,7 +141,7 @@ struct ParametersHandler<Clust::Gamma_a_bjk_>: public ParametersHandlerGammaBase
   inline void releaseIntermediateResults()
   { shape_.releaseIntermediateResults(); scale_.releaseIntermediateResults();}
   /** set the parameters stored in stat_proba_ and release stat_proba_. */
-  inline void setParameters() { shape_.setParameters(); scale_.setParameters();}
+  inline void setParametersStep() { shape_.setParametersStep(); scale_.setParametersStep();}
 };
 
 /** @ingroup Clustering
@@ -191,7 +191,7 @@ class Gamma_a_bjk : public GammaBase< Gamma_a_bjk<Array> >
      */
     void randomInit();
     /** Compute the mStep. */
-    bool mStep();
+    bool paramUpdateStep();
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable() + 1;}
@@ -221,7 +221,7 @@ void Gamma_a_bjk<Array>::randomInit()
 
 /* Compute the weighted mean and the common variance. */
 template<class Array>
-bool Gamma_a_bjk<Array>::mStep()
+bool Gamma_a_bjk<Array>::paramUpdateStep()
 {
   if (!this->moments()) { return false;}
   // estimate a
@@ -246,7 +246,7 @@ bool Gamma_a_bjk<Array>::mStep()
   if (!Arithmetic<Real>::isFinite(a))
   {
 #ifdef STK_MIXTURE_DEBUG
-    stk_cout << "ML estimation failed in Gamma_a_bjk::mStep()\n";
+    stk_cout << "ML estimation failed in Gamma_a_bjk::paramUpdateStep()\n";
     stk_cout << "x0 =" << x0 << _T("\n";);
     stk_cout << "f(x0) =" << f(x0) << _T("\n";);
     stk_cout << "x1 =" << x1 << _T("\n";);

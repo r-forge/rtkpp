@@ -1,0 +1,70 @@
+library(MixAll)
+## get data and target from iris data set
+data(iris)
+x <- as.matrix(iris[,1:4]);
+z <- as.vector(iris[,5]);
+n <- nrow(x); p <- ncol(x);
+## add missing values at random
+indexes <- matrix(c(round(runif(5,1,n)), round(runif(5,1,p))), ncol=2);
+x[indexes] <- NA;
+## learn continuous model
+model <- learnDiagGaussian( data=x, labels= z, prop = c(1/3,1/3,1/3)
+                          , models = clusterDiagGaussianNames(prop = "equal")
+                          , algo = "simul", nbIter = 2, epsilon = 1e-08
+                          )
+summary(model)
+model <- learnDiagGaussian( data=x, labels= z,
+                          , models = clusterDiagGaussianNames(prop = "equal")
+                          , algo = "impute", nbIter = 2, epsilon = 1e-08)
+summary(model)
+model <- learnGamma( data=x, labels= z,
+                   , models = clusterGammaNames(prop = "equal")
+                   , algo = "simul", nbIter = 2, epsilon = 1e-08
+                   )
+summary(model)
+
+## get data and target from DebTrivedi data set
+data(DebTrivedi)
+x <- DebTrivedi[, c(1, 6,8, 15)]
+z <- DebTrivedi$medicaid;
+n <- nrow(x); p <- ncol(x);
+model <- learnPoisson( data=x, labels=z
+                     , models = clusterPoissonNames(prop = "equal")
+                     , algo="simul", nbIter = 2, epsilon =  1e-08
+                     )
+summary(model)
+
+## get data and target from bird data set
+data(birds)
+## add 10 missing values
+x <- birds[,2:5]; x = as.matrix(x); n <- nrow(x); p <- ncol(x);
+z <- birds[,1];
+indexes <- matrix(c(round(runif(5,1,n)), round(runif(5,1,p))), ncol=2);
+x[indexes] <- NA;
+model <- learnCategorical( data=x, labels=z
+                         , models = clusterCategoricalNames(prop = "equal")
+                         , algo="simul", nbIter = 2, epsilon =  1e-08
+                         )
+summary(model)
+
+## get data and target from bulls eye data set
+data(bullsEye)
+x <- bullsEye[,1:2]; x = as.matrix(x); n <- nrow(x); p <- ncol(x);
+z <- bullsEye[,3];
+model <- learnKernel( data=x, labels=z
+                    , models = clusterKernelNames(prop = "equal")
+                    , algo="impute", nbIter = 1, epsilon =  1e-08
+                    )
+summary(model)
+
+## A quantitative example with the heart disease data set
+data(HeartDisease.cat)
+data(HeartDisease.cont)
+data(HeartDisease.target)
+## with default values
+ldata = list(HeartDisease.cat, HeartDisease.cont);
+models = c("categorical_pk_pjk","gaussian_pk_sjk")
+z<-HeartDisease.target[[1]];
+model <- learnMixedData(ldata, models, z, algo="simul", nbIter=2)
+summary(model)
+

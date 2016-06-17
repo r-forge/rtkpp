@@ -38,7 +38,7 @@
 #ifndef STK_CLUSTERLAUNCHER_H
 #define STK_CLUSTERLAUNCHER_H
 
-#include "RDataHandler.h"
+#include "ILauncher.h"
 
 namespace STK
 {
@@ -46,7 +46,7 @@ namespace STK
 /**The ClusterLauncher allow to create the strategy for estimating a mixture model
  * with less effort
  **/
-class ClusterLauncher : public IRunnerBase
+class ClusterLauncher: public ILauncher
 {
   public:
     /** constructor.
@@ -82,50 +82,18 @@ class ClusterLauncher : public IRunnerBase
     /** Select the best model among the models and nbCluster given.
      *  @return the value of the best criteria.
      **/
-    Real selectSingleBestModel();
+    Real selectBestSingleModel();
     /** Select the best model among the models and nbCluster given.
      *  @return the value of the best criteria.
      **/
-    Real selectMixedBestModel();
-    /** create the mixtures in the given composer */
-    void createMixtures(MixtureComposer* p_composer);
+    Real selectBestMixedModel();
     /** create the kernel mixtures in the given composer. We have to
      * use a workaround for this kind of model as they need an extra parameter
      * (the dimension) to be given
      **/
-    void createKernelMixtures(MixtureComposer* p_composer);
-    /** get the parameters */
-    void getParameters(Rcpp::S4& s4_component, std::string const& idData);
-    /** get the diagonal Gaussian parameters */
-    void getDiagGaussianParameters(Rcpp::S4& s4_component, std::string const& idData);
-    /** get the Poisson parameters */
-    void getPoissonParameters(Rcpp::S4& s4_component, std::string const& idData);
-    /** get the gamma parameters */
-    void getGammaParameters(Rcpp::S4& s4_component, std::string const& idData);
-    /** get the gamma parameters */
-    void getCategoricalParameters(Rcpp::S4& s4_component, std::string const& idData);
-    /** get the kernel parameters */
-    void getKernelParameters(Rcpp::S4& s4_component, std::string const& idData);
-
-    /** data handler */
-    RDataHandler handler_;
-
-    /** diagonal Gaussian mixture models manager */
-    DiagGaussianMixtureManager<RDataHandler> diagGaussianManager_;
-    /** Poisson mixture models manager */
-    PoissonMixtureManager<RDataHandler> poissonManager_;
-    /** gamma mixture models manager */
-    GammaMixtureManager<RDataHandler> gammaManager_;
-    /** categorical mixture models manager */
-    CategoricalMixtureManager<RDataHandler> categoricalManager_;
-    /** kernel mixture models manager */
-    KernelMixtureManager<RDataHandler> kernelManager_;
-
+    void updateMixtures(MixtureComposer* p_composer);
     /** pointer on the main composer */
     IMixtureComposer* p_composer_;
-
-    /** Is the model with mixed data ? */
-    bool isMixedData_;
 };
 
 } // namespace STK

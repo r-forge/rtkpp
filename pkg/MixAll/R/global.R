@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-#     Copyright (C) 2012-2014  Serge Iovleff, University Lille 1, Inria
+#     Copyright (C) 2012-2016  Serge Iovleff, University Lille 1, Inria
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as
@@ -126,7 +126,8 @@ NULL
 
 #' Produce summary of a MixAll S4 class.
 #'
-#' @param object any cluster model deriving from a \code{\linkS4class{IClusterModelBase}} object.
+#' @param object any cluster model deriving from a \code{\linkS4class{IClusterModel}}
+#' or \code{\linkS4class{IClusterComponent}} object.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @return NULL. Summaries to standard out.
@@ -136,10 +137,6 @@ NULL
 #' @rdname summary-methods
 #' @exportMethod summary
 #'
-#' @seealso \code{\link{summary}}
-#' @examples
-#'   data(geyser)
-#'   model <- clusterDiagGaussian(geyser,3)
-#'   summary(model)
+# @seealso \code{\link{base::summary}}
 #'
 NULL

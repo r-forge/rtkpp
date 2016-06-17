@@ -1,4 +1,5 @@
 export(clusterAlgo
+      ,learnAlgo
       ,clusterInit
       ,clusterStrategy
       ,clusterFastStrategy
@@ -19,12 +20,19 @@ export(clusterAlgo
       ,clusterPoisson
       ,clusterMixedData
       ,clusterKernel
+      ,learnDiagGaussian
+      ,learnGamma
+      ,learnPoisson
+      ,learnCategorical
+      ,learnMixedData
+      ,learnKernel
       )
 
 exportClasses(ClusterAlgo
+             ,LearnAlgo
              ,ClusterInit
              ,ClusterStrategy
-             ,IClusterModelBase
+             ,IClusterModel
              ,IClusterComponent
              ,ClusterDiagGaussianComponent
              ,ClusterDiagGaussian
@@ -47,9 +55,8 @@ exportMethods(missingValues)
 
 import(rtkore)
 
-importFrom("methods", "show")
 importFrom("graphics", "close.screen", "hist", "lines", "par", "screen", "split.screen")
-importFrom("methods", "callNextMethod", "new", "validObject")
+importFrom("methods", "show", "callNextMethod", "new", "validObject")
 importFrom("stats", "cov.wt", "dgamma", "dnorm", "dpois")
 
 useDynLib(MixAll)

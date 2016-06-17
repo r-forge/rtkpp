@@ -51,12 +51,12 @@ NULL
 #'
 #' @examples
 #' ## A quantitative example with the heart disease data set
-#'  data(HeartDisease.cat)
-#'  data(HeartDisease.cont)
+#' data(HeartDisease.cat)
+#' data(HeartDisease.cont)
 #' ## with default values
-#' ldata = list(HeartDisease.cat,HeartDisease.cont);
-#' lnames = c("categorical_pk_pjk","gaussian_pk_sjk")
-#' model <- clusterMixedData(ldata, lnames, nbCluster=2:5, strategy = clusterFastStrategy())
+#' ldata = list(HeartDisease.cat, HeartDisease.cont);
+#' models = c("categorical_pk_pjk","gaussian_pk_sjk")
+#' model <- clusterMixedData(ldata, models, nbCluster=2:5, strategy = clusterFastStrategy())
 #'
 #' ## get summary
 #' summary(model)
@@ -92,11 +92,11 @@ clusterMixedData <- function( data, models, nbCluster=2
   if(class(strategy)[1] != "ClusterStrategy")
   {stop("strategy is not a Cluster Stategy class (must be an instance of the class ClusterStrategy).")}
   validObject(strategy);
-
   # check data and models
-  if (!is.list(data)) { stop("data must be a list");}
+  if (!is.list(data))     { stop("data must be a list");}
   if (!is.vector(models)) { stop("models must be a vector of character");}
   if (length(data) != length(models)) { stop("data and models must be of equal lengths");}
+
   # create list of component
   ldata <- vector("list", length(data));
   for (i in 1:length(data))
@@ -105,7 +105,8 @@ clusterMixedData <- function( data, models, nbCluster=2
     if (is.list(models))
     {
       param <- models[[i]];
-      modelName <- param$modelName
+      if (is.list(param)) { modelName <- param$modelName}
+      else {modelName <- param}
     }
     else # otherwise param and modelName are the same
     {
@@ -124,26 +125,29 @@ clusterMixedData <- function( data, models, nbCluster=2
         if( clusterValidDiagGaussianNames(modelName) )
         { ldata[[i]] <- new("ClusterDiagGaussianComponent", data[[i]], nbClusterMin, modelName);}
         else
-        {
-          if( clusterKernelNames(modelName) )
+        { # check if it a kernel model
+          if( clusterValidKernelNames(modelName) )
           {
-            # check if it is kernel mixture model
-            if (is.list(param)) # param has to be a list
+            if (is.list(param)) # get kernel parameters and check values
             {
-              kernelName = param$kernelName
-              kernelParameters = param$kernelParameters
-              dim = param$dim
-              # check values
-              if(is.null(modelName)) { modelName="kernelGaussian_pk_sk";}
-              if(is.null(dim)) { dim = 10; }
-              if(is.null(kernelParameters)) { kernelParameters = c(); }
+              kernelName = param$kernelName;
+              if(is.null(kernelName)) { kernelName = "gaussian";}
+              kernelParameters = param$kernelParameters;
+              if(is.null(kernelParameters)) { kernelParameters = c();}
+              dim = param$dim;
+              if(is.null(dim)) { dim = 10;}
             }
-            else
+            else # set default values
             {
-              kernelName = "kernelGaussian_pk_sk"
-              kernelParameters = c()
-              dim = 10
+              kernelName <- "gaussian"
+              kernelParameters <- c()
+              dim <- 10
             }
+            # check kernel name
+            if(sum(kernelName %in% c("gaussian","polynomial", "exponential","linear","hamming")) != 1)
+            { stop("kernelName is not valid. See ?clusterKernel for the list of valid kernel name")}
+            # check dim
+            if (dim < 1) { stop("The dimension must be greater or equal to 1")}
             # create component
             component <- new("ClusterKernelComponent", data[[i]], dim= dim, nbCluster= nbClusterMin, modelName= modelName);
             # compute gram matrix
@@ -183,9 +187,9 @@ clusterMixedData <- function( data, models, nbCluster=2
 #-----------------------------------------------------------------------
 #' Definition of the [\code{\linkS4class{ClusterMixedData}}] class
 #'
-#' This class defines an MixedData mixture Model.
+#' This class defines a mixed data mixture Model.
 #'
-#' This class inherits from the [\code{\linkS4class{IClusterModelBase}}] class.
+#' This class inherits from the [\code{\linkS4class{IClusterModel}}] class.
 #' A model for mixed data is a mixture model of the form:
 #' \deqn{
 #' f({{x}}_i=({{x}}_{1i}, {{x}}_{2i},\ldots {{x}}_{Li})|\theta)
@@ -196,7 +200,7 @@ clusterMixedData <- function( data, models, nbCluster=2
 #' can be any implemented model (Gaussian, Poisson,...).
 #'
 #' @slot ldata  a list of IClusterComponent.
-#' @seealso [\code{\linkS4class{IClusterModelBase}}] class
+#' @seealso [\code{\linkS4class{IClusterModel}}] class
 #'
 #' @examples
 #' getSlots("ClusterMixedData")
@@ -211,7 +215,7 @@ clusterMixedData <- function( data, models, nbCluster=2
 setClass(
     Class="ClusterMixedData",
     representation( ldata = "list"),
-    contains=c("IClusterModelBase"),
+    contains=c("IClusterModel"),
     validity=function(object)
     {
       nbData = length(object@ldata)

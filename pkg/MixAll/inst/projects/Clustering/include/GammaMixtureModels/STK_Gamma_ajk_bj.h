@@ -144,7 +144,7 @@ struct ParametersHandler<Clust::Gamma_ajk_bj_>: public ParametersHandlerGammaBas
   inline void releaseIntermediateResults()
   { shape_.releaseIntermediateResults(); scale_.releaseIntermediateResults();}
   /** set the parameters stored in stat_proba_ and release stat_proba_. */
-  inline void setParameters() { shape_.setParameters(); scale_.setParameters();}
+  inline void setParametersStep() { shape_.setParametersStep(); scale_.setParametersStep();}
 };
 
 /** @ingroup Clustering
@@ -190,7 +190,7 @@ class Gamma_ajk_bj : public GammaBase<Gamma_ajk_bj<Array> >
     /** Initialize randomly the parameters of the Gamma mixture. */
     void randomInit();
     /** Compute the weighted mean and the common variance. */
-    bool mStep();
+    bool paramUpdateStep();
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable()+ this->nbVariable();}
@@ -223,7 +223,7 @@ void Gamma_ajk_bj<Array>::randomInit()
 
 /* Compute the weighted mean and the common variance. */
 template<class Array>
-bool Gamma_ajk_bj<Array>::mStep()
+bool Gamma_ajk_bj<Array>::paramUpdateStep()
 {
   if (!this->moments()) { return false;}
   // start estimations of the ajk and bj
@@ -249,7 +249,7 @@ bool Gamma_ajk_bj<Array>::mStep()
         {
           param_.shape_[k][j] = x0; // use moment estimate
 #ifdef STK_MIXTURE_DEBUG
-          stk_cout << _T("ML estimation failed in Gamma_ajk_bj::mStep()\n");
+          stk_cout << _T("ML estimation failed in Gamma_ajk_bj::paramUpdateStep()\n");
           stk_cout << "x0 =" << x0 << _T("\n";);
           stk_cout << "f(x0) =" << f(x0) << _T("\n";);
           stk_cout << "x1 =" << x1 << _T("\n";);
@@ -271,7 +271,7 @@ bool Gamma_ajk_bj<Array>::mStep()
 #ifdef STK_MIXTURE_DEBUG
     if (value < qvalue)
     {
-      stk_cout << _T("In Gamma_ajk_bj::mStep(): mStep diverge\n");
+      stk_cout << _T("In Gamma_ajk_bj::paramUpdateStep(): mStep diverge\n");
       stk_cout << _T("New value =") << value << _T(", qvalue =") << qvalue << _T("\n");
     }
 #endif
@@ -281,7 +281,7 @@ bool Gamma_ajk_bj<Array>::mStep()
 #ifdef STK_MIXTURE_DEBUG
   if (iter == MAXITER)
   {
-    stk_cout << _T("In Gamma_ajk_bj::mStep(): mStep did not converge\n");
+    stk_cout << _T("In Gamma_ajk_bj::paramUpdateStep(): mStep did not converge\n");
     stk_cout << _T("qvalue =") << qvalue << _T("\n");
   }
 #endif

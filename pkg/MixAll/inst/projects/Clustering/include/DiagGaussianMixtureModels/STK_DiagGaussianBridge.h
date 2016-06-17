@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2015 Serge Iovleff
+/*     Copyright (C) 2004-2016 Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -37,13 +37,15 @@
 #ifndef STK_DIAGGAUSSIANBRIDGE_H
 #define STK_DIAGGAUSSIANBRIDGE_H
 
-#include "STK_Gaussian_s.h"
-#include "STK_Gaussian_sj.h"
-#include "STK_Gaussian_sjk.h"
-#include "STK_Gaussian_sk.h"
+#include "STK_MixtureGaussian_s.h"
+#include "STK_MixtureGaussian_sj.h"
+#include "STK_MixtureGaussian_sjk.h"
+#include "STK_MixtureGaussian_sk.h"
 
-#include "../STK_MixtureData.h"
 #include "../STK_IMixtureBridge.h"
+
+#include <DManager/include/STK_DataBridge.h>
+#include <STatistiK/include/STK_Stat_Online.h>
 
 namespace STK
 {
@@ -54,25 +56,25 @@ template<int Id, class Data> class DiagGaussianBridge;
 namespace hidden
 {
 /** @ingroup hidden
- *  Partial specialization of the MixtureBridgeTraits for the Gaussian_sjk model
+ *  Partial specialization of the MixtureBridgeTraits for the MixtureGaussian_sjk model
  **/
 template<class Data_>
 struct MixtureBridgeTraits< DiagGaussianBridge< Clust::Gaussian_sjk_, Data_> >
 {
   typedef Data_ Data;
   /** Type of the mixture model */
-  typedef Gaussian_sjk<Data> Mixture;
+  typedef MixtureGaussian_sjk<Data> Mixture;
+  /** Type of the structure storing the mixture parameters */
+  typedef ModelParameters<Clust::Gaussian_sjk_> Parameters;
   /** Type of the parameter handler */
   typedef ParametersHandler<Clust::Gaussian_sjk_> ParamHandler;
-  /** Structure storing Parameters */
-  typedef ArrayXX Parameters;
   enum
   {
     idMixtureClass_ = Clust::Gaussian_
   };
 };
 /** @ingroup hidden
- *  Partial specialization of the MixtureBridgeTraits for the Gaussian_sk model
+ *  Partial specialization of the MixtureBridgeTraits for the MixtureGaussian_sk model
  **/
 template<class Data_>
 struct MixtureBridgeTraits< DiagGaussianBridge< Clust::Gaussian_sk_, Data_> >
@@ -81,18 +83,18 @@ struct MixtureBridgeTraits< DiagGaussianBridge< Clust::Gaussian_sk_, Data_> >
   /** Data Type */
   typedef typename Data_::Type Type;
   /** Type of the mixture model */
-  typedef Gaussian_sk<Data> Mixture;
+  typedef MixtureGaussian_sk<Data> Mixture;
+  /** Type of the structure storing the mixture parameters */
+  typedef ModelParameters<Clust::Gaussian_sk_> Parameters;
   /** Type of the parameter handler */
   typedef ParametersHandler<Clust::Gaussian_sk_> ParamHandler;
-  /** Structure storing Parameters */
-  typedef ArrayXX Parameters;
   enum
   {
     idMixtureClass_ = Clust::Gaussian_
   };
 };
 /** @ingroup hidden
- *  Partial specialization of the MixtureBridgeTraits for the Gaussian_sj model
+ *  Partial specialization of the MixtureBridgeTraits for the MixtureGaussian_sj model
  **/
 template<class Data_>
 struct MixtureBridgeTraits< DiagGaussianBridge< Clust::Gaussian_sj_, Data_> >
@@ -101,18 +103,18 @@ struct MixtureBridgeTraits< DiagGaussianBridge< Clust::Gaussian_sj_, Data_> >
   /** Data Type */
   typedef typename Data_::Type Type;
   /** Type of the mixture model */
-  typedef Gaussian_sj<Data> Mixture;
+  typedef MixtureGaussian_sj<Data> Mixture;
+  /** Type of the structure storing the mixture parameters */
+  typedef ModelParameters<Clust::Gaussian_sj_> Parameters;
   /** Type of the parameter handler */
   typedef ParametersHandler<Clust::Gaussian_sj_> ParamHandler;
-  /** Structure storing Parameters */
-  typedef ArrayXX Parameters;
   enum
   {
     idMixtureClass_ = Clust::Gaussian_
   };
 };
 /** @ingroup hidden
- *  Partial specialization of the MixtureBridgeTraits for the Gaussian_s model
+ *  Partial specialization of the MixtureBridgeTraits for the MixtureGaussian_s model
  **/
 template<class Data_>
 struct MixtureBridgeTraits< DiagGaussianBridge< Clust::Gaussian_s_, Data_> >
@@ -121,11 +123,11 @@ struct MixtureBridgeTraits< DiagGaussianBridge< Clust::Gaussian_s_, Data_> >
   /** Data Type */
   typedef typename Data_::Type Type;
   /** Type of the mixture model */
-  typedef Gaussian_s<Data> Mixture;
+  typedef MixtureGaussian_s<Data> Mixture;
+  /** Type of the structure storing the mixture parameters */
+  typedef ModelParameters<Clust::Gaussian_s_> Parameters;
   /** Type of the parameter handler */
   typedef ParametersHandler<Clust::Gaussian_s_> ParamHandler;
-  /** Structure storing Parameters */
-  typedef ArrayXX Parameters;
   enum
   {
     idMixtureClass_ = Clust::Gaussian_
@@ -134,10 +136,399 @@ struct MixtureBridgeTraits< DiagGaussianBridge< Clust::Gaussian_s_, Data_> >
 
 } // namespace hidden
 
-} // namespace STK
-
-namespace STK
+/** @ingroup Clustering
+ *  Specialization of the ParametersHandler struct for MixtureGaussian_sjk model
+ **/
+template <>
+struct ParametersHandler<Clust::Gaussian_sjk_>
 {
+    typedef ModelParameters<Clust::Gaussian_sjk_> Parameters;
+    /** Array of the mean statistics */
+    Array1D< Stat::Online<CPointX, Real> > stat_mean_;
+    /** Array of the standard deviation statistics */
+    Array1D< Stat::Online<CPointX, Real> > stat_sigma_;
+    /** default constructor. */
+    inline ParametersHandler( int nbCluster)
+                            : stat_mean_(nbCluster)
+                            , stat_sigma_(nbCluster)
+    {}
+    /** copy constructor.
+     *  @param param the parameters to copy.
+     **/
+    inline ParametersHandler( ParametersHandler const& param)
+                            : stat_mean_(param.stat_mean_)
+                            , stat_sigma_(param.stat_sigma_)
+    {}
+    /** destructor */
+    inline ~ParametersHandler() {}
+    /** copy operator */
+    inline ParametersHandler& operator=( ParametersHandler const& other)
+    {
+      stat_mean_ = other.stat_mean_;
+      stat_sigma_ = other.stat_sigma_;
+      return *this;
+    }
+    /** update statistics of the parameters. */
+    inline void updateStatistics(Parameters const& param)
+    {
+      for(int k=stat_mean_.begin(); k<stat_mean_.end(); ++k)
+      { stat_mean_[k].update(param.mean_[k]);
+        stat_sigma_[k].update(param.sigma_[k]);
+      }
+    }
+    /** Set the computed statistics */
+    inline void setStatistics(Parameters& param)
+    {
+      for(int k=stat_mean_.begin(); k<stat_mean_.end(); ++k)
+      {
+        param.mean_[k] = stat_mean_[k].mean();
+        stat_mean_[k].release();
+        param.sigma_[k] = stat_sigma_[k].mean();
+        stat_sigma_[k].release();
+      }
+    }
+    /** Get the parameters of the mixture model.
+     *  It is assumed that the array params store for each class the shapes and
+     *  scales parameters on two consecutive rows.
+     *  The number of column of params is the number of variables.
+     *  @note the array params has to be resized before any call
+     **/
+    template<class Array>
+    inline void getParameters(Parameters const& param, ArrayBase<Array>& params)
+    {
+      for(int k=param.mean_.begin(), kp= params.beginRows(); k<param.mean_.end(); ++k, kp+=2)
+      {
+        params.row(kp) = param.mean_[k];
+        params.row(kp+1) = param.sigma_[k];
+      }
+    }
+    /** Set the parameters of the mixture model.
+     *  It is assumed that the array params store for each class the shapes and
+     *  scales parameters on two consecutive rows.
+     *  The number of column of params is the number of variables.
+     **/
+    template<class Array>
+    inline void setParameters(Parameters& param, ExprBase<Array> const& params)
+    {
+      for(int k=param.mean_.begin(), kp= params.beginRows(); k<param.mean_.end(); ++k, kp+=2)
+      {
+        param.mean_[k] = params.row(kp);
+        param.sigma_[k] = params.row(kp+1);
+      }
+    }
+    /** Release the computed statistics */
+    inline void releaseStatistics()
+    {
+      for(int k=stat_mean_.begin(); k<stat_mean_.end(); ++k)
+      {
+        stat_mean_[k].release();
+        stat_sigma_[k].release();
+      }
+    }
+    /** Initialize the statistics. */
+    inline void resize(Range const& range)
+    {
+      for(int k=stat_mean_.begin(); k<stat_mean_.end(); ++k)
+      { stat_mean_[k].resize(range);
+        stat_sigma_[k].resize(range);
+      }
+    }
+};
+
+/** @ingroup Clustering
+ *  Specialization of the ParametersHandler struct for MixtureGaussian_sk model
+ **/
+template <>
+struct ParametersHandler<Clust::Gaussian_sk_>
+{
+    typedef ModelParameters<Clust::Gaussian_sk_> Parameters;
+    /** Array of the mean statistics */
+    Array1D< Stat::Online<CPointX, Real> > stat_mean_;
+    /** Array of the standard deviation statistics */
+    Array1D< Stat::Online<Real, Real> > stat_sigma_;
+
+    /** default constructor. */
+    inline ParametersHandler( int nbCluster)
+                            : stat_mean_(nbCluster)
+                            , stat_sigma_(nbCluster)
+    {}
+    /** copy constructor.
+     *  @param param the parameters to copy.
+     **/
+    inline ParametersHandler( ParametersHandler const& param)
+                            : stat_mean_(param.stat_mean_)
+                            , stat_sigma_(param.stat_sigma_)
+    {}
+    /** destructor */
+    inline ~ParametersHandler() {}
+    /** copy operator */
+    inline ParametersHandler& operator=( ParametersHandler const& other)
+    {
+      stat_mean_ = other.stat_mean_;
+      stat_sigma_ = other.stat_sigma_;
+      return *this;
+    }
+    /** update statistics of the parameters. */
+    inline void updateStatistics(Parameters const& param)
+    {
+      for(int k=stat_mean_.begin(); k<stat_mean_.end(); ++k)
+      { stat_mean_[k].update(param.mean_[k]);
+        stat_sigma_[k].update(param.sigma_[k]);
+      }
+    }
+    /** Set the computed statistics */
+    inline void setStatistics(Parameters& param)
+    {
+      for(int k=stat_mean_.begin(); k<stat_mean_.end(); ++k)
+      {
+        param.mean_[k] = stat_mean_[k].mean();
+        stat_mean_[k].release();
+        param.sigma_[k] = stat_sigma_[k].mean();
+        stat_sigma_[k].release();
+      }
+    }
+    /** Get the parameters of the mixture model.
+     *  It is assumed that the array params store for each class the shapes and
+     *  scales parameters on two consecutive rows.
+     *  The number of column of params is the number of variables.
+     *  @note the array params has to be resized before any call
+     **/
+    template<class Array>
+    inline void getParameters(Parameters const& param, ArrayBase<Array>& params)
+    {
+      for(int k=param.mean_.begin(), kp= params.beginRows(); k<param.mean_.end(); ++k, kp+=2)
+      {
+        params.row(kp) = param.mean_[k];
+        params.row(kp+1) = param.sigma_[k];
+      }
+    }
+    /** Set the parameters of the mixture model.
+     *  It is assumed that the array params store for each class the shapes and
+     *  scales parameters on two consecutive rows.
+     *  The number of column of params is the number of variables.
+     **/
+    template<class Array>
+    inline void setParameters(Parameters& param, ExprBase<Array> const& params)
+    {
+      for(int k=param.mean_.begin(), kp= params.beginRows(); k<param.mean_.end(); ++k, kp+=2)
+      {
+        param.mean_[k] = params.row(kp);
+        param.sigma_[k] = params.row(kp+1).mean();
+      }
+    }
+    /** Release the computed statistics */
+    inline void releaseStatistics()
+    {
+      for(int k=stat_mean_.begin(); k<stat_mean_.end(); ++k)
+      {
+        stat_mean_[k].release();
+        stat_sigma_[k].release();
+      }
+    }
+    /** Initialize the statistics. */
+    inline void resize(Range const& range)
+    {
+      for(int k=stat_mean_.begin(); k<stat_mean_.end(); ++k)
+      { stat_mean_[k].resize(range);
+        stat_sigma_[k].release();
+      }
+    }
+};
+
+/** @ingroup Clustering
+ *  Specialization of the ParametersHandler struct for MixtureGaussian_sj model
+ **/
+template <>
+struct ParametersHandler<Clust::Gaussian_sj_>
+{
+    typedef ModelParameters<Clust::Gaussian_sj_> Parameters;
+    /** Array of the mean statistics */
+    Array1D< Stat::Online<CPointX, Real> > stat_mean_;
+    /** Array of the standard deviation statistics */
+   Stat::Online<CPointX, Real> stat_sigma_;
+
+    /** default constructor. */
+    inline ParametersHandler( int nbCluster)
+                            : stat_mean_(nbCluster)
+                            , stat_sigma_()
+    {}
+    /** copy constructor.
+     *  @param param the parameters to copy.
+     **/
+    inline ParametersHandler( ParametersHandler const& param)
+                            : stat_mean_(param.stat_mean_)
+                            , stat_sigma_(param.stat_sigma_)
+    {}
+    /** destructor */
+    inline ~ParametersHandler() {}
+    /** copy operator */
+    inline ParametersHandler& operator=( ParametersHandler const& other)
+    {
+      stat_mean_ = other.stat_mean_;
+      stat_sigma_ = other.stat_sigma_;
+      return *this;
+    }
+    /** update statistics of the parameters. */
+    inline void updateStatistics(Parameters const& param)
+    {
+      for(int k=stat_mean_.begin(); k<stat_mean_.end(); ++k)
+      { stat_mean_[k].update(param.mean_[k]);}
+      stat_sigma_.update(param.sigma_);
+    }
+    /** Get the parameters of the mixture model.
+     *  It is assumed that the array params store for each class the shapes and
+     *  scales parameters on two consecutive rows.
+     *  The number of column of params is the number of variables.
+     *  @note the array params has to be resized before any call
+     **/
+    template<class Array>
+    inline void getParameters(Parameters const& param, ArrayBase<Array>& params)
+    {
+      for(int k=param.mean_.begin(), kp= params.beginRows(); k<param.mean_.end(); ++k, kp+=2)
+      {
+        params.row(kp) = param.mean_[k];
+        params.row(kp+1) = param.sigma_;
+      }
+    }
+    /** Set the parameters of the mixture model.
+     *  It is assumed that the array params store for each class the shapes and
+     *  scales parameters on two consecutive rows.
+     *  The number of column of params is the number of variables.
+     **/
+    template<class Array>
+    inline void setParameters(Parameters& param, ExprBase<Array> const& params)
+    {
+      param.sigma_ =0.;
+      for(int k=param.mean_.begin(), kp= params.beginRows(); k<param.mean_.end(); ++k, kp+=2)
+      {
+        param.mean_[k] = params.row(kp);
+        param.sigma_ += params.row(kp+1);
+      }
+      param.sigma_ /= param.mean_.size();
+    }
+    /** Set the computed statistics */
+    inline void setStatistics(Parameters& param)
+    {
+      for(int k=stat_mean_.begin(); k<stat_mean_.end(); ++k)
+      {
+        param.mean_[k] = stat_mean_[k].mean();
+        stat_mean_[k].release();
+      }
+      param.sigma_ = stat_sigma_.mean();
+      stat_sigma_.release();
+    }
+    /** Release the computed statistics */
+    inline void releaseStatistics()
+    {
+      for(int k=stat_mean_.begin(); k<stat_mean_.end(); ++k)
+      { stat_mean_[k].release();}
+      stat_sigma_.release();
+    }
+    /** Initialize the statistics. */
+    inline void resize(Range const& range)
+    {
+      for(int k=stat_mean_.begin(); k<stat_mean_.end(); ++k)
+      { stat_mean_[k].resize(range);}
+      stat_sigma_.resize(range);
+    }
+};
+
+/** @ingroup Clustering
+ *  Specialization of the ParametersHandler struct for MixtureGaussian_s model
+ **/
+template <>
+struct ParametersHandler<Clust::Gaussian_s_>
+{
+    typedef ModelParameters<Clust::Gaussian_s_> Parameters;
+    /** Array of the mean statistics */
+    Array1D< Stat::Online<CPointX, Real> > stat_mean_;
+    /** Array of the standard deviation statistics */
+    Stat::Online<Real, Real> stat_sigma_;
+    /** default constructor. */
+    inline ParametersHandler( int nbCluster)
+                            : stat_mean_(nbCluster)
+                            , stat_sigma_()
+    {}
+    /** copy constructor.
+     *  @param param the parameters to copy.
+     **/
+    inline ParametersHandler( ParametersHandler const& param)
+                            : stat_mean_(param.stat_mean_)
+                            , stat_sigma_(param.stat_sigma_)
+    {}
+    /** destructor */
+    inline ~ParametersHandler() {}
+    /** copy operator */
+    inline ParametersHandler& operator=( ParametersHandler const& other)
+    {
+      stat_mean_ = other.stat_mean_;
+      stat_sigma_ = other.stat_sigma_;
+      return *this;
+    }
+    /** update statistics of the parameters. */
+    inline void updateStatistics(Parameters const& param)
+    {
+      for(int k=stat_mean_.begin(); k<stat_mean_.end(); ++k)
+      { stat_mean_[k].update(param.mean_[k]);}
+      stat_sigma_.update(param.sigma_);
+    }
+    /** Set the computed statistics */
+    inline void setStatistics(Parameters& param)
+    {
+      for(int k=stat_mean_.begin(); k<stat_mean_.end(); ++k)
+      {
+        param.mean_[k] = stat_mean_[k].mean();
+        stat_mean_[k].release();
+      }
+      param.sigma_ = stat_sigma_.mean();
+      stat_sigma_.release();
+    }
+    /** Get the parameters of the mixture model.
+     *  It is assumed that the array params store for each class the shapes and
+     *  scales parameters on two consecutive rows.
+     *  The number of column of params is the number of variables.
+     *  @note the array params has to be resized before any call
+     **/
+    template<class Array>
+    inline void getParameters(Parameters const& param, ArrayBase<Array>& params)
+    {
+      for(int k=param.mean_.begin(), kp= params.beginRows(); k<param.mean_.end(); ++k, kp+=2)
+      {
+        params.row(kp) = param.mean_[k];
+        params.row(kp+1) = param.sigma_;
+      }
+    }
+    /** Set the parameters of the mixture model.
+     *  It is assumed that the array params store for each class the shapes and
+     *  scales parameters on two consecutive rows.
+     *  The number of column of params is the number of variables.
+     **/
+    template<class Array>
+    inline void setParameters(Parameters& param, ExprBase<Array> const& params)
+    {
+      param.sigma_ =0.;
+      for(int k=param.mean_.begin(), kp= params.beginRows(); k<param.mean_.end(); ++k, kp+=2)
+      {
+        param.mean_[k] = params.row(kp);
+        param.sigma_ += params.row(kp+1).mean();
+      }
+      param.sigma_ /= param.mean_.size();
+    }
+    /** Release the computed statistics */
+    inline void releaseStatistics()
+    {
+      for(int k=stat_mean_.begin(); k<stat_mean_.end(); ++k)
+      { stat_mean_[k].release();}
+      stat_sigma_.release();
+    }
+    /** Initialize the statistics. */
+    inline void resize(Range const& range)
+    {
+      for(int k=stat_mean_.begin(); k<stat_mean_.end(); ++k)
+      { stat_mean_[k].resize(range);}
+    }
+};
+
 /** @ingroup Clustering
  *  @brief Templated implementation of the IMixture interface allowing
  *  to bridge a STK++ mixture with the composer.
@@ -146,7 +537,7 @@ namespace STK
  *  all the treatments to the wrapped class.
  *
  * @tparam Id is any identifier of a concrete model deriving from the
- * interface STK::IMixtureModel class.
+ * interface STK::IMixtureDensity class.
  */
 template<int Id, class Data>
 class DiagGaussianBridge: public IMixtureBridge< DiagGaussianBridge<Id,Data> >
@@ -156,8 +547,8 @@ class DiagGaussianBridge: public IMixtureBridge< DiagGaussianBridge<Id,Data> >
     typedef IMixtureBridge< DiagGaussianBridge<Id,Data> > Base;
     // type of Mixture
     typedef typename hidden::MixtureBridgeTraits< DiagGaussianBridge<Id,Data> >::Mixture Mixture;
-    typedef typename hidden::MixtureBridgeTraits< DiagGaussianBridge<Id,Data> >::ParamHandler ParamHandler;
     typedef typename hidden::MixtureBridgeTraits< DiagGaussianBridge<Id,Data> >::Parameters Parameters;
+    typedef typename hidden::MixtureBridgeTraits< DiagGaussianBridge<Id,Data> >::ParamHandler ParamHandler;
     // type of data
     typedef typename Data::Type Type;
     // class of mixture
@@ -167,21 +558,22 @@ class DiagGaussianBridge: public IMixtureBridge< DiagGaussianBridge<Id,Data> >
     };
     typedef std::vector<std::pair<int,int> >::const_iterator ConstIterator;
     using Base::mixture_;
+    using Base::paramHandler_;
     using Base::p_data_;
     using Base::p_tik;
 
     /** default constructor. Remove the missing values from the data set and
      *  initialize the mixture by setting the data set.
-     *  @param p_data pointer on the MixtureData that will be used by the bridge.
+     *  @param p_data pointer on the DataBridge that will be used by the bridge.
      *  @param idData id name of the mixture model
      *  @param nbCluster number of cluster
      **/
-    DiagGaussianBridge( MixtureData<Data>* p_data, std::string const& idData, int nbCluster)
+    DiagGaussianBridge( DataBridge<Data>* p_data, std::string const& idData, int nbCluster)
                       : Base( p_data, idData, nbCluster)
-    { removeMissing(); initializeMixture();}
+    { removeMissing(); initializeBridge();}
     /** copy constructor */
     DiagGaussianBridge( DiagGaussianBridge const& bridge): Base(bridge)
-    { initializeMixture();}
+    { initializeBridge();}
     /** destructor */
     virtual ~DiagGaussianBridge() {}
     /** This is a standard clone function in usual sense. It must be defined to
@@ -198,17 +590,17 @@ class DiagGaussianBridge: public IMixtureBridge< DiagGaussianBridge<Id,Data> >
      */
     virtual DiagGaussianBridge* create() const
     {
-      DiagGaussianBridge* p_bridge = new DiagGaussianBridge( mixture_, this->idName(), this->nbCluster());
+      DiagGaussianBridge* p_bridge = new DiagGaussianBridge( mixture_, this->idData(), this->nbCluster());
       p_bridge->p_data_ = p_data_;
-      // Bug Fix: set the correct data set
-      p_bridge->mixture_.setData(p_bridge->p_data_->dataij());
+      p_bridge->initializeBridge();
       return p_bridge;
     }
     /** This function is used in order to get the current values of the
      *  parameters in an array.
      *  @param[out] params the array with the parameters of the mixture.
      */
-    void getParameters(Parameters& params) const;
+    template<class Array>
+    void getParameters(Array& params) const;
     /** Write the parameters on the output stream os */
     void writeParameters(ostream& os) const;
 
@@ -218,10 +610,14 @@ class DiagGaussianBridge: public IMixtureBridge< DiagGaussianBridge<Id,Data> >
      **/
     void removeMissing();
     /** This function will be used in order to initialize the mixture model
-     *  using informations stored by the MixtureData. For example the missing
-     *  values in the case of a MixtureData instance.
+     *  using informations stored by the DataBridge. For example the missing
+     *  values in the case of a DataBridge instance.
      **/
-    void initializeMixture() { mixture_.setData(p_data_->dataij());}
+    void initializeBridge()
+    {
+      mixture_.setData(p_data_->dataij());
+      paramHandler_.resize(p_data_->cols());
+    }
     /** protected constructor to use in order to create a bridge.
      *  @param mixture the mixture to copy
      *  @param idData id name of the mixture
@@ -244,14 +640,15 @@ void DiagGaussianBridge<Id, Data>::removeMissing()
     if (j != old_j)
     {
       old_j = j;
-      value =  p_data_->dataij().col(j).safe().mean();
+      value =  p_data_->dataij().col(j).meanSafe();
     }
     p_data_->dataij()(it->first, j) = value;
   }
 }
 
 template<int Id, class Data>
-void DiagGaussianBridge<Id, Data>::getParameters(Parameters& params) const
+template<class Array>
+void DiagGaussianBridge<Id, Data>::getParameters(Array& params) const
 {
   int nbClust = this->nbCluster();
   params.resize(2*nbClust, mixture_.p_data()->cols());

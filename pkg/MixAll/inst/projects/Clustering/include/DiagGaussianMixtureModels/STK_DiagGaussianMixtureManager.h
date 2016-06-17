@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2015  Serge Iovleff, Université Lille 1, Inria
+/*     Copyright (C) 2004-2016  Serge Iovleff, Université Lille 1, Inria
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -43,7 +43,7 @@
           Data* p_data = new Data(idData); \
           p_handler()->getData(idData, p_data->dataij(), p_data->nbVariable() ); \
           p_data->initialize(); \
-          registerMixtureData(p_data); \
+          registerDataBridge(p_data); \
           return new Bridge( p_data, idData, nbCluster);
 
 namespace STK
@@ -62,8 +62,8 @@ class DiagGaussianMixtureManager : public IMixtureManager<DataHandler>
 {
   public:
     typedef IMixtureManager<DataHandler> Base;
-    using Base::registerMixtureData;
-    using Base::getMixtureData;
+    using Base::registerDataBridge;
+    using Base::getDataBridge;
     using Base::getIdModel;
     using Base::p_handler;
 
@@ -72,7 +72,7 @@ class DiagGaussianMixtureManager : public IMixtureManager<DataHandler>
     // type of these containers when data is Real and Integer.
     typedef typename hidden::DataHandlerTraits<DataHandler, Real>::Data DataReal;
     // Classes wrapping the Real and Integer containers
-    typedef MixtureData<DataReal> MixtureDataReal;
+    typedef DataBridge<DataReal> DataBridgeReal;
 
     // All Diagonal Gaussian bridges
     typedef DiagGaussianBridge<Clust::Gaussian_sjk_, DataReal> MixtureBridge_sjk;
@@ -90,7 +90,7 @@ class DiagGaussianMixtureManager : public IMixtureManager<DataHandler>
      **/
     void getParameters(IMixture* p_mixture, ArrayXX& param) const
     {
-      Clust::Mixture idModel = getIdModel(p_mixture->idName());
+      Clust::Mixture idModel = getIdModel(p_mixture->idData());
       if (idModel == Clust::unknown_mixture_) return;
       // up-cast... (Yes it's bad....;)...)
       switch (idModel)
@@ -118,7 +118,7 @@ class DiagGaussianMixtureManager : public IMixtureManager<DataHandler>
      **/
     virtual void setParameters(IMixture* p_mixture, ArrayXX const& param) const
     {
-      Clust::Mixture idModel = getIdModel(p_mixture->idName());
+      Clust::Mixture idModel = getIdModel(p_mixture->idData());
       if (idModel == Clust::unknown_mixture_) return;
       // up-cast... (Yes it's bad....;)...)
       switch (idModel)
@@ -164,16 +164,16 @@ class DiagGaussianMixtureManager : public IMixtureManager<DataHandler>
       {
         // Gaussian models
         case Clust::Gaussian_sjk_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_sjk)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_sjk)}
         break;
         case Clust::Gaussian_sk_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_sk)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_sk)}
         break;
         case Clust::Gaussian_sj_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_sj)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_sj)}
         break;
         case Clust::Gaussian_s_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_s)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_s)}
         break;
         default:
           return 0; // 0 if idModel is not implemented

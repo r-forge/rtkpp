@@ -98,11 +98,16 @@ class RDataHandler: public IDataHandler
     /** @return the number of variables (the number of columns of the data) */
     inline int nbVariable() const { return nbVariable_;}
 
+    /** @return the number of sample (the number of rows of the data) */
+    inline int nbSampleImpl() const { return nbSample_;}
+    /** @return the number of sample (the number of columns of the data) */
+    inline int nbVariableImpl() const { return nbVariable_;}
+
     /** Add a Matrix to the existing data sets
      *  @param idData Id of the data set
      *  @param idModel Id of the model to use
      *  @param data a R list with the numeric data sets
-     *  @note cannot be passed as const& due to a bug from the Rcpop side (fixed
+     *  @note cannot be passed as const& due to a bug from the Rcpp side (fixed
      *  in the next release of Rcpp).
      **/
     template<int Rtype>

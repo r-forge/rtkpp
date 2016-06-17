@@ -114,7 +114,7 @@ struct ParametersHandler<Clust::Categorical_pk_>
   inline void releaseIntermediateResults()
   { proba_.releaseIntermediateResults();}
   /** set the parameters stored in stat_proba_ and release stat_proba_. */
-  inline void setParameters() { proba_.setParameters();}
+  inline void setParametersStep() { proba_.setParametersStep();}
 };
 
 /** @ingroup Clustering
@@ -161,7 +161,7 @@ class Categorical_pk : public CategoricalBase<Categorical_pk<Array> >
      */
     void randomInit();
     /** Compute the weighted proportions of each class. */
-    bool mStep();
+    bool paramUpdateStep();
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*(this->modalities_.size()-1);}
@@ -183,7 +183,7 @@ void Categorical_pk<Array>::randomInit()
 
 /* Compute the weighted mean and the common variance. */
 template<class Array>
-bool Categorical_pk<Array>::mStep()
+bool Categorical_pk<Array>::paramUpdateStep()
 {
   for (int k = p_tik()->beginCols(); k < p_tik()->endCols(); ++k)
   {

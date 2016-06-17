@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2015  Serge Iovleff, Université Lille 1, Inria
+/*     Copyright (C) 2004-2016  Serge Iovleff, Université Lille 1, Inria
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -38,8 +38,8 @@
 #ifndef STK_MIXTURECRITERION_H
 #define STK_MIXTURECRITERION_H
 
-#include "Sdk/include/STK_IRunner.h"
-#include "STK_IMixtureComposer.h"
+#include <Sdk/include/STK_IRunner.h>
+#include "STK_IMixtureStatModel.h"
 
 namespace STK
 {
@@ -56,7 +56,7 @@ class IMixtureCriterion : public IRunnerBase
     /** Constructor.
      *  @param p_composer a pointer on the current model
      **/
-    inline IMixtureCriterion( IMixtureComposer const* p_composer)
+    inline IMixtureCriterion( IMixtureStatModel const* p_composer)
                             : p_composer_(p_composer), value_(Arithmetic<Real>::NA()){}
     /** copy Constructor.
      *  @param criterion the criterion to copy
@@ -70,12 +70,12 @@ class IMixtureCriterion : public IRunnerBase
     /** @return The value of the criterion */
     inline Real const& value() const { return value_;}
     /** @param p_composer a pointer on the current model to set */
-    inline void setModel( IMixtureComposer const* p_composer)
+    inline void setModel( IMixtureStatModel const* p_composer)
     { p_composer_ = p_composer;}
 
   protected:
     /** The current statistical model to use*/
-    IMixtureComposer const* p_composer_;
+    IMixtureStatModel const* p_composer_;
     /** Computed value of the criterion */
     Real value_;
 };
@@ -98,7 +98,7 @@ class AICMixtureCriterion : public IMixtureCriterion
     /** Constructor.
      *  @param p_composer apointer on the current model
      **/
-    inline AICMixtureCriterion( IMixtureComposer* const p_composer)
+    inline AICMixtureCriterion( IMixtureStatModel* const p_composer)
                               : IMixtureCriterion(p_composer) {}
     /** copy Constructor.
      *  @param criterion the criterion to copy
@@ -132,7 +132,7 @@ class BICMixtureCriterion : public IMixtureCriterion
     /** Constructor.
      *  @param p_composer apointer on the current model
      **/
-    inline BICMixtureCriterion( IMixtureComposer* const p_composer)
+    inline BICMixtureCriterion( IMixtureStatModel* const p_composer)
                               : IMixtureCriterion(p_composer) {}
     /** copy Constructor.
      *  @param criterion the criterion to copy
@@ -164,7 +164,7 @@ class ICLMixtureCriterion : public IMixtureCriterion
     /** Constructor.
      *  @param p_composer a pointer on the current composer
      **/
-    inline ICLMixtureCriterion( IMixtureComposer const* p_composer)
+    inline ICLMixtureCriterion( IMixtureStatModel const* p_composer)
                               : IMixtureCriterion(p_composer) {}
     /** copy Constructor.
      *  @param criterion the criterion to copy

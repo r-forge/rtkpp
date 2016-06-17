@@ -119,11 +119,11 @@ There is five kinds of generative models implemented:
 \begin{enumerate}
   \item the diagonal Gaussian mixture models (8 models), see sections
   \ref{subsec:DiagGaussian} and \ref{subsec:clustDiagGaussian},
-  \item the diagonal gamma mixture models (24 models), see sections
+  \item the gamma mixture models (24 models), see sections
   \ref{subsec:Gamma} and \ref{subsec:clustGamma},
-  \item the diagonal categorical mixture models (4 models), see sections
+  \item the categorical mixture models (4 models), see sections
   \ref{subsec:Categorical} and \ref{subsec:clustCategorical},
-  \item the diagonal Poisson mixture models (6 models), see sections
+  \item the Poisson mixture models (6 models), see sections
   \ref{subsec:Poisson} and \ref{subsec:clustPoisson},
   \item the kernel mixture models (4 models), see sections
   \ref{subsec:Kernel} and \ref{subsec:clustKernel}.
@@ -363,7 +363,9 @@ generating directly random parameters, or by using random classes labels/random
 fuzzy classes and estimating $\theta^0$. In order to prevent unlucky
 initialization, multiple initialization with a limited number of an algorithm
 are performed and the best initialization (in the likelihood sense) is
-conserved.
+conserved. This initialization method can appear to be disappointing in a
+large dimension setting because the domain parameter to be explored becomes
+very large or when the number of mixture components is large \cite{baudry2015}.
 
 The initialization step is encoded in a \code{S4} class and can be created
 using the utility function \code{clusterInit}. This function take as input

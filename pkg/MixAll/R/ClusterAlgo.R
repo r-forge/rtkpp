@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-#     Copyright (C) 2012-2014  Serge Iovleff, University Lille 1, Inria
+#     Copyright (C) 2012-2016  Serge Iovleff, University Lille 1, Inria
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as
@@ -60,8 +60,12 @@
 #'
 clusterAlgo <- function( algo="EM", nbIteration=200, epsilon=1e-07)
 {
+  # for algo
+  if (!is.character(algo) )
+  { stop("algo must be a string.")}
+  algo = toupper(algo)
   # check algo
-  if ( sum(algo %in% c("EM","SEM","CEM","SemiSEM")) != 1 )
+  if ( sum(algo %in% c("EM","SEM","CEM","SEMISEM")) != 1 )
   {  stop("algo is not valid. See ?clusterAlgo for the list of available algorithms.")}
   # check nbIteration
   if (!is.numeric(nbIteration))
@@ -111,22 +115,25 @@ setClass (
   validity = function(object)
   {
     # for algo
-    if ( sum(object@algo %in% c("EM","SEM","CEM","SemiSEM")) != 1 )
-    {  stop("Algorithm is not valid. See ?ClusterAlgo for the list of available algorithms.")}
+    if (!is.character(object@algo) )
+    { stop("algo must be a string.")}
+    object@algo = toupper(object@algo)
+    if ( sum(object@algo %in% c("EM","SEM","CEM","SEMISEM")) != 1 )
+    { stop("Algorithm is not valid. See ?ClusterAlgo for the list of available algorithms.")}
     # for nbIteration
     if (!is.numeric(object@nbIteration))
-    {stop("nbIteration must be an integer.")}
+    { stop("nbIteration must be an integer.")}
     if (round(object@nbIteration)!=object@nbIteration)
-    {stop("nbIteration must be an integer.")}
+    { stop("nbIteration must be an integer.")}
     if( object@nbIteration < 0 ) # can be zero (no iterations)
-    {  stop("nbIteration must be positive or zero.")}
+    { stop("nbIteration must be positive or zero.")}
     # for epsilon
     if (object@algo != "SEM" && object@algo != "SemiSEM")
     {
       if (!is.double(object@epsilon) )
-      {  stop("epsilon must be a scalar.")}
+      { stop("epsilon must be a scalar.")}
       if( object@epsilon < 0.)
-      {  stop("epsilon must be positive.")}
+      { stop("epsilon must be positive.")}
     }
     return(TRUE)
   }

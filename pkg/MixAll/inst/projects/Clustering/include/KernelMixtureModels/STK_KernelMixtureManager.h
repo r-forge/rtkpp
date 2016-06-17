@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2015  Serge Iovleff, Université Lille 1, Inria
+/*     Copyright (C) 2004-2016  Serge Iovleff, Université Lille 1, Inria
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -42,7 +42,7 @@
 
 #define STK_CREATE_MIXTURE(Data, Bridge) \
           Data* p_data = new Data(idData); \
-          registerMixtureData(p_data); \
+          registerDataBridge(p_data); \
           p_handler()->getData(idData, p_data->dataij(), p_data->nbVariable() ); \
           p_data->initialize(); \
           return new Bridge( p_data, idData, nbCluster);
@@ -63,8 +63,8 @@ class KernelMixtureManager : public IMixtureManager<DataHandler>
 {
   public:
     typedef IMixtureManager<DataHandler> Base;
-    using Base::registerMixtureData;
-    using Base::getMixtureData;
+    using Base::registerDataBridge;
+    using Base::getDataBridge;
     using Base::getIdModel;
     using Base::p_handler;
 
@@ -73,11 +73,11 @@ class KernelMixtureManager : public IMixtureManager<DataHandler>
     // type of these containers when data is Real and Integer.
     typedef typename hidden::DataHandlerTraits<DataHandler, Real>::Data DataReal;
     // Classes wrapping the Real and Integer containers
-    typedef MixtureData<DataReal> MixtureDataReal;
+    typedef DataBridge<DataReal> DataBridgeReal;
 
     // All Kernel bridges
-    typedef KernelGaussianBridge<Clust::KernelGaussian_sk_,  DataReal> MixtureKernelGaussianBridge_sk;
-    typedef KernelGaussianBridge<Clust::KernelGaussian_s_,  DataReal> MixtureKernelGaussianBridge_s;
+    typedef KernelGaussianBridge<Clust::KernelGaussian_sk_,  DataReal> KernelGaussianBridge_sk;
+    typedef KernelGaussianBridge<Clust::KernelGaussian_s_,  DataReal> KernelGaussianBridge_s;
 
     /** Default constructor, need an instance of a DataHandler.  */
     inline KernelMixtureManager(DataHandler const& handler): Base(&handler) {}
@@ -88,16 +88,16 @@ class KernelMixtureManager : public IMixtureManager<DataHandler>
     void setDim(IMixture* p_mixture, Real const& dim)
     {
       if (!p_mixture) return;
-      Clust::Mixture idModel = getIdModel(p_mixture->idName());
+      Clust::Mixture idModel = getIdModel(p_mixture->idData());
       // up-cast... (Yes it's bad....;)...)
       switch (idModel)
       {
         // Kernel models
         case Clust::KernelGaussian_sk_:
-        { static_cast<MixtureKernelGaussianBridge_sk*>(p_mixture)->setDim(dim);}
+        { static_cast<KernelGaussianBridge_sk*>(p_mixture)->setDim(dim);}
         break;
         case Clust::KernelGaussian_s_:
-        { static_cast<MixtureKernelGaussianBridge_s*>(p_mixture)->setDim(dim);}
+        { static_cast<KernelGaussianBridge_s*>(p_mixture)->setDim(dim);}
         break;
         default: // idModel is not implemented
         break;
@@ -107,16 +107,16 @@ class KernelMixtureManager : public IMixtureManager<DataHandler>
     void setDim(IMixture* p_mixture, PointX const& dim)
     {
       if (!p_mixture) return;
-      Clust::Mixture idModel = getIdModel(p_mixture->idName());
+      Clust::Mixture idModel = getIdModel(p_mixture->idData());
       // up-cast... (Yes it's bad....;)...)
       switch (idModel)
       {
         // Kernel models
         case Clust::KernelGaussian_sk_:
-        { static_cast<MixtureKernelGaussianBridge_sk*>(p_mixture)->setDim(dim);}
+        { static_cast<KernelGaussianBridge_sk*>(p_mixture)->setDim(dim);}
         break;
         case Clust::KernelGaussian_s_:
-        { static_cast<MixtureKernelGaussianBridge_s*>(p_mixture)->setDim(dim);}
+        { static_cast<KernelGaussianBridge_s*>(p_mixture)->setDim(dim);}
         break;
         default: // idModel is not implemented
         break;
@@ -129,16 +129,16 @@ class KernelMixtureManager : public IMixtureManager<DataHandler>
     void getParameters(IMixture* p_mixture, ArrayXX& param) const
     {
       if (!p_mixture) return;
-      Clust::Mixture idModel = getIdModel(p_mixture->idName());
+      Clust::Mixture idModel = getIdModel(p_mixture->idData());
       // up-cast... (Yes it's bad....;)...)
       switch (idModel)
       {
         // Kernel models
         case Clust::KernelGaussian_sk_:
-        { static_cast<MixtureKernelGaussianBridge_sk*>(p_mixture)->getParameters(param);}
+        { static_cast<KernelGaussianBridge_sk*>(p_mixture)->getParameters(param);}
         break;
         case Clust::KernelGaussian_s_:
-        { static_cast<MixtureKernelGaussianBridge_s*>(p_mixture)->getParameters(param);}
+        { static_cast<KernelGaussianBridge_s*>(p_mixture)->getParameters(param);}
         break;
         default: // idModel is not implemented
         break;
@@ -151,16 +151,16 @@ class KernelMixtureManager : public IMixtureManager<DataHandler>
     virtual void setParameters(IMixture* p_mixture, ArrayXX const& param) const
     {
       if (!p_mixture) return;
-      Clust::Mixture idModel = getIdModel(p_mixture->idName());
+      Clust::Mixture idModel = getIdModel(p_mixture->idData());
       // up-cast... (Yes it's bad....;)...)
       switch (idModel)
       {
         // Kernel models
         case Clust::KernelGaussian_sk_:
-        { static_cast<MixtureKernelGaussianBridge_sk*>(p_mixture)->setParameters(param);}
+        { static_cast<KernelGaussianBridge_sk*>(p_mixture)->setParameters(param);}
         break;
         case Clust::KernelGaussian_s_:
-        { static_cast<MixtureKernelGaussianBridge_s*>(p_mixture)->setParameters(param);}
+        { static_cast<KernelGaussianBridge_s*>(p_mixture)->setParameters(param);}
         break;
         default: // idModel is not implemented
         break;
@@ -192,10 +192,10 @@ class KernelMixtureManager : public IMixtureManager<DataHandler>
       switch (idModel)
       {
         case Clust::KernelGaussian_sk_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureKernelGaussianBridge_sk)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, KernelGaussianBridge_sk)}
         break;
         case Clust::KernelGaussian_s_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureKernelGaussianBridge_s)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, KernelGaussianBridge_s)}
         break;
         default:
           return 0; // 0 if idModel is not implemented

@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2013  Serge Iovleff
+/*     Copyright (C) 2004-2016  Serge Iovleff
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -35,7 +35,9 @@
 #include "../include/STK_MixtureFacade.h"
 #include "../include/STK_MixtureStrategy.h"
 #include "../include/STK_MixtureInit.h"
+#include "../include/STK_MixtureAlgo.h"
 #include "../include/STK_IMixtureComposer.h"
+#include "../include/STK_IMixtureLearner.h"
 
 namespace STK
 {
@@ -73,7 +75,6 @@ bool StrategyFacade::run()
   bool flag = false;
   if (p_strategy_)
   {
-    // just check if the model is fresh or is already
     if (p_strategy_->run()) { flag = true;}
     else
     {
@@ -85,11 +86,11 @@ bool StrategyFacade::run()
                << _T("------------------------------------------------\n");
 #endif
     }
-    p_model_->imputationStep();
+    // p_model_->imputationStep();
     p_model_->finalizeStep();
   }
   else
-  { msg_error_ = STKERROR_NO_ARG(MixtureFacade::run(),strategy is not set);}
+  { msg_error_ = STKERROR_NO_ARG(MixtureFacade::run(),strategy is not created);}
 #ifdef STK_MIXTURE_VERBOSE
   stk_cout << _T("StrategyFacade:run() terminated.\np_model->lnLikelihood() =")
            << p_model_->lnLikelihood() << _T("\n")
@@ -98,6 +99,58 @@ bool StrategyFacade::run()
   return flag;
 }
 
+LearnFacade::~LearnFacade() { if (p_algo_) delete p_algo_;}
+
+void LearnFacade::createImputeAlgo(  Clust::algoLearnType algo, int nbIter, Real epsilon)
+{
+  p_algo_ = Clust::createLearnAlgo(algo, nbIter, epsilon);
+  p_algo_->setModel(p_model_);
+}
+
+/* create a FullStrategy */
+void LearnFacade::createSimulAlgo( Clust::algoLearnType algo, int nbIter)
+{
+  p_algo_ = Clust::createLearnAlgo(algo, nbIter, 0.);
+  p_algo_->setModel(p_model_);
+}
+
+bool LearnFacade::run()
+{
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("------------------------------\n")
+           << _T("Entering LearnFacade::run()   \n");
+#endif
+  // initialize model
+  p_model_->initializeStep();
+  // start algorithm
+  bool flag = false;
+  if (p_algo_)
+  {
+    if (p_algo_->run()) { flag = true;}
+    else
+    {
+      msg_error_ += STKERROR_NO_ARG(StrategyFacade::run,strategy failed\n);
+      msg_error_ += p_algo_->error();
+#ifdef STK_MIXTURE_VERBOSE
+      stk_cout << _T("LearnFacade:run() terminated without success.   \n")
+               << msg_error_ << _T("\n")
+               << _T("------------------------------------------------\n");
+#endif
+    }
+    // finalize any
+    p_model_->finalizeStep();
+  }
+  else
+  {
+    msg_error_ = STKERROR_NO_ARG(MixtureFacade::run(),algo is not created);
+  }
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("StrategyFacade:run() terminated.\n")
+           << _T("p_model->lnLikelihood() =") << p_model_->lnLikelihood() << _T("\n")
+           << _T("--------------------------------\n");
+#endif
+  return flag;
+}
 
 }  // namespace STK
 

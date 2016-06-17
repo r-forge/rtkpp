@@ -6,10 +6,10 @@
 \alias{ClusterMixedData-class}
 \title{Definition of the [\code{\linkS4class{ClusterMixedData}}] class}
 \description{
-This class defines an MixedData mixture Model.
+This class defines a mixed data mixture Model.
 }
 \details{
-This class inherits from the [\code{\linkS4class{IClusterModelBase}}] class.
+This class inherits from the [\code{\linkS4class{IClusterModel}}] class.
 A model for mixed data is a mixture model of the form:
 \deqn{
 f({{x}}_i=({{x}}_{1i}, {{x}}_{2i},\ldots {{x}}_{Li})|\theta)
@@ -32,6 +32,6 @@ getSlots("ClusterMixedData")
 Serge Iovleff
 }
 \seealso{
-[\code{\linkS4class{IClusterModelBase}}] class
+[\code{\linkS4class{IClusterModel}}] class
 }
 

@@ -9,7 +9,7 @@
 This class defines a Kernel mixture Model (KMM).
 }
 \details{
-This class inherits from the [\code{\linkS4class{IClusterModelBase}}] class.
+This class inherits from the [\code{\linkS4class{IClusterModel}}] class.
 A Kernel mixture  model is a mixture model of the form:
 \deqn{
   f({x}|\boldsymbol{\theta})
@@ -42,6 +42,6 @@ new("ClusterKernel", data=geyser)
 Serge Iovleff
 }
 \seealso{
-[\code{\linkS4class{IClusterModelBase}}] class
+[\code{\linkS4class{IClusterModel}}] class
 }
 

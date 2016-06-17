@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2015  Serge Iovleff, Université Lille 1, Inria
+/*     Copyright (C) 2004-2016  Serge Iovleff, Université Lille 1, Inria
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -29,7 +29,7 @@
  * Originally created by Parmeet Bhatia <b..._DOT_p..._AT_gmail_Dot_com>
  **/
 
-/** @file STK_IMixtureModel.h
+/** @file STK_MixtureAlgo.h
  *  @brief In this file we define the classes for mixture algorithms.
  **/
 
@@ -43,13 +43,14 @@ namespace STK
 {
 // forward declaration
 class IMixtureComposer;
+class IMixtureLearner;
 
 /** @ingroup Clustering
  * Interface base class for the algorithms.
  * All algorithms are runners applying on a model instance given by pointer
  * and have to implement the run method.
  *
- * All algorithms start with an mStep(), so user have to provide an instance of
+ * All algorithms start with an paramUpdateStep(), so user have to provide an instance of
  * the model with initial parameters values.
  **/
 class IMixtureAlgo : public IRunnerBase
@@ -96,9 +97,50 @@ class IMixtureAlgo : public IRunnerBase
 };
 
 /** @ingroup Clustering
+ * Interface base class for the learning algorithms.
+ * All algorithms are runners applying on a model instance given by pointer
+ * and have to implement the run method.
+ **/
+class IMixtureLearnAlgo: public IRunnerBase
+{
+  protected:
+    /** default constructor */
+    inline IMixtureLearnAlgo(): IRunnerBase(), p_model_(0), nbIterMax_(0), epsilon_(0.) {}
+    /** Copy constructor.
+     *  @param algo the algorithm to copy */
+    inline IMixtureLearnAlgo( IMixtureLearnAlgo const& algo) : IRunnerBase(algo)
+                       , p_model_(algo.p_model_)
+                       , nbIterMax_(algo.nbIterMax_)
+                       , epsilon_(algo.epsilon_)
+    {}
+
+  public:
+    /** destructor */
+    inline virtual ~IMixtureLearnAlgo() {}
+    /** @return the maximal number of iteration of the algorithm */
+    inline int nbIterMax() const { return nbIterMax_; }
+    /** @return the epsilon of the algorithm */
+    inline int epsilon() const { return epsilon_; }
+    /** set a new model. Default threshold_ is 2 samples. */
+    void setModel(IMixtureLearner* p_model);
+    /** set the maximal number of iterations */
+    inline void setNbIterMax(int nbIterMax) { nbIterMax_ = nbIterMax; }
+    /** set the tolerance value */
+    inline void setEpsilon(Real epsilon) { epsilon_ = epsilon; }
+
+  protected:
+    /** pointer on the mixture model */
+    IMixtureLearner* p_model_;
+    /** maximal number of iterations of the algorithm */
+    int nbIterMax_;
+    /** tolerance of the algorithm. */
+    Real epsilon_;
+};
+
+/** @ingroup Clustering
  *  @ brief Implementation of the EM algorithm.
  *  The EM algorithm call alternatively the steps:
- *  - mStep()
+ *  - paramUpdateStep()
  *  - eStep()
  *  until the maximum number of iterations is reached or the variation of the
  *  ln-likelihood is less than the tolerance.
@@ -127,7 +169,7 @@ class EMAlgo: public IMixtureAlgo
  *  @brief Implementation of the SEM algorithm.
  *  The CEM algorithm calls alternatively the steps:
  *  - cStep()
- *  - mStep()
+ *  - paramUpdateStep()
  *  - eStep()
  *  until the maximum number of iterations is reached or the variation of the
  *  ln-likelihood is less than the tolerance.
@@ -158,7 +200,7 @@ class CEMAlgo: public IMixtureAlgo
  *  - sStep()
  *  - samplingStep()
  *  - pStep()
- *  - mStep()
+ *  - paramUpdateStep()
  *  - eStep()
  *  - storeIntermediateResults(iter)
  *  until the maximum number of iterations is reached.
@@ -187,7 +229,7 @@ class SEMAlgo: public IMixtureAlgo
  *  The SemiSEM algorithm calls alternatively the steps:
  *  - samplingStep()
  *  - pStep()
- *  - mStep()
+ *  - paramUpdateStep()
  *  - eStep()
  *  - storeIntermediateResults(iter)
  *  until the maximum number of iterations is reached.
@@ -295,6 +337,60 @@ class SemiSEMPredict: public IMixtureAlgo
     virtual bool run();
 };
 
+/** @ingroup Clustering
+ *  @ brief Implementation of the ImputeAlgo learning algorithm.
+ *  The Impute algorithm call alternatively the steps:
+ *  - imputeStep()
+ *  - paramUpdateStep()
+ *  until the maximum number of iterations is reached or the variation of the
+ *  log-likelihood is less than the tolerance.
+ **/
+class ImputeAlgo: public IMixtureLearnAlgo
+{
+  public:
+    /** default constructor */
+    inline ImputeAlgo() : IMixtureLearnAlgo() {}
+    /** Copy constructor.
+     *  @param algo the algorithm to copy */
+    inline ImputeAlgo( ImputeAlgo const& algo) : IMixtureLearnAlgo(algo) {}
+    /** destructor */
+    inline virtual ~ImputeAlgo(){}
+    /** clone pattern */
+    inline virtual ImputeAlgo* clone() const { return new ImputeAlgo(*this);}
+    /** run the algorithm on the model calling the eStep and mStep of the model
+     *  until the maximal number of iteration is reached or the variation
+     *  of the lnLikelihood is less than epsilon.
+     * @return @c true if no error occur, @c false otherwise
+     **/
+    virtual bool run();
+};
+
+/** @ingroup Clustering
+ *  @brief Implementation of the SimulAlgo learning algorithm.
+ *  The SimulAlgo algorithm calls alternatively steps:
+ *  - samplingStep()
+ *  - paramUpdateStep()
+ *  - storeIntermediateResults(iter)
+ *  until the maximum number of iterations is reached.
+ **/
+class SimulAlgo: public IMixtureLearnAlgo
+{
+  public:
+    /** default constructor */
+    inline SimulAlgo() : IMixtureLearnAlgo() {}
+    /** Copy constructor.
+     *  @param algo the algorithm to copy */
+    inline SimulAlgo( SimulAlgo const& algo) : IMixtureLearnAlgo(algo) {}
+    /** destructor */
+    inline virtual ~SimulAlgo(){}
+    /** clone pattern */
+    inline virtual SimulAlgo* clone() const { return new SimulAlgo(*this);}
+    /** run the algorithm on the model calling sStep, mStep and eStep of the
+     *  model until the maximal number of iteration is reached.
+     *  @return @c true if no error occur, @c false otherwise.
+     **/
+    virtual bool run();
+};
 } // namespace STK
 
 #endif /* STK_MIXTUREALGO_H */

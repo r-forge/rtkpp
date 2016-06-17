@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-#     Copyright (C) 2012-2014  Serge Iovleff, University Lille 1, Inria
+#     Copyright (C) 2012-2016  Serge Iovleff, University Lille 1, Inria
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
-# Plotting of a class  deriving from[\code{\linkS4class{IClusterModelBase}}]
+# Plotting of a class  deriving from[\code{\linkS4class{IClusterModel}}]
 ##############################
 # Adapted from Rmixmod package
 ##############################

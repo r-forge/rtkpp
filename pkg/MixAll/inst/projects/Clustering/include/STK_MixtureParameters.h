@@ -110,7 +110,7 @@ struct MixtureParameters
   inline void releaseIntermediateResults()
   { stat_param_.release();}
   /** set the parameters stored in stat_param and release stat_param. */
-  inline void setParameters()
+  inline void setParametersStep()
   { param_ = stat_param_.mean_; stat_param_.release();}
 };
 
@@ -194,7 +194,7 @@ struct MixtureParametersSet
     { stat_param_[k].release();}
   }
   /** set the parameters stored in stat_param and release stat_param. */
-  inline void setParameters()
+  inline void setParametersStep()
   {
     for (int k= stat_param_.begin(); k < stat_param_.end(); ++k)
     { param_[k] = stat_param_[k].mean_; stat_param_[k].release();}

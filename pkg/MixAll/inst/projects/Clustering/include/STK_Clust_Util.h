@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2015  Serge Iovleff, Université Lille 1, Inria
+/*     Copyright (C) 2004-2016  Serge Iovleff, Université Lille 1, Inria
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -45,6 +45,7 @@ namespace STK
 
 // forward declaration
 class IMixtureAlgo;
+class IMixtureLearnAlgo;
 class IMixtureInit;
 class IMixtureStrategy;
 class IMixtureComposer;
@@ -56,15 +57,16 @@ namespace Clust
  *  @brief initialization type.
  *  There is trheee ways to initialize the mixture model:
  *  - using random values for the parameters
- *  - using random class for the individuals
- *  - using random probabilities class for the individuals
+ *  - using random class for the sampling
+ *  - using random probabilities class for the sampling
  **/
 enum initType
 {
-  randomInit_ = 0,      // DEPRECATED
-  randomParamInit_ = 0, // same as random randomInit_
-  randomClassInit_ = 1,
-  randomFuzzyInit_ = 2
+  noInit_ = -1,         ///< no initialization
+  randomInit_ = -2,      ///< DEPRECATED
+  randomParamInit_ = 0, ///< initialize randomly the parameters
+  randomClassInit_ = 1, ///< initialize randomly the class labels
+  randomFuzzyInit_ = 2  ///< initialize randomly the partnership class probabilities
 };
 
 /** @ingroup Clustering
@@ -87,7 +89,7 @@ enum initType
 initType stringToInit( std::string const& type);
 
 /** @ingroup Clustering
- *  Algorithms of estimation
+ *  Estimation algorithms
  **/
 enum algoType
 {
@@ -95,6 +97,15 @@ enum algoType
   cemAlgo_ = 1,
   semAlgo_ = 2,
   semiSemAlgo_ = 3
+};
+
+/** @ingroup Clustering
+ *  Learning estimation algorithms
+ **/
+enum algoLearnType
+{
+  imputeAlgo_,
+  simulAlgo_
 };
 
 /** @ingroup Clustering
@@ -116,6 +127,22 @@ enum algoType
  *  in the list above,the type Clust::emAlgo_ is returned.
  **/
 algoType stringToAlgo( std::string const& type);
+
+/** @ingroup Clustering
+ *  Convert a String to an algoLearnType. The recognized strings are
+ * <table>
+ * <tr> <th> Algorithm     </th></tr>
+ * <tr> <td> "imputeAlgo"  </td></tr>
+ * <tr> <td> "simulAlgo"   </td></tr>
+ * <tr> <td> "impute"      </td></tr>
+ * <tr> <td> "simul"       </td></tr>
+ * </table>
+ *  @param type the type of algorithm wanted
+ *  @return the algoType corresponding (default is emAlgo)
+ *  @note The capitalized letters have no effect and if the string is not found
+ *  in the list above,the type Clust::emAlgo_ is returned.
+ **/
+algoLearnType stringToLearnAlgo( std::string const& type);
 
 /** @ingroup Clustering
  *  strategy of estimation
@@ -159,7 +186,7 @@ String exceptionToString( exceptions const& type);
 enum modelState
 {
   modelCreated_ =0,         ///< the model has been created but is not initialized
-  modelInitialized_ =1,     ///< the model is initialized, but its parameters are not initialized
+  modelInitialized_ =1,     ///< the model is initialized and its parameters are initialized to default values
   modelParamInitialized_=2, ///< The parameters of the model have been initialized
   shortRun_,                ///< A short run has been done
   longRun_,                 ///< A long run has been done
@@ -171,7 +198,7 @@ enum modelState
  **/
 enum MixtureClass
 {
-  Gamma_,
+ Gamma_,
   Gaussian_,
   Categorical_,
   Poisson_,
@@ -238,12 +265,12 @@ MixtureClass mixtureToMixtureClass( Mixture const& type);
  * <tr> <td> "Gaussian_sj"     </td></tr>
  * <tr> <td> "Gaussian_s"      </td></tr>
  * <tr> <td> "Categorical_pjk" </td></tr>
- * <tr> <td> "Categorical_pk"  </td></tr>
+ * <tr> <td> "MixtureCategorical_pk"  </td></tr>
  * <tr> <td> "Poisson_ljk"     </td></tr>
  * <tr> <td> "Poisson_lk"      </td></tr>
  * <tr> <td> "Poisson_ljlk"    </td></tr>
- * <tr> <td> "KernelGaussian_sk" </td></tr>
- * <tr> <td> "KernelGaussian_s"  </td></tr>
+ * <tr> <td> "MixtureKernelGaussian_sk" </td></tr>
+ * <tr> <td> "MixtureKernelGaussian_s"  </td></tr>
  * </table>
  *  @param type the String we want to convert
  *  @return the Mixture represented by the String @c type. if the string
@@ -277,8 +304,8 @@ Mixture stringToMixture( std::string const& type);
  * <tr> <td> "Poisson_pk_ljk"     </td><td> "Poisson_p_ljk"     </td> </tr>
  * <tr> <td> "Poisson_pk_lk"      </td><td> "Poisson_p_lk"      </td> </tr>
  * <tr> <td> "Poisson_pk_ljlk"    </td><td> "Poisson_p_ljlk"    </td> </tr>
- * <tr> <td> "KernelGaussian_pk_sk" </td><td> "KernelGaussian_p_sk"    </td> </tr>
- * <tr> <td> "KernelGaussian_pk_s" </td><td> "KernelGaussian_p_s"    </td> </tr>
+ * <tr> <td> "MixtureKernelGaussian_pk_sk" </td><td> "MixtureKernelGaussian_p_sk"    </td> </tr>
+ * <tr> <td> "MixtureKernelGaussian_pk_s" </td><td> "MixtureKernelGaussian_p_s"    </td> </tr>
  * </table>
  *  @param type the String we want to convert
  *  @param[out] freeProp @c true if the model have free proportions, @c false otherwise.
@@ -347,18 +374,23 @@ const Real defaultEpsilonLongRun = 1e-08;
 /** @ingroup Clustering
  *  utility function for creating an estimation algorithm.
  *  @param algo the algorithm to create
- *  @param nbIterMax the maximal number of iteration of the algorithm
- *  @param epsilon the tolerance of the algorithm
+ *  @param nbIterMax,epsilon the maximal number of iteration and the tolerance of the algorithm
  **/
 IMixtureAlgo* createAlgo( Clust::algoType algo, int nbIterMax, Real epsilon);
+
+/** @ingroup Clustering
+ *  utility function for creating a learning algorithm.
+ *  @param algo the algorithm to create
+ *  @param nbIterMax,epsilon the maximal number of iteration and the tolerance of the algorithm
+ **/
+IMixtureLearnAlgo* createLearnAlgo(Clust::algoLearnType algo, int nbIterMax, Real epsilon);
 
 /** @ingroup Clustering
  *  Utility function for creating a model initializer.
  *  @param init the kind of initializer to create
  *  @param nbInits the number of initialization to try
  *  @param algo the kind of algorithm to add to the initializer
- *  @param nbIterMax the maximal number of iteration of the initialization algorithm
- *  @param epsilon the tolerance of the initialization algorithm
+ *  @param nbIterMax,epsilon the maximal number of iteration and the tolerance of the initialization algorithm
  **/
 IMixtureInit* createInit( Clust::initType init = defaultInitType
                         , int nbInits          = defaultNbInit

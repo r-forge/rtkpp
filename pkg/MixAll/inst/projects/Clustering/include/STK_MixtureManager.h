@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/*     Copyright (C) 2004-2015  Serge Iovleff, Université Lille 1, Inria
+/*     Copyright (C) 2004-2016  Serge Iovleff, Université Lille 1, Inria
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as
@@ -46,7 +46,7 @@
 
 #define STK_CREATE_MIXTURE(Data, Bridge) \
           Data* p_data = new Data(idData); \
-          registerMixtureData(p_data); \
+          registerDataBridge(p_data); \
           p_handler()->getData(idData, p_data->dataij(), p_data->nbVariable() ); \
           p_data->initialize(); \
           return new Bridge( p_data, idData, nbCluster);;
@@ -68,8 +68,8 @@ class MixtureManager : public IMixtureManager<DataHandler>
 {
   public:
     typedef IMixtureManager<DataHandler> Base;
-    using Base::registerMixtureData;
-    using Base::getMixtureData;
+    using Base::registerDataBridge;
+    using Base::getDataBridge;
     using Base::getIdModel;
     using Base::p_handler;
 
@@ -79,8 +79,8 @@ class MixtureManager : public IMixtureManager<DataHandler>
     typedef typename hidden::DataHandlerTraits<DataHandler, Real>::Data DataReal;
     typedef typename hidden::DataHandlerTraits<DataHandler, Integer>::Data DataInt;
     // Classes wrapping the Real and Integer containers
-    typedef MixtureData<DataReal> MixtureDataReal;
-    typedef MixtureData<DataInt>  MixtureDataInt;
+    typedef DataBridge<DataReal> DataBridgeReal;
+    typedef DataBridge<DataInt>  DataBridgeInt;
 
     // All Gamma bridges
     typedef GammaBridge<Clust::Gamma_ajk_bjk_, DataReal> MixtureBridge_ajk_bjk;
@@ -125,7 +125,7 @@ class MixtureManager : public IMixtureManager<DataHandler>
      **/
     void getParameters(IMixture* p_mixture, ArrayXX& param) const
     {
-      Clust::Mixture idModel = getIdModel(p_mixture->idName());
+      Clust::Mixture idModel = getIdModel(p_mixture->idData());
       if (idModel == Clust::unknown_mixture_) return;
       // up-cast... (Yes it's bad....;)...)
       switch (idModel)
@@ -211,7 +211,7 @@ class MixtureManager : public IMixtureManager<DataHandler>
      **/
     void setParameters(IMixture* p_mixture, ArrayXX const& param) const
     {
-      Clust::Mixture idModel = getIdModel(p_mixture->idName());
+      Clust::Mixture idModel = getIdModel(p_mixture->idData());
       if (idModel == Clust::unknown_mixture_) return;
       // up-cast... (Yes it's bad....;)...)
       switch (idModel)
@@ -314,72 +314,74 @@ class MixtureManager : public IMixtureManager<DataHandler>
       {
         // gamma models
         case Clust::Gamma_ajk_bjk_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_ajk_bjk)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_ajk_bjk)}
         break;
         case Clust::Gamma_ajk_bk_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_ajk_bk)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_ajk_bk)}
         break;
         case Clust::Gamma_ajk_bj_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_ajk_bj)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_ajk_bj)}
         break;
         case Clust::Gamma_ajk_b_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_ajk_b)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_ajk_b)}
         break;
         case Clust::Gamma_ak_bjk_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_ak_bjk)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_ak_bjk)}
         break;
         case Clust::Gamma_ak_bk_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_ak_bk)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_ak_bk)}
         break;
         case Clust::Gamma_ak_bj_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_ak_bj)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_ak_bj)}
         break;
         case Clust::Gamma_ak_b_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_ak_b)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_ak_b)}
         break;
         case Clust::Gamma_aj_bjk_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_aj_bjk)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_aj_bjk)}
         break;
         case Clust::Gamma_aj_bk_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_aj_bk)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_aj_bk)}
+        break;
         case Clust::Gamma_a_bjk_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_a_bjk)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_a_bjk)}
         break;
         case Clust::Gamma_a_bk_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_a_bk)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_a_bk)}
+        break;
         // Gaussian models
         case Clust::Gaussian_sjk_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_sjk)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_sjk)}
         break;
         case Clust::Gaussian_sk_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_sk)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_sk)}
         break;
         case Clust::Gaussian_sj_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_sj)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_sj)}
         break;
         case Clust::Gaussian_s_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureBridge_s)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_s)}
         break;
         // Categorical models
         case Clust::Categorical_pjk_:
-        { STK_CREATE_MIXTURE(MixtureDataInt, MixtureBridge_pjk)}
+        { STK_CREATE_MIXTURE(DataBridgeInt, MixtureBridge_pjk)}
         break;
         case Clust::Categorical_pk_:
-        { STK_CREATE_MIXTURE(MixtureDataInt, MixtureBridge_pk)}
+        { STK_CREATE_MIXTURE(DataBridgeInt, MixtureBridge_pk)}
         break;
         // Poisson models
         case Clust::Poisson_ljk_:
-        { STK_CREATE_MIXTURE(MixtureDataInt, MixtureBridge_ljk)}
+        { STK_CREATE_MIXTURE(DataBridgeInt, MixtureBridge_ljk)}
         break;
         case Clust::Poisson_lk_:
-        { STK_CREATE_MIXTURE(MixtureDataInt, MixtureBridge_lk)}
+        { STK_CREATE_MIXTURE(DataBridgeInt, MixtureBridge_lk)}
         break;
         case Clust::Poisson_ljlk_:
-        { STK_CREATE_MIXTURE(MixtureDataInt, MixtureBridge_ljlk)}
+        { STK_CREATE_MIXTURE(DataBridgeInt, MixtureBridge_ljlk)}
         break;
         // Kernel models
         case Clust::KernelGaussian_sk_:
-        { STK_CREATE_MIXTURE(MixtureDataReal, MixtureKernelGaussianBridge)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureKernelGaussianBridge)}
         break;
         default:
           return 0; // 0 if idModel is not implemented

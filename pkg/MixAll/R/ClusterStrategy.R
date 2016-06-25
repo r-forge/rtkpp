@@ -105,7 +105,7 @@ clusterStrategy <- function( nbTry =1
 
 #' @description
 #' \code{clusterSemiSEMStrategy()} create an instance of [\code{\linkS4class{ClusterStrategy}}]
-#' for users with many missing values.
+#' for users with many missing values uning a semiSem algorithm.
 #' @examples
 #'    clusterSemiSEMStrategy()
 #'
@@ -124,6 +124,26 @@ clusterSemiSEMStrategy <- function()
 }
 
 #' @description
+#' \code{clusterSEMStrategy()} create an instance of [\code{\linkS4class{ClusterStrategy}}]
+#' for users with many missing values using a SEM algorithm.
+#' @examples
+#'    clusterSEMStrategy()
+#'
+#' @rdname clusterStrategy
+#' @export
+clusterSEMStrategy <- function()
+{
+  # create init
+  initMethod = clusterInit("class", 5, "SEM", 20, 0);
+  # create shortAlgo
+  shortAlgo = clusterAlgo("SEM", 50, 0);
+  # create longAlgo
+  longAlgo = clusterAlgo("SEM", 400, 0);
+  # create strategy
+  new("ClusterStrategy", nbTry= 2, nbShortRun= 5, initMethod= initMethod, shortAlgo= shortAlgo, longAlgo= longAlgo);
+}
+
+#' @description
 #' \code{clusterFastStrategy()} create an instance of [\code{\linkS4class{ClusterStrategy}}] for impatient user.
 #' @examples
 #'    clusterFastStrategy()
@@ -135,7 +155,7 @@ clusterFastStrategy <- function()
   # create init
   initMethod = clusterInit("class", 3, "EM", 5, 0.01);
   # create shortAlgo
-  shortAlgo = clusterAlgo("CEM", 10, 0.001);
+  shortAlgo = clusterAlgo("EM", 10, 0.001);
   # create longAlgo
   longAlgo = clusterAlgo("EM", 100, 1e-07);
   # create strategy

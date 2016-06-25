@@ -127,7 +127,10 @@ class MixtureGaussian_sjk : public MixtureDiagGaussianBase<MixtureGaussian_sjk<A
     {
       Real sum =0.;
       for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)
-      { sum += Law::Normal::lpdf(p_data()->elt(i,j), param_.mean_[k][j], param_.sigma_[k][j]);}
+      {
+        if (param_.sigma_[k][j])
+        { sum += Law::Normal::lpdf(p_data()->elt(i,j), param_.mean_[k][j], param_.sigma_[k][j]);}
+      }
       return sum;
     }
     /** Initialize randomly the parameters of the Gaussian mixture. The centers
@@ -170,7 +173,15 @@ bool MixtureGaussian_sjk<Array>::run( CArrayXX const*  p_tik, CPointX const* p_n
   for (int k= p_tik->beginCols(); k < p_tik->endCols(); ++k)
   {
     param_.sigma_[k] = Stat::varianceWithFixedMean(*p_data(), p_tik->col(k), param_.mean_[k], false).sqrt();
-    //if (param_.sigma_[k].nbAvailableValues() != param_.sigma_[k].size()) return false;
+#ifdef STK_MIXTURE_DEBUG
+    if( (param_.sigma_[k] <= 0).any()  )
+    {
+      stk_cout << _T("MixtureGaussian_sjk::run() failed\n");
+      stk_cout << _T("p_tik->col(") << k << _T(") =\n") << p_tik->col(k).transpose() << _T("\n");
+      stk_cout << _T("param_.mean_[") << k << _T("]  =") << param_.mean_[k];
+      stk_cout << _T("param_.sigma_[") << k << _T("] =") << param_.sigma_[k];
+    }
+#endif
   }
   return true;
 }

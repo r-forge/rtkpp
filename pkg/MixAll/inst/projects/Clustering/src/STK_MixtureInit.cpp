@@ -74,6 +74,7 @@ bool RandomInit::run()
   {
     try
     {
+      p_model_->initializeStep();
       p_model_->randomInit();
       if (runInitAlgo()) { result = true; break;}
 #ifdef STK_MIXTURE_VERBOSE
@@ -113,6 +114,7 @@ bool ClassInit::run()
   {
     try
     {
+      p_model_->initializeStep();
       p_model_->randomClassInit();
       if (runInitAlgo()) { result = true; break;}
 #ifdef STK_MIXTURE_VERBOSE
@@ -153,6 +155,7 @@ bool FuzzyInit::run()
   {
     try
     {
+      p_model_->initializeStep();
       p_model_->randomFuzzyInit();
       if (runInitAlgo()) { result = true; break;}
 #ifdef STK_MIXTURE_VERBOSE
@@ -163,11 +166,12 @@ bool FuzzyInit::run()
     }
     catch (Clust::exceptions const& error)
     {
-#ifdef STK_MIXTURE_VERBOSE
-  stk_cout << _T("In FuzzyInit::run(), try number") << iTry << " generate an exception.\n";
-#endif
       String msg = Clust::exceptionToString(error);
       msg_error_ = STKERROR_NO_ARG(ClassInit::run,msg\n);
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("In FuzzyInit::run(), try number") << iTry << _T(" generate an exception.\n");
+  stk_cout << _T("In FuzzyInit::run(), error") << msg_error_ << _T("\n");
+#endif
     }
   } // iTry
 #ifdef STK_MIXTURE_VERBOSE

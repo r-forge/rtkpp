@@ -119,13 +119,13 @@ class MixtureGamma_aj_bk : public MixtureGammaBase< MixtureGamma_aj_bk<Array> >
     /** default constructor
      * @param nbCluster number of cluster in the model
      **/
-    inline MixtureGamma_aj_bk( int nbCluster): Base(nbCluster) {}
+    MixtureGamma_aj_bk( int nbCluster): Base(nbCluster) {}
     /** copy constructor
      *  @param model The model to copy
      **/
-    inline MixtureGamma_aj_bk( MixtureGamma_aj_bk const& model): Base(model) {}
+    MixtureGamma_aj_bk( MixtureGamma_aj_bk const& model): Base(model) {}
     /** destructor */
-    inline ~MixtureGamma_aj_bk() {}
+    ~MixtureGamma_aj_bk() {}
     /** @return the value of the probability of the i-th sample in the k-th component.
      *  @param i,k indexes of the sample and of the component
      **/
@@ -133,7 +133,10 @@ class MixtureGamma_aj_bk : public MixtureGammaBase< MixtureGamma_aj_bk<Array> >
     {
       Real sum =0.;
       for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)
-      { sum += Law::Gamma::lpdf(p_data()->elt(i,j), param_.shape_[j], param_.scale_[k]);}
+      {
+        if (param_.shape_[j] && param_.scale_[k])
+        { sum += Law::Gamma::lpdf(p_data()->elt(i,j), param_.shape_[j], param_.scale_[k]);}
+      }
       return sum;
     }
     /** Initialize randomly the parameters of the Gamma mixture. The shape

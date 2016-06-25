@@ -1,0 +1,125 @@
+%\VignetteIndexEntry{Learning With MixAll}
+%\VignetteKeywords{Rcpp, C++, STK++, Learning, Missing Values}
+%\VignettePackage{MixAll}
+
+\documentclass[shortnames,nojss,article]{jss}
+
+%------------------------------------------------
+%
+\usepackage{amsfonts,amstext,amsmath,amssymb}
+
+%------------------------------------------------
+%
+\usepackage{Sweave}
+
+\SweaveOpts{concordance=TRUE}
+
+<<prelim,echo=FALSE,print=FALSE>>=
+library(MixAll)
+MixAll.version <- packageDescription("MixAll")$Version
+MixAll.date <- packageDescription("MixAll")$Date
+@
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{float}
+
+%------------------------------------------------
+% Sets
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Rd}{{\mathbb{R}^d}}
+
+\newcommand{\X}{{\mathcal{X}}}
+\newcommand{\Z}{{\mathcal{X}}}
+\newcommand{\Xd}{{\mathcal{X}^d}}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Nd}{{\mathbb{N}^d}}
+
+% bold letters
+\newcommand{\ba}{\mathbf{a}}
+\newcommand{\bb}{\mathbf{b}}
+\newcommand{\bc}{\mathbf{c}}
+\newcommand{\bg}{\mathbf{g}}
+\newcommand{\be}{\mathbf{e}}
+\newcommand{\bp}{\mathbf{p}}
+\newcommand{\bu}{\mathbf{u}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\bX}{\mathbf{X}}
+%\newcommand{\bZ}{\mathbf{Z}}
+\newcommand{\bz}{\mathbf{z}}
+\newcommand{\bt}{\mathbf{t}}
+\newcommand{\by}{\mathbf{y}}
+
+% bold greek letters \usepackage{amssymb}
+\newcommand{\balpha}{\boldsymbol{\alpha}}
+\newcommand{\bbeta}{\boldsymbol{\beta}}
+\newcommand{\bsigma}{\boldsymbol{\sigma}}
+\newcommand{\bDelta}{\boldsymbol{\Delta}}
+\newcommand{\bepsilon}{\boldsymbol{\epsilon}}
+\newcommand{\bGamma}{\boldsymbol{\Gamma}}
+\newcommand{\blambda}{\boldsymbol{\lambda}}
+\newcommand{\bmu}{\boldsymbol{\mu}}
+\newcommand{\bpi}{\boldsymbol{\pi}}
+\newcommand{\bphi}{\boldsymbol{\phi}}
+\newcommand{\brho}{\boldsymbol{\rho}}
+\newcommand{\btheta}{\boldsymbol{\theta}}
+\newcommand{\bTheta}{\boldsymbol{\Theta}}
+\newcommand{\bvarepsilon}{\boldsymbol{\varepsilon}}
+
+%% Hilbert space and scalar product
+\newcommand{\Hil}{\mathcal{H}} %% RKHS
+\newcommand{\scalprod}[2]{\left\langle#1,#2\right\rangle}
+
+%---------------------------------------------------------
+\title{\pkg{MixAll}: Learning mixture models}
+\Plaintitle{MixAll:  Learning mixture models with Mixed data and Missing Values}
+\Shorttitle{MixAll: Learning data}
+
+\Abstract{
+  The MixALL package can also be used in order to learn miture models when the
+  labels class are known. You should read this vignette after the vignette
+  "Clustering With MixAll".
+}
+
+\Keywords{\proglang{R}, \proglang{C++}, \proglang{STK++}, Learning, missing
+values}
+\Plainkeywords{R, C++, STK++, Clustering, missing values}
+
+
+\Address{
+  Serge Iovleff\\
+  Univ. Lille 1, CNRS U.M.R. 8524, Inria Lille Nord Europe \\
+  59655 Villeneuve d'Ascq Cedex, France \\
+  E-mail: \email{Serge.Iovleff@stkpp.org} \\
+  URL: \url{http://www.stkpp.org}\\
+}
+
+
+% Title Page
+\author{Serge Iovleff\\University Lille 1}
+\date{now.data}
+
+\begin{document}
+
+\SweaveOpts{concordance=FALSE}
+\maketitle
+
+%\tableofcontents
+
+\section{Introduction}
+It is possible to perform supervised learning with MiXAll if the labels of the
+individuals are known.
+
+Let $\X$ be an arbitrary measurable space, $\Z=\{1,\ldots,K\}$ and let
+${\bx,\bz)}=\{({\bx}_1,{\bz}_1),...,({\bx}_n,\bz_n)\}$ be $n$ independent
+vectors in $\X\times\Z$ such that each $\Pr({\bz}_i=k) = p_k$
+and conditionnaly to ${\bz}_i=k$) arises from a probability distribution with
+density
+
+
+%\bibliography{MixAll}
+
+
+\end{document}

@@ -287,7 +287,7 @@ bool SemiSEMAlgo::run()
              << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
 #endif
   }
-  else
+  else // no result
   { p_model_->releaseIntermediateResults();}
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Terminating SemiSEMAlgo::run()\n");

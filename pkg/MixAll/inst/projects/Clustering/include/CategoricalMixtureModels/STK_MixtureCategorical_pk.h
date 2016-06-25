@@ -108,13 +108,13 @@ class MixtureCategorical_pk : public MixtureCategoricalBase<MixtureCategorical_p
     /** default constructor
      * @param nbCluster number of cluster in the model
      **/
-    inline MixtureCategorical_pk( int nbCluster) : Base(nbCluster) {}
+    MixtureCategorical_pk( int nbCluster) : Base(nbCluster) {}
     /** copy constructor
      *  @param model The model to copy
      **/
-    inline MixtureCategorical_pk( MixtureCategorical_pk const& model): Base(model) {}
+    MixtureCategorical_pk( MixtureCategorical_pk const& model): Base(model) {}
     /** destructor */
-    inline ~MixtureCategorical_pk() {}
+    ~MixtureCategorical_pk() {}
     /** @return the value of the probability of the i-th sample in the k-th component.
      *  @param i,k indexes of the sample and of the component
      **/
@@ -123,9 +123,9 @@ class MixtureCategorical_pk : public MixtureCategoricalBase<MixtureCategorical_p
       Real sum =0., prob;
       for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)
       {
-        if ( (prob = param_.proba_[k][p_data()->elt(i,j)]) <= 0.) return -Arithmetic<Real>::infinity();
-        sum += std::log(prob);
-       }
+        if ( (prob = param_.proba_[k][p_data()->elt(i,j)]) > 0. )
+        { sum += std::log(prob);}
+      }
       return sum;
     }
     /** Initialize randomly the parameters of the Categorical mixture.

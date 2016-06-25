@@ -2,6 +2,7 @@
 % Please edit documentation in R/ClusterStrategy.R
 \name{clusterStrategy}
 \alias{clusterFastStrategy}
+\alias{clusterSEMStrategy}
 \alias{clusterSemiSEMStrategy}
 \alias{clusterStrategy}
 \title{Create an instance of [\code{\linkS4class{ClusterStrategy}}] class}
@@ -13,6 +14,8 @@ clusterStrategy(nbTry = 1, nbInit = 5, initMethod = "class",
   longEpsilon = 1e-07)
 
 clusterSemiSEMStrategy()
+
+clusterSEMStrategy()
 
 clusterFastStrategy()
 }
@@ -65,7 +68,10 @@ A strategy is a multistage empirical process for finding a
 good estimate in the clustering estimation process.
 
 \code{clusterSemiSEMStrategy()} create an instance of [\code{\linkS4class{ClusterStrategy}}]
-for users with many missing values.
+for users with many missing values uning a semiSem algorithm.
+
+\code{clusterSEMStrategy()} create an instance of [\code{\linkS4class{ClusterStrategy}}]
+for users with many missing values using a SEM algorithm.
 
 \code{clusterFastStrategy()} create an instance of [\code{\linkS4class{ClusterStrategy}}] for impatient user.
 }
@@ -93,6 +99,8 @@ success, the estimated model is returned, otherwise an empty model is returned.
    clusterStrategy(nbTry = 1, nbInit= 1, shortRunAlgo= "SEM", nbShortIteration=100)
 
    clusterSemiSEMStrategy()
+
+   clusterSEMStrategy()
 
    clusterFastStrategy()
 

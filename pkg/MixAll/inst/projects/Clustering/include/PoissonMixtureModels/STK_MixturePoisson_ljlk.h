@@ -118,7 +118,7 @@ class MixturePoisson_ljlk : public MixturePoissonBase<MixturePoisson_ljlk<Array>
      **/
     MixturePoisson_ljlk( MixturePoisson_ljlk const& model): Base(model) {}
     /** destructor */
-    inline ~MixturePoisson_ljlk() {}
+    ~MixturePoisson_ljlk() {}
     /** @return the value of the probability of the i-th sample in the k-th component.
      *  @param i,k indexes of the sample and of the component
      **/
@@ -126,7 +126,11 @@ class MixturePoisson_ljlk : public MixturePoissonBase<MixturePoisson_ljlk<Array>
     {
       Real sum =0.;
       for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)
-      { sum += Law::Poisson::lpdf(p_data()->elt(i,j), param_.lambdak_[k]*param_.lambdaj_[j]);}
+      {
+        Real lambda = param_.lambdak_[k]*param_.lambdaj_[j];
+        if (lambda)
+        { sum += Law::Poisson::lpdf(p_data()->elt(i,j), lambda);}
+      }
       return sum;
     }
     /** Initialize randomly the parameters of the Poisson mixture. */

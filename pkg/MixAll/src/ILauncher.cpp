@@ -102,13 +102,13 @@ void ILauncher::createDiscreteDataSets( std::string const& idData
 }
 
 /* create the mixtures in the given learner */
-void ILauncher::createMixtures(IMixtureStatModel* p_learner)
+void ILauncher::createMixtures(IMixtureStatModel* p_model)
 {
-  p_learner->createMixture(diagGaussianManager_);
-  p_learner->createMixture(poissonManager_);
-  p_learner->createMixture(gammaManager_);
-  p_learner->createMixture(categoricalManager_);
-  p_learner->createMixture(kernelManager_);
+  p_model->createMixture(diagGaussianManager_);
+  p_model->createMixture(poissonManager_);
+  p_model->createMixture(gammaManager_);
+  p_model->createMixture(categoricalManager_);
+  p_model->createMixture(kernelManager_);
 }
 
 /* fill the s4_component with the parameters */

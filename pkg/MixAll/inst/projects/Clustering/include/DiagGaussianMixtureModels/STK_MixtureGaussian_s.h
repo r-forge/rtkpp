@@ -127,9 +127,8 @@ class MixtureGaussian_s : public MixtureDiagGaussianBase<MixtureGaussian_s<Array
       Real sum =0.;
       for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)
       {
-        Real mean  = param_.mean_[k][j];
-        Real sigma = param_.sigma_;
-        sum += Law::Normal::lpdf(p_data()->elt(i,j), mean, sigma);
+        if (param_.sigma_)
+        { sum += Law::Normal::lpdf(p_data()->elt(i,j), param_.mean_[k][j], param_.sigma_);}
       }
       return sum;
     }
@@ -183,8 +182,16 @@ bool MixtureGaussian_s<Array>::run( CArrayXX const*  p_tik, CPointX const* p_nk)
                    ).square()
                 ).sum();
   }
-  //if ((variance<=0) || !Arithmetic<Real>::isFinite(variance)) return false;
   param_.sigma_ = std::sqrt(variance/(this->nbSample()*this->nbVariable()));
+#ifdef STK_MIXTURE_DEBUG
+    if( param_.sigma_ <= 0  )
+    {
+      stk_cout << _T("MixtureGaussian_s::run() failed\n");
+      stk_cout << _T("param_.mean_ =") << param_.mean_;
+      stk_cout << _T("param_.sigma_=") << param_.sigma_ << _T("\n");
+    }
+#endif
+  //if ((variance<=0) || !Arithmetic<Real>::isFinite(variance)) return false;
   return true;
 }
 

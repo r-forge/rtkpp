@@ -120,13 +120,13 @@ class MixtureGamma_ajk_b : public MixtureGammaBase<MixtureGamma_ajk_b<Array> >
     /** default constructor
      * @param nbCluster number of cluster in the model
      **/
-    inline MixtureGamma_ajk_b( int nbCluster): Base(nbCluster) {}
+    MixtureGamma_ajk_b( int nbCluster): Base(nbCluster) {}
     /** copy constructor
      *  @param model The model to copy
      **/
-    inline MixtureGamma_ajk_b( MixtureGamma_ajk_b const& model): Base(model) {}
+    MixtureGamma_ajk_b( MixtureGamma_ajk_b const& model): Base(model) {}
     /** destructor */
-    inline ~MixtureGamma_ajk_b() {}
+    ~MixtureGamma_ajk_b() {}
     /** @return the value of the probability of the i-th sample in the k-th component.
      *  @param i,k indexes of the sample and of the component
      **/
@@ -134,7 +134,13 @@ class MixtureGamma_ajk_b : public MixtureGammaBase<MixtureGamma_ajk_b<Array> >
     {
       Real sum =0.;
       for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)
-      { sum += Law::Gamma::lpdf(p_data()->elt(i,j), param_.shape_[k][j], param_.scale_);}
+      {
+        if (param_.shape_[k][j] && param_.scale_)
+        {
+          if (param_.shape_[k][j] && param_.scale_)
+          { sum += Law::Gamma::lpdf(p_data()->elt(i,j), param_.shape_[k][j], param_.scale_);}
+        }
+      }
       return sum;
     }
     /** Initialize randomly the parameters of the Gamma mixture. */

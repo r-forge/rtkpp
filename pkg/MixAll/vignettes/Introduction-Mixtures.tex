@@ -12,13 +12,8 @@
 %
 \usepackage{Sweave}
 
-\SweaveOpts{concordance=TRUE}
+\input{Introduction-Mixtures-concordance}
 
-<<prelim,echo=FALSE,print=FALSE>>=
-library(MixAll)
-MixAll.version <- packageDescription("MixAll")$Version
-MixAll.date <- packageDescription("MixAll")$Date
-@
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -107,7 +102,7 @@ values}
 
 \begin{document}
 
-\SweaveOpts{concordance=FALSE}
+
 \maketitle
 
 %\tableofcontents
@@ -350,10 +345,30 @@ is 200.
 \item \code{epsilon}:  threshold to use in order to stop the iterations
 (not used by the \code{SEM} and \code{SemiSEM} algorithms).
 \end{itemize}
-<< >>=
-clusterAlgo()
-clusterAlgo(algo="SemiSEM",nbIteration=100,epsilon=1e-08)
-@
+\begin{Schunk}
+\begin{Sinput}
+> clusterAlgo()
+\end{Sinput}
+\begin{Soutput}
+****************************************
+*** MixAll ClusterAlgo:
+* algorithm            =  EM 
+* number of iterations =  200 
+* epsilon              =  1e-07 
+****************************************
+\end{Soutput}
+\begin{Sinput}
+> clusterAlgo(algo="SemiSEM",nbIteration=100,epsilon=1e-08)
+\end{Sinput}
+\begin{Soutput}
+****************************************
+*** MixAll ClusterAlgo:
+* algorithm            =  SemiSEM 
+* number of iterations =  100 
+* epsilon              =  1e-08 
+****************************************
+\end{Soutput}
+\end{Schunk}
 
 \subsection{Initialization Methods}\label{subsubsec:init}
 
@@ -382,10 +397,34 @@ initialization algorithm.  Default values is 20.
 value: 0.01.
 \end{itemize}
 
-<< >>=
-clusterInit()
-clusterInit(method="random", nbInit= 2, algo="CEM", nbIteration=10,epsilon=1e-04)
-@
+\begin{Schunk}
+\begin{Sinput}
+> clusterInit()
+\end{Sinput}
+\begin{Soutput}
+****************************************
+*** MixAll ClusterInit:
+* method               =  class 
+* number of init       =  5 
+* algorithm            =  EM 
+* number of iterations =  20 
+* epsilon              =  0.01 
+****************************************
+\end{Soutput}
+\begin{Sinput}
+> clusterInit(method="random", nbInit= 2, algo="CEM", nbIteration=10,epsilon=1e-04)
+\end{Sinput}
+\begin{Soutput}
+****************************************
+*** MixAll ClusterInit:
+* method               =  class 
+* number of init       =  2 
+* algorithm            =  CEM 
+* number of iterations =  10 
+* epsilon              =  1e-04 
+****************************************
+\end{Soutput}
+\end{Schunk}
 
 \subsection{Estimation Strategy}
 \label{subsec:Strategy}
@@ -463,9 +502,35 @@ value is 1e-07.\\
 \label{tab:clusterStrategy}
 \end{table}
 
-<< >>=
-clusterStrategy()
-@
+\begin{Schunk}
+\begin{Sinput}
+> clusterStrategy()
+\end{Sinput}
+\begin{Soutput}
+****************************************
+*** Cluster Strategy:
+* number of try         =  1 
+* number of short run   =  5 
+****************************************
+*** Initialization :
+* method =  class 
+* number of init       =  5 
+* algorithm            =  EM 
+* number of iterations =  20 
+* epsilon              =  0.01 
+****************************************
+*** short Algorithm :
+* algorithm            =  EM 
+* number of iterations =  100 
+* epsilon              =  1e-04 
+****************************************
+*** long algorithm :
+* algorithm            =  EM 
+* number of iterations =  1000 
+* epsilon              =  1e-07 
+****************************************
+\end{Soutput}
+\end{Schunk}
 Users have to take care that there will be \code{nbInit} $\times$
 \code{nbShortRun} starting points $\theta^0$ during the estimation process. The
 default generate randomly fifty times $\theta^0$.
@@ -480,17 +545,69 @@ There is two defined utility functions for the end-user:
 For impatient user, the \code{clusterFastStrategy} furnish results very quickly.
 The accuracy of the result is not guaranteed if the model is a bit difficult to
 estimate.
-<< >>=
-clusterFastStrategy()
-@
+\begin{Schunk}
+\begin{Sinput}
+> clusterFastStrategy()
+\end{Sinput}
+\begin{Soutput}
+****************************************
+*** Cluster Strategy:
+* number of try         =  1 
+* number of short run   =  2 
+****************************************
+*** Initialization :
+* method =  class 
+* number of init       =  3 
+* algorithm            =  EM 
+* number of iterations =  5 
+* epsilon              =  0.01 
+****************************************
+*** short Algorithm :
+* algorithm            =  CEM 
+* number of iterations =  10 
+* epsilon              =  0.001 
+****************************************
+*** long algorithm :
+* algorithm            =  EM 
+* number of iterations =  100 
+* epsilon              =  1e-07 
+****************************************
+\end{Soutput}
+\end{Schunk}
 
 The function \code{clusterSemiSEMStrategy} is highly recommended if there is
 missing values int the data set. The "SemiSEM" algorithm simulate the missing
 values and computes a Monte-Carlo estimator of the $\theta$ parameter during the
 iterations allowing to get unbiased estimators.
-<< >>=
-clusterSemiSEMStrategy()
-@
+\begin{Schunk}
+\begin{Sinput}
+> clusterSemiSEMStrategy()
+\end{Sinput}
+\begin{Soutput}
+****************************************
+*** Cluster Strategy:
+* number of try         =  2 
+* number of short run   =  5 
+****************************************
+*** Initialization :
+* method =  class 
+* number of init       =  5 
+* algorithm            =  SemiSEM 
+* number of iterations =  20 
+* epsilon              =  0 
+****************************************
+*** short Algorithm :
+* algorithm            =  SemiSEM 
+* number of iterations =  50 
+* epsilon              =  0 
+****************************************
+*** long algorithm :
+* algorithm            =  SemiSEM 
+* number of iterations =  400 
+* epsilon              =  0 
+****************************************
+\end{Soutput}
+\end{Schunk}
 
 \section{Implemented Mixture Models}
 \label{sec:ImplementedModels}
@@ -542,11 +659,27 @@ and has a density function of the form
 It is possible to get a vector with all Gaussian mixture model names using the
 \code{clusterDiagGaussianNames} function.
 
-<< >>=
-clusterDiagGaussianNames()
-clusterDiagGaussianNames("all", "equal", "free")
-clusterValidDiagGaussianNames(c("gaussian_pk_sjk","gaussian_p_ljk"))
-@
+\begin{Schunk}
+\begin{Sinput}
+> clusterDiagGaussianNames()
+\end{Sinput}
+\begin{Soutput}
+[1] "gaussian_pk_sjk" "gaussian_pk_sj"  "gaussian_pk_sk"  "gaussian_pk_s"  
+[5] "gaussian_p_sjk"  "gaussian_p_sj"   "gaussian_p_sk"   "gaussian_p_s"   
+\end{Soutput}
+\begin{Sinput}
+> clusterDiagGaussianNames("all", "equal", "free")
+\end{Sinput}
+\begin{Soutput}
+[1] "gaussian_pk_sk" "gaussian_p_sk" 
+\end{Soutput}
+\begin{Sinput}
+> clusterValidDiagGaussianNames(c("gaussian_pk_sjk","gaussian_p_ljk"))
+\end{Sinput}
+\begin{Soutput}
+[1] FALSE
+\end{Soutput}
+\end{Schunk}
 
 \subsection{Multivariate categorical Mixture Models}
 \label{subsec:Categorical}
@@ -572,11 +705,27 @@ It is possible to get a vector with all Gaussian model names using the
 
 It is possible to get a vector with all categorical mixture model names using
 the \code{clusterCategoricalNames} function.
-<< >>=
-clusterCategoricalNames()
-clusterCategoricalNames("all", "equal")
-clusterValidCategoricalNames(c("categorical_pk_pjk","categorical_p_pk"))
-@
+\begin{Schunk}
+\begin{Sinput}
+> clusterCategoricalNames()
+\end{Sinput}
+\begin{Soutput}
+[1] "categorical_pk_pjk" "categorical_pk_pk"  "categorical_p_pjk" 
+[4] "categorical_p_pk"  
+\end{Soutput}
+\begin{Sinput}
+> clusterCategoricalNames("all", "equal")
+\end{Sinput}
+\begin{Soutput}
+[1] "categorical_pk_pk" "categorical_p_pk" 
+\end{Soutput}
+\begin{Sinput}
+> clusterValidCategoricalNames(c("categorical_pk_pjk","categorical_p_pk"))
+\end{Sinput}
+\begin{Soutput}
+[1] TRUE
+\end{Soutput}
+\end{Schunk}
 
 \subsection{Multivariate Poisson Mixture Models}
 \label{subsec:Poisson}
@@ -612,11 +761,27 @@ and has a density of the form
 
 It is possible to get a vector with all Poisson mixture model names using
 the \code{clusterPoissonNames} function.
-<< >>=
-clusterPoissonNames()
-clusterPoissonNames("all","proportional")
-clusterValidPoissonNames(c("poisson_pk_ljk","poisson_p_ljlk"))
-@
+\begin{Schunk}
+\begin{Sinput}
+> clusterPoissonNames()
+\end{Sinput}
+\begin{Soutput}
+[1] "poisson_pk_ljk"  "poisson_pk_lk"   "poisson_pk_ljlk" "poisson_p_ljk"  
+[5] "poisson_p_lk"    "poisson_p_ljlk" 
+\end{Soutput}
+\begin{Sinput}
+> clusterPoissonNames("all","proportional")
+\end{Sinput}
+\begin{Soutput}
+[1] "poisson_pk_ljlk" "poisson_p_ljlk" 
+\end{Soutput}
+\begin{Sinput}
+> clusterValidPoissonNames(c("poisson_pk_ljk","poisson_p_ljlk"))
+\end{Sinput}
+\begin{Soutput}
+[1] TRUE
+\end{Soutput}
+\end{Schunk}
 
 \subsection{Multivariate Gamma Mixture Models}
 \label{subsec:Gamma}
@@ -688,11 +853,31 @@ mixture model $\verb+gamma_aj_bk+$ has a density function of the form
 
 It is possible to get a vector with all gamma mixture model names using
 the \code{clusterGammaNames} function.
-<< >>=
-clusterGammaNames()
-clusterGammaNames("all", "equal","free","free","all")
-clusterValidGammaNames(c("gamma_pk_aj_bk","gamma_p_ajk_bjk"))
-@
+\begin{Schunk}
+\begin{Sinput}
+> clusterGammaNames()
+\end{Sinput}
+\begin{Soutput}
+ [1] "gamma_p_ajk_bjk"  "gamma_p_ajk_bk"   "gamma_p_ajk_bj"   "gamma_p_ajk_b"   
+ [5] "gamma_p_ak_bjk"   "gamma_p_ak_bk"    "gamma_p_ak_bj"    "gamma_p_ak_b"    
+ [9] "gamma_p_aj_bjk"   "gamma_p_aj_bk"    "gamma_p_a_bjk"    "gamma_p_a_bk"    
+[13] "gamma_pk_ajk_bjk" "gamma_pk_ajk_bk"  "gamma_pk_ajk_bj"  "gamma_pk_ajk_b"  
+[17] "gamma_pk_ak_bjk"  "gamma_pk_ak_bk"   "gamma_pk_ak_bj"   "gamma_pk_ak_b"   
+[21] "gamma_pk_aj_bjk"  "gamma_pk_aj_bk"   "gamma_pk_a_bjk"   "gamma_pk_a_bk"   
+\end{Soutput}
+\begin{Sinput}
+> clusterGammaNames("all", "equal","free","free","all")
+\end{Sinput}
+\begin{Soutput}
+[1] "gamma_p_ak_bjk"  "gamma_p_ak_bj"   "gamma_pk_ak_bjk" "gamma_pk_ak_bj" 
+\end{Soutput}
+\begin{Sinput}
+> clusterValidGammaNames(c("gamma_pk_aj_bk","gamma_p_ajk_bjk"))
+\end{Sinput}
+\begin{Soutput}
+[1] TRUE
+\end{Soutput}
+\end{Schunk}
 
 \subsection{Gaussian Kernel Mixture Models}
 \label{subsec:Kernel}
@@ -750,10 +935,21 @@ and have a density function given in (\ref{eq:kmmLikelihood}), the
 It is possible to get a vector with all (Gaussian) kernel mixture model names
 using \code{clusterKernelNames} function.
 
-<< >>=
-clusterKernelNames()
-clusterValidKernelNames(c("kernelGaussian_pk_sk","kernelGaussian_pk_s"))
-@
+\begin{Schunk}
+\begin{Sinput}
+> clusterKernelNames()
+\end{Sinput}
+\begin{Soutput}
+[1] "kernelGaussian_pk_sk" "kernelGaussian_pk_s"  "kernelGaussian_p_sk" 
+[4] "kernelGaussian_p_s"  
+\end{Soutput}
+\begin{Sinput}
+> clusterValidKernelNames(c("kernelGaussian_pk_sk","kernelGaussian_pk_s"))
+\end{Sinput}
+\begin{Soutput}
+[1] TRUE
+\end{Soutput}
+\end{Schunk}
 
 There is threee kernels availables: "gaussian", "exponential" and "polynomial"
 \begin{itemize}
@@ -860,17 +1056,47 @@ estimate.  Call \code{clusterDiagGaussianNames()} by default
 
 We illustrate this function with the well known geyser data set
 (\cite{azzalini1990},\cite{hardle1991}).
-<<fig=TRUE>>=
-data(geyser);
-x = as.matrix(geyser); n <- nrow(x); p <- ncol(x);
-# add missing values at random
-indexes  <- matrix(c(round(runif(10,1,n)), round(runif(10,1,p))), ncol=2);
-x[indexes] <- NA;
-model <- clusterDiagGaussian(data=x, nbCluster=3, strategy = clusterFastStrategy())
-summary(model)
-missingValues(model)
-plot(model)
-@
+\begin{Schunk}
+\begin{Sinput}
+> data(geyser);
+> x = as.matrix(geyser); n <- nrow(x); p <- ncol(x);
+> # add missing values at random
+> indexes  <- matrix(c(round(runif(10,1,n)), round(runif(10,1,p))), ncol=2);
+> x[indexes] <- NA;
+> model <- clusterDiagGaussian(data=x, nbCluster=3, strategy = clusterFastStrategy())
+> summary(model)
+\end{Sinput}
+\begin{Soutput}
+**************************************************************
+* nbSample       =  272 
+* nbCluster      =  3 
+* lnLikelihood   =  -9378.967 
+* nbFreeParameter=  74 
+* criterion      =  19177.55 
+* model name     = gaussian_pk_sj 
+**************************************************************
+\end{Soutput}
+\begin{Sinput}
+> missingValues(model)
+\end{Sinput}
+\begin{Soutput}
+      row col     value
+ [1,]  10   1  4.379080
+ [2,] 223   1  2.034394
+ [3,] 240   1  2.034394
+ [4,] 255   1  4.379080
+ [5,]  27   2 54.204301
+ [6,]  76   2 74.989557
+ [7,]  86   2 74.989557
+ [8,] 167   2 54.204301
+ [9,] 216   2 74.989557
+[10,] 259   2 54.204301
+\end{Soutput}
+\begin{Sinput}
+> plot(model)
+\end{Sinput}
+\end{Schunk}
+\includegraphics{Introduction-Mixtures-012}
 
 \subsection{Clustering with Multivariate categorical Mixture Models}
 \label{subsec:clustCategorical}
@@ -903,16 +1129,47 @@ Input Parameter & Description \\
 
 We illustrate this function with the birds data set.
 
-<<fig=TRUE>>=
-data(birds)
-x = as.matrix(birds);  n <- nrow(x); p <- ncol(x);
-indexes  <- matrix(c(round(runif(10,1,n)), round(runif(10,1,p))), ncol=2);
-x[indexes] <- NA;
-model <- clusterCategorical(data=x, nbCluster=2)
-summary(model)
-missingValues(model)
-plot(model)
-@
+\begin{Schunk}
+\begin{Sinput}
+> data(birds)
+> x = as.matrix(birds);  n <- nrow(x); p <- ncol(x);
+> indexes  <- matrix(c(round(runif(10,1,n)), round(runif(10,1,p))), ncol=2);
+> x[indexes] <- NA;
+> model <- clusterCategorical(data=x, nbCluster=3, strategy = clusterFastStrategy())
+> summary(model)
+\end{Sinput}
+\begin{Soutput}
+**************************************************************
+* nbSample       =  69 
+* nbCluster      =  3 
+* lnLikelihood   =  -190.6983 
+* nbFreeParameter=  32 
+* criterion      =  530.4146 
+* model name     = categorical_pk_pjk 
+* nbModalities   =  4 
+**************************************************************
+\end{Soutput}
+\begin{Sinput}
+> missingValues(model)
+\end{Sinput}
+\begin{Soutput}
+   row col value
+12  12   1     1
+26  26   1     1
+37  37   1     1
+62  62   1     1
+66  66   1     1
+17  17   2     2
+19  19   2     3
+43  43   2     3
+21  21   4     1
+27  27   5     3
+\end{Soutput}
+\begin{Sinput}
+> plot(model)
+\end{Sinput}
+\end{Schunk}
+\includegraphics{Introduction-Mixtures-013}
 
 Categorical mixture models are plotted using the \emph{logistic latent
 representation}.
@@ -943,16 +1200,46 @@ Input Parameter & Description \\
 \label{tab:clusterGamma}
 \end{table}
 
-<<fig=TRUE>>=
-data(geyser);
-x = as.matrix(geyser); n <- nrow(x); p <- ncol(x);
-indexes  <- matrix(c(round(runif(10,1,n)), round(runif(10,1,p))), ncol=2);
-x[indexes] <- NA;
-model <- clusterGamma(data=x, nbCluster=3, strategy = clusterFastStrategy())
-summary(model)
-missingValues(model)
-plot(model)
-@
+\begin{Schunk}
+\begin{Sinput}
+> data(geyser);
+> x = as.matrix(geyser); n <- nrow(x); p <- ncol(x);
+> indexes  <- matrix(c(round(runif(10,1,n)), round(runif(10,1,p))), ncol=2);
+> x[indexes] <- NA;
+> model <- clusterGamma(data=x, nbCluster=3, strategy = clusterFastStrategy())
+> summary(model)
+\end{Sinput}
+\begin{Soutput}
+**************************************************************
+* nbSample       =  272 
+* nbCluster      =  3 
+* lnLikelihood   =  -1118.026 
+* nbFreeParameter=  14 
+* criterion      =  2340.435 
+* model name     = gamma_pk_ajk_bjk 
+**************************************************************
+\end{Soutput}
+\begin{Sinput}
+> missingValues(model)
+\end{Sinput}
+\begin{Soutput}
+      row col     value
+ [1,]  39   1  1.998091
+ [2,]  89   1  1.992308
+ [3,] 109   1  4.331709
+ [4,] 133   1  1.993122
+ [5,] 140   1  4.331603
+ [6,] 268   1  4.331681
+ [7,] 110   2 80.533725
+ [8,] 121   2 54.664163
+ [9,] 125   2 80.544316
+[10,] 227   2 80.543469
+\end{Soutput}
+\begin{Sinput}
+> plot(model)
+\end{Sinput}
+\end{Schunk}
+\includegraphics{Introduction-Mixtures-014}
 
 \subsection{Clustering with Multivariate Poisson Models}
 \label{subsec:clustPoisson}
@@ -982,14 +1269,34 @@ Input Parameter & Description \\
 \end{table}
 
 
-<<fig=TRUE>>=
-data(DebTrivedi)
-dt <- DebTrivedi[1:500, c(1, 6,8, 15)]
-model <- clusterPoisson( data=dt, nbCluster=3, strategy = clusterFastStrategy())
-summary(model)
-missingValues(model)
-plot(model)
-@
+\begin{Schunk}
+\begin{Sinput}
+> data(DebTrivedi)
+> dt <- DebTrivedi[1:500, c(1, 6,8, 15)]
+> model <- clusterPoisson( data=dt, nbCluster=3, strategy = clusterFastStrategy())
+> summary(model)
+\end{Sinput}
+\begin{Soutput}
+**************************************************************
+* nbSample       =  500 
+* nbCluster      =  3 
+* lnLikelihood   =  -32699.52 
+* nbFreeParameter=  46 
+* criterion      =  65739.06 
+* model name     = poisson_pk_ljlk 
+**************************************************************
+\end{Soutput}
+\begin{Sinput}
+> missingValues(model)
+\end{Sinput}
+\begin{Soutput}
+     row col value
+\end{Soutput}
+\begin{Sinput}
+> plot(model)
+\end{Sinput}
+\end{Schunk}
+\includegraphics{Introduction-Mixtures-015}
 
 \subsection{Clustering with Kernel Mixture Models}
 \label{subsec:clustKernel}
@@ -1025,321 +1332,7 @@ $1$ by default.\\
 \end{table}
 
 
-<<fig=TRUE>>=
-data(bullsEye)
-model <- clusterKernel( data=bullsEye[,1:2], nbCluster=2, models = "kernelGaussian_pk_s", strategy = clusterFastStrategy())
-summary(model)
-plot(model)
-@
-\subsection{Clustering Mixed data sets}
-\label{subsec:clustMixedData}
-
-Mixed data sets can be clustered using the \code{clusterMixedData}
-function. The original mixed data set has to be splited in multiple
-homogeneous data sets and each one associated to a mixture model name.
-
-In Table~\ref{tab:clusterMixedData} the reader will find a summary of all
-the specific input parameters of this function with its default value.
-\begin{table}[H]
-\centering
-\begin{tabular}{|p{0.3\textwidth}|p{0.65\textwidth}|}
-\hline
-Input Parameter & Description \\
-\hline
-\code{data} & A \code{list} containing the homogeneous data sets (matrices
-and/or data.frames). All the data sets must have the same number of rows. \\
-\hline
-\code{models} & A \code{vector} of character and of same length than data
-containing the model names to fit to each data set (see \ref{subsec:MixedData}).\\
-\hline
-\end{tabular}
-\caption{List of all the specific parameters of the \code{clusterMixedData}
-function.}
-\label{tab:clusterMixedData}
-\end{table}
-
-<<fig=TRUE>>=
-data(HeartDisease.cat)
-data(HeartDisease.cont)
-ldata = list(HeartDisease.cat,HeartDisease.cont);
-lnames = c("categorical_pk_pjk","gaussian_pk_sjk")
-model <- clusterMixedData(ldata, lnames, nbCluster=3, strategy = clusterFastStrategy())
-summary(model)
-missingValues(model)
-plot(model)
-@
-
-MixedData mixture models are plotted using the \emph{logistic latent
-representation}.
-
-
-\bibliography{MixAll}
-
-\appendix
-
-\section{M step computation for the Gaussian models}
-
-For all the M Step, the mean is updated using the following formula
-$$
-{\bmu}_k = \frac{1}{t_{.k}} \sum_{i=1}^n t_{ik} \bx_i,
-$$
-with $t_{.k} = \sum_{i=1}^n t_{ik}$, for $k=1,\ldots,K$.
-
-\subsection{M Step of the gaussian sjk model}
-
-Using the equation (\ref{eq:mStepEM}) and dropping the constant, we obtain that
-we have to maximize in $\bsigma = (\sigma^j_k)^2$, for $j=1,\ldots,d$ and
-$k=1,\ldots,K$ the expression
-\begin{equation} \label{eq:gaussian_sjk}
-l(\bsigma | {\bx}_{1},\ldots,{\bx}_{n}, {\bt}^m) = \sum_{i=1}^{n} \sum_{k=1}^{K} t_{ik}^m
-     \sum_{j=1}^d \left[ - \frac{1}{(\sigma^j_k)^2} (x_i^j - \hat{\mu}_j^k)^2 - \log((\sigma^j_k)^2) \right].
-\end{equation}
-
-For this model, the variance is updated using the formula:
-$$
-(\hat{\sigma}^j_k)^2 = \frac{1}{t_{.k}} \sum_{i=1}^n t_{ik} (x^j_i-\hat{\mu}^j_k)^2.
-$$
-
-\subsection{M Step of the gaussian sk model}
-
-For this model, the variance is updated using the formula:
-$$
-(\hat{\sigma}_k)^2 = \frac{1}{d t_{.k}} \sum_{j=1}^d\sum_{i=1}^n t_{ik} (x^j_i-\hat{\mu}^j_k)^2.
-$$
-
-\subsection{M Step of the gaussian sj model}
-
-For this model, the variance is updated using the formula:
-$$
-(\hat{\sigma}^j)^2 =  t_{ik} (x^j_i-\mu^j_k)^2.
-$$
-
-\subsection{M Step of the gaussian s model}
-
-For this model, the variance is updated using the formula:
-$$
-\hat{\sigma}^2 = \frac{1}{nd} \sum_{i=1}^n \sum_{k=1}^K t_{ik} \|\bx_i-\bmu_k\|^2.
-$$
-
-\section{M step computation for the Gamma models}
-In this section, given the array $\bt$ of conditional probabilities, we will write
-$t_{.k} = \sum_{i=1}^n t_{ik}$, for $k=1,\ldots,K$ and will denote
-$$
-\bar{x}^j_k = \frac{1}{t_{.k}} \sum_{i=1}^n t_{ik} x^j_i,
-$$
-the $k$-th pondered mean of the $j$-th observation, and by
-$$
-(\overline{\log(x)})^j_k = \frac{1}{t_{.k}} \sum_{i=1}^n t_{ik} \log(x^j_i),
-$$
-the $k$-th pondered $\log$-mean of the $j$-th observation.
-
-Replacing $h$ by its expression in the equation (\ref{eq:mStepEM}) and summing
-in $i$, the M-step for the twelve gamma mixture models defined in table
- (\ref{tab:gammamodels}) is equivalent to maximize the following expression
-\begin{equation}\label{eq:mStep_A_B}
-l(A, B) = \sum_{k=1}^K \sum_{j=1}^d t_{.k}\left( A(\overline{\log(x)})^j_k - \frac{\bar{x}^j_k}{B} - \log(\Gamma(A)) - A \log(B) \right),
-\end{equation}
-with $A\in \{a, a^j, a_k, a^j_k\}$ and $B\in \{b, b^j, b_k, b^j_k\}$.
-
-We now describe the various derivatives and for each models explicit the maximum
-likelihood equations to solve. Taking the derivative with respect to $B$:
-\begin{itemize}
-\item If $B = b^j_k$ then
-$$
-\frac{dl}{db^j_k} = t_{.k}  \left(\frac{\bar{x}^j_k}{b^2} - \frac{A}{b}\right)
-\mbox{ and thus }
-\hat{b}^j_k = \frac{\bar{x}^j_k}{A}$$
-\item If $B = b_{k}$ then
-$$
-\frac{dl}{db_k} = t_{.k}  \sum_{j=1}^d \left(\frac{\bar{x}^j_k}{b_k^2} - \frac{A}{b_k}\right)
-\mbox{ and thus }
-\hat{b}_k = \frac{\sum_{j=1}^d  \bar{x}^j_k}{\sum_{j=1}^d A}$$
-\item If $B = b^j$ then
-$$
-\frac{dl}{db^j} = \sum_{k=1}^K t_{.k}  \left(\frac{\bar{x}^j_k}{(b^{j})^2} - \frac{A}{b^j}\right)
-\mbox{ and thus }
-\hat{b}^j = \frac{\sum_{k=1}^K t_{.k} \bar{x}^j_k}{\sum_{k=1}^K t_{.k} A}$$
-\item If $B = b$ then
-$$
-\frac{dl}{db} = \sum_{k=1}^K \sum_{j=1}^d t_{.k}  \left(\frac{\bar{x}^j_k}{b^2} - \frac{A}{b}\right)
-\mbox{ and thus }
-\hat{b} = \frac{\sum_{k=1}^K \sum_{j=1}^d t_{.k} \bar{x}^j_k}{\sum_{k=1}^K \sum_{j=1}^d t_{.k} A}$$
-\end{itemize}
-
-Taking now the derivative with respect to $A$:
-\begin{enumerate}
-\item If $A = a^j_k$, then
-$$
-\frac{dl}{da^j_k} = t_{.k} \left( (\overline{\log(x)})^j_k -  \log(B)\right) - t_{.k}\Psi(a^j_k).
-$$
-and thus
-\begin{itemize}
-\item if $B=b^j_k$ (model \verb+gamma_ajk_bjk+)
-\begin{equation}\label{eq:mStep_ajk_bjk}
-\left\lbrace
-\begin{array}{lcl}
-  \Psi(\hat{a}^j_k) & = & (\overline{\log(x)})^j_k  - \log(\hat{b}^j_k) \\
-  \hat{b}^j_k & = & \frac{\bar{x}^j_k}{\hat{a}^j_k},
-\end{array}
-\right.
-\end{equation}
-\item  if $B=b_k$  (model \verb+gamma_ajk_bk+)
-\begin{equation}\label{eq:mStep_ajk_bk}
-\left\lbrace
-\begin{array}{lcl}
-  \Psi(\hat{a}^j_k) & = & (\overline{\log(x)})^j_k  - \log(\hat{b}_k) \\
-  \hat{b}_k         & = & \frac{\sum_{j=1}^d  \bar{x}^j_k}{\sum_{j=1}^d a^j_k}
-\end{array}
-\right.
-\end{equation}
-\item  if $B=b^j$  (model \verb+gamma_ajk_bj+)
-\begin{equation}\label{eq:mStep_ajk_bj}
-\left\lbrace
-\begin{array}{lcl}
-  \Psi(\hat{a}^j_k) & = & (\overline{\log(x)})^j_k  - \log(\hat{b}^j) \\
-  \hat{b}^j         & = & \frac{\sum_{k=1}^K t_{.k} \bar{x}^j_k}{\sum_{k=1}^K t_{.k} a^j_k}
-\end{array}
-\right.
-\end{equation}
-\item if $B=b$  (model \verb+gamma_ajk_b+)
-\begin{equation}\label{eq:mStep_ajk_b}
-\left\lbrace
-\begin{array}{lcl}
-  \Psi(\hat{a}^j_k) & = & (\overline{\log(x)})^j_k  - \log(\hat{b}) \\
-  \hat{b}           & = & \frac{\sum_{j=1}^d\sum_{k=1}^K t_{.k} \bar{x}^j_k}{\sum_{j=1}^d\sum_{k=1}^K t_{.k} a^j_k}
-\end{array}
-\right.
-\end{equation}
-\end{itemize}
-\item If $A = a_{k}$, then
-$$
-\frac{dl}{da_k} = t_{.k} \sum_{j=1}^d \left( (\overline{\log(x)})^j_k - \log(B)\right) - t_{.k}d\Psi(a_k).
-$$
-and thus
-\begin{itemize}
-\item if $B=b^j_k$ (model \verb+gamma_ak_bjk+)
-\begin{equation}\label{eq:mStep_ak_bjk}
-\left\lbrace
-\begin{array}{lcl}
-\Psi(\hat{a}_k) & = & \frac{1}{d} \sum_{j=1}^d \left( (\overline{\log(x)})^j_k - \log(\hat{b}^j_k) \right) \\
-    \hat{b}^j_k & = & \frac{\bar{x}^j_k}{\hat{a}_k},
-\end{array}
-\right.
-\end{equation}
-\item  if $B=b_k$  (model \verb+gamma_ak_bk+)
-\begin{equation}\label{eq:mStep_ak_bk}
-\left\lbrace
-\begin{array}{lcl}
-\Psi(\hat{a}_k) & = & \frac{1}{d} \sum_{j=1}^d \left( (\overline{\log(x)})^j_k - \log(\hat{b}_k) \right) \\
-  \hat{b}_k     & = & \frac{\sum_{j=1}^d  \bar{x}^j_k}{d a_k}
-\end{array}
-\right.
-\end{equation}
-\item  if $B=b^j$  (model \verb+gamma_ak_bj+)
-\begin{equation}\label{eq:mStep_ak_bj}
-\left\lbrace
-\begin{array}{lcl}
-\Psi(\hat{a}_k) & = & \frac{1}{d} \sum_{j=1}^d \left( (\overline{\log(x)})^j_k - \log(\hat{b}^j) \right) \\
-  \hat{b}^j     & = & \frac{\sum_{k=1}^K t_{.k} \bar{x}^j_k}{\sum_{k=1}^K t_{.k} a_k}
-\end{array}
-\right.
-\end{equation}
-\item if $B=b$  (model \verb+gamma_ak_b+)
-\begin{equation}\label{eq:mStep_ak_b}
-\left\lbrace
-\begin{array}{lcl}
-\Psi(\hat{a}_k) & = & \frac{1}{d} \sum_{j=1}^d \left( (\overline{\log(x)})^j_k - \log(\hat{b}) \right) \\
-  \hat{b}       & = & \frac{\sum_{j=1}^d\sum_{k=1}^K t_{.k} \bar{x}^j_k}{d\sum_{k=1}^K t_{.k} a_k}
-\end{array}
-\right.
-\end{equation}
-\end{itemize}
-
-\item If $A = a^j$, then
-$$
-\frac{dl}{da^j} = \sum_{k=1}^K t_{.k} \left((\overline{\log(x)})^j_k - \log(B)\right) - n\Psi(a^j).
-$$
-and thus
-\begin{itemize}
-\item if $B=b^j_k$ (model \verb+gamma_aj_bjk+)
-\begin{equation}\label{eq:mStep_aj_bjk}
-\left\lbrace
-\begin{array}{lcl}
-\Psi(\hat{a}^j) & = & \frac{1}{n} \sum_{k=1}^K  t_{.k} \left( (\overline{\log(x)})^j_k - \log(\hat{b}^j_k) \right) \\
-    \hat{b}^j_k & = & \frac{\bar{x}^j_k}{\hat{a}^j},
-\end{array}
-\right.
-\end{equation}
-\item  if $B=b_k$  (model \verb+gamma_aj_bk+)
-\begin{equation}\label{eq:mStep_aj_bk}
-\left\lbrace
-\begin{array}{lcl}
-\Psi(\hat{a}^j) & = & \frac{1}{n} \sum_{k=1}^K  t_{.k} \left( (\overline{\log(x)})^j_k - \log(\hat{b}_k) \right) \\
-  \hat{b}_k     & = & \frac{\sum_{j=1}^d  \bar{x}^j_k}{\sum_{j=1}^d \hat{a}^j}
-\end{array}
-\right.
-\end{equation}
-\end{itemize}
-\item If $A = a$, then
-$$
-\frac{dl}{da} = \sum_{k=1}^K \sum_{j=1}^d t_{.k} \left((\overline{\log(x)})^j_k - \log(B)\right) - nd\Psi(a).
-$$
-and thus
-\begin{itemize}
-\item if $B=b^j_k$ (model \verb+gamma_a_bjk+)
-\begin{equation}\label{eq:mStep_a_bjk}
-\left\lbrace
-\begin{array}{lcl}
-\Psi(\hat{a}) & = & \frac{1}{nd} \sum_{j=1}^d \sum_{k=1}^K  t_{.k} \left( (\overline{\log(x)})^j_k - \log(\hat{b}^j_k) \right) \\
-  \hat{b}^j_k & = & \frac{\bar{x}^j_k}{\hat{a}},
-\end{array}
-\right.
-\end{equation}
-\item  if $B=b_k$  (model \verb+gamma_a_bk+)
-\begin{equation}\label{eq:mStep_a_bk}
-\left\lbrace
-\begin{array}{lcl}
-\Psi(\hat{a}) & = & \frac{1}{nd} \sum_{j=1}^d \sum_{k=1}^K  t_{.k} \left( (\overline{\log(x)})^j_k - \log(\hat{b}_k) \right) \\
-  \hat{b}_k   & = & \frac{\sum_{j=1}^d  \bar{x}^j_k}{d \hat{a}}
-\end{array}
-\right.
-\end{equation}
-\end{itemize}
-\end{enumerate}
-
-In the next sections, we will describe for some models the way to estimate $A$ and $B$
-when $A = a^j_k$.
-
-\subsection{First algorithm for the M Step of the gamma models}
-Among the twelve models, we can find six models from whom it is possible to estimate in
-a single pass of the Brent's method the value of $A$ and then to estimate the value of $B$.
-For example for the \verb+gamma_ajk_bjk+ model, using (\ref{eq:mStep_ajk_bjk}) gives
-$\hat{a}^j_k$ solution in $a$ of the following equation
-\begin{equation}\label{eq:mStep_ajk_bjk_zero}
-  (\overline{\log(x)})^j_k - \Psi(a) - \log(\bar{x}^j_k) + \log(a) =0
-\end{equation}
-whom solution can be found using Brent's method \cite{Brent1973}.
-
-Having found the estimator of the $a^j_k$, the estimator of $b^j_k$ can be computed.
-
-\subsection{Second algorithm for the M Step of the gamma models}
-For the other models we have to iterate in order to find the ML estimators.
-For example for the \verb+gamma_ajk_bj+ model, the set of non-linear equations
-(\ref{eq:mStep_ajk_bj}) can be solved using an iterative algorithm:
-\begin{itemize}
-\item {\bf Initialization:} Compute an initial estimator of the $\ba_k$, $k=1,\ldots K$ and $\bb$
-using moment estimators.
-\item {\bf Repeat until convergence :}
-\begin{itemize}
-\item {\bf a step:} For fixed $b^j$ solve for each $a^j_k$, the equation:
-\begin{equation*}
-  \Psi(a) - (\overline{\log(x)})^j_k + \log(b^j) = 0.
-\end{equation*}
-\item {\bf b step:} Update $b^j$ using equation (\ref{eq:mStep_ajk_bj}).
-\end{itemize}
-\end{itemize}
-
-This algorithm minimize alternatively the log-likelihood in $\ba_k$, $k=1,\ldots n$ and in
-$\bb$ and converge in few iterations.
-
-\end{document}
+\begin{Schunk}
+\begin{Sinput}
+> data(bullsEye)
+> model <- clusterKernel( data=bullsEye[,1:2], nbCluster=2, models = "kernelGaussian_pk_s", strategy = clusterFastStrategy())

@@ -73,6 +73,9 @@ IMixtureComposer::~IMixtureComposer() {}
  **/
 void IMixtureComposer::initializeStep()
 {
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("Entering IMixtureComposer::initializeStep\n");
+#endif
   // (re)initialize the mixture parameters tik and pk. (virtual method)
   initializeMixtureParameters();
   // compute nk
@@ -91,6 +94,13 @@ void IMixtureComposer::initializeStep()
   setNbVariable(computeNbVariables());
   // update state
   setState(Clust::modelInitialized_);
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("IMixtureComposer::initializeStep done\n");
+#endif
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("Model parameters\n");
+  this->writeParameters(stk_cout);
+#endif
 }
 
 /* initialize randomly the labels zi of the model */
@@ -132,7 +142,7 @@ void IMixtureComposer::randomFuzzyInit()
   eStep();
   // model intialized
   setState(Clust::modelParamInitialized_);
-#ifdef STK_MIXTURE_VERY_VERBOSE
+#ifdef STK_MIXTURE_VERBOSE
   stk_cout << _T("IMixtureComposer::randomFuzzyInit() done\n");
 #endif
 }
@@ -140,29 +150,41 @@ void IMixtureComposer::randomFuzzyInit()
 /* cStep */
 int IMixtureComposer::cStep()
 {
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("Entering IMixtureComposer::cStep()\n");
+#endif
   for (int i=tik_.beginRows(); i < tik_.endRows(); i++)
   { cStep(i);}
   // count the number of individuals in each class
   nk_= Stat::sum(tik_);
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("IMixtureComposer::cStep() nk_ = ") << nk_;
+  stk_cout << _T("IMixtureComposer::cStep() done\n");
+#endif
   return nk_.minElt();
 }
 
 /* simulate zi  */
+/* compute tik, default implementation. */
 int IMixtureComposer::sStep()
 {
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("Entering IMixtureComposer::sStep()\n");
+#endif
   // simulate zi
-  for (int i = zi_.begin(); i< zi_.end(); ++i)
-  { sStep(i);}
+  for (int i = zi_.begin(); i< zi_.end(); ++i) { sStep(i);}
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("IMixtureComposer::sStep() done\n");
+#endif
   return cStep();
 }
 
-/* compute tik, default implementation. */
 Real IMixtureComposer::eStep()
 {
-#ifdef STK_MIXTURE_DEBUG
+#ifdef STK_MIXTURE_VERBOSE
   stk_cout << _T("Entering IMixtureComposer::eStep()\n");
 #endif
-  Real sum = 0.; nk_ =0.;
+  Real sum = 0.;
   int i;
 #ifdef _OPENMP
 #pragma omp parallel for reduction (+:sum)
@@ -172,9 +194,11 @@ Real IMixtureComposer::eStep()
   setLnLikelihood(sum);
   // compute proportions
   nk_ = Stat::sum(tik_);
-#ifdef STK_MIXTURE_DEBUG
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("IMixtureComposer::eStep() lnLikelihood =") << sum << _T("\n");
   stk_cout << _T("IMixtureComposer::eStep() done\n");
-  stk_cout << _T("lnLikelihood =") << sum << _T("\n");
+  if (!isFinite(sum))
+  { stk_cout << _T("tik_ =\n") << tik_.transpose();}
 #endif
   return nk_.minElt();
 }
@@ -206,6 +230,23 @@ Real IMixtureComposer::eStep(int i)
   // get maximal element of ln(x_i,\theta_k) + ln(p_k)
   for (int k=tik_.beginCols(); k< tik_.endCols(); k++)
   { lnComp_[k] = std::log(pk_[k])+lnComponentProbability(i,k);}
+  if (lnComp_.isInfinite().any())
+  {
+#ifdef STK_MIXTURE_VERBOSE
+    stk_cout << _T("IMixtureComposer::eStep(") << i << _T(")\n");
+    stk_cout << _T("pk_ =") << pk_;
+    stk_cout << _T("nk_ =") << nk_;
+    stk_cout << _T("lnComp_ =") << lnComp_;
+    for (int k=tik_.beginCols(); k< tik_.endCols(); k++)
+    {
+      Real val = lnComponentProbability(i,k);
+      stk_cout << _T("lnComponentProbability(") << i << _T(",")<< k << _T(")=") << val << _T("\n");
+    }
+    writeParameters(stk_cout);
+    stk_cout << _T("tik_ =\n") << tik_.transpose();
+#endif
+    throw(Clust::eStepFail_);
+  }
   int kmax;
   Real max = lnComp_.maxElt(kmax);
   // set zi_

@@ -12,16 +12,16 @@ model <- learnDiagGaussian( data=x, labels= z, prop = c(1/3,1/3,1/3)
                           , models = clusterDiagGaussianNames(prop = "equal")
                           , algo = "simul", nbIter = 2, epsilon = 1e-08
                           )
-summary(model)
+print(model)
 model <- learnDiagGaussian( data=x, labels= z,
                           , models = clusterDiagGaussianNames(prop = "equal")
                           , algo = "impute", nbIter = 2, epsilon = 1e-08)
-summary(model)
+print(model)
 model <- learnGamma( data=x, labels= z,
                    , models = clusterGammaNames(prop = "equal")
                    , algo = "simul", nbIter = 2, epsilon = 1e-08
                    )
-summary(model)
+print(model)
 
 ## get data and target from DebTrivedi data set
 data(DebTrivedi)
@@ -32,7 +32,7 @@ model <- learnPoisson( data=x, labels=z
                      , models = clusterPoissonNames(prop = "equal")
                      , algo="simul", nbIter = 2, epsilon =  1e-08
                      )
-summary(model)
+print(model)
 
 ## get data and target from bird data set
 data(birds)
@@ -45,7 +45,7 @@ model <- learnCategorical( data=x, labels=z
                          , models = clusterCategoricalNames(prop = "equal")
                          , algo="simul", nbIter = 2, epsilon =  1e-08
                          )
-summary(model)
+print(model)
 
 ## get data and target from bulls eye data set
 data(bullsEye)
@@ -55,7 +55,7 @@ model <- learnKernel( data=x, labels=z
                     , models = clusterKernelNames(prop = "equal")
                     , algo="impute", nbIter = 1, epsilon =  1e-08
                     )
-summary(model)
+print(model)
 
 ## A quantitative example with the heart disease data set
 data(HeartDisease.cat)
@@ -66,5 +66,5 @@ ldata = list(HeartDisease.cat, HeartDisease.cont);
 models = c("categorical_pk_pjk","gaussian_pk_sjk")
 z<-HeartDisease.target[[1]];
 model <- learnMixedData(ldata, models, z, algo="simul", nbIter=2)
-summary(model)
+print(model)
 

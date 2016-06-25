@@ -126,7 +126,8 @@ class MixturePoisson_ljk : public MixturePoissonBase<MixturePoisson_ljk<Array> >
       for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)
       {
         Real lambda = param_.lambda_[k][j];
-        sum += Law::Poisson::lpdf(p_data()->elt(i,j), lambda);
+        if (lambda)
+        { sum += Law::Poisson::lpdf(p_data()->elt(i,j), lambda);}
       }
       return sum;
     }

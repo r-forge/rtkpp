@@ -4,6 +4,7 @@ export(clusterAlgo
       ,clusterStrategy
       ,clusterFastStrategy
       ,clusterSemiSEMStrategy
+      ,clusterSEMStrategy
       ,clusterDiagGaussianNames
       ,clusterGammaNames
       ,clusterCategoricalNames

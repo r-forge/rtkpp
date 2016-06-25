@@ -111,7 +111,6 @@ class MixtureGamma_ak_bj: public MixtureGammaBase< MixtureGamma_ak_bj<Array> >
   public:
     typedef MixtureGammaBase<MixtureGamma_ak_bj<Array> > Base;
     using Base::param_;
-    
     using Base::p_data;
     using Base::meanjk;
     using Base::variancejk;
@@ -119,13 +118,13 @@ class MixtureGamma_ak_bj: public MixtureGammaBase< MixtureGamma_ak_bj<Array> >
     /** default constructor
      * @param nbCluster number of cluster in the model
      **/
-    inline MixtureGamma_ak_bj( int nbCluster): Base(nbCluster) {}
+    MixtureGamma_ak_bj( int nbCluster): Base(nbCluster) {}
     /** copy constructor
      *  @param model The model to copy
      **/
-    inline MixtureGamma_ak_bj( MixtureGamma_ak_bj const& model): Base(model) {}
+    MixtureGamma_ak_bj( MixtureGamma_ak_bj const& model): Base(model) {}
     /** destructor */
-    inline ~MixtureGamma_ak_bj() {}
+    ~MixtureGamma_ak_bj() {}
     /** @return the value of the probability of the i-th sample in the k-th component.
      *  @param i,k indexes of the sample and of the component
      **/
@@ -133,7 +132,10 @@ class MixtureGamma_ak_bj: public MixtureGammaBase< MixtureGamma_ak_bj<Array> >
     {
       Real sum =0.;
       for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)
-      { sum += Law::Gamma::lpdf(p_data()->elt(i,j), param_.shape_[k], param_.scale_[j]);}
+      {
+        if (param_.shape_[k] && param_.scale_[j])
+        { sum += Law::Gamma::lpdf(p_data()->elt(i,j), param_.shape_[k], param_.scale_[j]);}
+      }
       return sum;
     }
     /** Initialize randomly the parameters of the Gaussian mixture. The centers

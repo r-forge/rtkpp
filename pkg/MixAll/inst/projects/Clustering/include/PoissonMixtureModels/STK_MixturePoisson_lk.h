@@ -109,13 +109,13 @@ class MixturePoisson_lk : public MixturePoissonBase<MixturePoisson_lk<Array> >
     /** default constructor
      * @param nbCluster number of cluster in the model
      **/
-    inline MixturePoisson_lk( int nbCluster) : Base(nbCluster) {}
+    MixturePoisson_lk( int nbCluster) : Base(nbCluster) {}
     /** copy constructor
      *  @param model The model to copy
      **/
-    inline MixturePoisson_lk( MixturePoisson_lk const& model) : Base(model) {}
+    MixturePoisson_lk( MixturePoisson_lk const& model) : Base(model) {}
     /** destructor */
-    inline ~MixturePoisson_lk() {}
+    ~MixturePoisson_lk() {}
     /** @return the value of lambda of the kth cluster and jth variable */
     inline Real lambda(int k, int j) const { return param_.lambda_[k];}
     /** @return the value of the probability of the i-th sample in the k-th component.
@@ -124,8 +124,11 @@ class MixturePoisson_lk : public MixturePoissonBase<MixturePoisson_lk<Array> >
     inline Real lnComponentProbability(int i, int k) const
     {
       Real sum =0., lambda = param_.lambda_[k];
-      for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)
-      { sum += Law::Poisson::lpdf(p_data()->elt(i,j), lambda);}
+      if (lambda)
+      {
+        for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)
+        { sum += Law::Poisson::lpdf(p_data()->elt(i,j), lambda);}
+      }
       return sum;
     }
     /** Initialize randomly the parameters of the Poisson mixture. */

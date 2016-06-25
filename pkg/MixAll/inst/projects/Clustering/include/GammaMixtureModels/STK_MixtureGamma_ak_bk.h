@@ -118,13 +118,13 @@ class MixtureGamma_ak_bk : public MixtureGammaBase< MixtureGamma_ak_bk<Array> >
     /** default constructor
      * @param nbCluster number of cluster in the model
      **/
-    inline MixtureGamma_ak_bk( int nbCluster): Base(nbCluster) {}
+    MixtureGamma_ak_bk( int nbCluster): Base(nbCluster) {}
     /** copy constructor
      *  @param model The model to copy
      **/
-    inline MixtureGamma_ak_bk( MixtureGamma_ak_bk const& model): Base(model) {}
+    MixtureGamma_ak_bk( MixtureGamma_ak_bk const& model): Base(model) {}
     /** destructor */
-    inline ~MixtureGamma_ak_bk() {}
+    ~MixtureGamma_ak_bk() {}
     /** @return the value of the probability of the i-th sample in the k-th component.
      *  @param i,k indexes of the sample and of the component
      **/
@@ -132,7 +132,10 @@ class MixtureGamma_ak_bk : public MixtureGammaBase< MixtureGamma_ak_bk<Array> >
     {
       Real sum =0.;
       for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)
-      { sum += Law::Gamma::lpdf(p_data()->elt(i,j), param_.shape_[k], param_.scale_[k]);}
+      {
+        if (param_.shape_[k] && param_.scale_[k])
+        { sum += Law::Gamma::lpdf(p_data()->elt(i,j), param_.shape_[k], param_.scale_[k]);}
+      }
       return sum;
     }
     /** Initialize randomly the parameters of the Gamma mixture. The shape
@@ -179,7 +182,6 @@ bool MixtureGamma_ak_bk<Array>::run( CArrayXX const*  p_tik, CPointX const* p_nk
     Real x0 = this->meank(k)*this->meank(k)/this->variancek(k);
     Real x1 =  param_.shape_[k];
     if ((x0 <=0.) || (isNA(x0))) return false;
-
     // get shape
     hidden::invPsiMLog f( (param_.meanLog_[k]-std::log( this->meank(k))).mean() );
     Real a = Algo::findZero(f, x0, x1, 1e-08);

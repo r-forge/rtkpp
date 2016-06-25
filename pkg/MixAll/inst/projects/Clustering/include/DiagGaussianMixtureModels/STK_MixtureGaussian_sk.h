@@ -125,9 +125,8 @@ class MixtureGaussian_sk : public MixtureDiagGaussianBase<MixtureGaussian_sk<Arr
       Real sum =0.;
       for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)
       {
-        Real mean  = param_.mean_[k][j];
-        Real sigma = param_.sigma_[k];
-        sum += Law::Normal::lpdf(p_data()->elt(i,j), mean, sigma);
+        if (param_.sigma_[k])
+        { sum += Law::Normal::lpdf(p_data()->elt(i,j), param_.mean_[k][j], param_.sigma_[k]);}
       }
       return sum;
     }

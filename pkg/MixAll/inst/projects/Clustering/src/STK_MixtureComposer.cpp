@@ -83,8 +83,14 @@ Real MixtureComposer::lnComponentProbability(int i, int k) const
 
 void MixtureComposer::paramUpdateStep()
 {
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("Entering MixtureComposer::paramUpdateStep()\n");
+#endif
   for (MixtIterator it = v_mixtures_.begin() ; it != v_mixtures_.end(); ++it)
   { (*it)->paramUpdateStep();}
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("MixtureComposer::paramUpdateStep() done\n");
+#endif
 }
 
 void MixtureComposer::writeParameters(std::ostream& os) const

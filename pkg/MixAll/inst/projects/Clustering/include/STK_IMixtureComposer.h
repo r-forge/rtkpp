@@ -140,14 +140,13 @@ class IMixtureComposer: public IMixtureStatModel
      *  as virtual in case we impose fixed proportions in derived Composer.
      **/
     virtual void pStep();
-
-    // not virtual
     /** @brief Initialize the model before its first use.
      *  Initialize the values of the mixture parameters @c pk_ and @© tik_ using
      *  virtual method @c initializeMixtureParameters() and compute @c nk_ and
      *  @c zk_ using the virtual methods @c mapStep() and @c pStep().
      **/
-    void initializeStep();
+    virtual void initializeStep();
+    // not virtual
     /** Initialize randomly the labels zi of the model.
      *  Initialize the model parameters using initializeStep() if it has not
      *  been already called. Simulate the zi, compute tik using cStep(), update

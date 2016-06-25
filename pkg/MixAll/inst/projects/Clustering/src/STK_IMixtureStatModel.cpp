@@ -117,7 +117,7 @@ IMixture* IMixtureStatModel::getMixture( String const& idData) const
 /* register the mixture in the composer*/
 void IMixtureStatModel::registerMixture(IMixture* p_mixture)
 {
-#ifdef STK_MIXTURE_VERY_VERBOSE
+#ifdef STK_MIXTURE_VERBOSE
   stk_cout << _T("In MixtureComposer::registerMixture, registering mixture: ")
            << p_mixture->idData() << _T("\n");
 #endif

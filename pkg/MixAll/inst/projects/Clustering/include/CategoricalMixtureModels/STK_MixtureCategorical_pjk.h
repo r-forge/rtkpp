@@ -67,7 +67,7 @@ struct ModelParameters<Clust::Categorical_pjk_>
      *  classes */
     Array1D<CArrayXX> proba_;
     /** default constructor
-     *  @param nbCluster the number of clmass of the mixture
+     *  @param nbCluster the number of class of the mixture
      **/
     ModelParameters(int nbCluster): proba_(nbCluster) {}
     /** copy constructor.
@@ -117,18 +117,18 @@ class MixtureCategorical_pjk : public MixtureCategoricalBase<MixtureCategorical_
      **/
     MixtureCategorical_pjk( MixtureCategorical_pjk const& model): Base(model) {}
     /** destructor */
-    inline ~MixtureCategorical_pjk() {}
+    ~MixtureCategorical_pjk() {}
     /** @return the value of the probability of the i-th sample in the k-th component.
      *  @param i,k indexes of the sample and of the component
      **/
     inline Real lnComponentProbability(int i, int k) const
     {
-      Real sum =0., prob;
+      Real sum =0.;
       for (int j=p_data()->beginCols(); j<p_data()->endCols(); ++j)
-      {
-        if ( (prob = param_.proba_[k](p_data()->elt(i,j), j)) <= 0.)
-        { return -Arithmetic<Real>::infinity();}
-        sum += std::log(prob);
+      { // what to do if the probability is zero but a sample get this modality
+        // for now, just ignore it (it's possible if tik_(i,k) == 0)
+        Real prob= param_.proba_[k](p_data()->elt(i,j), j);
+        if (prob) { sum += std::log(prob);}
        }
       return sum;
     }
@@ -149,9 +149,7 @@ void MixtureCategorical_pjk<Array>::randomInit( CArrayXX const*  p_tik, CPointX 
   {
     param_.proba_[k].randUnif();
     for (int j=param_.proba_[k].beginCols(); j< param_.proba_[k].endCols(); ++j)
-    {
-      param_.proba_[k].col(j) /= param_.proba_[k].col(j).sum();
-    }
+    { param_.proba_[k].col(j) /= param_.proba_[k].col(j).sum();}
   }
 }
 
@@ -167,9 +165,10 @@ bool MixtureCategorical_pjk<Array>::run( CArrayXX const*  p_tik, CPointX const* 
     {
       // count the number of modalities weighted by the tik
       for (int i = p_data()->beginRows(); i < p_data()->endRows(); ++i)
-      { param_.proba_[k].col(j)[(*p_data())(i, j)] += (*p_tik)(i, k);}
+      { param_.proba_[k](p_data()->elt(i, j), j) += p_tik->elt(i, k);}
       // normalize the probabilities
-      param_.proba_[k].col(j) /= param_.proba_[k].col(j).sum();
+      Real sum = param_.proba_[k].col(j).sum();
+      if (sum) { param_.proba_[k].col(j) /= sum;}
     }
   }
   return true;

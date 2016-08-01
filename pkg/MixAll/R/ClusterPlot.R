@@ -71,8 +71,8 @@
     if (is.numeric(y)) { xlab=colnames(model@component@data)[y[i]];}
     else               { xlab= y[i];}
     # TODO: check if xlab is empty
-    if (is.null(xlab)) { xlab = paste("dimension ", i)}
-    main=paste("Histogram of",xlab)
+    if (is.null(xlab)) { xlab = paste("dim ", i)}
+    main=paste("Hist of",xlab)
     h<-hist(model@component@data[,y[i]], xlab=xlab, main=main, ...)
     # add on the histogram the estimated densities
     ratio<-max(h$counts)/max(mixture)
@@ -89,15 +89,15 @@
     {
       if (is.numeric(y)) { xlab=colnames(model@component@data)[y[i]];}
       else               { xlab= y[i];}
-      if (is.null(xlab)) { xlab = paste("dimension ", i)}
-      main=paste("Histogram of",xlab)
+      if (is.null(xlab)) { xlab = paste("dim ", i)}
+      main=paste("Hist of",xlab)
       for( j in 1:(i-1) )
       {
         screen(j+((i-1)*nbCol)) # screen(i,j)
         if (is.numeric(y)) {ylab=colnames(model@component@data)[y[j]];}
         else {ylab= y[j];}
-        if (is.null(ylab)) { ylab = paste("dimension ", j)}
-        main=paste("Histogram of",xlab)
+        if (is.null(ylab)) { ylab = paste("dim ", j)}
+        main=paste("Hist of",xlab)
         plot(model@component@data[,y[j]], model@component@data[,y[i]], col=col, pch=pch, xlab=xlab, ylab=ylab, ...)
       }
     }

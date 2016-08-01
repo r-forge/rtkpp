@@ -831,7 +831,7 @@ is 1, 0 for all cores. \\
 \label{tab:clusterCommon}
 \end{table}
 
-\subsection{Clustering with Multivariate (diagonal) Gaussian Mixture Models}
+\subsection{Clustering Multivariate (diagonal) Gaussian Mixture Models}
 \label{subsec:clustDiagGaussian}
 
 Multivariate Gaussian data (without correlations) can be clustered using the
@@ -872,7 +872,7 @@ missingValues(model)
 plot(model)
 @
 
-\subsection{Clustering with Multivariate categorical Mixture Models}
+\subsection{Clustering Multivariate categorical Mixture Models}
 \label{subsec:clustCategorical}
 
 Categorical (nominal) data can be clustered using the \code{clusterCategorical}
@@ -917,7 +917,7 @@ plot(model)
 Categorical mixture models are plotted using the \emph{logistic latent
 representation}.
 
-\subsection{Clustering with Multivariate gamma Mixture Models}
+\subsection{Clustering Multivariate gamma Mixture Models}
 \label{subsec:clustGamma}
 
 Gamma data can be clustered using the \code{clusterGamma} function.
@@ -954,7 +954,7 @@ missingValues(model)
 plot(model)
 @
 
-\subsection{Clustering with Multivariate Poisson Models}
+\subsection{Clustering Multivariate Poisson Models}
 \label{subsec:clustPoisson}
 
 Poisson data (count data) can be clustered using the \code{clusterPoisson}
@@ -991,7 +991,7 @@ missingValues(model)
 plot(model)
 @
 
-\subsection{Clustering with Kernel Mixture Models}
+\subsection{Clustering Kernel Mixture Models}
 \label{subsec:clustKernel}
 
 Data can be clustered using the \code{clusterKernel} function.
@@ -1015,12 +1015,12 @@ Input Parameter & Description \\
 a "gaussian" kernel by default (Possible values are "gaussian", "polynomial"
 or "exponential").\\
 \hline
-\code{kernelParameters} & A vector with the kernel parameter value(s). Use
-$1$ by default.\\
+\code{kernelParameters} & A vector with the kernel parameter value(s).
+Default value is $1$.\\
 \hline
 \end{tabular}
-\caption{List of all the specific parameters of the
-\code{clusterPoisson} function.}
+\caption{List of all the specific parameters of the \code{clusterKernel}
+function.}
 \label{tab:clusterKernel}
 \end{table}
 

@@ -86,6 +86,7 @@ NULL
 #'
 #' @return An instance of a learned mixture model class.
 #' @rdname learners
+#' @aliases learnDiagGaussian
 #' @author Serge Iovleff
 #' @export
 #'
@@ -123,6 +124,7 @@ learnDiagGaussian <- function( data, labels, prop = NULL
 }
 
 #' @rdname learners
+#' @aliases learnPoisson
 learnPoisson <- function( data, labels, prop = NULL
                         , models=clusterPoissonNames(prop = "equal")
                         , algo="simul", nbIter = 100, epsilon = 1e-08
@@ -415,7 +417,6 @@ learnMixedData <- function( data, models, labels, prop = NULL
   } # for i
   # create model
   model = .createMixtureModel("ClusterMixedData", ldata, labels, prop);
-#model = new("ClusterMixedData", ldata)
   # Create algorithm
   algo = learnAlgo( algo, nbIter, epsilon)
   # start estimation of the models

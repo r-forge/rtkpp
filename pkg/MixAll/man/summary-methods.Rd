@@ -4,6 +4,7 @@
 \name{summary,IClusterModel-method}
 \alias{summary}
 \alias{summary,ClusterCategorical-method}
+\alias{summary,ClusterCategoricalComponent-method}
 \alias{summary,ClusterDiagGaussian-method}
 \alias{summary,ClusterGamma-method}
 \alias{summary,ClusterKernel-method}
@@ -11,11 +12,14 @@
 \alias{summary,ClusterPoisson-method}
 \alias{summary,IClusterComponent-method}
 \alias{summary,IClusterModel-method}
+\alias{summary-ClusterCategoricalComponent,ClusterCategoricalComponent,ClusterCategoricalComponent-method}
 \title{Produce summary of a MixAll S4 class.}
 \usage{
 \S4method{summary}{IClusterModel}(object, ...)
 
 \S4method{summary}{IClusterComponent}(object, ...)
+
+\S4method{summary}{ClusterCategoricalComponent}(object)
 
 \S4method{summary}{ClusterCategorical}(object, ...)
 

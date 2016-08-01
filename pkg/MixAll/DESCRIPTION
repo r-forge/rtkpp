@@ -1,6 +1,6 @@
 Package: MixAll
 Version: 1.2.0
-Date: 2016-06-14
+Date: 2016-08-01
 Title: Clustering using Mixture Models
 Authors@R: c(person("Serge", "Iovleff", role = c("aut","cre"), email = "Serge.Iovleff@stkpp.org"))
 Copyright: inria, University Lille 1

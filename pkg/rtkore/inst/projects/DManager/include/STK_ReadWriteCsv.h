@@ -60,6 +60,9 @@ namespace Csv
    *  with_mapping_ default value */
   static const bool   DEFAULT_MAPPING = false;
   /** @ingroup DManager
+   *  with_last_nl_ default value */
+  static const bool   DEFAULT_LAST_NL = true;
+  /** @ingroup DManager
    *  reserve_ default value*/
   static const int DEFAULT_RESERVE = int(0x0FFFF);
   /** @ingroup DManager
@@ -109,6 +112,7 @@ class TReadWriteCsv
     inline TReadWriteCsv() : file_name_()
                            , with_names_(Csv::DEFAULT_READNAMES)
                            , with_mapping_(Csv::DEFAULT_MAPPING)
+                           , with_last_nl_(Csv::DEFAULT_LAST_NL)
                            , delimiters_(Csv::DEFAULT_DELIMITER)
                            , reserve_(Csv::DEFAULT_RESERVE)
                            , msg_error_()
@@ -131,6 +135,7 @@ class TReadWriteCsv
                         : file_name_(file_name)
                         , with_names_(read_names)
                         , with_mapping_(Csv::DEFAULT_MAPPING)
+                        , with_last_nl_(Csv::DEFAULT_LAST_NL)
                         , delimiters_(delimiters)
                         , reserve_(Csv::DEFAULT_RESERVE)
                         , msg_error_()
@@ -151,6 +156,7 @@ class TReadWriteCsv
       str_data_.clear();
       with_names_   = Csv::DEFAULT_READNAMES;
       with_mapping_ = Csv::DEFAULT_MAPPING;
+      with_last_nl_ = Csv::DEFAULT_LAST_NL;
       delimiters_   = Csv::DEFAULT_DELIMITER;
       reserve_      = Csv::DEFAULT_RESERVE;
     }
@@ -240,14 +246,18 @@ class TReadWriteCsv
      *  @param delimiters delimiters to use
      **/
     inline void setDelimiters( String const& delimiters) const { delimiters_ = delimiters; }
-    /** Sets the with_names_ value for reading/writting variables names
+    /** Sets the with_names_ value for reading/writing variables names
      *  @param with_names @c true if we want to read the names of the variables
      **/
     inline void setWithNames( bool with_names) const { with_names_ = with_names; }
-    /** Sets the with_mapping_ value for reading/writting variables names
+    /** Sets the with_mapping_ value for reading/writing variables names
      *  @param with_mapping @c true if we want to read the data using a map
      **/
     inline void setWithMapping( bool with_mapping) const { with_mapping_ = with_mapping; }
+    /** Sets the with_last_nl_ value for writing a new line after the last line
+     *  @param with_last_nl @c true if we want to write a new line after the last line
+     **/
+    inline void setLast_nl( bool with_last_nl) const { with_last_nl_ = with_last_nl; }
     /** Sets the reserve value for data storage (reserve_ is mutable).
      *  @param reserve number of place to reserve
      **/
@@ -545,10 +555,12 @@ class TReadWriteCsv
   protected:
     /// Name of the Current file read
     mutable std::string file_name_;
-    /// Read and Write names of the variables
+    /// Read or Write names of the variables
     mutable bool with_names_;
-    /// Read and Write names of the variables
+    /// map the values stored
     mutable bool with_mapping_;
+    /// write a new line character at the end of the output
+    mutable bool with_last_nl_;
     /// Delimiter(s)
     mutable String  delimiters_;
     /// Size of the buffer
@@ -728,7 +740,7 @@ bool TReadWriteCsv<Type>::read( istream& inBuffer)
          :  fastSetData(icol, currentRow, stringToType<Type>(field));
       }
       // Append NA values if the row is not complete
-      for (; icol<=lastIdx(); icol++) { fastSetData(icol, currentRow, Arithmetic<Type>::NA());}
+      for (; icol<end(); icol++) { fastSetData(icol, currentRow, Arithmetic<Type>::NA());}
     }
     // resize in case there exists too much rows
     resizeRows(Range(countRows));
@@ -762,7 +774,7 @@ void TReadWriteCsv<Type>::writeSelection( ostream& os, int top, int bottom, int 
        << _T("\n");
   }
   // write data
-  for(int irow = top; irow<=bottom; irow++)
+  for(int irow = top; irow<bottom; irow++)
   {
     for(int iVar = left; iVar<right; iVar++)
     {
@@ -782,8 +794,27 @@ void TReadWriteCsv<Type>::writeSelection( ostream& os, int top, int bottom, int 
     }
     catch(...) // if an error occur, we put NA value
     { os << std::setw(format[right]) << std::right << stringNa;}
-    os << _T("\n");
+     os << _T("\n");
   }
+  for(int iVar = left; iVar<right; iVar++)
+  {
+    try
+    {
+      os << std::setw(format[iVar]) << std::right
+         << Proxy<Type>(str_data_[iVar].at(bottom));
+    }
+    catch(...) // if an error occur, we put NA value
+    { os << std::setw(format[iVar]) << std::right << stringNa;}
+    os <<  delimiters_.at(0);
+  }
+  try
+  {
+    os << std::setw(format[right]) << std::right
+       << Proxy<Type>(str_data_[right].at(bottom));
+  }
+  catch(...) // if an error occur, we put NA value
+  { os << std::setw(format[right]) << std::right << stringNa;}
+  if (with_last_nl_) { os << _T("\n");}
 }
 
 } // namespace STK

@@ -167,6 +167,15 @@ class RVector : public ArrayBase< RVector<Type_> >, public TRef<1>
      *  @param i index of the ith element
      **/
     inline Type& elt1Impl(int i) { return static_cast<Type&>(vector_[i]);}
+    /** @return a constant reference on element (i,j)
+     *  @param i, j indexes of the row and of the column
+     **/
+    inline Type const& elt2Impl(int i, int j) const
+    { return static_cast<Type const&>(vector_[i]);}
+    /** @return a reference on the element (i,j)
+     *  @param i, j indexes of the row and of the column
+     **/
+    inline Type& elt2Impl(int i, int j) { return (vector_[i]);}
     /** overwrite the RVector with vec using Rcpp::operator=.
      *  @param vec the vector to copy
      **/

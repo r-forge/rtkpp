@@ -1,6 +1,13 @@
 \name{NEWS}
 \title{News for Package 'rtkore}
 
+\section{Changes in rtkore version 1.1.1 (2016-0804)}{
+  \itemize{
+    \item Creating and Implementing InvertMatrix and InvertSymMatrix classes
+    for fixed size matrices (up to 4x4)
+    \item Adding computation of levels and frequence to the Factor class
+  }
+}
 \section{Changes in rtkore version 1.1.0 (2016-0530)}{
   \itemize{
     \item Adding svd decomposition using lapack in Algebra project
@@ -8,7 +15,7 @@
     \item Adding kernels classes in STatistiK project
     \item Adding class Factor allowing to use factor rather than original
     nominal data encoding in STatistiK project
-    \item Corecting many small bugs
+    \item Correcting many small bugs
   }
 }
 \section{Changes in rtkore version 1.0.1 (2015-1124)}{

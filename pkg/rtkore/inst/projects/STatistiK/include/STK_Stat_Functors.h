@@ -596,8 +596,8 @@ struct VarianceWithFixedMeanOp
       // unbiased variance
       if (unbiased)
       {
-        return (nobs > 1) ? (var - (sum*sum)/(Type)(V_.size()))/(Type)(V_.size() -1)
-                              : Arithmetic<Type>::NA();
+        return (nobs > 1) ? (var - (sum*sum)/(Type)(nobs))/((Type)nobs -1)
+                          : Arithmetic<Type>::NA();
       }
       // ML variance
       return (var - (sum*sum)/(Type)nobs)/(Type)(nobs);

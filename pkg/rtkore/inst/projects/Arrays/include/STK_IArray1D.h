@@ -332,15 +332,15 @@ class IArray1D  : public ITContainer1D<Derived>
     void insert( Range const& I, Type const& v)
     {
       this->insertElt(I.begin(), I.size());
-      for (int i=I.begin(); i<=I.lastIdx(); i++) this->data(i) = v;
+      for (int i=I.begin(); i<I.end(); i++) this->data(i) = v;
     }
-    /** STL compatibility : push front an element.
+    /** STL compatibility: push front an element.
      *  @param v value to append
      **/
     void push_front(Type const& v)
-    { insert(Range(this->begin(), 0), v);}
+    { insert(Range(this->begin(), 1), v);}
 
-    /** STL compatibility : append an element v.
+    /** STL compatibility: append an element v.
      *  @param v value to append
      **/
     void push_back(Type const& v)

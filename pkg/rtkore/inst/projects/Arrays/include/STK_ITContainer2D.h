@@ -114,6 +114,7 @@ class IContainer2D
      **/
     void setRanges(RowRange const& I = RowRange(), ColRange const& J = ColRange())
     { rows_ = I; cols_ =J;}
+    // rows
     /** Set the range of the number of rows.
      *  @param I the range of the rows number
      **/
@@ -129,19 +130,20 @@ class IContainer2D
     /** Increment the first index of the number of rows.
      *  @param inc the increment to apply
      **/
-    void incFirstIdxRows( int inc) { rows_.incFirst(inc);}
+    void incBeginRows( int inc) { rows_.incFirst(inc);}
     /** Decrement the first index of the number of rows.
      *  @param dec the decrement to apply
      **/
-    void decFirstIdxRows( int dec) { rows_.decFirst(dec);}
+    void decBeginRows( int dec) { rows_.decFirst(dec);}
     /** Increment the end of the number of rows.
      *  @param inc the increment to apply
      **/
-    void incLastIdxRows( int inc) { rows_.incLast(inc);}
+    void incEndRows( int inc) { rows_.incLast(inc);}
     /** Decrement the end of the number of rows.
      *  @param dec the decrement to apply
      **/
-    void decLastIdxRows( int dec) { rows_.decLast(dec);}
+    void decEndRows( int dec) { rows_.decLast(dec);}
+    // cols
     /** Set the columns range.
      * @param J the columns range
      **/
@@ -157,19 +159,20 @@ class IContainer2D
     /** increment the first index of the columns.
      *  @param inc the increment to apply
      **/
-    void incbeginCols( int inc) { cols_.incFirst(inc);}
+    void incBeginCols( int inc) { cols_.incFirst(inc);}
     /** Decrement the columns first index.
      *  @param dec the decrement to apply
      **/
-    void decbeginCols( int dec) { cols_.decFirst(dec);}
+    void decBeginCols( int dec) { cols_.decFirst(dec);}
     /** Increment the last index of the columns.
      *  @param inc the increment to apply
      **/
-    void incLastIdxCols( int inc)  { cols_.incLast(inc);}
+    void incEndCols( int inc)  { cols_.incLast(inc);}
     /** Decrement the last index of the columns.
      *  @param dec the decrement to apply
      **/
-    void decLastIdxCols( int dec) { cols_.decLast(dec);}
+    void decEndCols( int dec) { cols_.decLast(dec);}
+
     /** exchange this container with T
      *  @param T the container to exchange with this
      **/
@@ -178,6 +181,24 @@ class IContainer2D
        std::swap(T.rows_, this->rows_ );
        std::swap(T.cols_, this->cols_ );
      }
+     // Deprecated
+     /** Increment the end of the number of rows.
+      *  @param inc the increment to apply
+      **/
+     void incLastIdxRows( int inc) { rows_.incLast(inc);}
+     /** Decrement the end of the number of rows.
+      *  @param dec the decrement to apply
+      **/
+     void decLastIdxRows( int dec) { rows_.decLast(dec);}
+     /** Increment the last index of the columns.
+      *  @param inc the increment to apply
+      **/
+     void incLastIdxCols( int inc)  { cols_.incLast(inc);}
+     /** Decrement the last index of the columns.
+      *  @param dec the decrement to apply
+      **/
+     void decLastIdxCols( int dec) { cols_.decLast(dec);}
+
   private:
     /** Vertical range : Range of the indexes for the rows. */
     RowRange rows_;

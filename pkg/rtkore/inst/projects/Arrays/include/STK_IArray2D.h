@@ -246,11 +246,7 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
     /** @return the resized row or column vector
      *  @param I the new range for the vector/point
      **/
-    Derived& resize( Range const& I)
-    {
-      return this->asDerived().resize1D(I);
-      return this->asDerived();
-    }
+    Derived& resize( Range const& I) { return this->asDerived().resize1D(I);}
     /** New first index for the Rfws of the array.
      *  @param rbeg the index of the first row to set
      **/
@@ -426,7 +422,7 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
         initializeCols( this->cols());
       }
       else // else insert to the end of the array
-      { insertCols(this->lastIdxCols()+1, n);}
+      { insertCols(this->endCols(), n);}
     }
     /** Insert n Columns at the beginning of the array.
      *  @param n the number of column to insert
@@ -820,8 +816,35 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
     /** @brief function for reserving memory in all the columns
      *  @param size the size to reserve
      **/
-    void reserveRows(int size)
-    { reserveRows(this->cols(), size);}
+    void reserveRows(int size) { reserveRows(this->cols(), size);}
+
+    // for one dimension containers
+    /** STL compatibility: insert element @c v in the range @c I of the Array.
+     *  @param v,I value and range of indexes
+     **/
+    void insert( Range const& I, Type const& v)
+    { // insert defined for vector, point and diagonal arrays
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+      this->asDerived().insertElt(I.begin(), I.size());
+      for (int i=I.begin(); i<I.end(); i++) this->elt(i) = v;
+    }
+    /** STL compatibility: push front an element.
+     *  @param v value to push front
+     **/
+    void push_front(Type const& v)
+    { // push_front defined for vector, point and diagonal arrays
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+      insert(Range(this->begin(), 1), v);
+    }
+    /** STL compatibility: append an element v.
+     *  @param v value to append back
+     **/
+    void push_back(Type const& v)
+    { // push_back defined for vector, point and diagonal arrays
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+      this->asDerived().pushBack();
+      this->back() = v;
+    }
 
   protected:
     /** copy forward the column @c srcCol of @c src in the column @c dstCol of this. */
@@ -873,9 +896,11 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
         }
         catch(Exception const& error)// if an error occur just stop iterations
         {
-          stk_cout << "J=" << J << "\n";
-          stk_cout << "size=" << size << "\n";
-          stk_cout << "this->cols()=" << this->cols() << "\n";
+#ifdef STK_DEBUG
+          stk_cout << STKERROR_2ARG2(IArray2D::reserveRows,J, size,memory allocation failed.);
+#endif
+          // and throw an exception
+          STKRUNTIME_ERROR_2ARG(IArray2D::reserveRows,J, size,memory allocation failed.);
         }
       }
     }

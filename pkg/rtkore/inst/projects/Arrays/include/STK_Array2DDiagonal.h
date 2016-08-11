@@ -149,60 +149,55 @@ class Array2DDiagonal : public IArray2D< Array2DDiagonal<Type_> >
     /** @param i index of the diagonal element
      *  @return a reference on the ith diagonal element
      **/
-    inline Type& elt1Impl(int const& i)
-    { return this->elt(i,i);}
+    inline Type& elt1Impl(int i) { return this->elt(i,i);}
     /** @param i index of the diagonal element
      *  @return a constant reference on the ith diagonal element
      **/
-    inline Type const& elt1Impl(int const& i) const
-    { return this->elt(i,i);}
+    inline Type const& elt1Impl(int i) const { return this->elt(i,i);}
     /** New beginning index for the object.
      *  @param beg first index of the container
      **/
-    void shift1D(int beg)
-    { Base::shift(beg, beg);}
+    void shift1D(int beg) { Base::shift(beg, beg);}
     /** New size for the container.
      *  @param I range of the columns and rows of the container
      **/
     Array2DDiagonal& resize1D( Range const& I)
     { Base::resize(I, I); return *this;}
     /** Insert n rows and column at the given position to the container.
-     *  @param pos position to insert the Rows and Cols
-     *  @param n number of Rows and Cols insert
+     *  @param pos,n position and number of element to insert
      **/
-    void insert( int const& pos, int const& n =1)
+    void insertElt( int pos, int n =1)
     {
       Base::insertCols(pos, n);
-      Base::insertRows(pos, n);
+      this->incEndRows(n);
+      Base::update( Range(pos+n, this->lastIdxCols(), 0) );
     }
-
     /** Delete n rows and columns at the specified position to
      *  the container.
-     *  @param pos position to erase the Rows and Cols
-     *  @param n number of Rows and Cols erase
+     *  @param pos,n position and number of element to erase
      **/
-    void erase( int const& pos, int const& n=1)
+    void erase( int pos, int n=1)
     {
-      Base::eraseRows(pos, n);
       Base::eraseCols(pos, n);
+      this->decEndRows(n);
+      Base::update( Range(pos, this->lastIdxCols(), 0) );
     }
-
     /** Add n rows and columns to the container.
      *  @param n number of Rows and Cols to add
      **/
     void pushBack(int n=1)
     {
-      Base::pushBackRows(n);
       Base::pushBackCols(n);
+      this->incEndRows(n);
     }
 
     /** Delete n rows and columns at the end of the container.
      *  @param n number of Rows and Cols to delete
      **/
-    void popBack(int const& n=1)
+    void popBack(int n=1)
     {
-      Base::popBackRows(n);
       Base::popBackCols(n);
+      this->decEndRows(n);
     }
     /** operator = : overwrite the CArray with the Right hand side T.
      *  @note If the size match, @c this is not resized

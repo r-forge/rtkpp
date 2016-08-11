@@ -160,39 +160,37 @@ class Array2DSquare : public IArray2D< Array2DSquare<Type_> >
     Array2DSquare& resize1D( Range const& I)
     { Base::resize(I, I); return *this;}
     /** Insert n rows and column at the given position to the container.
-     *  @param pos position to insert the Rows and Cols
-     *  @param n number of Rows and Cols insert
+     *  @param pos,n position and number of rows and columns to insert
      **/
-    void insert( int pos, int const& n =1)
+    void insert( int pos, int n =1)
     {
       Base::insertRows(pos, n);
       Base::insertCols(pos, n);
     }
     /** Delete n rows and columns at the specified position to
      *  the container.
-     *  @param pos position to erase the Rows and Cols
-     *  @param n number of Rows and Cols erase
+     *  @param pos,n position and number of rows and columns to erase
      **/
-    void erase( int pos, int const& n=1)
+    void erase( int pos, int n=1)
     {
-      Base::eraseRows(pos, n);
       Base::eraseCols(pos, n);
+      Base::eraseRows(pos, n);
     }
     /** Add n rows and columns to the container.
      *  @param n number of Rows and Cols to add
      **/
-    void pushBack(int const& n=1)
+    void pushBack(int n=1)
     {
-      Base::pushBackCols(n);
       Base::pushBackRows(n);
+      Base::pushBackCols(n);
     }
     /** Delete n rows and columns at the end of the container.
      *  @param n number of Rows and Cols to delete
      **/
-    void popBack(int const& n=1)
+    void popBack(int n=1)
     {
-      Base::popBackRows(n);
       Base::popBackCols(n);
+      Base::popBackRows(n);
     }
     /** operator = : overwrite the CArray with the Right hand side T.
      *  @param T the container to copy

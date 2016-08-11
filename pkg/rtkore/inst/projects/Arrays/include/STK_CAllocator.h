@@ -675,6 +675,9 @@ class StructuredCAllocator<Derived, 1, 1>
       this->shift2Impl(begin, begin);
       row_ = begin; col_ = begin;
     }
+    /** resize the allocator (for square and diagonal matrices). */
+    Derived& resize1Impl(int)
+    { return this->asDerived().resize2Impl(1, 1);}
     /** move T to this.
      *  @param T the container to move
      **/

@@ -186,20 +186,18 @@ class Array2DPoint : public IArray2D< Array2DPoint<Type_> >
     /** Add n elements to the container.
      *  @param n number of elements to add
      **/
-    void pushBack( int const& n=1) { Base::pushBackCols(n);}
+    void pushBack( int n=1) { Base::pushBackCols(n);}
     /** Delete n elts at the pos index to the container.
-     *  @param pos index where to delete elements
-     *  @param n number of elements to delete (default 1)
+     *  @param pos, n position and number of elements to delete
     **/
-    void erase( int const& pos, int const& n=1)
+    void erase( int pos, int n=1)
     { Base::eraseCols(pos, n);}
     /** Insert n elts at the position pos of the container. The bound
      *  end_ should be modified at the very end of the insertion as pos
      *  can be a reference to it.
-     *  @param pos index where to insert elements
-     *  @param n number of elements to insert (default 1)
+     *  @param pos, n position and number of elements to insert
      **/
-    void insertElt(int const& pos, int const& n =1)
+    void insertElt( int pos, int n =1)
     { Base::insertCols(pos, n);}
     /** operator = : overwrite the CArray with the Right hand side T.
      *  @param T the container to copy

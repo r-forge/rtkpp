@@ -78,8 +78,8 @@
 #include "../projects/Algebra/include/STK_SymEigen.h"
 #include "../projects/Algebra/include/STK_MultiLeastSquare.h"
 #include "../projects/Algebra/include/STK_GinvSymmetric.h"
-
-// the lapack classes
+#include "../projects/Algebra/include/STK_InvertFixedSizeMatrix.h"
+#include "../projects/Algebra/include/STK_InvertFixedSizeSymMatrix.h"
 #include "../projects/Algebra/include/STK_lapack_Qr.h"
 #include "../projects/Algebra/include/STK_lapack_Svd.h"
 #include "../projects/Algebra/include/STK_lapack_SymEigen.h"

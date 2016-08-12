@@ -44,28 +44,28 @@ namespace STK
  *  @return @c true if m is invertible, @c false otherwise
  **/
 template<class Matrix>
-static bool invertMatrix11( Matrix const& m, CArraySquare<typename Matrix::Type, 1>& inv);
+static typename Matrix::Type invertMatrix11( Matrix const& m, CArraySquare<typename Matrix::Type, 1>& inv);
 /** @ingroup Algebra
  *  @brief compute the inverse of the 2x2 matrix m and store the result in inv.
  *  @param m, inv the matrices to invert and its inverse
  *  @return @c true if m is invertible, @c false otherwise
  **/
 template<class Matrix>
-static bool invertMatrix22( Matrix const& m, CArraySquare<typename Matrix::Type, 2>& inv);
+static typename Matrix::Type invertMatrix22( Matrix const& m, CArraySquare<typename Matrix::Type, 2>& inv);
 /** @ingroup Algebra
  *  @brief compute the inverse of the 3x3 matrix m and store the result in inv.
  *  @param m, inv the matrices to invert and its inverse
  *  @return @c true if m is invertible, @c false otherwise
  **/
 template<class Matrix>
-static bool invertMatrix33( Matrix const& m, CArraySquare<typename Matrix::Type, 3>& inv);
+static typename Matrix::Type invertMatrix33( Matrix const& m, CArraySquare<typename Matrix::Type, 3>& inv);
 /** @ingroup Algebra
  *  @brief compute the inverse of the 4x4 matrix m and store the result in inv.
  *  @param m, inv the matrices to invert and its inverse
  *  @return @c true if m is invertible, @c false otherwise
  **/
 template<class Matrix>
-static bool invertMatrix44( Matrix const& m, CArraySquare<typename Matrix::Type, 4>& inv);
+static typename Matrix::Type invertMatrix44( Matrix const& m, CArraySquare<typename Matrix::Type, 4>& inv);
 
 namespace hidden
 {
@@ -77,7 +77,7 @@ template<class Matrix>
 struct invertMatrixDispatcher<Matrix, 1>
 {
   typedef typename Matrix::Type Type;
-  inline static bool run( Matrix const& m, CArraySquare<Type, 1>& inv)
+  inline static Type run( Matrix const& m, CArraySquare<Type, 1>& inv)
   { return invertMatrix11(m, inv);}
 };
 
@@ -85,7 +85,7 @@ template<class Matrix>
 struct invertMatrixDispatcher<Matrix, 2>
 {
   typedef typename Matrix::Type Type;
-  inline static bool run( Matrix const& m, CArraySquare<Type, 2>& inv)
+  inline static Type run( Matrix const& m, CArraySquare<Type, 2>& inv)
   { return invertMatrix22(m, inv);}
 };
 
@@ -93,7 +93,7 @@ template<class Matrix>
 struct invertMatrixDispatcher<Matrix, 3>
 {
   typedef typename Matrix::Type Type;
-  inline static bool run( Matrix const& m, CArraySquare<Type, 3>& inv)
+  inline static Type run( Matrix const& m, CArraySquare<Type, 3>& inv)
   { return invertMatrix33(m, inv);}
 };
 
@@ -101,7 +101,7 @@ template<class Matrix>
 struct invertMatrixDispatcher<Matrix, 4>
 {
   typedef typename Matrix::Type Type;
-  inline static bool run( Matrix const& m, CArraySquare<Type, 4>& inv)
+  inline static Type run( Matrix const& m, CArraySquare<Type, 4>& inv)
   { return invertMatrix44(m, inv);}
 };
 
@@ -113,24 +113,24 @@ struct invertMatrixDispatcher<Matrix, 4>
  *  @return @c true if m is invertible, @c false otherwise
  **/
 template<class Matrix>
-static bool invertMatrix11( Matrix const& m, CArraySquare<typename Matrix::Type, 1>& inv)
+static typename Matrix::Type invertMatrix11( Matrix const& m, CArraySquare<typename Matrix::Type, 1>& inv)
 {
   typedef typename Matrix::Type Type;
   // cofactor (0,0) [0]
   inv(0, 0) = Type(1);
   // compute determinant
   Type det = m(0,0);
-  if (det == 0) return false;
+  if (det == Type(0)) return Type(0);
   // compute inverse matrix
   inv /= det;
-  return true;
+  return det;
 }
 /* compute the inverse of the 2x2 matrix m and store the result in inv.
  *  @param m, inv the matrices to invert and its inverse
  *  @return @c true if m is invertible, @c false otherwise
  **/
 template<class Matrix>
-static bool invertMatrix22( Matrix const& m, CArraySquare<typename Matrix::Type, 2>& inv)
+static typename Matrix::Type invertMatrix22( Matrix const& m, CArraySquare<typename Matrix::Type, 2>& inv)
 {
   typedef typename Matrix::Type Type;
   // cofactor (0,0) [0]
@@ -144,17 +144,17 @@ static bool invertMatrix22( Matrix const& m, CArraySquare<typename Matrix::Type,
 
   // determinant
   Type det = m(0,0) * inv(0,0) + m(0,1) * inv(1,0);
-  if (det == 0) return false;
-  // inverse matrix
+  if (det == Type(0)) return Type(0);
+  // compute inverse matrix
   inv /= det;
-  return true;
+  return det;
 }
 /* compute the inverse of the 3x3 matrix m and store the result in inv.
  *  @param m, inv the matrices to invert and its inverse
  *  @return @c true if m is invertible, @c false otherwise
  **/
 template<class Matrix>
-static bool invertMatrix33( Matrix const& m, CArraySquare<typename Matrix::Type, 3>& inv)
+static typename Matrix::Type invertMatrix33( Matrix const& m, CArraySquare<typename Matrix::Type, 3>& inv)
 {
   typedef typename Matrix::Type Type;
 
@@ -171,9 +171,10 @@ static bool invertMatrix33( Matrix const& m, CArraySquare<typename Matrix::Type,
 
   // computes the inverse of a matrix m
   Type det = m(0, 0) * inv(0,0) + m(0, 1) * inv(1,0) + m(0, 2) * inv(2,0);
-  if (det == 0.) return false;
+  if (det == Type(0)) return Type(0);
+  // compute inverse matrix
   inv /= det;
-  return true;
+  return det;
 }
 
 /* compute the inverse of the 4x4 matrix m and store the result in inv.
@@ -181,7 +182,7 @@ static bool invertMatrix33( Matrix const& m, CArraySquare<typename Matrix::Type,
  *  @return @c true if m is invertible, @c false otherwise
  **/
 template<class Matrix>
-static bool invertMatrix44( Matrix const& m, CArraySquare<typename Matrix::Type, 4>& inv)
+static typename Matrix::Type invertMatrix44( Matrix const& m, CArraySquare<typename Matrix::Type, 4>& inv)
 {
   typedef typename Matrix::Type Type;
   // cofactor (0,0) [0]
@@ -250,12 +251,14 @@ static bool invertMatrix44( Matrix const& m, CArraySquare<typename Matrix::Type,
            + m(0,2) * m(1,0) * m(2,1) - m(0,2) * m(2,0) * m(1,1);
   // compute determinant and inverse matrix
   Type det = m(0,0) * inv(0,0) + m(1,0) * inv(0,1) + m(2,0) * inv(0,2) + m(3,0) * inv(0,3);
-  if (det == 0) return false;
+  if (det == Type(0)) return Type(0);
+  // compute inverse matrix
   inv /= det;
-  return true;
+  return det;
 }
 
-/** @brief The InvertSymMatrix class is a functor class allowing to compute the
+/** @ingroup Algebra
+ *  @brief The InvertSymMatrix class is a functor class allowing to compute the
  *  inverse of a symmetric matrix. It is specialized for fixed sized matrices.
  */
 template<class Matrix, int Size> class InvertMatrix
@@ -263,8 +266,12 @@ template<class Matrix, int Size> class InvertMatrix
   public:
     typedef typename Matrix::Type Type;
     /** Constructor */
-    inline InvertMatrix(Matrix const& m): m_(m), inv_(_R(0,Size-1)), det_(), isInvertible_(true)
-    { isInvertible_ = hidden::invertMatrixDispatcher<Matrix, Size>::run(m_, inv_);}
+    inline InvertMatrix( ArrayBase<Matrix> const& m)
+                       : m_(m.asDerived())
+                       , inv_(_R(0,Size-1))
+                       , det_(hidden::invertMatrixDispatcher<Matrix, Size>::run(m_, inv_))
+                       , isInvertible_(det_==0)
+    {}
     /** Destructor */
     inline virtual ~InvertMatrix() {}
 

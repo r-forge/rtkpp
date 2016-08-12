@@ -270,7 +270,7 @@ template<class Matrix, int Size> class InvertMatrix
                        : m_(m.asDerived())
                        , inv_(_R(0,Size-1))
                        , det_(hidden::invertMatrixDispatcher<Matrix, Size>::run(m_, inv_))
-                       , isInvertible_(det_==0)
+                       , isInvertible_(det_!=0)
     {}
     /** Destructor */
     inline virtual ~InvertMatrix() {}

@@ -126,7 +126,7 @@ inline UnivariateDistribution stringToUnivariateDistribution( std::string const&
   if (toUpperString(removeWhiteSpaces(dist)) == toUpperString(_T("uniform"))) return uniform_;
   if (toUpperString(removeWhiteSpaces(dist)) == toUpperString(_T("uniformdiscrete"))) return uniform_discrete_;
   if (toUpperString(removeWhiteSpaces(dist)) == toUpperString(_T("weibull"))) return weibull_;
-#ifdef STK_MIXTURE_DEBUG
+#ifdef STK_STATISTIK_DEBUG
   stk_cout << _T("In stringToUnivariateDistribution, dist ") << dist << _T(" not found.\n");
 #endif
   return unknown_univ_distribution_;

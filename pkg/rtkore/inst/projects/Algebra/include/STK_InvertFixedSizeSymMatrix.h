@@ -263,9 +263,7 @@ template<class Matrix, int Size> class InvertSymMatrix
                           , inv_(_R(0,Size-1))
                           , det_(hidden::invertSymMatrixDispatcher<Matrix, Size>::run(m_, inv_))
                           , isInvertible_(det_!=0)
-    {
-      //isInvertible_ = ((det_ = hidden::invertSymMatrixDispatcher<Matrix, Size>::run(m_, inv_)) == 0);
-    }
+    {}
     /** Destructor */
     inline virtual ~InvertSymMatrix() {}
 

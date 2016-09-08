@@ -38,13 +38,6 @@
 #ifndef STK_MACROS_H
 #define STK_MACROS_H
 
-// any number
-#define STK_WORLD_VERSION 0
-// between 0 and 99
-#define STK_MAJOR_VERSION 9
-// between 0 and 99
-#define STK_MINOR_VERSION 3
-
 #include <STKernel/include/STK_Exceptions.h>
 
 /** @ingroup Sdk

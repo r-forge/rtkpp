@@ -45,6 +45,7 @@
 #define SDK_H
 
 /* Macros. */
+#include "../projects/Sdk/include/STK_MacrosVersion.h"
 #include "../projects/Sdk/include/STK_Macros.h"
 /* Static Assert. */
 #include "../projects/Sdk/include/STK_StaticAssert.h"

@@ -86,6 +86,7 @@
  *     <ul>
  *     <li> @subpage TipsArraysCentering
  *     <li> @subpage TipsComputeMeanByColumn
+ *     <li> @subpage TipsComputeMeanAndVarianceOfMultidimensionalData
  *     </ul>
  *  <li> @b The @b %Arrays @b And @b Their @b Usages
  *     <ul>

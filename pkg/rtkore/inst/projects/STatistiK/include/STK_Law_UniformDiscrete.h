@@ -47,7 +47,7 @@ namespace Law
 {
 /** @ingroup Laws
  *  @brief class for the Uniform law distribution.
- *  In probability theory and statistics, the <emWdiscrete uniform distributionw/em>
+ *  In probability theory and statistics, the <em> discrete uniform distribution </em>
  *  is a probability distribution whereby a finite number of values are equally
  *  likely to be observed; every one of @e n values has equal probability <em>1/n</em>.
  *  Another way of saying "discrete uniform distribution" would be "a known,

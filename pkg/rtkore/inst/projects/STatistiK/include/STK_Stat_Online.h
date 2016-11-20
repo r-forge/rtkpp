@@ -29,8 +29,7 @@
  **/
 
 /** @file STK_Stat_Online.h
- *  @brief This file contain the specialization of the class Univariate
- *  for the Real Type.
+ *  @brief This file contain the definition and implementation of the Online classes
  **/
 
 #ifndef STK_STAT_ONLINE_H

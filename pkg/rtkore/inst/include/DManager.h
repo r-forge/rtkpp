@@ -79,6 +79,8 @@
 /* Interface class for data handlers */
 #include "../projects/DManager/include/STK_DataHandlerBase.h"
 #include "../projects/DManager/include/STK_IDataHandler.h"
+/* Cross Validation */
+#include "../projects/DManager/include/STK_CvHandler.h"
 
 /* Interface class for data wrappers */
 #include "../projects/DManager/include/STK_IDataBridge.h"

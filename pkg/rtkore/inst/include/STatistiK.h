@@ -131,8 +131,10 @@
 #include "STatistiK/include/STK_Stat_Multivariate.h"
 #include "STatistiK/include/STK_Stat_MultivariateReal.h"
 
-// perform the usual transformations on variables
+// perform the usual Computations on categorical variables
 #include "STatistiK/include/STK_Stat_Factor.h"
+#include "STatistiK/include/STK_Stat_MultiFactor.h"
+#include "STatistiK/include/STK_Stat_ConfusionMatrix.h"
 #include "STatistiK/include/STK_Stat_Transform.h"
 
 // Kernels

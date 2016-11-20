@@ -303,40 +303,51 @@ class TRange<UnknownSize>
     /** Shift the TRange giving the first element : the size is not modified.
      *  @param first new value of the first element. */
     inline TRange& shift(int first) { return inc(first - begin_);}
-    /** create the TRange [begin_+inc, end_+inc_].
+    /** create the TRange [begin_+inc, end_+inc_).
      *  @param inc the increment to apply
      **/
     inline TRange& inc(int inc){ if(inc) { begin_ +=inc; end_ +=inc;} return *this;}
-    /** create the TRange [begin_+inc, end_].
+    /** create the TRange [begin_+inc, end_).
      *  @param dec the decrement to apply
      **/
     inline TRange& dec(int dec) { if(dec) { begin_ -=dec; end_ -=dec;} return *this;}
-    /** create the TRange [begin_-dec, end_-dec]
+    /** create the TRange [begin_-dec, end_-dec)
      *  @param inc the increment to apply to begin_
      **/
     inline TRange& incFirst(int inc) { begin_ +=inc; size_ -=inc; return *this;}
-    /** create the TRange [begin_, end_+inc]
-     * @param inc the increment to apply
+    /** create the TRange [begin_, end_+inc)
+     *  @param inc the increment to apply
      **/
     inline TRange& incLast(int inc) { end_ +=inc; size_ +=inc; return *this;}
-    /** @brief create the TRange [begin_-dec, end_]
+    /** create the TRange [begin_, end_+inc)
+     *  @param inc the increment to apply
+     **/
+    inline TRange& incEnd(int inc) { end_ +=inc; size_ +=inc; return *this;}
+    /** @brief create the TRange [begin_-dec, end_)
      * @param dec the decrement to apply
      **/
     inline TRange& decFirst(int dec) { begin_ -=dec; size_  +=dec; return *this;}
-    /** create the TRange [begin_, end_-dec]
-     * @param dec the decrement to apply
+    /** create the TRange [begin_, end_-dec)
+     *  @param dec the decrement to apply
      **/
     inline TRange& decLast(int dec){ end_ -= dec; size_ -=dec; return *this;}
+    /** create the TRange [begin_, end_-dec)
+     *  @param dec the decrement to apply
+     **/
+    inline TRange& decEnd(int dec){ end_ -= dec; size_ -=dec; return *this;}
+
     /** @return this %TRange incremented **/
     inline TRange& operator+=(int inc) { begin_ += inc; end_ += inc; return *this;}
     /** @return this %TRange decremented **/
     inline TRange& operator-=(int dec) { begin_ -= dec; end_ -=dec; return *this;}
     /** @return this %TRange incremented **/
     inline TRange operator+(int inc) const { return(TRange(begin_+inc, size_));}
+    /** @return this %TRange incremented **/
+    inline TRange operator-(int inc) const { return(TRange(begin_-inc, size_));}
     /** @return %TRange I incremented **/
     inline friend TRange operator+(int inc, TRange const &I) { return I+inc;}
-    /** @return this %TRange decremented **/
-    inline TRange operator-(int dec) const { return(TRange(begin_-dec, size_));}
+    /** @return %TRange I incremented **/
+    inline friend TRange operator-(int inc, TRange const &I) { return I-inc;}
 
     /** Take the lowest value of begin_ and I.begin_ for begin_
      *  and the largest value of end_ and I.end_ for end_.

@@ -213,7 +213,7 @@ inline Real Uniform::icdf( Real const& p) const
 inline Real Uniform::rand( Real const& a, Real const& b)
 {
   return( (b-a <= 1.) ? a + (b-a) * generator.randUnif()
-                      : a + generator.randDblExc(b-a));
+                      : a + generator.rand(b-a));
 }
 /* Give the value of the pdf at x.
  *  @param x a real value

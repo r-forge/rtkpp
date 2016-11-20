@@ -49,13 +49,18 @@ namespace hidden
 /** @ingroup hidden
  *  The DataHandlerTraits will give the type of container furnished by the
  *  concrete implementations of the DataHandlerBase class.
+ *  @note In incoming version of STK++ DataHandlerBase will be renamed as
+ *  IDataHandler
  **/
 template<class DataHandler, typename Type> struct DataHandlerTraits;
 
 } // namespace hidden
 
 /** @ingroup DManager
- *  A DataHandler class allow to store various data set idetified with an idData
+ *  A DataHandlerBase class allow to store various data set identified by an
+ *  idData
+ *  @note In incoming version of STK++ DataHandlerBase will be refactored as
+ *  IDataHandler
  */
 template<class Derived>
 class DataHandlerBase : public IRecursiveTemplate<Derived>

@@ -154,8 +154,7 @@ template < class RowVector, class Array >
 void decenter( Array&  V, RowVector const& mean)
 {
   if (V.cols() != mean.range())
-    throw runtime_error(_T("Error in Stat::decenter(V, mean): "
-                             "ranges are not the same."));
+    STKRUNTIME_ERROR_NO_ARG(Stat::decenter(V, mean),ranges are not the same);
   // get dimensions
   const int  firstRowVector = V.beginRows(), lastRowVector = V.lastIdxRows();
   const int  firstVar = V.beginCols(), lastVar = V.lastIdxCols();

@@ -77,13 +77,15 @@ class ArrayInitializer
      **/
     void toFirstElt()
     {
-      while ( (array_.rangeColsInRow(row_).size() <= 0) && (row_ < array_.endRows()))
-      { row_++;}
-      if (row_ >= array_.endRows())
-      { STKRUNTIME_ERROR_NO_ARG(ArrayInitializer::toFirstElt,array is empty);}
+      // loop over the rows, until we get existing columns
+      while (array_.rangeColsInRow(row_).size() <= 0)
+      { row_++;
+        if (row_ >= array_.endRows())
+        { STKRUNTIME_ERROR_NO_ARG(ArrayInitializer::toFirstElt,array is empty);}
+      }
       col_ = array_.rangeColsInRow(row_).begin();
     }
-    /** Computr the next element*/
+    /** Compute the next element*/
     void toNextElt()
     {
       // for the current row go to first available column if necessary

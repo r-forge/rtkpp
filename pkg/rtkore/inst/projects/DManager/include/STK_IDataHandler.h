@@ -61,6 +61,8 @@ struct DataHandlerTraits
  *  that can be adjusted to this data set. This statistical model is identified
  *  by an idModel (a string).
  *  @note all data set should have the same number of individuals.
+ *  @note In next version IDataHandler will disappear and will be replaced by
+ *  DataHandlerBase class
  */
 class IDataHandler
 {

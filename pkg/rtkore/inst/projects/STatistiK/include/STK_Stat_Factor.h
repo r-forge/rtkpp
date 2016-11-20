@@ -36,17 +36,20 @@
 #define STK_STAT_FACTOR_H
 
 #include <Sdk/include/STK_IRunner.h>
+#include <Sdk/include/STK_Macros.h>
 
 namespace STK
 {
+
+
 namespace Stat
 {
 /** @ingroup StatDesc
- *  @brief Computation of the Factors of a 2D Container.
+ *  @brief Computation of the Factors of a 1D Container.
  *
- *  The class @c Factor is a factory class for computing the factors of an array.
+ *  The class @c Factor is a factory class for computing the factors of a vector.
  *  The values can be of any type. the Coding is performed from the previous type
- *  in integer. The mapping is stored and preserved in an array of map array.
+ *  in integer. The mapping is stored and preserved in a map array.
  **/
 template <class Array>
 class Factor: public IRunnerWithData<Array>
@@ -59,9 +62,6 @@ class Factor: public IRunnerWithData<Array>
 
     typedef std::map<Type, int> EncodingMap;
     typedef std::map<int, Type> DecodingMap;
-
-    typedef CArrayPoint<EncodingMap> Encoder;
-    typedef CArrayPoint<DecodingMap> Decoder;
 
     using Base::p_data_;
 
@@ -86,34 +86,34 @@ class Factor: public IRunnerWithData<Array>
     inline virtual Factor* clone() const { return new Factor(*this);}
 
     /** @return array with the factors encoded as integers */
-    inline CArrayXXi const& asInteger() const { return asInteger_;}
+    inline CVectorXi const& asInteger() const { return asInteger_;}
     /** @return array with for each variables the levels */
-    inline CArrayPoint< Array2DVector<Type> > const& levels() const {return levels_;}
+    inline Array2DVector<Type> const& levels() const {return levels_;}
     /** @return array with for each variables the counts of the levels */
-    inline CArrayPoint< VectorXi > const& counts() const {return counts_;}
+    inline VectorXi const& counts() const {return counts_;}
     /** @return array with for each variables the number of levels */
-    inline CPointXi const& nbLevels() const { return nbLevels_;}
+    inline int const& nbLevels() const { return nbLevels_;}
     /** @return array with the encoding maps factor to int */
-    inline Encoder const& encoder() const { return encoder_;}
+    inline EncodingMap const& encoder() const { return encoder_;}
     /** @return array with the encoding maps factor to int */
-    inline Decoder const& decoder() const { return decoder_;}
+    inline DecodingMap const& decoder() const { return decoder_;}
 
     /** run the estimation of the Factor statistics. **/
     virtual bool run();
 
   protected:
     /** Array of the data size with the levels of each variables in an integer format*/
-    CArrayXXi asInteger_;
+    CVectorXi asInteger_;
     /** Number of levels of each variables */
-    CPointXi nbLevels_;
+    int nbLevels_;
     /** Array with the levels of each variables */
-    CArrayPoint< Array2DVector<Type> > levels_;
+    Array2DVector<Type> levels_;
     /** Array with the counts of each factor */
-    CArrayPoint< VectorXi > counts_;
+    VectorXi counts_;
     /** encoder of the levels */
-    Encoder encoder_;
+    EncodingMap encoder_;
     /** decoder of the levels */
-    Decoder decoder_;
+    DecodingMap decoder_;
 
     /** udpating method in case we set a new data set */
     virtual void update();
@@ -124,12 +124,12 @@ Factor<Array>::Factor(): Base(), asInteger_(), nbLevels_(), levels_(), counts_()
 
 template <class Array>
 Factor<Array>::Factor( Array const& data): Base(data)
-                                         , asInteger_(p_data_->rows(),p_data_->cols())
-                                         , nbLevels_(p_data_->cols(), baseIdx - 1)
-                                         , levels_(p_data_->cols())
-                                         , counts_(p_data_->cols())
-                                         , encoder_(p_data_->cols())
-                                         , decoder_(p_data_->cols())
+                                         , asInteger_(p_data_->range())
+                                         , nbLevels_(0)
+                                         , levels_()
+                                         , counts_()
+                                         , encoder_()
+                                         , decoder_()
 {}
 
 /* Constructor.
@@ -138,19 +138,16 @@ Factor<Array>::Factor( Array const& data): Base(data)
 template <class Array>
 Factor<Array>::Factor( Array const* p_data): Base(p_data)
                                            , asInteger_()
-                                           , nbLevels_()
+                                           , nbLevels_(0)
                                            , levels_()
+                                           , counts_()
                                            , encoder_()
                                            , decoder_()
 {
   if (p_data_)
   {
-    asInteger_.resize(p_data_->rows(),p_data_->cols());
-    nbLevels_.resize(p_data_->cols()).setValue(baseIdx - 1);
-    levels_.resize(p_data_->cols());
-    counts_.resize(p_data_->cols());
-    encoder_.resize(p_data_->cols());
-    decoder_.resize(p_data_->cols());
+    asInteger_.resize(p_data_->range());
+    nbLevels_= 0;
   }
 }
 
@@ -167,19 +164,12 @@ void Factor<Array>::update()
    // if there is no data there is nothing to update
    if (p_data_)
    {
-     asInteger_.resize(p_data_->rows(),p_data_->cols());
-     nbLevels_.resize(p_data_->cols()).setValue(baseIdx - 1);
-     for(int j=encoder_.begin(); j<std::min(encoder_.end(), p_data_->cols().end()); ++j)
-     {
-       levels_[j].clear();
-       counts_[j].clear();
-       encoder_[j].clear();
-       decoder_[j].clear();
-     }
-     levels_.resize(p_data_->cols());
-     counts_.resize(p_data_->cols());
-     encoder_.resize(p_data_->cols());
-     decoder_.resize(p_data_->cols());
+     asInteger_.resize(p_data_->rows());
+     nbLevels_=0;
+     levels_.clear();
+     counts_.clear();
+     encoder_.clear();
+     decoder_.clear();
    }
 }
 
@@ -192,26 +182,24 @@ bool Factor<Array>::run()
   }
   try
   {
-    for (int j=p_data_->beginCols(); j< p_data_->endCols(); ++j)
+    for (int i=p_data_->begin(); i< p_data_->end(); ++i)
     {
-      for (int i=p_data_->beginRows(); i< p_data_->endRows(); ++i)
+      // find coding
+      Type idData = p_data_->elt(i);
+      typename EncodingMap::const_iterator it = encoder_.find(idData);
+      if (it != encoder_.end()) // levels already exist, just update the levels array
+      { asInteger_[i] = it->second;
+        counts_[it->second]++;  // add one to this level
+      }
+      else // find a new level to add
       {
-        // find coding
-        Type idData = p_data_->elt(i,j);
-        typename EncodingMap::const_iterator it = encoder_[j].find(idData);
-        if (it != encoder_[j].end()) // levels already exist, just update the levels array
-        { asInteger_(i,j) = it->second;
-          counts_[j][it->second]++;  // add one to this level
-        }
-        else // find a new level to add
-        {
-          // create a new level and set it
-          asInteger_(i,j) = (++nbLevels_[j]);
-          encoder_[j].insert(std::pair<Type, int>(idData, nbLevels_[j]));
-          decoder_[j].insert(std::pair<int, Type>(nbLevels_[j], idData));
-          levels_[j].push_back(idData);
-          counts_[j].push_back(1); // start counting for this new level
-        }
+        // create a new level and set it
+        asInteger_[i] = nbLevels_;
+        encoder_.insert(std::pair<Type, int>(idData, nbLevels_));
+        decoder_.insert(std::pair<int, Type>(nbLevels_, idData));
+        levels_.push_back(idData);
+        counts_.push_back(1); // start counting for this new level
+        nbLevels_++;
       }
     }
   }

@@ -37,7 +37,7 @@
 #define STK_KERNEL_HAMMING_H
 
 #include "STK_Kernel_IKernelBase.h"
-#include "STK_Stat_Factor.h"
+#include "STK_Stat_MultiFactor.h"
 
 namespace STK
 {
@@ -54,7 +54,7 @@ namespace Kernel
  *
  * @note The creation of this Kernel trigger the computation of the factors
  * present in the data set.
- * @sa STK::Stat::Factors
+ * @sa STK::Stat::MultiFactors
  */
 template<class Array>
 class Hamming: public IKernelBase<Array>
@@ -92,7 +92,7 @@ class Hamming: public IKernelBase<Array>
     /** @return the lambda of the kernel */
     Real const& lambda() const {return lambda_;}
     /** @return the lambda of the kernel */
-    Stat::Factor<Array> const& factors() const {return factors_;}
+    Stat::MultiFactor<Array> const& factors() const {return factors_;}
     /** set the lambda of the kernel */
     void setLambda(Real const& lambda) { lambda_ = lambda;}
 
@@ -109,7 +109,7 @@ class Hamming: public IKernelBase<Array>
     /** diagonal element of the kernel */
     Real diagElt_;
     /** factors of the values */
-    Stat::Factor<Array> factors_;
+    Stat::MultiFactor<Array> factors_;
     /** Compute the diagonal element of the kernel*/
     void computeDiagonalElement();
 };

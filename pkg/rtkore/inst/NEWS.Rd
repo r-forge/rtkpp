@@ -1,6 +1,13 @@
 \name{NEWS}
 \title{News for Package 'rtkore}
 
+\section{Changes in rtkore version 1.2.0 (2016-1120)}{
+  \itemize{
+    \item Adding more vignettes about STK++ arrays
+    \item Creating Factor class for vectors and MultiFactor class for arrays
+    \item Adding CvHandler class for cross validation
+  }
+}
 \section{Changes in rtkore version 1.1.1 (2016-0804)}{
   \itemize{
     \item Creating and Implementing InvertMatrix and InvertSymMatrix classes

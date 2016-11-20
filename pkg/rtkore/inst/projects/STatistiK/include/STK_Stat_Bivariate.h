@@ -35,7 +35,7 @@
 #ifndef STK_STAT_BIVARIATE_H
 #define STK_STAT_BIVARIATE_H
 
-#include "../include/STK_Stat_UnivariateReal.h"
+#include "STK_Stat_UnivariateReal.h"
 
 namespace STK
 {

@@ -59,7 +59,7 @@ rtkore.date <- packageDescription("rtkore")$Date
 
 \maketitle
 \begin{abstract}
-This vignette give some hints about the usage of the \rtkore{} (successor of
+This vignette gives some hints about the usage of the \rtkore{} (successor of
 the \rtkpp{}) package. It explains shortly how to wrap R vectors and matrices
 into \stkpp{}  structures. It gives also an example of Makevars for linking an R
 package with \rtkore{}.
@@ -164,6 +164,9 @@ RcppExport SEXP countNA( SEXP r_matrix)
   END_RCPP
 }
 \end{lstlisting}
+
+\section{Using \rtkore{} random number generators}
+
 
 \section{Linking with \rtkore{}}
 

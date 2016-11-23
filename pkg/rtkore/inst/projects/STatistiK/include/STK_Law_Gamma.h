@@ -180,30 +180,30 @@ class Gamma : public IUnivLaw<Real>
 #ifdef IS_RTKPP_LIB
 
 inline Real Gamma::rand() const
-{ GetRNGstate(); Real s = ::Rf_rgamma(a_, b_);
+{ GetRNGstate(); Real s = Rf_rgamma(a_, b_);
   PutRNGstate(); return s;
 }
 inline Real Gamma::pdf( Real const& x) const
-{ return ::Rf_dgamma(x, a_, b_, false);}
+{ return Rf_dgamma(x, a_, b_, false);}
 inline Real Gamma::lpdf( Real const& x) const
-{  return ::Rf_dgamma(x, a_, b_, true);}
+{  return Rf_dgamma(x, a_, b_, true);}
 inline Real Gamma::cdf( Real const& t) const
-{ return ::Rf_pgamma(t, a_, b_, true, false);}
+{ return Rf_pgamma(t, a_, b_, true, false);}
 inline Real Gamma::icdf( Real const& p) const
-{ return ::Rf_qgamma(p, a_, b_, true, false);}
+{ return Rf_qgamma(p, a_, b_, true, false);}
 
 inline Real Gamma::rand( Real const& a, Real const& b)
-{ GetRNGstate(); Real s = ::Rf_rgamma(a, b);
+{ GetRNGstate(); Real s = Rf_rgamma(a, b);
   PutRNGstate(); return s;
 }
 inline Real Gamma::pdf( Real const& x, Real const& a, Real const& b)
-{ return ::Rf_dgamma(x, a, b, false);}
+{ return Rf_dgamma(x, a, b, false);}
 inline Real Gamma::lpdf( Real const& x, Real const& a, Real const& b)
-{ return ::Rf_dgamma(x, a, b, true);}
+{ return Rf_dgamma(x, a, b, true);}
 inline Real Gamma::cdf(Real const& t, Real const& a, Real const& b)
-{ return ::Rf_pgamma(t, a, b, true, false);}
+{ return Rf_pgamma(t, a, b, true, false);}
 inline Real Gamma::icdf(Real const& p, Real const& a, Real const& b)
-{ return ::Rf_qgamma(p, a, b, true, false);}
+{ return Rf_qgamma(p, a, b, true, false);}
 
 #endif
 

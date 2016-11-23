@@ -165,30 +165,30 @@ class LogNormal : public IUnivLaw<Real>
 #ifdef IS_RTKPP_LIB
 
 inline Real LogNormal::rand() const
-{ GetRNGstate(); Real s = ::Rf_rlnorm(mu_, sigma_);
+{ GetRNGstate(); Real s = Rf_rlnorm(mu_, sigma_);
   PutRNGstate(); return s;
 }
 inline Real LogNormal::pdf( Real const& x) const
-{ return ::Rf_dlnorm(x, mu_, sigma_, false);}
+{ return Rf_dlnorm(x, mu_, sigma_, false);}
 inline Real LogNormal::lpdf( Real const& x) const
-{ return ::Rf_dlnorm(x, mu_, sigma_, true);}
+{ return Rf_dlnorm(x, mu_, sigma_, true);}
 inline Real LogNormal::cdf( Real const& t) const
-{ return ::Rf_plnorm(t, mu_, sigma_, true, false);}
+{ return Rf_plnorm(t, mu_, sigma_, true, false);}
 inline Real LogNormal::icdf( Real const& p) const
-{ return ::Rf_qlnorm(p, mu_, sigma_, true, false);}
+{ return Rf_qlnorm(p, mu_, sigma_, true, false);}
 
 inline Real LogNormal::rand( Real const& mu, Real const& sigma)
-{ GetRNGstate(); Real s = ::Rf_rlnorm(mu, sigma);
+{ GetRNGstate(); Real s = Rf_rlnorm(mu, sigma);
   PutRNGstate(); return s;
 }
 inline Real LogNormal::pdf( Real const& x, Real const& mu, Real const& sigma)
-{ return ::Rf_dlnorm(x, mu, sigma, false);}
+{ return Rf_dlnorm(x, mu, sigma, false);}
 inline Real LogNormal::lpdf( Real const& x, Real const& mu, Real const& sigma)
-{ return ::Rf_dlnorm(x, mu, sigma, true);}
+{ return Rf_dlnorm(x, mu, sigma, true);}
 inline Real LogNormal::cdf( Real const& t, Real const& mu, Real const& sigma)
-{ return ::Rf_plnorm(t, mu, sigma, true, false);}
+{ return Rf_plnorm(t, mu, sigma, true, false);}
 inline Real LogNormal::icdf( Real const& p, Real const& mu, Real const& sigma)
-{ return ::Rf_qlnorm(p, mu, sigma, true, false);}
+{ return Rf_qlnorm(p, mu, sigma, true, false);}
 
 #endif
 

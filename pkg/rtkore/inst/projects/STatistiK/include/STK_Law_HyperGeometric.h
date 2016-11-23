@@ -181,29 +181,29 @@ class HyperGeometric: public IUnivLaw<Integer>
 #ifdef IS_RTKPP_LIB
 
 inline int HyperGeometric::rand() const
-{ GetRNGstate(); int s = ::Rf_rhyper(nbSuccesses_, nbFailures_, nbDraws_);
+{ GetRNGstate(); int s = Rf_rhyper(nbSuccesses_, nbFailures_, nbDraws_);
   PutRNGstate(); return s;
 }
 inline Real HyperGeometric::pdf(Integer const& x) const
-{ return ::Rf_dhyper((double)x, nbSuccesses_, nbFailures_, nbDraws_, false);}
+{ return Rf_dhyper((double)x, nbSuccesses_, nbFailures_, nbDraws_, false);}
 inline Real HyperGeometric::lpdf(Integer const& x) const
-{ return ::Rf_dhyper((double)x, nbSuccesses_, nbFailures_, nbDraws_, true);}
+{ return Rf_dhyper((double)x, nbSuccesses_, nbFailures_, nbDraws_, true);}
 inline Real HyperGeometric::cdf(Real const& t) const
-{ return ::Rf_phyper(t, nbSuccesses_, nbFailures_, nbDraws_, true, false);}
+{ return Rf_phyper(t, nbSuccesses_, nbFailures_, nbDraws_, true, false);}
 inline int HyperGeometric::icdf(Real const& p) const
 { return (int)::Rf_qhyper(p, nbSuccesses_, nbFailures_, nbDraws_, true, false);}
 
 inline Integer HyperGeometric::rand( int nbSuccesses, int nbFailures, int nbDraws)
 {
-  GetRNGstate(); int s = ::Rf_rhyper(nbSuccesses, nbFailures, nbDraws);
+  GetRNGstate(); int s = Rf_rhyper(nbSuccesses, nbFailures, nbDraws);
   PutRNGstate(); return s;
 }
 inline Real HyperGeometric::pdf(Integer x, int nbSuccesses, int nbFailures, int nbDraws)
-{ return ::Rf_dhyper((double)x, nbSuccesses, nbFailures, nbDraws, false);}
+{ return Rf_dhyper((double)x, nbSuccesses, nbFailures, nbDraws, false);}
 inline Real HyperGeometric::lpdf(Integer x, int nbSuccesses, int nbFailures, int nbDraws)
-{ return ::Rf_dhyper((double)x, nbSuccesses, nbFailures, nbDraws, true);}
+{ return Rf_dhyper((double)x, nbSuccesses, nbFailures, nbDraws, true);}
 inline Real HyperGeometric::cdf(Real const& t, int nbSuccesses, int nbFailures, int nbDraws)
-{ return ::Rf_phyper(t, nbSuccesses, nbFailures, nbDraws, true, false);}
+{ return Rf_phyper(t, nbSuccesses, nbFailures, nbDraws, true, false);}
 inline int HyperGeometric::icdf(Real const& p, int nbSuccesses, int nbFailures, int nbDraws)
 { return (int)::Rf_qhyper(p, nbSuccesses, nbFailures, nbDraws, true, false);}
 

@@ -180,27 +180,27 @@ class Cauchy : public IUnivLaw<Real>
 
 /*  Generate a pseudo Cauchy random variate. */
 inline Real Cauchy::rand() const
-{ GetRNGstate(); Real s = ::Rf_rcauchy(mu_, scale_);
+{ GetRNGstate(); Real s = Rf_rcauchy(mu_, scale_);
   PutRNGstate(); return s;
 }
-inline Real Cauchy::pdf( Real const& x) const { return ::Rf_dcauchy(x,mu_, scale_, false);}
-inline Real Cauchy::lpdf( Real const& x) const { return ::Rf_dcauchy(x,mu_, scale_, true);}
-inline Real Cauchy::cdf( Real const& t) const { return ::Rf_pcauchy(t, mu_, scale_, true, false);}
-inline Real Cauchy::icdf( Real const& p) const { return ::Rf_qcauchy(p , mu_, scale_, true, false);}
+inline Real Cauchy::pdf( Real const& x) const { return Rf_dcauchy(x,mu_, scale_, false);}
+inline Real Cauchy::lpdf( Real const& x) const { return Rf_dcauchy(x,mu_, scale_, true);}
+inline Real Cauchy::cdf( Real const& t) const { return Rf_pcauchy(t, mu_, scale_, true, false);}
+inline Real Cauchy::icdf( Real const& p) const { return Rf_qcauchy(p , mu_, scale_, true, false);}
 
 // static
 inline Real Cauchy::rand( Real const& mu, Real const& scale)
-{ GetRNGstate(); Real s = ::Rf_rcauchy(mu, scale);
+{ GetRNGstate(); Real s = Rf_rcauchy(mu, scale);
   PutRNGstate(); return s;
 }
 inline Real Cauchy::pdf(Real const& x, Real const& mu, Real const& scale)
-{ return ::Rf_dcauchy(x,mu, scale, false);}
+{ return Rf_dcauchy(x,mu, scale, false);}
 inline Real Cauchy::lpdf(Real const& x, Real const& mu, Real const& scale)
-{ return ::Rf_dcauchy(x,mu, scale, true);}
+{ return Rf_dcauchy(x,mu, scale, true);}
 inline Real Cauchy::cdf(Real const& t, Real const& mu, Real const& scale)
-{ return ::Rf_pcauchy(t, mu, scale, true, false);}
+{ return Rf_pcauchy(t, mu, scale, true, false);}
 inline Real Cauchy::icdf(Real const& p, Real const& mu, Real const& scale)
-{ return ::Rf_qcauchy(p , mu, scale, true, false);}
+{ return Rf_qcauchy(p , mu, scale, true, false);}
 
 #endif
 

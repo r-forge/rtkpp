@@ -97,7 +97,7 @@ Real betaRatio_raw( Real const& a, Real const& b, Real const& x, bool lower_tail
 #else
 
 inline Real betaRatio( Real const& a, Real const& b, Real const& x, bool lower_tail = true)
-{ return ::Rf_pbeta(x,a,b,lower_tail,false);}
+{ return Rf_pbeta(x,a,b,lower_tail,false);}
 
 #endif
 

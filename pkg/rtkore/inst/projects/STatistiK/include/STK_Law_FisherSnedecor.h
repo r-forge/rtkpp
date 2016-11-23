@@ -142,30 +142,30 @@ class FisherSnedecor : public IUnivLaw<Real>
 #ifdef IS_RTKPP_LIB
 
 inline Real FisherSnedecor::rand() const
-{ GetRNGstate(); Real s = ::Rf_rf(df1_, df2_);
+{ GetRNGstate(); Real s = Rf_rf(df1_, df2_);
   PutRNGstate(); return s;
 }
 inline Real FisherSnedecor::pdf(Real const& x) const
-{   return ::Rf_df(x, df1_, df2_, false);}
+{   return Rf_df(x, df1_, df2_, false);}
 inline Real FisherSnedecor::lpdf(Real const& x) const
-{   return ::Rf_df(x, df1_, df2_, true);}
+{   return Rf_df(x, df1_, df2_, true);}
 inline Real FisherSnedecor::cdf(Real const& t) const
-{ return ::Rf_pf(t, df1_, df2_, true, false);}
+{ return Rf_pf(t, df1_, df2_, true, false);}
 inline Real FisherSnedecor::icdf(Real const& p) const
-{ return ::Rf_qf(p, df1_, df2_, true, false);}
+{ return Rf_qf(p, df1_, df2_, true, false);}
 
 inline Real FisherSnedecor::rand( int df1, int df2)
-{ GetRNGstate(); Real s = ::Rf_rf(df1, df2);
+{ GetRNGstate(); Real s = Rf_rf(df1, df2);
   PutRNGstate(); return s;
 }
 inline Real FisherSnedecor::pdf(Real const& x, int df1, int df2)
-{ return ::Rf_df(x, df1, df2, false);}
+{ return Rf_df(x, df1, df2, false);}
 inline Real FisherSnedecor::lpdf(Real const& x, int df1, int df2)
-{ return ::Rf_df(x, df1, df2, true);}
+{ return Rf_df(x, df1, df2, true);}
 inline Real FisherSnedecor::cdf(Real const& t, int df1, int df2)
-{  return ::Rf_pf(t, df1, df2, true, false);}
+{  return Rf_pf(t, df1, df2, true, false);}
 inline Real FisherSnedecor::icdf(Real const& p, int df1, int df2)
-{  return ::Rf_qf(p, df1, df2, true, false);}
+{  return Rf_qf(p, df1, df2, true, false);}
 
 #endif
 

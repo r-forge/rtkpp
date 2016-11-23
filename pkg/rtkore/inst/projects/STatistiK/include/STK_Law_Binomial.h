@@ -172,7 +172,7 @@ class Binomial: public IUnivLaw<Integer>
 #ifdef IS_RTKPP_LIB
 
 inline int Binomial::rand() const
-{ GetRNGstate(); int s = ::Rf_rbinom(n_, prob_);
+{ GetRNGstate(); int s = Rf_rbinom(n_, prob_);
   PutRNGstate(); return s;}
 inline Real Binomial::pdf(int const& x) const
 { return (Real)::Rf_dbinom((double)x, (double)n_, prob_, false);}
@@ -181,10 +181,10 @@ inline Real Binomial::lpdf(int const& x) const
 inline Real Binomial::cdf(Real const& t) const
 { return (Real)::Rf_pbinom(t, (double)n_, prob_, true, false);}
 inline int Binomial::icdf(Real const& p) const
-{ return ::Rf_qbinom(p, (double)n_, prob_, true, false);}
+{ return Rf_qbinom(p, (double)n_, prob_, true, false);}
 
 inline int Binomial::rand(int n, Real const& prob)
-{ GetRNGstate(); int s = ::Rf_rbinom(n, prob);
+{ GetRNGstate(); int s = Rf_rbinom(n, prob);
   PutRNGstate(); return s;}
 inline Real Binomial::pdf(int x, int n, Real const& prob)
 { return (Real)::Rf_dbinom(x, (double)n, prob, false);}
@@ -193,7 +193,7 @@ inline Real Binomial::lpdf(int x, int n, Real const& prob)
 inline Real Binomial::cdf(Real const& t, int n, Real const& prob)
 { return (Real)::Rf_pbinom(t, (double)n, prob, true, false);}
 inline int Binomial::icdf(Real const& p, int n, Real const& prob)
-{ return ::Rf_qbinom(p, (double)n, prob, true, false);}
+{ return Rf_qbinom(p, (double)n, prob, true, false);}
 
 #endif
 

@@ -146,30 +146,30 @@ class Weibull : public IUnivLaw<Real>
 #ifdef IS_RTKPP_LIB
 
 inline Real Weibull::rand() const
-{ GetRNGstate(); Real s = ::Rf_rweibull(k_, lambda_);
+{ GetRNGstate(); Real s = Rf_rweibull(k_, lambda_);
   PutRNGstate(); return s;
 }
 inline Real Weibull::pdf(Real const& x) const
-{ return ::Rf_dweibull(x, k_, lambda_, false);}
+{ return Rf_dweibull(x, k_, lambda_, false);}
 inline Real Weibull::lpdf(Real const& x) const
-{ return ::Rf_dweibull(x, k_, lambda_, true);}
+{ return Rf_dweibull(x, k_, lambda_, true);}
 inline Real Weibull::cdf(Real const& t) const
-{ return ::Rf_pweibull(t, k_, lambda_, true, false);}
+{ return Rf_pweibull(t, k_, lambda_, true, false);}
 inline Real Weibull::icdf(Real const& p) const
-{ return ::Rf_qweibull(p, k_, lambda_, true, false);}
+{ return Rf_qweibull(p, k_, lambda_, true, false);}
 
 inline Real Weibull::rand( Real const& k, Real const& lambda)
-{ GetRNGstate(); Real s = ::Rf_rweibull(k, lambda);
+{ GetRNGstate(); Real s = Rf_rweibull(k, lambda);
   PutRNGstate(); return s;
 }
 inline Real Weibull::pdf(Real const& x, Real const& k, Real const& lambda)
-{ return ::Rf_dweibull(x, k, lambda, false);}
+{ return Rf_dweibull(x, k, lambda, false);}
 inline Real Weibull::lpdf(Real const& x, Real const& k, Real const& lambda)
-{ return ::Rf_dweibull(x, k, lambda, true);}
+{ return Rf_dweibull(x, k, lambda, true);}
 inline Real Weibull::cdf(Real const& t, Real const& k, Real const& lambda)
-{ return ::Rf_pweibull(t, k, lambda, true, false);}
+{ return Rf_pweibull(t, k, lambda, true, false);}
 inline Real Weibull::icdf( Real const& p, Real const& k, Real const& lambda)
-{ return ::Rf_qweibull(p, k, lambda, true, false);}
+{ return Rf_qweibull(p, k, lambda, true, false);}
 
 #endif
 

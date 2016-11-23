@@ -47,7 +47,7 @@ namespace Funct
 #ifdef IS_RTKPP_LIBRARY
 
 inline Real gammaRatio(Real const& a, Real const& x, bool lower_tail)
-{ return ::Rf_pgamma(x, a, 1., lower_tail, false);}
+{ return Rf_pgamma(x, a, 1., lower_tail, false);}
 
 #else
 

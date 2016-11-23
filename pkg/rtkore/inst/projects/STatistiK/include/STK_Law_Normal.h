@@ -184,27 +184,27 @@ class Normal : public IUnivLaw<Real>
 
 /*  Generate a pseudo Normal random variate. */
 inline Real Normal::rand() const
-{ GetRNGstate(); Real s = ::Rf_rnorm(mu_, sigma_);
+{ GetRNGstate(); Real s = Rf_rnorm(mu_, sigma_);
   PutRNGstate(); return s;
 }
-inline Real Normal::pdf( Real const& x) const {   return ::Rf_dnorm4(x, mu_, sigma_, false);}
-inline Real Normal::lpdf( Real const& x) const {   return ::Rf_dnorm4(x, mu_, sigma_, true);}
-inline Real Normal::cdf( Real const& t) const { return ::Rf_pnorm5(t, mu_, sigma_, true, false);}
-inline Real Normal::icdf( Real const& p) const { return ::Rf_qnorm5(p , mu_, sigma_, true, false);}
+inline Real Normal::pdf( Real const& x) const {   return Rf_dnorm4(x, mu_, sigma_, false);}
+inline Real Normal::lpdf( Real const& x) const {   return Rf_dnorm4(x, mu_, sigma_, true);}
+inline Real Normal::cdf( Real const& t) const { return Rf_pnorm5(t, mu_, sigma_, true, false);}
+inline Real Normal::icdf( Real const& p) const { return Rf_qnorm5(p , mu_, sigma_, true, false);}
 
 // static
 inline Real Normal::rand( Real const& mu, Real const& scale)
-{ GetRNGstate(); Real s = ::Rf_rnorm(mu, scale);
+{ GetRNGstate(); Real s = Rf_rnorm(mu, scale);
   PutRNGstate(); return s;
 }
 inline Real Normal::pdf(Real const& x, Real const& mu, Real const& scale)
-{ return ::Rf_dnorm4(x,mu, scale, false);}
+{ return Rf_dnorm4(x,mu, scale, false);}
 inline Real Normal::lpdf(Real const& x, Real const& mu, Real const& scale)
-{ return ::Rf_dnorm4(x,mu, scale, true);}
+{ return Rf_dnorm4(x,mu, scale, true);}
 inline Real Normal::cdf(Real const& t, Real const& mu, Real const& scale)
-{ return ::Rf_pnorm5(t, mu, scale, true, false);}
+{ return Rf_pnorm5(t, mu, scale, true, false);}
 inline Real Normal::icdf(Real const& p, Real const& mu, Real const& scale)
-{ return ::Rf_qnorm5(p , mu, scale, true, false);}
+{ return Rf_qnorm5(p , mu, scale, true, false);}
 
 #endif
 

@@ -168,28 +168,28 @@ class NegativeBinomial: public IUnivLaw<Integer>
 #ifdef IS_RTKPP_LIB
 
 inline int NegativeBinomial::rand() const
-{ GetRNGstate(); int s = ::Rf_rnbinom(size_, prob_);
+{ GetRNGstate(); int s = Rf_rnbinom(size_, prob_);
   PutRNGstate(); return s;
 }
 inline Real NegativeBinomial::pdf(Integer const& x) const
-{ return ::Rf_dnbinom((double)x, size_, prob_, false);}
+{ return Rf_dnbinom((double)x, size_, prob_, false);}
 inline Real NegativeBinomial::lpdf(Integer const& x) const
-{ return ::Rf_dnbinom((double)x, size_, prob_, true);}
+{ return Rf_dnbinom((double)x, size_, prob_, true);}
 inline Real NegativeBinomial::cdf(Real const& t) const
-{ return ::Rf_pnbinom(t, size_, prob_, true, false);}
+{ return Rf_pnbinom(t, size_, prob_, true, false);}
 inline int NegativeBinomial::icdf(Real const& p) const
 { return (int)::Rf_qnbinom(p, size_, prob_, true, false);}
 
 inline int NegativeBinomial::rand(int size, Real const& prob)
-{ GetRNGstate(); int s = ::Rf_rnbinom(size, prob);
+{ GetRNGstate(); int s = Rf_rnbinom(size, prob);
   PutRNGstate(); return s;
 }
 inline Real NegativeBinomial::pdf(Integer x, int size, Real const& prob)
-{ return ::Rf_dnbinom((double)x, size, prob, false);}
+{ return Rf_dnbinom((double)x, size, prob, false);}
 inline Real NegativeBinomial::lpdf(Integer x, int size, Real const& prob)
-{ return ::Rf_dnbinom((double)x, size, prob, true);}
+{ return Rf_dnbinom((double)x, size, prob, true);}
 inline Real NegativeBinomial::cdf(Real const& t, int size, Real const& prob)
-{ return ::Rf_pnbinom(t, size, prob , true, false);}
+{ return Rf_pnbinom(t, size, prob , true, false);}
 inline int NegativeBinomial::icdf(Real const& p, int size, Real const& prob)
 { return (int)::Rf_qnbinom(p, size, prob , true, false);}
 

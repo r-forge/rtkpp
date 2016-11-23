@@ -179,7 +179,7 @@ inline String removeWhiteSpaces( String const& s)
 {
   // iterate along the String
   String str = s;
-  str.erase(remove_if(str.begin(), str.end(), ::isspace), str.end());
+  str.erase(remove_if(str.begin(), str.end(), isspace), str.end());
   return str;
 }
 

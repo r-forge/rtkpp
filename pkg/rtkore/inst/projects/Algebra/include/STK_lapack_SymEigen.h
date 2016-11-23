@@ -251,10 +251,10 @@ bool SymEigen<SquareArray>::runImpl()
   // return the result of the computation
   if (!info) return true;
   if (info>0)
-  { this->msg_error_ = STKERROR_NO_ARG(SymEigen ::run,internal error);
+  { this->msg_error_ = STKERROR_NO_ARG(SymEigen::run,internal error);
     return false;
   }
-  this->msg_error_= STKERROR_1ARG(SymEigen ::run,-info,error parameter);
+  this->msg_error_= STKERROR_1ARG(SymEigen::run,-info,error parameter);
   return false;
 }
 

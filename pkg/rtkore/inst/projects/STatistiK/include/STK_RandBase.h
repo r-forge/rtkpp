@@ -37,14 +37,14 @@
 #define STK_RANDBASE_H
 
 #include "STKernel/include/STK_Misc.h"
-// MersenneTwister header.
-#ifndef IS_RTKPP_LIB
-#include "MersenneTwister.h"
-#endif
 
 namespace STK
 {
-#ifdef IS_RTKPP_LIB
+
+#ifdef IS_RTKPP_LIB /* is rtkpp lib */
+
+#include <R_ext/Random.h>
+#include <Rmath.h>
 
 /** @ingroup Laws
  *  @brief class for the Base random generator.
@@ -52,46 +52,49 @@ namespace STK
 class RandBase
 {
   public:
-      inline RandBase(){}
-      inline ~RandBase(){}
-      /** pseudo-random uniform generator.
-       *  \f[
-       *   f(x) = 1, \qquad 0< x <1
-       *  \f]
-       *  @return a uniform number in (0,1) using the R random generator
-      **/
-      inline Real randUnif() { GetRNGstate();
-                               Real s = ::Rf_runif(0, 1);
-                               PutRNGstate();
-                               return s;
-                             }
-      /** @return same as randUnif().*/
-      inline Real operator()() { return randUnif(); }
-      /** Pseudo-random gaussian generator of the gaussian probability law:
-       * \f[     f(x) = \frac{1}{\sqrt{2\pi}}
-       *         \exp\left\{-\frac{x^2}{2}\right\}.
-       * \f]
-       * @param mu mean of the gaussian distribution
-       * @param sigma standard deviation of the gaussian distribution
-       * @return a real number from a normal (Gaussian) distribution.
-      **/
-      inline Real randGauss( Real const& mu = 0, Real const& sigma = 1)
-                           { GetRNGstate();
-                             Real s = ::Rf_rnorm(mu, sigma);
+    /** Default constructor */
+    inline RandBase(){}
+    /** destructor */
+    inline ~RandBase(){}
+    /** pseudo-random uniform generator.
+     *  \f[
+     *   f(x) = 1, \qquad 0< x <1
+     *  \f]
+     *  @return a uniform number in (0,1) using the R random generator
+    **/
+    inline Real randUnif() { GetRNGstate();
+                             Real s = Rf_runif(0, 1);
                              PutRNGstate();
                              return s;
                            }
-      /** real number in (0,n) */
-      inline Real rand( Real const& n ) { GetRNGstate();
-                                          Real s = ::Rf_runif(0, n);
-                                          PutRNGstate();
-                                                return s;}
-      /** DEPRECATED. real number in (0,n) */
-      inline Real randDblExc( Real const& n ) { return rand(n);}
+    /** @return same as randUnif().*/
+    inline Real operator()() { return randUnif(); }
+    /** Pseudo-random gaussian generator of the gaussian probability law:
+     * \f[     f(x) = \frac{1}{\sqrt{2\pi}}
+     *         \exp\left\{-\frac{x^2}{2}\right\}.
+     * \f]
+     * @param mu,sigma mean and standard deviation of the gaussian distribution
+     * @return a real number from a normal (Gaussian) distribution.
+    **/
+    inline Real randGauss( Real const& mu = 0, Real const& sigma = 1)
+                         { GetRNGstate();
+                           Real s = Rf_rnorm(mu, sigma);
+                           PutRNGstate();
+                           return s;
+                         }
+    /** real number in (0,n) */
+    inline Real rand( Real const& n ) { GetRNGstate();
+                                        Real s = Rf_runif(0, n);
+                                        PutRNGstate();
+                                              return s;}
+    /** DEPRECATED. real number in (0,n) */
+    inline Real randDblExc( Real const& n ) { return rand(n);}
 };
 
 #else
 
+// MersenneTwister header.
+#include "MersenneTwister.h"
 /** @ingroup Laws
  *  @brief class for the Base random generator.
  *

@@ -44,7 +44,7 @@ namespace STK
 /*  @returns the dot product of *this with other. */
 template<class Derived>
 template<class Rhs>
-typename STK::hidden::Promote<typename STK::hidden::Traits<Derived>::Type, typename Rhs::Type>::result_type const
+typename hidden::Promote<typename hidden::Traits<Derived>::Type, typename Rhs::Type>::result_type const
 inline ExprBase<Derived>::dot(ExprBase<Rhs> const& other) const
 {
   STK_STATIC_ASSERT_VECTOR_ONLY(Derived);
@@ -57,7 +57,7 @@ inline ExprBase<Derived>::dot(ExprBase<Rhs> const& other) const
 /*  @returns the dot product of *this with other. */
 template<class Derived>
 template<class Rhs>
-typename STK::hidden::Promote<typename STK::hidden::Traits<Derived>::Type, typename Rhs::Type>::result_type const
+typename hidden::Promote<typename hidden::Traits<Derived>::Type, typename Rhs::Type>::result_type const
 
 inline ExprBase<Derived>::dotSafe(ExprBase<Rhs> const& other) const
 {

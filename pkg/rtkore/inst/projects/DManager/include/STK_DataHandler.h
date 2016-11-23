@@ -160,7 +160,7 @@ void DataHandler::getData(std::string const& idData, Array2D<Type>& data, int& n
   for (std::vector<int>::const_iterator it = indexes.begin(); it != indexes.end(); ++it, ++j)
   {
     for (int i = data_.firstRow(*it); i <= data_.lastRow(*it); ++i)
-    { data(i, j) = STK::stringToType<Type>(data_(i,*it));}
+    { data(i, j) = stringToType<Type>(data_(i,*it));}
   }
 }
 

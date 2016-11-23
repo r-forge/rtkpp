@@ -38,14 +38,13 @@
 
 #include "STKernel/include/STK_Misc.h"
 
-namespace STK
-{
-
 #ifdef IS_RTKPP_LIB /* is rtkpp lib */
 
 #include <R_ext/Random.h>
 #include <Rmath.h>
 
+namespace STK
+{
 /** @ingroup Laws
  *  @brief class for the Base random generator.
  **/
@@ -90,11 +89,16 @@ class RandBase
     /** DEPRECATED. real number in (0,n) */
     inline Real randDblExc( Real const& n ) { return rand(n);}
 };
+} // namespace STK
 
 #else
 
 // MersenneTwister header.
 #include "MersenneTwister.h"
+
+namespace STK
+{
+
 /** @ingroup Laws
  *  @brief class for the Base random generator.
  *
@@ -335,9 +339,9 @@ inline void RandBase::gaussInit()
     wn[i] = kn[i + 1] / kn[i];
 }
 
-#endif
-
 } // namespace STK
+
+#endif
 
 #endif //STK_RANDBASE_H
 

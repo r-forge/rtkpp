@@ -31,10 +31,11 @@
 #'
 #' As described at the STK++ project's home page, \url{http://www.stkpp.org},
 #' STK++ is a versatile, fast, reliable and elegant collection of C++ classes
-#' for statistics, clustering, linear algebra, arrays (with an Eigen-like API),
-#' regression, dimension reduction, etc.
-#'
-#' The core package
+#' for statistics, clustering, classification, regression, dimension reduction,
+#' linear algebra, etc.
+#' 
+#' The core package provide a set arrays (with an Eigen-like API) allowing
+#' to store and process data in an efficient way.
 #'
 #' \tabular{ll}{
 #'   Package: \tab rtkore\cr

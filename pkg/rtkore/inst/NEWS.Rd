@@ -1,21 +1,21 @@
 \name{NEWS}
 \title{News for Package 'rtkore}
 
-\section{Changes in rtkore version 1.2.0 (2016-1120)}{
+\section{Changes in rtkore version 1.2.0 (2016-11-20)}{
   \itemize{
     \item Adding more vignettes about STK++ arrays
-    \item Creating Factor class for vectors and MultiFactor class for arrays
-    \item Adding CvHandler class for cross validation
+    \item Creating Factor class for vectors and MultiFactor class for arrays in STatistiK project
+    \item Adding CvHandler class in DManager project for cross validation
   }
 }
-\section{Changes in rtkore version 1.1.1 (2016-0804)}{
+\section{Changes in rtkore version 1.1.1 (2016-08-04)}{
   \itemize{
     \item Creating and Implementing InvertMatrix and InvertSymMatrix classes
     for fixed size matrices (up to 4x4)
     \item Adding computation of levels and frequence to the Factor class
   }
 }
-\section{Changes in rtkore version 1.1.0 (2016-0530)}{
+\section{Changes in rtkore version 1.1.0 (2016-05-30)}{
   \itemize{
     \item Adding svd decomposition using lapack in Algebra project
     \item Adding online mean ancd variance computation in STatistiK project
@@ -25,7 +25,7 @@
     \item Correcting many small bugs
   }
 }
-\section{Changes in rtkore version 1.0.1 (2015-1124)}{
+\section{Changes in rtkore version 1.0.1 (2015-11-24)}{
   \itemize{
     \item First release of the rtkore package, successor of the rtkpp package.
   }

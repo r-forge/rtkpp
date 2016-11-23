@@ -1,0 +1,401 @@
+%\VignetteIndexEntry{STK++ Arrays Quick Ref}
+
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{Sweave}
+
+%-------------------------
+% preamble for nice lsitings and notes
+\include{rtkpp-preamble}
+%
+%-------------------------
+
+
+\geometry{top=3cm, bottom=3cm, left=2cm, right=2cm}
+
+%% need no \usepackage{Sweave.sty}
+<<prelim,echo=FALSE,print=FALSE>>=
+library(rtkore)
+rtkore.version <- packageDescription("rtkore")$Version
+rtkore.date <- packageDescription("rtkore")$Date
+@
+% Title Page
+\title{ Quick Reference guide of the STK++ Arrays}
+\author{Serge Iovleff}
+\date{\today}
+
+% start documentation
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\maketitle
+
+\section{STK++ Arrays and Vectors}
+
+\subsection{Containers}
+
+Data can be encapsulate in one of the following array
+\begin{lstlisting}[style=customcpp]
+  typedef CArray<Type, SizeRows, SizeCols, Orient> MyCArray;
+  typedef CArraySquare<Type, Size, Orient> MyCSquare;
+  typedef CArrayVector<Type, SizeRows, Orient> MyCVector;
+  typedef CArrayPoint<Type, SizeCols, Orient> MyCPoint;
+
+  typedef Array2D<Type> MyArray2D;
+  typedef Array2DVector<Type> MyVector2D;
+  typedef Array2DPoint<Type> MyPoint2D;
+  typedef Array2DUpperTriangular<Type> MyUpperTriangular2D;
+  typedef Array2DLowerTriangular<Type> MyLowerTriangular2D;
+  typedef Array2DDiagonal<Type> MyDiagonal2D;
+\end{lstlisting}
+
+\begin{itemize}
+\item \code{Type} is the type of the elements like \code{double}, \code{float},
+etc.
+\item \code{Orient} can be either \code{STK::Arrays::by_col_}
+ (= 1, the default template) or \code{Arrays::by_col_} (= 0)
+\item If you don't know the size of your array/vector just use
+\code{STK::UnknownSize} (the default template)
+\end{itemize}
+\begin{note}
+Only the first template argument is mandatory in \code{CArray} family.
+\end{note}
+
+\subsection{Convenience typedef}
+
+There exists predefined typedef for the arrays that can be used.
+Hereafter we give a sample for the CArray class
+
+\begin{lstlisting}[style=customcpp,caption=CArray family]
+// CArray
+typedef CArray<Real, UnknownSize, UnknownSize, Arrays::by_col_> CArrayXX;
+typedef CArray<Real, UnknownSize, 2, Arrays::by_col_>           CArrayX2;
+typedef CArray<Real, UnknownSize, 3, Arrays::by_col_>           CArrayX3;
+typedef CArray<Real, 2, UnknownSize, Arrays::by_col_>           CArray2X;
+typedef CArray<Real, 3, UnknownSize, Arrays::by_col_>           CArray3X;
+typedef CArray<Real, 2, 2, Arrays::by_col_>                     CArray22;
+typedef CArray<Real, 3, 3, Arrays::by_col_>                     CArray33;
+typedef CArray<double, UnknownSize, UnknownSize, Arrays::by_col_>CArrayXXd;
+//...
+typedef CArray<int, UnknownSize, UnknownSize, Arrays::by_col_>  CArrayXXi;
+//...
+// the same as above with ByRow added
+typedef CArray<Real, UnknownSize, UnknownSize, Arrays::by_row_> CArrayByRowXX;
+//...
+// CArraySquare (like CArray)
+typedef CArraySquare<Real, UnknownSize, Arrays::by_col_>   CSquareX;
+typedef CArraySquare<Real, 2, Arrays::by_col_>             CSquare2;
+//..
+typedef CArraySquare<int, 3, Arrays::by_col_>              CSquare3i;
+// the same as above with ByRow added
+typedef CArraySquare<Real, UnknownSize, Arrays::by_row_>   CSquareByRowX;
+// CArrayVector
+typedef CArrayVector<Real, UnknownSize, Arrays::by_col_>   CVectorX;
+typedef CArrayVector<Real, 2, Arrays::by_col_>             CVector2;
+//...
+\end{lstlisting}
+
+Some of the predefined typedef for the \code{Array2D} class are given hereafter
+\begin{lstlisting}[style=customcpp,caption=Array2D family]
+  typedef Array2D<Real>   ArrayXX;
+  typedef Array2D<double> ArrayXXd;
+  typedef Array<int>      ArrayXXi;
+  typedef Array<float>    ArrayXXff
+\end{lstlisting}
+
+The predefined type STK::Real can be either @c double (the default) or @c float.
+
+For the other kind of containers there exists also predefined types
+
+\begin{lstlisting}[style=customcpp,caption=CArrayVector and CArrayPoint family]
+typedef CArrayVector<Real, UnknownSize, Arrays::by_col_>   CVectorX;
+typedef CArrayVector<Real, 2, Arrays::by_col_>             CVector2;
+typedef CArrayVector<Real, 3, Arrays::by_col_>             CVector3;
+typedef CArrayVector<double, UnknownSize, Arrays::by_col_> CVectorXd;
+typedef CArrayVector<double, 2, Arrays::by_col_>           CVector2d;
+typedef CArrayVector<double, 3, Arrays::by_col_>           CVector3d;
+typedef CArrayVector<int, UnknownSize, Arrays::by_col_>    CVectorXi;
+typedef CArrayVector<int, 2, Arrays::by_col_>              CVector2i;
+typedef CArrayVector<int, 3, Arrays::by_col_>              CVector3i;
+
+typedef CArrayVector<Real, UnknownSize, Arrays::by_row_>   CVectorByRowX;
+typedef CArrayVector<Real, 2, Arrays::by_row_>             CVectorByRow2;
+typedef CArrayVector<Real, 3, Arrays::by_row_>             CVectorByRow3;
+typedef CArrayVector<double, UnknownSize, Arrays::by_row_> CVectorByRowXd;
+typedef CArrayVector<double, 2, Arrays::by_row_>           CVectorByRow2d;
+typedef CArrayVector<double, 3, Arrays::by_row_>           CVectorByRow3d;
+typedef CArrayVector<int, UnknownSize, Arrays::by_row_>    CVectorByRowXi;
+typedef CArrayVector<int, 2, Arrays::by_row_>              CVectorByRow2i;
+typedef CArrayVector<int, 3, Arrays::by_row_>              CVectorByRow3i;
+// CArrayPoint
+typedef CArrayPoint<Real, UnknownSize, Arrays::by_col_>   CPointX;
+typedef CArrayPoint<Real, 2, Arrays::by_col_>             CPoint2;
+typedef CArrayPoint<Real, 3, Arrays::by_col_>             CPoint3;
+//...
+typedef CArrayPoint<int, 3, Arrays::by_col_>              CPoint3i;
+// the same as above with ByRow added
+typedef CArrayPoint<Real, UnknownSize, Arrays::by_row_>   CPointByRowX;
+//...
+\end{lstlisting}
+
+\begin{lstlisting}[style=customcpp,caption=Array2DVector\, Array2DPoint and Array2DDiagonal]
+  typedef Array2DPoint<Real>    PointX;
+  typedef Array2DPoint<double>  PointXd;
+  typedef Array2DVector<Real>   VectorX;
+  typedef Array2DVector<double> VectorXd;
+  typedef Array2DDiagonal<Real> ArrayDiagonalX;
+  typedef Array2DDiagonal<int>  ArrayDiagonalXi;
+\end{lstlisting}
+
+\subsection{Constant Arrays}
+
+It is possible to use constant arrays with all values equal to 1 using
+the type predefined in the \code{namespace STK::Const}
+\begin{lstlisting}[style=customcpp]
+ Const::Identity<Type, Size> i;
+ Const::Identity<Type> i(10);
+ Const::Square<Type, Size> s;
+ Const::Square<Type> s(10);
+ Const::Vector<Type, Size> v;
+ Const::Point<Type, Size> p;
+ Const::Array< Type, SizeRows, SizeCols> a;
+ Const::Array< Type> a(10, 20);
+ Const::UpperTriangular< Type, SizeRows, SizeCols> u;
+ Const::LowerTriangular< Type, SizeRows, SizeCols> l;
+\end{lstlisting}
+As usual, only the first template parameter is mandatory.
+
+\section{Manipulating Arrays and Vectors}
+
+\subsection{Basic operations}
+Constructors are detailed in the document Arrays Constructors.
+After creation \code{arrays} can be initialized using comma initializer
+\begin{lstlisting}[style=customcpp]
+  CVector3  v;     v << 1, 2, 3;
+  CSquareXX m(3);  v << 1, 2, 3,
+                        2, 3, 4,
+                        3, 4, 5;
+\end{lstlisting}
+and elements can be accessed using the parenthesis (for arrays), the brackets
+(for vectors) and the \code{elt} methods
+\begin{lstlisting}[style=customcpp]
+  v[0] = 3; v.elt(1) = 1; v.at(2) = 2; // at check index range
+  m(0,0) = 5; m.elt(1,1) = 1; m.at(2,2) = 3; // at check indexes range
+\end{lstlisting}
+
+The whole array/vector can be initialized using a value, either at the construction
+or during execution by using
+\begin{lstlisting}[style=customcpp]
+  v.setZeros()
+  m.setOnes();
+  Array2D<int> a(3, 3, 1); // arrays of size (3,3) with all the elements equal to 1
+  a.setValue(2);
+\end{lstlisting}
+
+\subsection{Arrays and vectors getters}
+
+For all the containers it is possible to get the status (reference or array owning its data)
+the  range, the beginning, the end and the size using
+\begin{lstlisting}[style=customcpp]
+  CArrayXX m(3,4);
+  bool mf = m.isRef(); // mf is false
+
+  Range mc= m.cols();
+  int mbc= m.beginCols(), mec= m.endCols(), msc= m.sizeCols();
+
+  Range mr= m.rows();
+  int mbr= m.beginRows(), mer= m.endRows(), msr= m.sizeRows();
+
+  CArrayVectorX v(m.col(0), true); // v is a reference on the column 0 of m
+  bool vf = v.isRef(); // vf is true
+
+  Range vr= m.range();
+  int vb= m.begin(), ve= m.end(), vs= m.size();
+\end{lstlisting}
+
+For the Arrays2D family, it is also possible to get informations about the
+allocated memory of the containers. It can be interested in order to known
+if the container will have to reallocate the memory if you try to resize it.
+\begin{lstlisting}[style=customcpp]
+  ArrayXX m(3,4);
+  m.availableCols();                  // number of available columns
+  Array1D<int> a = m.availableRows(); // vector with the number of available rows of each column
+
+  m.capacityCol(1);  // capacity of the column 1
+  Array1D< Range > r = m.rangeCols () // vector with used range of each columns (think to triangular matrices)
+\end{lstlisting}
+The Array2D family of container allocate a small amount of supplementary memory
+so that in case of a @ resize, it is possible to expand the container without
+data transfer.
+
+\subsection{Arrays and vectors visitors and appliers}
+
+Visitors and appliers visit/are applied to an array or vector (or expression)
+and are automatically unrolled if the array is of fixed (small) size.
+
+\begin{lstlisting}[style=customcpp,caption=Visitors]
+  m.count();
+  m.any();
+  m.all();
+  m.minElt(i,j); // can be v.minElt(i) or m.minElt()
+  m.maxElt(i,j); // can be v.maxElt(i) or m.maxElt()
+  m.minEltSafe(i,j); // can be v.minEltSafe(i) or m.minEltSafe()
+  m.maxEltSafe(i,j); // can be v.maxEltSafe(i) or m.maxEltSafe()
+  m.sum(); m.sumSafe();
+  m.mean(); m.meanSafe();
+\end{lstlisting}
+
+\begin{lstlisting}[style=customcpp,caption=Appliers]
+  m.randUnif(); // fill m with uniform random numbers between 0 and 1
+  m.randGauss(); // fill m with standardized Gaussian random numbers
+  m.setOnes(); // fill m with value 1
+  m.setValues(2); // fill m with value 2
+  m.setZeros();  // fill m with value 0
+  Law::Gamma law(1,2); // create a Gamma distribution
+  m.rand( law); // fill m with gamma(1,2) random numbers
+\end{lstlisting}
+
+The next methods use visitors in order to compute the result, eventually safely
+\begin{lstlisting}[style=customcpp]
+ m.norm();  m.normSafe();
+ m.norm2(); m.norm2Safe();
+ m.normInf();
+ m.variance(); m.varianceSafe();
+ // variance with fixed mean
+ m.variance(mean); m.varianceSafe(mean);
+ // weighted visitors
+ m.wsum(weights);  m.wsumSafe(weights);
+ m.wnorm(weights);  m.wnormSafe(weights);
+ m.wnorm2(weights); m.wnorm2Safe(weights);
+ m.wmean(weights);  m.wmeanSafe(weights);
+ m.wvariance(weights); m.wvarianceSafe(weights);
+ m.wvariance(mean, weights); m.wvarianceSafe(mean, weights);
+\end{lstlisting}
+
+\section{Functors on arrays/vectors and expressions}
+
+All the functors applied on arrays are currently in the STK::Stat namespace.
+If there is the possibility of missing/NaN values add the word
+Safe to the name of the functor. If the mean by row is needed, just add ByRow
+to the name of the functor. If you want a safe computation by row add SafeByRow.
+
+All functors applied on an array by column will return by value an STK::Array2DPoint and a number
+if it is applied on a vector or a point.
+
+All functors applied on an array by row will return by value an STK::Array2DVector
+and a number if it is applied on a vector or a point.
+
+\begin{lstlisting}[style=customcpp,caption=Functors by column]
+Stat::min(a); Stat::minSafe(a); Stat::min(a, w); Stat::minSafe(a, w);
+Stat::max(a); Stat::maxSafe(a); Stat::max(a, w); Stat::maxSafe(a, w);
+Stat::sum(a); Stat::sumSafe(a); Stat::sum(a, w); Stat::sumSafe(a, w);
+Stat::mean(a); Stat::meanSafe(a); Stat::mean(a, w); Stat::meanSafe(a, w);
+// could also be
+Stat::minByCol(a); Stat::minSafeByCol(a); Stat::minByCol(a, w); Stat::minSafeByCol(a, w);
+// .. etc
+// unbiased variance (division by n-1) when unbiased is true, false is the default
+Stat::variance(a, false); Stat::varianceSafe(a, false);
+Stat::variance(a, w, false); Stat::varianceSafe(a, w, false);
+// fixed mean. Must be a vector/point for arrays and a number for vectors/points
+// unbiased has to be given
+Stat::varianceWithFixedMean(a, mean, false);
+Stat::varianceWithFixedMean(a, w, mean, false);
+Stat::varianceWithFixedMeanSafe(a, mean, false);
+Stat::varianceWithFixedMeanSafe(a, w, mean, false);
+\end{lstlisting}
+
+
+\begin{lstlisting}[style=customcpp,caption=Functors by row]
+Stat::minByRow(a); Stat::minSafeByRow(a); Stat::minByRow(a, w); Stat::minSafeByRow(a, w);
+Stat::maxByRow(a); Stat::maxSafeByRow(a); Stat::maxByRow(a, w); Stat::maxSafeByRow(a, w);
+Stat::sumByRow(a); Stat::sumSafeByRow(a); Stat::sumByRow(a, w); Stat::sumSafeByRow(a, w);
+Stat::meanByRow(a); Stat::meanSafeByRow(a); Stat::meanByRow(a, w); Stat::meanSafeByRow(a, w);
+// unbiased variance (division by n-1) when unbiased is true, false is the default
+Stat::varianceByRow(a, false); Stat::varianceSafeByRow(a, false);
+Stat::varianceByRow(a, w, false); Stat::varianceSafeByRow(a, w, false);
+// fixed mean. Must be a vector/point for arrays and a number for vectors/points
+// unbiased has to be given
+Stat::varianceWithFixedMeanByRow(a, mean, false);
+Stat::varianceWithFixedMeanByRow(a, w, mean, false);
+Stat::varianceWithFixedMeanSafeByRow(a, mean, false);
+Stat::varianceWithFixedMeanSafeByRow(a, w, mean, false);
+\end{lstlisting}
+
+\section{Arithmetic Operations on arrays/vectors and expressions}
+
+Available operations on arrays/vectors and expressions are summarized in the next table.
+Many operations are similar to the operations
+furnished by the Eigen library \href{http://eigen.tuxfamily.org/}.
+
+\begin{lstlisting}[style=customcpp,caption=add\, subtract\, divide\, multiply arrays element by element"]
+   m= m1+m2; m+= m1;
+   m= m1-m2; m-= m1;
+   m= m1/m2; m/= m1;
+   m= m1.prod(m2); // don't use m1*m2 if you want a product element by element
+\end{lstlisting}
+
+\begin{lstlisting}[style=customcpp,caption=add\, subtract\, divide\, multiply a number]
+   Real s;
+   m= m1+s; m= s+m1; m+= s;
+   m= m1-s; m= s-m1; m-= s;
+   m= m1/s; m= s/m1; m/= s;
+   m= m1*s; m= s*m1; m*= s;
+\end{lstlisting}
+
+\begin{lstlisting}[style=customcpp,caption=matrix by matrix/vector products]
+  ArrayXX m2(5,4), m1(4,5), m; PointX p2(5), p1(4), p; VectorX v2(4), v1(5), v;
+  Real s = p2v1; // dot product
+  v= m2*v2; v= m1p2.transpose(); // get a vector
+  p= p2*m2; p= v1.transpose()*m2;   // get a point (row-vector)
+  m= m2*m1; m = m1.transpose()m; // matrix multiplication
+  m= m2.prod(m1.transpose());       // product element by element
+  m2*= m1;                   // m2 will be resized and filled with m2*m1 product
+\end{lstlisting}
+
+\begin{lstlisting}[style=customcpp,caption=Comparisons operators]
+Real s;
+// count for each columns the number of true comparisons
+count(m1 < m2);  count(m1 > m2);  count(m1 < s);  count(m1 > s);
+count(m1 <= m2); count(m1 >= m2); count(m1 <= s); count(m1 >= s);
+count(m1 == m2); count(m1 != m2); count(m1 == s); count(m1 != s);
+\end{lstlisting}
+
+\begin{lstlisting}[style=customcpp,caption=Miscellaneous functions]
+  m.isNa();       // boolean expression with true if m(i,j) is a NA value
+  m.isFinite();   // boolean expression with true if m(i,j) is a finite value
+  m.isInfinite(); // boolean expression with true if m(i,j) is an infinite value
+  m.min(m2);      // Type expression with min(m(i,j), m2(i,j))
+  m.max(m2);      // Type expression with max(m(i,j), m2(i,j))
+  m.prod(m2);     // Type expression with m(i,j)*m2(i,j)
+  m.neg();        // Type expression with !m(i,j)
+  m.abs();        // Type expression with abs(m(i,j))
+  m.sqrt();       // Type expression with sqrt(m(i,j))
+  m.log();        // Type expression with log(m(i,j))
+  m.exp();        // Type expression with exp(m(i,j))
+  m.pow(number);  // Type expression with m(i,j)^number
+  m.square();     // Type expression with m(i,j)*m(i,j)
+  m.cube();       // Type expression with m(i,j)*m(i,j)*m(i,j)
+  m.inverse();    // Type expression with 1./m(i,j)
+  m.sin();        // Type expression with sin(m(i,j))
+  m.cos();        // Type expression with cos(m(i,j))
+  m.tan();        // Type expression with tan(m(i,j))
+  m.asin();       // Type expression with asin(m(i,j))
+  m.acos();       // Type expression with acos(m(i,j))
+  m.cast<OtherType>(); // OtherType expression with static_cast<OtherType>(m(i,j)))
+\end{lstlisting}
+
+
+
+%\bibliographystyle{plain}
+%\bibliography{rtkore}
+\end{document}
+

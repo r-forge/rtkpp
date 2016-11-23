@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{Introduction to arrays usage}
+%\VignetteIndexEntry{User guide of STK++ arrays}
 
 \documentclass[a4paper,10pt]{article}
 
@@ -13,85 +13,13 @@
 
 \usepackage{Sweave}
 
+%-------------------------
+% preamble for nice lsitings and notes
+\include{rtkpp-preamble}
+%
+%-------------------------
 
-%-------------------
-% Nice notes
-\usepackage{mdframed} % Add easy frames to paragraphs
-\usepackage{xcolor}
-\usepackage{xparse} % Add support for \NewDocumentEnvironment
-\definecolor{graylight}{cmyk}{.30,0,0,.67} % define color using xcolor syntax
-\definecolor{redlight}{rgb}{1,.2,.2} % define color using xcolor syntax
-
-\newmdenv[ % Define mdframe settings and store as leftrule
-  linecolor=graylight,
-  topline=false,
-  bottomline=false,
-  rightline=false,
-  skipabove=\topsep,
-  skipbelow=\topsep
-]{leftrule}
-
-\newmdenv[ % Define mdframe settings and store as leftrule
-  linecolor=redlight,
-  topline=false,
-  bottomline=false,
-  rightline=false,
-  skipabove=\topsep,
-  skipbelow=\topsep
-]{redleftrule}
-
-\NewDocumentEnvironment{note}{O{\textbf{Note:}}} % Define example environment
-{\begin{leftrule}\noindent\textcolor{graylight}{#1}\par}
-{\end{leftrule}}
-
-\NewDocumentEnvironment{warning}{O{\textbf{Warning:}}} % Define example
-% environment
-{\begin{redleftrule}\noindent\textcolor{redlight}{#1}\par}
-{\end{redleftrule}}
-
-%-------------------
-% nice code
-\usepackage{listings}
-\usepackage{caption}
-\usepackage{xcolor}
-
-\lstdefinestyle{customcpp}{
-  language=C++,
-  %backgroundcolor=\color{white},
-  belowcaptionskip=1\baselineskip,
-  breaklines=true,
-  basicstyle=\ttfamily\footnotesize,
-  frame=single,
-  xleftmargin=\parindent,
-  showstringspaces=false,
-  keywordstyle=\color{red},
-  commentstyle=\ttfamily\footnotesize\color{green!40!black},
-  identifierstyle=\color{blue},
-  stringstyle=\color{orange},
-}
-
-\DeclareCaptionFormat{listing}
-{
-  \colorbox[cmyk]{0.43, 0.35, 0.35, 0.01}
-  { \parbox{\textwidth}{\hspace{15pt}#1#2#3}}
-}
-\captionsetup[lstlisting]{ format=listing, %labelfont=white, textfont=white
-                         , singlelinecheck=false, margin=-0.2cm
-                         , font={bf,footnotesize} }
-
-\newcommand{\includecode}[1]{\lstinputlisting[style=customcpp]{#1}}
-\newcommand{\code}[1]{\lstinline[style=customcpp]$#1$}
-\newcommand{\ttcode}[1]{{\tt #1}}
-
-
-\newcommand{\rtkpp}{{\tt rtkpp}} %
-\newcommand{\rtkore}{{\tt rtkore}} %
-\newcommand{\stkpp}{{\tt STK++}} %
-\newcommand{\Cpp}{{\tt C++}}
-% end nice code
-%---------------------
-
-\geometry{top=3cm, bottom=3cm, left=2cm, right=2cm}
+%\geometry{top=3cm, bottom=3cm, left=2cm, right=2cm}
 
 %% need no \usepackage{Sweave.sty}
 <<prelim,echo=FALSE,print=FALSE>>=
@@ -100,9 +28,9 @@ rtkore.version <- packageDescription("rtkore")$Version
 rtkore.date <- packageDescription("rtkore")$Date
 @
 % Title Page
-\title{ General Review of the STK++ Arrays and their usages}
+\title{ User Guide: STK++ Arrays}
 \author{Serge Iovleff}
-\date{}
+\date{\today}
 
 % start documentation
 \begin{document}
@@ -110,13 +38,17 @@ rtkore.date <- packageDescription("rtkore")$Date
 
 \maketitle
 \begin{abstract}
-This vignette gives a general review of the STK++ arrays and of their uses.
-After giving a general review of the capability of the arrays, we detail the various
-accessors/mutators available. We give a complete list of the constructors.
-
+This user guide gives a general review of the STK++ arrays and of their usages.
+After giving a general review of the capability of the library, we detail the
+various accessors/mutators available. We give a complete list of
+constructors. We focus on the Array2D class and give some hints about their
+capabilities. We then present the different visitors, appliers and functors
+implemented in STK++ allowing to compute quantities or arrays of interests. We
+then explain how it is possible to use or modify slices of arrays. Finally we end
+this document by detailing the way to construct reference arrays.
 \end{abstract}
 
-\section{General Review of the STK++ Arrays and theirs usages}
+\section{Introduction}
 
 The containers/arrays you use in order to store and process the data in your
 application greatly influence the speed and the memory usage of your application.
@@ -150,12 +82,11 @@ resize,... quickly rows or columns to your container. On the other hand, the
 storing scheme of the the CArray classes allow you to used them easily with
 other linear algebra libraries (e.g. Lapack, Blas, ...).
 
-\subsection{Introductory Example}
-Let us give you an introductory example:
+\section{A detailed introductory example}
+Consider the following example:
 
 \begin{minipage}[t]{0.66\textwidth}
-\lstinputlisting[style=customcpp,caption=First
-example]{programs/tutoAccessors.cpp}
+\lstinputlisting[style=customcpp,caption=Introductory example]{programs/tutoAccessors.cpp}
 \end{minipage}
 \hspace{0.2cm}
 \begin{minipage}[t]{0.33\textwidth}
@@ -163,7 +94,7 @@ example]{programs/tutoAccessors.cpp}
 \lstinputlisting[style=customcpp,caption=Output]{programs/tutoAccessors.out}
 \end{minipage}
 
-\section{Accessors}
+\subsection{Accessors}
 The primary coefficient accessors and mutators in STK++ are the overloaded
 parenthesis operators. For matrices, the row index is always
 passed first.
@@ -185,7 +116,7 @@ Column-Vectors, square matrices and diagonal matrices.
 Here an example
 
 \begin{minipage}[t]{0.66\textwidth}
-\lstinputlisting[style=customcpp,caption=Accesors]{programs/tutoAccessors2.cpp}
+\lstinputlisting[style=customcpp,caption=Accessors]{programs/tutoAccessors2.cpp}
 \end{minipage}
 \hspace{0.2cm}
 \begin{minipage}[t]{0.33\textwidth}
@@ -193,11 +124,11 @@ Here an example
 \lstinputlisting[style=customcpp,caption=Output]{programs/tutoAccessors2.out}
 \end{minipage}
 
-\subsection{Templated Expression}
+\subsection{Expression template}
 
 Assume that \code{c, a, d} are arrays of the same size and consider the line of
 code
-\begin{lstlisting}
+\begin{lstlisting}[style=customcpp]
 c= -a - d  + 3.;
 \end{lstlisting}
 It is an expression involving matrix operations. All these expressions
@@ -208,9 +139,8 @@ are evaluated.
 \subsection{Constructors}
 
 The \code{Array2D} family have only one mandatory template parameter: the type
-of the data that will be stored.
-
-On the other hand arrays in \code{CArray} family have four template parameters:
+of the data that will be stored. On the other hand arrays in \code{CArray}
+family have four template parameters:
 \begin{enumerate}
 \item the type of the data that will be stored,
 \item the number of rows (\code{UnknownSize} if it is not known at compile time),
@@ -296,7 +226,7 @@ perform the operations:
 \end{itemize}
 
 \begin{note}
-Many more examples can be found in the test files coming with the STK++ lbrary.
+Many more examples can be found in the test files coming with the STK++ library.
 \end{note}
 
 \section{Arrays classes and their constructors}
@@ -571,8 +501,8 @@ without duplicating data.
 
 \subsection{General features of the \ttcode{Array2D}}
 
-The \code{Array2D} is a family of array/vectors/points proposing many
-functionalities allowing to add/remove rows/columns. It is also possible to
+The \code{Array2D} is a family of array/vectors/points proposing much
+functionality allowing to add/remove rows/columns. It is also possible to
 resize them in a conservative way. It is also possible to merge them if the
 dimensions agreed.
 
@@ -798,7 +728,7 @@ This part explains how to create reference on existing arrays.
 \subsection{Creating reference to sub-arrays}
 
 Any slice of an existing array can be referenced by an other array
-and modified using this "reference" container. Thsi is achieved
+and modified using this "reference" container. This is achieved
 using the copy constructor with reference as \code{true}.
 
 \begin{minipage}[t]{0.5\textwidth}
@@ -812,6 +742,10 @@ using the copy constructor with reference as \code{true}.
 
 This method allows to get a safe access to some sub-part of a big array that
 you want to modify.
+
+\begin{warning}
+It is the responsibility of the user to verify that a reference is valid.
+\end{warning}
 
 \subsection{Creating reference to raw data}
 

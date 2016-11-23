@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{Short Introduction to rtkore usage}
+%\VignetteIndexEntry{Short Introduction to rtkore}
 
 \documentclass[a4paper,10pt]{article}
 
@@ -13,33 +13,12 @@
 
 \usepackage{url}
 
-%-------------------
-% nice code
-\usepackage{xcolor}
-\usepackage{listings}
+%-------------------------
+% preamble for nice lsitings and notes
+\include{rtkpp-preamble}
+%
+%-------------------------
 
-\lstdefinestyle{customcpp}{
-  language=C++,
-  belowcaptionskip=1\baselineskip,
-  breaklines=true,
-  basicstyle=\ttfamily\footnotesize,
-  frame=single,
-  xleftmargin=\parindent,
-  showstringspaces=false,
-  keywordstyle=\color{blue},
-  commentstyle=\itshape\color{purple!40!black},
-  identifierstyle=\color{blue},
-  stringstyle=\color{orange},
-}
-
-\newcommand{\includecode}[1]{\lstinputlisting[style=customcpp]{#1}}
-
-\newcommand{\rtkpp}{{\tt rtkpp}} %
-\newcommand{\rtkore}{{\tt rtkore}} %
-\newcommand{\stkpp}{{\tt STK++}} %
-
-% end nice code
-%---------------------
 
 \usepackage{Sweave}
 %% need no \usepackage{Sweave.sty}
@@ -51,7 +30,7 @@ rtkore.date <- packageDescription("rtkore")$Date
 % Title Page
 \title{ rtkore: R and STK++ Integration using Rcpp}
 \author{Serge Iovleff}
-\date{}
+\date{\today}
 
 % start documentation
 \begin{document}
@@ -166,6 +145,21 @@ RcppExport SEXP countNA( SEXP r_matrix)
 \end{lstlisting}
 
 \section{Using \rtkore{} random number generators}
+
+All the random numbers of R are interfaced in rtkore. You can used them like
+STK++ random number generators like in the following example
+
+\begin{lstlisting}[style=customcpp]
+RcppExport SEXP fastBetaRand( SEXP n, SEXP alpha, SEXP beta)
+{
+  BEGIN_RCPP;
+  STK::RVector<double> tab(Rcpp::as<int>(n));
+  STK::Law::Beta law(Rcpp::as<double>(alpha), Rcpp::as<double>(beta));
+  tab.rand(law);
+  return tab.vector();
+  END_RCPP;
+}
+\end{lstlisting}
 
 
 \section{Linking with \rtkore{}}

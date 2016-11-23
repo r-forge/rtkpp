@@ -37,22 +37,12 @@
 #ifndef STK_STATICASSERT_H
 #define STK_STATICASSERT_H
 
-#if(__cplusplus > 201103L)
 
-// if native static_assert is enabled, let's use it
-#include <type_traits>
-#define STK_STATIC_ASSERT(COND,MSG) static_assert(COND,#MSG);
-
-#else // not C++11
-
-#define STK_STATIC_ASSERT(COND,MSG) \
-if (STK::StaticAssert<bool(COND)>::MSG) {}
+#if(__cplusplus < 201103L) // use old way
 
 namespace STK
 {
-
 template<bool condition> struct StaticAssert;
-
 // if the condition is false the compiler will complain it does not find the message
 template<> struct StaticAssert<false> {};
 template<> struct StaticAssert<true>
@@ -90,6 +80,14 @@ template<> struct StaticAssert<true>
 };
 
 } // namespace STK
+
+#define STK_STATIC_ASSERT(COND,MSG) \
+if (STK::StaticAssert<bool(COND)>::MSG) {}
+
+#else // C++11
+// if native static_assert is enabled, let's use it
+#include <type_traits>
+#define STK_STATIC_ASSERT(COND,MSG) static_assert(COND,#MSG);
 
 #endif // not C++11
 

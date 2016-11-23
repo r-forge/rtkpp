@@ -7,8 +7,8 @@
  License, or (at your option) any later version.
 
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but WITHOUT ANY WARRANYArray; without even the implied warranty of
+ MERCHANTABILIYArray or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU Lesser General Public License for more details.
 
  You should have received a copy of the GNU Lesser General Public
@@ -110,7 +110,7 @@ class IRunnerBase
  *  implementation of @c setData.
  **/
 template < class Array>
-class IRunnerWithData : public IRunnerBase
+class IRunnerWithData: public IRunnerBase
 {
   protected:
     /** default constructor. */
@@ -171,7 +171,7 @@ class IRunnerWithData : public IRunnerBase
  *  @brief Abstract class for all classes making unsupervised learning.
  *
  *  This Interface is designed for unsupervised learning purpose. In a
- *  supervised learning setting, use IRunnerRegression. The data set to
+ *  supervised learning setting, use IRunnerSupervised. The data set to
  *  process is not copied and a ptr on the data set is stored internally.
  *
  *  The pure virtual methods to implement are
@@ -264,36 +264,33 @@ class IRunnerUnsupervised : public IRunnerBase
  *  @endcode
  *
  **/
-template < typename TY, typename TX>
-class IRunnerRegression : virtual public IRunnerBase
+template < typename YArray, typename XArray, class WColVector>
+class IRunnerSupervised: public IRunnerBase
 {
   protected:
-    /** default constructor
-     *  @param p_x A pointer on the x data set to run
-     *  @param p_y A pointer on the y data set to run
+    /** default constructor */
+    IRunnerSupervised(): p_y_(0), p_x_(0) {}
+    /** constructor
+     *  @param p_y,p_x pointers on the y and x data sets
      **/
-    IRunnerRegression( TY const* const& p_y, TX const* const& p_x)
-                     : p_y_(p_y)
-                     , p_x_(p_x)
+    IRunnerSupervised( YArray const* const& p_y, XArray const* const& p_x)
+                     : p_y_(p_y), p_x_(p_x)
     {}
     /** default constructor
-     *  @param x The x data set to run
-     *  @param y The y data set to run
+     *  @param y,x y and x data sets
      **/
-    IRunnerRegression( TY const& y, TX const& x)
-                     : p_y_(&y)
-                     , p_x_(&x)
+    IRunnerSupervised( YArray const& y, XArray const& x)
+                     : p_y_(&y), p_x_(&x)
     {}
     /** copy constructor
-     * @param runner the runner to copy
+     *  @param runner the runner to copy
      **/
-    IRunnerRegression( IRunnerRegression const& runner)
+    IRunnerSupervised( IRunnerSupervised const& runner)
                      : IRunnerBase(runner)
-                     , p_y_(runner.p_y_)
-                     , p_x_(runner.p_x_)
+                     , p_y_(runner.p_y_), p_x_(runner.p_x_)
     {}
     /** destructor*/
-    inline ~IRunnerRegression() { }
+    inline ~IRunnerSupervised() {}
 
   public:
     /** set the x data set (predictors). If the state of the runner change when
@@ -301,7 +298,7 @@ class IRunnerRegression : virtual public IRunnerBase
      *  udpate() method.
      *  @param x The x data set to run
      */
-    virtual void setX( TX const& x)
+    virtual void setX( XArray const& x)
     {
       p_x_ = &x;
       updateX();
@@ -311,7 +308,7 @@ class IRunnerRegression : virtual public IRunnerBase
      *  set is set, the user of this class have to overload the udpate() method.
      *  @param y The y data set to run
      */
-    virtual void setY( TY const& y)
+    virtual void setY( YArray const& y)
     {
       p_y_ = &y;
       updateY();
@@ -321,7 +318,7 @@ class IRunnerRegression : virtual public IRunnerBase
      *  @param y The y data set to run
      *  @param x The x data set to run
      */
-    virtual void setData( TX const& y, TY const& x)
+    virtual void setData( YArray const& y, XArray const& x)
     {
       p_y_ = &y;
       p_x_ = &x;
@@ -337,13 +334,13 @@ class IRunnerRegression : virtual public IRunnerBase
      *  @return @c true if no error occur during the running process, @c false
      *  otherwise
      **/
-    virtual bool run( typename TY::Col const& weights) =0;
+    virtual bool run( WColVector const& weights) =0;
 
   protected:
-    /** A pointer on the original data set. */
-    TY const* p_y_;
-    /** A pointer on the original data set. */
-    TY const* p_x_;
+    /** A pointer on the y data set. */
+    YArray const* p_y_;
+    /** A pointer on the x data set. */
+    XArray const* p_x_;
     /** @brief update the runner when y data set is set.
      * This virtual method will be called when the state of the runner will
      * change, i.e. when a new y data is set is set. By default do nothing.
@@ -355,8 +352,8 @@ class IRunnerRegression : virtual public IRunnerBase
      **/
     virtual void updateX() {}
     /** update the runner.
-     * This virtual method will be called when the state of the runner will
-     * change, i.e. when new x and y data sets are set. By default do nothing.
+     *  This virtual method will be called when the state of the runner will
+     *  change, i.e. when new x and y data sets are set. By default do nothing.
      **/
     virtual void update() { updateX(); updateY();}
 };

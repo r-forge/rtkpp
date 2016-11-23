@@ -1,0 +1,88 @@
+%-------------------
+% Nice notes
+\usepackage{mdframed} % Add easy frames to paragraphs
+\usepackage{xcolor}
+\usepackage{xparse} % Add support for \NewDocumentEnvironment
+\definecolor{graylight}{cmyk}{.30,0,0,.67} % define color using xcolor syntax
+\definecolor{redlight}{rgb}{1,.2,.2} % define color using xcolor syntax
+
+\newmdenv[ % Define mdframe settings and store as leftrule
+  linecolor=graylight,
+  topline=false,
+  bottomline=false,
+  rightline=false,
+  skipabove=\topsep,
+  skipbelow=\topsep
+]{leftrule}
+
+\newmdenv[ % Define mdframe settings and store as leftrule
+  linecolor=redlight,
+  topline=false,
+  bottomline=false,
+  rightline=false,
+  skipabove=\topsep,
+  skipbelow=\topsep
+]{redleftrule}
+
+\NewDocumentEnvironment{note}{O{\textbf{Note:}}} % Define example environment
+{\begin{leftrule}\noindent\textcolor{graylight}{#1}\par}
+{\end{leftrule}}
+
+\NewDocumentEnvironment{warning}{O{\textbf{Warning:}}} % Define example
+% environment
+{\begin{redleftrule}\noindent\textcolor{redlight}{#1}\par}
+{\end{redleftrule}}
+
+%-------------------
+% nice listing
+\usepackage{listings}
+\usepackage{caption}
+
+\lstdefinestyle{customcpp}{
+  language=C++,
+  %backgroundcolor=\color{white},
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  basicstyle=\ttfamily\scriptsize,
+  frame=single,
+  xleftmargin=\parindent,
+  showstringspaces=false,
+  keywordstyle=\color{red},
+  commentstyle=\ttfamily\scriptsize\color{green!40!black},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+}
+\lstdefinestyle{inlinecpp}{
+  language=C++,
+  belowcaptionskip=1\baselineskip,
+  basicstyle=\ttfamily,
+  frame=single,
+  xleftmargin=\parindent,
+  showstringspaces=false,
+  keywordstyle=\color{red},
+  commentstyle=\ttfamily\color{green!40!black},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+}
+
+
+\DeclareCaptionFormat{listing}
+{
+  \colorbox[cmyk]{0.43, 0.35, 0.35, 0.01}
+  { \parbox{\textwidth}{\hspace{15pt}#1#2#3}}
+}
+\captionsetup[lstlisting]{ format=listing, %labelfont=white, textfont=white
+                         , singlelinecheck=false, margin=-0.2cm
+                         , font={bf,footnotesize} }
+
+\newcommand{\includelstlisting}[1]{\lstinputlisting[style=customcpp]{#1}}
+\newcommand{\code}[1]{\lstinline[style=inlinecpp]$#1$}
+\newcommand{\ttcode}[1]{{\tt #1}}
+% end nice lstlisting
+%---------------------
+
+\newcommand{\rtkpp}{{\tt rtkpp}} %
+\newcommand{\rtkore}{{\tt rtkore}} %
+\newcommand{\stkpp}{{\tt STK++}} %
+\newcommand{\Cpp}{{\tt C++}}
+

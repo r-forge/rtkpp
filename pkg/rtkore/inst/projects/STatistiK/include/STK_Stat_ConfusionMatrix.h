@@ -43,23 +43,49 @@ namespace Stat
 {
 
 /** @ingroup StatDesc
- *  @brief Compute the confusion matrix given two vector of integer
- * 
+ *  @brief Class computing the confusion matrix given two vectors
+ *  of integer.
  **/
-template < class Data>
-CSquareXi confusionMatrix(Data const& trueClass, Data const& predictClass)
+template < class TrueArray, class PredArray>
+class ConfusionMatrix
 {
-  if (trueClass.range() != predictClass.range())
-  { STKRUNTIME_ERROR_NO_ARG(confusionMatrix(trueClass,predictClass),trueClass and predictClass are not of the same size);}
-  //
-  // compute nbLevels and create result
-  int min = std::min(trueClass.minElt(), predictClass.minElt());
-  int max = std::max(trueClass.maxElt(), predictClass.maxElt());
-  CSquareXi res(Range(min, max, 0), 0);
-  for (int i=trueClass.begin(); i<trueClass.end(); ++i)
-  { res(trueClass[i], predictClass[i])++;}
-  return res;
-}
+  public:
+    /** default constructor */
+    ConfusionMatrix( TrueArray const& trueClass, PredArray const& predictClass)
+                   : trueClass_(trueClass), predictClass_(predictClass)
+    {
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(TrueArray);
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(PredArray);
+      if (trueClass_.range() != predictClass_.range())
+      { STKRUNTIME_ERROR_NO_ARG(confusionMatrix(trueClass,predictClass),trueClass and predictClass are not of the same size);}
+    }
+
+    /** @return the confusion matrix obtained with the true classes and the
+     *  predicted classes.
+     **/
+    CSquareXi operator()()
+    {
+      // compute nbLevels and create result
+      int min = std::min(trueClass_.minElt(), predictClass_.minElt());
+      int max = std::max(trueClass_.maxElt(), predictClass_.maxElt());
+      CSquareXi res(Range(min, max, 0), 0);
+      for (int i=trueClass_.begin(); i<trueClass_.end(); ++i)
+      { res(trueClass_[i], predictClass_[i])++;}
+      return res;
+    }
+  protected:
+    TrueArray const& trueClass_;
+    PredArray const& predictClass_;
+};
+
+
+/** @ingroup StatDesc
+ *  @brief Utility function computing the confusion matrix given two vectors
+ *  of integer.
+ **/
+template < class TrueArray, class PredArray>
+CSquareXi confusionMatrix(TrueArray const& trueClass, PredArray const& predictClass)
+{ return ConfusionMatrix<TrueArray, PredArray>(trueClass,predictClass)();}
 
 }  // namespace Stat
 

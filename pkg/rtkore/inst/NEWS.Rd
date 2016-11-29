@@ -1,6 +1,11 @@
 \name{NEWS}
 \title{News for Package 'rtkore}
 
+\section{Changes in rtkore version 1.2.1 (2016-11-29)}{
+  \itemize{
+    \item Vignettes are correctly names
+  }
+}
 \section{Changes in rtkore version 1.2.0 (2016-11-20)}{
   \itemize{
     \item Adding more vignettes about STK++ arrays

@@ -66,13 +66,15 @@ class IRunnerBase
 {
   protected:
     /** default constructor */
-    inline IRunnerBase() : msg_error_() {}
+    inline IRunnerBase() : msg_error_(), hasRun_(false) {}
     /** copy constructor
      * @param runner the runner to copy
      **/
-    inline IRunnerBase( IRunnerBase const& runner) : msg_error_(runner.msg_error_) {}
+    inline IRunnerBase( IRunnerBase const& runner)
+                      : msg_error_(runner.msg_error_)
+                      , hasRun_(runner.hasRun_){}
     /** destructor*/
-    inline ~IRunnerBase() {}
+    inline virtual ~IRunnerBase() {}
 
   public:
     /** get the last error message.
@@ -88,6 +90,8 @@ class IRunnerBase
   protected:
     /** String with the last error message. */
     String msg_error_;
+    /** @c true if run has been used, @c false otherwise */
+    bool hasRun_;
 };
 
 /** @ingroup Sdk

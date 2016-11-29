@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{STK++ Arrays Quick Ref}
+%\VignetteIndexEntry{Tips}
 
 \documentclass[a4paper,10pt]{article}
 

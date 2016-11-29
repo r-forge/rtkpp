@@ -201,6 +201,9 @@ class ICArray : public ArrayBase<Derived>
     /** @return the Vertical range */
     inline RowRange const& rowsImpl() const { return allocator_.rows();}
 
+    /** clear all allocated memory . */
+    inline void clear() { allocator_.clear();}
+
     /** @return @c true if the container is empty, @c false otherwise */
     bool empty() const { return allocator_.empty();}
     /** @return @c true if *this is reference container, @c false otherwise */

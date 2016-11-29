@@ -81,6 +81,7 @@
 #include "../projects/DManager/include/STK_IDataHandler.h"
 /* Cross Validation */
 #include "../projects/DManager/include/STK_CvHandler.h"
+#include "../projects/DManager/include/STK_PartitionHandler.h"
 
 /* Interface class for data wrappers */
 #include "../projects/DManager/include/STK_IDataBridge.h"

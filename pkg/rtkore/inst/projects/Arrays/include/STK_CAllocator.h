@@ -189,6 +189,7 @@ class OrientedCAllocator<Derived, Arrays::by_col_>: public ITContainer2D<Derived
       }
       return this->asDerived();
     }
+
   protected:
     /** leading dimension of the data set */
     int ldx_;
@@ -716,6 +717,8 @@ class CAllocator: public StructuredCAllocator<CAllocator<Type_, SizeRows_, SizeC
     /** wrapper constructor for 0 based C-Array*/
     CAllocator( Type* const& q, int , int ): Base(q, SizeRows_, SizeCols_) {}
     ~CAllocator() {}
+    /**  clear allocated memories */
+    void clear() {}
     CAllocator& move(CAllocator const& T)
     {
       if (this == &T) return *this;
@@ -778,6 +781,9 @@ class CAllocator<Type_, UnknownSize, UnknownSize, Orient_>
     {}
     /** Destructor */
     ~CAllocator() {}
+    /**  clear allocated memories */
+    void clear() { allocator_.free(); this->setRanges();}
+    /** resize CAllocator */
     CAllocator& resize2Impl( int sizeRows, int sizeCols)
     {
       if (this->sizeRows() == sizeRows && this->sizeCols() == sizeCols) return *this;
@@ -822,7 +828,7 @@ class CAllocator<Type_, UnknownSize, UnknownSize, Orient_>
      catch (std::bad_alloc & error)  // if an alloc error occur
      {
        this->exchange(copy); // restore the original container
-       STKRUNTIME_ERROR_2ARG(CAllocator::realloc, sizeRows, sizeCols, memory allocation failed);
+       STKRUNTIME_ERROR_2ARG(Allocator::realloc, sizeRows, sizeCols, memory allocation failed);
      }
    }
 };
@@ -858,6 +864,8 @@ class CAllocator<Type_, SizeRows_, UnknownSize, Orient_>
                      : Base(q, SizeRows_, nbCol)
     {}
     ~CAllocator() {}
+    /**  clear allocated memories. */
+    void clear() { allocator_.free(); this->setCols();}
     CAllocator& resize2Impl( int, int sizeCols)
     {
       if (this->sizeCols() == sizeCols) return *this;
@@ -895,7 +903,7 @@ class CAllocator<Type_, SizeRows_, UnknownSize, Orient_>
       catch (std::bad_alloc const& error)  // if an alloc error occur
       {
         this->exchange(copy); // restore the original container
-        STKRUNTIME_ERROR_2ARG(CAllocator::realloc, SizeRows_, sizeCols, memory allocation failed);
+        STKRUNTIME_ERROR_2ARG(Allocator::realloc, SizeRows_, sizeCols, memory allocation failed);
       }
     }
 };
@@ -932,6 +940,9 @@ class CAllocator<Type_, UnknownSize, SizeCols_, Orient_>
     /** wrapper constructor for 0 based C-Array*/
     CAllocator( Type* const& q, int nbRow, int ): Base(q, nbRow, SizeCols_) {}
     ~CAllocator() {}
+    /**  clear allocated memories. */
+    void clear() { allocator_.free(); this->setRows();}
+    /** resize the rows */
     CAllocator& resize2Impl( int sizeRows, int)
     {
       if (this->sizeRows() == sizeRows) return *this;
@@ -969,7 +980,7 @@ class CAllocator<Type_, UnknownSize, SizeCols_, Orient_>
      catch (std::bad_alloc & error)  // if an alloc error occur
      {
        this->exchange(copy); // restore the original container
-       STKRUNTIME_ERROR_2ARG(CAllocator::realloc, sizeRows, SizeCols_, memory allocation failed);
+       STKRUNTIME_ERROR_2ARG(Allocator::realloc, sizeRows, SizeCols_, memory allocation failed);
      }
    }
 };

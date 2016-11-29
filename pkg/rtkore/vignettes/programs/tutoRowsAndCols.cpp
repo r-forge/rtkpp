@@ -2,15 +2,15 @@
 using namespace STK;
 int main(int argc, char *argv[])
 {
-  ArrayXX A(4, 2);
-  A << 1, 2,   1, 3,   2, 3,   2, 4;
+  CArrayXX A(4, 6); CArray2X B(2,4, -1.);
+  A << 1, 2, 3, 4, 1, 2,
+       4, 3, 1, 3, 2, 4,
+       1, 3, 4, 2, 1, 4,
+       2, 3, 1, 4, 3, 2;
   stk_cout << _T("A =\n") << A;
-  // Adding a column with 1
-  A.pushFrontCols(Const::VectorX(4));
-  // Insert x^2 and x^3
-  A.insertCols(2, 1);
-  A.col(2) = A.col(1).square();
-  A.pushBackRows(1);
-  A.row(4) = A.row(0).square();
+  stk_cout << _T("B =\n") << B;
+  A.sub(B.rows(), B.cols()) = B;  // copy B in A(0:1,0:3)
+  stk_cout << _T("A =\n") << A;
+  A.row(3,B.cols()) = meanByCol(B); // copy a row-vector in row 3 of A
   stk_cout << _T("A =\n") << A;
 }

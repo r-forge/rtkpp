@@ -29,8 +29,8 @@
  **/
 
 /** @file STK_CvHandler.h
- *  @brief In this file we define the Interface Class for sampling data
- *  from data sets for CV and
+ *  @brief In this file we define and impement the class CvHandler dedicated
+ *  to Cross Validation
  **/
 
 
@@ -39,24 +39,25 @@
 
 #include <Arrays/include/STK_CArrayVector.h>
 #include <STatistiK/include/STK_Law_UniformDiscrete.h>
+#include <Sdk/include/STK_IRunner.h>
 
 namespace STK
 {
 
-/** CvHanler is an utility function for building the submatrix/subvectors
+/** @ingroup DManager
+ *  CvHanler is an utility function for building the submatrix/subvectors
  *  needed when using k-folds cross-validation.
  **/
-class CvHandler
+class CvHandler: public IRunnerBase
 {
   public:
-    /** Default constructor. nbFolds is set to the number of observation
-     *  @param rangeData the range of the data to set
-     *  @param nbFolds numbbe of Folds
+    /** Default constructor.
+     *  @param rangeData, nbFolds range of the data and number of folds
      **/
-    CvHandler( Range const& rangeData, int nbFolds)
-             : rangeData_(rangeData), nbFolds_(nbFolds)
-             , partitions_(rangeData), sizePartitions_(Range(0, nbFolds_), 0)
-    { partition();}
+    CvHandler( Range const& rangeData, int nbFolds);
+    /** destructor */
+    inline virtual ~CvHandler() {}
+
     /** @return the number of folds */
     inline int nbFolds() const { return nbFolds_;}
     /** @return the range of the data */
@@ -66,93 +67,28 @@ class CvHandler
     /** @return the size of the partitions */
     inline CVectorXi const& sizePartitions() const { return sizePartitions_;}
 
+    inline virtual bool run()
+    { partition(); hasRun_ = true; return true;}
+
+    inline void setData( Range const& rangeData, int nbFolds)
+    {
+      rangeData_ = (rangeData);
+      nbFolds_ = nbFolds;
+      partitions_.clear();
+      sizePartitions_.clear();
+      hasRun_ = false;
+    }
     /** get the data set when setting out fold k and test data set  */
     template<class Data>
-    void getKFold( int k, Data const& x,Data& xFold, Data& xTest) const
-    {
-      // check dimensions
-      if (x.rows() != rangeData_)
-      { STKRUNTIME_ERROR_1ARG(CvHandler::getKFold,k,x.rows()!=rangeData_);}
-      if (sizePartitions_.begin() > k)
-      { STKOUT_OF_RANGE_1ARG(CvHandler::getKFold,k,k<sizePartitions_.begin());}
-      if (sizePartitions_.end() <= k)
-      { STKOUT_OF_RANGE_1ARG(CvHandler::getKFold,k,k<sizePartitions_.end()<=k);}
-      // prepare containers
-      Range xFoldRows = x.rows();
-      xFoldRows.decLast(sizePartitions_[k]);
-      xFold.resize(xFoldRows, x.cols());
-      xTest.resize(sizePartitions_[k], x.cols());
-      // copy data
-      int iFoldRow = xFold.beginRows(), iTestRow = xTest.beginRows();
-      for (int i = partitions_.begin(); i < partitions_.end(); ++i)
-      {
-        if (partitions_[i] == k)
-        {
-          xTest.row(iTestRow) = x.row(i);
-          ++iTestRow;
-        }
-        else
-        {
-          xFold.row(iFoldRow) = x.row(i);
-          ++iFoldRow;
-        }
-      }
-    }
+    bool getKFold( int k, Data const& x,Data& xFold, Data& xTest);
     /** get the data set when setting out fold k and test data set  */
     template<class xData, class yData>
-    void getKFold( int k, xData const& x, xData& xFold, xData& xTest
-                        , yData const& y, yData& yFold, yData& yTest) const
-    {
-      // check dimensions
-      if (x.rows() != rangeData_)
-      { STKRUNTIME_ERROR_1ARG(CvHandler::getKFold,k,x.rows()!=rangeData_);}
-      // check dimensions
-      if (y.rows() != rangeData_)
-      { STKRUNTIME_ERROR_1ARG(CvHandler::getKFold,k,y.rows()!=rangeData_);}
-      if (sizePartitions_.begin() > k)
-      { STKOUT_OF_RANGE_1ARG(CvHandler::getKFold,k,k<sizePartitions_.begin());}
-      if (sizePartitions_.end() <= k)
-      { STKOUT_OF_RANGE_1ARG(CvHandler::getKFold,k,k<sizePartitions_.end()<=k);}
-      // prepare constainers
-      Range xFoldRows = x.rows();
-      xFoldRows.decLast(sizePartitions_[k]);
-      xFold.resize(xFoldRows, x.cols());
-      xTest.resize(sizePartitions_[k], x.cols());
-      yFold.resize(xFoldRows, y.cols());
-      yTest.resize(sizePartitions_[k], y.cols());
-      // copy data
-      int iFoldRow = xFold.beginRows(), iTestRow = xTest.beginRows();
-      for (int i = partitions_.begin(); i < partitions_.end(); ++i)
-      {
-        if (partitions_[i] == k)
-        {
-          xTest.row(iTestRow) = x.row(i);
-          yTest.row(iTestRow) = y.row(i);
-          ++iTestRow;
-        }
-        else
-        {
-          xFold.row(iFoldRow) = x.row(i);
-          yFold.row(iFoldRow) = y.row(i);
-          ++iFoldRow;
-        }
-      }
-    }
+    bool getKFold( int k, xData const& x, xData& xFold, xData& xTest
+                        , yData const& y, yData& yFold, yData& yTest);
+
   protected:
     /** create a random partition in k folds*/
-    inline void partition()
-    {
-      //fill the container with the index of folds
-      for(int i = partitions_.begin() ; i< partitions_.end() ;i++)
-      {
-        partitions_[i] = i%nbFolds_;
-        sizePartitions_[i%nbFolds_]++;
-      }
-      //make a random rearrangement
-      int begin = partitions_.begin();
-      for (int i=partitions_.end()-2; i>begin; --i)
-      { std::swap(partitions_[i], partitions_[Law::UniformDiscrete::rand(begin, i+1)]);}
-    }
+    inline void partition();
 
   private:
     /** Range of the data set (number of rows) */
@@ -164,6 +100,136 @@ class CvHandler
     /** size of each fold */
     CVectorXi sizePartitions_;
 };
+
+/* Default constructor. nbFolds is set to the number of observation
+ *  @param rangeData the range of the data to set
+ *  @param nbFolds numbbe of Folds
+ **/
+inline CvHandler::CvHandler( Range const& rangeData, int nbFolds)
+                           : IRunnerBase()
+                           , rangeData_(rangeData), nbFolds_(nbFolds)
+                           , partitions_(), sizePartitions_()
+{
+  // check nbFolds parameter
+  if (nbFolds_<1)
+  { STKRUNTIME_ERROR_1ARG(CvHandler::CvHandler,nbFolds,nbFolds<1);}
+  if (nbFolds_>rangeData_.size())
+  { STKRUNTIME_ERROR_1ARG(CvHandler::CvHandler,nbFolds,nbFolds>rangeData_.size());}
+}
+/* get the data set when setting out fold k and test data set  */
+template<class Data>
+bool CvHandler::getKFold( int k, Data const& x,Data& xFold, Data& xTest)
+{
+  // check if partitions are determined
+  if (!hasRun_)
+  { msg_error_ = STKERROR_NO_ARG(CvHandler::getKFold,CvHandler has to run);
+    return false;
+  }
+  // check dimensions
+  if (x.rows() != rangeData_)
+  { msg_error_ = STKERROR_1ARG(CvHandler::getKFold,k,x.rows()!=rangeData_);
+    return false;
+  }
+  if (sizePartitions_.begin() > k)
+  { msg_error_ = STKERROR_1ARG(CvHandler::getKFold,k,k<sizePartitions_.begin());
+    return false;
+  }
+  if (sizePartitions_.end() <= k)
+  { msg_error_ = STKERROR_1ARG(CvHandler::getKFold,k,k<sizePartitions_.end()<=k);
+    return false;
+  }
+  // prepare containers
+  Range xFoldRows = x.rows();
+  xFoldRows.decLast(sizePartitions_[k]);
+  xFold.resize(xFoldRows, x.cols());
+  xTest.resize(sizePartitions_[k], x.cols());
+  // copy data
+  int iFoldRow = xFold.beginRows(), iTestRow = xTest.beginRows();
+  for (int i = partitions_.begin(); i < partitions_.end(); ++i)
+  {
+    if (partitions_[i] == k)
+    {
+      xTest.row(iTestRow) = x.row(i);
+      ++iTestRow;
+    }
+    else
+    {
+      xFold.row(iFoldRow) = x.row(i);
+      ++iFoldRow;
+    }
+  }
+  return true;
+}
+/* get the data set when setting out fold k and test data set  */
+template<class xData, class yData>
+bool CvHandler::getKFold( int k, xData const& x, xData& xFold, xData& xTest
+                               , yData const& y, yData& yFold, yData& yTest)
+{
+  // check if partitions are determined
+  if (!hasRun_)
+  { msg_error_ = STKERROR_NO_ARG(CvHandler::getKFold,CvHandler has to run);
+    return false;
+  }
+  // check dimensions
+  if (x.rows() != rangeData_)
+  { msg_error_ = STKERROR_1ARG(CvHandler::getKFold,k,x.rows()!=rangeData_);
+    return false;
+  }
+  if (y.rows() != rangeData_)
+  { msg_error_ = STKERROR_1ARG(CvHandler::getKFold,k,y.rows()!=rangeData_);
+    return false;
+  }
+  if (sizePartitions_.begin() > k)
+  { msg_error_ = STKERROR_1ARG(CvHandler::getKFold,k,k<sizePartitions_.begin());
+    return false;
+  }
+  if (sizePartitions_.end() <= k)
+  { msg_error_ = STKERROR_1ARG(CvHandler::getKFold,k,k<sizePartitions_.end()<=k);
+    return false;
+  }
+  // prepare constainers
+  Range xFoldRows = x.rows();
+  xFoldRows.decLast(sizePartitions_[k]);
+  xFold.resize(xFoldRows, x.cols());
+  xTest.resize(sizePartitions_[k], x.cols());
+  yFold.resize(xFoldRows, y.cols());
+  yTest.resize(sizePartitions_[k], y.cols());
+  // copy data
+  int iFoldRow = xFold.beginRows(), iTestRow = xTest.beginRows();
+  for (int i = partitions_.begin(); i < partitions_.end(); ++i)
+  {
+    if (partitions_[i] == k)
+    {
+      xTest.row(iTestRow) = x.row(i);
+      yTest.row(iTestRow) = y.row(i);
+      ++iTestRow;
+    }
+    else
+    {
+      xFold.row(iFoldRow) = x.row(i);
+      yFold.row(iFoldRow) = y.row(i);
+      ++iFoldRow;
+    }
+  }
+  return true;
+}
+
+/* create a random partition in k folds*/
+inline void CvHandler::partition()
+{
+  partitions_.resize(rangeData_);
+  sizePartitions_.resize(Range(0, nbFolds_)) = 0;
+  //fill the container with the index of folds
+  for(int i = partitions_.begin() ; i< partitions_.end() ;i++)
+  {
+    partitions_[i] = i%nbFolds_;
+    sizePartitions_[i%nbFolds_]++;
+  }
+  //make a random rearrangement
+  int begin = partitions_.begin();
+  for (int i=partitions_.end()-2; i>begin; --i)
+  { std::swap(partitions_[i], partitions_[Law::UniformDiscrete::rand(begin, i+1)]);}
+}
 
 } // namespace STK
 

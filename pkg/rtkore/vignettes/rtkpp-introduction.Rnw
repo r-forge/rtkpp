@@ -40,7 +40,7 @@ rtkore.date <- packageDescription("rtkore")$Date
 \begin{abstract}
 This vignette gives some hints about the usage of the \rtkore{} (successor of
 the \rtkpp{}) package. It explains shortly how to wrap R vectors and matrices
-into \stkpp{}  structures. It gives also an example of Makevars for linking an R
+into \stkpp{} structures. It gives also an example of Makevars for linking an R
 package with \rtkore{}.
 \end{abstract}
 
@@ -84,16 +84,16 @@ SEXP myFunction(SEXP data)
 \end{lstlisting}
 The templated class \texttt{STK::RMatrix} wraps a Rcpp matrix which itself
 wrap the \texttt{R} \verb+SEXP+ structure. You can access directly (and
-eventually modify) the \texttt{R} data in your application like if it were
-a usual \texttt{STK++} array.
+eventually modify) the \texttt{R} data in your application like
+an usual \stkpp{} array.
 
 The second templated class you can use is \texttt{STK::RVector} which
-allows to wrap \texttt{Rcpp::NumericVector}.
+allows to wrap \texttt{Rcpp::Vector} class.
 
 \section{Converting \stkpp{} arrays and expressions to \texttt{R} data}
 
 \texttt{Rcpp} facilitates data conversion from \texttt{C++} to \texttt{R}
-through  \texttt{Rcpp::wrap}. This function is extended by \rtkore{} for the stk++
+through  \texttt{Rcpp::wrap}. This function is extended by \rtkore{} for \stkpp{}
 arrays and vectors.
 
 The following example is taken from the \texttt{STK::ClusterLauncher} class
@@ -146,16 +146,20 @@ RcppExport SEXP countNA( SEXP r_matrix)
 
 \section{Using \rtkore{} random number generators}
 
-All the random numbers of R are interfaced in rtkore. You can used them like
+All the random numbers of R are interfaced in rtkore. You can used them as
 STK++ random number generators like in the following example
 
 \begin{lstlisting}[style=customcpp]
 RcppExport SEXP fastBetaRand( SEXP n, SEXP alpha, SEXP beta)
 {
   BEGIN_RCPP;
+  // create a STK++ RVector
   STK::RVector<double> tab(Rcpp::as<int>(n));
+  // Create a Beta distribution function with alpha and beta as parameters
   STK::Law::Beta law(Rcpp::as<double>(alpha), Rcpp::as<double>(beta));
+  // fill tab with random numbers
   tab.rand(law);
+  // return the wrapped rcpp vector
   return tab.vector();
   END_RCPP;
 }

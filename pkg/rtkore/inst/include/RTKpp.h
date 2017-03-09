@@ -40,11 +40,11 @@
 #include <Rcpp.h>
 
 #include "RTKppForward.h"
-#include "../projects/Rtkpp/include/Rcpp_as.h"
-#include "../projects/Rtkpp/include/Rcpp_wrap.h"
-#include "../projects/Rtkpp/include/STK_RcppTraits.h"
-#include "../projects/Rtkpp/include/STK_RMatrix.h"
-#include "../projects/Rtkpp/include/STK_RVector.h"
-#include "../projects/Rtkpp/include/STK_wrap.h"
+#include <Rtkpp/include/Rcpp_as.h>
+#include <Rtkpp/include/Rcpp_wrap.h>
+#include <Rtkpp/include/STK_RcppTraits.h>
+#include <Rtkpp/include/STK_RMatrix.h>
+#include <Rtkpp/include/STK_RVector.h>
+#include <Rtkpp/include/STK_wrap.h>
 
 #endif /* RTKPP_H */

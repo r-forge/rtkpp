@@ -39,12 +39,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Rcpp.  If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------
-#' CxxFlags defaults for the rtkore
+#' CxxFlags defaults for rtkore
 #' @rdname rtkoreFlags
 #' @keywords internal
 CxxFlags <- function(cpp11=FALSE) { cat(.rtkoreCxxFlags(cpp11=cpp11)) }
 #-----------------------------------------------------------------------
-#' CppFlags defaults for the rtkore
+#' CppFlags defaults for rtkore
 #' @rdname rtkoreFlags
 #' @keywords internal
 CppFlags <- function() { cat(.rtkoreCppFlags()) }
@@ -89,8 +89,7 @@ LdFlags <- function() { cat(.rtkoreLdFlags()) }
 ###########################
 # @rdname rtkoreFlags
 # @keywords internal
-.rtkoreLdFlags <- function()
-{}
+.rtkoreLdFlags <- function() {}
 
 # Transform a path for passing to the build system on the command line.
 # Leave paths alone for posix. For Windows, mirror the behavior of the

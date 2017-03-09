@@ -1,9 +1,10 @@
 \name{NEWS}
 \title{News for Package 'rtkore}
 
-\section{Changes in rtkore version 1.2.1 (2016-11-29)}{
+\section{Changes in rtkore version 1.2.1 (2017-03-07)}{
   \itemize{
-    \item Vignettes are correctly names
+    \item Vignettes are correctly named
+    \item Adding callMethods array and R_init_myRoutines function
   }
 }
 \section{Changes in rtkore version 1.2.0 (2016-11-20)}{

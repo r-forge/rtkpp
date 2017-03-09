@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{STK++ Arrays Quick Ref}
+%\VignetteIndexEntry{STK++ Arrays, Quick Reference Guide}
 
 \documentclass[a4paper,10pt]{article}
 
@@ -43,6 +43,13 @@ rtkore.date <- packageDescription("rtkore")$Date
 
 \subsection{Containers}
 
+The containers/arrays you use in order to store and process the data in your
+application greatly influence the speed and the memory usage of your application.
+STK++ proposes a large choice of containers/arrays and methods that you can used in
+conjunction with them.
+
+All the classes are in \code{namespace STK}.
+
 Data can be encapsulate in one of the following array
 \begin{lstlisting}[style=customcpp]
   typedef CArray<Type, SizeRows, SizeCols, Orient> MyCArray;
@@ -59,10 +66,9 @@ Data can be encapsulate in one of the following array
 \end{lstlisting}
 
 \begin{itemize}
-\item \code{Type} is the type of the elements like \code{double}, \code{float},
-etc.
+\item \code{Type} is the type of the elements like \code{double}, \code{float}, etc.
 \item \code{Orient} can be either \code{STK::Arrays::by_col_}
- (= 1, the default template) or \code{Arrays::by_col_} (= 0)
+ (= 1, the default template) or \code{Arrays::by_row_} (= 0)
 \item If you don't know the size of your array/vector just use
 \code{STK::UnknownSize} (the default template)
 \end{itemize}
@@ -73,35 +79,35 @@ Only the first template argument is mandatory in \code{CArray} family.
 \subsection{Convenience typedef}
 
 There exists predefined typedef for the arrays that can be used.
-Hereafter we give a sample for the CArray class
+Hereafter we give a sample for the CArray class (The type Real is defined
+as \code{typedef double Real} by default but it can be overwritten at
+compilation as \code{float})
 
 \begin{lstlisting}[style=customcpp,caption=CArray family]
-// CArray
+// CArray with Real (double by default) data
 typedef CArray<Real, UnknownSize, UnknownSize, Arrays::by_col_> CArrayXX;
 typedef CArray<Real, UnknownSize, 2, Arrays::by_col_>           CArrayX2;
 typedef CArray<Real, UnknownSize, 3, Arrays::by_col_>           CArrayX3;
 typedef CArray<Real, 2, UnknownSize, Arrays::by_col_>           CArray2X;
-typedef CArray<Real, 3, UnknownSize, Arrays::by_col_>           CArray3X;
+typedef CArray<Real, 3, UnknownSize, Arrays::by_col_by>         CArray3X;
 typedef CArray<Real, 2, 2, Arrays::by_col_>                     CArray22;
 typedef CArray<Real, 3, 3, Arrays::by_col_>                     CArray33;
+// CArray with double data (add d to the type name)
 typedef CArray<double, UnknownSize, UnknownSize, Arrays::by_col_>CArrayXXd;
-//...
+...
+// CArray with int data (add i to the typename)
 typedef CArray<int, UnknownSize, UnknownSize, Arrays::by_col_>  CArrayXXi;
-//...
-// the same as above with ByRow added
+...
+// Arrays with data stored by rows, the same as above with ByRow added
 typedef CArray<Real, UnknownSize, UnknownSize, Arrays::by_row_> CArrayByRowXX;
-//...
-// CArraySquare (like CArray)
+...
+// CArraySquare (like CArray with the same number of rows and columns)
 typedef CArraySquare<Real, UnknownSize, Arrays::by_col_>   CSquareX;
 typedef CArraySquare<Real, 2, Arrays::by_col_>             CSquare2;
-//..
+..
 typedef CArraySquare<int, 3, Arrays::by_col_>              CSquare3i;
-// the same as above with ByRow added
+...
 typedef CArraySquare<Real, UnknownSize, Arrays::by_row_>   CSquareByRowX;
-// CArrayVector
-typedef CArrayVector<Real, UnknownSize, Arrays::by_col_>   CVectorX;
-typedef CArrayVector<Real, 2, Arrays::by_col_>             CVector2;
-//...
 \end{lstlisting}
 
 Some of the predefined typedef for the \code{Array2D} class are given hereafter
@@ -127,24 +133,12 @@ typedef CArrayVector<int, UnknownSize, Arrays::by_col_>    CVectorXi;
 typedef CArrayVector<int, 2, Arrays::by_col_>              CVector2i;
 typedef CArrayVector<int, 3, Arrays::by_col_>              CVector3i;
 
-typedef CArrayVector<Real, UnknownSize, Arrays::by_row_>   CVectorByRowX;
-typedef CArrayVector<Real, 2, Arrays::by_row_>             CVectorByRow2;
-typedef CArrayVector<Real, 3, Arrays::by_row_>             CVectorByRow3;
-typedef CArrayVector<double, UnknownSize, Arrays::by_row_> CVectorByRowXd;
-typedef CArrayVector<double, 2, Arrays::by_row_>           CVectorByRow2d;
-typedef CArrayVector<double, 3, Arrays::by_row_>           CVectorByRow3d;
-typedef CArrayVector<int, UnknownSize, Arrays::by_row_>    CVectorByRowXi;
-typedef CArrayVector<int, 2, Arrays::by_row_>              CVectorByRow2i;
-typedef CArrayVector<int, 3, Arrays::by_row_>              CVectorByRow3i;
 // CArrayPoint
 typedef CArrayPoint<Real, UnknownSize, Arrays::by_col_>   CPointX;
 typedef CArrayPoint<Real, 2, Arrays::by_col_>             CPoint2;
 typedef CArrayPoint<Real, 3, Arrays::by_col_>             CPoint3;
-//...
+...
 typedef CArrayPoint<int, 3, Arrays::by_col_>              CPoint3i;
-// the same as above with ByRow added
-typedef CArrayPoint<Real, UnknownSize, Arrays::by_row_>   CPointByRowX;
-//...
 \end{lstlisting}
 
 \begin{lstlisting}[style=customcpp,caption=Array2DVector\, Array2DPoint and Array2DDiagonal]
@@ -157,7 +151,6 @@ typedef CArrayPoint<Real, UnknownSize, Arrays::by_row_>   CPointByRowX;
 \end{lstlisting}
 
 \subsection{Constant Arrays}
-
 It is possible to use constant arrays with all values equal to 1 using
 the type predefined in the \code{namespace STK::Const}
 \begin{lstlisting}[style=customcpp]
@@ -181,15 +174,15 @@ Constructors are detailed in the document Arrays Constructors.
 After creation \code{arrays} can be initialized using comma initializer
 \begin{lstlisting}[style=customcpp]
   CVector3  v;     v << 1, 2, 3;
-  CSquareXX m(3);  v << 1, 2, 3,
+  CSquareXX m(3);  m << 1, 2, 3,
                         2, 3, 4,
                         3, 4, 5;
 \end{lstlisting}
 and elements can be accessed using the parenthesis (for arrays), the brackets
 (for vectors) and the \code{elt} methods
 \begin{lstlisting}[style=customcpp]
-  v[0] = 3; v.elt(1) = 1; v.at(2) = 2; // at check index range
-  m(0,0) = 5; m.elt(1,1) = 1; m.at(2,2) = 3; // at check indexes range
+  v[0] = 3; v.elt(1) = 1; v.at(2) = 2;       // at(.) check index range
+  m(0,0) = 5; m.elt(1,1) = 1; m.at(2,2) = 3; // at(.) check indexes range
 \end{lstlisting}
 
 The whole array/vector can be initialized using a value, either at the construction
@@ -222,7 +215,7 @@ the  range, the beginning, the end and the size using
   int vb= m.begin(), ve= m.end(), vs= m.size();
 \end{lstlisting}
 
-For the Arrays2D family, it is also possible to get informations about the
+For the Array2D family of container, it is also possible to get informations about the
 allocated memory of the containers. It can be interested in order to known
 if the container will have to reallocate the memory if you try to resize it.
 \begin{lstlisting}[style=customcpp]
@@ -230,11 +223,11 @@ if the container will have to reallocate the memory if you try to resize it.
   m.availableCols();                  // number of available columns
   Array1D<int> a = m.availableRows(); // vector with the number of available rows of each column
 
-  m.capacityCol(1);  // capacity of the column 1
+  m.capacityCol(1);                   // capacity of the column 1
   Array1D< Range > r = m.rangeCols () // vector with used range of each columns (think to triangular matrices)
 \end{lstlisting}
 The Array2D family of container allocate a small amount of supplementary memory
-so that in case of a @ resize, it is possible to expand the container without
+so that in case of a \code{resize}, it is possible to expand the container without
 data transfer.
 
 \subsection{Arrays and vectors visitors and appliers}
@@ -246,8 +239,8 @@ and are automatically unrolled if the array is of fixed (small) size.
   m.count();
   m.any();
   m.all();
-  m.minElt(i,j); // can be v.minElt(i) or m.minElt()
-  m.maxElt(i,j); // can be v.maxElt(i) or m.maxElt()
+  m.minElt(i,j);     // can be v.minElt(i) or m.minElt()
+  m.maxElt(i,j);     // can be v.maxElt(i) or m.maxElt()
   m.minEltSafe(i,j); // can be v.minEltSafe(i) or m.minEltSafe()
   m.maxEltSafe(i,j); // can be v.maxEltSafe(i) or m.maxEltSafe()
   m.sum(); m.sumSafe();
@@ -255,13 +248,13 @@ and are automatically unrolled if the array is of fixed (small) size.
 \end{lstlisting}
 
 \begin{lstlisting}[style=customcpp,caption=Appliers]
-  m.randUnif(); // fill m with uniform random numbers between 0 and 1
+  m.randUnif();  // fill m with uniform random numbers between 0 and 1
   m.randGauss(); // fill m with standardized Gaussian random numbers
-  m.setOnes(); // fill m with value 1
-  m.setValues(2); // fill m with value 2
+  m.setOnes();   // fill m with value 1
+  m.setValues(2);// fill m with value 2
   m.setZeros();  // fill m with value 0
   Law::Gamma law(1,2); // create a Gamma distribution
-  m.rand( law); // fill m with gamma(1,2) random numbers
+  m.rand( law);        // fill m with gamma(1,2) random numbers
 \end{lstlisting}
 
 The next methods use visitors in order to compute the result, eventually safely
@@ -283,13 +276,13 @@ The next methods use visitors in order to compute the result, eventually safely
 
 \section{Functors on arrays/vectors and expressions}
 
-All the functors applied on arrays are currently in the STK::Stat namespace.
+All the functors applied on arrays are currently in the \code{namespace STK::Stat}.
 If there is the possibility of missing/NaN values add the word
 Safe to the name of the functor. If the mean by row is needed, just add ByRow
 to the name of the functor. If you want a safe computation by row add SafeByRow.
 
-All functors applied on an array by column will return by value an STK::Array2DPoint and a number
-if it is applied on a vector or a point.
+All functors applied on an array by column will return by value an
+\code{STK::Array2DPoint} and a number if it is applied on a vector or a point.
 
 All functors applied on an array by row will return by value an STK::Array2DVector
 and a number if it is applied on a vector or a point.
@@ -299,14 +292,14 @@ Stat::min(a); Stat::minSafe(a); Stat::min(a, w); Stat::minSafe(a, w);
 Stat::max(a); Stat::maxSafe(a); Stat::max(a, w); Stat::maxSafe(a, w);
 Stat::sum(a); Stat::sumSafe(a); Stat::sum(a, w); Stat::sumSafe(a, w);
 Stat::mean(a); Stat::meanSafe(a); Stat::mean(a, w); Stat::meanSafe(a, w);
-// could also be
+// could also be (safe versions)
 Stat::minByCol(a); Stat::minSafeByCol(a); Stat::minByCol(a, w); Stat::minSafeByCol(a, w);
 // .. etc
 // unbiased variance (division by n-1) when unbiased is true, false is the default
 Stat::variance(a, false); Stat::varianceSafe(a, false);
 Stat::variance(a, w, false); Stat::varianceSafe(a, w, false);
 // fixed mean. Must be a vector/point for arrays and a number for vectors/points
-// unbiased has to be given
+// unbiased (false in examples below) has to be given
 Stat::varianceWithFixedMean(a, mean, false);
 Stat::varianceWithFixedMean(a, w, mean, false);
 Stat::varianceWithFixedMeanSafe(a, mean, false);
@@ -323,7 +316,7 @@ Stat::meanByRow(a); Stat::meanSafeByRow(a); Stat::meanByRow(a, w); Stat::meanSaf
 Stat::varianceByRow(a, false); Stat::varianceSafeByRow(a, false);
 Stat::varianceByRow(a, w, false); Stat::varianceSafeByRow(a, w, false);
 // fixed mean. Must be a vector/point for arrays and a number for vectors/points
-// unbiased has to be given
+// unbiased (false in examples below) has to be given
 Stat::varianceWithFixedMeanByRow(a, mean, false);
 Stat::varianceWithFixedMeanByRow(a, w, mean, false);
 Stat::varianceWithFixedMeanSafeByRow(a, mean, false);

@@ -71,7 +71,7 @@ RcppExport  SEXP stk_version(SEXP single)
                      +  100 * STK_MAJOR_VERSION
                      +        STK_MINOR_VERSION);
   }
-  // return an integer with the three
+  // return a list with the number versions
   return IntegerVector::create(_["major"] = STK_WORLD_VERSION,
                                _["minor"] = STK_MAJOR_VERSION,
                                _["patch"] = STK_MINOR_VERSION);

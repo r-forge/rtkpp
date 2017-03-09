@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{User guide of STK++ arrays}
+%\VignetteIndexEntry{STK++ Arrays, User Guide}
 
 \documentclass[a4paper,10pt]{article}
 

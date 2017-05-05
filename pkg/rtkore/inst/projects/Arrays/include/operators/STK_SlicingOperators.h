@@ -87,6 +87,7 @@ struct Traits< RowOperator <Lhs> >
   };
   typedef typename Lhs::Type Type;
   typedef typename Lhs::ReturnType ReturnType;
+  typedef typename Lhs::ConstReturnType ConstReturnType;
 };
 
 } // namespace hidden
@@ -180,6 +181,7 @@ struct Traits< ColOperator <Lhs> >
   };
   typedef typename Lhs::Type Type;
   typedef typename Lhs::ReturnType ReturnType;
+  typedef typename Lhs::ConstReturnType ConstReturnType;
 };
 
 } // namespace hidden
@@ -275,6 +277,7 @@ struct Traits< SubOperator <Lhs> >
   };
   typedef typename Lhs::Type Type;
   typedef typename Lhs::ReturnType ReturnType;
+  typedef typename Lhs::ConstReturnType ConstReturnType;
 };
 
 } // namespace hidden

@@ -60,6 +60,8 @@ struct Traits< Variable<Type_> >
 
   typedef Type_          Type;
   typedef typename RemoveConst<Type>::Type const& ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+
   enum
   {
     structure_ = Arrays::vector_,

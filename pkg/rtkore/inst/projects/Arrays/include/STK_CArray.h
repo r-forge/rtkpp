@@ -125,6 +125,8 @@ struct Traits< CArray<Type_, SizeRows_, SizeCols_, Orient_> >
 
     typedef Type_                Type;
     typedef typename RemoveConst<Type_>::Type const& ReturnType;
+    typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+
     enum
     {
       structure_ = Arrays::array2D_,
@@ -237,7 +239,8 @@ template <typename Type, int SizeRows_, int SizeCols_, bool Orient_>
 ostream& operator<<(ostream& s, const CAllocator<Type, SizeRows_, SizeCols_, Orient_>& V)
 {
   CArray<Type, SizeRows_, SizeCols_, Orient_> wrap(V);
-  return out2D(s,wrap);}
+  return out2D(s,wrap);
+}
 
 
 } // namespace STK

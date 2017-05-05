@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
   A.merge(C);
   stk_cout << _T("A =\n") << A << _T('\n');
   // B has been invalidate by A.merge(C) and cannot be used anymore
-  // stk_cout << _T("B =\n") << B;
+  // stk_cout << _T("B =\n") << B; produce an error at execution
   stk_cout << _T("C.isRef() = ") << C.isRef() << _T('\n');
   stk_cout << _T("C =\n") << C;
 }

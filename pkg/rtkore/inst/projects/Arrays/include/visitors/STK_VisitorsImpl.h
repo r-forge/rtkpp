@@ -43,9 +43,9 @@ namespace STK
 
 namespace hidden
 {
-template<typename Visitor, typename Derived, bool orient_, int SizeRows_, int SizeCols_>
+template<typename Visitor, typename Derived, bool Orient_, int SizeRows_, int SizeCols_>
 struct VisitorArrayNoUnrollImpl;
-template<typename Visitor, typename Derived, bool orient_, int SizeRows_, int SizeCols_>
+template<typename Visitor, typename Derived, bool Orient_, int SizeRows_, int SizeCols_>
 struct VisitorArrayUnrollImpl;
 template<typename Visitor, typename Derived, int SizeRows_, int SizeCols_>
 struct VisitorArrayImpl;
@@ -129,18 +129,6 @@ struct VisitorArrayUnrollImpl<Visitor, Derived, Arrays::by_col_, SizeRows_, Size
 };
 
 /** @ingroup hidden
- *  @brief specialization for the Arrays with 1 column.
- *  In this case, just unroll the column. */
-template<typename Visitor, typename Derived, int SizeRows_>
-struct VisitorArrayUnrollImpl<Visitor, Derived, Arrays::by_col_, SizeRows_, 1>
-{
-  inline static void run( Derived const& tab, Visitor& visitor)
-  { VisitorUnrollCol<Visitor, Derived, SizeRows_, 1>::run(tab, visitor);}
-  inline static void apply( Derived& tab, Visitor& applier)
-  { VisitorUnrollCol<Visitor, Derived, SizeRows_, 1>::apply(tab, applier);}
-};
-
-/** @ingroup hidden
  *  @brief specialization for the general case when we unroll the rows and the
  *  columns with a row oriented arrays */
 template<typename Visitor, typename Derived, int SizeRows_ , int SizeCols_>
@@ -161,6 +149,18 @@ struct VisitorArrayUnrollImpl<Visitor, Derived, Arrays::by_row_, SizeRows_, Size
 };
 
 /** @ingroup hidden
+ *  @brief specialization for the Arrays with 1 column.
+ *  In this case, just unroll the column. */
+template<typename Visitor, typename Derived, int SizeRows_>
+struct VisitorArrayUnrollImpl<Visitor, Derived, Arrays::by_col_, SizeRows_, 1>
+{
+  inline static void run( Derived const& tab, Visitor& visitor)
+  { VisitorUnrollCol<Visitor, Derived, SizeRows_, 1>::run(tab, visitor);}
+  inline static void apply( Derived& tab, Visitor& applier)
+  { VisitorUnrollCol<Visitor, Derived, SizeRows_, 1>::apply(tab, applier);}
+};
+
+/** @ingroup hidden
  *  @brief specialization for the arrays with 1 column (Vector) */
 template<typename Visitor, typename Derived, int SizeCols_>
 struct VisitorArrayUnrollImpl<Visitor, Derived, Arrays::by_row_, 1, SizeCols_>
@@ -175,8 +175,21 @@ struct VisitorArrayUnrollImpl<Visitor, Derived, Arrays::by_row_, 1, SizeCols_>
  *  @brief specialization for the general case with 1 row and 1 column arrays.
  *  This specialization allow to disambiguate instantiation.
  **/
-template<typename Visitor, typename Derived, int Orient_>
-struct VisitorArrayUnrollImpl<Visitor, Derived, Orient_, 1, 1>
+template<typename Visitor, typename Derived>
+struct VisitorArrayUnrollImpl<Visitor, Derived, Arrays::by_col_, 1, 1>
+{
+  inline static void run( Derived const& tab, Visitor& visitor)
+  { visitor(tab.elt(tab.beginRows(), tab.beginCols()), tab.beginRows(), tab.beginCols());}
+  inline static void apply( Derived& tab, Visitor& visitor)
+  { visitor(tab.elt(tab.beginRows(), tab.beginCols()));}
+};
+
+/** @ingroup hidden
+ *  @brief specialization for the general case with 1 row and 1 column arrays.
+ *  This specialization allow to disambiguate instantiation.
+ **/
+template<typename Visitor, typename Derived>
+struct VisitorArrayUnrollImpl<Visitor, Derived, Arrays::by_row_, 1, 1>
 {
   inline static void run( Derived const& tab, Visitor& visitor)
   { visitor(tab.elt(tab.beginRows(), tab.beginCols()), tab.beginRows(), tab.beginCols());}

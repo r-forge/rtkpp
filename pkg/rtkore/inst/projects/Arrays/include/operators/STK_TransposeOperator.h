@@ -98,6 +98,7 @@ struct Traits< TransposeOperator <Lhs> >
   };
   typedef typename Lhs::Type Type;
   typedef typename Lhs::ReturnType ReturnType;
+  typedef typename Lhs::ConstReturnType ConstReturnType;
 };
 
 } // end namespace hidden
@@ -148,7 +149,7 @@ class TransposeOperator: public ExprBase< TransposeOperator<Lhs> >, public TRef<
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return lhs_.cols();}
     /** @return the range of the Columns */
-    inline ColRange const&colsImpl() const { return lhs_.rows();}
+    inline ColRange const& colsImpl() const { return lhs_.rows();}
 
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_; }

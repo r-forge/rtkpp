@@ -19,7 +19,7 @@
     Boston, MA 02111-1307
     USA
 
-    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
+    Contact: S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 */
 
 /*
@@ -95,7 +95,7 @@ struct TestEndOfLineOp
   enum { NbParam_ = 1 };
   typedef bool result_type;
   typedef Char param1_type ;
-  inline TestEndOfLineOp(char* c) : last_(c) {}
+  inline TestEndOfLineOp(char* c): last_(c) {}
   Char* last_;
   inline result_type operator()(Char c)
   {
@@ -104,6 +104,9 @@ struct TestEndOfLineOp
   }
 };
 
+//------------------------------------------------------------------------------
+// binary functors:
+//------------------------------------------------------------------------------
 /** @ingroup Functors
   * @brief Template functor testing if a number is equal to an other
   */
@@ -200,7 +203,7 @@ struct MaxOp
   typedef typename hidden::RemoveConst<Type2>::Type const& param2_type ;
 
   inline result_type operator()(param1_type const&  value1, param2_type value2) const
-  { return  (value1 < value2) ? value2 : value1 ;}
+  { return  (value1 < value2) ? value2: value1 ;}
 };
 /** @ingroup Functors
   * @brief Template functor which compute the minimum of two numbers
@@ -214,7 +217,7 @@ struct MinOp
   typedef typename hidden::RemoveConst<Type2>::Type const& param2_type ;
 
   inline result_type operator()(param1_type const&  value1, param2_type value2) const
-  { return  (value1 < value2) ? value1 : value2 ;}
+  { return  (value1 < value2) ? value1: value2 ;}
 };
 /** @ingroup Functors
   * @brief Template functor which compute the sum of two numbers
@@ -224,10 +227,10 @@ struct SumOp
 {
   enum { NbParam_ = 2 };
   typedef typename hidden::Promote<Type1, Type2>::result_type result_type;
-  typedef typename hidden::RemoveConst<Type1>::Type param1_type ;
+  typedef typename hidden::RemoveConst<Type1>::Type const& param1_type ;
   typedef typename hidden::RemoveConst<Type2>::Type const& param2_type ;
 
-  inline result_type operator()(param1_type const& a, param2_type b) const
+  inline result_type operator()(param1_type a, param2_type b) const
   { return a + b; }
 };
 /** @ingroup Functors
@@ -238,10 +241,10 @@ struct ProductOp
 {
   enum { NbParam_ = 2 };
   typedef typename hidden::Promote<Type1, Type2>::result_type result_type;
-  typedef typename hidden::RemoveConst<Type1>::Type param1_type ;
+  typedef typename hidden::RemoveConst<Type1>::Type const& param1_type ;
   typedef typename hidden::RemoveConst<Type2>::Type const& param2_type ;
 
-  inline result_type operator()(param1_type const& a, param2_type b) const
+  inline result_type operator()(param1_type a, param2_type b) const
   { return a * b; }
 };
 /** @ingroup Functors
@@ -252,10 +255,10 @@ struct DifferenceOp
 {
   enum { NbParam_ = 2 };
   typedef typename hidden::Promote<Type1, Type2>::result_type result_type;
-  typedef typename hidden::RemoveConst<Type1>::Type param1_type ;
+  typedef typename hidden::RemoveConst<Type1>::Type const& param1_type ;
   typedef typename hidden::RemoveConst<Type2>::Type const& param2_type ;
 
-  inline result_type operator()(param1_type const& a, param2_type b) const
+  inline result_type operator()(param1_type a, param2_type b) const
   { return a - b; }
 };
 /** @ingroup Functors
@@ -266,14 +269,16 @@ struct DivOp
 {
   enum { NbParam_ = 2 };
   typedef typename hidden::Promote<Type1, Type2>::result_type result_type;
-  typedef typename hidden::RemoveConst<Type1>::Type param1_type ;
+  typedef typename hidden::RemoveConst<Type1>::Type const& param1_type ;
   typedef typename hidden::RemoveConst<Type2>::Type const& param2_type ;
 
-  inline result_type operator()(param1_type const& a, param2_type b) const
+  inline result_type operator()(param1_type a, param2_type b) const
   { return a / b; }
 };
 
+//------------------------------------------------------------------------------
 // unary functors:
+//------------------------------------------------------------------------------
 /** @ingroup Functors
   * @brief Template functor to test if a number is less than a fixed number
   */
@@ -285,7 +290,7 @@ struct LessThanOp
   typedef typename hidden::RemoveConst<Type>::Type param1_type;
 
   inline LessThanOp(const LessThanOp& other): other_(other.other_) { }
-  inline LessThanOp(Type other) : other_(other) { }
+  inline LessThanOp(Type other): other_(other) { }
   inline result_type operator() (param1_type const& a) const { return a < other_; }
   const Type other_;
 };
@@ -301,7 +306,7 @@ struct LeqThanOp
 
   inline LeqThanOp(LeqThanOp const& other): other_(other.other_)
   {}
-  inline LeqThanOp(Type other) : other_(other)
+  inline LeqThanOp(Type other): other_(other)
   {}
   inline result_type operator() (param1_type const& a) const
   { return (a <= other_); }
@@ -318,7 +323,7 @@ struct GreaterThanOp
   typedef typename hidden::RemoveConst<Type>::Type param1_type ;
 
   inline GreaterThanOp(const GreaterThanOp& other): other_(other.other_) { }
-  inline GreaterThanOp(Type other) : other_(other) { }
+  inline GreaterThanOp(Type other): other_(other) { }
   inline result_type operator() (param1_type const& a) const { return a > other_; }
   const Type other_;
 };
@@ -332,8 +337,8 @@ struct GeqThanOp
   typedef bool result_type;
   typedef typename hidden::RemoveConst<Type>::Type param1_type ;
 
-  inline GeqThanOp(const GeqThanOp& other) : other_(other.other_) { }
-  inline GeqThanOp(Type other) : other_(other) { }
+  inline GeqThanOp(const GeqThanOp& other): other_(other.other_) { }
+  inline GeqThanOp(Type other): other_(other) { }
   inline result_type operator() (param1_type const& a) const { return a >= other_; }
   const Type other_;
 };
@@ -347,8 +352,8 @@ struct EqualThanOp
   typedef bool result_type;
   typedef typename hidden::RemoveConst<Type>::Type param1_type ;
 
-  inline EqualThanOp(const EqualThanOp& other) : other_(other.other_) { }
-  inline EqualThanOp(Type other) : other_(other) {}
+  inline EqualThanOp(const EqualThanOp& other): other_(other.other_) { }
+  inline EqualThanOp(Type other): other_(other) {}
   inline result_type operator() (param1_type const& a) const { return a == other_; }
   const Type other_;
 };
@@ -363,7 +368,7 @@ struct NotEqualThanOp
   typedef typename hidden::RemoveConst<Type>::Type param1_type ;
 
   inline NotEqualThanOp(const NotEqualThanOp& other): other_(other.other_) { }
-  inline NotEqualThanOp(Type other) : other_(other) { }
+  inline NotEqualThanOp(Type other): other_(other) { }
   inline result_type operator() (param1_type const& a) const { return a != other_; }
   const Type other_;
 };
@@ -478,11 +483,11 @@ template<typename Type>
 struct MinimumOp
 {
   enum { NbParam_ = 1 };
-  typedef Type const result_type;
+  typedef Type result_type;
   typedef Type const param1_type ;
 
-  inline MinimumOp(Type const other) : other_(other) {}
-  inline MinimumOp( MinimumOp const& other) : other_(other.other_) {}
+  inline MinimumOp(Type const other): other_(other) {}
+  inline MinimumOp( MinimumOp const& other): other_(other.other_) {}
   inline result_type operator() (param1_type const& a) const
   {return std::min(a,other_); }
   Type const other_;
@@ -495,11 +500,11 @@ template<typename Type>
 struct MaximumOp
 {
   enum { NbParam_ = 1 };
-  typedef Type const result_type;
+  typedef Type result_type;
   typedef Type const param1_type ;
 
-  inline MaximumOp(Type const other) : other_(other) {}
-  inline MaximumOp( MaximumOp const& other) : other_(other.other_) {}
+  inline MaximumOp(Type const other): other_(other) {}
+  inline MaximumOp( MaximumOp const& other): other_(other.other_) {}
   inline result_type operator() (param1_type const& a) const
   {return std::max(a,other_); }
   Type const other_;
@@ -511,15 +516,32 @@ template<typename Type>
 struct MultipleOp
 {
   enum { NbParam_ = 1 };
-  typedef Type const result_type;
+  typedef Type result_type;
   typedef Type const param1_type ;
 
-  inline MultipleOp(Type const other) : other_(other) {}
-  inline MultipleOp( MultipleOp const& other) : other_(other.other_) {}
+  inline MultipleOp(Type const other): other_(other) {}
+  inline MultipleOp( MultipleOp const& other): other_(other.other_) {}
   inline result_type operator() (param1_type const& a) const
   {return a * other_; }
   Type const other_;
 };
+/** @ingroup Functors
+  * @brief Specialization for boolean
+  */
+template<>
+struct MultipleOp<bool>
+{
+  enum { NbParam_ = 1 };
+  typedef bool const result_type;
+  typedef bool const param1_type ;
+
+  inline MultipleOp(bool const other): other_(other) {}
+  inline MultipleOp( MultipleOp const& other): other_(other.other_) {}
+  inline result_type operator() (param1_type const& a) const
+  {return a && other_; }
+  bool const other_;
+};
+
 
 /** @ingroup Functors
   * @brief Template functor which return a default value if the value is NA
@@ -531,10 +553,10 @@ struct SafeOp
   typedef Type result_type;
   typedef typename hidden::RemoveConst<Type>::Type param1_type ;
 
-  inline SafeOp(Type const other = Type()) : other_(other) {}
-  inline SafeOp( SafeOp const& other) : other_(other.other_) {}
+  inline SafeOp(Type const other = Type()): other_(other) {}
+  inline SafeOp( SafeOp const& other): other_(other.other_) {}
   inline result_type operator()(param1_type const& a) const
-  { return Arithmetic<Type>::isFinite(a) ? a : other_; }
+  { return Arithmetic<Type>::isFinite(a) ? a: other_; }
   Type const other_;
 };
 /** @ingroup Functors
@@ -547,10 +569,10 @@ struct SafeInverseOp
   typedef Type result_type;
   typedef typename hidden::RemoveConst<Type>::Type param1_type ;
 
-  inline SafeInverseOp(Type const tol = Arithmetic<Type>::epsilon()) : tol_(tol) {}
-  inline SafeInverseOp( SafeInverseOp const& other) : tol_(other.tol_) {}
+  inline SafeInverseOp(Type const tol = Arithmetic<Type>::epsilon()): tol_(tol) {}
+  inline SafeInverseOp( SafeInverseOp const& other): tol_(other.tol_) {}
   inline result_type operator()(param1_type const& a) const
-  { return (std::abs(a)>tol_) ? Type(1)/a : 1.; }
+  { return (std::abs(a)>tol_) ? Type(1)/a: 1.; }
   Type const tol_;
 };
 
@@ -562,8 +584,8 @@ template<typename Type>
 struct QuotientBaseOp<Type, false>
 {
   typedef typename hidden::RemoveConst<Type>::Type param1_type ;
-  inline QuotientBaseOp(const QuotientBaseOp& other) : other_(other.other_) {}
-  inline QuotientBaseOp(param1_type const& other) : other_( static_cast<Type>(1) / other) {}
+  inline QuotientBaseOp(const QuotientBaseOp& other): other_(other.other_) {}
+  inline QuotientBaseOp(param1_type const& other): other_( static_cast<Type>(1) / other) {}
   inline Type const operator() (param1_type const& a) const { return a * other_; }
   Type const other_;
 };
@@ -572,8 +594,8 @@ template<typename Type>
 struct QuotientBaseOp<Type, true>
 {
   typedef typename hidden::RemoveConst<Type>::Type param1_type ;
-  inline QuotientBaseOp( QuotientBaseOp const& other) : other_(other.other_) {}
-  inline QuotientBaseOp( param1_type other) : other_(other) {}
+  inline QuotientBaseOp( QuotientBaseOp const& other): other_(other.other_) {}
+  inline QuotientBaseOp( param1_type other): other_(other) {}
   inline Type const operator()( param1_type a) const { return a / other_; }
   Type const other_;
 };
@@ -585,7 +607,7 @@ struct QuotientBaseOp<Type, true>
   * a number where the number type is not necessarily a floating point type.
   */
 template<typename Type>
-struct QuotientOp : public QuotientBaseOp<Type, hidden::isInt<Type>::yes >
+struct QuotientOp: public QuotientBaseOp<Type, hidden::isInt<Type>::yes >
 {
   enum { NbParam_ = 1 };
   typedef Type result_type;
@@ -603,8 +625,8 @@ struct AddOp
   typedef Type result_type;
   typedef typename hidden::RemoveConst<Type>::Type param1_type ;
 
-  inline AddOp(const AddOp& other) : other_(other.other_) { }
-  inline AddOp(Type other) : other_(other) { }
+  inline AddOp(AddOp const& other): other_(other.other_) { }
+  inline AddOp(Type other): other_(other) { }
   inline result_type operator() (param1_type const& a) const { return a + other_; }
   const result_type other_;
 };
@@ -618,8 +640,8 @@ struct AddOppositeOp
   typedef Type result_type;
   typedef typename hidden::RemoveConst<Type>::Type param1_type ;
 
-  inline AddOppositeOp(const AddOppositeOp& other) : other_(other.other_) { }
-  inline AddOppositeOp(Type other) : other_(other) { }
+  inline AddOppositeOp(AddOppositeOp const& other): other_(other.other_) { }
+  inline AddOppositeOp(Type other): other_(other) { }
   inline result_type operator() (param1_type const& a) const { return other_ - a; }
   const result_type other_;
 };
@@ -651,7 +673,7 @@ template<typename Type> struct CosOp
 template<typename Type> struct SinOp
 {
   enum { NbParam_ = 1 };
-  typedef Type const result_type;
+  typedef Type result_type;
   typedef typename hidden::RemoveConst<Type>::Type param1_type ;
 
   inline result_type operator() (param1_type const& a) const { return std::sin(a); }
@@ -699,8 +721,8 @@ struct PowOp
   typedef Type result_type;
   typedef typename hidden::RemoveConst<Type>::Type param1_type ;
 
-  inline PowOp(PowOp const& other) : exponent_(other.exponent_) {}
-  inline PowOp(Type exponent) : exponent_(exponent) {}
+  inline PowOp(PowOp const& other): exponent_(other.exponent_) {}
+  inline PowOp(Type exponent): exponent_(exponent) {}
   inline result_type operator()(param1_type const& a) const  { return std::pow(a, exponent_); }
   const Type exponent_;
 };

@@ -1,6 +1,14 @@
 \name{NEWS}
 \title{News for Package 'rtkore}
 
+\section{Changes in rtkore version 1.2.2 (2017-03-29)}{
+  \itemize{
+    \item Vignettes are renamed
+    \item Fixing small bugs in expression evaluation
+    \item Adding iterators for Array1D and List1D containers
+    \item Adding extended Cholesky decomposition method 
+  }
+}
 \section{Changes in rtkore version 1.2.1 (2017-03-07)}{
   \itemize{
     \item Vignettes are correctly named

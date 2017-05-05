@@ -41,10 +41,9 @@
 #define STK_ITCONTAINER_H
 
 #include <Sdk/include/STK_IRecursiveTemplate.h>
-#include <Sdk/include/STK_StaticAssert.h>
 #include <Sdk/include/STK_Macros.h>
 
-#include "STK_Traits.h"
+#include "STK_ArraysTraits.h"
 #include "STK_Arrays_Util.h"
 
 namespace STK
@@ -114,6 +113,7 @@ class ITContainerBase: public IRecursiveTemplate<Derived>, hidden::NoAssignOpera
     typedef IRecursiveTemplate<Derived> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
     typedef typename hidden::Traits<Derived>::ReturnType ReturnType;
+    typedef typename hidden::Traits<Derived>::ConstReturnType ConstReturnType;
     enum
     {
       structure_ = hidden::Traits<Derived>::structure_,
@@ -135,7 +135,7 @@ class ITContainerBase: public IRecursiveTemplate<Derived>, hidden::NoAssignOpera
 
   public:
     /** @return the columns range */
-    inline ColRange const&cols() const { return this->asDerived().colsImpl();};
+    inline ColRange const& cols() const { return this->asDerived().colsImpl();};
     /**  @return the index of the first column */
     inline int beginCols() const { return cols().begin();}
     /**  @return the ending index of the columns */
@@ -696,7 +696,7 @@ class ITContainer<Derived, Arrays::point_> : public ITContainerBase<Derived>
 
   public:
     /** @return the range of the container */
-    inline ColRange const&range() const  { return this->asDerived().cols();}
+    inline ColRange const& range() const  { return this->asDerived().cols();}
     /** @return the index of the first element */
     inline int begin() const { return range().begin();}
     /**  @return the ending index of the elements */

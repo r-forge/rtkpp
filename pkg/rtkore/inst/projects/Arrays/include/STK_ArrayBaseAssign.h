@@ -39,18 +39,28 @@
 
 // this macro will be true if the assignation is correct and false otherwise
 #define CORRECT_ASSIGN(dst,src) \
-( (    ( dst==Arrays::array2D_ || dst==Arrays::square_) \
-     &&( src==Arrays::array2D_ || src==Arrays::square_  \
-      || src==Arrays::diagonal_ || src==Arrays::lower_triangular_ || src==Arrays::upper_triangular_) \
+( (  ( dst==Arrays::array2D_  || dst==Arrays::square_) \
+     && \
+     ( src==Arrays::array2D_           || src==Arrays::square_  \
+     || src==Arrays::diagonal_         || src==Arrays::number_ \
+     || src==Arrays::lower_triangular_ || src==Arrays::upper_triangular_) \
+  )  \
+  || \
+  (  ( dst==Arrays::array2D_) \
+     && \
+     (src==Arrays::vector_ || src==Arrays::point_|| src==Arrays::number_) \
+  )  \
+  || \
+  ( dst==Arrays::lower_triangular_ && src==Arrays::lower_triangular_) \
+  || \
+  ( dst==Arrays::upper_triangular_ && src==Arrays::upper_triangular_) \
+  || \
+  ( ( dst==Arrays::diagonal_ || dst==Arrays::vector_ || dst==Arrays::point_) \
+    && \
+    (src==Arrays::diagonal_ || src==Arrays::vector_ || src==Arrays::point_) \
   ) \
-  ||( dst==Arrays::array2D_ && src==Arrays::vector_) \
-  ||( dst==Arrays::array2D_ && src==Arrays::point_) \
-  ||( dst==Arrays::lower_triangular_ && src==Arrays::lower_triangular_) \
-  ||( dst==Arrays::upper_triangular_ && src==Arrays::upper_triangular_) \
-  ||(   (dst==Arrays::diagonal_ || dst==Arrays::vector_ || dst==Arrays::point_) \
-     && (src==Arrays::diagonal_ || src==Arrays::vector_ || src==Arrays::point_) \
-    ) \
-  ||( dst==Arrays::number_ && src==Arrays::number_) \
+  || \
+  ( dst==Arrays::number_ && src==Arrays::number_) \
 )
 
 namespace STK
@@ -59,7 +69,6 @@ namespace STK
 
 namespace hidden
 {
-
 /** @ingroup hidden
  *  @brief Copycat to use at compile time.
  *  If n is the number of structures, there is potentially n^2 ways to
@@ -580,11 +589,14 @@ inline Derived& ArrayBase<Derived>::assign(ExprBase<Rhs> const& rhs)
   enum
   {
     rhs_structure_ = hidden::Traits<Rhs>::structure_
-  , rhs_orient_ = hidden::Traits<Rhs>::orient_
-  , rhs_sizeRows_ = hidden::Traits<Rhs>::sizeRows_
-  , rhs_sizeCols_ = hidden::Traits<Rhs>::sizeCols_
+  , rhs_orient_    = hidden::Traits<Rhs>::orient_
+  , rhs_sizeRows_  = hidden::Traits<Rhs>::sizeRows_
+  , rhs_sizeCols_  = hidden::Traits<Rhs>::sizeCols_
   };
-   STK_STATIC_ASSERT(CORRECT_ASSIGN((Arrays::Structure)structure_, (Arrays::Structure)rhs_structure_),YOU_TRIED_TO_ASSIGN_A_NOT_COMPATIBLE_ARRAY);
+  STK_STATIC_ASSERT(CORRECT_ASSIGN((Arrays::Structure)structure_, (Arrays::Structure)rhs_structure_),YOU_TRIED_TO_ASSIGN_A_NOT_COMPATIBLE_ARRAY);
+  // check if assignment is possible
+  if (!hidden::CheckAssign<Derived, structure_, rhs_structure_>::isAllowed(this->asDerived(), rhs.rows(), rhs.cols()))
+  { STKRUNTIME_ERROR_2ARG(ArrayBase::assign,rhs.rows(),rhs.cols(),not permited);}
   // choose the correct way to resize if necessary
   hidden::resizeSelector<Derived, Rhs, rhs_structure_>::run(this->asDerived(), rhs.asDerived());
   // choose the correct way to copy

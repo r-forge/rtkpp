@@ -151,7 +151,7 @@ class ISymEigen : public IRunnerBase, public IRecursiveTemplate<Derived>
       // compute tolerance
       Real tol = Arithmetic<Real>::epsilon() * norm_;
       // compute PD^-P'
-      res = eigenVectors_ * eigenValues_.diagonalize().safeInverse(tol) * eigenVectors_.transpose();
+      res = eigenVectors_ * eigenValues_.asDiagonal().safeInverse(tol) * eigenVectors_.transpose();
       // result
       return res;
     }

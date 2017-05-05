@@ -223,6 +223,7 @@ struct Traits< BinaryOperator<BinaryOp, Lhs, Rhs> >
   // handle the case when the type is different in LHS and Rhs.
   typedef typename BinaryOp::result_type Type;
   typedef typename RemoveConst<Type>::Type ReturnType;
+  typedef typename RemoveConst<Type>::Type ConstReturnType;
 
   typedef RowOperator< BinaryOperator<BinaryOp, Lhs, Rhs> > Row;
   typedef ColOperator< BinaryOperator<BinaryOp, Lhs, Rhs> > Col;

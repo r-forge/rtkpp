@@ -44,6 +44,8 @@
 namespace STK
 {
 template< class Type> class List1D;
+template<class Derived> struct BiDirectionalIterator1D;
+template<class Derived> struct ConstBiDirectionalIterator1D;
 
 
 namespace hidden
@@ -54,13 +56,17 @@ namespace hidden
 template<class Type_>
 struct Traits< List1D<Type_> >
 {
-  typedef Type_          Type;
   typedef List1D<Type_> Row;
   typedef List1D<Type_> Col;
   typedef List1D<Type_> SubRow;
   typedef List1D<Type_> SubCol;
   typedef List1D<Type_> SubArray;
   typedef List1D<Type_> SubVector;
+
+  typedef Type_ Type;
+  typedef typename RemoveConst<Type_>::Type const& ReturnType;
+  typedef typename RemoveConst<Type_>::Type const& ConstReturnType;
+
   enum
   {
     structure_ = Arrays::point_,
@@ -70,11 +76,24 @@ struct Traits< List1D<Type_> >
     sizeRows_  = 1,
     storage_ = Arrays::dense_ // always dense
   };
+  typedef TRange<size_> RowRange;
+  typedef TRange<1>     ColRange;
+
+  typedef BiDirectionalIterator1D<List1D<Type_> > Iterator;
+  typedef ConstBiDirectionalIterator1D<List1D<Type_> > ConstIterator;
+
+  typedef std::reverse_iterator<Iterator> ReverseIterator;
+  typedef std::reverse_iterator<ConstIterator> ConstReverseIterator;
 };
 
 
 } // namespace hidden
+} // namespace STK
 
+#include <Arrays/include/iterators/STK_BiDirectionalIterator1D.h>
+
+namespace STK
+{
 /** @ingroup DManager
   * @brief Templated One dimensional Horizontal List.
   *
@@ -82,10 +101,9 @@ struct Traits< List1D<Type_> >
   * of homogeneous objects.
   **/
 template<class Type_>
-class List1D : public ITContainer1D< List1D<Type_> >, public IContainerRef
+class List1D: public ITContainer1D< List1D<Type_> >, public IContainerRef
 {
   public:
-    typedef typename hidden::Traits< List1D <Type_> >::Type Type;
     enum
     {
       structure_ = hidden::Traits< List1D <Type_> >::structure_,
@@ -94,8 +112,23 @@ class List1D : public ITContainer1D< List1D<Type_> >, public IContainerRef
       sizeCols_  = hidden::Traits< List1D <Type_> >::sizeCols_,
       storage_   = hidden::Traits< List1D <Type_> >::storage_
     };
-    typedef CellHo<Type> Cell;
+    typedef typename hidden::Traits<List1D<Type_> >::Type Type;
+    typedef typename hidden::Traits<List1D<Type_> >::RowRange RowRange;
+    typedef typename hidden::Traits<List1D<Type_> >::ColRange ColRange;
     typedef ITContainer1D< List1D<Type> > Base;
+    typedef CellHo<Type> Cell;
+
+    typedef typename hidden::Traits<List1D<Type > >::Iterator Iterator;
+    typedef typename hidden::Traits<List1D<Type > >::ConstIterator ConstIterator;
+    typedef typename hidden::Traits<List1D<Type > >::ReverseIterator ReverseIterator;
+    typedef typename hidden::Traits<List1D<Type> >::ConstReverseIterator ConstReverseIterator;
+
+    // Compatibility naming scheme with STL
+    typedef Iterator iterator;
+    typedef ConstIterator const_iterator;
+    typedef ReverseIterator reverse_iterator;
+    typedef ConstReverseIterator const_reverse_iterator;
+
 
     /** Default constructor : empty List. */
     List1D() : Base(), IContainerRef(false) { initialize(Range()); }
@@ -112,7 +145,7 @@ class List1D : public ITContainer1D< List1D<Type_> >, public IContainerRef
           : ITContainer1D<List1D >(I), IContainerRef(false)
     { initialize(I);
       Cell* p1  = p_begin_;
-      for ( int j=this->begin(); j<=this->lastIdx(); j++)
+      for ( int j=this->begin(); j<this->end(); j++)
       { (*p1) = v;             // overwrite the value of the current cell
         p1    = p1->getRight();   // Goto Right place
       }
@@ -127,7 +160,7 @@ class List1D : public ITContainer1D< List1D<Type_> >, public IContainerRef
       // copy the container
       Cell* p1  = p_begin_;
       Cell* pt1 = T.p_begin_;
-      for (int j=T.begin(); j<=T.lastIdx(); j++)
+      for (int j=T.begin(); j<T.end(); j++)
       { (*p1) = pt1->data();   // write the value of the current cell
         p1    = p1->getRight();   // Goto Right
         pt1   = pt1->getRight();  // Goto Right
@@ -153,6 +186,29 @@ class List1D : public ITContainer1D< List1D<Type_> >, public IContainerRef
       currentPosition_  = this->begin();
       p_current_ = p_begin_;
     }
+    /**  @return the range of the rows of the container */
+    inline RowRange const& rows() const  { return this->range();}
+     /** @return the index of the first element */
+    inline int beginRows() const { return this->begin();}
+    /**  @return the ending index of the elements */
+    inline int endRows() const { return this->end();}
+    /**  @return the size of the container */
+    inline int sizeRows() const  { return this->size();}
+
+    /** @return the Horizontal range (1 column) */
+    inline ColRange cols() const { return ColRange(1);}
+    /** @return the index of the first column */
+    inline int beginCols() const { return baseIdx;}
+    /**  @return the index of the ending column */
+    inline int endCols() const  { return baseIdx+1;}
+    /** @return the number of columns */
+    inline int sizeCols() const  { return 1;};
+
+    /**  @return the index of the last element */
+    inline int lastIdxRows() const  { return this->lastIdx();}
+    /**  @return the index of the last element */
+    inline int lastIdxCols() const  { return baseIdx;}
+
   protected:
     /** constructor by reference, ref_=1.
      *  This constructor does not copy physically the elements contained
@@ -540,7 +596,7 @@ class List1D : public ITContainer1D< List1D<Type_> >, public IContainerRef
       p1 = new Cell();        // pointer on the first cell
       p_begin_ = p1;                     // set the first cell
       // main loop for the other cells
-      for (int j=this->begin()+1; j<=this->lastIdx(); j++)
+      for (int j=this->begin()+1; j<this->end(); j++)
       { try
         { p2 = new Cell(p1);}        // try to allocate memory
         catch (std::bad_alloc & error)       // if an alloc error occur
@@ -571,7 +627,7 @@ class List1D : public ITContainer1D< List1D<Type_> >, public IContainerRef
       if (this->isRef()) return;   // Nothing to do for ref
       Cell *p2, *p1 =p_begin_;   // Auxiliary pointers for cells
       // for all cells
-      for (int j=this->begin(); j<=this->lastIdx(); j++)
+      for (int j=this->begin(); j<this->end(); j++)
       { p2 = p1->getRight();               // get the right cell
         delete p1;                         // delete the curent cell
         p1 = p2;                           // and iterate

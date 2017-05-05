@@ -1,0 +1,376 @@
+%\VignetteIndexEntry{STK++ Utilities, Reference Guide}
+
+\documentclass[a4paper,10pt]{article}
+
+%-------------------------
+% preamble for nice lsitings and notes
+\include{rtkpp-preamble}
+
+\geometry{top=2cm, bottom=2cm, left=1cm, right=1cm}
+
+%% need no \usepackage{Sweave.sty}
+<<prelim,echo=FALSE,print=FALSE>>=
+library(rtkore)
+rtkore.version <- packageDescription("rtkore")$Version
+rtkore.date <- packageDescription("rtkore")$Date
+@
+% Title Page
+\title{STK++ Utilities reference guide}
+\author{Serge Iovleff}
+\date{\today}
+
+% start documentation
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\maketitle
+
+\begin{abstract}
+This reference guide gives a general review of the capabilities offered
+by the \stkpp{} library. The library is divided in various \emph{projects}.
+The "Arrays" project is described in detail in the vignette "STK++ Arrays,
+User Guide" (\cite{rtkore-Arrays}) and the quick reference guide.
+This vignette focus on the "STatistiK" project and the "Algebra" project.
+\end{abstract}
+
+\tableofcontents
+
+\section{Statistical functors, methods and functions (STatistiK project)}
+\label{sec:STatistiK}
+
+This section describe the main features provided by the STatistiK project. Mainly
+\begin{enumerate}
+\item the probability classes (\ref{subsec:prob}),
+\item the descriptive statistical methods,
+\item the utilities related methods.
+\end{enumerate}
+
+\subsection{Probabilities }
+\label{subsec:prob}
+All the probabilities handled by R are available in \rtkore{}. In the stand-alone \stkpp{} library, only a
+subset of theses probabilities are implemented. Probability distribution classes are defined in the
+\code{namespace Law} and can be used as in this example
+
+\begin{minipage}[t]{0.66\textwidth}
+\lstinputlisting[style=customcpp,caption=Example]{programs/tutoProbability.cpp}
+\end{minipage}
+\hspace{0.2cm}
+\begin{minipage}[t]{0.33\textwidth}
+\addtocounter{lstlisting}{-1}
+\lstinputlisting[style=customcpp,caption=Output]{programs/tutoProbability.out}
+\end{minipage}
+
+All probability distribution classes have a similar prototype like the one given below
+\begin{lstlisting}[style=customcpp,caption=Prototype of probability distribution class (example taken from Cauchy class)]
+class Cauchy : public IUnivLaw<Real>
+{
+  public:
+    Cauchy( Real const& mu=0, Real const& scale=1);
+    virtual ~Cauchy() {}
+    Real const& mu() const;
+    Real const& scale() const;
+    void setMu( Real const& mu);
+    void setScale( Real const& scale);
+    virtual Real rand() const;
+    virtual Real pdf( Real const& x) const;
+    virtual Real lpdf( Real const& x) const;
+    virtual Real cdf( Real const& t) const;
+    virtual Real icdf( Real const& p) const;
+    static Real rand( Real const& mu, Real const& scale);
+    static Real pdf( Real const& x, Real const& mu, Real const& scale);
+    static Real lpdf( Real const& x, Real const& mu, Real const& scale);
+    static Real cdf( Real const& t, Real const& mu, Real const& scale);
+    static Real icdf( Real const& p, Real const& mu, Real const& scale);
+  protected:
+    Real mu_;
+    Real scale_;
+}
+\end{lstlisting}
+If $f$ denote the density of some probability distribution function (pdf) on $\R$,
+the methods have the following meaning
+\begin{enumerate}
+\item \code{pdf(x)} return the value $f(x)$,
+\item \code{lpdf(x)} return the value $\log(f(x))$,
+\item \code{rand()} return a a realization of the density $f$,
+\item \code{cdf(t)} return the cumulative distribution function value $F(t)=\int_{-\infty}^t f(x) dx$
+\item \code{icdf(p)} return the inverse cumulative distribution function value $F^{-1}(p)$.
+\end{enumerate}
+
+The table \ref{tab:prob} gives the list of available probability distribution.
+\begin{table}[htb]
+\begin{tabular}{|l|l|l|l|}
+\hline
+Name             & Constructor                                & R functions     & Notes\\
+\hline
+Bernoulli        & \ttcode{Law::Bernouilli(p) }          & -               & \\
+\hline
+Binomial         & \ttcode{Law::Binomial(n,p)}           & \ttcode{*binom} & \\
+\hline
+Beta             & \ttcode{Law::Beta(alpha,beta)}        & \ttcode{*beta} & \\
+\hline
+Categorical      & \ttcode{Law::Categorical(p)}          & -               & p can be any \stkpp{} vector \\
+\hline
+Cauchy           & \ttcode{Law::Cauchy(m,s)}             & \ttcode{*cauchy}& \\
+\hline
+ChiSquared       & \ttcode{Law::ChiSquared(n)}           & \ttcode{*chisq} & \\
+\hline
+Exponential      & \ttcode{Law::Exponential(lambda)}     & \ttcode{*exp}   & Parameterization $\frac{e^{-x/\lambda}}{\lambda}$ \\
+\hline
+FisherSnedecor   & \ttcode{Law::FisherSnedecor(df1,df2)} &  \ttcode{*f}    & \\
+\hline
+Gamma            & \ttcode{Law::Gamma(a,b)}              & \ttcode{*gamma} & Parameterization $\frac{x^{a-1}}{\beta^a\Gamma(a)} e^{-x/\beta}$ \\
+\hline
+Geometric        & \ttcode{Law::Geometric(p)}            & \ttcode{*geom}  &  \\
+\hline
+HyperGeometric   & \ttcode{Law::HyperGeometric(m,n,k)}   & \ttcode{*hyper} & \\
+\hline
+Logistic         & \ttcode{Law::Logistic(mu,scale)}      & \ttcode{*logis} & \\
+\hline
+LogNormal        & \ttcode{Law::LogNormal(mulog,sdlog)}  & \ttcode{*lnorm} & \\
+\hline
+NegativeBinomial & \ttcode{Law::NegativeBinomial(size,prob,mu)}& \ttcode{*nbinom}&\\
+\hline
+Normal           & \ttcode{Law::Normal(mu,sigma)}        & \ttcode{*norm}   &\\
+\hline
+Poisson          & \ttcode{Law::Poisson(lambda)}         & \ttcode{*poiss}  & \\
+\hline
+Student          & \ttcode{Law::Student(df)}             & \ttcode{*t}      &\\
+\hline
+Uniform          & \ttcode{Law::Uniform(a,b)}            & \ttcode{*unif}   & \\
+\hline
+UniformDiscrete  & \ttcode{Law::UniformDiscrete(a,b)}    & -                & \\
+\hline
+Weibull          & \ttcode{Law::Weibull(a)}              & \ttcode{*weibull} & \\
+\hline
+\end{tabular}
+\caption{List of the available probability distribution in \rtkore{}}
+\label{tab:prob}
+\end{table}
+
+\subsection{Statistical Methods and global functions}
+
+\stkpp{} provides a lot of methods, functions and functors in order to compute
+usual statistics.
+
+\subsubsection{Methods}
+Let $m$ be any kind of array (square, vector, point, etc...). it is possible to
+compute the $\min$, $\max$, mean, variance of the elements. These computations
+can be safe (i.e. discarding N.A. and infinite values) or unsafe and weighted
+
+\begin{table}[H]
+\begin{tabular}{|l|l|l|l|}
+\hline
+Method                  & weigthed version          & safe versions  & Notes\\
+\hline
+\ttcode{m.norm()}       & \ttcode{m.wnorm(w)}       & \ttcode{m.normSafe(); m.wnormSafe(w)}       & $\sqrt{\sum |m_{ij}|^2}$ \\
+\hline
+\ttcode{m.norm2()}      & \ttcode{m.wnorm2(w)}      & \ttcode{m.norm2Safe(); m.wnorm2Safe(w)}     & $\sum |m_{ij}|^2$  \\
+\hline
+\ttcode{m.normInf()}    & \ttcode{m.wnormInf(w)}    & \ttcode{m.normInfSafe(); m.wnormInfSafe(w)} & $\sup |m_{ij}|$\\
+\hline
+\ttcode{m.sum()}        & \ttcode{m.wsum(w)}        & \ttcode{m.sumSafe(); m.wsumSafe(w)}         & $\sum m_{ij}$ \\
+\hline
+\ttcode{m.mean()}       & \ttcode{m.wmean(w)}       & \ttcode{m.meanSafe(); m.wmeanSafe(w)}        & $\frac{1}{n}\sum m_{ij}$\\
+\hline
+\ttcode{m.variance()}   & \ttcode{m.wvariance(w)}   & \ttcode{m.varianceSafe(); m.wvarianceSafe(w)} & $\frac{1}{n}\sum (m_{ij}-\bar{m})^2$\\
+\hline
+\ttcode{m.variance(mu)} & \ttcode{m.wvariance(mu,w)}& \ttcode{m.varianceSafe(mu); m.wvarianceSafe(mu,w)}& $\frac{1}{n}\sum (m_{ij}-\mu)^2$\\
+\hline
+\end{tabular}
+\caption{List of the available statistical methods for the arrays. $n$ represents the number of elements of $m$. For safe
+versions, $n$ represents the number of available observations in $m$.}
+\end{table}
+
+\subsubsection{Statistical functions}
+
+For two dimensional arrays, there exists global functions allowing to compute
+the usual statistics by column or by row. By default all global functions are
+computing the statistics columns by columns. For example, if $m$ is an array, \code{sum(m)}
+return a row-vector of range \code{m.cols()} containing the sum of each columns.
+The alias \code{sumByCol(m)} can also be used. The sum of each rows can be obtained
+using the function \code{sumByow(m)} which return an array of range \code{m.rows()}.
+
+These computations can be safe (i.e. discarding N.A. and infinite values) or unsafe
+and/or weighted.
+
+\begin{table}[H]
+\begin{tabular}{|l|l|l|l|}
+\hline
+Function                 & weigthed version        & safe versions  \\
+\hline
+\ttcode{min(m)}          & \ttcode{min(m, w)}      &\ttcode{minSafe(m/*,w*/)} \\
+\ttcode{minByCol(m)}     & \ttcode{minByCol(m, w)} &\ttcode{minSafeByCol(m/*,w*/)} \\
+\ttcode{minByRow(m)}     & \ttcode{minByRow(m, w)} &\ttcode{minSafeByRow(m/*,w*/)} \\
+\hline
+\ttcode{max(m)}          & \ttcode{max(m, w)}      &\ttcode{maxSafe(m/*,w*/)} \\
+\ttcode{maxByCol(m)}     & \ttcode{maxByCol(m, w)} &\ttcode{maxSafeByCol(m/*,w*/)} \\
+\ttcode{maxByRow(m)}     & \ttcode{maxByRow(m, w)} &\ttcode{maxSafeByRow(m/*,w*/)} \\
+\hline
+\ttcode{sum(m)}          & \ttcode{sum(m, w)}      &\ttcode{sumSafe(m/*,w*/)} \\
+\ttcode{sumByCol(m)}     & \ttcode{sumByCol(m, w)} &\ttcode{sumSafeByCol(m/*,w*/)} \\
+\ttcode{sumByRow(m)}     & \ttcode{sumByRow(m, w)} &\ttcode{sumSafeByRow(m/*,w*/)} \\
+\hline
+\ttcode{mean(m)}          & \ttcode{mean(m, w)}      &\ttcode{meanSafe(m/*,w*/)}   \\
+\ttcode{meanByCol(m)}     & \ttcode{meanByCol(m, w)} &\ttcode{meanSafeByCol(m/*,w*/)} \\
+\ttcode{meanByRow(m)}     & \ttcode{meanByRow(m, w)} &\ttcode{meanSafeByRow(m/*,w*/)} \\
+\hline
+\ttcode{variance(m, unbiased)}          & \ttcode{variance(m, w, unbiased)}      &\ttcode{varianceSafe(m/*,w*/, unbiased)}      \\
+\ttcode{varianceByCol(m, unbiased)}     & \ttcode{varianceByCol(m, w, unbiased)} &\ttcode{varianceSafeByCol(m/*,w*/, unbiased)} \\
+\ttcode{varianceByRow(m, unbiased)}     & \ttcode{varianceByRow(m, w, unbiased)} &\ttcode{varianceSafeByRow(m/*,w*/, unbiased)} \\
+\hline
+\ttcode{varianceWithFixedMean(m, mu, unbiased)}       & \ttcode{variance*(m, w, mu, unbiased)}      &\ttcode{variance*Safe(m/*,w*/, mu, unbiased)}  \\
+\ttcode{varianceWithFixedMeanByCol(m, mu, unbiased)}  & \ttcode{variance*ByCol(m, w, mu, unbiased)} &\ttcode{variance*SafeByCol(m/*,w*/, mu, unbiased)} \\
+\ttcode{varianceWithFixedMeanByRow(m, mu, unbiased)}  & \ttcode{variance*ByRow(m, w, mu, unbiased)} & \ttcode{variance*SafeByRow(m/*,w*/, mu, unbiased)} \\
+\hline
+\end{tabular}
+\caption{List of the available global statistical functions for arrays. $m$ is the array, $w$ the vector of weights. \code{unbiased}
+is a Boolean to set to \code{true} if unbiased variance (divided by $n-1$) is desired. }
+\end{table}
+
+The covariance can be computed in two ways : using two vectors of same size, or using all
+the columns (rows) of a two-dimensional array. In the first case the functions return
+the value of the covariance, in the second case, they return a \code{CSquareArray}.
+
+\begin{table}[H]
+\begin{tabular}{|l|l|l|l|}
+\hline
+Function                               & weigthed version          & safe versions \\
+\hline
+\ttcode{covariance(v1, v2, unbiased)}  & \ttcode{covariance(v1, v2, w, unbiased)} &
+\vcell{ \ttcode{covarianceSafe(v1, v2, unbiased)} \\ \ttcode{covarianceSafe(v1, v2, w, unbiased)} } \\
+\hline
+\ttcode{covarianceWithFixedMean(v1, v2, mean, unbiased)}  & \ttcode{covariance*(v1, v2, w, mean, unbiased)} &\ttcode{covariance*Safe(v1, v2, unbiased)} \\
+\hline
+\hline
+\ttcode{covariance(m, unbiased)}       & \ttcode{covariance(m, w, unbiased)} & \\
+\ttcode{covarianceByRow(m, unbiased)}       & \ttcode{covarianceByRow(m, w, unbiased)} & \\
+\hline
+\ttcode{covarianceWithFixedMean(m, mean, unbiased)}       & \ttcode{covariance*(m, w, mean, unbiased)} & \\
+\ttcode{covarianceWithFixedMeanByRow(m, mean, unbiased)}       & \ttcode{covariance*ByRow(m, w, mean, unbiased)} & \\
+\hline
+\end{tabular}
+\caption{List of the available covariance functions for vectors and arrays. $v_1$ and $v_2$ are vectors, $m$ is an array, $w$ a vector of weights. \code{unbiased}
+is a Boolean to set to \code{true} if unbiased covariance (divided by $n-1$) is desired.
+The first set of covariance functions return a scalar, the second set of covariance functions return a \code{CSquareArray}}
+\end{table}
+
+The following example illustrate the use of the covariance function:
+
+\begin{minipage}[t]{0.66\textwidth}
+\lstinputlisting[style=customcpp,caption=Example]{programs/tutoStatCovariance.cpp}
+\end{minipage}
+\hspace{0.2cm}
+\begin{minipage}[t]{0.33\textwidth}
+\addtocounter{lstlisting}{-1}
+\lstinputlisting[style=customcpp,caption=Output]{programs/tutoStatCovariance.out}
+\end{minipage}
+
+\subsection{Miscellaneous statistical functions}
+
+Given an array $m$, it is possible to center it, to standardize it and to perform the
+reverse operations as illustrated in the following exemple
+
+\begin{minipage}[t]{0.66\textwidth}
+\lstinputlisting[style=customcpp,caption=Example]{programs/tutoStatTransform.cpp}
+\end{minipage}
+\hspace{0.2cm}
+\begin{minipage}[t]{0.33\textwidth}
+\addtocounter{lstlisting}{-1}
+\lstinputlisting[style=customcpp,caption=Output]{programs/tutoStatTransform.out}
+\end{minipage}
+
+\begin{table}[H]
+\begin{tabular}{|l|l|}
+\hline
+Function                 & weigthed version \\
+\hline
+\ttcode{center(m, mean)} & \ttcode{center(m, w, mean)} \\
+\ttcode{centerByCol(m, mean)} & \ttcode{centerByCol(m, w, mean)} \\
+\ttcode{centerByRow(m, mean)} & \ttcode{centerByRow(m, w, mean)} \\
+\hline
+\ttcode{standardize(m, std, unbiased)} & \ttcode{standardize(m, w, std, unbiased)} \\
+\ttcode{standardizeByCol(m, std, unbiased)} & \ttcode{standardizeByCol(m, w, std, unbiased)} \\
+\ttcode{standardizeByRow(m, std, unbiased)} & \ttcode{standardizeByRow(m, w, std, unbiased)} \\
+\hline
+\ttcode{standardize(m, mean, std, unbiased)} & \ttcode{standardize(m, w, mean, std, unbiased)} \\
+\ttcode{standardizeByCol(m, mean, std, unbiased)} & \ttcode{standardizeByCol(m, w, mean, std, unbiased)} \\
+\ttcode{standardizeByRow(m, mean, std, unbiased)} & \ttcode{standardizeByRow(m, w, mean, std, unbiased)} \\
+\hline
+\ttcode{uncenter(m, mean)}      &  \\
+\ttcode{uncenterByCol(m, mean)} &  \\
+\ttcode{uncenterByRow(m, mean)} &  \\
+\hline
+\ttcode{unstandardize(m, std)}      &  \\
+\ttcode{unstandardizeByCol(m, std)} &  \\
+\ttcode{unstandardizeByRow(m, std)} &  \\
+\hline
+\ttcode{unstandardize(m, mean, std)}      &  \\
+\ttcode{unstandardizeByCol(m, mean, std)} &  \\
+\ttcode{unstandardizeByRow(m, mean, std)} &  \\
+\hline
+\end{tabular}
+\caption{List of the available utilites functions for centering and/or standardize an array.
+$m$ is an array, $w$ a vector of weights. If used on the columns, \code{mean} and \code{std}
+have to be points (row-vectors), if used by rows, \code{mean} and \code{std} have to be
+vectors.\code{unbiased} is a boolean to set to \code{true} if unbiased covariance (divided by $n-1$)
+is desired.}
+\end{table}
+
+\subsection{Computing factors}
+
+Given a finite collection of object in a vector or an array/expression, it is possible to encode
+it as factor using the classes \code{Stat::Factor} (for vectors) and \code{Stat::MultiFactor}
+(for array). These classes are runners and you have to use the \code{run} method in order to
+trigger the computation of the factors.
+
+An exemple is given below
+
+\begin{minipage}[t]{0.66\textwidth}
+\lstinputlisting[style=customcpp,caption=Example]{programs/tutoStatFactors.cpp}
+\end{minipage}
+\hspace{0.2cm}
+\begin{minipage}[t]{0.33\textwidth}
+\addtocounter{lstlisting}{-1}
+\lstinputlisting[style=customcpp,caption=Output]{programs/tutoStatFactors.out}
+\end{minipage}
+
+\section{Linear Algebra classes, methods and functions}
+
+\stkpp{} basic linear operation as product, dot product, sum, multiplication
+by a scalar,... are encoded in template expressions and optimized.
+
+Since \stkpp{} version 0.9 and later, LAPACK library can be used as backends for dense matrix
+matrix decompositions (QR, Svd, eigenvalues) and least square regression. In order to use lapack,
+you must activate its usage by defining the following macros \ttcode{-DSTKUSELAPACK} at
+compilation time and by linking your code with your installed lapack library using \ttcode{-llapack}
+(at least in *nix operating systems).
+
+
+\begin{table}[H]
+\begin{tabular}{|l|l|l|}
+\hline
+Class                 & constructor                                 &  Note \\
+\hline
+lapack::Qr            & Qr( data, ref = false) & if data is an \ttcode{ArrayXX} and  \ttcode{ref} is true, data will be overwritten by $Q$ \\
+                      & Qr( data)                   & \\
+\hline
+lapack::Svd           & Svd( data, ref = false, withU=true, withV=true) & if \ttcode{ref} is true, data will be overwritten \\
+                      & Svd(data)           & \\
+\hline
+lapack::SymEigen      & SymEigen( data, ref = false) & if data is a \ttcode{SquareArray} and  \ttcode{ref} is true, data will be overwritten by $P$ \\
+                      & SymEigen( data)                   & \\
+\hline
+lapack::MultiLeastSquare & MultiLeastSquare( b, a, isBref = false, isBref=false) & \\
+                      & MultiLeastSquare( b, a)           & \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{To be continued...}
+
+%-----------------------------------------
+% bibliography
+\bibliographystyle{plain}
+\bibliography{rtkore}
+\end{document}
+

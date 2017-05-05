@@ -70,7 +70,7 @@ struct AlgebraTraits< Svd<Array_> >
 
 /** Computing the bidiagonalization of M.
  *  The diagonal and the subdiagonal are stored in D and F
- *  @param M the matrix to bi-diagonalize, the matrix is overwritten
+ *  @param M the matrix to bi-asDiagonal, the matrix is overwritten
  *  with the left and right Householder vectors.
  *  The method return the estimate of the inf norm of M.
  *  @param D the element of the diagonal
@@ -257,7 +257,7 @@ bool Svd<Array>::computeSvd()
   F_.resize(0,0);
   U_.shift(beginRow, beginCol);
   D_.shift(beginCol);
-  V_.shift(beginCol); // U_*D_.diagonalize()*VT_ will work
+  V_.shift(beginCol); // U_*D_.asDiagonal()*VT_ will work
   return error;
 }
 

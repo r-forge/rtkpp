@@ -28,26 +28,26 @@
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
 
-/** @file STK_SparseMatrix.h
+/** @file STK_SparseArray.h
  *  @brief In this file we define the SparseMatrix class.
  **/
 
-#ifndef STK_SPARSEMATRIX_H
-#define STK_SPARSEMATRIX_H
+#ifndef STK_SPARSEARRAY_H
+#define STK_SPARSEARRAY_H
 
 /** @brief
  *
  */
-class SparseMatrix
+class SparseArray
 {
   public:
-    SparseMatrix()
+    SparseArray()
     {
     }
-    ~SparseMatrix()
+    ~SparseArray()
     {
     }
   private:
 };
 
-#endif /* STK_SPARSEMATRIX_H */
+#endif /* STK_SPARSEARRAY_H */

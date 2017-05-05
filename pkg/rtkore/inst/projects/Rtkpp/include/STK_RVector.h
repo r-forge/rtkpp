@@ -36,13 +36,13 @@
 #ifndef STK_RVECTOR_H
 #define STK_RVECTOR_H
 
-#include "../projects/Arrays/include/STK_ExprBaseVisitor.h"
-#include "../projects/Arrays/include/STK_ExprBaseDot.h"
-#include "../projects/Arrays/include/STK_ExprBaseProduct.h"
+#include <Arrays/include/STK_ExprBaseVisitor.h>
+#include <Arrays/include/STK_ExprBaseDot.h>
+#include <Arrays/include/STK_ExprBaseProduct.h>
 
-#include "../projects/Arrays/include/STK_ArrayBaseApplier.h"
-#include "../projects/Arrays/include/STK_ArrayBaseAssign.h"
-#include "../projects/Arrays/include/STK_ArrayBaseInitializer.h"
+#include <Arrays/include/STK_ArrayBaseApplier.h>
+#include <Arrays/include/STK_ArrayBaseAssign.h>
+#include <Arrays/include/STK_ArrayBaseInitializer.h>
 
 namespace STK
 {
@@ -72,6 +72,7 @@ struct Traits< RVector<Type_> >
 
     typedef Type_ Type;
     typedef Type const& ReturnType;
+    typedef Type const& ConstReturnType;
 
     enum
     {
@@ -112,17 +113,17 @@ class RVector : public ArrayBase< RVector<Type_> >, public TRef<1>
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
 
-    /** Default Constructor. */
+    /** Default Constructor */
     inline RVector(): vector_(),rows_(), cols_(0,1) {}
-    /** Constructor with given dimension. */
+    /** Constructor with given dimension */
     inline RVector(int length): vector_(length),rows_(0,length), cols_(0,1) {}
     /** Constructor */
     inline RVector( Rcpp::Vector<Rtype_> vector)
                   : vector_(vector), rows_(vector.length()), cols_(0,1) {}
-    /** Constructor with SEXP. */
+    /** Constructor with SEXP */
     inline RVector( SEXP robj)
                   : vector_(robj), rows_(0, vector_.size()), cols_(0,1) {}
-    /** Constructor with SEXP. */
+    /** Copy constructor */
     inline RVector( RVector robj, bool ref)
                   : vector_(robj), rows_(0, robj.size()), cols_(0,1) {}
 

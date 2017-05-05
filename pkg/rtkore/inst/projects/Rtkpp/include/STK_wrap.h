@@ -41,15 +41,15 @@ namespace STK
 namespace hidden
 {
 // forward declaration
-template<class Derived, int structure = Traits<Derived>::structure_ >
+template<class Derived, int Structure_ = Traits<Derived>::structure_, int Orient_ =  Traits<Derived>::orient_>
 struct WrapHelper;
 
 
 /** @ingroup hidden
  * Specialization of WrapHelpher for vector_
  */
-template<class Derived>
-struct WrapHelper<Derived, Arrays::vector_>
+template<class Derived, int Orient_>
+struct WrapHelper<Derived, Arrays::vector_, Orient_>
 {
   typedef typename Traits<Derived>::Type Type;
   enum
@@ -68,8 +68,8 @@ struct WrapHelper<Derived, Arrays::vector_>
 };
 
 // specialization for vector_
-template<class Derived>
-struct WrapHelper<Derived, Arrays::point_>
+template<class Derived, int Orient_>
+struct WrapHelper<Derived, Arrays::point_, Orient_>
 {
   typedef typename Traits<Derived>::Type Type;
   enum
@@ -87,9 +87,33 @@ struct WrapHelper<Derived, Arrays::point_>
   }
 };
 
+// specialization for diagonal_
+template<class Derived, int Orient_>
+struct WrapHelper<Derived, Arrays::diagonal_, Orient_>
+{
+  typedef typename Traits<Derived>::Type Type;
+  enum
+  {
+    Rtype_ = RcppTraits<Type>::Rtype_
+  };
+  typedef Rcpp::Matrix<Rtype_> Result;
+
+  static SEXP wrapImpl(Derived const& d)
+  {
+    Result res(d.size(), d.size());
+    for(int i=d.begin(), iRes=0; i< d.end(); i++, iRes++)
+    {
+      for(int j=d.begin(), jRes=0; j< d.end(); j++, jRes++)
+      { res(iRes, jRes) = Type(0);}
+      res(iRes, iRes) = d.elt(i);
+    }
+    return Rcpp::wrap(res);
+  }
+};
+
 // specialization for array2D_
 template<class Derived>
-struct WrapHelper<Derived, Arrays::array2D_>
+struct WrapHelper<Derived, Arrays::array2D_, Arrays::by_col_>
 {
   typedef typename Traits<Derived>::Type Type;
   enum
@@ -109,10 +133,74 @@ struct WrapHelper<Derived, Arrays::array2D_>
     return Rcpp::wrap(res);
   }
 };
+template<class Derived>
+struct WrapHelper<Derived, Arrays::array2D_, Arrays::by_row_>
+{
+  typedef typename Traits<Derived>::Type Type;
+  enum
+  {
+    Rtype_ = RcppTraits<Type>::Rtype_
+  };
+  typedef Rcpp::Matrix<Rtype_> Result;
+
+  static SEXP wrapImpl(Derived const& matrix)
+  {
+    Result res(matrix.sizeRows(), matrix.sizeCols());
+    for(int i=matrix.beginRows(), iRes=0; i< matrix.endRows(); i++, iRes++)
+    {
+      for(int j=matrix.beginCols(), jRes=0; j< matrix.endCols(); j++, jRes++)
+      { res(iRes, jRes) = matrix.elt(i,j);}
+    }
+    return Rcpp::wrap(res);
+  }
+};
 
 // specialization for array2D_
 template<class Derived>
-struct WrapHelper<Derived, Arrays::square_>
+struct WrapHelper<Derived, Arrays::square_, Arrays::by_col_>
+{
+  typedef typename Traits<Derived>::Type Type;
+  enum
+  {
+    Rtype_ = RcppTraits<Type>::Rtype_
+  };
+  typedef Rcpp::Matrix<Rtype_> Result;
+
+  static SEXP wrapImpl(Derived const& matrix)
+  {
+    Result res(matrix.size(), matrix.size());
+    for(int j=matrix.begin(), jRes=0; j< matrix.end(); j++, jRes++)
+    {
+      for(int i=matrix.begin(), iRes=0; i< matrix.end(); i++, iRes++)
+      { res(iRes, jRes) = matrix.elt(i,j);}
+    }
+    return Rcpp::wrap(res);
+  }
+};
+template<class Derived>
+struct WrapHelper<Derived, Arrays::square_, Arrays::by_row_>
+{
+  typedef typename Traits<Derived>::Type Type;
+  enum
+  {
+    Rtype_ = RcppTraits<Type>::Rtype_
+  };
+  typedef Rcpp::Matrix<Rtype_> Result;
+
+  static SEXP wrapImpl(Derived const& matrix)
+  {
+    Result res(matrix.size(), matrix.size());
+    for(int i=matrix.begin(), iRes=0; i< matrix.end(); i++, iRes++)
+    {
+      for(int j=matrix.begin(), jRes=0; j< matrix.end(); j++, jRes++)
+      { res(iRes, jRes) = matrix.elt(i,j);}
+    }
+    return Rcpp::wrap(res);
+  }
+};
+// specialization for upper_triangular_
+template<class Derived>
+struct WrapHelper<Derived, Arrays::upper_triangular_, Arrays::by_col_>
 {
   typedef typename Traits<Derived>::Type Type;
   enum
@@ -126,12 +214,78 @@ struct WrapHelper<Derived, Arrays::square_>
     Result res(matrix.sizeRows(), matrix.sizeCols());
     for(int j=matrix.beginCols(), jRes=0; j< matrix.endCols(); j++, jRes++)
     {
-      for(int i=matrix.beginRows(), iRes=0; i< matrix.endRows(); i++, iRes++)
+      for(int i=matrix.beginRows(), iRes=0; i<= j; i++, iRes++)
       { res(iRes, jRes) = matrix.elt(i,j);}
     }
     return Rcpp::wrap(res);
   }
 };
+template<class Derived>
+struct WrapHelper<Derived, Arrays::upper_triangular_, Arrays::by_row_>
+{
+  typedef typename Traits<Derived>::Type Type;
+  enum
+  {
+    Rtype_ = RcppTraits<Type>::Rtype_
+  };
+  typedef Rcpp::Matrix<Rtype_> Result;
+
+  static SEXP wrapImpl(Derived const& matrix)
+  {
+    Result res(matrix.sizeRows(), matrix.sizeCols());
+    for(int i=matrix.beginRows(), iRes=0; i< matrix.endRows(); i++, iRes++)
+    {
+      for(int j=i, jRes=iRes; j< matrix.endCols(); j++, jRes++)
+      { res(iRes, jRes) = matrix.elt(i,j);}
+    }
+    return Rcpp::wrap(res);
+  }
+};
+
+// specialization for array2D_
+template<class Derived>
+struct WrapHelper<Derived, Arrays::lower_triangular_, Arrays::by_col_>
+{
+  typedef typename Traits<Derived>::Type Type;
+  enum
+  {
+    Rtype_ = RcppTraits<Type>::Rtype_
+  };
+  typedef Rcpp::Matrix<Rtype_> Result;
+
+  static SEXP wrapImpl(Derived const& matrix)
+  {
+    Result res(matrix.sizeRows(), matrix.sizeCols());
+    for(int j=matrix.beginCols(), jRes=0; j< matrix.endCols(); j++, jRes++)
+    {
+      for(int i=j, iRes=jRes; i< matrix.endRows(); i++, iRes++)
+      { res(iRes, jRes) = matrix.elt(i,j);}
+    }
+    return Rcpp::wrap(res);
+  }
+};
+template<class Derived>
+struct WrapHelper<Derived, Arrays::lower_triangular_, Arrays::by_row_>
+{
+  typedef typename Traits<Derived>::Type Type;
+  enum
+  {
+    Rtype_ = RcppTraits<Type>::Rtype_
+  };
+  typedef Rcpp::Matrix<Rtype_> Result;
+
+  static SEXP wrapImpl(Derived const& matrix)
+  {
+    Result res(matrix.sizeRows(), matrix.sizeCols());
+    for(int i=matrix.beginRows(), iRes=0; i< matrix.endRows(); i++, iRes++)
+    {
+      for(int j=matrix.beginCols(), jRes=0; j<=i; j++, jRes++)
+      { res(iRes, jRes) = matrix.elt(i,j);}
+    }
+    return Rcpp::wrap(res);
+  }
+};
+
 
 } // namespace hidden
 

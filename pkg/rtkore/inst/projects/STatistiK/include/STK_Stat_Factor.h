@@ -85,28 +85,35 @@ class Factor: public IRunnerWithData<Array>
     /** clone pattern */
     inline virtual Factor* clone() const { return new Factor(*this);}
 
-    /** @return array with the factors encoded as integers */
+    /** @return vector with the factors encoded as integers */
     inline CVectorXi const& asInteger() const { return asInteger_;}
-    /** @return array with for each variables the levels */
+    /** @return vector with the levels */
     inline Array2DVector<Type> const& levels() const {return levels_;}
-    /** @return array with for each variables the counts of the levels */
+    /** @return vector with the counts of each level */
     inline VectorXi const& counts() const {return counts_;}
-    /** @return array with for each variables the number of levels */
+    /** @return the value of the first level */
+    inline int const& firstLevel() const { return firstLevel_;}
+    /** @return number of levels */
     inline int const& nbLevels() const { return nbLevels_;}
-    /** @return array with the encoding maps factor to int */
+    /** @return encoding maps factor from Type -> int */
     inline EncodingMap const& encoder() const { return encoder_;}
-    /** @return array with the encoding maps factor to int */
+    /** @return decoding maps factor from int -> Type */
     inline DecodingMap const& decoder() const { return decoder_;}
+
+    /** set the value of the first level */
+    inline void setFirstLevel(int firstLevel) { firstLevel_ = firstLevel;}
 
     /** run the estimation of the Factor statistics. **/
     virtual bool run();
 
   protected:
-    /** Array of the data size with the levels of each variables in an integer format*/
+    /** vector with the levels in an integer format*/
     CVectorXi asInteger_;
+    /** first level */
+    int firstLevel_;
     /** Number of levels of each variables */
     int nbLevels_;
-    /** Array with the levels of each variables */
+    /** vector with the levels */
     Array2DVector<Type> levels_;
     /** Array with the counts of each factor */
     VectorXi counts_;
@@ -120,11 +127,13 @@ class Factor: public IRunnerWithData<Array>
 };
 
 template <class Array>
-Factor<Array>::Factor(): Base(), asInteger_(), nbLevels_(), levels_(), counts_(), encoder_() {}
+Factor<Array>::Factor(): Base(), asInteger_(), firstLevel_(baseIdx), nbLevels_()
+                       , levels_(), counts_(), encoder_() {}
 
 template <class Array>
 Factor<Array>::Factor( Array const& data): Base(data)
                                          , asInteger_(p_data_->range())
+                                         , firstLevel_(baseIdx)
                                          , nbLevels_(0)
                                          , levels_()
                                          , counts_()
@@ -138,6 +147,7 @@ Factor<Array>::Factor( Array const& data): Base(data)
 template <class Array>
 Factor<Array>::Factor( Array const* p_data): Base(p_data)
                                            , asInteger_()
+                                           , firstLevel_(baseIdx)
                                            , nbLevels_(0)
                                            , levels_()
                                            , counts_()
@@ -152,7 +162,8 @@ Factor<Array>::Factor( Array const* p_data): Base(p_data)
 }
 
 template <class Array>
-Factor<Array>::Factor( Factor const& f): Base(f), asInteger_(f.asInteger_), nbLevels_(f.nbLevels_)
+Factor<Array>::Factor( Factor const& f): Base(f), asInteger_(f.asInteger_)
+                                       , firstLevel_(f.firstLevel_), nbLevels_(f.nbLevels_)
                                        , levels_(f.levels_), counts_(f.counts_)
                                        , encoder_(f.encoder_)
                                        , decoder_(f.decoder_)
@@ -165,6 +176,7 @@ void Factor<Array>::update()
    if (p_data_)
    {
      asInteger_.resize(p_data_->rows());
+     firstLevel_ = baseIdx;
      nbLevels_=0;
      levels_.clear();
      counts_.clear();
@@ -194,9 +206,10 @@ bool Factor<Array>::run()
       else // find a new level to add
       {
         // create a new level and set it
-        asInteger_[i] = nbLevels_;
-        encoder_.insert(std::pair<Type, int>(idData, nbLevels_));
-        decoder_.insert(std::pair<int, Type>(nbLevels_, idData));
+        int lev = firstLevel_ + nbLevels_;
+        asInteger_[i] = lev;
+        encoder_.insert(std::pair<Type, int>(idData, lev));
+        decoder_.insert(std::pair<int, Type>(lev, idData));
         levels_.push_back(idData);
         counts_.push_back(1); // start counting for this new level
         nbLevels_++;

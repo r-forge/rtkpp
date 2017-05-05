@@ -19,7 +19,7 @@
     Boston, MA 02111-1307
     USA
 
-    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
+    Contact: S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 */
 
 /*
@@ -35,14 +35,14 @@
 #ifndef STK_ARRAY1D_H
 #define STK_ARRAY1D_H
 
-#include <Arrays/include/STK_ExprBase.h>
+#include "STK_ExprBase.h"
 #include "STK_IArray1D.h"
 
 namespace STK
 {
-
 template<class Type, int Size_ = UnknownSize > class Array1D;
-
+template<class Derived> struct RandomIterator1D;
+template<class Derived> struct ConstRandomIterator1D;
 
 namespace hidden
 {
@@ -61,6 +61,7 @@ struct Traits< Array1D<Type_, Size_> >
 
   typedef Type_ Type;
   typedef typename RemoveConst<Type_>::Type const& ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   enum
   {
@@ -71,10 +72,25 @@ struct Traits< Array1D<Type_, Size_> >
     sizeRows_  = Size_,
     storage_   = Arrays::dense_ // always dense
   };
+
+  typedef TRange<size_> RowRange;
+  typedef TRange<1>     ColRange;
+
+  typedef RandomIterator1D<Array1D<Type_, Size_> > Iterator;
+  typedef ConstRandomIterator1D<Array1D<Type_, Size_> > ConstIterator;
+
+  typedef std::reverse_iterator<Iterator> ReverseIterator;
+  typedef std::reverse_iterator<ConstIterator> ConstReverseIterator;
 };
 
 } // namespace hidden
 
+}
+
+#include "iterators/STK_RandomIterator1D.h"
+
+namespace STK
+{
 /** @ingroup Arrays
  *  @brief Templated one dimensional Arrays.
  * 
@@ -84,73 +100,77 @@ struct Traits< Array1D<Type_, Size_> >
  *
  * @note It is a final class for the curious recursive paradigm.
  *
- * @tparam the Type of the objects stored in the @c Array1D
+ * @tparam Type of the objects stored in the @c Array1D
+ * @tparam Size_ size of the vector if it known. Default is @c UnknownSize
  **/
 template<class Type, int Size_ >
-class Array1D : public IArray1D< Array1D<Type, Size_> >
+class Array1D: public IArray1D< Array1D<Type, Size_> >
 {
   public:
+    enum
+    {
+      structure_ = hidden::Traits<Array1D<Type, Size_> >::structure_,
+      orient_    = hidden::Traits<Array1D<Type, Size_> >::orient_,
+      size_      = Size_,
+      sizeCols_  = 1,
+      sizeRows_  = Size_,
+      storage_   = Arrays::dense_ // always dense
+    };
+    typedef IArray1D< Array1D<Type, Size_> > Base;
+
     typedef typename hidden::Traits<Array1D<Type, Size_> >::Row Row;
     typedef typename hidden::Traits<Array1D<Type, Size_> >::Col Col;
     typedef typename hidden::Traits<Array1D<Type, Size_> >::SubRow SubRow;
     typedef typename hidden::Traits<Array1D<Type, Size_> >::SubCol SubCol;
     typedef typename hidden::Traits<Array1D<Type, Size_> >::SubVector SubVector;
     typedef typename hidden::Traits<Array1D<Type, Size_> >::SubArray SubArray;
-    /** Type for the Array1DBase Class. */
-    typedef IArray1D< Array1D<Type, Size_> > Base;
+
+    typedef typename hidden::Traits<Array1D<Type, Size_> >::Iterator Iterator;
+    typedef typename hidden::Traits<Array1D<Type, Size_> >::ConstIterator ConstIterator;
+    typedef typename hidden::Traits<Array1D<Type, Size_> >::ReverseIterator ReverseIterator;
+    typedef typename hidden::Traits<Array1D<Type, Size_> >::ConstReverseIterator ConstReverseIterator;
+
+    // Compatibility naming scheme with STL
+    typedef Iterator iterator;
+    typedef ConstIterator const_iterator;
+    typedef ReverseIterator reverse_iterator;
+    typedef ConstReverseIterator const_reverse_iterator;
+
     /** Default constructor. */
-    Array1D() : Base(){}
+    Array1D(): Base(){}
     /** constructor with a specified Range
      *  @param I range of the container
      **/
-    Array1D( Range const& I) : Base(I) {}
+    Array1D( Range const& I): Base(I) {}
     /** Misc constructor with beg and end, initialization with a constant.
-     *  @param I range of the container
-     *  @param v initial value of the container
+     *  @param I,v range and initial value of the container
      **/
-    Array1D( Range const& I, Type const& v) : Base(I, v) {}
+    Array1D( Range const& I, Type const& v): Base(I, v) {}
     /** Copy constructor
      *  @param T the container to copy
-     *  @param ref true if T is wrapped
+     *  @param ref @c true if T is wrapped
      **/
-    Array1D( const Array1D &T, bool ref =false) : Base(T, ref) {}
+    Array1D( const Array1D &T, bool ref =false): Base(T, ref) {}
     /** constructor by reference, ref_=1.
-     *  @param T the container to wrap
-     *  @param I range of the data to wrap
+     *  @param T,I the container and the range of data to wrap
      **/
-    Array1D( Array1D const& T, Range const& I) : Base(T, I) {}
-    /** Wrapper constructor : the container is a reference of a C-Array.
-     *  @param q pointer on data
-     *  @param I range of the data
+    Array1D( Array1D const& T, Range const& I): Base(T, I) {}
+    /** constructor by reference, ref_=1.
+     *  @param T,I the container and the range of data to wrap
      **/
-    Array1D( Type* q, Range const& I) : Base(q, I) {}
+    template<int OtherSize>
+    Array1D( Array1D<Type, OtherSize> const& T, Range const& I): Base(T, I) {}
+    /** Wrapper constructor: the container is a reference of a C-Array.
+     *  @param q, I pointer and range of data
+     **/
+    Array1D( Type* q, Range const& I): Base(q, I) {}
     /** destructor: allocated memory is liberated by AllocatorBase base class. */
     ~Array1D() {}
     /** operator = : overwrite the Array1D with T.
-     *  We resize the object if this and T does not have the same size
-     *  but if they have the same size, we don't modify the range
-     *  of the object.
      *  @param T the container to copy
      **/
     Array1D& operator=(Array1D const& T)
-    {
-      // check size
-      if (this->range()!=T.range()) this->resize(T.range());
-      // copy without ovelapping.
-      if (this->begin() < T.begin())
-      { for (int i=this->begin(), j=T.begin(); i<this->end(); i++, j++) this->elt(i) = T.elt(j);}
-      else
-      { for (int i=this->lastIdx(), j=T.lastIdx(); i>=this->begin(); i--, j--) this->elt(i) = T.elt(j);}
-      return *this;
-    }
-    /** operator= : set the container to a constant value.
-     *  @param v the value to set
-     **/
-    Array1D& operator=(Type const& v)
-    {
-      for (int i=this->begin(); i<this->end(); i++) this->elt(i)= v;
-      return *this;
-    }
+    { return this->copy(T);}
     /** Copy an other type of 1D array in an Array1D.
      *  @param T the array to copy
      **/
@@ -159,7 +179,7 @@ class Array1D : public IArray1D< Array1D<Type, Size_> >
     {
       // check size
       if (this->range()!=T.range()) this->resize(T.range());
-      for (int i=this->begin(), j=T.begin(); i<this->end(); i++, j++) this->elt(i) = T.elt(j);
+      for (int i=this->begin(); i<this->end(); i++) this->elt(i) = T.elt(i);
       return *this;
     }
     /** Copy an other type of array/expression in an Array1D.
@@ -170,7 +190,15 @@ class Array1D : public IArray1D< Array1D<Type, Size_> >
     {
       // check size
       if (this->size()!=T.size()) this->resize(T.range());
-      for (int i=this->begin(); i<this->end(); i++) this->elt(i)= T[i];
+      for (int i=this->begin(); i<this->end(); i++) this->elt(i)= T.elt(i);
+      return *this;
+    }
+    /** operator= : set the container to a constant value.
+     *  @param v the value to set
+     **/
+    Array1D& operator=(Type const& v)
+    {
+      for (int i=this->begin(); i<this->end(); i++) this->elt(i)= v;
       return *this;
     }
 };

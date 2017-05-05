@@ -40,7 +40,7 @@
 #include "Arrays/include/STK_Array2DPoint.h"
 #include "Arrays/include/STK_Array2DSquare.h"
 
-#include "STK_Stat_BivariateRealReal.h"
+#include "STK_Stat_Covariance.h"
 #include "STK_Stat_Multivariate.h"
 #include "STK_Stat_Functors.h"
 
@@ -225,62 +225,6 @@ class Multivariate<Array, Real> : public IRunnerUnsupervised< Array, typename Ar
       }
     }
 };
-
-/**  @ingroup StatDesc
- *  Compute the covariance of the data set V.
- *  \f[ \hat{\sigma}^2 = \frac{1}{n}
- *                       \sum_{i=1}^n (V_i-\hat{\mu}) (V_i-\hat{\mu})'.
- *  \f]
- *  @param V variable
- *  @param cov the computed covariance
- *  @param unbiased @c true if we want an unbiased estimate of the variance,
- *  @c false otherwise (default is @c false)
- **/
-template < class Array >
-void covariance( Array const& V, ArraySquareX & cov, bool unbiased = false)
-{
-  typename Array::Row mean;
-  // compute the mean
-  mean = Stat::mean(V);
-  // get dimensions
-  const int firstVar = V.beginCols(), lastVar = V.lastIdxCols();
-  cov.resize(V.cols());
-  for (int j= firstVar; j<= lastVar; j++)
-  {
-    cov(j, j) = varianceWithFixedMean(V.col(j), mean[j], unbiased);
-    for (int i= firstVar; i<j; i++)
-    { cov(j,i) = ( cov(i, j) = covarianceWithFixedMean(V.col(i), V.col(j), mean[i], mean[j], unbiased));}
-  }
-}
-
-/**  @ingroup StatDesc
- *  Compute the weighted covariance of the data set V.
- *  \f[ \hat{\sigma}^2 = \frac{1}{n}
- *                       \sum_{i=1}^n  w_{i} w_j (V_i-\hat{\mu}) (V_i-\hat{\mu})'.
- *  \f]
- *  @param V the variable
- *  @param W the weights
- *  @param cov the computed covariance
- *  @param unbiased @c true if we want an unbiased estimate of the variance,
- *  @c false otherwise (default is @c false)
- **/
-template <class Array, class WColVector >
-void covariance( Array const& V, WColVector const& W, ArraySquareX & cov, bool unbiased = false)
-{
-  typedef typename Array::Row RowVector;
-  RowVector mean;
-  // compute the
-  mean = Stat::mean(V, W);
-  // get dimensions
-  const int firstVar = V.beginCols(), lastVar = V.lastIdxCols();
-  cov.resize(V.cols());
-  for (int j= firstVar; j<= lastVar; j++)
-  {
-    cov(j, j) = varianceWithFixedMean(V.col(j), W, mean[j], unbiased);
-    for (int i= firstVar; i<j; i++)
-    { cov(j,i) = ( cov(i, j) = covarianceWithFixedMean(V.col(i), V.col(j), W, mean[i], mean[j], unbiased));}
-  }
-}
 
 
 }  // namespace Stat

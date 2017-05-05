@@ -54,6 +54,11 @@
   inline UnaryOperator<FUNCTOR<Type>, Derived> const FUNCTION(Type const number) const \
   { return UnaryOperator<FUNCTOR<Type>, Derived>(this->asDerived(), FUNCTOR<Type>(number)); }
 
+/// utility macro allowing to construct unary operators
+#define MAKE_RESHAPE_OPERATOR(OPERATOR, SHAPE) \
+  inline OPERATOR< Derived> const SHAPE() const \
+  { return OPERATOR< Derived>(this->asDerived()); }
+
 
 // forward declarations
 namespace STK
@@ -67,11 +72,11 @@ template<class Derived> class  ArrayInitializer;
 #include "STKernel/include/STK_Functors.h"
 
 #include "products/STK_ProductOperators.h"
+#include "products/STK_DotProduct.h"
 #include "operators/STK_TransposeOperator.h"
-#include "operators/STK_DiagonalOperator.h"
+#include "operators/STK_ReshapeOperators.h"
 #include "operators/STK_UnaryOperators.h"
 #include "operators/STK_BinaryOperators.h"
-#include "operators/STK_DotOperators.h"
 
 namespace STK
 {
@@ -433,15 +438,15 @@ class ExprBase : public ITContainer<Derived, hidden::Traits<Derived>::structure_
     { return UnaryOperator<OtherOperator<Type>, Derived>(this->asDerived(), OtherOperator<Type>(number));}
 
     /** @return the transposed expression of this. */
-    inline TransposeOperator<Derived> transpose() const
-    { return TransposeOperator<Derived> (this->asDerived());}
-
-    /** @return the diagonal expression of this (work only for 1D expressions). */
-    inline DiagonalizeOperator<Derived> diagonalize() const
-    { return DiagonalizeOperator<Derived> (this->asDerived());}
-    /** @return the diagonal of this expression (work only for square expressions). */
-    inline DiagonalOperator<Derived> diagonal() const
-    { return DiagonalOperator<Derived> (this->asDerived());}
+    MAKE_RESHAPE_OPERATOR(TransposeOperator,transpose)
+    /** @return this as a diagonal expression (work only with 1D expressions). */
+    MAKE_RESHAPE_OPERATOR(DiagonalizeOperator,asDiagonal)
+    /** @return the diagonal of this expression (work only with square expressions). */
+    MAKE_RESHAPE_OPERATOR(DiagonalOperator,diagonalize)
+    /** @return the upper part of this expression. */
+    MAKE_RESHAPE_OPERATOR(UpperTriangularizeOperator,upperTriangularize)
+    /** @return the lower part of this expression. */
+    MAKE_RESHAPE_OPERATOR(LowerTriangularizeOperator,lowerTriangularize)
 
     /** @return the j-th column of this. */
     inline ColOperator<Derived> col(int j) const
@@ -475,6 +480,7 @@ class ExprBase : public ITContainer<Derived, hidden::Traits<Derived>::structure_
 #undef MAKE_BINARY_OPERATOR
 #undef MAKE_UNARY_OPERATOR_NOARG
 #undef MAKE_UNARY_OPERATOR_1ARG
+#undef MAKE_RESHAPE_OPERATOR
 
 } // namespace STK
 

@@ -19,7 +19,7 @@
     Boston, MA 02111-1307
     USA
 
-    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
+    Contact: S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 */
 
 /*
@@ -75,23 +75,23 @@ class TRange
 {
   public:
     /** Default constructor. Null range.*/
-    inline TRange() : begin_(baseIdx) {}
+    inline TRange(): begin_(baseIdx) {}
     /** constructor. The first index is defined by the baseIdx macro.
      **/
-    inline TRange( int) : begin_(baseIdx) {}
+    inline TRange( int): begin_(baseIdx) {}
     /** Complete constructor. Give the beginning and the size of the sub-region.
      *  @param first is the beginning of the sub-region
      **/
-    inline TRange( int first, int) : begin_(first) {}
+    inline TRange( int first, int): begin_(first) {}
     /** Complete constructor. Give the beginning and the end of the sub-region.
      * @param first is the beginning of the sub-region
      **/
-    inline TRange( int first, int, bool) : begin_(first) {}
+    inline TRange( int first, int, bool): begin_(first) {}
     /** Create a copy of an existing TRange.
      *  @param I The index to copy
      **/
     template<int OtherSize_>
-    inline TRange(TRange<OtherSize_> const& I) : begin_(I.begin()) {}
+    inline TRange(TRange<OtherSize_> const& I): begin_(I.begin()) {}
     /** destructor. */
     inline ~TRange() {}
     /** get the first index of the TRange.
@@ -126,37 +126,27 @@ class TRange
     /** create the TRange [begin_+inc, end_+inc_].
      *  @param inc the increment to apply
      **/
-    inline TRange& inc(int inc) { begin_ +=inc; return *this;}
+    inline TRange& inc(int inc =1) { begin_ +=inc; return *this;}
     /** create the TRange [begin_+inc, end_].
      *  @param inc the increment to apply
      **/
-    inline TRange& incFirst(int inc) { begin_ +=inc; return *this;}
+    inline TRange& incFirst(int inc=1) { begin_ +=inc; return *this;}
     /** create the TRange [begin_, end_+inc]
      * @param inc the increment to apply
      **/
-    inline TRange& incLast(int inc) { begin_ +=inc; return *this;}
+    inline TRange& incLast(int inc=1) { begin_ +=inc; return *this;}
     /** create the TRange [begin_-dec, end_-dec]
      *  @param dec the decrement to apply
      **/
-    inline TRange& dec(int dec) { begin_ -=dec; return *this;}
+    inline TRange& dec(int dec=1) { begin_ -=dec; return *this;}
     /** @brief create the TRange [begin_-dec, end_]
      * @param dec the decrement to apply
      **/
-    inline TRange& decFirst(int dec) { begin_ -=dec;  return *this;}
+    inline TRange& decFirst(int dec=1) { begin_ -=dec;  return *this;}
     /** create the TRange [begin_, end_-dec]
      * @param dec the decrement to apply
      **/
-    inline TRange& decLast(int dec){ begin_ -=dec; return *this;}
-    /** @return this %TRange incremented **/
-    inline TRange& operator+=(int inc) { begin_ += inc; return *this;}
-    /** @return this %TRange decremented **/
-    inline TRange& operator-=(int dec) { begin_ -= dec; return *this;}
-    /** @return this %TRange incremented **/
-    inline TRange operator+(int inc) const { return(TRange(begin_+inc, Size_));}
-    /** @return %TRange I incremented **/
-    inline friend TRange operator+(int inc, TRange const &I) { return I+inc;}
-    /** @return this %TRange decremented **/
-    inline TRange operator-(int dec) const { return(TRange(begin_-dec, Size_));}
+    inline TRange& decLast(int dec=1){ begin_ -=dec; return *this;}
 
     /** check if this TRange in include in an other TRange
      *  @param I the index to compare
@@ -201,7 +191,7 @@ class TRange
  *  NA (not available) numbers is part of the TRange.
  */
 template<int Size_>
-struct Arithmetic< TRange<Size_> > : public std::numeric_limits< TRange<Size_> >
+struct Arithmetic< TRange<Size_> >: public std::numeric_limits< TRange<Size_> >
 {
   /** Adding a Non Available (NA) special number. */
   static inline  TRange<Size_> NA() throw()
@@ -252,27 +242,27 @@ class TRange<UnknownSize>
 {
   public:
     /** Default constructor. Null range.*/
-    inline TRange() : begin_(baseIdx), end_(baseIdx), size_(0) {}
+    inline TRange(): begin_(baseIdx), end_(baseIdx), size_(0) {}
     /** constructor. The first index is defined by the baseIdx macro.
      *  @param size the size of the range
      **/
-    inline TRange( int size) : begin_(baseIdx), end_(size+baseIdx), size_(size) {}
+    inline TRange( int size): begin_(baseIdx), end_(size+baseIdx), size_(size) {}
     /** Complete constructor. Give the beginning and the size of the sub-region.
      *  @param first is the beginning of the sub-region
      *  @param size is the size of the sub-region.
      **/
-    inline TRange( int first, int size) : begin_(first), end_(size+first), size_(size) {}
+    inline TRange( int first, int size): begin_(first), end_(size+first), size_(size) {}
     /**  Complete constructor. Give the first and last index of the sub-region.
      *  @param first is the beginning of the sub-region
      *  @param last is the index ending the sub-region.
      **/
-    inline TRange( int first, int last, bool) : begin_(first), end_(last+1), size_(end_-first) {}
+    inline TRange( int first, int last, bool): begin_(first), end_(last+1), size_(end_-first) {}
     /** @brief Copy constructor.
      *  Create a copy of an existing TRange.
      *  @param I The index to copy
      **/
     template<int OtherSize_>
-    inline TRange(TRange<OtherSize_> const& I) : begin_(I.begin()), end_(I.end()), size_(I.size()) {}
+    inline TRange(TRange<OtherSize_> const& I): begin_(I.begin()), end_(I.end()), size_(I.size()) {}
     /** destructor. */
     inline ~TRange() {}
     /** get the first index of the TRange.
@@ -300,55 +290,41 @@ class TRange<UnknownSize>
      *  @return @c true if size <=0, @c false otherwise
      */
     inline bool empty() const { return size_<=0;};
-    /** Shift the TRange giving the first element : the size is not modified.
+    /** Shift the TRange giving the first element: the size is not modified.
      *  @param first new value of the first element. */
     inline TRange& shift(int first) { return inc(first - begin_);}
     /** create the TRange [begin_+inc, end_+inc_).
      *  @param inc the increment to apply
      **/
-    inline TRange& inc(int inc){ if(inc) { begin_ +=inc; end_ +=inc;} return *this;}
+    inline TRange& inc(int inc =1){ if(inc) { begin_ +=inc; end_ +=inc;} return *this;}
     /** create the TRange [begin_+inc, end_).
      *  @param dec the decrement to apply
      **/
-    inline TRange& dec(int dec) { if(dec) { begin_ -=dec; end_ -=dec;} return *this;}
+    inline TRange& dec(int dec =1) { if(dec) { begin_ -=dec; end_ -=dec;} return *this;}
     /** create the TRange [begin_-dec, end_-dec)
      *  @param inc the increment to apply to begin_
      **/
-    inline TRange& incFirst(int inc) { begin_ +=inc; size_ -=inc; return *this;}
+    inline TRange& incFirst(int inc =1) { begin_ +=inc; size_ -=inc; return *this;}
     /** create the TRange [begin_, end_+inc)
      *  @param inc the increment to apply
      **/
-    inline TRange& incLast(int inc) { end_ +=inc; size_ +=inc; return *this;}
+    inline TRange& incLast(int inc =1) { end_ +=inc; size_ +=inc; return *this;}
     /** create the TRange [begin_, end_+inc)
      *  @param inc the increment to apply
      **/
-    inline TRange& incEnd(int inc) { end_ +=inc; size_ +=inc; return *this;}
+    inline TRange& incEnd(int inc =1) { end_ +=inc; size_ +=inc; return *this;}
     /** @brief create the TRange [begin_-dec, end_)
      * @param dec the decrement to apply
      **/
-    inline TRange& decFirst(int dec) { begin_ -=dec; size_  +=dec; return *this;}
+    inline TRange& decFirst(int dec =1) { begin_ -=dec; size_  +=dec; return *this;}
     /** create the TRange [begin_, end_-dec)
      *  @param dec the decrement to apply
      **/
-    inline TRange& decLast(int dec){ end_ -= dec; size_ -=dec; return *this;}
+    inline TRange& decLast(int dec =1){ end_ -= dec; size_ -=dec; return *this;}
     /** create the TRange [begin_, end_-dec)
      *  @param dec the decrement to apply
      **/
-    inline TRange& decEnd(int dec){ end_ -= dec; size_ -=dec; return *this;}
-
-    /** @return this %TRange incremented **/
-    inline TRange& operator+=(int inc) { begin_ += inc; end_ += inc; return *this;}
-    /** @return this %TRange decremented **/
-    inline TRange& operator-=(int dec) { begin_ -= dec; end_ -=dec; return *this;}
-    /** @return this %TRange incremented **/
-    inline TRange operator+(int inc) const { return(TRange(begin_+inc, size_));}
-    /** @return this %TRange incremented **/
-    inline TRange operator-(int inc) const { return(TRange(begin_-inc, size_));}
-    /** @return %TRange I incremented **/
-    inline friend TRange operator+(int inc, TRange const &I) { return I+inc;}
-    /** @return %TRange I incremented **/
-    inline friend TRange operator-(int inc, TRange const &I) { return I-inc;}
-
+    inline TRange& decEnd(int dec =1){ end_ -= dec; size_ -=dec; return *this;}
     /** Take the lowest value of begin_ and I.begin_ for begin_
      *  and the largest value of end_ and I.end_ for end_.
      *  @param I the index to apply
@@ -408,7 +384,7 @@ class TRange<UnknownSize>
     /** @brief compute sup(I,J).
      *  Take the lowest value of I.begin_ and J.begin_ for begin_
      *  and the largest value of I.end_ and J.end_ for end_.
-     *  @param I,J the first anbd second Range
+     *  @param I,J the first and second Range
     */
     template<int SizeI_, int SizeJ_>
     static inline Range sup(TRange<SizeI_> const& I, TRange<SizeJ_> const& J)

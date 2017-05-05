@@ -161,7 +161,7 @@ inline bool Svd::runImpl()
   }
   U_.shift(beginRow, beginCol);
   D_.shift(beginCol);
-  V_.shift(beginCol); // u*s.diagonalize()*vt work
+  V_.shift(beginCol); // u*s.asDiagonal()*vt work
   return result;
 }
 

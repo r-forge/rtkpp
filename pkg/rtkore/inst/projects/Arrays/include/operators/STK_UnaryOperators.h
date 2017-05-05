@@ -64,6 +64,7 @@ struct Traits< UnaryOperator <UnaryOp, Lhs> >
 
   typedef typename UnaryOp::result_type Type;
   typedef Type ReturnType;
+  typedef Type ConstReturnType;
 };
 
 } // end namespace hidden

@@ -132,7 +132,7 @@ class SymEigen : public ISymEigen<SymEigen<SquareArray> >
     /** @brief compute the Householder matrix and P */
     void compHouse();
     /** computing the diagonalization of eigenValues_ and F_ */
-    void diagonalize();
+    void asDiagonal();
 };
 
 
@@ -178,10 +178,10 @@ bool SymEigen<SquareArray>::runImpl()
     // compute eigenVectors_
     compHouse();
 #ifdef STK_ALGEBRA_VERBOSE
-    stk_cout << _T("calling SymEigen::diagonalize()\n");
+    stk_cout << _T("calling SymEigen::asDiagonal()\n");
 #endif
     // Diagonalize
-    diagonalize();
+    asDiagonal();
 #ifdef STK_ALGEBRA_VERBOSE
     stk_cout << _T("calling SymEigen::finalize()\n");
 #endif
@@ -317,9 +317,9 @@ void SymEigen<SquareArray>::compHouse()
   { eigenVectors_(range_.begin(), j) = 0.0; eigenVectors_(j, range_.begin()) = 0.0;}
 }
 
-// diagonalize eigenValues_ and F_
+// asDiagonal eigenValues_ and F_
 template<class SquareArray>
-void SymEigen<SquareArray>::diagonalize()
+void SymEigen<SquareArray>::asDiagonal()
 {
   // Diagonalisation of eigenVectors_
   for (int iend=range_.lastIdx(); iend>=range_.begin()+1; iend--)
@@ -382,7 +382,7 @@ void SymEigen<SquareArray>::diagonalize()
       F_[ibeg-1] = 0.;
     } // iter
     if (iter == MAXITER)
-    { this->msg_error_ = _T("Warning, max iteration reached in SymEigen::diagonalize()\n");}
+    { this->msg_error_ = _T("Warning, max iteration reached in SymEigen::asDiagonal()\n");}
     // We have to sort the eigenvalues : we use a basic strategy
     Real z = eigenValues_[iend];        // current value
     for (int i=iend+1; i<eigenValues_.end(); i++)

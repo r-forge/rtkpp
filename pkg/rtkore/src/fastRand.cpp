@@ -93,7 +93,7 @@ RcppExport SEXP fastExponentialRand( SEXP n, SEXP lambda)
 {
   BEGIN_RCPP;
   STK::RVector<double> tab(Rcpp::as<int>(n));
-  STK::Law::Exponential law(1./Rcpp::as<Real>(lambda));
+  STK::Law::Exponential law(Rcpp::as<Real>(lambda));
   tab.rand(law);
   return tab.vector();
   END_RCPP;
@@ -113,7 +113,7 @@ RcppExport SEXP fastGammaRand( SEXP n, SEXP shape, SEXP scale)
 {
   BEGIN_RCPP;
   STK::RVector<double> tab(Rcpp::as<int>(n));
-  STK::Law::Gamma law(Rcpp::as<Real>(shape), 1./Rcpp::as<Real>(scale));
+  STK::Law::Gamma law(Rcpp::as<Real>(shape), Rcpp::as<Real>(scale));
   tab.rand(law);
   return tab.vector();
   END_RCPP;

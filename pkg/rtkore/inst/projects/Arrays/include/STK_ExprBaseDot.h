@@ -47,7 +47,7 @@ template<class Rhs>
 typename hidden::Promote<typename hidden::Traits<Derived>::Type, typename Rhs::Type>::result_type const
 inline ExprBase<Derived>::dot(ExprBase<Rhs> const& other) const
 {
-  STK_STATIC_ASSERT_VECTOR_ONLY(Derived);
+  STK_STATIC_ASSERT_POINT_OR_VECTOR_ONLY(Derived);
   STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Rhs);
   return BinaryOperator< ProductOp<Type, typename hidden::Traits<Rhs>::Type>
                        , Derived
@@ -58,10 +58,9 @@ inline ExprBase<Derived>::dot(ExprBase<Rhs> const& other) const
 template<class Derived>
 template<class Rhs>
 typename hidden::Promote<typename hidden::Traits<Derived>::Type, typename Rhs::Type>::result_type const
-
 inline ExprBase<Derived>::dotSafe(ExprBase<Rhs> const& other) const
 {
-  STK_STATIC_ASSERT_VECTOR_ONLY(Derived);
+  STK_STATIC_ASSERT_POINT_OR_VECTOR_ONLY(Derived);
   STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Rhs);
   return BinaryOperator< ProductOp<Type, typename hidden::Traits<Rhs>::Type>
                        , Derived

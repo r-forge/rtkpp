@@ -93,6 +93,8 @@ class MultiFactor: public IRunnerWithData<Array>
     inline CArrayPoint< Array2DVector<Type> > const& levels() const {return levels_;}
     /** @return array with for each variables the counts of the levels */
     inline CArrayPoint< VectorXi > const& counts() const {return counts_;}
+    /** @return the value of the first level */
+    inline int const& firstLevel() const { return firstLevel_;}
     /** @return array with for each variables the number of levels */
     inline CPointXi const& nbLevels() const { return nbLevels_;}
     /** @return array with the encoding maps factor to int */
@@ -100,12 +102,17 @@ class MultiFactor: public IRunnerWithData<Array>
     /** @return array with the encoding maps factor to int */
     inline Decoder const& decoder() const { return decoder_;}
 
+    /** set the value of the first level */
+    inline void setFirstLevel(int firstLevel) { firstLevel_ = firstLevel;}
+
     /** run the estimation of the MultiFactor statistics. **/
     virtual bool run();
 
   protected:
     /** Array of the data size with the levels of each variables in an integer format*/
     CArrayXXi asInteger_;
+    /** first level number */
+    int firstLevel_;
     /** Number of levels of each variables */
     CPointXi nbLevels_;
     /** Array with the levels of each variables */
@@ -122,16 +129,18 @@ class MultiFactor: public IRunnerWithData<Array>
 };
 
 template <class Array>
-MultiFactor<Array>::MultiFactor(): Base(), asInteger_(), nbLevels_(), levels_(), counts_(), encoder_() {}
+MultiFactor<Array>::MultiFactor(): Base(), asInteger_(), firstLevel_(baseIdx)
+                                 , nbLevels_(), levels_(), counts_(), encoder_() {}
 
 template <class Array>
 MultiFactor<Array>::MultiFactor( Array const& data): Base(data)
-                                         , asInteger_(p_data_->rows(),p_data_->cols())
-                                         , nbLevels_(p_data_->cols(), baseIdx - 1)
-                                         , levels_(p_data_->cols())
-                                         , counts_(p_data_->cols())
-                                         , encoder_(p_data_->cols())
-                                         , decoder_(p_data_->cols())
+                               , asInteger_(p_data_->rows(),p_data_->cols())
+                               , firstLevel_(baseIdx)
+                               , nbLevels_(p_data_->cols(), 0)
+                               , levels_(p_data_->cols())
+                               , counts_(p_data_->cols())
+                               , encoder_(p_data_->cols())
+                               , decoder_(p_data_->cols())
 {}
 
 /* Constructor.
@@ -139,16 +148,17 @@ MultiFactor<Array>::MultiFactor( Array const& data): Base(data)
  **/
 template <class Array>
 MultiFactor<Array>::MultiFactor( Array const* p_data): Base(p_data)
-                                           , asInteger_()
-                                           , nbLevels_()
-                                           , levels_()
-                                           , encoder_()
-                                           , decoder_()
+                               , asInteger_()
+                               , firstLevel_(baseIdx)
+                               , nbLevels_()
+                               , levels_()
+                               , encoder_()
+                               , decoder_()
 {
   if (p_data_)
   {
     asInteger_.resize(p_data_->rows(),p_data_->cols());
-    nbLevels_.resize(p_data_->cols()).setValue(baseIdx - 1);
+    nbLevels_.resize(p_data_->cols()).setValue(0);
     levels_.resize(p_data_->cols());
     counts_.resize(p_data_->cols());
     encoder_.resize(p_data_->cols());
@@ -157,10 +167,11 @@ MultiFactor<Array>::MultiFactor( Array const* p_data): Base(p_data)
 }
 
 template <class Array>
-MultiFactor<Array>::MultiFactor( MultiFactor const& f): Base(f), asInteger_(f.asInteger_), nbLevels_(f.nbLevels_)
-                                       , levels_(f.levels_), counts_(f.counts_)
-                                       , encoder_(f.encoder_)
-                                       , decoder_(f.decoder_)
+MultiFactor<Array>::MultiFactor( MultiFactor const& f): Base(f), asInteger_(f.asInteger_)
+                               , firstLevel_(baseIdx), nbLevels_(f.nbLevels_)
+                               , levels_(f.levels_), counts_(f.counts_)
+                               , encoder_(f.encoder_)
+                               , decoder_(f.decoder_)
 {}
 
 template <class Array>
@@ -170,7 +181,8 @@ void MultiFactor<Array>::update()
    if (p_data_)
    {
      asInteger_.resize(p_data_->rows(),p_data_->cols());
-     nbLevels_.resize(p_data_->cols()).setValue(baseIdx - 1);
+     firstLevel_ = baseIdx;
+     nbLevels_.resize(p_data_->cols()).setValue(0);
      for(int j=encoder_.begin(); j<std::min(encoder_.end(), p_data_->cols().end()); ++j)
      {
        levels_[j].clear();
@@ -201,18 +213,21 @@ bool MultiFactor<Array>::run()
         // find coding
         Type idData = p_data_->elt(i,j);
         typename EncodingMap::const_iterator it = encoder_[j].find(idData);
-        if (it != encoder_[j].end()) // levels already exist, just update the levels array
-        { asInteger_(i,j) = it->second;
-          counts_[j][it->second]++;  // add one to this level
+        if (it != encoder_[j].end())
+        { // levels already exist, just update the integer and counts array
+          asInteger_(i,j) = it->second;
+          counts_[j][it->second]++;
         }
-        else // find a new level to add
-        {
+        else
+        { // find a new level to add
           // create a new level and set it
-          asInteger_(i,j) = (++nbLevels_[j]);
-          encoder_[j].insert(std::pair<Type, int>(idData, nbLevels_[j]));
-          decoder_[j].insert(std::pair<int, Type>(nbLevels_[j], idData));
+          int lev = firstLevel_ + nbLevels_[j];
+          asInteger_(i,j) = lev;
+          encoder_[j].insert(std::pair<Type, int>(idData, lev));
+          decoder_[j].insert(std::pair<int, Type>(lev, idData));
           levels_[j].push_back(idData);
           counts_[j].push_back(1); // start counting for this new level
+          ++nbLevels_[j];
         }
       }
     }

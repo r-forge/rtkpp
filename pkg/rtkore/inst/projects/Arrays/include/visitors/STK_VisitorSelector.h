@@ -76,9 +76,11 @@ struct VisitorSelector
 
 /** @ingroup hidden
  *  @brief Helper for the Visitor selector: allow to select the correct
- *  implementation to instantiate. General case for general 2D arrays with
- *  known dimensions of the rows and columns but at least one of the dimension
- *  is too great for being unrolled.
+ *  implementation to instantiate for arrays and square arrays when only one
+ *  dimension (rows or columns but not both).
+ *
+ *  This selector will select the visitor method to use for 2D arrays (arrays_
+ *  and square_).
  **/
 template<typename Visitor, typename Derived, int Structure_>
 struct VisitorSelectorHelper

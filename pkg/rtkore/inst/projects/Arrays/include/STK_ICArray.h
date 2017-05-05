@@ -54,54 +54,6 @@ namespace STK
 
 namespace hidden
 {
-template<class Derived, int Structure_ = Derived::structure_>
-struct CheckArray;
-
-template<class Derived>
-struct CheckArray<Derived, Arrays::array2D_>
-{
-  static bool resize(Derived const& array, Range const& I, Range const& J)
-  { return (array.rows() == I && array.cols() == J) ? false : true;}
-  static bool shift(Derived const& array, int beginRow, int beginCol)
-  { return (array.beginRows() == beginRow && array.beginCols() == beginCol) ? false : true;}
-  static bool resize(Derived const& array, Range const& I)
-  { return (array.rows() == I && array.cols() == I) ? false : true;}
-  static bool shift(Derived const& array, int begin)
-  { return (array.beginRows() == begin && array.beginCols() == begin) ? false : true;}
-};
-template<class Derived>
-struct CheckArray<Derived, Arrays::upper_triangular_>
-{
-  static bool resize(Derived const& array, Range const& I, Range const& J)
-  { return (array.rows() == I && array.cols() == J) ? false : true;}
-  static bool shift(Derived const& array, int beginRow, int beginCol)
-  { return (array.beginRows() == beginRow && array.beginCols() == beginCol) ? false : true;}
-  static bool resize(Derived const& array, Range const& I)
-  { return (array.rows() == I && array.cols() == I) ? false : true;}
-  static bool shift(Derived const& array, int begin)
-  { return (array.beginRows() == begin && array.beginCols() == begin) ? false : true;}
-};
-template<class Derived>
-struct CheckArray<Derived, Arrays::lower_triangular_>
-{
-  static bool resize(Derived const& array, Range const& I, Range const& J)
-  { return (array.rows() == I && array.cols() == J) ? false : true;}
-  static bool shift(Derived const& array, int beginRow, int beginCol)
-  { return (array.beginRows() == beginRow && array.beginCols() == beginCol) ? false : true;}
-  static bool resize(Derived const& array, Range const& I)
-  { return (array.rows() == I && array.cols() == I) ? false : true;}
-  static bool shift(Derived const& array, int begin)
-  { return (array.beginRows() == begin && array.beginCols() == begin) ? false : true;}
-};
-
-template<class Derived, int Structure_>
-struct CheckArray
-{
-  static bool resize(Derived const& array, Range const& I)
-  { return (array.range() == I) ? false : true;}
-  static bool shift(Derived const& array, int begin)
-  { return (array.begin() == begin) ? false : true;}
-};
 }
 /** @class ICArray
   * @ingroup Arrays
@@ -139,7 +91,6 @@ class ICArray : public ArrayBase<Derived>
       sizeCols_  = hidden::Traits<Derived>::sizeCols_,
       storage_   = hidden::Traits<Derived>::storage_
     };
-    typedef hidden::CheckArray<Derived, structure_> Checker;
     /** Type of the Range for the rows */
     typedef TRange<sizeRows_> RowRange;
     /** Type of the Range for the columns */
@@ -298,7 +249,7 @@ class ICArray : public ArrayBase<Derived>
                       ||(structure_ == (int)Arrays::lower_triangular_)
                       ||(structure_ == (int)Arrays::upper_triangular_)
                       ,YOU_CANNOT_USED_THIS_METHOD_WITH_THIS_KIND_OF_ARRAY);
-      if (!Checker::shift(this->asDerived(), beginRows, beginCols)) return this->asDerived();
+      if (!hidden::Checker<Derived, structure_>::shift(this->asDerived(), beginRows, beginCols)) return this->asDerived();
       if (this->isRef())
       { STKRUNTIME_ERROR_2ARG(ICArray::shift,beginRows,beginCols,cannot operate on reference);}
       allocator_.shift(beginRows, beginCols);
@@ -311,7 +262,7 @@ class ICArray : public ArrayBase<Derived>
      **/
     Derived& shift(int firstIdx)
     {
-      if (!Checker::shift(this->asDerived(), firstIdx)) return this->asDerived();
+      if (!hidden::Checker<Derived, structure_>::shift(this->asDerived(), firstIdx)) return this->asDerived();
       if (this->isRef())
       { STKRUNTIME_ERROR_1ARG(ICArray::shift,firstIdx,cannot operate on reference);}
       allocator_.shift(firstIdx);
@@ -322,11 +273,15 @@ class ICArray : public ArrayBase<Derived>
      **/
     Derived& resize(Range const& I, Range const& J)
     {
-      STK_STATIC_ASSERT((structure_ == (int)Arrays::array2D_)
-                      ||(structure_ == (int)Arrays::lower_triangular_)
-                      ||(structure_ == (int)Arrays::upper_triangular_)
+      STK_STATIC_ASSERT( (structure_ == (int)Arrays::array2D_)
+                       ||(structure_ == (int)Arrays::square_)
+                       ||(structure_ == (int)Arrays::diagonal_)
+                       ||(structure_ == (int)Arrays::lower_triangular_)
+                       ||(structure_ == (int)Arrays::upper_triangular_)
                       ,YOU_CANNOT_USED_THIS_METHOD_WITH_THIS_KIND_OF_ARRAY);
-      if (!Checker::resize(this->asDerived(), I, J)) return this->asDerived();
+      if (!hidden::Checker<Derived, structure_>::isAllowed(this->asDerived(), I, J))
+      { STKRUNTIME_ERROR_2ARG(ICArray::resize,I,J,not permited);}
+      if (!hidden::Checker<Derived, structure_>::resize(this->asDerived(), I, J)) return this->asDerived();
       if (this->isRef())
       { STKRUNTIME_ERROR_2ARG(ICArray::resize,I,J,cannot operate on reference);}
       allocator_.resize(I.size(), J.size()).shift(I.begin(), J.begin());
@@ -339,7 +294,7 @@ class ICArray : public ArrayBase<Derived>
      **/
     Derived& resize(Range const& I)
     {
-      if (!Checker::resize(this->asDerived(), I)) return this->asDerived();
+      if (!hidden::Checker<Derived, structure_>::resize(this->asDerived(), I)) return this->asDerived();
       if (this->isRef())
       { STKRUNTIME_ERROR_1ARG(ICArray::resize,I,cannot operate on reference);}
       allocator_.resize(I.size()).shift(I.begin());

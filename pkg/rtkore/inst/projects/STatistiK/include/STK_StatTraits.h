@@ -23,42 +23,28 @@
 */
 
 /*
- * Project:  stkpp::Sdk
- * created on: 14 déc. 2011
+ * Project:  stkpp::STatistiK
+ * created on: 3 April 2017
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
 
-/** @file STK_Traits.h
+/** @file STK_StatTraits.h
  *  @brief In this file we define the main traits class we use for the
- *  STK++ Containers.
+ *  STatistiK project.
  **/
 
 
-#ifndef STK_TRAITS_H
-#define STK_TRAITS_H
+#ifndef STK_STATTRAITS_H
+#define STK_STATTRAITS_H
 
 namespace STK
 {
 
 namespace hidden
 {
-/** @ingroup hidden
- *  The traits struct Traits must be specialized for any 2D
- *  container derived from the interface classes ITContainer. For example:
- *  @code
- *  template<class TYPE>
- *  struct hidden::Traits< Array2D<TYPE> >
- *  {
- *    typedef TYPE          Type;
- *    typedef Array2DPoint<TYPE> Row;
- *    typedef Array1D<TYPE> Column;
- *  };
- *  @endcode
- */
-template <typename Derived> struct Traits;
 
-} // Sdk
+} // hidden
 
 } // namespace STK
 
-#endif /* STK_SDK_TRAITS_H */
+#endif /* STK_STATTRAITS_H */

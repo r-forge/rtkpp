@@ -72,7 +72,7 @@ namespace lapack
  *  {
  *    @class Qr
  *    @brief Qr computes the QR decomposition of a real matrix using the
- *    Lapack routine dgeqrf.
+ *    Lapack routine *geqrf.
  */
 class Qr : public IQr<Qr >
 {

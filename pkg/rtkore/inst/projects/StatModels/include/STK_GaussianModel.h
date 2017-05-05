@@ -165,13 +165,13 @@ bool GaussianModel<Array>::run(ColVector const& weights)
 /** compute the empirical covariance matrix. */
 template <class Array>
 void GaussianModel<Array>::compCovariance()
-{ Stat::covariance(*p_dataij_,cov_);}
+{ cov_ = Stat::covariance(*p_dataij_);}
 /** compute the empirical weighted covariance matrix.
  * @param weights the weights of the samples
  **/
 template <class Array>
 void GaussianModel<Array>::compWeightedCovariance(ColVector const& weights)
-{ Stat::covariance(*p_dataij_, weights, cov_);}
+{ cov_ = Stat::covariance(*p_dataij_, weights);}
 
 } // namespace STK
 

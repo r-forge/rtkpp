@@ -105,6 +105,8 @@ struct Traits< CArraySquare<Type_, Size_, Orient_> >
 
     typedef Type_                Type;
     typedef typename RemoveConst<Type_>::Type const& ReturnType;
+    typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+
     enum
     {
       structure_ = Arrays::square_,
@@ -121,8 +123,7 @@ struct Traits< CArraySquare<Type_, Size_, Orient_> >
  *  @brief specialization for the square case.
  */
 template <typename Type_, int Size_, bool Orient_>
-class CArraySquare
-      : public ICArray < CArraySquare<Type_, Size_, Orient_> >
+class CArraySquare: public ICArray < CArraySquare<Type_, Size_, Orient_> >
 {
   public:
     typedef ICArray < CArraySquare<Type_, Size_, Orient_> > Base;
@@ -177,10 +178,10 @@ class CArraySquare
     template<class OtherAllocator>
     CArraySquare( ITContainer2D<OtherAllocator> const& allocator): Base(allocator.asDerived()) {}
     /** Copy constructor using an expression.
-     *  @param T the container to wrap
+     *  @param T the expression to copy
      **/
     template<class OtherDerived>
-    CArraySquare( ExprBase<OtherDerived> const& T): Base(T.size(), T.size())
+    CArraySquare( ExprBase<OtherDerived> const& T): Base(T.sizeRows(), T.sizeCols())
     { LowBase::operator=(T);}
     /** destructor. */
     ~CArraySquare() {}

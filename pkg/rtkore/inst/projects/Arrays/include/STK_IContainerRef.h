@@ -78,12 +78,11 @@ struct TRef<-1>
 
   public:
     /** @return @c true if *this is reference container, @c false otherwise */
-    bool isRef() const { return ref_;}
+    inline bool isRef() const { return ref_;}
     /** swap this with the container T.
      *  @param T the container to swap with this
      **/
     void exchange(TRef const& T) { std::swap(ref_, T.ref_);}
-
     /** Modify the container : can become a reference or the owner of
      *  the data. To use with care if we want to avoid memory leak.
      *  @param ref : false if this own its own data.

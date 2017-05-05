@@ -39,29 +39,29 @@
 
 #define FUNCTION_ON_ARRAY(funct, Op) \
 template< class Derived> \
-typename hidden::ApplyFunctorSelector<Derived, Op >::resultByColType \
+typename hidden::FunctorTraits<Derived, Op >::Row \
 funct(Derived const& A) \
-{ return typename hidden::ApplyFunctorSelector<Derived, Op>::ColOp(A)();} \
+{ return typename hidden::FunctorTraits<Derived, Op>::ColOp(A)();} \
 template< class Derived, class Weights> \
-typename hidden::ApplyFunctorSelector<Derived, Op >::resultByColType \
+typename hidden::FunctorTraits<Derived, Op >::Row \
 funct(Derived const& A, Weights const& w) \
-{ return typename hidden::ApplyFunctorSelector<Derived, Op>::ColWeightedOp(A)(w);} \
+{ return typename hidden::FunctorTraits<Derived, Op>::ColWeightedOp(A)(w);} \
 template< class Derived> \
-typename hidden::ApplyFunctorSelector<Derived, Op >::resultByColType \
+typename hidden::FunctorTraits<Derived, Op >::Row \
 funct##ByCol(Derived const& A) \
-{ return typename hidden::ApplyFunctorSelector<Derived, Op>::ColOp(A)();} \
+{ return typename hidden::FunctorTraits<Derived, Op>::ColOp(A)();} \
 template< class Derived, class Weights> \
-typename hidden::ApplyFunctorSelector<Derived, Op >::resultByColType \
+typename hidden::FunctorTraits<Derived, Op >::Row \
 funct##ByCol(Derived const& A, Weights const& w) \
-{ return typename hidden::ApplyFunctorSelector<Derived, Op>::ColWeightedOp(A)(w);} \
+{ return typename hidden::FunctorTraits<Derived, Op>::ColWeightedOp(A)(w);} \
 template< class Derived> \
-typename hidden::ApplyFunctorSelector<Derived, Op >::resultByRowType \
+typename hidden::FunctorTraits<Derived, Op >::Col \
 funct##ByRow(Derived const& A) \
-{ return typename hidden::ApplyFunctorSelector<Derived, Op>::RowOp(A)();} \
+{ return typename hidden::FunctorTraits<Derived, Op>::RowOp(A)();} \
 template< class Derived, class Weights> \
-typename hidden::ApplyFunctorSelector<Derived, Op >::resultByRowType \
+typename hidden::FunctorTraits<Derived, Op >::Col \
 funct##ByRow(Derived const& A, Weights const& w) \
-{ return typename hidden::ApplyFunctorSelector<Derived, Op>::RowWeightedOp(A)(w);}
+{ return typename hidden::FunctorTraits<Derived, Op>::RowWeightedOp(A)(w);}
 
 
 namespace STK
@@ -78,7 +78,7 @@ struct MinOp
 {
     typedef typename Derived::Type Type;
     /** constructor */
-    inline MinOp( ExprBase<Derived> const&  V) :  V_(V.asDerived())
+    inline MinOp( ExprBase<Derived> const&  V):  V_(V.asDerived())
     { STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);}
     /**  @return the minimal value of the variable V
      *  \f[ \min_{i=1}^n v_i \f]
@@ -222,19 +222,17 @@ struct SumOp
     /** constructor */
     inline SumOp( ExprBase<Derived> const&  V) :  V_(V.asDerived())
     { STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);}
-    /** @return the mean of the variable V
-     *  \f[ \hat{\mu} = \frac{1}{n} \sum_{i=1}^n V(i) \f]
+    /** @return the sum of the variable V
+     *  \f[ \sum_{i=1}^n V(i) \f]
      **/
     Type const operator()() const
     {
-      // sum the samples
       Type sum  = 0.;
       for (int i=V_.begin(); i<V_.end(); i++) { sum += V_[i];}
-      // compute the mean
       return sum;
     }
-    /** @return the weighted mean value of the variable V
-     *  \f[ \hat{\mu} = \frac{1}{\sum_{i=1}^n w(i)} \sum_{i=1}^n w(i) V(i). \f]
+    /** @return the weighted sum of the variable V
+     *  \f[ \hat{\mu} = \sum_{i=1}^n w(i) V(i). \f]
      *  @param w the weights
      **/
     template< class Weights>
@@ -242,10 +240,8 @@ struct SumOp
     {
       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Weights);
       // sum the weighted samples
-      Type sum  = 0.0, sum1weights= 0.0;
-      for (int i=V_.begin(); i<V_.end(); i++)
-      { sum     += w[i] * V_[i];}
-      // compute the weighted mean. If all weights are 0, we get 0
+      Type sum  = 0.0;
+      for (int i=V_.begin(); i<V_.end(); i++) { sum += w[i] * V_[i];}
       return sum;
     }
   protected:
@@ -262,33 +258,32 @@ struct SumSafeOp
     /** constructor */
     inline SumSafeOp( ExprBase<Derived> const&  V) :  V_(V.asDerived())
     { STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);}
-    /** @return the safely computed mean of the variable V discarding all missing values. */
+    /** @return the safely computed sum of the variable V discarding all missing values. */
     Type const operator()() const
     {
       // sum the samples
       Type sum  = 0.0;
       for (int i=V_.begin(); i<V_.end(); i++)
       { if (!Arithmetic<Type>::isNA(V_[i])) sum += V_[i];}
-      // compute the mean
       return sum;
     }
-    /** @return the safely computed weighted mean of the variable V
+    /** @return the safely computed weighted sum of the variable V
      *  @param w the weights
      **/
     template< class Weights>
     inline Type const operator()( ExprBase<Weights> const&  w) const
     {
       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Weights);
+#ifdef STK_BOUNDS_CHECK
       if (V_.range() != w.range())
         STKRUNTIME_ERROR_NO_ARG(wmeanSafe,V.range()!=w.range());
-
+#endif
       // sum the weighted samples
       Type sum  = 0.0;
       for (int i=V_.begin(); i<V_.end(); i++)
       { if ( (!Arithmetic<Type>::isNA(V_[i])) && (!Arithmetic<Type>::isNA(w[i])))
         { sum += std::abs(w[i]) * V_[i];}
       }
-      // compute the weighted mean. If all weights are 0, we get 0
       return sum;
     }
   protected:
@@ -311,11 +306,10 @@ struct MeanOp
     Type const operator()() const
     {
       // no samples
-      if (V_.empty()) { return Arithmetic<Type>::NA();}
+      if (V_.empty()) { return Type(0);}
       // sum the samples
       Type sum  = 0.;
       for (int i=V_.begin(); i<V_.end(); i++) { sum += V_[i];}
-      // compute the mean
       return sum /= (Type)(V_.size());
     }
     /** @return the weighted mean value of the variable V
@@ -327,17 +321,17 @@ struct MeanOp
     {
       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Weights);
       // no samples
-      if (V_.empty()) { return Arithmetic<Type>::NA();}
+      if (V_.empty()) { return Type(0);}
       // sum the weighted samples
-      Type sum  = 0.0, sum1weights= 0.0;
+      Type sum  = 0.0, sumweights= 0.0;
       for (int i=V_.begin(); i<V_.end(); i++)
       {
-        Type const weight = w[i];
-        sum1weights += weight;
-        sum     += weight * V_[i];
+        Type const weight = std::abs(w[i]);
+        sumweights += weight;
+        sum        += weight * V_[i];
       }
       // compute the weighted mean. If all weights are 0, we get 0
-      return (sum1weights) ? sum /= sum1weights: 0.;
+      return (sumweights) ? sum /= sumweights: Type(0);
     }
   protected:
     Derived const& V_;
@@ -357,7 +351,7 @@ struct MeanSafeOp
     Type const operator()() const
     {
       // no samples
-      if (V_.empty()) { return Arithmetic<Type>::NA();}
+      if (V_.empty()) { return Type(0);}
       // get dimensions
       int nobs = V_.size();
       // sum the samples
@@ -365,7 +359,7 @@ struct MeanSafeOp
       for (int i=V_.begin(); i<V_.end(); i++)
       { (!Arithmetic<Type>::isNA(V_[i])) ? sum += V_[i] : nobs--;}
       // compute the mean
-      return nobs ? sum /= Type(nobs) : Arithmetic<Type>::NA();
+      return nobs ? (sum /= Type(nobs)) : Type(0);
     }
     /** @return the safely computed weighted mean of the variable V
      *  @param w the weights
@@ -375,22 +369,23 @@ struct MeanSafeOp
     {
       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Weights);
       // no samples
-      if (V_.empty()) { return Arithmetic<Type>::NA();}
+      if (V_.empty()) { return Type(0);}
+#ifdef STK_BOUNDS_CHECK
       if (V_.range() != w.range())
         STKRUNTIME_ERROR_NO_ARG(wmeanSafe,V.range()!=w.range());
-
+#endif
       // sum the weighted samples
-      Type sum  = 0.0, sum1weights= 0.0;
+      Type sum  = 0.0, sumweights= 0.0;
       for (int i=V_.begin(); i<V_.end(); i++)
       { if ( (!Arithmetic<Type>::isNA(V_[i])) && (!Arithmetic<Type>::isNA(w[i])))
         {
           Type weight  = std::abs(w[i]);
-          sum1weights += weight;
-          sum      += weight * V_[i];
+          sumweights += weight;
+          sum        += weight * V_[i];
         }
       }
       // compute the weighted mean. If all weights are 0, we get 0
-      return (sum1weights) ? sum /= sum1weights: 0.;
+      return (sumweights) ? (sum / sumweights) : Type(0);
     }
   protected:
     Derived const& V_;
@@ -414,7 +409,7 @@ struct VarianceOp
     inline Type const operator()(bool unbiased) const
     {
       // no samples
-      if (V_.empty()) { return Arithmetic<Type>::NA();}
+      if (V_.empty()) { return Type(0);}
 
       int nobs = V_.size();
       // Compute the mean and sum
@@ -426,12 +421,12 @@ struct VarianceOp
         var += (dev*dev);         // squared value
       }
       // compute the variance
-      if (unbiased)
-      { return (nobs > 1) ? (var - (sum*sum)/Type(nobs))/Type(nobs -1)
-                          : Arithmetic<Type>::NA();
-      }
-      // variance
-      return (var - (sum*sum)/(Type)nobs)/(Type)(nobs);
+      return (unbiased) ?
+      (nobs > 1) ? (var - (sum*sum)/Type(nobs))/Type(nobs -1)
+                 : Arithmetic<Type>::infinity()
+      :
+      (nobs > 0) ? (var - (sum*sum)/(Type)nobs)/(Type)(nobs)
+                 : Type(0);
     }
     /** @return the weighted variance of the variable V.
      *  \f[ \hat{\sigma}^2
@@ -449,7 +444,7 @@ struct VarianceOp
     {
       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Weights);
       // no samples
-      if (V_.empty()) { return Arithmetic<Type>::NA();}
+      if (V_.empty()) { return Type(0);}
       // Compute the mean
       Type mu = MeanOp<Derived>(V_)(w);
       // sum the weighted samples
@@ -462,12 +457,10 @@ struct VarianceOp
         sum         += weight*(V_[i]-mu)*(V_[i]-mu); // deviation from the mean
       }
       // compute the variance
-      if (unbiased)
-      {
-        return (sum1weights) ? (sum*sum/sum1weights)/(sum1weights- sum2weights/sum1weights)
-                             : 0.;
-      }
-      return (sum1weights) ? (sum/sum1weights) : 0.;
+      return(unbiased) ?
+      (sum1weights) ? (sum)/(sum1weights- sum2weights/sum1weights) : Type(0)
+      :
+      (sum1weights) ? (sum/sum1weights) : Type(0);
     }
   protected:
     Derived const& V_;
@@ -491,7 +484,7 @@ struct VarianceSafeOp
     Type const operator()(bool unbiased) const
     {
       // no samples
-      if (V_.empty()) { return Arithmetic<Type>::NA();}
+      if (V_.empty()) { return Type(0);}
       int nobs = V_.size();
       // Compute the mean
       Type mu = MeanSafeOp<Derived>(V_)();
@@ -507,14 +500,12 @@ struct VarianceSafeOp
         else nobs--;
       }
       // compute the variance
-      if (unbiased)
-      {
-        return (nobs > 1) ? (var - (sum*sum)/Type(nobs))/Type(nobs -1)
-                          : Arithmetic<Type>::NA();
-      }
-      // variance
-      return (nobs > 0) ? (var - (sum*sum)/(Type)nobs)/(Type)(nobs)
-                        : Arithmetic<Type>::NA();
+      return (unbiased) ?
+      (nobs > 1) ? (var - (sum*sum)/Type(nobs))/Type(nobs -1)
+                 : Arithmetic<Type>::infinity()
+      :
+      (nobs > 0) ? (var - (sum*sum)/(Type)nobs)/(Type)(nobs)
+                 : Type(0);
     }
     /** @return the safely computed weighted variance of the variable V.
      *  \f[ \hat{\sigma}^2
@@ -532,11 +523,13 @@ struct VarianceSafeOp
     {
       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Weights);
       // no samples
-      if (V_.empty()) { return Arithmetic<Type>::NA();}
+      if (V_.empty()) { return Type(0);}
       // Compute the mean
       Type mu = MeanSafeOp<Derived>(V_)(w);
+#ifdef STK_BOUNDS_CHECK
       if (V_.range() != w.range())
         STKRUNTIME_ERROR_NO_ARG(VarianceSafeOp,V.range()!=w.range());
+#endif
       // sum the weighted samples
       Type sum = 0.0, sum1weights= 0.0, sum2weights = 0.0;
       for (int i=V_.begin(); i<V_.end(); i++)
@@ -549,12 +542,10 @@ struct VarianceSafeOp
         }
       }
       // compute the variance
-      if (unbiased)
-      {
-        return (sum1weights) ? (sum/sum1weights)/(sum1weights- sum2weights/sum1weights)
-                             : 0.;
-      }
-      return (sum1weights) ? (sum/sum1weights) : 0.;
+      return (unbiased) ?
+      (sum1weights) ? (sum)/(sum1weights- sum2weights/sum1weights) : 0.
+      :
+      (sum1weights) ? (sum/sum1weights) : 0.;
     }
   protected:
     Derived const& V_;
@@ -584,7 +575,7 @@ struct VarianceWithFixedMeanOp
     Type const operator()( Type const& mu, bool unbiased) const
     {
       // no samples
-      if (V_.empty()) { return Arithmetic<Type>::NA();}
+      if (V_.empty()) { return Type(0);}
       int nobs = V_.size();
       // sum
       Type sum = 0., var = 0., dev;
@@ -594,13 +585,11 @@ struct VarianceWithFixedMeanOp
         var += (dev*dev);         // squared value
       }
       // unbiased variance
-      if (unbiased)
-      {
-        return (nobs > 1) ? (var - (sum*sum)/(Type)(nobs))/((Type)nobs -1)
-                          : Arithmetic<Type>::NA();
-      }
-      // ML variance
-      return (var - (sum*sum)/(Type)nobs)/(Type)(nobs);
+      return (unbiased) ?
+      (nobs > 1) ? (var - (sum*sum)/(Type)(nobs))/((Type)nobs -1)
+                 : Arithmetic<Type>::infinity()
+      :
+      (nobs > 0) ? (var - (sum*sum)/Type(nobs))/Type(nobs) : Type(0);
     }
     /** @return the weighted variance of the variable V with fixed mean.
      *  \f[ \hat{\sigma^2} = \frac{1}{\sum_{i=1}^n w(i)}
@@ -618,7 +607,7 @@ struct VarianceWithFixedMeanOp
     {
       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Weights);
       // no samples
-      if (V_.empty()) { return Arithmetic<Type>::NA();}
+      if (V_.empty()) { return Type(0);}
       // sum the weighted samples
       Type sum = 0.0, sum1weights = 0.0, sum2weights = 0.0;
       for (int i=V_.begin(); i<V_.end(); i++)
@@ -629,12 +618,11 @@ struct VarianceWithFixedMeanOp
         sum         += weight * (V_[i]-mu)*(V_[i]-mu);  // deviation from the mean
       }
       // compute the variance
-      if (unbiased)
-      {
-        return (sum1weights) ? (sum/sum1weights)/(sum1weights - sum2weights/sum1weights)
-                            : 0.;
-      }
-      return (sum1weights) ? (sum/sum1weights) : 0.;
+      return (unbiased) ?
+      (sum1weights) ?  (sum)/(sum1weights - sum2weights/sum1weights)
+                    : Arithmetic<Type>::infinity()
+      :
+      (sum1weights) ? (sum/sum1weights) : Type(0);
     }
   protected:
     Derived const& V_;
@@ -664,7 +652,7 @@ struct VarianceWithFixedMeanSafeOp
     Type const operator()( Type mu, bool unbiased) const
     {
       // no samples
-      if (V_.empty()) { return Arithmetic<Type>::NA();}
+      if (V_.empty()) { return Type(0);}
       int nobs = V_.size();
       // sum
       Type sum  = 0.0, var  = 0.0, dev;
@@ -678,14 +666,12 @@ struct VarianceWithFixedMeanSafeOp
         else nobs--;
       }
       // compute the variance
-      if (unbiased)
-      {
-        return (nobs > 1) ? (var - (sum*sum)/Type(nobs))/Type(nobs -1)
-                          : Arithmetic<Type>::NA();
-      }
-      // variance
-      return (nobs > 0) ? (var - (sum*sum)/(Type)nobs)/(Type)(nobs)
-                        : Arithmetic<Type>::NA();
+      return (unbiased) ?
+      (nobs > 1) ? (var - (sum*sum)/Type(nobs))/Type(nobs -1)
+                 : Arithmetic<Type>::infinity()
+      :
+      (nobs > 0) ? (var - (sum*sum)/(Type)nobs)/(Type)(nobs)
+                 : Type(0.);
     }
 
     /** @return the safely computed weighted variance of the variable V with fixed mean.
@@ -698,12 +684,11 @@ struct VarianceWithFixedMeanSafeOp
      *  @c false otherwise
      **/
     template< class Weights>
-    Type const operator()( ExprBase<Weights> const& w, Type const& mu
-                         , bool unbiased) const
+    Type const operator()( ExprBase<Weights> const& w, Type const& mu, bool unbiased) const
     {
       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Weights);
       // no samples
-      if (V_.empty()) { return Arithmetic<Type>::NA();}
+      if (V_.empty()) { return Type(0);}
       if (V_.range() != w.range())
         STKRUNTIME_ERROR_NO_ARG(wmeanSafe,V.range()!=w.range());
       // sum the weighted samples
@@ -718,12 +703,11 @@ struct VarianceWithFixedMeanSafeOp
         }
       }
       // compute the variance
-      if (unbiased)
-      {
-        return (sum1weights) ? (sum/sum1weights)/(sum1weights - sum2weights/sum1weights)
-                             : 0.;
-      }
-      return (sum1weights) ? (sum/sum1weights) : 0.;
+      return (unbiased) ?
+        (sum1weights) ? (sum)/(sum1weights - sum2weights/sum1weights)
+                      : Arithmetic<Type>::infinity()
+        :
+        (sum1weights) ? (sum/sum1weights) : Type(0);
     }
   protected:
     Derived const& V_;
@@ -838,35 +822,35 @@ FUNCTION_ON_ARRAY(meanSafe, MeanSafeOp)
  *  @return the variance(s) or NA if there is no available value
  **/
 template< class Derived>
-typename hidden::ApplyFunctorSelector<Derived, VarianceOp >::resultByColType
+typename hidden::FunctorTraits<Derived, VarianceOp >::Row
 variance(Derived const& A, bool unbiased = false)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceOp>::ColOp(A)(unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceOp>::ColOp(A)(unbiased);}
 
 template< class Derived, class Weights>
-typename hidden::ApplyFunctorSelector<Derived, VarianceOp >::resultByColType
+typename hidden::FunctorTraits<Derived, VarianceOp >::Row
 variance(Derived const& A, ExprBase<Weights> const& w, bool unbiased = false)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceOp>::ColWeightedOp(A)(w, unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceOp>::ColWeightedOp(A)(w, unbiased);}
 
 template< class Derived>
-typename hidden::ApplyFunctorSelector<Derived, VarianceOp >::resultByColType
+typename hidden::FunctorTraits<Derived, VarianceOp >::Row
 varianceByCol(Derived const& A, bool unbiased = false)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceOp>::ColOp(A)(unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceOp>::ColOp(A)(unbiased);}
 
 template< class Derived, class Weights>
-typename hidden::ApplyFunctorSelector<Derived, VarianceOp >::resultByColType
+typename hidden::FunctorTraits<Derived, VarianceOp >::Row
 varianceByCol(Derived const& A, ExprBase<Weights> const& w, bool unbiased = false)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceOp>::ColWeightedOp(A)(w, unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceOp>::ColWeightedOp(A)(w, unbiased);}
 
 template< class Derived>
-typename hidden::ApplyFunctorSelector<Derived, VarianceOp >::resultByRowType
+typename hidden::FunctorTraits<Derived, VarianceOp >::Col
 varianceByRow(Derived const& A, bool unbiased = false)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceOp>::RowOp(A)(unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceOp>::RowOp(A)(unbiased);}
 
 
 template< class Derived, class Weights>
-typename hidden::ApplyFunctorSelector<Derived, VarianceOp >::resultByRowType
+typename hidden::FunctorTraits<Derived, VarianceOp >::Col
 varianceByRow(Derived const& A, ExprBase<Weights> const& w, bool unbiased = false)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceOp>::RowWeightedOp(A)(w, unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceOp>::RowWeightedOp(A)(w, unbiased);}
 
 /** @ingroup StatDesc
  *  Compute safely the variance(s) value(s) of A. If A is a row-vector or a
@@ -881,34 +865,34 @@ varianceByRow(Derived const& A, ExprBase<Weights> const& w, bool unbiased = fals
  *  @return the variance(s) or NA if there is no available value
  **/
 template< class Derived>
-typename hidden::ApplyFunctorSelector<Derived, VarianceSafeOp >::resultByColType
+typename hidden::FunctorTraits<Derived, VarianceSafeOp >::Row
 varianceSafe(Derived const& A, bool unbiased = false)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceSafeOp>::ColOp(A)(unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceSafeOp>::ColOp(A)(unbiased);}
 
 template< class Derived, class Weights>
-typename hidden::ApplyFunctorSelector<Derived, VarianceSafeOp >::resultByColType
+typename hidden::FunctorTraits<Derived, VarianceSafeOp >::Row
 varianceSafe(Derived const& A, ExprBase<Weights> const& w, bool unbiased = false)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceSafeOp>::ColWeightedOp(A)(w, unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceSafeOp>::ColWeightedOp(A)(w, unbiased);}
 
 template< class Derived>
-typename hidden::ApplyFunctorSelector<Derived, VarianceSafeOp >::resultByColType
+typename hidden::FunctorTraits<Derived, VarianceSafeOp >::Row
 varianceSafeByCol(Derived const& A, bool unbiased = false)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceSafeOp>::ColOp(A)(unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceSafeOp>::ColOp(A)(unbiased);}
 
 template< class Derived, class Weights>
-typename hidden::ApplyFunctorSelector<Derived, VarianceSafeOp >::resultByColType
+typename hidden::FunctorTraits<Derived, VarianceSafeOp >::Row
 varianceSafeByCol(Derived const& A, ExprBase<Weights> const& w, bool unbiased = false)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceSafeOp>::ColWeightedOp(A)(w, unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceSafeOp>::ColWeightedOp(A)(w, unbiased);}
 
 template< class Derived>
-typename hidden::ApplyFunctorSelector<Derived, VarianceSafeOp >::resultByRowType
+typename hidden::FunctorTraits<Derived, VarianceSafeOp >::Col
 varianceSafeByRow(Derived const& A, bool unbiased = false)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceSafeOp>::RowOp(A)(unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceSafeOp>::RowOp(A)(unbiased);}
 
 template< class Derived, class Weights>
-typename hidden::ApplyFunctorSelector<Derived, VarianceSafeOp >::resultByRowType
+typename hidden::FunctorTraits<Derived, VarianceSafeOp >::Col
 varianceSafeByRow(Derived const& A, ExprBase<Weights> const& w, bool unbiased = false)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceSafeOp>::RowWeightedOp(A)(w, unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceSafeOp>::RowWeightedOp(A)(w, unbiased);}
 
 /** @ingroup StatDesc
  *  Compute the VarianceWithFixedMean(s) value(s) of A. If A is a row-vector or a
@@ -924,34 +908,34 @@ varianceSafeByRow(Derived const& A, ExprBase<Weights> const& w, bool unbiased = 
  *  @return the variance(s) or NA if there is no available value
  **/
 template< class Derived, class MeanType>
-typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanOp >::resultByColType
+typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanOp >::Row
 varianceWithFixedMean(Derived const& A, MeanType const& mean, bool unbiased)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanOp>::ColOp(A)(mean, unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanOp>::ColOp(A)(mean, unbiased);}
 
 template< class Derived, class MeanType, class Weights>
-typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanOp >::resultByColType
+typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanOp >::Row
 varianceWithFixedMean(Derived const& A, ExprBase<Weights> const& w, MeanType const& mean, bool unbiased)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanOp>::ColWeightedOp(A)(w, mean, unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanOp>::ColWeightedOp(A)(w, mean, unbiased);}
 
 template< class Derived, class MeanType>
-typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanOp >::resultByColType
+typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanOp >::Row
 varianceWithFixedMeanByCol(Derived const& A, MeanType const& mean, bool unbiased)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanOp>::ColOp(A)(mean, unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanOp>::ColOp(A)(mean, unbiased);}
 
 template< class Derived, class MeanType, class Weights>
-typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanOp >::resultByColType
+typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanOp >::Row
 varianceWithFixedMeanByCol(Derived const& A, ExprBase<Weights> const& w, MeanType const& mean, bool unbiased)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanOp>::ColWeightedOp(A)(w, mean, unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanOp>::ColWeightedOp(A)(w, mean, unbiased);}
 
 template< class Derived, class MeanType>
-typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanOp >::resultByRowType
+typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanOp >::Col
 varianceWithFixedMeanByRow(Derived const& A, MeanType const& mean, bool unbiased = false)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanOp>::RowOp(A)(mean, unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanOp>::RowOp(A)(mean, unbiased);}
 
 template< class Derived, class MeanType, class Weights>
-typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanOp >::resultByRowType
+typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanOp >::Col
 varianceWithFixedMeanByRow(Derived const& A, ExprBase<Weights> const& w, MeanType const& mean, bool unbiased)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanOp>::RowWeightedOp(A)(w, mean, unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanOp>::RowWeightedOp(A)(w, mean, unbiased);}
 
 /** @ingroup StatDesc
  *  Compute safely the VarianceWithFixedMean(s) value(s) of A.
@@ -963,34 +947,34 @@ varianceWithFixedMeanByRow(Derived const& A, ExprBase<Weights> const& w, MeanTyp
  *  @return the variance(s) or NA if there is no available value
  **/
 template< class Derived, class MeanType>
-typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanSafeOp >::resultByColType
+typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanSafeOp >::Row
 varianceWithFixedMeanSafe( Derived const& A, MeanType const& mean, bool unbiased)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanSafeOp>::ColOp(A)(mean, unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanSafeOp>::ColOp(A)(mean, unbiased);}
 
 template< class Derived, class MeanType, class Weights>
-typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanSafeOp >::resultByColType
+typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanSafeOp >::Row
 varianceWithFixedMeanSafe( Derived const& A, ExprBase<Weights> const& w, MeanType const& mean, bool unbiased)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanSafeOp>::ColWeightedOp(A)(w, mean, unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanSafeOp>::ColWeightedOp(A)(w, mean, unbiased);}
 
 template< class Derived, class MeanType>
-typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanSafeOp >::resultByColType
+typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanSafeOp >::Row
 varianceWithFixedMeanSafeByCol( Derived const& A, MeanType const& mean, bool unbiased)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanSafeOp>::ColOp(A)(mean, unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanSafeOp>::ColOp(A)(mean, unbiased);}
 
 template< class Derived, class MeanType, class Weights>
-typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanSafeOp >::resultByColType
+typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanSafeOp >::Row
 varianceWithFixedMeanSafeByCol( Derived const& A, ExprBase<Weights> const& w, MeanType const& mean, bool unbiased)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanSafeOp>::ColWeightedOp(A)(w, mean, unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanSafeOp>::ColWeightedOp(A)(w, mean, unbiased);}
 
 template< class Derived, class MeanType>
-typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanSafeOp >::resultByRowType
+typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanSafeOp >::Col
 varianceWithFixedMeanSafeByRow(Derived const& A, MeanType const& mean, bool unbiased)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanSafeOp>::RowOp(A)(mean, unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanSafeOp>::RowOp(A)(mean, unbiased);}
 
 template< class Derived, class MeanType, class Weights>
-typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanSafeOp >::resultByRowType
+typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanSafeOp >::Col
 varianceWithFixedMeanSafeByRow(Derived const& A, ExprBase<Weights> const& w, MeanType const& mean, bool unbiased)
-{ return typename hidden::ApplyFunctorSelector<Derived, VarianceWithFixedMeanOp>::RowWeightedOp(A)(w, mean, unbiased);}
+{ return typename hidden::FunctorTraits<Derived, VarianceWithFixedMeanOp>::RowWeightedOp(A)(w, mean, unbiased);}
 
 
 }  // namespace Stat

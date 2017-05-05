@@ -89,7 +89,7 @@ if (STK::StaticAssert<bool(COND)>::MSG) {}
 
 // if native static_assert is enabled, let's use it
 #include <type_traits>
-#define STK_STATIC_ASSERT(COND,MSG) static_assert(COND,#MSG);
+#define STK_STATIC_ASSERT(COND,MSG) static_assert(bool(COND),#MSG);
 
 #endif // not C++11
 
@@ -138,7 +138,15 @@ STK_STATIC_ASSERT(  (hidden::Traits<EXPR>::structure_==(int)Arrays::array2D_) \
 STK_STATIC_ASSERT( hidden::Traits<LHS>::structure_== hidden::Traits<RHS>::structure_ \
                  ,YOU_HAVE_TO_USE_TWO_ARRAYS_WITH_THE_SAME_ORIENTATION)
 
+#define STK_STATIC_ASSERT_POINT_ONLY(EXPR) \
+STK_STATIC_ASSERT( (hidden::Traits<EXPR>::structure_==(int)Arrays::point_) \
+                 ,YOU_TRIED_CALLING_A_POINT_METHOD_ON_SOMETHING_ELSE)
+
 #define STK_STATIC_ASSERT_VECTOR_ONLY(EXPR) \
+STK_STATIC_ASSERT( (hidden::Traits<EXPR>::structure_==(int)Arrays::vector_) \
+                 ,YOU_TRIED_CALLING_A_VECTOR_METHOD_ON_SOMETHING_ELSE)
+
+#define STK_STATIC_ASSERT_POINT_OR_VECTOR_ONLY(EXPR) \
 STK_STATIC_ASSERT(  (hidden::Traits<EXPR>::structure_==(int)Arrays::vector_) \
                  ||(hidden::Traits<EXPR>::structure_==(int)Arrays::point_) \
                  ,YOU_TRIED_CALLING_A_VECTOR_METHOD_ON_A_MATRIX)
@@ -147,6 +155,7 @@ STK_STATIC_ASSERT(  (hidden::Traits<EXPR>::structure_==(int)Arrays::vector_) \
 STK_STATIC_ASSERT((hidden::Traits<EXPR>::structure_==(int)Arrays::vector_)||(hidden::Traits<EXPR>::structure_==(int)Arrays::point_)||(hidden::Traits<EXPR>::structure_==(int)Arrays::diagonal_),YOU_CANNOT_USED_AN_UNIDIMENSIONAL_METHOD_ON_THIS_OBJECT)
 
 #define STK_STATIC_ASSERT_ZERO_DIMENSION_ONLY(EXPR) \
-STK_STATIC_ASSERT((hidden::Traits<EXPR>::structure_==(int)Arrays::number_),YOU_CANNOT_USED_A_ZERODIMENSIONAL_METHOD_ON_THIS_OBJECT)
+STK_STATIC_ASSERT( (hidden::Traits<EXPR>::structure_==(int)Arrays::number_) \
+                  ,YOU_CANNOT_USED_A_ZERODIMENSIONAL_METHOD_ON_THIS_OBJECT)
 
 #endif /* STK_STATICASSERT_H */

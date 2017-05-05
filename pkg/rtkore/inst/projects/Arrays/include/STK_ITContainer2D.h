@@ -38,7 +38,7 @@
 #include <Sdk/include/STK_IRecursiveTemplate.h>
 #include <Sdk/include/STK_Macros.h>
 
-#include "STK_Traits.h"
+#include "STK_ArraysTraits.h"
 #include "STK_Arrays_Util.h"
 
 namespace STK

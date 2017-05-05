@@ -38,7 +38,8 @@
 
 #define EGAL(arg1, arg2) ((arg1::structure_ == int(Arrays::arg2)))
 
-#include "../STK_CAllocator.h"
+#include <Sdk/include/STK_StaticAssert.h>
+#include "../allocators/STK_CAllocator.h"
 #include "STK_ProductDispatcher.h"
 
 namespace STK
@@ -50,15 +51,6 @@ template<typename> class Array2DLowerTriangular;
 
 namespace hidden
 {
-
-/** @ingroup hidden
- *  @brief Traits class to get the correct returned Structure, Type, allocator,...
- *  of operator*. This Traits class is used by the functors classes operating
- *  on the Array2D  classes.
- *  @note the impossible cases are tracked in ArrayByArrayProduct class.
- **/
-template<typename Lhs, typename Rhs, int LStructure_, int RStructure_>
-struct ProductTraits;
 
 //------------------------------------------------------------
 // general lhs case. result is general except if rhs is vector
@@ -77,11 +69,12 @@ struct ProductTraits<Lhs, Rhs, Arrays::array2D_, RStructure_>
                  : (Traits<Lhs>::sizeRows_)/blockSize < (Traits<Rhs>::sizeCols_)/blockSize
                    ? int(Arrays::by_row_) : int(Arrays::by_col_),
     storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
-              ? int(Arrays::dense_) : int(Arrays::sparse_)
+                ? int(Arrays::dense_) : int(Arrays::sparse_)
   };
 
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
   typedef typename RemoveConst<Type>::Type const& ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
   typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
 };
 
@@ -105,6 +98,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::square_, RStructure_>
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
   typedef typename RemoveConst<Type>::Type const& ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   typedef CAllocator<Type, sizeRows_,sizeCols_, orient_> Allocator;
 };
@@ -127,6 +121,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::square_, Arrays::square_>
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
   typedef typename RemoveConst<Type>::Type const& ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
 };
@@ -151,6 +146,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::lower_triangular_, RStructure_>
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
   typedef typename RemoveConst<Type>::Type const& ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
 };
@@ -197,6 +193,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::upper_triangular_, RStructure_>
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
   typedef typename RemoveConst<Type>::Type const& ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   typedef CAllocator<Type, sizeRows_ , sizeCols_, orient_> Allocator;
 };
@@ -219,6 +216,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::upper_triangular_, Arrays::upper_triangul
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
   typedef typename RemoveConst<Type>::Type const& ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   typedef Array2DUpperTriangular<Type> Allocator;  // no CAllocator
 };
@@ -331,8 +329,9 @@ struct Traits< ArrayByDiagonalProduct < Lhs, Rhs> >
     orient_    = Lhs::orient_,
     storage_   = Lhs::storage_
   };
-  typedef typename Lhs::Type Type;
+  typedef typename Promote<typename Lhs::Type, typename Rhs::Type>::result_type Type;
   typedef typename RemoveConst<Type>::Type ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 };
 /** @ingroup hidden
  *  @brief Traits class for the DiagonalByArrayProduct class
@@ -350,6 +349,7 @@ struct Traits< DiagonalByArrayProduct < Lhs, Rhs> >
   };
   typedef typename Promote<typename Lhs::Type, typename Rhs::Type>::result_type Type;
   typedef typename RemoveConst<Type>::Type ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 };
 /** @ingroup hidden
  *  @brief Traits class for the PointByArrayProduct
@@ -369,6 +369,7 @@ struct Traits< PointByArrayProduct < Lhs, Rhs> >
 
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
   typedef typename RemoveConst<Type>::Type const& ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
 };
@@ -392,6 +393,7 @@ struct Traits< ArrayByVectorProduct < Lhs, Rhs> >
   typedef ProductTraits<Lhs, Rhs, Lhs::structure_, Rhs::structure_> Base;
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
   typedef typename RemoveConst<Type>::Type const& ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
 };
@@ -412,6 +414,7 @@ struct Traits< VectorByPointProduct < Lhs, Rhs> >
   };
   typedef typename Promote<typename Lhs::Type, typename Rhs::Type>::result_type Type;
   typedef Type ReturnType;
+  typedef Type ConstReturnType;
 };
 /** @ingroup hidden
  *  @brief Traits class for the ArrayByArrayProduct class
@@ -436,6 +439,8 @@ struct Traits< ArrayByArrayProduct<Lhs, Rhs> >
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
   typedef typename RemoveConst<Type>::Type const& ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+
   typedef typename Base::Allocator Allocator;
 };
 

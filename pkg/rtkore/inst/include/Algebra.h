@@ -69,6 +69,7 @@
 #include "../projects/Algebra/include/STK_Givens.h"
 #include "../projects/Algebra/include/STK_GramSchmidt.h"
 #include "../projects/Algebra/include/STK_Householder.h"
+#include "../projects/Algebra/include/STK_Cholesky.h"
 
 /* Algebra methods */
 #include "../projects/Algebra/include/STK_CG.h"

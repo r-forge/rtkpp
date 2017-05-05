@@ -74,6 +74,8 @@ struct Traits< Array2DUpperTriangular<Type_> >
 
     typedef Type_                Type;
     typedef typename RemoveConst<Type_>::Type const& ReturnType;
+    typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+
     enum
     {
       structure_ = Arrays::upper_triangular_,
@@ -93,6 +95,10 @@ struct Traits< Array2DUpperTriangular<Type_> >
   * but in this case the container will no more be triangular.
   * The container can be set upper triangular again using the method
   * IArray2D::update().
+  *
+  * One can give any range for the rows/columns in the constructor but as the
+  * diagonal of the matrix is defined as @em i=j then the upper part of the
+  * matrix is the set of index [i,j], with i>j.
   **/
 template<typename Type_>
 class Array2DUpperTriangular : public IArray2D< Array2DUpperTriangular<Type_> >

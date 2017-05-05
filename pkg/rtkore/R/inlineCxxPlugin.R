@@ -63,14 +63,17 @@ using namespace STK;
 "
 
 body <- function( x ){ sprintf( "BEGIN_RCPP\n%s\nEND_RCPP", x ) }
-
 LinkingTo <- unique(c("Rcpp", "rtkore" ))
 
-#  libs <-""
-libs <- "`$(R_HOME)/bin/Rscript -e \"rtkore:::LdFlags()\"` `$(R_HOME)/bin/Rscript -e \"Rcpp:::LdFlags()\"`"
-Cxx = "`${R_HOME}/bin/Rscript -e \"rtkore:::CxxFlags()\"` `$(R_HOME)/bin/Rscript -e \"Rcpp:::CxxFlags()\"` -DIS_RTKPP_LIB -DSTKUSELAPACK"
+# Makevars environment variables
+cxx  <- "`${R_HOME}/bin/Rscript -e \"rtkore:::CxxFlags()\"`"
+cpp  <- "`${R_HOME}/bin/Rscript -e \"rtkore:::CppFlags()\" ` $(SHLIB_OPENMP_CXXFLAGS)"
+libs <- "`$(R_HOME)/bin/Rscript -e \"rtkore:::LdFlags()\"` $(SHLIB_OPENMP_CFLAGS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)"
 
-out <- list( env = list( PKG_LIBS = libs, PKG_CXXFLAGS = Cxx ), includes = includes, LinkingTo = LinkingTo , body = body)
+out <- list( env = list( PKG_LIBS = libs, PKG_CXXFLAGS = cxx, PKG_CPPFLAGS = cpp  )
+           , includes = includes
+           , LinkingTo = LinkingTo
+           , body = body)
 
 out
 }

@@ -2,23 +2,9 @@
 
 \documentclass[a4paper,10pt]{article}
 
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-
-\usepackage{amsmath,amssymb,amsthm}
-\usepackage[english]{babel}
-\usepackage{graphicx}
-\usepackage{geometry}
-\usepackage{url}
-\usepackage{hyperref}
-\usepackage{Sweave}
-
 %-------------------------
 % preamble for nice lsitings and notes
 \include{rtkpp-preamble}
-%
-%-------------------------
-
 
 \geometry{top=3cm, bottom=3cm, left=2cm, right=2cm}
 
@@ -38,6 +24,39 @@ rtkore.date <- packageDescription("rtkore")$Date
 \SweaveOpts{concordance=TRUE}
 
 \maketitle
+
+\section{R wrappers}
+
+The R structure \code{SEXP} can be wrapped and used as S\stkpp{} arrays by the
+following objects
+\begin{lstlisting}[style=customcpp]
+template <typename Type > class RVector;
+template <typename Type > class RMatrix;
+\end{lstlisting}
+
+The constructors for these objects are the following
+\begin{lstlisting}[style=customcpp]
+/** Default Constructor. */
+RVector<Type>();
+/** Constructor with given dimension. */
+RVector<Type>(int length);
+/** Constructor with SEXP. */
+RVector<Type>( SEXP robj);
+/** Constructor with Rcpp vector*/
+RVector<Type>( Rcpp::Vector<Rtype_> vector)
+/** Copy constructor */
+RVector<Type>( RVector robj, bool ref);
+/** Default Constructor */
+RMatrix<Type>();
+/** Constructor with given dimension */
+RMatrix(int nRow, int nCol);
+/** Constructor with SEXP */
+RMatrix<Type>( SEXP robj);
+/** Copy constructor */
+RMatrix<Type>( Rcpp::Matrix<Rtype_> matrix)
+/** Copy Constructor. @c ref is only there for compatibility */
+RMatrix<Type>( RMatrix const& matrix, bool ref)
+\end{lstlisting}
 
 \section{STK++ Arrays and Vectors}
 

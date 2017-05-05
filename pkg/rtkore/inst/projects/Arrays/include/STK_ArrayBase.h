@@ -42,6 +42,272 @@
 namespace STK
 {
 
+namespace hidden
+{
+/** @ingroup hidden
+ *  Utility class allowing to know if in an assignment the dimensions are
+ *  correct
+ **/
+template<class Derived, int Structure_, int RhsStucture_>
+struct CheckAssign;
+
+/** @ingroup hidden
+ *  Utility class allowing to know if in an assignment the destination must
+ *   be resized or shifted
+ **/
+template<class Derived, int Structure_>
+struct Checker;
+
+/** @ingroup hidden
+ *  Specialization for general array2D_
+ **/
+template<class Derived,int RhsStructure_>
+struct CheckAssign<Derived, Arrays::array2D_, RhsStructure_>
+{
+  // all range are authorized for array2D_
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return true;}
+};
+/** @ingroup hidden
+ *  Specialization for square_
+ **/
+template<class Derived, int RhsStructure_>
+struct CheckAssign<Derived, Arrays::square_, RhsStructure_>
+{
+  // same ranges for square_ arrays
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return I==J;}
+};
+
+/** @ingroup hidden
+ *  Specialization for upper_triangular_
+ **/
+template<class Derived>
+struct CheckAssign<Derived, Arrays::upper_triangular_, Arrays::upper_triangular_>
+{
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return true;}
+};
+/** @ingroup hidden
+ *  Specialization for lower_triangular_
+ **/
+template<class Derived>
+struct CheckAssign<Derived, Arrays::lower_triangular_, Arrays::lower_triangular_>
+{
+  // all range are authorized for lower_triangular_
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return true;}
+};
+
+/** @ingroup hidden
+ *  Specialization for diagonal_
+ **/
+template<class Derived>
+struct CheckAssign<Derived, Arrays::diagonal_, Arrays::diagonal_>
+{
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return true;}
+};
+template<class Derived>
+struct CheckAssign<Derived, Arrays::diagonal_, Arrays::vector_>
+{
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return true;}
+};
+template<class Derived>
+struct CheckAssign<Derived, Arrays::diagonal_, Arrays::point_>
+{
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return true;}
+};
+
+/** @ingroup hidden
+ *  Specialization for vector_
+ **/
+template<class Derived>
+struct CheckAssign<Derived, Arrays::vector_, Arrays::diagonal_>
+{
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return true;}
+};
+template<class Derived>
+struct CheckAssign<Derived, Arrays::vector_, Arrays::vector_>
+{
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return true;}
+};
+template<class Derived>
+struct CheckAssign<Derived, Arrays::vector_, Arrays::point_>
+{
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return true;}
+};
+/** @ingroup hidden
+ *  Specialization for point_
+ **/
+template<class Derived>
+struct CheckAssign<Derived, Arrays::point_, Arrays::diagonal_>
+{
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return true;}
+};
+template<class Derived>
+struct CheckAssign<Derived, Arrays::point_, Arrays::vector_>
+{
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return true;}
+};
+template<class Derived>
+struct CheckAssign<Derived, Arrays::point_, Arrays::point_>
+{
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return true;}
+};
+// for number_
+template<class Derived>
+struct CheckAssign<Derived, Arrays::number_, Arrays::number_>
+{
+  // same range only for diagonal_ arrays
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return (I.size() == 1 && J.size() == 1);}
+};
+
+/** @ingroup hidden
+ *  Specialization for general array2D_
+ **/
+template<class Derived>
+struct Checker<Derived, Arrays::array2D_>
+{
+  // all range are authorized for array2D_
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return true;}
+  // check if resize is necessary
+  static bool resize(Derived const& array, Range const& I, Range const& J)
+  { return (array.rows() != I || array.cols() != J);}
+  // check if shift is necessary
+  static bool shift(Derived const& array, int beginRow, int beginCol)
+  { return (array.beginRows() != beginRow || array.beginCols() != beginCol);}
+  // check if resize is necessary
+  static bool resize(Derived const& array, Range const& I)
+  { return (array.rows() != I || array.cols() != I);}
+  // check if shift is necessary
+  static bool shift(Derived const& array, int begin)
+  { return (array.beginRows() != begin || array.beginCols() != begin);}
+};
+/** @ingroup hidden
+ *  Specialization for upper_triangular_
+ **/
+template<class Derived>
+struct Checker<Derived, Arrays::upper_triangular_>
+{
+  // all range are authorized for upper_triangular_
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return true;}
+  static bool resize(Derived const& array, Range const& I, Range const& J)
+  { return (array.rows() != I || array.cols() != J);}
+  static bool shift(Derived const& array, int beginRow, int beginCol)
+  { return (array.beginRows() != beginRow || array.beginCols() != beginCol);}
+  static bool resize(Derived const& array, Range const& I)
+  { return (array.rows() != I || array.cols() != I);}
+  static bool shift(Derived const& array, int begin)
+  { return (array.beginRows() != begin || array.beginCols() != begin);}
+};
+/** @ingroup hidden
+ *  Specialization for lower_triangular_
+ **/
+template<class Derived>
+struct Checker<Derived, Arrays::lower_triangular_>
+{
+  // all range are authorized for lower_triangular_
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return true;}
+  static bool resize(Derived const& array, Range const& I, Range const& J)
+  { return (array.rows() != I || array.cols() != J);}
+  static bool shift(Derived const& array, int beginRow, int beginCol)
+  { return (array.beginRows() != beginRow || array.beginCols() != beginCol);}
+  static bool resize(Derived const& array, Range const& I)
+  { return (array.rows() != I || array.cols() != I);}
+  static bool shift(Derived const& array, int begin)
+  { return (array.beginRows() != begin || array.beginCols() != begin);}
+};
+
+/** @ingroup hidden
+ *  Specialization for square_
+ **/
+template<class Derived>
+struct Checker<Derived, Arrays::square_>
+{
+  // same range only for square_ arrays
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return I==J;}
+  static bool resize(Derived const& array, Range const& I, Range const& J)
+  { return (array.rows() != I || array.cols() != J);}
+  static bool shift(Derived const& array, int beginRow, int beginCol)
+  { return (array.beginRows() != beginRow || array.beginCols() != beginCol);}
+  static bool resize(Derived const& array, Range const& I)
+  { return (array.range() != I);}
+  static bool shift(Derived const& array, int begin)
+  { return (array.beginRows() != begin || array.beginCols() != begin);}
+};
+
+/** @ingroup hidden
+ *  Specialization for diagonal_
+ **/
+template<class Derived>
+struct Checker<Derived, Arrays::diagonal_>
+{
+  // same range only for diagonal_ arrays
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return I==J;}
+  static bool resize(Derived const& array, Range const& I, Range const& J)
+  { return (array.rows() != I || array.cols() != J);}
+  static bool shift(Derived const& array, int beginRow, int beginCol)
+  { return (array.beginRows() != beginRow || array.beginCols() != beginCol);}
+  static bool resize(Derived const& array, Range const& I)
+  { return (array.range() != I);}
+  static bool shift(Derived const& array, int begin)
+  { return (array.beginRows() != begin || array.beginCols() != begin);}
+};
+
+// for vectors
+template<class Derived>
+struct Checker<Derived, Arrays::vector_>
+{
+  // same range only for vector_ arrays
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return J.size() == 1;}
+  static bool resize(Derived const& array, Range const& I)
+  { return (array.range() != I);}
+  static bool shift(Derived const& array, int begin)
+  { return (array.begin() != begin);}
+};
+
+// for point
+template<class Derived>
+struct Checker<Derived, Arrays::point_>
+{
+  // same range only for diagonal_ arrays
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return I.size() == 1;}
+  static bool resize(Derived const& array, Range const& I)
+  { return (array.range() == I) ? false : true;}
+  static bool shift(Derived const& array, int begin)
+  { return (array.begin() == begin) ? false : true;}
+};
+// for point
+template<class Derived>
+struct Checker<Derived, Arrays::number_>
+{
+  // same range only for diagonal_ arrays
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return (I.size() == 1 && J.size() == 1);}
+  static bool resize(Derived const& array, Range const& I)
+  { return (array.range() == I) ? false : true;}
+  static bool shift(Derived const& array, int begin)
+  { return (array.begin() == begin) ? false : true;}
+};
+
+} // namespace hidden
 /** @ingroup Arrays
  *  @brief base class for templated arrays.
  *
@@ -76,9 +342,6 @@ class ArrayBase :  public ExprBase<Derived>
       sizeCols_  = hidden::Traits<Derived>::sizeCols_,
       storage_   = hidden::Traits<Derived>::storage_
     };
-
-    /** iterator class for compatibility with the stl */
-    class iterator;
 
   protected:
     /** Default constructor. Default values are cols=(1:0) and rows=(1:0). */
@@ -139,7 +402,8 @@ class ArrayBase :  public ExprBase<Derived>
     Derived& operator=( Derived const& rhs) { return assign(rhs);}
     /** @return the matrix or vector obtained by evaluating this expression */
     template<typename Rhs>
-    inline Derived& operator=( ExprBase<Rhs> const& rhs) { return assign(rhs.asDerived());}
+    inline Derived& operator=( ExprBase<Rhs> const& rhs)
+    { return assign(rhs.asDerived());}
     /** Adding a Rhs to this. */
     template<typename Rhs>
     inline Derived& operator+=( ExprBase<Rhs> const& other);
@@ -255,8 +519,6 @@ class ArrayBase :  public ExprBase<Derived>
       { STKOUT_OF_RANGE_2ARG(Type const& ArrayBase::elt, i, j, endRows() <= i);}
       if (this->beginCols() > j)
       { STKOUT_OF_RANGE_2ARG(Type const& ArrayBase::elt, i, j, beginCols() > j);}
-//      stk_cout << "cols =" << this->cols() << "\n";
-//      stk_cout << "endCols =" << this->endCols() << "\n";
       if (this->endCols() <= j)
       { STKOUT_OF_RANGE_2ARG(Type const& ArrayBase::elt, i, j, endCols() <= j);}
 #endif

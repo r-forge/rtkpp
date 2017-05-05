@@ -87,7 +87,7 @@ class WeightedSvd: public ISvd< WeightedSvd<Array, WRows, WCols> >
     /** run the weighted svd */
     virtual bool run()
     {
-      U_ = wrows_.diagonalize() * U_ * wcols_.diagonalize();
+      U_ = wrows_.asDiagonal() * U_ * wcols_.asDiagonal();
 #ifdef STKUSELAPACK
       lapack::Svd solver(U_, false, this->withU_, this->withV_);
       // if there is no cv, fall back to STK++ svd

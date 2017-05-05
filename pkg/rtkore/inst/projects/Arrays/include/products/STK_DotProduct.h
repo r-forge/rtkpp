@@ -28,14 +28,14 @@
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
 
-/** @file STK_DotOperators.h
- *  @brief In this file we implement the DotOperator class.
+/** @file STK_DotProduct.h
+ *  @brief In this file we implement the DotProduct class.
  **/
 
-#ifndef STK_DOTOPERATOR_H
-#define STK_DOTOPERATOR_H
+#ifndef STK_DOTPRODUCT_H
+#define STK_DOTPRODUCT_H
 
-#include "../STK_CAllocator.h"
+#include "../allocators/STK_CAllocator.h"
 
 namespace STK
 {
@@ -62,6 +62,7 @@ struct Traits< DotProduct < Lhs, Rhs> >
   };
   typedef typename Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
   typedef typename RemoveConst<Type>::Type const& ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
   typedef CAllocator<Type, sizeRows_, sizeCols_, (bool)orient_> Allocator;
 };
 
@@ -70,13 +71,12 @@ struct Traits< DotProduct < Lhs, Rhs> >
 
 /** @ingroup Arrays
   *
-  * @brief Generic expression where a dot operator is
-  * applied to two expressions.
+  * @brief Generic expression where a DotProduct is applied to two expressions.
   *
   * @tparam Lhs the type of the left-hand side
   * @tparam Rhs the type of the right-hand side
   *
-  * This class represents an expression  where a product operator is applied to
+  * This class represents an expression where a dot product is applied to
   * two expressions. The left hand side being a point_ (a row-oriented vector)
   * and the right hand side a vector_ (a column-oriented vector).
   *
@@ -90,6 +90,7 @@ class DotProduct : public ExprBase< DotProduct<Lhs, Rhs> >
   public:
     typedef typename hidden::Traits<DotProduct>::Type Type;
     typedef typename hidden::Traits<DotProduct>::ReturnType ReturnType;
+    typedef typename hidden::Traits<DotProduct>::ConstReturnType ConstReturnType;
     typedef typename hidden::Traits<DotProduct>::Allocator Allocator;
 
     enum
@@ -109,8 +110,12 @@ class DotProduct : public ExprBase< DotProduct<Lhs, Rhs> >
                      : lhs_(lhs), rhs_(rhs)
                      , result_()
     {
-      if (lhs.cols() != rhs.rows())
-      { STKRUNTIME_ERROR_NO_ARG(DotProduct, sizes mismatch for 2D array);}
+      STK_STATIC_ASSERT_POINT_ONLY(Lhs);
+      STK_STATIC_ASSERT_VECTOR_ONLY(Rhs);
+#ifdef STK_BOUNDS_CHECK
+      if (lhs.range() != rhs.range())
+      { STKRUNTIME_ERROR_NO_ARG(DotProduct:DotProduct, sizes mismatch between Lhs and Rhs);}
+#endif
       result_.shift(lhs.beginRows(), rhs.beginCols());
       result_.elt() = lhs.dot(rhs);
     }
@@ -120,7 +125,16 @@ class DotProduct : public ExprBase< DotProduct<Lhs, Rhs> >
     inline ColRange const& colsImpl() const { return result_.cols();}
 
     /** access to the element */
-    inline ReturnType elt0Impl() const { return result_.elt();}
+    inline ConstReturnType elt2Impl(int i, int j) const
+    {
+#ifdef STK_BOUNDS_CHECK
+      if ( (result_.beginRows() != i) || (result_.beginCols() !=j) )
+      { STKRUNTIME_ERROR_2ARG(DotProduct:elt2Impl,i,j,wrong indexes);}
+#endif
+      return result_.elt(i, j);
+    }
+    /** access to the element */
+    inline ConstReturnType elt0Impl() const { return result_.elt();}
 
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_; }
@@ -139,4 +153,4 @@ class DotProduct : public ExprBase< DotProduct<Lhs, Rhs> >
 
 }  // namespace STK
 
-#endif /* STK_DOTOPERATOR_H */
+#endif /* STK_DOTPRODUCT_H */

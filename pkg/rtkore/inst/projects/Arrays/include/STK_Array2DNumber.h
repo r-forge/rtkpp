@@ -69,6 +69,8 @@ struct Traits< Array2DNumber<Type_> >
 
   typedef Type_                Type;
   typedef typename RemoveConst<Type_>::Type const& ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+
   enum
   {
     structure_ = Arrays::number_,

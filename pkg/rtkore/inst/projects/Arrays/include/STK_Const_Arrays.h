@@ -103,6 +103,7 @@ struct Traits< Const::Identity <Type_, Size_> >
 
   typedef Type_                Type;
   typedef typename RemoveConst<Type_>::Type ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 };
 /** @ingroup hidden
  *  @brief Traits class for the identity constant matrix
@@ -120,6 +121,7 @@ struct Traits< Const::Vector <Type_, Size_> >
   };
   typedef Type_                Type;
   typedef typename RemoveConst<Type_>::Type ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 };
 /** @ingroup hidden
  *  @brief Traits class for the constant vector_
@@ -137,6 +139,7 @@ struct Traits< Const::Point <Type_, Size_> >
   };
   typedef Type_                Type;
   typedef typename RemoveConst<Type_>::Type ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 };
 /** @ingroup hidden
  *  @brief Traits class for the square constant matrix
@@ -154,6 +157,7 @@ struct Traits< Const::Square <Type_, Size_> >
   };
   typedef Type_                Type;
   typedef typename RemoveConst<Type_>::Type ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 };
 /** @ingroup hidden
  *  @brief Traits class for the general constant matrix
@@ -171,6 +175,7 @@ struct Traits< Const::Array<Type_, SizeRows_, SizeCols_> >
   };
   typedef Type_                Type;
   typedef typename RemoveConst<Type_>::Type ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 };
 /** @ingroup hidden
  *  @brief Traits class for the upper triangular constant matrix
@@ -188,6 +193,7 @@ struct Traits< Const::UpperTriangular<Type_, SizeRows_, SizeCols_> >
   };
   typedef Type_                Type;
   typedef typename RemoveConst<Type_>::Type ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 };
 /** @ingroup hidden
  *  @brief Traits class for the lower triangular constant matrix
@@ -205,6 +211,7 @@ struct Traits< Const::LowerTriangular<Type_, SizeRows_, SizeCols_> >
   };
   typedef Type_                Type;
   typedef typename RemoveConst<Type_>::Type ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 };
 
 } // namespace hidden

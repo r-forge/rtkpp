@@ -1,6 +1,5 @@
 #include "STKpp.h"
 using namespace STK;
-/** @ingroup tutorial */
 int main(int argc, char** argv)
 {
  CArray3X a(3,5);  a.randGauss();

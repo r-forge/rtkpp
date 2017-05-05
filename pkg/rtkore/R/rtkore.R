@@ -51,10 +51,8 @@
 #' @aliases rtkore
 #' @docType package
 #' @keywords STK++, stkpp
-#' @import Rcpp
 #'
 #' @author
 #' Author: Serge Iovleff \email{contact@@stkpp.org}
 #'
-#' @useDynLib rtkore
 NULL

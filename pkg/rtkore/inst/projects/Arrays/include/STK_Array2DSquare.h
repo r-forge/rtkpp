@@ -70,6 +70,7 @@ struct Traits<Array2DSquare<Type_> >
 
     typedef Type_                Type;
     typedef typename RemoveConst<Type_>::Type const& ReturnType;
+    typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
     enum
     {

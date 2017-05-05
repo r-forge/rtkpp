@@ -65,7 +65,7 @@ typename hidden::SliceVisitorSelector<Derived, hidden::VISITOR, Arrays::by_row_>
 FUNC##ByRow(Derived const& A) \
 { return typename hidden::SliceVisitorSelector<Derived, hidden::VISITOR, Arrays::by_row_>::VisitorOp(A);}
 
-#include "../STK_CAllocator.h"
+#include "../allocators/STK_CAllocator.h"
 
 namespace STK
 {
@@ -83,14 +83,6 @@ namespace hidden
 template<typename Derived, template<class> class Visitor>
 struct Traits< VisitorByCol <Derived, Visitor> >
 {
-  typedef typename Derived::Type Type_;
-  typedef Visitor<Type_> VisitorType;
-  typedef typename VisitorType::Type Type;
-  typedef typename VisitorType::ReturnType ReturnType;
-
-  typedef RowOperator< VisitorByCol <Derived, Visitor> > Row;
-  typedef ColOperator< VisitorByCol <Derived, Visitor> > Col;
-
   enum
   {
       structure_ = Arrays::point_,
@@ -99,6 +91,15 @@ struct Traits< VisitorByCol <Derived, Visitor> >
       sizeCols_  = Derived::sizeCols_,
       storage_   = Arrays::dense_
   };
+  typedef typename Derived::Type Type_;
+  typedef Visitor<Type_> VisitorType;
+  typedef typename VisitorType::Type Type;
+  typedef typename VisitorType::ReturnType ReturnType;
+  typedef typename VisitorType::ConstReturnType ConstReturnType;
+
+  typedef RowOperator< VisitorByCol <Derived, Visitor> > Row;
+  typedef ColOperator< VisitorByCol <Derived, Visitor> > Col;
+
   typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
 };
 
@@ -181,14 +182,6 @@ namespace hidden
 template<typename Derived, template<class> class Visitor>
 struct Traits< VisitorByRow <Derived, Visitor> >
 {
-  typedef typename Derived::Type Type_;
-  typedef Visitor<Type_> VisitorType;
-  typedef typename VisitorType::Type Type;
-  typedef typename VisitorType::ReturnType ReturnType;
-
-  typedef RowOperator< VisitorByRow <Derived, Visitor> > Row;
-  typedef ColOperator< VisitorByRow <Derived, Visitor> > Col;
-
   enum
   {
       structure_ = Arrays::vector_,
@@ -197,6 +190,15 @@ struct Traits< VisitorByRow <Derived, Visitor> >
       sizeCols_  = 1,
       storage_   = Arrays::dense_
   };
+  typedef typename Derived::Type Type_;
+  typedef Visitor<Type_> VisitorType;
+  typedef typename VisitorType::Type Type;
+  typedef typename VisitorType::ReturnType ReturnType;
+  typedef typename VisitorType::ConstReturnType ConstReturnType;
+
+  typedef RowOperator< VisitorByRow <Derived, Visitor> > Row;
+  typedef ColOperator< VisitorByRow <Derived, Visitor> > Col;
+
   typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
 };
 

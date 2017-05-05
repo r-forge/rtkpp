@@ -75,6 +75,7 @@ struct Traits< Array2DLowerTriangular<Type_> >
 
     typedef Type_                Type;
     typedef typename RemoveConst<Type_>::Type const& ReturnType;
+    typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
    enum
    {
@@ -97,9 +98,9 @@ struct Traits< Array2DLowerTriangular<Type_> >
   * The container can be set lower triangular again using the method
   * IArray2D::update().
   *
-  * One can give any range for the rows/columns but if the diagonal of the
-  * matrix is defined for @em i=j and the lower part of the matrix is
-  * the set of index [i,j], with i<j.
+  * One can give any range for the rows/columns in the constructor but as the
+  * diagonal of the matrix is defined as @em i=j then the lower part of the matrix
+  * is the set of index [i,j], with i<j.
  **/
 template<class Type_ >
 class Array2DLowerTriangular : public IArray2D< Array2DLowerTriangular<Type_> >

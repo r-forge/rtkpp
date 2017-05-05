@@ -2,11 +2,6 @@ library(rtkore)
 
 testFastRand <- function()
 {
-# check beta random variates rtkore generator
-set.seed(1)
-ssim <- .Call("fastBetaRand", 10, 0.5, 0.5, PACKAGE="rtkore")
-set.seed(1)
-rsim <- rbeta(10, 0.5, 0.5)
 # check binomial random variates rtkore generator
 set.seed(1)
 ssim <- .Call("fastBinomialRand", 10, 25, 0.4, PACKAGE="rtkore")
@@ -15,6 +10,17 @@ rsim <- rbinom(10, 25, 0.4)
 if (max(abs(ssim - rsim)))
 {
   print("Binomial test failed\n")
+  return(FALSE);
+}
+
+# check beta random variates rtkore generator
+set.seed(1)
+ssim <- .Call("fastBetaRand", 10, 0.5, 0.5, PACKAGE="rtkore")
+set.seed(1)
+rsim <- rbeta(10, 0.5, 0.5)
+if (max(abs(ssim - rsim)))
+{
+  print("Beta test failed\n")
   return(FALSE);
 }
 
@@ -44,7 +50,7 @@ if (max(abs(ssim - rsim)))
 set.seed(1)
 ssim <- .Call("fastExponentialRand", 10, 4, PACKAGE="rtkore")
 set.seed(1)
-rsim <- rexp(10, 4)
+rsim <- rexp(10, 1./4.)
 if (max(abs(ssim - rsim)))
 {
   print("exponential test failed\n")
@@ -66,7 +72,7 @@ if (max(abs(ssim - rsim)))
 set.seed(1)
 ssim <- .Call("fastGammaRand", 10, 2, 2, PACKAGE="rtkore")
 set.seed(1)
-rsim <- rgamma(10, 2, 2)
+rsim <- rgamma(10, 2, 1/2)
 if (max(abs(ssim - rsim)))
 {
   print("gamma test failed\n")

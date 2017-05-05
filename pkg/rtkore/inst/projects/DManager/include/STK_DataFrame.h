@@ -78,6 +78,30 @@ class DataFrame : protected List1D<IVariable* >, public IContainer2D<UnknownSize
     /** Destructor. */
     virtual ~DataFrame();
 
+    /**  @return the range of the rows of the container */
+    inline RowRange const& rows() const  { return Base2D::rows();}
+     /** @return the index of the first element */
+    inline int beginRows() const { return Base2D::beginRows();}
+    /**  @return the ending index of the elements */
+    inline int endRows() const { return  Base2D::endRows();}
+    /**  @return the size of the container */
+    inline int sizeRows() const  { return  Base2D::sizeRows();}
+
+    /** @return the Horizontal range (1 column) */
+    inline ColRange cols() const { return ColRange(1);}
+    /** @return the index of the first column */
+    inline int beginCols() const { return  Base2D::beginCols();}
+    /**  @return the index of the ending column */
+    inline int endCols() const  { return  Base2D::endCols();}
+    /** @return the number of columns */
+    inline int sizeCols() const  { return  Base2D::sizeCols();};
+
+    /**  @return the index of the last element */
+    inline int lastIdxRows() const  { return this->lastIdx();}
+    /**  @return the index of the last element */
+    inline int lastIdxCols() const  { return baseIdx;}
+
+
     /** @return @c true if the container is empty, @c false otherwise */
      inline bool empty() const { return Base::empty();}
 

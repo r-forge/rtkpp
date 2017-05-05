@@ -2,22 +2,9 @@
 
 \documentclass[a4paper,10pt]{article}
 
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-
-\usepackage{amsmath,amssymb,amsthm}
-\usepackage[english]{babel}
-\usepackage{graphicx}
-\usepackage{geometry}
-\usepackage{url}
-\usepackage{hyperref}
-\usepackage{Sweave}
-
 %-------------------------
 % preamble for nice lsitings and notes
 \include{rtkpp-preamble}
-%
-%-------------------------
 
 \geometry{top=3cm, bottom=3cm, left=2cm, right=2cm}
 

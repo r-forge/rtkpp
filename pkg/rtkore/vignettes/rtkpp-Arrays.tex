@@ -2,31 +2,13 @@
 
 \documentclass[a4paper,10pt]{article}
 
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-
-\usepackage{amsmath,amssymb,amsthm}
-\usepackage[english]{babel}
-\usepackage{graphicx}
-\usepackage{geometry}
-\usepackage{url}
-
-\usepackage{Sweave}
-
 %-------------------------
 % preamble for nice lsitings and notes
 \include{rtkpp-preamble}
-%
-%-------------------------
 
-%\geometry{top=3cm, bottom=3cm, left=2cm, right=2cm}
+\geometry{top=3cm, bottom=3cm, left=2cm, right=2cm}
 
 %% need no \usepackage{Sweave.sty}
-<<prelim,echo=FALSE,print=FALSE>>=
-library(rtkore)
-rtkore.version <- packageDescription("rtkore")$Version
-rtkore.date <- packageDescription("rtkore")$Date
-@
 % Title Page
 \title{ User Guide: STK++ Arrays}
 \author{Serge Iovleff}
@@ -34,7 +16,7 @@ rtkore.date <- packageDescription("rtkore")$Date
 
 % start documentation
 \begin{document}
-\SweaveOpts{concordance=TRUE}
+\input{rtkpp-Arrays-concordance}
 
 \maketitle
 \begin{abstract}
@@ -61,6 +43,8 @@ There are mainly two kinds of arrays you can use with STK++:
 oldest versions of STK++,
 \item the \code{CArray} family classes which have been introduced in version
 0.4 of STK++ library.
+\item For \rtkore{} users, the \code{RVector} and \code{RMatrix} wrap the
+R \code{SEXP} stucture.
 \end{itemize}
 
 Before explaining the usage and differences between the different arrays,

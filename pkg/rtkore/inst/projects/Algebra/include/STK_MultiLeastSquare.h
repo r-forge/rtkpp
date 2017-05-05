@@ -108,14 +108,14 @@ bool MultiLeastSquare<ArrayB, ArrayA>::runImpl(Weights const& weights)
 {
   STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Weights);
   // compute a'a
-  ArraySquareX prod = a_.transpose() * weights.diagonalize() * a_;
+  ArraySquareX prod = a_.transpose() * weights.asDiagonal() * a_;
   // compute (a'a)^{-1}
   SymEigen<ArraySquareX> decomp(prod);
   decomp.run();
   rank_ = decomp.rank();
   // compute (a'a)^{-1}b'a
-  if (a_.sizeRows() < b_.sizeCols()) { x_ = (decomp.ginv(prod) * a_.transpose())  * weights.diagonalize() * b_;}
-  else { x_ = decomp.ginv(prod) * (a_.transpose() * weights.diagonalize() * b_);}
+  if (a_.sizeRows() < b_.sizeCols()) { x_ = (decomp.ginv(prod) * a_.transpose())  * weights.asDiagonal() * b_;}
+  else { x_ = decomp.ginv(prod) * (a_.transpose() * weights.asDiagonal() * b_);}
   return true;
 }
 

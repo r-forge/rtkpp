@@ -125,7 +125,7 @@
 
 // bivariate Statistics
 #include "STatistiK/include/STK_Stat_Bivariate.h"
-#include "STatistiK/include/STK_Stat_BivariateRealReal.h"
+#include "STatistiK/include/STK_Stat_Covariance.h"
 
 // Multivariate Statistics
 #include "STatistiK/include/STK_Stat_Multivariate.h"

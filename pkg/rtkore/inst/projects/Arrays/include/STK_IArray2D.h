@@ -187,7 +187,7 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
       this->freeMem();
       this->setRanges();
       // initialize if necessary
-      this->mallocHo(this->cols());
+      this->mallocCols(this->cols());
       initializeCols(this->cols());
     }
     /** @brief Set new beginning indexes to the array.
@@ -418,7 +418,7 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
       if (this->sizeCols() <=0)
       {
         this->incLastIdxCols(n);
-        this->mallocHo( this->cols());
+        this->mallocCols( this->cols());
         initializeCols( this->cols());
       }
       else // else insert to the end of the array
@@ -446,7 +446,7 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
         // initialize columns of the array
         try
         {
-          this->mallocHo(range_ho);
+          this->mallocCols(range_ho);
         }
         catch (Exception const& error)   // if an error occur
         {
@@ -503,7 +503,7 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
         // initialize columns of the array
         try
         {
-          this->mallocHo(range_ho);
+          this->mallocCols(range_ho);
         }
         catch (Exception & error)   // if an error occur
         {

@@ -72,7 +72,9 @@ struct Traits< RMatrix<Type_> >
 
     typedef Type_ Type;
     typedef Type const& ReturnType;
-    enum
+    typedef Type const& ConstReturnType;
+
+   enum
     {
       structure_ = Arrays::array2D_,
       orient_    = Arrays::by_col_,
@@ -110,11 +112,11 @@ class RMatrix : public ArrayBase< RMatrix<Type_> >, public TRef<1>
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
 
-    /** Default Constructor. */
+    /** Default Constructor */
     inline RMatrix(): matrix_(),rows_(), cols_() {}
-    /** Constructor with given dimension. */
+    /** Constructor with given dimension */
     inline RMatrix(int nRow, int nCol): matrix_(nRow, nCol),rows_(nRow), cols_(nCol) {}
-    /** Constructor with SEXP. */
+    /** Constructor with SEXP */
     inline RMatrix( SEXP robj)
                   : matrix_(robj),rows_(0, matrix_.rows()), cols_(0, matrix_.cols())
     {}

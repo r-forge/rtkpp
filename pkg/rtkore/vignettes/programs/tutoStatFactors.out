@@ -1,0 +1,30 @@
+nbLevels= 3
+asInteger= 0 1 0 0 0 1 2 2 2 1 0 0 2
+
+Levels: a b c
+Levels counts: 6 3 4
+nbLevels= 3 3 2
+
+asInteger=
+0 0 0
+1 1 0
+0 0 0
+1 0 0
+2 0 0
+0 1 0
+2 2 1
+1 2 1
+0 2 1
+2 1 1
+0 0 1
+2 0 1
+1 2 1
+
+Levels variable 0: b c d
+Levels variable 1: a b c
+Levels variable 2: a b
+
+Levels counts 0: 5 4 4
+Levels counts 1: 6 3 4
+Levels counts 2: 6 7
+

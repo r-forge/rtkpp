@@ -70,6 +70,9 @@ class Gamma : public IUnivLaw<Real>
      **/
     Gamma( Real const& shape = 1., Real const& scale = 1.)
          : Base(_T("Gamma")), a_(shape), b_(scale)
+#ifndef IS_RTKPP_LIB
+         , c_(), d_()
+#endif
     {
       // check parameters
       if ( !Arithmetic<Real>::isFinite(a_) || !Arithmetic<Real>::isFinite(b_)

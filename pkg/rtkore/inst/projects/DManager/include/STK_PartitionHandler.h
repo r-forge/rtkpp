@@ -19,7 +19,7 @@ class PartitionHandler: public IRunnerBase
   public:
     /** Default constructor.
      *  @param rangeData prop range of the data to partition
-     *  @param  proportions to set in test data
+     *  @param  prop to set in test data
      **/
     PartitionHandler( Range const& rangeData, Real prop);
     /** destructor */

@@ -1,4 +1,46 @@
 %-------------------
+% Useful packages
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{float}
+
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{Sweave}
+
+%-------------------
+% Useful macro
+\newcommand{\Rcpp}{{\tt Rcpp}} %
+\newcommand{\rtkpp}{{\tt rtkpp}} %
+\newcommand{\rtkore}{{\tt rtkore}} %
+\newcommand{\stkpp}{{\tt STK++}} %
+\newcommand{\Cpp}{{\tt C++}}
+
+\newcommand{\Esp}[1]{\mathbb{E}\left[#1\right]}
+\newcommand{\Var}[1]{\mathrm{Var}\left[#1\right]}
+\newcommand{\E}[1]{\mathbb{E}\left[#1\right]}
+\newcommand{\V}[1]{\mathrm{Var}\left[#1\right]}
+\newcommand{\Loi}[1]{\mathcal{L}\left(#1\right)}
+
+%----- Sets : integers, reals, complexes -----
+\newcommand{\Nn}{\mathbb{N}} \newcommand{\N}{\mathbb{N}}
+\newcommand{\Zz}{\mathbb{Z}} \newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Qq}{\mathbb{Q}} \newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Rr}{\mathbb{R}} \newcommand{\R}{\mathbb{R}}
+\newcommand{\Cc}{\mathbb{C}}
+
+%-------------------
+% Multiple lines in a tabular
+\newcommand{\vcell}[2][c]{%
+\begin{tabular}[#1]{@{}l@{}}#2\end{tabular}}
+
+%-------------------
 % Nice notes
 \usepackage{mdframed} % Add easy frames to paragraphs
 \usepackage{xcolor}
@@ -40,7 +82,6 @@
 
 \lstdefinestyle{customcpp}{
   language=C++,
-  %backgroundcolor=\color{white},
   belowcaptionskip=1\baselineskip,
   breaklines=true,
   basicstyle=\ttfamily\scriptsize,
@@ -76,13 +117,8 @@
                          , font={bf,footnotesize} }
 
 \newcommand{\includelstlisting}[1]{\lstinputlisting[style=customcpp]{#1}}
-\newcommand{\code}[1]{\lstinline[style=inlinecpp]$#1$}
-\newcommand{\ttcode}[1]{{\tt #1}}
+\newcommand{\code}[1]{\lstinline[style=inlinecpp]@#1@}
+\newcommand{\ttcode}[1]{{\ttfamily\scriptsize #1}}
 % end nice lstlisting
 %---------------------
-
-\newcommand{\rtkpp}{{\tt rtkpp}} %
-\newcommand{\rtkore}{{\tt rtkore}} %
-\newcommand{\stkpp}{{\tt STK++}} %
-\newcommand{\Cpp}{{\tt C++}}
 

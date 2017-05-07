@@ -82,18 +82,14 @@ class IVariable
       return *this;
     }
     /** @return a default name for a variable of the form : prefix + num. */
-    static inline String giveName( int const& num    = 0
-                                 , String const& prefix = STRING_VAR
-                                 )
-   { return (prefix+typeToString<int> (num));}
+    static inline String giveName( int num= 0, String const& prefix = STRING_VAR)
+    { return (prefix+typeToString<int> (num));}
     /** @return the type of the variable. */
     inline const Base::IdType& getType() const { return type_;}
     /** @return the name of the variable. */
     inline String const& name() const { return name_;}
     /** Set a default name for the variable of the form : prefix + num.   */
-    inline void setName( int const& num     = 0
-                       , String const& prefix  = STRING_VAR
-                       )
+    inline void setName( int num= 0, String const& prefix  = STRING_VAR)
     { name_ = (prefix+typeToString<int> (num));}
     /** Set the name of the variable.  */
     inline void setName( String const& name) { name_ = name;}
@@ -108,33 +104,33 @@ class IVariable
     /** push back n NA values.
      *  @param n number of NA values to add
      **/
-    virtual void pushBackNAValues(int const& n=1) = 0;
+    virtual void pushBackNAValues(int n=1) = 0;
     /** @return the number of sample in the variable */
     virtual int size() const = 0;
     /** Insert n elements at the position pos of the container.
      *  @param pos index where to insert elements
      *  @param n number of elements to insert (default 1)
      **/
-    virtual void insertElt(int pos, int const& n =1) = 0;
+    virtual void insertElt(int pos, int n =1) = 0;
     /** clear Container from all elements and memory allocated. */
     virtual void clear() = 0;
     /** Delete n elements at the @c pos index from the container.
      *  @param pos index where to delete elements
      *  @param n number of elements to delete (default 1)
      **/
-    virtual void erase(int pos, int const& n=1) = 0;
+    virtual void erase(int pos, int n=1) = 0;
     /** New first index for the object.
      *  @param beg the index of the first column to set
      **/
-    virtual void shift(int const& beg) = 0;
+    virtual void shift(int beg) = 0;
     /** Add n elements at the end of the container.
      *  @param n number of elements to add
      **/
-    virtual void pushBack(int const& n =1) = 0;
+    virtual void pushBack(int n =1) = 0;
     /** Delete n last elements of the container.
      *  @param n number of elements to delete
      **/
-    virtual void popBack(int const& n =1) = 0;
+    virtual void popBack(int n =1) = 0;
     /** Operator << : overwrite the IVariable by converting the strings
      *  contained in V into the Type.
      *  @param V the Variable of string to import

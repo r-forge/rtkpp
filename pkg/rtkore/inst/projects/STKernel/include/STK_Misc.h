@@ -30,7 +30,7 @@
  **/
 
 /** @file STK_Misc.h
- *  @brief In this file we define miscellaneous utility (templated)
+ *  @brief In this file we define miscellaneous utility (template)
  *  functions.
  **/
 
@@ -47,7 +47,7 @@ namespace STK
 {
 /** @ingroup Base
  *
- *  templated sign value sign(x) * y:
+ *  template sign value sign(x) * y:
  *  Type should be an integral type
  *  @param x the sign value
  *  @param y the signed value to return

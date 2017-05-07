@@ -23,7 +23,7 @@
 
 /*
  * Project: stkpp::DManager
- * Purpose:  Define the templated CellBase, CellVe and CellHo classes.
+ * Purpose:  Define the template CellBase, CellVe and CellHo classes.
  * Author:   Serge Iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  *
  **/
@@ -130,7 +130,7 @@ class CellVe : virtual public CellBase<Type>
 template<class Type>
 class CellHo : virtual public CellBase<Type>
 {
-  // needed for templated classes
+  // needed for template classes
   using STK::CellBase<Type>::data_;
   
   protected:

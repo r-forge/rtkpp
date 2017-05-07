@@ -29,7 +29,7 @@
  **/
 
 /** @file STK_CG.h
- *  @brief In this file we define a templated version of the conjugate gradient.
+ *  @brief In this file we define a template version of the conjugate gradient.
  **/
 
 

@@ -249,7 +249,7 @@ class ICArray : public ArrayBase<Derived>
                       ||(structure_ == (int)Arrays::lower_triangular_)
                       ||(structure_ == (int)Arrays::upper_triangular_)
                       ,YOU_CANNOT_USED_THIS_METHOD_WITH_THIS_KIND_OF_ARRAY);
-      if (!hidden::Checker<Derived, structure_>::shift(this->asDerived(), beginRows, beginCols)) return this->asDerived();
+      if (!hidden::CheckShift<Derived, structure_>::shift(this->asDerived(), beginRows, beginCols)) return this->asDerived();
       if (this->isRef())
       { STKRUNTIME_ERROR_2ARG(ICArray::shift,beginRows,beginCols,cannot operate on reference);}
       allocator_.shift(beginRows, beginCols);
@@ -262,7 +262,7 @@ class ICArray : public ArrayBase<Derived>
      **/
     Derived& shift(int firstIdx)
     {
-      if (!hidden::Checker<Derived, structure_>::shift(this->asDerived(), firstIdx)) return this->asDerived();
+      if (!hidden::CheckShift<Derived, structure_>::shift(this->asDerived(), firstIdx)) return this->asDerived();
       if (this->isRef())
       { STKRUNTIME_ERROR_1ARG(ICArray::shift,firstIdx,cannot operate on reference);}
       allocator_.shift(firstIdx);
@@ -279,9 +279,9 @@ class ICArray : public ArrayBase<Derived>
                        ||(structure_ == (int)Arrays::lower_triangular_)
                        ||(structure_ == (int)Arrays::upper_triangular_)
                       ,YOU_CANNOT_USED_THIS_METHOD_WITH_THIS_KIND_OF_ARRAY);
-      if (!hidden::Checker<Derived, structure_>::isAllowed(this->asDerived(), I, J))
+      if (!hidden::CheckShift<Derived, structure_>::isAllowed(this->asDerived(), I, J))
       { STKRUNTIME_ERROR_2ARG(ICArray::resize,I,J,not permited);}
-      if (!hidden::Checker<Derived, structure_>::resize(this->asDerived(), I, J)) return this->asDerived();
+      if (!hidden::CheckShift<Derived, structure_>::resize(this->asDerived(), I, J)) return this->asDerived();
       if (this->isRef())
       { STKRUNTIME_ERROR_2ARG(ICArray::resize,I,J,cannot operate on reference);}
       allocator_.resize(I.size(), J.size()).shift(I.begin(), J.begin());
@@ -294,7 +294,7 @@ class ICArray : public ArrayBase<Derived>
      **/
     Derived& resize(Range const& I)
     {
-      if (!hidden::Checker<Derived, structure_>::resize(this->asDerived(), I)) return this->asDerived();
+      if (!hidden::CheckShift<Derived, structure_>::resize(this->asDerived(), I)) return this->asDerived();
       if (this->isRef())
       { STKRUNTIME_ERROR_1ARG(ICArray::resize,I,cannot operate on reference);}
       allocator_.resize(I.size()).shift(I.begin());

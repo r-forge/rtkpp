@@ -40,6 +40,7 @@
 
 #include <iomanip>
 #include "STK_Variable.h"
+#include <Arrays/include/STK_Array1D.h>
 
 namespace STK
 {
@@ -224,7 +225,7 @@ class TReadWriteCsv
     {
       if (size()<= 0) return baseIdx-1;
       int retVal = lastRow(begin());
-      for (int i=begin()+1; i<=lastIdx(); i++)
+      for (int i=begin()+1; i<end(); i++)
       { retVal = std::max(retVal, lastRow(i));}
       return retVal;
     }

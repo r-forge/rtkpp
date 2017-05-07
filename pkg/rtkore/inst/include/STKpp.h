@@ -114,7 +114,7 @@
  *    - @subpage Sdk       "Sdk: Software Development Kits"
  *    - @subpage Arrays    "Arrays: Containers oriented to numerical computation"
  *    - @subpage DManager  "DManager: Tools for handling data and input/output"
- *    - @subpage Analysis  "Analysis: Special functions and templated algorithms"
+ *    - @subpage Analysis  "Analysis: Special functions and template algorithms"
  *    - @subpage Algebra   "Algebra: Linear Algebra tools"
  *    - @subpage STatistiK "STatistiK: Statistical Tools"
  *    - @subpage StatModels "StatModels: Statistical Models"

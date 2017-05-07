@@ -44,7 +44,7 @@ namespace STK
 /** @ingroup Analysis
  *  @brief Interface base class for Series.
  *
- * The ISerie class is the templated base class for all Series.
+ * The ISerie class is the template base class for all Series.
  * 
  * ISerie takes a Serie template parameter. This parameter
  * is the type of the class which derives from it. For exemple

@@ -209,7 +209,7 @@ class IContainer2D
 /** @ingroup Arrays
  *  @brief Interface base class for homogeneous 2D containers like allocators.
  *
- * The ITContainer2D class is the templated base class for all
+ * The ITContainer2D class is the template base class for all
  * homogeneous two-dimensional containers containing element of type @c Type
  * where Type is note necessarily a scalar. It assumes that the derived class
  * cannot be part of an expression and is not constant, so that it can be

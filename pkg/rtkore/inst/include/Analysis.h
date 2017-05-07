@@ -60,7 +60,7 @@
 #ifndef ANALYSIS_H
 #define ANALYSIS_H
 
-// templated generic algorithms
+// template generic algorithms
 #include "../projects/Analysis/include/STK_Algo.h"
 #include "../projects/Analysis/include/STK_Algo_FindZero.h"
 

@@ -170,7 +170,7 @@ bool DataHandler::readDataFromArray2D( Array2D<Type> const& data
                                      , std::string const& idModel)
 {
   // add descriptor
-  Variable<std::string> desc(2);
+  Variable<std::string> desc(2, stringNa);
   desc[baseIdx] = idModel ; desc[baseIdx+1] = idData;
   if (!addInfo(idData, idModel)) return false;
   // store data at the end of the ReadWriteCsv array in a string format
@@ -192,7 +192,7 @@ bool DataHandler::readDataFromArray( ExprBase<Array> const& data
                                    , std::string const& idModel)
 {
   // add descriptor
-  Variable<std::string> desc(2);
+  Variable<std::string> desc(2, stringNa);
   desc[baseIdx] = idModel ; desc[baseIdx+1] = idData;
   if (!addInfo(idData, idModel)) return false;
   // store data at the end of the ReadWriteCsv array in a string format

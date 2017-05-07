@@ -43,7 +43,7 @@
  * It provides
  * <ul>
  *    <li> an abstract base class for statistical variables, </li>
- *    <li> a templated implementation for arbitrary data, </li>
+ *    <li> a template implementation for arbitrary data, </li>
  *    <li> a Dataframe (Table) class,</li>
  *    <li> classes for read and write csv and (TODO) dbf files, </li>
  *    <li> various  classes for importing/exporting and converting data from

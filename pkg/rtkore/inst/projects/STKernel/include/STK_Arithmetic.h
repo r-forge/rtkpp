@@ -24,12 +24,12 @@
 
 /*
  * Project:  STKernel::Arithmetic
- * Purpose:  DSefine templated arithmetic for handling special values (NA).
+ * Purpose:  DSefine template arithmetic for handling special values (NA).
  * Author:   Serge Iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
 
 /** @file STK_Arithmetic.h
- *  @brief In this file we define for the templated class Arithmetic for
+ *  @brief In this file we define for the template class Arithmetic for
  *  handling the greatest, lowest, NA,... values of all types.
  **/
 

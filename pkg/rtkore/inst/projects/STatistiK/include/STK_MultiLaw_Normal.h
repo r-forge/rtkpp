@@ -25,7 +25,7 @@
 /*
  * Project:  stkpp::STatistiK::MultiLaw
  * created on: 29 juil. 2011
- * Purpose:  define the templated MultiLaw::Normal law.
+ * Purpose:  define the template MultiLaw::Normal law.
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  *
  **/

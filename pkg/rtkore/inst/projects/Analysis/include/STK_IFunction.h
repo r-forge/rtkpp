@@ -44,7 +44,7 @@ namespace STK
 /** @ingroup Analysis
  *  @brief Interface base class for functions.
  *
- * The IFunction class is the templated base class for all functions.
+ * The IFunction class is the template base class for all functions.
  *
  * IFunction takes a function template parameter. This parameter
  * is the type of the class which derives from it. For example

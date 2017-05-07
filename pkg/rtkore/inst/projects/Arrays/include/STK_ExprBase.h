@@ -82,7 +82,7 @@ namespace STK
 {
 
 /** @ingroup Arrays
- *  @brief base class for templated evaluation expressions and visitors.
+ *  @brief base class for template evaluation expressions and visitors.
  *
  * This class is the base that is inherited by all objects (matrix, vector,
  * point and expression). The common API for these objects is contained in
@@ -423,7 +423,7 @@ class ExprBase : public ITContainer<Derived, hidden::Traits<Derived>::structure_
     inline friend UnaryOperator< MultipleOp<Type>, Derived> const
     operator*(Type const number, ExprBase<Derived> const& other)
     { return other.asDerived()*number; }
-    // templated
+    // template
     /** @return an expression of *this with the  Type type casted to  OtherType. */
     template<typename CastedType>
     inline UnaryOperator<CastOp<Type, CastedType>, Derived> const cast() const

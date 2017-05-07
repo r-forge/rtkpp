@@ -243,7 +243,7 @@ class DiagonalOperator: public ExprBase< DiagonalOperator< Lhs> >, public TRef<1
         sizeRows_  = hidden::Traits< DiagonalOperator<Lhs> >::sizeRows_,
         sizeCols_  = hidden::Traits< DiagonalOperator<Lhs> >::sizeCols_,
         storage_   = hidden::Traits< DiagonalOperator<Lhs> >::storage_,
-        size_      = (sizeRows_ != UnknownSize) ? sizeRows_ : sizeCols_,
+        size_      = (sizeRows_ != UnknownSize) ? sizeRows_ : sizeCols_
     };
     /** Type of the Range for the rows */
     typedef TRange<size_> RowRange;

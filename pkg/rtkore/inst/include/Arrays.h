@@ -39,7 +39,7 @@
  * in a two entries arrays (matrices) numeric data.
  *
  * All the containers you can used in order to stored numeric values are
- * templated by the Type of numeric value you want to use. Some predefined type
+ * template by the Type of numeric value you want to use. Some predefined type
  * have been defined for the Real and the arithmetic cases.
  *
  * There is two kind of containers that have been defined and implemented in the

@@ -95,6 +95,7 @@ class Univariate<TContainer1D, Real>
               , viceciles_(19, Arithmetic<Real>::NA(), String(_T("Viceciles")))
               , percentiles_(99, Arithmetic<Real>::NA(), String(_T("Percentiles")))
     {
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(TContainer1D);
       initializeVariable();
       compOrderStatistics();
       compStatistics();
@@ -104,14 +105,10 @@ class Univariate<TContainer1D, Real>
      *  Copy locally the variable V, the weights W and set dimensions.
      *  No statistics except min_, max_ and amax_ are calculated at
      *  this stage.
-     *  @param V the variable
-     *  @param W the weights
+     *  @param V,W the variable and the weights
      *  @param sorted @c true if the variable is sorted, @c false otherwise
      **/
-    Univariate( TContainer1D const& V
-              , TContainer1D const& W
-              , bool sorted = false
-              )
+    Univariate( TContainer1D const& V, TContainer1D const& W, bool sorted = false)
               : nbSamples_(V.size())
               , nbAvailable_(V.size())
               , nbMiss_(0)
@@ -137,16 +134,14 @@ class Univariate<TContainer1D, Real>
               , viceciles_(19)
               , percentiles_(99)
     {
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(TContainer1D);
       // check weights size
       if ((V_.range() != W_.range()))
-      {  throw runtime_error("Univariate<TContainer1D>::Univariate(V, W, sorted) "
-                                  "V and W have not the same range");
-      }
+      {  STKRUNTIME_ERROR_NO_ARG(Univariate::Univariate(V, W, sorted),V and W have different range);}
       initializeVariableAndWeights();
       compOrderStatistics();
       compWeightedStatistics();
     }
-
     /** Copy constructor
      *  @param stat the univariate statistics to copy
      **/
@@ -178,10 +173,10 @@ class Univariate<TContainer1D, Real>
               , deciles_(stat.deciles_)
               , viceciles_(stat.viceciles_)
               , percentiles_(stat.percentiles_)
-    { ;}
+    {}
 
     /** destructor. */
-    ~Univariate() { ;}
+    ~Univariate() {}
 
     /** Operator = : overwrite the Univariate with stat. */
     Univariate& operator=( const Univariate& stat)
@@ -221,22 +216,24 @@ class Univariate<TContainer1D, Real>
      *  @param V the variable to set
      *  @param sorted true if the variable is sorted
      **/
-    void setData( TContainer1D const& V, bool sorted = false)
+    template<class Vector>
+    void setData( Vector const& V, bool sorted = false)
     {
-      // initialize dimensions
-      nbSamples_    = V.size();
-      nbAvailable_  = V.size();
-      nbMiss_ = 0;
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Vector);
       // set variable and weights
-      V_ = V.asDerived();
+      V_ = V;
       W_.clear();  // no weights
+      // initialize dimensions
+      nbSamples_    = V_.size();
+      nbAvailable_  = V_.size();
+      nbMiss_ = 0;
       // initialize data
       weighted_    = false;
       sorted_      = sorted;
       comporder_   = false;
       compstat_    = false;
-      sumweights_     = 0.0;
-      sum2weights_    = 0.0;
+      sumweights_  = 0.0;
+      sum2weights_ = 0.0;
       mean_        = Arithmetic<Real>::NA();
       median_      = Arithmetic<Real>::NA();
       var_         = Arithmetic<Real>::NA();
@@ -257,25 +254,24 @@ class Univariate<TContainer1D, Real>
     }
 
     /** Compute the statistics of a new weighted Variable.
-     *  @param V the variable to set
-     *  @param W the weights of the variable
+     *  @param V,W the variable and the weights to set
      *  @param sorted true if the variable is sorted
      **/
-    void setData( ITContainer< TContainer1D> const& V
-                , ITContainer< TContainer1D> const& W
-                , bool sorted = false
-                )
+    template<class Vector, class Weights>
+    void setData( Vector const& V, Weights const& W, bool sorted = false)
     {
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Vector);
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Weights);
       // check range size
       if ((V.range() != W.range()))
-      {  STKRUNTIME_ERROR_NO_ARG(setData(V, W, sorted),V and W have different range);}
-      // initialize dimensions
-      nbSamples_    = V.size();
-      nbAvailable_  = V.size();
-      nbMiss_ = 0;
+      {  STKRUNTIME_ERROR_NO_ARG(Univariate::setData(V, W, sorted),V and W have different range);}
       // set variable and weights
-      V_ = V.asDerived();
-      W_ = W.asDerived();
+      V_ = V;
+      W_ = W;
+      // initialize dimensions
+      nbSamples_    = V_.size();
+      nbAvailable_  = V_.size();
+      nbMiss_ = 0;
       // initialize data
       weighted_    = true;
       sorted_      = sorted;
@@ -361,7 +357,7 @@ class Univariate<TContainer1D, Real>
       int  nt = T.size(), shift = V_.begin()-1;
       Real n1 = Real(nbAvailable_+1), nt1 = Real(nt+1);
 
-      for (int j=T.begin(), k=1; j<=T.lastIdx(); j++, k++)
+      for (int j=T.begin(), k=1; j<T.end(); j++, k++)
       {
         // find index of the k-th quantile
         Real find  = Real(k*n1)/nt1;  // compute the index in Real
@@ -582,7 +578,7 @@ class Univariate<TContainer1D, Real>
       if (amax_) // if the maximal value is greater than 0
        {
         // sum samples
-        for (int i=V_.begin(); i<=V_.lastIdx(); i++)
+        for (int i=V_.begin(); i<V_.end(); i++)
           mean_ += (W_[i]*V_[i])/amax_; // compute the mean with scaling
         mean_ /= sumweights_;           // weight the sum
         mean_ *= amax_;                 // and unscale
@@ -594,7 +590,7 @@ class Univariate<TContainer1D, Real>
       mad_  = 0.0;
       kurtosis_ = 0.0;
       skewness_ = 0.0;
-      for (int i=V_.begin(); i<=V_.lastIdx(); i++)
+      for (int i=V_.begin(); i<V_.end(); i++)
       {
         Real weight = W_[i];
         sum       += weight * (dev1 = V_[i]-mean_); // deviation from the mean
@@ -673,13 +669,13 @@ class Univariate<TContainer1D, Real>
 
   protected:
     // dimensions
-    int    nbSamples_;    ///< Number of samples
+    int    nbSamples_;   ///< Number of samples
     int    nbAvailable_; ///< Number of Available samples
     int    nbMiss_;      ///< Number of missing samples
 
     // containers
-    VectorX V_;      ///< local copy of the variable
-    VectorX W_;            ///< local copy of the weights
+    Variable<Real> V_;   ///< local copy of the variable
+    Variable<Real> W_;   ///< local copy of the weights
 
     // Some flag about the internal state of the object
     bool weighted_;       ///< Samples are weighted ?
@@ -688,8 +684,8 @@ class Univariate<TContainer1D, Real>
     bool compstat_;       ///< Usuals Statistics are computed ?
 
     // statistics
-    Real sumweights_;        ///< Sum of the weights
-    Real sum2weights_;       ///< Sum of the square of the weights
+    Real sumweights_;     ///< Sum of the weights
+    Real sum2weights_;    ///< Sum of the square of the weights
     Real min_;            ///< Min of the variable
     Real max_;            ///< Max of the variable
     Real amax_;           ///< Absolute maximal value
@@ -709,62 +705,6 @@ class Univariate<TContainer1D, Real>
     Variable<Real> viceciles_;    ///< viceciles (5%)
     Variable<Real> percentiles_;  ///< percentiles (1%)
 };
-
-
-///* @ingroup StatDesc
-// *  @brief Computation of the univariate Statistics of a Integer Variable.
-// *
-// *  This is a specialization of the class Univariate for the type @c Integer.
-// *
-// *  The template parameter @c TContainer1D is the type of container
-// *  used for storing the data : It should derive from @c ITContainer and
-// *  contain elements of type Real.
-// *
-// *  This specialization propose also statics methods for computing
-// *  the (weighted) mean and the (weighted) variance.
-// **/
-//template < class TContainer1D>
-//class Univariate<TContainer1D, Integer>
-//{
-//    /** Default constructor
-//     *  Copy locally the variable V and set dimensions. The statistics
-//     *  are then computed.
-//     *  @param V variable
-//     *  @param sorted @c true if the variable is sorted, @c false otherwise
-//     **/
-//    Univariate( TContainer1D const& V, bool sorted = false)
-//    {
-//
-//    }
-//    /** get the number of samples */
-//    inline const int nbSamples() const {return nbSamples_;}
-//    /** get the number of available samples (not missing) */
-//    inline const int nbAvailableSamples() const {return nbAvailable_;}
-//    /** get the number of missing samples */
-//    inline const int nbMissingSamples() const {return nbMiss_;}
-//
-//  protected:
-//    // dimensions
-//    int    nbSamples_;    ///< Number of samples
-//    int    nbAvailable_; ///< Number of Available samples
-//    int    nbMiss_;      ///< Number of missing samples
-//
-//    // containers
-//    VectorX V_;      ///< local copy of the variable
-//    VectorX W_;      ///< local copy of the weights
-//
-//    // Some flag about the internal state of the object
-//    bool weighted_;       ///< Samples are weighted ?
-//    bool sorted_;         ///< Samples are sorted ?
-//
-//    // statistics
-//    Integer min_;            ///< Min of the variable
-//    Integer max_;            ///< Max of the variable
-//    Integer amax_;           ///< Absolute maximal value
-//
-//    Real mean_;           ///< mean of the variable
-//    Real median_;         ///< median of the variable
-//};
 
 }  // namespace Stat
 

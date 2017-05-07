@@ -101,7 +101,7 @@ class MultiLeastSquare: public ILeastSquare< MultiLeastSquare<ArrayB, ArrayA> >
      */
     MultiLeastSquare( ArrayB const& b, ArrayA const& a, bool isBref=false, bool isAref=false)
                     : Base(b, a, isBref, isAref), rcond_(-1) {};
-    /** @brief templated constructor
+    /** @brief template constructor
      *  @param b,a the left hand side and the right hand side of the least square
      *  problem.
      */

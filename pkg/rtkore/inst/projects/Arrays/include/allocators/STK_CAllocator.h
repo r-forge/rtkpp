@@ -130,7 +130,7 @@ class OrientedCAllocator<Derived, Arrays::by_col_>: public ITContainer2D<Derived
     /** copy constructor */
     OrientedCAllocator( OrientedCAllocator const& A, bool ref)
                       : Base(A), ldx_(A.ldx()), allocator_(A.allocator_, ref)
-    { if (!ref) allocator_.copy(A.allocator_);}
+    { if (!ref) allocator_.assign(A.allocator_);}
     /** Reference constructor */
     template<class OtherDerived>
     inline OrientedCAllocator( OrientedCAllocator<OtherDerived, Arrays::by_col_> const& A
@@ -246,7 +246,7 @@ class OrientedCAllocator<Derived, Arrays::by_row_>: public ITContainer2D<Derived
     /** copy constructor */
     OrientedCAllocator( OrientedCAllocator const& A, bool ref)
                              : Base(A), ldx_(A.ldx_), allocator_(A.allocator_, ref)
-    { if (!ref) allocator_.copy(A.allocator_);}
+    { if (!ref) allocator_.assign(A.allocator_);}
     /** Reference constructor */
     template<class OtherDerived>
     inline OrientedCAllocator( OrientedCAllocator<OtherDerived, Arrays::by_row_> const& A
@@ -704,7 +704,7 @@ class CAllocator: public StructuredCAllocator<CAllocator<Type_, SizeRows_, SizeC
     CAllocator( int, int): Base(SizeRows_, SizeCols_) {}
     CAllocator( int, int, Type const& v): Base(SizeRows_, SizeCols_) { this->setValue(v);}
     CAllocator( CAllocator const& A, bool ref = true): Base(A, ref)
-    { if (!ref) { allocator_.copy(A.allocator_);} }
+    { if (!ref) { allocator_.assign(A.allocator_);} }
     template< int OtherSizeRows_, int OtherSizeCols_>
     inline CAllocator( CAllocator<Type, OtherSizeRows_, OtherSizeCols_, Orient_> const& A
                      , Range const& I, Range const& J)
@@ -752,7 +752,7 @@ class CAllocator<Type_, UnknownSize, UnknownSize, Orient_>
      *  @param ref : is this a wrapper of A ?
      **/
     CAllocator( CAllocator const& A, bool ref = true): Base(A, ref)
-    { if (!ref) { allocator_.copy(A.allocator_);}}
+    { if (!ref) { allocator_.assign(A.allocator_);}}
     /** Wrapper constructor. This become a reference on (some part of) the Allocator A.
      *  @param A original allocator
      *  @param I,J range of the rows and columns to wrap.
@@ -840,7 +840,7 @@ class CAllocator<Type_, SizeRows_, UnknownSize, Orient_>
     { this->setValue(v);}
     CAllocator( CAllocator const& A, bool ref = true)
                      : Base(A, ref)
-    { if (!ref) { allocator_.copy(A.allocator_);}}
+    { if (!ref) { allocator_.assign(A.allocator_);}}
     template< int OtherSizeRows_, int OtherSizeCols_>
     inline CAllocator( CAllocator<Type, OtherSizeRows_, OtherSizeCols_, Orient_> const& A
                      , Range const& I, Range const& J)
@@ -916,7 +916,7 @@ class CAllocator<Type_, UnknownSize, SizeCols_, Orient_>
     { this->setValue(v);}
     CAllocator( CAllocator const& A, bool ref = true)
                      : Base(A, ref)
-    { if (!ref) { allocator_.copy(A.allocator_);} }
+    { if (!ref) { allocator_.assign(A.allocator_);} }
 
     /** wrap other allocator */
     template< int OtherSizeRows_, int OtherSizeCols_>

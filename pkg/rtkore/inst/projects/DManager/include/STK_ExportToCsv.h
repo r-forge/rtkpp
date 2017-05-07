@@ -91,7 +91,7 @@ class ExportToCsv
 
     /** Instantiates an instance of ExportToCvs with an Array1D, a list1D, etc....
      *  @param A the 1D container to export
-     *  @param byCol export the container as a column vector or a raw vector ?
+     *  @param byCol export the container as a column vector or a row vector ?
      *  @param prefix the prefix of the name to set to the variable
      **/
     template < class Container>
@@ -100,24 +100,24 @@ class ExportToCsv
                , String const& prefix=Csv::DEFAULT_COLUMN_PREFIX)
                : p_data_(new ReadWriteCsv())
     {
+#ifdef STK_DMANAGER_DEBUG
+      stk_cout << "Entering ExportToCsv( ITContainer1D<Container> const& A, byCol, prefix)\n";
+      stk_cout << "A.range()= " << A.range()  << "\n";
+#endif
       // add an empty string variable (an empty column)
       p_data_->setWithNames(true);
       if (byCol)
-      {
-        p_data_->push_back(Variable<String>(A.range()));
-        p_data_->back().setName(prefix);
+      { // add to ReadWriteCsv a new variable
+        //p_data_->
+        p_data_->push_back(Variable<String>(A.range(), prefix));
 
         for(int i = A.begin(); i<A.end(); i++)
         { p_data_->back()[i] = typeToString(A.at(i));}
       }
-      else
+      else // by row
       {
         for(int i = A.begin(); i<A.end(); i++)
-        {
-          p_data_->push_back(Variable<String>(1));
-          p_data_->back().setName(prefix+typeToString(i));
-          p_data_->back().front() = typeToString(A.at(i));
-        }
+        { p_data_->push_back( Variable<String>(1, typeToString(A.at(i)), prefix+typeToString(i)) );}
       }
     }
 
@@ -136,8 +136,7 @@ class ExportToCsv
         p_data_->setWithNames(true);
         if (byCol)
         {
-          p_data_->push_back(Variable<String>(A.range()));
-          p_data_->back().setName(prefix);
+          p_data_->push_back(Variable<String>(A.range(), prefix));
 
           for(int i = A.begin(); i<A.end(); i++)
           { p_data_->back()[i] = typeToString(A.at(i));}
@@ -146,8 +145,7 @@ class ExportToCsv
         {
           for(int i = A.begin(); i<A.end(); i++)
           {
-            p_data_->push_back(Variable<String>(1));
-            p_data_->back().setName(prefix+typeToString(i));
+            p_data_->push_back(Variable<String>(1, prefix+typeToString(i)));
             p_data_->back().front() = typeToString(A.at(i));
           }
         }
@@ -167,8 +165,7 @@ class ExportToCsv
         p_data_->setWithNames(true);
         if (byCol)
         {
-          p_data_->push_back(Variable<String>(A.range()));
-          p_data_->back().setName(prefix);
+          p_data_->push_back(Variable<String>(A.range(), prefix));
 
           for(int i = A.begin(); i<A.end(); i++)
           { p_data_->back()[i] = typeToString(A.at(i));}
@@ -177,8 +174,7 @@ class ExportToCsv
         {
           for(int i = A.begin(); i<A.end(); i++)
           {
-            p_data_->push_back(Variable<String>(1));
-            p_data_->back().setName(prefix+typeToString(i));
+            p_data_->push_back(Variable<String>(1, prefix+typeToString(i)));
             p_data_->back().front() = typeToString(A.at(i));
           }
         }
@@ -196,8 +192,7 @@ class ExportToCsv
       for(int iVar = A.beginCols(); iVar<A.endCols(); iVar++)
       {
         // add an empty string variable (an empty column)
-        p_data_->push_back(Variable<String>(A.rows()));
-        p_data_->back().setName(prefix) ;
+        p_data_->push_back(Variable<String>(A.rows(), prefix));
         for (int iRow=A.beginRows(); iRow<A.endRows(); iRow++)
         { p_data_->back()[iRow] = typeToString(A.at(iRow,iVar));}
       }
@@ -215,8 +210,7 @@ class ExportToCsv
     void append( ITContainer<Container, Arrays::vector_> const& A, String const& prefix=Csv::DEFAULT_COLUMN_PREFIX)
     {
       // add an empty string variable
-      p_data_->push_back(Variable<String>(A.range()));
-      p_data_->back().setName(prefix) ;
+      p_data_->push_back(Variable<String>(A.range(), prefix));
       // add strings to the String variable
       for(int i = A.begin(); i< A.end(); i++)
       { p_data_->back()[i] = typeToString(A[i]);}
@@ -229,8 +223,7 @@ class ExportToCsv
     void append( ITContainer<Container, Arrays::point_> const& A, String const& prefix=Csv::DEFAULT_COLUMN_PREFIX)
     {
       // add an empty string variable
-      p_data_->push_back(Variable<String>(A.range()));
-      p_data_->back().setName(prefix) ;
+      p_data_->push_back(Variable<String>(A.range(), prefix));
       // add strings to the String variable
       for(int i = A.begin(); i< A.end(); i++)
       { p_data_->back()[i] = typeToString(A[i]);}
@@ -246,8 +239,7 @@ class ExportToCsv
       for(int iVar = A.beginCols(), iNum=1; iVar<A.endCols(); iVar++, iNum++)
       {
         // add an empty string variable (an empty column)
-        p_data_->push_back(Variable<String>(A.rows()));
-        p_data_->back().setName(prefix+typeToString(iNum)) ;
+        p_data_->push_back(Variable<String>(A.rows(), prefix+typeToString(iNum)));
         for (int iRow=A.beginRows(); iRow<A.endRows(); iRow++)
         { p_data_->back()[iRow] = typeToString(A(iRow,iVar));}
       }
@@ -263,8 +255,7 @@ class ExportToCsv
       for(int iVar = A.beginCols(), iNum=1; iVar<A.endCols(); iVar++, iNum++)
       {
         // add an empty string variable (an empty column)
-        p_data_->push_back(Variable<String>(A.rows()));
-        p_data_->back().setName(prefix+typeToString(iNum)) ;
+        p_data_->push_back(Variable<String>(A.rows(), prefix+typeToString(iNum)));
         for (int iRow=A.beginRows(); iRow<A.endRows(); iRow++)
         { p_data_->back()[iRow] = typeToString(A(iRow,iVar));}
       }
@@ -277,8 +268,7 @@ class ExportToCsv
     void appendData( TYPE const& A, String const& prefix=Csv::DEFAULT_COLUMN_PREFIX)
     {
       // add an empty string variable
-      p_data_->push_back(Variable<String>());
-      p_data_->back().setName(prefix + typeToString(p_data_->lastIdx()) );
+      p_data_->push_back(Variable<String>( prefix + typeToString(p_data_->lastIdx())) );
       // add strings to the String variable
       p_data_->back().push_back(typeToString(A));
     }

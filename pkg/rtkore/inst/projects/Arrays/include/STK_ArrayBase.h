@@ -29,7 +29,8 @@
  **/
 
 /** @file STK_ArrayBase.h
- *  @brief In this file we define the base class for Arrays and Expressions
+ *  @brief In this file we define the base class for Arrays. Derived ArrayBase can be
+ *  a lhs
  **/
 
 #ifndef STK_ARRAYBASE_H
@@ -56,7 +57,7 @@ struct CheckAssign;
  *   be resized or shifted
  **/
 template<class Derived, int Structure_>
-struct Checker;
+struct CheckShift;
 
 /** @ingroup hidden
  *  Specialization for general array2D_
@@ -176,7 +177,7 @@ struct CheckAssign<Derived, Arrays::number_, Arrays::number_>
  *  Specialization for general array2D_
  **/
 template<class Derived>
-struct Checker<Derived, Arrays::array2D_>
+struct CheckShift<Derived, Arrays::array2D_>
 {
   // all range are authorized for array2D_
   static bool isAllowed(Derived const& array, Range const& I, Range const& J)
@@ -198,7 +199,7 @@ struct Checker<Derived, Arrays::array2D_>
  *  Specialization for upper_triangular_
  **/
 template<class Derived>
-struct Checker<Derived, Arrays::upper_triangular_>
+struct CheckShift<Derived, Arrays::upper_triangular_>
 {
   // all range are authorized for upper_triangular_
   static bool isAllowed(Derived const& array, Range const& I, Range const& J)
@@ -216,7 +217,7 @@ struct Checker<Derived, Arrays::upper_triangular_>
  *  Specialization for lower_triangular_
  **/
 template<class Derived>
-struct Checker<Derived, Arrays::lower_triangular_>
+struct CheckShift<Derived, Arrays::lower_triangular_>
 {
   // all range are authorized for lower_triangular_
   static bool isAllowed(Derived const& array, Range const& I, Range const& J)
@@ -235,7 +236,7 @@ struct Checker<Derived, Arrays::lower_triangular_>
  *  Specialization for square_
  **/
 template<class Derived>
-struct Checker<Derived, Arrays::square_>
+struct CheckShift<Derived, Arrays::square_>
 {
   // same range only for square_ arrays
   static bool isAllowed(Derived const& array, Range const& I, Range const& J)
@@ -254,7 +255,7 @@ struct Checker<Derived, Arrays::square_>
  *  Specialization for diagonal_
  **/
 template<class Derived>
-struct Checker<Derived, Arrays::diagonal_>
+struct CheckShift<Derived, Arrays::diagonal_>
 {
   // same range only for diagonal_ arrays
   static bool isAllowed(Derived const& array, Range const& I, Range const& J)
@@ -271,7 +272,7 @@ struct Checker<Derived, Arrays::diagonal_>
 
 // for vectors
 template<class Derived>
-struct Checker<Derived, Arrays::vector_>
+struct CheckShift<Derived, Arrays::vector_>
 {
   // same range only for vector_ arrays
   static bool isAllowed(Derived const& array, Range const& I, Range const& J)
@@ -284,7 +285,7 @@ struct Checker<Derived, Arrays::vector_>
 
 // for point
 template<class Derived>
-struct Checker<Derived, Arrays::point_>
+struct CheckShift<Derived, Arrays::point_>
 {
   // same range only for diagonal_ arrays
   static bool isAllowed(Derived const& array, Range const& I, Range const& J)
@@ -296,7 +297,7 @@ struct Checker<Derived, Arrays::point_>
 };
 // for point
 template<class Derived>
-struct Checker<Derived, Arrays::number_>
+struct CheckShift<Derived, Arrays::number_>
 {
   // same range only for diagonal_ arrays
   static bool isAllowed(Derived const& array, Range const& I, Range const& J)
@@ -309,10 +310,11 @@ struct Checker<Derived, Arrays::number_>
 
 } // namespace hidden
 /** @ingroup Arrays
- *  @brief base class for templated arrays.
+ *  @brief base class for template arrays.
  *
  * This class is the base that is inherited by all containers storing
- * values (matrix, vector, point). Expressions are not arrays.
+ * values (matrix, vector, point). Expressions are not arrays. Any derived
+ * class can be a lhs in an expression.
  *
  * The common API for these objects is contained in this class.
  *

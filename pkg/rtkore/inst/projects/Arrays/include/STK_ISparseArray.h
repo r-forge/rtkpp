@@ -74,7 +74,7 @@ class STK_ISparseArray: public ArrayBase<Derived>
       sizeCols_  = hidden::Traits<Derived>::sizeCols_,
       storage_   = hidden::Traits<Derived>::storage_
     };
-    typedef hidden::Checker<Derived, structure_> Checker;
+    typedef hidden::CheckShift<Derived, structure_> CheckShift;
     /** Type of the Range for the rows */
     typedef TRange<sizeRows_> RowRange;
     /** Type of the Range for the columns */

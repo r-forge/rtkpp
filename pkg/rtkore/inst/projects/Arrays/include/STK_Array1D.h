@@ -35,14 +35,13 @@
 #ifndef STK_ARRAY1D_H
 #define STK_ARRAY1D_H
 
-#include "STK_ExprBase.h"
 #include "STK_IArray1D.h"
 
 namespace STK
 {
 template<class Type, int Size_ = UnknownSize > class Array1D;
-template<class Derived> struct RandomIterator1D;
-template<class Derived> struct ConstRandomIterator1D;
+//template<class Derived> struct RandomIterator1D;
+//template<class Derived> struct ConstRandomIterator1D;
 
 namespace hidden
 {
@@ -87,14 +86,14 @@ struct Traits< Array1D<Type_, Size_> >
 
 }
 
-#include "iterators/STK_RandomIterator1D.h"
+//#include "iterators/STK_RandomIterator1D.h"
 
 namespace STK
 {
 /** @ingroup Arrays
  *  @brief Templated one dimensional Arrays.
  * 
- * An Array1D is a templated non-oriented container (even if the @c Traits
+ * An Array1D is a template non-oriented container (even if the @c Traits
  * struct define it as column oriented) implementing the interface
  * class @c IArray1D.
  *
@@ -111,10 +110,10 @@ class Array1D: public IArray1D< Array1D<Type, Size_> >
     {
       structure_ = hidden::Traits<Array1D<Type, Size_> >::structure_,
       orient_    = hidden::Traits<Array1D<Type, Size_> >::orient_,
-      size_      = Size_,
-      sizeCols_  = 1,
-      sizeRows_  = Size_,
-      storage_   = Arrays::dense_ // always dense
+      size_      = hidden::Traits<Array1D<Type, Size_> >::size_,
+      sizeCols_  = hidden::Traits<Array1D<Type, Size_> >::sizeCols_,
+      sizeRows_  = hidden::Traits<Array1D<Type, Size_> >::sizeRows_,
+      storage_   = hidden::Traits<Array1D<Type, Size_> >::storage_
     };
     typedef IArray1D< Array1D<Type, Size_> > Base;
 
@@ -160,6 +159,11 @@ class Array1D: public IArray1D< Array1D<Type, Size_> >
      **/
     template<int OtherSize>
     Array1D( Array1D<Type, OtherSize> const& T, Range const& I): Base(T, I) {}
+    /** Copy an other type of array/expression in an Array1D.
+     *  @param T the array/expression to copy
+     **/
+    template<class OtherArray>
+    Array1D( ExprBase<OtherArray> const& T): Base(T) {}
     /** Wrapper constructor: the container is a reference of a C-Array.
      *  @param q, I pointer and range of data
      **/
@@ -170,7 +174,7 @@ class Array1D: public IArray1D< Array1D<Type, Size_> >
      *  @param T the container to copy
      **/
     Array1D& operator=(Array1D const& T)
-    { return this->copy(T);}
+    { return this->assign(T);}
     /** Copy an other type of 1D array in an Array1D.
      *  @param T the array to copy
      **/

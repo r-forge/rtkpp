@@ -29,7 +29,7 @@
  **/
 
 /** @file STK_Algo.h
- *  @brief In this file we give some templated generic algorithms.
+ *  @brief In this file we give some template generic algorithms.
  **/
 
 #ifndef STK_ALGO_FINDZERO_H

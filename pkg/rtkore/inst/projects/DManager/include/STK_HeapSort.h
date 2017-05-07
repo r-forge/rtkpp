@@ -23,7 +23,7 @@
 */
 
 /*
- * Project: DManager
+ * Project: stkpp::DManager
  * Purpose: sorting method acting on Containers
  * Author:   Serge Iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  *
@@ -37,7 +37,7 @@
 #ifndef STK_HEAPSORT_H
 #define STK_HEAPSORT_H
 
-#include "Arrays/include/STK_ArrayBase.h"
+//#include "Arrays/include/STK_ArrayBase.h"
 
 namespace STK
 {
@@ -47,8 +47,9 @@ namespace STK
  *  @param T the container to sort
  **/
 template<class Vector>
-void heapSort( ArrayBase<Vector>& T)
+void heapSort( Vector& T)
 {
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Vector);
   typedef typename hidden::Traits<Vector>::Type Type;
   // number of elements
   const int nb_elt = T.size();
@@ -118,8 +119,9 @@ void heapSort( ArrayBase<Vector>& T)
  *  @param Tsort the container with the result
  **/
 template< class Vector>
-void heapSort( ArrayBase<Vector> const& T, Vector& Tsort)
+void heapSort( Vector const& T, Vector& Tsort)
 {
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Vector);
   typedef typename Vector::Type Type;
   // copy T in Tsort
   Tsort = T.asDerived();
@@ -192,8 +194,10 @@ void heapSort( ArrayBase<Vector> const& T, Vector& Tsort)
  *  @param T the container to sort
  **/
 template< class Vector, class VectorInt>
-void heapSort( ArrayBase< VectorInt> & I, ArrayBase<Vector> const& T)
+void heapSort( VectorInt& I, Vector const& T)
 {
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Vector);
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(VectorInt);
   typedef typename hidden::Traits<Vector>::Type Type;
 
   // number of elements
@@ -280,17 +284,17 @@ void heapSort( ArrayBase< VectorInt> & I, ArrayBase<Vector> const& T)
  *  @param T the container to sort
  **/
 template<class Vector, class VectorInt>
-void applySort1D( ArrayBase<Vector>& T, ArrayBase<VectorInt> const& I)
+void applySort1D( Vector& T, VectorInt const& I)
 {
-#ifdef STK_DEBUG
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Vector);
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(VectorInt);
+#ifdef STK_BOUNDS_CHECK
   if (I.range() != T.range())
-  { throw runtime_error("In applySort(T, I) "
-                        "incompatible lengths\n");
-  }
+  { STKRUNTIME_ERROR_2ARG(applySort1D,I.range(),T.range(),incompatible lengths);}
 #endif
   Vector A(T.range());
-  for (int i=I.begin(); i<= I.lastIdx(); i++) { A[i] = T[I[i]];}
-  T.asDerived() = A.asDerived();
+  for (int i=I.begin(); i< I.end(); i++) { A[i] = T[I[i]];}
+  T.move(A);
 }
 
 /** @ingroup DManager
@@ -299,17 +303,16 @@ void applySort1D( ArrayBase<Vector>& T, ArrayBase<VectorInt> const& I)
  *  @param T the container to sort
  **/
 template < class Array, class VectorInt>
-void applySort2D( Array& T, ArrayBase< VectorInt> const& I)
+void applySort2D( Array& T, VectorInt const& I)
 {
-#ifdef STK_DEBUG
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(VectorInt);
+#ifdef STK_BOUNDS_CHECK
   if (I.range() != T.rows())
-  { throw runtime_error("In applySort(T, I) "
-                        "incompatible lengths\n");
-  }
+  { STKRUNTIME_ERROR_2ARG(applySort1D,I.range(),T.rows(),incompatible lengths);}
 #endif
   Array A(T.rows(), T.cols());
-  for (int i=I.begin(); i<= I.lastIdx(); i++) { A.row(i) = T.row(I[i]);}
-  T.asDerived().move(A.asDerived());
+  for (int i=I.begin(); i< I.end(); i++) { A.row(i) = T.row(I[i]);}
+  T.move(A);
 }
 
 } // namespace STK

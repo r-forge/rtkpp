@@ -29,7 +29,7 @@
  **/
 
 /** @file STK_Algo.h
- *  @brief In this file we give some templated generic algorithms.
+ *  @brief In this file we give some template generic algorithms.
  **/
 
 #ifndef STK_ALGO_H
@@ -100,7 +100,7 @@ Real sumAlternateSerie(const ISerie<Serie>& f, int const& n = 0)
  *  S = \sum_{k=0}^{+\infty} a_k
  *  \f]
  * where the coefficients of the series are given or computed
- * by the templated parameter Serie.
+ * by the template parameter Serie.
  *
  * The series should be monotone in absolute value.
  * We use the epsilon algorithm acceleration process with 6 epsilon.
@@ -216,7 +216,7 @@ Real sumSerie(const ISerie<Serie>& f, int const& iter_max = 10)
  *  \ldots
  *  \f]
  * where the coefficients of the series are given or computed
- * by the templated parameter Serie.
+ * by the template parameter Serie.
  * @param iter_max the number of iterations
  * @param a Denominator serie
  * @param b Numerator serie

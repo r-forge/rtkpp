@@ -24,7 +24,7 @@
 
 /*
  * Project:  stkpp::Arrays
- * Purpose:  Define the Interface 1D templated Container class.
+ * Purpose:  Define the Interface 1D template Container class.
  * Author:   Serge Iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  *
  **/
@@ -43,12 +43,15 @@
 #include "STK_ArraysTraits.h"
 #include "STK_Arrays_Util.h"
 
+#include "iterators/STK_RandomIterator1D.h"
+#include "iterators/STK_BiDirectionalIterator1D.h"
+
 namespace STK
 {
 /** @ingroup Arrays
  *  @brief Interface base class for homogeneous 1D containers.
  *
- * The ITContainer1D class is the templated base class for all
+ * The ITContainer1D class is the template base class for all
  * homogeneous one-dimensional containers containing element of type @c Type
  * where Type is not necessarily a scalar. It assumes that the derived class
  * cannot be part of an expression and is not constant, so that it can be

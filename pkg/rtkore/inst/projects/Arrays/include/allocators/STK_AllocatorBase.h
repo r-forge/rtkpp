@@ -68,7 +68,7 @@ template<class Type> struct memChooser<0, Type>
     /** copy mem using loop */
   static Type* memcpy(Type* p, int pos, Type* q, Range const& range)
   {
-    Type* ptr = p+pos;
+    Type* ptr = p+pos-range.begin();
     for (int k=range.begin(); k<range.end(); k++) { ptr[k] = q[k];}
     return p;
   }
@@ -279,9 +279,9 @@ struct AllocatorBase: public IContainerRef
     /** @brief copy the Allocator T by value.
      *  The memory is free and the Allocator T is physically copied in this.
      *  @param T the allocator to copy by value
-     *  @return a copy of this
+     *  @return a copy of T
      **/
-    AllocatorBase& copy( AllocatorBase const& T);
+    AllocatorBase& assign( AllocatorBase const& T);
     /** @brief move the Allocator T to this.
      *  The memory of this is freed and T becomes a reference of this. This
      *  method allow to move the data of T to this without using physical copy.
@@ -324,6 +324,7 @@ struct AllocatorBase: public IContainerRef
     {
       setPtrData();
       setRangeData();
+      setRef(false);
     }
     /** Increment the address of the data.
      *  @param inc the increment to apply
@@ -362,7 +363,7 @@ AllocatorBase<Type,Size>& AllocatorBase<Type,Size>::exchange(AllocatorBase<Type,
  *  @return a copy of this
  **/
 template<typename Type, int Size>
-AllocatorBase<Type,Size>& AllocatorBase<Type,Size>::copy( AllocatorBase<Type,Size> const& T)
+AllocatorBase<Type,Size>& AllocatorBase<Type,Size>::assign( AllocatorBase<Type,Size> const& T)
 {
   // allocate memory if necessary
   malloc(T.rangeData_);
@@ -414,7 +415,6 @@ void AllocatorBase<Type,Size>::malloc( Range const& I)
   if (I.size() <= 0)
   {
     setPtrData(0, I, false);
-    setRef(false);
     return;
   }
   // allocate memory
@@ -428,7 +428,6 @@ void AllocatorBase<Type,Size>::malloc( Range const& I)
     setDefault();
     STKRUNTIME_ERROR_1ARG(AllocatorBase::malloc, I, memory allocation failed);
   }
-  setRef(false);
 }
 
 template<typename Type, int Size>

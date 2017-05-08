@@ -103,6 +103,26 @@ inline Range evalRangeCapacity(STK::Range const& I)
   return Range(I.begin(),I.size() + n);
 }
 
+/** @ingroup Arrays
+ *  convert a Structure to a String.
+ *  @param type the type of Structure we want to convert
+ *  @return the string associated to this type.
+ **/
+inline std::string structureToString( Structure const& type)
+{
+  if (type == array2D_)          return String(_T("array2D_"));
+  if (type == square_)           return String(_T("square_"));
+  if (type == diagonal_)         return String(_T("diagonal_"));
+  if (type == lower_triangular_) return String(_T("lower_triangular_"));
+  if (type == upper_triangular_) return String(_T("upper_triangular_"));
+  if (type == vector_)           return String(_T("vector_"));
+  if (type == point_)            return String(_T("point_"));
+  if (type == number_)           return String(_T("number_"));
+  if (type == expression_)       return String(_T("expression_"));
+  return String(_T("unknown"));
+}
+
+
 } // namespace Arrays
 
 } // namespace STK

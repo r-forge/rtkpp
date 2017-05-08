@@ -596,7 +596,7 @@ inline Derived& ArrayBase<Derived>::assign(ExprBase<Rhs> const& rhs)
   STK_STATIC_ASSERT(CORRECT_ASSIGN((Arrays::Structure)structure_, (Arrays::Structure)rhs_structure_),YOU_TRIED_TO_ASSIGN_A_NOT_COMPATIBLE_ARRAY);
   // check if assignment is possible
   if (!hidden::CheckAssign<Derived, structure_, rhs_structure_>::isAllowed(this->asDerived(), rhs.rows(), rhs.cols()))
-  { STKRUNTIME_ERROR_2ARG(ArrayBase::assign,structure_,rhs_structure_,is not permited);}
+  { STKRUNTIME_ERROR_2ARG(ArrayBase::assign,Arrays::structureToString((Arrays::Structure)structure_),Arrays::structureToString((Arrays::Structure)rhs_structure_),is not permited);}
   // choose the correct way to resize if necessary
   hidden::resizeSelector<Derived, Rhs, rhs_structure_>::run(this->asDerived(), rhs.asDerived());
   // choose the correct way to copy

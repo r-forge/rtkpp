@@ -41,7 +41,6 @@
 #include <list>
 
 // STK+ headers
-#include "STKernel/include/STK_String.h"
 #include "STKernel/include/STK_Real.h"
 #include "STKernel/include/STK_Range.h"
 #include "STKernel/include/STK_Stream.h"

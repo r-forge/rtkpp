@@ -51,14 +51,14 @@ namespace Kernel
  * where @e h represents the bandwidth of the kernel.
  */
 template<class Array>
-class Gaussian : public IKernelBase<Array>
+class Gaussian: public IKernelBase<Array>
 {
   public:
     typedef IKernelBase<Array> Base;
-    typedef typename Array::Row RowVector;
     using Base::p_data_;
     using Base::gram_;
-    using Base::symmetrize;
+    using Base::hasRun_;
+
     /** constructor with a constant pointer on the data set
      *  @param p_data a pointer on a data set that will be "kernelized"
      *  @param width the size of the windows to use in the kernel
@@ -78,14 +78,16 @@ class Gaussian : public IKernelBase<Array>
     /** set the bandwidth of the kernel */
     void setWidth(Real const& width) {width_ = width;}
 
-    /** compute the kernel value between two individuals
-     *  @param ind1,ind2 two individuals to compare using the kernel metric
+    /** virtual method.
+     *  @return diagonal value of the kernel for the ith individuals.
+     *  @param i index of the individual
      **/
-    virtual Real kcomp(RowVector const& ind1, RowVector const& ind2) const;
-    /** compute the kernel between an individual and himself
-     *  @param ind the individual to evaluate using the kernel
+    virtual inline Real diag(int i) const {return 1.;};
+    /** virtual method implementation.
+     *  @return value of the kernel for the ith and jth individuals.
+     *  @param i,j indexes of the individuals
      **/
-    virtual Real kdiag(RowVector const& ind) const;
+    virtual Real comp(int i, int j) const;
 
   private:
     /** bandwidth of the kernel */
@@ -93,12 +95,9 @@ class Gaussian : public IKernelBase<Array>
 };
 
 template<class Array>
-Real Gaussian<Array>::kcomp(RowVector const& ind1, RowVector const& ind2) const
-{ return std::exp(-(ind1 - ind2).norm2()/(2.*width_));}
-
-template<class Array>
-Real Gaussian<Array>::kdiag(RowVector const& ind) const
-{ return 1.;}
+Real Gaussian<Array>::comp(int i, int j) const
+{ return hasRun_ ? gram_(i,j)
+                 : std::exp(-(p_data_->row(i) - p_data_->row(j)).norm2()/(2.*width_));}
 
 } // namespace Kernel
 

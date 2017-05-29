@@ -49,7 +49,7 @@ namespace hidden
 /** @ingroup hidden
  *  The DataHandlerTraits will give the type of container furnished by the
  *  concrete implementations of the DataHandlerBase class.
- *  @note In incoming version of STK++ DataHandlerBase will be renamed as
+ *  @note In incoming version of STK++ DataHandlerBase could be renamed as
  *  IDataHandler
  **/
 template<class DataHandler, typename Type> struct DataHandlerTraits;
@@ -57,18 +57,26 @@ template<class DataHandler, typename Type> struct DataHandlerTraits;
 } // namespace hidden
 
 /** @ingroup DManager
- *  A DataHandlerBase class allow to store various data set identified by an
- *  idData
- *  @note In incoming version of STK++ DataHandlerBase will be refactored as
+ *  A class derived from a DataHandlerBase allows to store various data sets
+ *  identified by an idData and an idModel.
+ *
+ *  A typical usage of a data handler is to store and handle various multiple
+ *  sets of data. Each data set possess an id (idData) and can be retrieved by
+ *  using it. To each data set is also associated an idModel allowing to know
+ *  which kind of (statistical) model is applied in order to model the data set.
+ *
+ *  @note In incoming version of STK++ DataHandlerBase could be renamed as
  *  IDataHandler
  */
 template<class Derived>
 class DataHandlerBase : public IRecursiveTemplate<Derived>
 {
+  protected:
+    /** default constructor */
+    DataHandlerBase() {}
+
   public:
     typedef std::map<std::string, std::string> InfoMap;
-    /** default constructor */
-    inline DataHandlerBase() {}
     /** destructor */
     inline ~DataHandlerBase() {}
     /** @return the map with the idDatas and idModel of the models */
@@ -86,14 +94,15 @@ class DataHandlerBase : public IRecursiveTemplate<Derived>
      *  idModel, @c true otherwise.
      **/
     bool addInfo(std::string const& idData, std::string const& idModel);
-    /** @brief Giving a the Id of a dataset, find the Id of the model.
+    /** @brief Giving the Id of a data set, find the Id of the model.
      *  @param idData can be any string given by the user for identifying data.
      *  @param idModel The Id of the model associated with the data
      *  (not modified if idData is not present in the map).
      *  @return @c true if there exists an idData in the InfoMap, @c false
      *  otherwise.
      **/
-    bool getIdModelName(std::string const& idData, std::string& idModel) const;    /** write the info on os */
+    bool getIdModelName(std::string const& idData, std::string& idModel) const;
+    /** write the info on os */
     void writeInfo(ostream& os) const;
 
   protected:

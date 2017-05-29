@@ -35,8 +35,8 @@
 #ifndef STK_ITERATORBASE_H
 #define STK_ITERATORBASE_H
 
-#include <iterator>
 #include <Sdk/include/STK_IRecursiveTemplate.h>
+#include <STKernel/include/STK_Integer.h>
 
 namespace STK
 {
@@ -55,7 +55,9 @@ struct IteratorBase: public IRecursiveTemplate<Derived>
     typedef typename hidden::IteratorTraits<Derived>::difference_type difference_type;
 
   protected:
-    /** default constructor.
+    /** default constructor */
+    IteratorBase(): pos_(Arithmetic<int>::NA()) {}
+    /** constructor with specified position
      *  @param pos the position of the iterator on the array
      **/
     IteratorBase( int pos): pos_(pos) {}
@@ -67,6 +69,9 @@ struct IteratorBase: public IRecursiveTemplate<Derived>
     ~IteratorBase() {}
 
   public:
+    /** @return the position of the iterator */
+    int pos() const  { return pos_;}
+
     // moving
     Derived& operator++()         { ++pos_; return this->asDerived(); }
     Derived& operator++(int junk) { ++pos_; return this->asDerived(); }

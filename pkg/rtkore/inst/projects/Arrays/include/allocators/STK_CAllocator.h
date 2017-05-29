@@ -241,11 +241,11 @@ class OrientedCAllocator<Derived, Arrays::by_row_>: public ITContainer2D<Derived
   protected:
     /** constructor with specified ranges */
     OrientedCAllocator( Range const& I, Range const& J)
-                             : Base(I, J), ldx_(J.size()), allocator_(prod(I, J))
+                      : Base(I, J), ldx_(J.size()), allocator_(prod(I, J))
     {}
     /** copy constructor */
     OrientedCAllocator( OrientedCAllocator const& A, bool ref)
-                             : Base(A), ldx_(A.ldx_), allocator_(A.allocator_, ref)
+                      : Base(A), ldx_(A.ldx_), allocator_(A.allocator_, ref)
     { if (!ref) allocator_.assign(A.allocator_);}
     /** Reference constructor */
     template<class OtherDerived>
@@ -418,11 +418,11 @@ class StructuredCAllocator<Derived, 1, SizeCols_>
   protected:
     /** Default constructor */
     StructuredCAllocator( Range const& I, Range const& J)
-                               : Base(I, J), row_(I.begin())
+                         : Base(I, J), row_(I.begin())
     {}
     /** copy constructor */
     StructuredCAllocator( StructuredCAllocator const& A, bool ref)
-                               : Base(A, ref), row_(A.row_)
+                         : Base(A, ref), row_(A.row_)
     {}
     /** Reference constructor */
     template<class OtherDerived, int OtherSizeRows_, int OtherSizeCols_>
@@ -432,7 +432,7 @@ class StructuredCAllocator<Derived, 1, SizeCols_>
     {}
     /** wrapper constructor for 0 based C-Array*/
     StructuredCAllocator( Type* const& q, int , int nbCol)
-                               : Base(q, 1, nbCol), row_(0)
+                         : Base(q, 1, nbCol), row_(0)
     {}
   public:
     /** exchange T with this.

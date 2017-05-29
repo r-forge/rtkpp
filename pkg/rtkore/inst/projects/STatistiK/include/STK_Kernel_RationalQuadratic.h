@@ -51,14 +51,14 @@ namespace Kernel
  * where @e h represents the bandwidth of the kernel.
  */
 template<class Array>
-class RationalQuadratic : public IKernelBase<Array>
+class RationalQuadratic: public IKernelBase<Array>
 {
   public:
     typedef IKernelBase<Array> Base;
-    typedef typename Array::Row RowVector;
     using Base::p_data_;
     using Base::gram_;
-    using Base::symmetrize;
+    using Base::hasRun_;
+
     /** constructor with a constant pointer on the data set
      *  @param p_data a pointer on a data set that will be "kernelized"
      *  @param shift the shift to use in the kernel
@@ -84,13 +84,14 @@ class RationalQuadratic : public IKernelBase<Array>
     /** set the shift of the kernel */
     void setWidth(Real const& shift) { shift_ = shift;}
 
+    /** virtual method.
+     *  @return diagonal value of the kernel for the ith individuals.
+     *  @param i index of the individual
+     **/
+    virtual inline Real diag(int i) const {return 1.;};
     /** compute the kernel value between two individuals
      *  @param ind1,ind2 two individuals to compare using the kernel metric */
-    virtual Real kcomp(RowVector const& ind1, RowVector const& ind2) const;
-    /** compute the kernel between an individual and himself
-     *  @param ind the individual to evaluate using the kernel
-     **/
-    virtual Real kdiag(RowVector const& ind) const;
+    virtual Real comp(int i, int j) const;
 
   private:
     /** shift of the kernel */
@@ -98,14 +99,12 @@ class RationalQuadratic : public IKernelBase<Array>
 };
 
 template<class Array>
-Real RationalQuadratic<Array>::kcomp(RowVector const& ind1, RowVector const& ind2) const
+Real RationalQuadratic<Array>::comp(int i, int j) const
 {
-  Real aux = (ind1 - ind2).norm2();
-  return 1. - aux/(aux + shift_);}
-
-template<class Array>
-Real RationalQuadratic<Array>::kdiag(RowVector const& ind) const
-{ return 1.;}
+  if (hasRun_) return gram_(i,j);
+  Real aux = (p_data_->row(i) - p_data_->row(j)).norm2();
+  return 1. - aux/(aux + shift_);
+}
 
 } // namespace Kernel
 

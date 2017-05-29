@@ -90,7 +90,7 @@ struct Traits< Array2DVector<Type_> >
 } // namespace hidden
 
 /** @ingroup Arrays
- *  @brief Templated one dimensional horizontal Array. 
+ *  @brief template one dimensional horizontal Array. 
  * 
  *  An Array2DVector is a Vertical container of a single column.
  * 

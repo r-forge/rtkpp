@@ -56,10 +56,10 @@ class Polynomial: public IKernelBase<Array>
 {
   public:
     typedef IKernelBase<Array> Base;
-    typedef typename Array::Row RowVector;
     using Base::p_data_;
     using Base::gram_;
-    using Base::symmetrize;
+    using Base::hasRun_;
+
     /** constructor with a constant pointer on the data set
      *  @param p_data a pointer on a data set that will be "kernelized"
      *  @param shift the shift to use in the kernel
@@ -91,13 +91,16 @@ class Polynomial: public IKernelBase<Array>
     /** set the shift of the kernel */
     void setShift(Real const& shift) { shift_ = shift;}
 
-    /** compute the kernel value between two individuals
-     *  @param ind1,ind2 two individuals to compare using the kernel metric */
-    virtual Real kcomp(RowVector const& ind1, RowVector const& ind2) const;
-    /** compute the kernel between an individual and himself
-     *  @param ind the individual to evaluate using the kernel
+    /** virtual method.
+     *  @return diagonal value of the kernel for the ith individuals.
+     *  @param i index of the individual
      **/
-    virtual Real kdiag(RowVector const& ind) const;
+    virtual Real diag(int i) const;
+    /** virtual method implementation.
+     *  @return value of the kernel for the ith and jth individuals.
+     *  @param i,j indexes of the individuals
+     **/
+    virtual Real comp(int i, int j) const;
 
   private:
     /** degree of the kernel */
@@ -106,13 +109,21 @@ class Polynomial: public IKernelBase<Array>
     Real shift_;
 };
 
+/* virtual method.
+ *  @return diagonal value of the kernel for the ith individuals.
+ *  @param i index of the individual
+ **/
 template<class Array>
-Real Polynomial<Array>::kcomp(RowVector const& ind1, RowVector const& ind2) const
-{ return std::pow(ind1.dot(ind2) + shift_, d_);}
+inline Real Polynomial<Array>::diag(int i) const
+{ return hasRun_ ? gram_(i,i)
+                 :  std::pow(p_data_->row(i).norm2() + shift_, d_);
+}
 
 template<class Array>
-Real Polynomial<Array>::kdiag(RowVector const& ind) const
-{ return std::pow(ind.norm2() + shift_, d_);}
+inline Real Polynomial<Array>::comp(int i, int j) const
+{ return hasRun_ ? gram_(i,j)
+                 :  std::pow(p_data_->row(i).dot(p_data_->row(j)) + shift_, d_);}
+
 
 } // namespace Kernel
 

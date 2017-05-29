@@ -86,66 +86,66 @@
 #define STATISTIK_H
 
 // random number generators
-#include "STatistiK/include/MersenneTwister.h"
-#include "STatistiK/include/STK_RandBase.h"
+#include <STatistiK/include/MersenneTwister.h>
+#include <STatistiK/include/STK_RandBase.h>
 
 // namespace Law
 // probabilities laws
-#include "STatistiK/include/STK_Law_Util.h"
+#include <STatistiK/include/STK_Law_Util.h>
 
-#include "STatistiK/include/STK_Law_Bernoulli.h"
-#include "STatistiK/include/STK_Law_Beta.h"
-#include "STatistiK/include/STK_Law_Binomial.h"
-#include "STatistiK/include/STK_Law_Categorical.h"
-#include "STatistiK/include/STK_Law_Cauchy.h"
-#include "STatistiK/include/STK_Law_ChiSquared.h"
-#include "STatistiK/include/STK_Law_Exponential.h"
-#include "STatistiK/include/STK_Law_FisherSnedecor.h"
-#include "STatistiK/include/STK_Law_Gamma.h"
-#include "STatistiK/include/STK_Law_Geometric.h"
-#include "STatistiK/include/STK_Law_HyperGeometric.h"
-#include "STatistiK/include/STK_Law_Logistic.h"
-#include "STatistiK/include/STK_Law_LogNormal.h"
-#include "STatistiK/include/STK_Law_NegativeBinomial.h"
-#include "STatistiK/include/STK_Law_Normal.h"
-#include "STatistiK/include/STK_Law_Poisson.h"
-#include "STatistiK/include/STK_Law_Student.h"
-#include "STatistiK/include/STK_Law_Uniform.h"
-#include "STatistiK/include/STK_Law_UniformDiscrete.h"
-#include "STatistiK/include/STK_Law_Weibull.h"
+#include <STatistiK/include/STK_Law_Bernoulli.h>
+#include <STatistiK/include/STK_Law_Beta.h>
+#include <STatistiK/include/STK_Law_Binomial.h>
+#include <STatistiK/include/STK_Law_Categorical.h>
+#include <STatistiK/include/STK_Law_Cauchy.h>
+#include <STatistiK/include/STK_Law_ChiSquared.h>
+#include <STatistiK/include/STK_Law_Exponential.h>
+#include <STatistiK/include/STK_Law_FisherSnedecor.h>
+#include <STatistiK/include/STK_Law_Gamma.h>
+#include <STatistiK/include/STK_Law_Geometric.h>
+#include <STatistiK/include/STK_Law_HyperGeometric.h>
+#include <STatistiK/include/STK_Law_Logistic.h>
+#include <STatistiK/include/STK_Law_LogNormal.h>
+#include <STatistiK/include/STK_Law_NegativeBinomial.h>
+#include <STatistiK/include/STK_Law_Normal.h>
+#include <STatistiK/include/STK_Law_Poisson.h>
+#include <STatistiK/include/STK_Law_Student.h>
+#include <STatistiK/include/STK_Law_Uniform.h>
+#include <STatistiK/include/STK_Law_UniformDiscrete.h>
+#include <STatistiK/include/STK_Law_Weibull.h>
 
-#include "STatistiK/include/STK_MultiLaw_Normal.h"
-#include "STatistiK/include/STK_MultiLaw_JointBernoulli.h"
-#include "STatistiK/include/STK_MultiLaw_JointCauchy.h"
-#include "STatistiK/include/STK_MultiLaw_JointNormal.h"
-#include "STatistiK/include/STK_MultiLaw_JointGamma.h"
+#include <STatistiK/include/STK_MultiLaw_Normal.h>
+#include <STatistiK/include/STK_MultiLaw_JointBernoulli.h>
+#include <STatistiK/include/STK_MultiLaw_JointCauchy.h>
+#include <STatistiK/include/STK_MultiLaw_JointNormal.h>
+#include <STatistiK/include/STK_MultiLaw_JointGamma.h>
 
-#include "STatistiK/include/STK_Stat_Functors.h"
-#include "STatistiK/include/STK_Stat_UnivariateReal.h"
+#include <STatistiK/include/STK_Stat_Functors.h>
+#include <STatistiK/include/STK_Stat_UnivariateReal.h>
 
 // bivariate Statistics
-#include "STatistiK/include/STK_Stat_Bivariate.h"
-#include "STatistiK/include/STK_Stat_Covariance.h"
+#include <STatistiK/include/STK_Stat_Bivariate.h>
+#include <STatistiK/include/STK_Stat_Covariance.h>
 
 // Multivariate Statistics
-#include "STatistiK/include/STK_Stat_Multivariate.h"
-#include "STatistiK/include/STK_Stat_MultivariateReal.h"
+#include <STatistiK/include/STK_Stat_Multivariate.h>
+#include <STatistiK/include/STK_Stat_MultivariateReal.h>
 
 // perform the usual Computations on categorical variables
-#include "STatistiK/include/STK_Stat_Factor.h"
-#include "STatistiK/include/STK_Stat_MultiFactor.h"
-#include "STatistiK/include/STK_Stat_ConfusionMatrix.h"
-#include "STatistiK/include/STK_Stat_Transform.h"
+#include <STatistiK/include/STK_Stat_Factor.h>
+#include <STatistiK/include/STK_Stat_MultiFactor.h>
+#include <STatistiK/include/STK_Stat_ConfusionMatrix.h>
+#include <STatistiK/include/STK_Stat_Transform.h>
 
 // Kernels
-#include "STatistiK/include/STK_Kernel_Util.h"
+#include <STatistiK/include/STK_Kernel_Util.h>
 
-#include "STatistiK/include/STK_Kernel_Gaussian.h"
-#include "STatistiK/include/STK_Kernel_Exponential.h"
-#include "STatistiK/include/STK_Kernel_Linear.h"
-#include "STatistiK/include/STK_Kernel_Polynomial.h"
-#include "STatistiK/include/STK_Kernel_RationalQuadratic.h"
-#include "STatistiK/include/STK_Kernel_Hamming.h"
+#include <STatistiK/include/STK_Kernel_Gaussian.h>
+#include <STatistiK/include/STK_Kernel_Exponential.h>
+#include <STatistiK/include/STK_Kernel_Linear.h>
+#include <STatistiK/include/STK_Kernel_Polynomial.h>
+#include <STatistiK/include/STK_Kernel_RationalQuadratic.h>
+#include <STatistiK/include/STK_Kernel_Hamming.h>
 
 #endif /*STATISTIK_H*/
 

@@ -95,7 +95,7 @@ struct Traits< List1D<Type_> >
 namespace STK
 {
 /** @ingroup DManager
-  * @brief Templated One dimensional Horizontal List.
+  * @brief template One dimensional Horizontal List.
   *
   * A List1D is an implementation of the Interface ITContainer1D for list
   * of homogeneous objects.

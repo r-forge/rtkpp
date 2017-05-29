@@ -47,7 +47,7 @@ namespace STK
 {
 
 /** @ingroup Arrays
- *  @brief Templated one dimensional Array.
+ *  @brief template one dimensional Array.
  * 
  * An IArray1D is a template one column container implementing the interface
  * base class ITContainer1D.

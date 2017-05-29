@@ -64,46 +64,46 @@
 #define DMANAGER_H
 
 /* Utilities used in the DManager Project */
-#include "../projects/DManager/include/STK_DManager_Util.h"
-#include "../projects/DManager/include/STK_Import_Util.h"
+#include <DManager/include/STK_DManager_Util.h>
+#include <DManager/include/STK_Import_Util.h>
 
 /* Interface Variable class and Variable class */
-#include "../projects/DManager/include/STK_IVariable.h"
-#include "../projects/DManager/include/STK_Variable.h"
+#include <DManager/include/STK_IVariable.h>
+#include <DManager/include/STK_Variable.h>
 
 /* DataFrame. */
-#include "../projects/DManager/include/STK_Cell.h"
-#include "../projects/DManager/include/STK_List1D.h"
-#include "../projects/DManager/include/STK_DataFrame.h"
+#include <DManager/include/STK_Cell.h>
+#include <DManager/include/STK_List1D.h>
+#include <DManager/include/STK_DataFrame.h>
+
+/* Cross Validation utilities */
+#include <DManager/include/STK_CvHandler.h>
+#include <DManager/include/STK_PartitionHandler.h>
 
 /* Interface class for data handlers */
-#include "../projects/DManager/include/STK_DataHandlerBase.h"
-#include "../projects/DManager/include/STK_IDataHandler.h"
-/* Cross Validation */
-#include "../projects/DManager/include/STK_CvHandler.h"
-#include "../projects/DManager/include/STK_PartitionHandler.h"
+#include <DManager/include/STK_DataHandlerBase.h>
 
 /* Interface class for data wrappers */
-#include "../projects/DManager/include/STK_IDataBridge.h"
-#include "../projects/DManager/include/STK_DataBridge.h"
+#include <DManager/include/STK_IDataBridge.h>
+#include <DManager/include/STK_DataBridge.h>
 
 
 /* main classes for managing Csv data. */
-#include "../projects/DManager/include/STK_ReadWriteCsv.h"
-#include "../projects/DManager/include/STK_DataHandler.h"
+#include <DManager/include/STK_ReadWriteCsv.h>
+#include <DManager/include/STK_DataHandler.h>
 
 /* Export or import data from one container to an other container */
-#include "../projects/DManager/include/STK_ImportFromCsv.h"
-#include "../projects/DManager/include/STK_ExportToCsv.h"
-#include "../projects/DManager/include/STK_DataFrameToArray2D.h"
-#include "../projects/DManager/include/STK_CsvToArray.h"
+#include <DManager/include/STK_ImportFromCsv.h>
+#include <DManager/include/STK_ExportToCsv.h>
+#include <DManager/include/STK_DataFrameToArray2D.h>
+#include <DManager/include/STK_CsvToArray.h>
 
 /* HeapSort utilities. */
-#include "../projects/DManager/include/STK_HeapSort.h"
+#include <DManager/include/STK_HeapSort.h>
 
 /* main classes for option files. */
-#include "../projects/DManager/include/STK_Option.h"
-#include "../projects/DManager/include/STK_IPage.h"
-#include "../projects/DManager/include/STK_ReadWritePages.h"
+#include <DManager/include/STK_Option.h>
+#include <DManager/include/STK_IPage.h>
+#include <DManager/include/STK_ReadWritePages.h>
 
 #endif  /* DMANAGER_H */

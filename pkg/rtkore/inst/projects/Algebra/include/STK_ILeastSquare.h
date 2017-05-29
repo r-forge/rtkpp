@@ -73,7 +73,7 @@ class ILeastSquare : public IRunnerBase, public IRecursiveTemplate<Derived>
       if (a.beginRows() != b.beginRows())
         STKRUNTIME_ERROR_NO_ARG(ILeastSquare::ILeastSquare,Wrong data set: a.beginRows() must be equal to b.beginRows());
     }
-    /** @brief Templated constructor
+    /** @brief template constructor
      *  @param b,a the left hand side and the right hand side of the least square
      *  problem.
      */

@@ -84,7 +84,7 @@ struct Traits< Array2DNumber<Type_> >
 } // namespace hidden
 
 /** @ingroup Arrays
- *  @brief Templated number Array.
+ *  @brief template number Array.
  * 
  * An Array2DNumber is an implementation of the interface IArray2D.
  * It's a number container and is referred as a number.

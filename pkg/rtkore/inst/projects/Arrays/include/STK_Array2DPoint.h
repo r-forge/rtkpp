@@ -85,7 +85,7 @@ struct Traits< Array2DPoint<Type_> >
 } // namespace hidden
 
 /** @ingroup Arrays
- *  @brief Templated one dimensional horizontal Array. 
+ *  @brief template one dimensional horizontal Array. 
  * 
  * An Array2DPoint is an implementation of the interface IArray2D.
  * It's a one dimensional row-vector and is refered as a point.

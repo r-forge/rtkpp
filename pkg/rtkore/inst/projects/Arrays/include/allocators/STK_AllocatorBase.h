@@ -91,7 +91,7 @@ template<class Type> struct memChooser<0, Type>
 
 } // namespace hidden
 /** @ingroup Arrays
- *  @brief Templated base class for all Allocator classes.
+ *  @brief template base class for all Allocator classes.
  *
  *  The AllocatorBase class is the base class of all memory allocators. This
  *  class manages the main pointer on the data. It derives from the IContainerRef

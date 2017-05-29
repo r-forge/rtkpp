@@ -351,14 +351,14 @@ compilation time and by linking your code with your installed lapack library usi
 \hline
 Class                 & constructor                                 &  Note \\
 \hline
-lapack::Qr            & Qr( data, ref = false) & if data is an \ttcode{ArrayXX} and  \ttcode{ref} is true, data will be overwritten by $Q$ \\
-                      & Qr( data)                   & \\
+lapack::Qr            & Qr( data, ref = false) & if data is an \ttcode{ArrayXX} and  \ttcode{ref} is true, \\
+                      & Qr( data)                   & data will be overwritten by $Q$ \\
 \hline
-lapack::Svd           & Svd( data, ref = false, withU=true, withV=true) & if \ttcode{ref} is true, data will be overwritten \\
-                      & Svd(data)           & \\
+lapack::Svd           & Svd( data, ref = false, withU=true, withV=true) & if \ttcode{ref} is true, \\
+                      & Svd(data)           & data will be overwritten by $Q$ \\
 \hline
-lapack::SymEigen      & SymEigen( data, ref = false) & if data is a \ttcode{SquareArray} and  \ttcode{ref} is true, data will be overwritten by $P$ \\
-                      & SymEigen( data)                   & \\
+lapack::SymEigen      & SymEigen( data, ref = false) & if data is a \ttcode{SquareArray} and  \ttcode{ref} is true, \\
+                      & SymEigen( data)                   & data will be overwritten by $Q$ \\
 \hline
 lapack::MultiLeastSquare & MultiLeastSquare( b, a, isBref = false, isBref=false) & \\
                       & MultiLeastSquare( b, a)           & \\

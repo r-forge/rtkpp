@@ -122,10 +122,10 @@ class DataBridge: public IDataBridge, public ITContainer2D< DataBridge<Data> >
     /** copy constructor (Warning: will copy the data set)
      *  @param manager the DataBridge to copy
      **/
-    DataBridge( DataBridge const& manager)
-              : IBase(manager), Base(manager)
-              , dataij_(manager.dataij_)
-              , nbVariable_(manager.nbVariable_) {}
+    DataBridge( DataBridge const& bridge)
+              : IBase(bridge), Base(bridge)
+              , dataij_(bridge.dataij_)
+              , nbVariable_(bridge.nbVariable_) {}
     /** destructor */
     virtual ~DataBridge() {}
     /** getter. @return the number of variables (the number of columns of the data)  */

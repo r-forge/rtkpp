@@ -58,7 +58,7 @@ namespace STK
 template < class PTRCOL, class Derived>
 class IArray2DBase;
 /** @ingroup Arrays
- *  @brief Templated interface base class for two-dimensional arrays.
+ *  @brief template interface base class for two-dimensional arrays.
  *
  * A IArray2DBase is an interface class for two-dimensional Arrays
  * stored in columns and having flexible dimensions. It is possible

@@ -54,7 +54,7 @@ namespace hidden
 {
 
 /** @ingroup hidden
- *  @brief Specialization of the Traits class for the  STK::IntegerVector class.
+ *  @brief Specialization of the Traits class for the  STK::RVector class.
  **/
 template<typename Type_>
 struct Traits< RVector<Type_> >
@@ -79,7 +79,7 @@ struct Traits< RVector<Type_> >
       structure_ = Arrays::vector_,
       orient_    = Arrays::by_col_,
       sizeRows_  = UnknownSize,
-      sizeCols_  = UnknownSize,
+      sizeCols_  = 1,
       storage_   = Arrays::dense_
     };
 };
@@ -176,7 +176,7 @@ class RVector : public ArrayBase< RVector<Type_> >, public TRef<1>
     /** @return a reference on the element (i,j)
      *  @param i, j indexes of the row and of the column
      **/
-    inline Type& elt2Impl(int i, int j) { return (vector_[i]);}
+    inline Type& elt2Impl(int i, int j) { return static_cast<Type&>(vector_[i]);}
     /** overwrite the RVector with vec using Rcpp::operator=.
      *  @param vec the vector to copy
      **/
@@ -206,7 +206,7 @@ class RVector : public ArrayBase< RVector<Type_> >, public TRef<1>
   private:
     Rcpp::Vector<Rtype_> vector_;
     RowRange rows_;
-    const ColRange cols_;
+    ColRange cols_;
 };
 
 } // namespace STK

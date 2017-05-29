@@ -40,7 +40,7 @@
 
 #include "STK_DataHandlerBase.h"
 #include "STK_ReadWriteCsv.h"
-#include "Arrays/include/STK_Array2D.h"
+#include <Arrays/include/STK_Array2D.h>
 
 namespace STK
 {

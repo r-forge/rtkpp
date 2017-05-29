@@ -111,16 +111,16 @@
 #define STKERNEL_H
 
 /* Fundamental types of STKpp.  */
-#include "../projects/STKernel/include/STK_TypeBase.h"
+#include <STKernel/include/STK_TypeBase.h>
 /* Index range. */
-#include "../projects/STKernel/include/STK_Range.h"
+#include <STKernel/include/STK_Range.h>
 /* Standard exceptions */
-#include "../projects/STKernel/include/STK_Exceptions.h"
-/* STK streams parametrized with Char.  */
-#include "../projects/STKernel/include/STK_Functors.h"
+#include <STKernel/include/STK_Exceptions.h>
+/* STK streams parameterized with Char.  */
+#include <STKernel/include/STK_Functors.h>
 /* Chrono functions.  */
-#include "../projects/STKernel/include/STK_Chrono.h"
+#include <STKernel/include/STK_Chrono.h>
 /* Miscellaneous functions. */
-#include "../projects/STKernel/include/STK_Misc.h"
+#include <STKernel/include/STK_Misc.h>
 
 #endif  /* STKERNEL_H */

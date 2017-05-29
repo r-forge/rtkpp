@@ -28,8 +28,9 @@
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
 
-/** @file RcppTraits.h
+/** @file STK_RcppTraits.h
  *  @brief In this file we (re)implement the Traits class of the Rcpp package.
+ *  Rcpp is licensed under the GNU GPL version 2 or later and so is this file
  **/
 
 
@@ -38,48 +39,60 @@
 
 #ifndef R_INTERNALS_H_
 
-#define NILSXP       0    /* nil = NULL */
-#define SYMSXP       1    /* symbols */
-#define LISTSXP      2    /* lists of dotted pairs */
-#define CLOSXP       3    /* closures */
-#define ENVSXP       4    /* environments */
-#define PROMSXP      5    /* promises: [un]evaluated closure arguments */
-#define LANGSXP      6    /* language constructs (special lists) */
-#define SPECIALSXP   7    /* special forms */
-#define BUILTINSXP   8    /* builtin non-special forms */
-#define CHARSXP      9    /* "scalar" string type (internal only)*/
-#define LGLSXP      10    /* logical vectors */
+namespace STK
+{
+namespace hidden
+{
+
+enum
+{
+NILSXP       =0,    /* nil = NULL */
+SYMSXP       =1,    /* symbols */
+LISTSXP      =2,    /* lists of dotted pairs */
+CLOSXP       =3,    /* closures */
+ENVSXP       =4,    /* environments */
+PROMSXP      =5,    /* promises: [un]evaluated closure arguments */
+LANGSXP      =6,    /* language constructs (special lists) */
+SPECIALSXP   =7,    /* special forms */
+BUILTINSXP   =8,    /* builtin non-special forms */
+CHARSXP      =9,    /* "scalar" string type (internal only)*/
+LGLSXP      =10,    /* logical vectors */
 /* 11 and 12 were factors and ordered factors in the 1990s */
-#define INTSXP      13    /* integer vectors */
-#define REALSXP     14    /* real variables */
-#define CPLXSXP     15    /* complex variables */
-#define STRSXP      16    /* string vectors */
-#define DOTSXP      17    /* dot-dot-dot object */
-#define ANYSXP      18    /* make "any" args work.
+INTSXP      =13,    /* integer vectors */
+REALSXP     =14,    /* real variables */
+CPLXSXP     =15,    /* complex variables */
+STRSXP      =16,    /* string vectors */
+DOTSXP      =17,    /* dot-dot-dot object */
+ANYSXP      =18,    /* make "any" args work.
            Used in specifying types for symbol
            registration to mean anything is okay  */
-#define VECSXP      19    /* generic vectors */
-#define EXPRSXP     20    /* expressions vectors */
-#define BCODESXP    21    /* byte code */
-#define EXTPTRSXP   22    /* external pointer */
-#define WEAKREFSXP  23    /* weak reference */
-#define RAWSXP      24    /* raw bytes */
-#define S4SXP       25    /* S4, non-vector */
+VECSXP      =19,    /* generic vectors */
+EXPRSXP     =20,    /* expressions vectors */
+BCODESXP    =21,    /* byte code */
+EXTPTRSXP   =22,    /* external pointer */
+WEAKREFSXP  =23,    /* weak reference */
+RAWSXP      =24,    /* raw bytes */
+S4SXP       =25,    /* S4, non-vector */
 
 /* used for detecting PROTECT issues in memory.c */
-#define NEWSXP      30    /* fresh node creaed in new page */
-#define FREESXP     31    /* node released by GC */
+NEWSXP      =30,    /* fresh node creaed in new page */
+FREESXP     =31,    /* node released by GC */
 
-#define FUNSXP      99    /* Closure or Builtin or Special */
+FUNSXP      =99    /* Closure or Builtin or Special */
+};
 
-#endif
+} // namespace hidden
+
+} // namespace STK
+
+#endif // R_INTERNALS_H_
 
 namespace STK
 {
 
 namespace hidden
 {
-/**
+/** code from Rcpp.
  * template that returns the SEXP type that is appropriate for
  * the type T, this is allways VECSXP (lists) unless it is specialized
  */
@@ -90,8 +103,8 @@ template<> struct r_sexptype_traits<double>{ enum{ rtype = REALSXP } ; } ;
 template<> struct r_sexptype_traits<const double>{ enum{ rtype = REALSXP } ; } ;
 template<> struct r_sexptype_traits<bool>{ enum{ rtype = LGLSXP } ; } ;
 template<> struct r_sexptype_traits<std::string>{ enum{ rtype = STRSXP } ; } ;
-//template<> struct r_sexptype_traits<Rcomplex>{ enum{ rtype = CPLXSXP } ; } ;
-//template<> struct r_sexptype_traits<Rbyte>{ enum{ rtype = RAWSXP } ; } ;
+template<> struct r_sexptype_traits<Rcomplex>{ enum{ rtype = CPLXSXP } ; } ;
+template<> struct r_sexptype_traits<Rbyte>{ enum{ rtype = RAWSXP } ; } ;
 
 
 template<> struct r_sexptype_traits<unsigned int>{ enum{ rtype = REALSXP } ; } ;
@@ -113,8 +126,8 @@ template<> struct r_sexptype_traits<short>{ enum{ rtype = INTSXP } ; } ;
 template<> struct r_sexptype_traits<unsigned short>{ enum{ rtype = INTSXP } ; } ;
 
 /* std::complex */
-//template<> struct r_sexptype_traits< std::complex<double> >{ enum{ rtype = CPLXSXP } ; } ;
-//template<> struct r_sexptype_traits< std::complex<float> >{ enum{ rtype = CPLXSXP } ; } ;
+template<> struct r_sexptype_traits< std::complex<double> >{ enum{ rtype = CPLXSXP } ; } ;
+template<> struct r_sexptype_traits< std::complex<float> >{ enum{ rtype = CPLXSXP } ; } ;
 
 /** @ingroup hidden
  * Indicates the storage type associated with a SEXP type
@@ -127,45 +140,21 @@ template<typename Type> struct RcppTraits
   { Rtype_ = r_sexptype_traits<Type>::rtype };
 };
 
+/** @ingroup hidden
+ *  Given a R type, return a STK type
+ */
+template<int RType> struct RTKppTraits;
+
+template<> struct RTKppTraits<INTSXP> { typedef int Type; };
+template<> struct RTKppTraits<REALSXP>{ typedef double Type; };
+template<> struct RTKppTraits<LGLSXP> { typedef bool Type; };
+template<> struct RTKppTraits<STRSXP> { typedef String Type; };
+template<> struct RTKppTraits<CPLXSXP>{ typedef std::complex<double> Type; };
+template<> struct RTKppTraits<RAWSXP> { typedef unsigned char Type; };
 
 } // namespace hidden
 
 } // namespace STK
 
-#ifndef R_INTERNALS_H_
-
-#undef NILSXP
-#undef SYMSXP
-#undef LISTSXP
-#undef CLOSXP
-#undef ENVSXP
-#undef PROMSXP
-#undef LANGSXP
-#undef SPECIALSXP
-#undef BUILTINSXP
-#undef CHARSXP
-#undef LGLSXP
-
-#undef INTSXP
-#undef REALSXP
-#undef CPLXSXP
-#undef STRSXP
-#undef DOTSXP
-#undef ANYSXP
-
-#undef VECSXP
-#undef EXPRSXP
-#undef BCODESXP
-#undef EXTPTRSXP
-#undef WEAKREFSXP
-#undef RAWSXP
-#undef S4SXP
-
-#undef NEWSXP
-#undef FREESXP
-
-#undef FUNSXP
-
-#endif
 
 #endif /* RCPPTRAITS_H */

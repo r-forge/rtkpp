@@ -61,24 +61,24 @@
 #define ANALYSIS_H
 
 // template generic algorithms
-#include "../projects/Analysis/include/STK_Algo.h"
-#include "../projects/Analysis/include/STK_Algo_FindZero.h"
+#include <Analysis/include/STK_Algo.h>
+#include <Analysis/include/STK_Algo_FindZero.h>
 
 // namespace Const
 // Mathematical constant
-#include "../projects/Analysis/include/STK_Const_Math.h"
+#include <Analysis/include/STK_Const_Math.h>
 
 // namespace Funct
 // usual functions
-#include "../projects/Analysis/include/STK_Funct_Util.h"
+#include <Analysis/include/STK_Funct_Util.h>
 // raw functions
-#include "../projects/Analysis/include/STK_Funct_raw.h"
+#include <Analysis/include/STK_Funct_raw.h>
 // gamma function
-#include "../projects/Analysis/include/STK_Funct_gamma.h"
+#include <Analysis/include/STK_Funct_gamma.h>
 // gamma ratio function
-#include "../projects/Analysis/include/STK_Funct_gammaRatio.h"
+#include <Analysis/include/STK_Funct_gammaRatio.h>
 // beta Ratio function
-#include "../projects/Analysis/include/STK_Funct_betaRatio.h"
+#include <Analysis/include/STK_Funct_betaRatio.h>
 
 
 #endif /*ANALYSIS_H*/

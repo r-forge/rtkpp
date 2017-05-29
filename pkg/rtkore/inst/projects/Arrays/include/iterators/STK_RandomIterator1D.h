@@ -92,16 +92,17 @@ struct RandomIterator1D: public IteratorBase< RandomIterator1D<Derived> >
     using Base::pos_;
 
     // creating
-    RandomIterator1D( Derived& array, int pos): Base(pos), array_(array) {}
+    RandomIterator1D(): Base(), array_(0) {}
+    RandomIterator1D( Derived& array, int pos): Base(pos), array_(&array) {}
     RandomIterator1D( RandomIterator1D const& it): Base(it), array_(it.array_) {}
     ~RandomIterator1D() {}
     RandomIterator1D& operator=(RandomIterator1D const& it)
     { array_ = it.array_; pos_= it.pos_; return *this;}
 
     // getting
-    reference operator*()         { return array_[pos_]; }
-    pointer operator->()          { return &(array_[pos_]); }
-    reference operator[](int pos) { return array_[pos]; }
+    reference operator*()         { return array_->elt(pos_); }
+    pointer operator->()          { return &(array_->elt(pos_)); }
+    reference operator[](int pos) { return array_->elt(pos); }
 
     // misc
     friend void swap(RandomIterator1D& lhs, RandomIterator1D& rhs)
@@ -111,7 +112,7 @@ struct RandomIterator1D: public IteratorBase< RandomIterator1D<Derived> >
     }
 
   private:
-    Derived& array_;
+    Derived* array_;
 };
 template<class Derived>
 struct ConstRandomIterator1D: public IteratorBase< ConstRandomIterator1D<Derived> >
@@ -127,17 +128,18 @@ struct ConstRandomIterator1D: public IteratorBase< ConstRandomIterator1D<Derived
     using Base::pos_;
 
     // creating
+    ConstRandomIterator1D(): Base(), array_(0) {}
     ConstRandomIterator1D( Derived const& array, int pos)
-                         : Base(pos), array_(array) {}
+                         : Base(pos), array_(&array) {}
     ConstRandomIterator1D( ConstRandomIterator1D const& it)
                          : Base(it), array_(it.array_) {}
     ~ConstRandomIterator1D() {}
     ConstRandomIterator1D& operator=(ConstRandomIterator1D const& it)
     { array_ = it.array_; pos_= it.pos_; return *this;}
     // getting
-    reference operator*() const       { return array_[pos_]; }
-    pointer operator->()  const       { return &(array_[pos_]); }
-    reference operator[](int pos) const { return array_[pos]; }
+    reference operator*() const       { return array_->elt(pos_); }
+    pointer operator->()  const       { return &(array_->elt(pos_)); }
+    reference operator[](int pos) const { return array_->elt(pos); }
 
     // misc
     friend void swap(ConstRandomIterator1D& lhs, ConstRandomIterator1D& rhs)
@@ -147,7 +149,7 @@ struct ConstRandomIterator1D: public IteratorBase< ConstRandomIterator1D<Derived
     }
 
   private:
-    Derived const& array_;
+    Derived const* array_;
 };
 
 } // namespace STK

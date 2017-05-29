@@ -67,32 +67,32 @@
 
 
 /* Array2D */
-#include "../projects/Arrays/include/STK_Array2DPoint.h"
-#include "../projects/Arrays/include/STK_Array2DVector.h"
-#include "../projects/Arrays/include/STK_Array2D.h"
-#include "../projects/Arrays/include/STK_Array2DSquare.h"
-#include "../projects/Arrays/include/STK_Array2DDiagonal.h"
-#include "../projects/Arrays/include/STK_Array2DUpperTriangular.h"
-#include "../projects/Arrays/include/STK_Array2DLowerTriangular.h"
-#include "../projects/Arrays/include/STK_Array2DNumber.h"
+#include <Arrays/include/STK_Array2DPoint.h>
+#include <Arrays/include/STK_Array2DVector.h>
+#include <Arrays/include/STK_Array2D.h>
+#include <Arrays/include/STK_Array2DSquare.h>
+#include <Arrays/include/STK_Array2DDiagonal.h>
+#include <Arrays/include/STK_Array2DUpperTriangular.h>
+#include <Arrays/include/STK_Array2DLowerTriangular.h>
+#include <Arrays/include/STK_Array2DNumber.h>
 
 /* Functors applied to  Array2D */
-#include "../projects/Arrays/include/STK_Array2D_Functors.h"
+#include <Arrays/include/STK_Array2D_Functors.h>
 
 /* CArray */
-#include "../projects/Arrays/include/STK_CArray.h"
-#include "../projects/Arrays/include/STK_CArrayPoint.h"
-#include "../projects/Arrays/include/STK_CArrayVector.h"
-#include "../projects/Arrays/include/STK_CArraySquare.h"
-#include "../projects/Arrays/include/STK_CArrayNumber.h"
+#include <Arrays/include/STK_CArray.h>
+#include <Arrays/include/STK_CArrayPoint.h>
+#include <Arrays/include/STK_CArrayVector.h>
+#include <Arrays/include/STK_CArraySquare.h>
+#include <Arrays/include/STK_CArrayNumber.h>
 
 /* constant Arrays */
-#include "../projects/Arrays/include/STK_Const_Arrays.h"
+#include <Arrays/include/STK_Const_Arrays.h>
 
 /* display arrays and expressions */
-#include "../projects/Arrays/include/STK_Display.h"
+#include <Arrays/include/STK_Display.h>
 
 /* Uni-dimensionnal Array. */
-#include "../projects/Arrays/include/STK_Array1D.h"
+#include <Arrays/include/STK_Array1D.h>
 
 #endif  /* ARRAYS_H */

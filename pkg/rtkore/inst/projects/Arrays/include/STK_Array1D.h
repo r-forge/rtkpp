@@ -91,7 +91,7 @@ struct Traits< Array1D<Type_, Size_> >
 namespace STK
 {
 /** @ingroup Arrays
- *  @brief Templated one dimensional Arrays.
+ *  @brief template one dimensional Arrays.
  * 
  * An Array1D is a template non-oriented container (even if the @c Traits
  * struct define it as column oriented) implementing the interface

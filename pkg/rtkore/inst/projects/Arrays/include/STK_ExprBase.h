@@ -425,9 +425,9 @@ class ExprBase : public ITContainer<Derived, hidden::Traits<Derived>::structure_
     { return other.asDerived()*number; }
     // template
     /** @return an expression of *this with the  Type type casted to  OtherType. */
-    template<typename CastedType>
-    inline UnaryOperator<CastOp<Type, CastedType>, Derived> const cast() const
-    { return UnaryOperator<CastOp<Type, CastedType>, Derived>(this->asDerived());}
+    template<typename OtherType>
+    inline UnaryOperator<CastOp<Type, OtherType>, Derived> const cast() const
+    { return UnaryOperator<CastOp<Type, OtherType>, Derived>(this->asDerived());}
     /** @return an expression of funct0 to this. */
     template< template<typename> class OtherOperator>
     inline UnaryOperator<OtherOperator<Type>, Derived> const funct0() const

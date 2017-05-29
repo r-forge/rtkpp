@@ -118,6 +118,7 @@
  *    - @subpage Algebra   "Algebra: Linear Algebra tools"
  *    - @subpage STatistiK "STatistiK: Statistical Tools"
  *    - @subpage StatModels "StatModels: Statistical Models"
+ *    - @subpage Classification  "Classification: classification algorithms"
  *    - @subpage Clustering "Clustering: Mixture Models"
  *    - @subpage Reduct    "Reduct: Dimension reduction tools"
  *    - @subpage Regress   "Regress: Regression tools"
@@ -128,8 +129,8 @@
 
 /** @namespace STK
  *  @brief The namespace STK is the main domain space of the Statistical
- *  ToolKit project. All methods and classes are (and have to be) enclosed
- *  in this namespace.
+ *  ToolKit project. All methods/functions/functors and classes are
+ *  (and have to be) enclosed in this namespace.
  **/
 
 /** @namespace STK::Const
@@ -143,10 +144,9 @@
  *  end-user of theses classes.
  **/
 
-// add openmp support
-#ifdef _OPENMP
-#include <omp.h>
-#endif
+//#ifdef _OPENMP
+//#include <omp.h>
+//#endif
 
 // STKernel project
 #include "STKernel.h"

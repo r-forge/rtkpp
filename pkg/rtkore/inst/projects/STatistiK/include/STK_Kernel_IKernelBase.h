@@ -36,7 +36,7 @@
 #ifndef STK_KERNEL_IKERNELBASE_H
 #define STK_KERNEL_IKERNELBASE_H
 
-#include <Arrays/include/STK_CArraySquare.h>
+#include "STK_Kernel_IKernel.h"
 
 namespace STK
 {
@@ -46,94 +46,60 @@ namespace Kernel
  *  Interface Base class for the kernels classes.
  */
 template<class Array>
-class IKernelBase : public IRunnerWithData<Array>
+class IKernelBase: public IKernel
 {
-  protected:
+  public:
+    using IKernel::gram_;
     /** constructor with a constant pointer on the data set
      *  @param p_data a pointer on a data set that will be "kernelized"
      **/
-    inline IKernelBase(Array const* p_data): Base(p_data), gram_() {}
+    IKernelBase(Array const* p_data): IKernel(), p_data_(p_data) {}
     /** constructor with a constant reference on the data set
      *  @param data a reference on a data set that will be "kernelized"
      **/
-    inline IKernelBase(Array const& data): Base(data), gram_() {}
-
-  public:
-    typedef IRunnerWithData<Array> Base;
-    typedef typename Array::Row RowVector;
-    using Base::p_data_;
-
+    IKernelBase(Array const& data): IKernel(), p_data_(&data) {}
+    /** copy constructor
+     *  @param kernel kernel to copy
+     **/
+    IKernelBase(IKernelBase const& kernel): IKernel(kernel), p_data_(kernel.p_data_) {}
     /** destructor */
-    inline virtual ~IKernelBase() {}
-    /** @return the gram matrix*/
-    inline CSquareX const& k() const { return gram_;}
-    /** @return the gram matrix (bis) */
-    inline CSquareX const& gram() const { return gram_;}
-    /** Utility method.
-     *  @return the computed value of the kernel for the
-     *  ith individual and jth individual.
-     *  @param i,j indexes of the individuals
-     **/
-    inline Real kcomp(int i, int j) const { return gram_(i,j);}
-    /** Utility method.
-     *  @return computed kernel distance between the ith individual and
-     *  jth individual using the computed kernel values.
-     *  @param i,j indexes of the individuals
-     **/
-    inline Real kdist(int i, int j) const { return gram_(i,i)+gram_(j,j)-2*gram_(i,j);}
-
-    /** compute the gram matrix. Default implementation using the pure virtual
-     *  method k */
+    virtual ~IKernelBase() {}
+    /** @return the pointer on the data set */
+    Array const* p_data() const { return p_data_;}
+    /** compute Gram matrix
+     *  @return @c true if the computation is successful, @c false otherwise */
     virtual bool run();
+    /** @return the number of samples (the number of rows in the data set) */
+    virtual int nbSample() const { return (p_data_) ? p_data_->sizeRows() : 0;}
+    /** @return the number of variables (the number of columns in the data set) */
+    virtual int nbVariable() const  { return (p_data_) ? p_data_->sizeCols() : 0;}
 
-    // pure virtuals
-    /** compute the kernel between an individual and himself
-     *  @param ind individual to evaluate using the kernel*/
-    virtual Real kdiag(RowVector const& ind) const = 0;
-    /** compute the kernel value between two individuals
-     *  @param ind1,ind2 two individuals to evaluate using the kernel metric */
-    virtual Real kcomp(RowVector const& ind1, RowVector const& ind2) const = 0;
-    /** compute the kernel distance between two individuals
-     *  @param ind1,ind2 two individuals to compare using the kernel metric */
-    Real kdist(RowVector const& ind1, RowVector const& ind2) const;
   protected:
-    /** the resulting gram_ matrix */
-    CSquareX gram_;
-    /** symmetrize the gram_ matrix using the upper part */
-    void symmetrize();
+    Array const* p_data_;
 };
-
-template<class Array>
-Real IKernelBase<Array>::kdist(RowVector const& ind1, RowVector const& ind2) const
-{ return kdiag(ind1)+kdiag(ind2)-2.*kcomp(ind1, ind2);}
-
-template<class Array>
-void IKernelBase<Array>::symmetrize()
-{
-  // lower part
-  for (int j= gram_.begin(); j < gram_.end(); ++j)
-  {
-    for (int i= gram_.begin(); i < j; ++i)
-    { gram_(j,i) = gram_(i,j);}
-  }
-}
 
 template<class Array>
 bool IKernelBase<Array>::run()
 {
+  if(!p_data_) return false;
   gram_.resize(p_data_->rows());
+  // upper part
   for (int j= gram_.begin(); j < gram_.end(); ++j)
   {
-    // create a reference on the current row
-    RowVector row_j(p_data_->row(j), true);
-    for (int i= gram_.begin(); i < j; ++i)
-    { gram_(i,j) = kcomp(p_data_->row(i), row_j);}
-    gram_(j, j) = kdiag(row_j);
+    { gram_(j,j) = this->diag(j);}
+    for (int i= j+1; i < gram_.end(); ++i)
+    { gram_(i,j) = this->comp(i,j);}
   }
-  // symmetrize
-  symmetrize();
+  // lower part
+  for (int j= gram_.begin(); j < gram_.end(); ++j)
+  {
+    for (int i= j+1; i < gram_.end(); ++i)
+    { gram_(j,i) = gram_(i,j);}
+  }
+  this->hasRun_ = true;
   return true;
 }
+
 
 } // namespace Kernel
 

@@ -61,10 +61,10 @@ class Hamming: public IKernelBase<Array>
 {
   public:
     typedef IKernelBase<Array> Base;
-    typedef typename Array::Row RowVector;
     using Base::p_data_;
     using Base::gram_;
-    using Base::symmetrize;
+    using Base::hasRun_;
+
     /** constructor with a constant pointer on the data set
      *  @param p_data a pointer on a data set that will be "kernelized"
      *  @param lambda the size of the windows to use in the kernel
@@ -96,12 +96,16 @@ class Hamming: public IKernelBase<Array>
     /** set the lambda of the kernel */
     void setLambda(Real const& lambda) { lambda_ = lambda;}
 
-    /** compute the kernel value between two individuals
-     *  @param ind1,ind2 two individuals to compare using the kernel metric */
-    virtual Real kcomp(RowVector const& ind1, RowVector const& ind2) const;
-    /** compute the kernel between an individual and himself
-     *  @param ind the individual to evaluate using the kernel */
-    virtual Real kdiag(RowVector const& ind) const;
+    /** virtual method.
+     *  @return diagonal value of the kernel for the ith individuals.
+     *  @param i index of the individual
+     **/
+    virtual Real diag(int i) const;
+    /** virtual method implementation.
+     *  @return value of the kernel for the ith and jth individuals.
+     *  @param i,j indexes of the individuals
+     **/
+    virtual Real comp(int i, int j) const;
 
   private:
     /** lambda of the kernel */
@@ -122,9 +126,16 @@ void Hamming<Array>::computeDiagonalElement()
    for(int j=factors_.nbLevels().begin(); j < factors_.nbLevels().end(); ++j)
    { diagElt_ *= lambda_*lambda_*(factors_.nbLevels()[j]-1) + 1;}
 }
+
 template<class Array>
-Real Hamming<Array>::kcomp(RowVector const& ind1, RowVector const& ind2) const
+inline Real Hamming<Array>::diag(int i) const { return diagElt_;}
+
+template<class Array>
+Real Hamming<Array>::comp(int i, int j) const
 {
+  typedef typename Array::Row RowVector;
+  if (hasRun_) return gram_(i,j);
+  RowVector ind1(p_data_->row(i), true), ind2(p_data_->row(j), true);
   Real value = 1.;
   for(int j=factors_.nbLevels().begin(); j < factors_.nbLevels().end(); ++j)
   {
@@ -133,10 +144,6 @@ Real Hamming<Array>::kcomp(RowVector const& ind1, RowVector const& ind2) const
   }
   return value;
 }
-
-template<class Array>
-Real Hamming<Array>::kdiag(RowVector const& ind) const
-{ return diagElt_;}
 
 } // namespace Kernel
 

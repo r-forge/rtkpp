@@ -66,25 +66,25 @@
 #define Algebra_H
 
 /* Utilities Algebra methods. */
-#include "../projects/Algebra/include/STK_Givens.h"
-#include "../projects/Algebra/include/STK_GramSchmidt.h"
-#include "../projects/Algebra/include/STK_Householder.h"
-#include "../projects/Algebra/include/STK_Cholesky.h"
+#include <Algebra/include/STK_Givens.h>
+#include <Algebra/include/STK_GramSchmidt.h>
+#include <Algebra/include/STK_Householder.h>
+#include <Algebra/include/STK_Cholesky.h>
 
 /* Algebra methods */
-#include "../projects/Algebra/include/STK_CG.h"
+#include <Algebra/include/STK_CG.h>
 
-#include "../projects/Algebra/include/STK_Qr.h"
-#include "../projects/Algebra/include/STK_Svd.h"
-#include "../projects/Algebra/include/STK_SymEigen.h"
-#include "../projects/Algebra/include/STK_MultiLeastSquare.h"
-#include "../projects/Algebra/include/STK_GinvSymmetric.h"
-#include "../projects/Algebra/include/STK_InvertFixedSizeMatrix.h"
-#include "../projects/Algebra/include/STK_InvertFixedSizeSymMatrix.h"
-#include "../projects/Algebra/include/STK_lapack_Qr.h"
-#include "../projects/Algebra/include/STK_lapack_Svd.h"
-#include "../projects/Algebra/include/STK_lapack_SymEigen.h"
-#include "../projects/Algebra/include/STK_lapack_MultiLeastSquare.h"
+#include <Algebra/include/STK_Qr.h>
+#include <Algebra/include/STK_Svd.h>
+#include <Algebra/include/STK_SymEigen.h>
+#include <Algebra/include/STK_MultiLeastSquare.h>
+#include <Algebra/include/STK_GinvSymmetric.h>
+#include <Algebra/include/STK_InvertFixedSizeMatrix.h>
+#include <Algebra/include/STK_InvertFixedSizeSymMatrix.h>
+#include <Algebra/include/STK_lapack_Qr.h>
+#include <Algebra/include/STK_lapack_Svd.h>
+#include <Algebra/include/STK_lapack_SymEigen.h>
+#include <Algebra/include/STK_lapack_MultiLeastSquare.h>
 
 #endif /*Algebra_H*/
 

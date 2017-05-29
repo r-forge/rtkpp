@@ -51,14 +51,14 @@ namespace Kernel
  * where @e h represents the bandwidth of the kernel.
  */
 template<class Array>
-class Exponential : public IKernelBase<Array>
+class Exponential: public IKernelBase<Array>
 {
   public:
     typedef IKernelBase<Array> Base;
-    typedef typename Array::Row RowVector;
     using Base::p_data_;
     using Base::gram_;
-    using Base::symmetrize;
+    using Base::hasRun_;
+
     /** constructor with a constant pointer on the data set
      *  @param p_data a pointer on a data set that will be "kernelized"
      *  @param width the size of the windows to use in the kernel
@@ -73,17 +73,22 @@ class Exponential : public IKernelBase<Array>
                : Base(data), width_(width) {}
     /** destructor */
     virtual ~Exponential() {}
+
     /** @return the bandwidth of the kernel */
     Real const& width() const {return width_;}
     /** set the bandwidth of the kernel */
     void setWidth(Real const& width) {width_ = width;}
 
-    /** compute the kernel value between two individuals
-     *  @param ind1,ind2 two individuals to compare using the kernel metric */
-    virtual Real kcomp(RowVector const& ind1, RowVector const& ind2) const;
-    /** compute the kernel between an individual and himself
-     *  @param ind the individual to evaluate using the kernel */
-    virtual Real kdiag(RowVector const& ind) const;
+    /** virtual method.
+     *  @return diagonal value of the kernel for the ith individuals.
+     *  @param i index of the individual
+     **/
+    virtual inline Real diag(int i) const {return 1.;};
+    /** virtual method implementation.
+     *  @return value of the kernel for the ith and jth individuals.
+     *  @param i,j indexes of the individuals
+     **/
+    virtual Real comp(int i, int j) const;
 
   private:
     /** bandwidth of the kernel */
@@ -91,12 +96,10 @@ class Exponential : public IKernelBase<Array>
 };
 
 template<class Array>
-Real Exponential<Array>::kcomp(RowVector const& ind1, RowVector const& ind2) const
-{ return std::exp(-(ind1 - ind2).norm()/width_);}
-
-template<class Array>
-Real Exponential<Array>::kdiag(RowVector const& ind) const
-{ return 1.0;}
+Real Exponential<Array>::comp(int i, int j) const
+{
+  return hasRun_ ? gram_(i,j)
+                 : std::exp(-(p_data_->row(i) - p_data_->row(j)).norm()/width_);}
 
 } // namespace Kernel
 

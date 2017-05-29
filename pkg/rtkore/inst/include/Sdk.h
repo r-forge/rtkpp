@@ -45,17 +45,17 @@
 #define SDK_H
 
 /* Macros. */
-#include "../projects/Sdk/include/STK_MacrosVersion.h"
-#include "../projects/Sdk/include/STK_Macros.h"
+#include <Sdk/include/STK_MacrosVersion.h>
+#include <Sdk/include/STK_Macros.h>
 /* Static Assert. */
-#include "../projects/Sdk/include/STK_StaticAssert.h"
+#include <Sdk/include/STK_StaticAssert.h>
 /* Templates. */
-#include "../projects/Sdk/include/STK_MetaTemplate.h"
+#include <Sdk/include/STK_MetaTemplate.h>
 
 /* Interface for all classes using the curious recursive template paradigm.*/
-#include "../projects/Sdk/include/STK_IRecursiveTemplate.h"
+#include <Sdk/include/STK_IRecursiveTemplate.h>
 
 /* Interface for all runners classes */
-#include "../projects/Sdk/include/STK_IRunner.h"
+#include <Sdk/include/STK_IRunner.h>
 
 #endif  /* SDK_H */

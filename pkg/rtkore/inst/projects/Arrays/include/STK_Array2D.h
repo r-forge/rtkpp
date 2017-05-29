@@ -89,7 +89,7 @@ struct Traits< Array2D<Type_> >
 } // namespace hidden
 
 /** @ingroup Arrays
-  * @brief Templated two dimensional column (vertically) oriented Array.
+  * @brief template two dimensional column (vertically) oriented Array.
   *
   * A Array2D is a two-dimensional general implementation of an IArray2D.
   *

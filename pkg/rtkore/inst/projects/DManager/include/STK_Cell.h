@@ -38,7 +38,7 @@
 namespace STK
 {
 /** @ingroup DManager
-  * @brief Templated Base class for the Cell in a list .
+  * @brief template Base class for the Cell in a list .
   * 
   * The class Type should have surdefined the operator = if
   * necessary.                                                          
@@ -75,7 +75,7 @@ class CellBase
 };
 
 /** @ingroup DManager
-  * @brief Templated class for the Vertical Cell of a Vertical List.
+  * @brief template class for the Vertical Cell of a Vertical List.
  * 
  * The class CellVe is used by the class ListVe.
  **/
@@ -123,7 +123,7 @@ class CellVe : virtual public CellBase<Type>
 };
 
 /** @ingroup DManager
-  * @brief Templated class for the Horizontal Cell of a Horizontal List.
+  * @brief template class for the Horizontal Cell of a Horizontal List.
   * 
   * The class CellHo is used by the class List1D.
  **/
@@ -189,7 +189,7 @@ class CellHo : virtual public CellBase<Type>
 };
 
 /** @ingroup DManager
-  * @brief Templated class for the 2 Dimensional Cells.
+  * @brief template class for the 2 Dimensional Cells.
   * The class Cell2D is not used.
  **/
 template<class Type>

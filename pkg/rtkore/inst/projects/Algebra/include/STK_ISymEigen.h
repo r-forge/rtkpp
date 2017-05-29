@@ -82,7 +82,7 @@ class ISymEigen : public IRunnerBase, public IRecursiveTemplate<Derived>
              , eigenValues_(data.size(), 0.)
              , SupportEigenVectors_(2*data.size(), 0)
     {}
-    /** @brief Templated constructor
+    /** @brief template constructor
      *  @param data reference on a symmetric square expression
      */
     template<class OtherDerived>

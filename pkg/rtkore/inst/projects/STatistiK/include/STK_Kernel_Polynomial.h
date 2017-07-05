@@ -56,14 +56,22 @@ class Polynomial: public IKernelBase<Array>
 {
   public:
     typedef IKernelBase<Array> Base;
+    typedef typename Array::Type Type;
     using Base::p_data_;
     using Base::gram_;
     using Base::hasRun_;
 
+    /** Default constructor with the degree and the shift
+     *  @param d degree of the polynomial
+     *  @param shift the shift to use in the kernel
+     **/
+    Polynomial( Real const& d=2., Real const& shift= 0)
+              : Base(0), d_(d), shift_(shift)
+    {}
     /** constructor with a constant pointer on the data set
      *  @param p_data a pointer on a data set that will be "kernelized"
-     *  @param shift the shift to use in the kernel
      *  @param d degree of the polynomial
+     *  @param shift the shift to use in the kernel
      **/
     Polynomial( Array const* p_data, Real const& d=2., Real const& shift= 0)
               : Base(p_data), d_(d), shift_(shift)
@@ -72,14 +80,35 @@ class Polynomial: public IKernelBase<Array>
     }
     /** constructor with a constant reference on the data set
      *  @param data a reference on a data set that will be "kernelized"
-     *  @param shift the shift to use in the kernel
      *  @param d degree of the polynomial
+     *  @param shift the shift to use in the kernel
      **/
     Polynomial( Array const& data, Real const& d=2., Real const& shift= 0.)
               : Base(data), d_(d), shift_(shift)
     { if (d_ <= 0.)
       STKDOMAIN_ERROR_2ARG(Polynomial::Polynomial,shift,d,d must be>0);
     }
+    /** constructor with an array of parameter.
+     *  @param p_data a pointer on a data set that will be "kernelized"
+     *  @param param array of parameter
+     **/
+    template<class Derived>
+    Polynomial( Array const* p_data, ExprBase<Derived> const& param)
+              : Base(p_data)
+              , d_(param.empty() ? 2. : param.front())
+              , shift_(param.empty() ? 2. : param.elt(param.begin()+1))
+    {}
+    /** constructor with a constant pointer on the data set
+     *  @param data a reference on a data set that will be "kernelized"
+     *  @param param array of parameter
+     **/
+    template<class Derived>
+    Polynomial( Array const& data, ExprBase<Derived> const& param)
+              : Base(data)
+              , d_(param.empty() ? 2. : param.front())
+              , shift_(param.empty() ? 2. : param.elt(param.begin()+1))
+    {}
+
     /** destructor */
     virtual ~Polynomial() {}
     /** @return the degree of the kernel */
@@ -90,6 +119,14 @@ class Polynomial: public IKernelBase<Array>
     Real const& shift() const {return shift_;}
     /** set the shift of the kernel */
     void setShift(Real const& shift) { shift_ = shift;}
+    /** Set parameter using an array
+     *  @param param array of parameter
+     **/
+    template<class Derived>
+    void setParam(  ExprBase<Derived> const& param)
+    { d_ = (param.empty() ? 2. : param.front());
+      shift_ = (param.empty() ? 0. : param.elt(param.begin()+1));
+    }
 
     /** virtual method.
      *  @return diagonal value of the kernel for the ith individuals.

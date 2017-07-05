@@ -54,10 +54,13 @@ class Linear: public IKernelBase<Array>
 {
   public:
     typedef IKernelBase<Array> Base;
+    typedef typename Array::Type Type;
     using Base::p_data_;
     using Base::gram_;
     using Base::hasRun_;
 
+    /** Default constructor */
+    Linear(): Base(0) {}
     /** constructor with a constant pointer on the data set
      *  @param p_data a pointer on a data set that will be "kernelized"
      **/
@@ -66,8 +69,28 @@ class Linear: public IKernelBase<Array>
      *  @param data a reference on a data set that will be "kernelized"
      **/
     Linear(Array const& data): Base(data) {}
+    /** constructor with an array of parameter.
+     *  @param p_data a pointer on a data set that will be "kernelized"
+     *  @param param array of parameter
+     **/
+    template<class Derived>
+    Linear( Array const* p_data, ExprBase<Derived> const& param): Base(p_data)
+    {}
+    /** constructor with a constant pointer on the data set
+     *  @param data a reference on a data set that will be "kernelized"
+     *  @param param array of parameter
+     **/
+    template<class Derived>
+    Linear( Array const& data, ExprBase<Derived> const& param): Base(data)
+    {}
+
     /** destructor */
     virtual ~Linear() {}
+    /** Set parameter using an array
+     *  @param param array of parameter
+     **/
+    template<class Derived>
+    void setParam(  ExprBase<Derived> const& param) {}
 
     /** virtual method.
      *  @return diagonal value of the kernel for the ith individuals.

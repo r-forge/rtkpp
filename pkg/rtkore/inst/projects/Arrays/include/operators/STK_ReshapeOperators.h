@@ -60,10 +60,10 @@ struct Traits< DiagonalizeOperator <Lhs> >
   {
     structure_ = Arrays::diagonal_,
     orient_    = Lhs::orient_,
-    sizeRows_  = ( (Lhs::sizeRows_ != UnknownSize) && (Lhs::structure_!= (int)Arrays::point_) )
-                 ?  Lhs::sizeRows_ : UnknownSize,
-    sizeCols_  = ( (Lhs::sizeCols_ != UnknownSize) && (Lhs::structure_!= (int)Arrays::vector_) )
-                 ?  Lhs::sizeCols_ : UnknownSize,
+    sizeRows_  = ( (Lhs::structure_== (int)Arrays::point_) )
+                 ?  Lhs::sizeCols_ : Lhs::sizeRows_,
+    sizeCols_  = ( (Lhs::structure_== (int)Arrays::point_) )
+                 ?  Lhs::sizeCols_ : Lhs::sizeRows_,
     storage_   = Lhs::storage_
   };
   typedef RowOperator<DiagonalizeOperator < Lhs> > Row;

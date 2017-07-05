@@ -36,8 +36,8 @@
 #ifndef STK_KERNEL_IKERNEL_H
 #define STK_KERNEL_IKERNEL_H
 
-#include <Arrays/include/STK_CArraySquare.h>
 #include <Sdk/include/STK_IRunner.h>
+#include <Arrays/include/STK_CArraySquare.h>
 
 namespace STK
 {
@@ -45,7 +45,14 @@ namespace STK
 namespace Kernel
 {
 /** @ingroup Kernel
- *  Interface Base class for the kernels classes.
+ *  @brief Interface class for the kernels classes.
+ *  A positive definite kernel is a generalization of a positive definite
+ *  function or a positive-definite matrix.
+ *  Let \f$ \mathcal X \f$ be a nonempty set, sometimes referred to as the index set.
+ *  A symmetric function \f$ K: \mathcal X \times \mathcal X \to \mathbb{R}\f$
+ *  is called a positive definite (p.d.) kernel on \f$\mathcal X\f$ if
+ *  \f$\sum_{i,j=1}^n c_i c_j K(x_i, x_j) \ge 0\f$ holds for any
+ *  \f$ n\in \mathbb{N}, x_1, \dots, x_n\in \mathcal X, c_1, \dots, c_n \in \mathbb{R}\f$.
  */
 class IKernel: public IRunnerBase
 {
@@ -80,9 +87,9 @@ class IKernel: public IRunnerBase
      **/
     inline Real dist(int i, int j) const
     { return comp(i,i)+comp(j,j)-2*comp(i,j);}
-
+    // virtual
     /** virtual method.
-     *  @return diagonale value of the kernel for the ith individuals.
+     *  @return diagonal value of the kernel for the ith individuals.
      *  @param i index of the individual
      **/
     virtual inline Real diag(int i) const {return comp(i,i);};

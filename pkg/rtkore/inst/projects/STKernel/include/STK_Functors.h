@@ -560,7 +560,8 @@ struct SafeOp
   Type const other_;
 };
 /** @ingroup Functors
-  * @brief Template functor which compute safely the inverse of a number
+  * @brief Template functor which compute safely the inverse of a number.
+  * If the number is 0, return 0.
   */
 template<typename Type>
 struct SafeInverseOp
@@ -572,7 +573,7 @@ struct SafeInverseOp
   inline SafeInverseOp(Type const tol = Arithmetic<Type>::epsilon()): tol_(tol) {}
   inline SafeInverseOp( SafeInverseOp const& other): tol_(other.tol_) {}
   inline result_type operator()(param1_type const& a) const
-  { return (std::abs(a)>tol_) ? Type(1)/a: 1.; }
+  { return (std::abs(a)>tol_) ? Type(1)/a: Type(0); }
   Type const tol_;
 };
 

@@ -39,6 +39,7 @@
 #include <Sdk/include/STK_Macros.h>
 #include <Arrays/include/STK_Array2DDiagonal.h>
 #include <Arrays/include/STK_Array2DLowerTriangular.h>
+#include <Arrays/include/STK_CArraySquare.h>
 
 namespace STK
 {
@@ -85,6 +86,7 @@ bool cholesky( ExprBase<Lhs> const& A
   }
   return nozero;
 }
+
 
 } // namespace STK
 

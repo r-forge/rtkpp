@@ -350,18 +350,18 @@ struct VisitorVectorImpl<Visitor, Derived, UnknownSize>
 /** @ingroup hidden
  *  @brief A visitor Vector allow to unroll the visit of a vector if possible
  **/
-template<typename Visitor, typename Derived, int SizeRows_>
+template<typename Visitor, typename Derived, int Size_>
 struct VisitorVectorImpl
 {
   inline static void run( Derived const& tab, Visitor& visitor)
   {
-    VisitorVectorImpl<Visitor, Derived, SizeRows_-1>::run(tab, visitor);
-    visitor(tab.elt(Idx(SizeRows_), tab.colIdx()), Idx(SizeRows_), tab.colIdx());
+    VisitorVectorImpl<Visitor, Derived, Size_-1>::run(tab, visitor);
+    visitor(tab.elt(tab.begin()+ Size_-1), tab.begin()+ Size_-1, tab.colIdx());
   }
   inline static void apply( Derived& tab, Visitor& applier)
   {
-    VisitorVectorImpl<Visitor, Derived, SizeRows_-1>::apply(tab, applier);
-    applier(tab.elt(Idx(SizeRows_), tab.colIdx()));
+    VisitorVectorImpl<Visitor, Derived, Size_-1>::apply(tab, applier);
+    applier(tab.elt(tab.begin()+ Size_-1));
   }
 };
 
@@ -371,9 +371,9 @@ template<typename Visitor, typename Derived>
 struct VisitorVectorImpl<Visitor, Derived, 1>
 {
   inline static void run( Derived const& tab, Visitor& visitor)
-  { visitor(tab.elt(baseIdx), baseIdx, tab.colIdx());}
+  { visitor(tab.elt(tab.begin()), tab.begin(), tab.colIdx());}
   inline static void apply( Derived& tab, Visitor& applier)
-  { applier(tab.elt(baseIdx));}
+  { applier(tab.elt(tab.begin()));}
 };
 
 /** @ingroup hidden
@@ -391,18 +391,18 @@ struct VisitorPointImpl<Visitor, Derived, UnknownSize>
 /** @ingroup hidden
  *  @brief A VisitorPointImpl allow to unroll the visit of a row-vector if possible
  *  */
-template<typename Visitor, typename Derived, int SizeCols_>
+template<typename Visitor, typename Derived, int Size_>
 struct VisitorPointImpl
 {
   inline static void run( Derived const& tab, Visitor& visitor)
   {
-    VisitorPointImpl<Visitor, Derived, SizeCols_-1>::run(tab, visitor);
-    visitor(tab.elt(Idx(SizeCols_)), tab.rowIdx(), Idx(SizeCols_));
+    VisitorPointImpl<Visitor, Derived, Size_-1>::run(tab, visitor);
+    visitor(tab.elt(tab.begin()+ Size_-1), tab.rowIdx(), tab.begin()+ Size_-1);
   }
   inline static void apply( Derived& tab, Visitor& visitor)
   {
-    VisitorPointImpl<Visitor, Derived, SizeCols_-1>::apply(tab, visitor);
-    visitor(tab.elt(Idx(SizeCols_)));
+    VisitorPointImpl<Visitor, Derived, Size_-1>::apply(tab, visitor);
+    visitor(tab.elt(tab.begin()+ Size_-1));
   }
 };
 
@@ -412,9 +412,9 @@ template<typename Visitor, typename Derived>
 struct VisitorPointImpl<Visitor, Derived, 1>
 {
   inline static void run( Derived const& tab, Visitor& visitor)
-  { visitor(tab.elt(baseIdx), tab.rowIdx(), baseIdx);}
+  { visitor(tab.elt(tab.begin()), tab.rowIdx(), tab.begin());}
   inline static void apply( Derived& tab, Visitor& visitor)
-  { visitor(tab.elt(baseIdx));}
+  { visitor(tab.elt(tab.begin()));}
 };
 
 /** @ingroup hidden
@@ -431,18 +431,18 @@ struct VisitorDiagonalImpl<Visitor, Derived, UnknownSize>
 /** @ingroup hidden
  *  @brief A VisitorDiagonalImpl allow to unroll the visit of a Diagonal tab if possible
  *  */
-template<typename Visitor, typename Derived, int SizeCols_>
+template<typename Visitor, typename Derived, int Size_>
 struct VisitorDiagonalImpl
 {
   inline static void run( Derived const& tab, Visitor& visitor)
   {
-    VisitorPointImpl<Visitor, Derived, SizeCols_-1>::run(tab, visitor);
-    visitor(tab.elt(Idx(SizeCols_)), Idx(SizeCols_), Idx(SizeCols_));
+    VisitorPointImpl<Visitor, Derived, Size_-1>::run(tab, visitor);
+    visitor(tab.elt(tab.begin()+ Size_-1), tab.begin()+ Size_-1, tab.begin()+ Size_-1);
   }
   inline static void apply( Derived& tab, Visitor& visitor)
   {
-    VisitorPointImpl<Visitor, Derived, SizeCols_-1>::apply(tab, visitor);
-    visitor(tab.elt(Idx(SizeCols_)));
+    VisitorPointImpl<Visitor, Derived, Size_-1>::apply(tab, visitor);
+    visitor(tab.elt(tab.begin()+ Size_-1));
   }
 };
 
@@ -452,9 +452,9 @@ template<typename Visitor, typename Derived>
 struct VisitorDiagonalImpl<Visitor, Derived, 1>
 {
   inline static void run( Derived const& tab, Visitor& visitor)
-  { visitor(tab.elt(baseIdx), baseIdx, baseIdx);}
+  { visitor(tab.elt(tab.begin()), tab.begin(), tab.begin());}
   inline static void apply( Derived& tab, Visitor& visitor)
-  { visitor(tab.elt(baseIdx));}
+  { visitor(tab.elt(tab.begin()));}
 };
 
 /** @ingroup hidden
@@ -503,14 +503,14 @@ struct VisitorLowerImpl<Visitor, Derived, Arrays::by_col_>
 {
   static void run( Derived const& tab, Visitor& visitor)
   {
-    for(int j = tab.beginCols(); j <= tab.lastIdxCols(); ++j)
-      for(int i = std::max(j, tab.beginRows()); i <= tab.lastIdxRows(); ++i)
+    for(int j = tab.beginCols(); j < tab.endCols(); ++j)
+      for(int i = std::max(j, tab.beginRows()); i < tab.endRows(); ++i)
         visitor(tab.elt(i, j), i, j);
   }
   static void apply( Derived& tab, Visitor& visitor)
   {
-    for(int j = tab.beginCols(); j <= tab.lastIdxCols(); ++j)
-      for(int i = std::max(j, tab.beginRows()); i <= tab.lastIdxRows(); ++i)
+    for(int j = tab.beginCols(); j < tab.endCols(); ++j)
+      for(int i = std::max(j, tab.beginRows()); i < tab.endRows(); ++i)
         visitor(tab.elt(i, j));
   }
 };

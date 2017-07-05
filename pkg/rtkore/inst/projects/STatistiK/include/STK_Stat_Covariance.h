@@ -35,6 +35,8 @@
 #ifndef STK_STAT_COVARIANCE_H
 #define STK_STAT_COVARIANCE_H
 
+#include "STK_Stat_Functors.h"
+
 namespace STK
 {
 namespace Stat

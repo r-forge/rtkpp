@@ -49,7 +49,9 @@ template<class Array>
 class IKernelBase: public IKernel
 {
   public:
+    typedef typename Array::Type Type;
     using IKernel::gram_;
+
     /** constructor with a constant pointer on the data set
      *  @param p_data a pointer on a data set that will be "kernelized"
      **/
@@ -64,8 +66,10 @@ class IKernelBase: public IKernel
     IKernelBase(IKernelBase const& kernel): IKernel(kernel), p_data_(kernel.p_data_) {}
     /** destructor */
     virtual ~IKernelBase() {}
+
     /** @return the pointer on the data set */
     Array const* p_data() const { return p_data_;}
+
     /** compute Gram matrix
      *  @return @c true if the computation is successful, @c false otherwise */
     virtual bool run();
@@ -74,7 +78,15 @@ class IKernelBase: public IKernel
     /** @return the number of variables (the number of columns in the data set) */
     virtual int nbVariable() const  { return (p_data_) ? p_data_->sizeCols() : 0;}
 
+    /** compute the value of the kernel for the given value
+     *  @param v value
+     *  @return the value of the kernel at v
+     **/
+    virtual Real value(Type const& v) const
+    { return 0;}
+
   protected:
+    /** pointer on the data set */
     Array const* p_data_;
 };
 

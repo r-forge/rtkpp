@@ -624,23 +624,6 @@ class IArray2D : public IArray2DBase< typename hidden::Traits<Derived>::Type*, D
      **/
     Derived& assign( IArray2D const& src);
 
-    /** overwrite @c this with @c src.
-     *  @note this method does not take care of the possibility of overlapping
-     *  @param src the array to copy
-     **/
-    template<class OtherDerived>
-    Derived& copy( ExprBase<OtherDerived> const& src)
-    {
-      // Resize if necessary.
-      if ( (this->sizeRows() != src.sizeRows()) ||(this->sizeCols() != src.sizeCols()) )
-      { this->resize(src.rows(), src.cols());}
-      // copy
-      for ( int jSrc=src.beginCols(), jDst=this->beginCols(); jSrc<src.endCols(); jDst++, jSrc++)
-        for ( int iSrc=src.beginRows(), iDst=this->beginRows(); iSrc<src.endRows(); iDst++, iSrc++)
-      { this->elt(iDst, jDst) = src(iSrc, jSrc);}
-      // return this
-      return this->asDerived();
-    }
     /** merge (by value) the array other with this.
      *  @param other the array to merge to this
      **/

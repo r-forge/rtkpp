@@ -141,7 +141,7 @@
 #include <STatistiK/include/STK_Kernel_Util.h>
 
 #include <STatistiK/include/STK_Kernel_Gaussian.h>
-#include <STatistiK/include/STK_Kernel_Exponential.h>
+#include <STatistiK/include/STK_Kernel_Laplace.h>
 #include <STatistiK/include/STK_Kernel_Linear.h>
 #include <STatistiK/include/STK_Kernel_Polynomial.h>
 #include <STatistiK/include/STK_Kernel_RationalQuadratic.h>

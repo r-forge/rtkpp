@@ -120,7 +120,7 @@ class DataBridge: public IDataBridge, public ITContainer2D< DataBridge<Data> >
                      , dataij_(dataij)
                      , nbVariable_(dataij.sizeCols()) {}
     /** copy constructor (Warning: will copy the data set)
-     *  @param manager the DataBridge to copy
+     *  @param bridge the DataBridge to copy
      **/
     DataBridge( DataBridge const& bridge)
               : IBase(bridge), Base(bridge)

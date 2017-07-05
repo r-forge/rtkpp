@@ -113,6 +113,7 @@ struct Traits< CArraySquare<Type_, Size_, Orient_> >
       orient_    = Orient_,
       sizeRows_  = Size_,
       sizeCols_  = Size_,
+      size_      = Size_,
       storage_   = Arrays::dense_
     };
 };

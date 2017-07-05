@@ -55,28 +55,61 @@ class Gaussian: public IKernelBase<Array>
 {
   public:
     typedef IKernelBase<Array> Base;
+    typedef typename Array::Type Type;
     using Base::p_data_;
     using Base::gram_;
     using Base::hasRun_;
 
+    /** Default constructor with the width
+     *  @param width the size of the windows to use in the kernel
+     **/
+    Gaussian( Real const& width= 1.)
+            : Base(0), width_(width)
+    {}
     /** constructor with a constant pointer on the data set
      *  @param p_data a pointer on a data set that will be "kernelized"
      *  @param width the size of the windows to use in the kernel
      **/
     Gaussian( Array const* p_data, Real const& width= 1.)
-            : Base(p_data), width_(width) {}
+            : Base(p_data), width_(width)
+    {}
     /** constructor with a constant pointer on the data set
      *  @param data a reference on a data set that will be "kernelized"
      *  @param width the size of the windows to use in the kernel
      **/
     Gaussian( Array const& data, Real const& width= 1.)
-            : Base(data), width_(width) {}
+            : Base(data), width_(width)
+    {}
+
+    /** constructor with an array of parameter.
+     *  @param p_data a pointer on a data set that will be "kernelized"
+     *  @param param array of parameter
+     **/
+    template<class Derived>
+    Gaussian( Array const* p_data, ExprBase<Derived> const& param)
+            : Base(p_data), width_(param.empty() ? 1. : param.front())
+    {}
+    /** constructor with a constant pointer on the data set
+     *  @param data a reference on a data set that will be "kernelized"
+     *  @param param array of parameter
+     **/
+    template<class Derived>
+    Gaussian( Array const& data, ExprBase<Derived> const& param)
+            : Base(data), width_(param.empty() ? 1. : param.front())
+    {}
+
     /** destructor */
     virtual ~Gaussian() {}
     /** @return the bandwidth of the kernel */
     Real const& width() const {return width_;}
     /** set the bandwidth of the kernel */
     void setWidth(Real const& width) {width_ = width;}
+    /** Set parameter using an array
+     *  @param param array of parameter
+     **/
+    template<class Derived>
+    void setParam(  ExprBase<Derived> const& param)
+    { width_ = (param.empty() ? 1. : param.front());}
 
     /** virtual method.
      *  @return diagonal value of the kernel for the ith individuals.
@@ -89,6 +122,12 @@ class Gaussian: public IKernelBase<Array>
      **/
     virtual Real comp(int i, int j) const;
 
+    /** compute the value of the kernel for the given value
+     *  @param v value
+     *  @return the value of the kernel at v
+     **/
+    virtual Real value(Type const& v) const;
+
   private:
     /** bandwidth of the kernel */
     Real width_;
@@ -97,7 +136,12 @@ class Gaussian: public IKernelBase<Array>
 template<class Array>
 Real Gaussian<Array>::comp(int i, int j) const
 { return hasRun_ ? gram_(i,j)
-                 : std::exp(-(p_data_->row(i) - p_data_->row(j)).norm2()/(2.*width_));}
+                 : std::exp(-(p_data_->row(i) - p_data_->row(j)).norm2()/(2.*width_));
+}
+
+template<class Array>
+Real Gaussian<Array>::value(Type const& v) const
+{ return std::exp(-v*v/(2.*width_));}
 
 } // namespace Kernel
 

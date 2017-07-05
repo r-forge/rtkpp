@@ -61,6 +61,7 @@ class Hamming: public IKernelBase<Array>
 {
   public:
     typedef IKernelBase<Array> Base;
+    typedef typename Array::Type Type;
     using Base::p_data_;
     using Base::gram_;
     using Base::hasRun_;
@@ -87,14 +88,55 @@ class Hamming: public IKernelBase<Array>
       factors_.run();
       computeDiagonalElement();
     }
+    /** constructor with an array of parameter.
+      *  @param p_data a pointer on a data set that will be "kernelized"
+      *  @param param array of parameter
+      **/
+     template<class Derived>
+     Hamming( Array const* p_data, ExprBase<Derived> const& param)
+            : Base(p_data), lambda_(param.empty() ? 1. : param.front())
+            , diagElt_(1.), factors_(p_data)
+     {
+         if (!p_data)
+         { STKRUNTIME_ERROR_NO_ARG(Hamming::Hamming(p_data,lambda),p_data is 0);}
+         factors_.run();
+         computeDiagonalElement();
+     }
+     /** constructor with a constant pointer on the data set
+      *  @param data a reference on a data set that will be "kernelized"
+      *  @param param array of parameter
+      **/
+     template<class Derived>
+     Hamming( Array const& data, ExprBase<Derived> const& param)
+            : Base(data), lambda_(param.empty() ? 1. : param.front())
+            , diagElt_(1.), factors_(data)
+     {
+         factors_.run();
+         computeDiagonalElement();
+     }
+
     /** destructor */
     virtual ~Hamming() {}
+
     /** @return the lambda of the kernel */
     Real const& lambda() const {return lambda_;}
     /** @return the lambda of the kernel */
     Stat::MultiFactor<Array> const& factors() const {return factors_;}
     /** set the lambda of the kernel */
-    void setLambda(Real const& lambda) { lambda_ = lambda;}
+    void setLambda(Real const& lambda)
+    {
+      lambda_ = lambda;
+      computeDiagonalElement();
+    }
+    /** Set parameter using an array
+     *  @param param array of parameter
+     **/
+    template<class Derived>
+    void setParam(  ExprBase<Derived> const& param)
+    {
+      lambda_ = (param.empty() ? 1. : param.front());
+      computeDiagonalElement();
+    }
 
     /** virtual method.
      *  @return diagonal value of the kernel for the ith individuals.

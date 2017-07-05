@@ -79,7 +79,7 @@ class IContainer2D
     ~IContainer2D() {}
 
     /** @return the columns range */
-    inline ColRange const&cols() const { return cols_;}
+    inline ColRange const &cols() const { return cols_;}
     /** @return the index of the first column */
     inline int beginCols() const { return cols_.begin();}
     /** @return the ending index of the columns */

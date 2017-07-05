@@ -55,11 +55,18 @@ class RationalQuadratic: public IKernelBase<Array>
 {
   public:
     typedef IKernelBase<Array> Base;
+    typedef typename Array::Type Type;
     using Base::p_data_;
     using Base::gram_;
     using Base::hasRun_;
 
-    /** constructor with a constant pointer on the data set
+    /** Default constructor with the width
+     *  @param shift the shift to use in the kernel
+     **/
+    RationalQuadratic( Real const& shift= 1.)
+           : Base(0), shift_(shift)
+    {}
+   /** constructor with a constant pointer on the data set
      *  @param p_data a pointer on a data set that will be "kernelized"
      *  @param shift the shift to use in the kernel
      **/
@@ -77,12 +84,35 @@ class RationalQuadratic: public IKernelBase<Array>
     { if (shift_ == 0.)
         STKDOMAIN_ERROR_1ARG(RationalQuadratic::RationalQuadratic,shift,shift must be!=0);
     }
+    /** constructor with an array of parameter.
+     *  @param p_data a pointer on a data set that will be "kernelized"
+     *  @param param array of parameter
+     **/
+    template<class Derived>
+    RationalQuadratic( Array const* p_data, ExprBase<Derived> const& param)
+                     : Base(p_data), shift_(param.empty() ? 1. : param.front())
+    {}
+    /** constructor with a constant pointer on the data set
+     *  @param data a reference on a data set that will be "kernelized"
+     *  @param param array of parameter
+     **/
+    template<class Derived>
+    RationalQuadratic( Array const& data, ExprBase<Derived> const& param)
+                     : Base(data), shift_(param.empty() ? 1. : param.front())
+    {}
+
     /** destructor */
     virtual ~RationalQuadratic() {}
     /** @return the shift of the kernel */
     Real const& shift() const {return shift_;}
     /** set the shift of the kernel */
-    void setWidth(Real const& shift) { shift_ = shift;}
+    void setShift(Real const& shift) { shift_ = shift;}
+    /** Set parameter using an array
+     *  @param param array of parameter
+     **/
+    template<class Derived>
+    void setParam(  ExprBase<Derived> const& param)
+    { shift_ = (param.empty() ? 1. : param.front());}
 
     /** virtual method.
      *  @return diagonal value of the kernel for the ith individuals.
@@ -90,8 +120,13 @@ class RationalQuadratic: public IKernelBase<Array>
      **/
     virtual inline Real diag(int i) const {return 1.;};
     /** compute the kernel value between two individuals
-     *  @param ind1,ind2 two individuals to compare using the kernel metric */
+     *  @param i,j index of the two individuals to compare using the kernel metric */
     virtual Real comp(int i, int j) const;
+    /** compute the value of the kernel for the given value
+     *  @param v value
+     *  @return the value of the kernel at v
+     **/
+    virtual Real value(Type const& v) const;
 
   private:
     /** shift of the kernel */
@@ -105,6 +140,10 @@ Real RationalQuadratic<Array>::comp(int i, int j) const
   Real aux = (p_data_->row(i) - p_data_->row(j)).norm2();
   return 1. - aux/(aux + shift_);
 }
+
+template<class Array>
+Real RationalQuadratic<Array>::value(Type const& v) const
+{ return 1- v*v/(v*v + shift_);}
 
 } // namespace Kernel
 

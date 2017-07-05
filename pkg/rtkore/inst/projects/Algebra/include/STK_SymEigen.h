@@ -90,6 +90,9 @@ class SymEigen : public ISymEigen<SymEigen<SquareArray> >
     using Base::norm_;
     using Base::rank_;
     using Base::det_;
+
+    /** @brief Default Constructor */
+    SymEigen();
     /** @brief Constructor
      *  @param data reference on a symmetric square matrix
      *  @param ref @c true if we overwrite the data set, @c false otherwise
@@ -97,16 +100,16 @@ class SymEigen : public ISymEigen<SymEigen<SquareArray> >
      */
     SymEigen( SquareArray const& data, bool ref =false);
     /** constructor.
-     *  @param data A reference on the symmetric matrix to decompose.
+     *  @param data A reference on a symetric expression matrix to decompose.
      **/
     template<class Derived>
-    SymEigen( ExprBase<Derived> const& data): Base(data) {}
+    SymEigen( ExprBase<Derived> const& data);
     /** Copy constructor.
      *  @param S the EigenValue to copy
      **/
-    inline SymEigen( SymEigen const& S): Base(S) {}
+    SymEigen( SymEigen const& S);
     /** virtual destructor */
-    inline virtual ~SymEigen() {}
+    virtual ~SymEigen() {}
     /** clone pattern */
     inline virtual SymEigen* clone() const { return new SymEigen(*this);}
 
@@ -136,13 +139,16 @@ class SymEigen : public ISymEigen<SymEigen<SquareArray> >
 };
 
 
+/* @brief Default Constructor */
+template<class SquareArray>
+SymEigen<SquareArray>::SymEigen(): Base() {}
 /* @brief Constructor
  *  @param data reference on a symmetric square matrix
  *  @param ref @c true if we overwrite the data set, @c false otherwise
  */
 template<class SquareArray>
-inline SymEigen<SquareArray>::SymEigen( SquareArray const& data, bool ref)
-                                      : Base(data)
+SymEigen<SquareArray>::SymEigen( SquareArray const& data, bool ref)
+                               : Base(data)
 {}
 /* @brief Constructor
  *  @param data reference on a symmetric square matrix
@@ -150,8 +156,21 @@ inline SymEigen<SquareArray>::SymEigen( SquareArray const& data, bool ref)
  */
 template<>
 inline SymEigen<CSquareX>::SymEigen( CSquareX const& data, bool ref)
-                                   : Base(data, ref)
+                            : Base(data, ref)
 {}
+
+/* constructor.
+ *  @param data A reference on the symmetric matrix to decompose.
+ **/
+template<class SquareArray>
+template<class Derived>
+SymEigen<SquareArray>::SymEigen( ExprBase<Derived> const& data): Base(data) {}
+/* Copy constructor.
+*  @param S the EigenValue to copy
+**/
+template<class SquareArray>
+SymEigen<SquareArray>::SymEigen( SymEigen const& S): Base(S) {}
+
 /* Main methods.  */
 /* Compute diagonalization of the symmetric matrix */
 template<class SquareArray>

@@ -118,7 +118,7 @@
  *    - @subpage Algebra   "Algebra: Linear Algebra tools"
  *    - @subpage STatistiK "STatistiK: Statistical Tools"
  *    - @subpage StatModels "StatModels: Statistical Models"
- *    - @subpage Classification  "Classification: classification algorithms"
+ *    - @subpage Classif  "Classification: classification algorithms"
  *    - @subpage Clustering "Clustering: Mixture Models"
  *    - @subpage Reduct    "Reduct: Dimension reduction tools"
  *    - @subpage Regress   "Regress: Regression tools"

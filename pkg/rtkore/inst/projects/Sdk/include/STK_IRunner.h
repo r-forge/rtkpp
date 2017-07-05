@@ -7,8 +7,8 @@
  License, or (at your option) any later version.
 
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANYArray; without even the implied warranty of
- MERCHANTABILIYArray or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but WITHOUT ANY WARRANYArray_; without even the implied warranty of
+ MERCHANTABILIYArray_ or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU Lesser General Public License for more details.
 
  You should have received a copy of the GNU Lesser General Public
@@ -150,6 +150,7 @@ class IRunnerWithData: public IRunnerBase
     {
       p_data_ = p_data;
       update();
+      this->hasRun_ = false;
     }
     /** Set the data set. If the state of the derived runner change when a new
      *  data set is set the user have to overload the udpate() method.
@@ -159,6 +160,7 @@ class IRunnerWithData: public IRunnerBase
     {
       p_data_ = &data;
       update();
+      this->hasRun_ = false;
     }
 
   protected:
@@ -184,7 +186,7 @@ class IRunnerWithData: public IRunnerBase
  *    bool run(weights);
  *  @endcode
  **/
-template < class Array, class WColVector>
+template < class Array, class Weights_>
 class IRunnerUnsupervised : public IRunnerBase
 {
   protected:
@@ -230,6 +232,7 @@ class IRunnerUnsupervised : public IRunnerBase
     {
       p_data_ = &data;
       update();
+      this->hasRun_ = false;
     }
     /** run the computations.
      * @return @c true if no error occur during the running process, @c false
@@ -241,7 +244,7 @@ class IRunnerUnsupervised : public IRunnerBase
      *  @return @c true if no error occur during the running process, @c false
      *  otherwise
      **/
-    virtual bool run( WColVector const& weights) =0;
+    virtual bool run( Weights_ const& weights) =0;
 
   protected:
     /** A pointer on the original data set. */
@@ -268,7 +271,7 @@ class IRunnerUnsupervised : public IRunnerBase
  *  @endcode
  *
  **/
-template < typename YArray, typename XArray, class WColVector>
+template < typename YArray_, typename XArray_, class Weights_>
 class IRunnerSupervised: public IRunnerBase
 {
   protected:
@@ -277,13 +280,13 @@ class IRunnerSupervised: public IRunnerBase
     /** constructor
      *  @param p_y,p_x pointers on the y and x data sets
      **/
-    IRunnerSupervised( YArray const* const& p_y, XArray const* const& p_x)
+    IRunnerSupervised( YArray_ const* const& p_y, XArray_ const* const& p_x)
                      : p_y_(p_y), p_x_(p_x)
     {}
     /** default constructor
      *  @param y,x y and x data sets
      **/
-    IRunnerSupervised( YArray const& y, XArray const& x)
+    IRunnerSupervised( YArray_ const& y, XArray_ const& x)
                      : p_y_(&y), p_x_(&x)
     {}
     /** copy constructor
@@ -302,31 +305,34 @@ class IRunnerSupervised: public IRunnerBase
      *  udpate() method.
      *  @param x The x data set to run
      */
-    virtual void setX( XArray const& x)
+    virtual void setX( XArray_ const& x)
     {
       p_x_ = &x;
       updateX();
+      this->hasRun_ = false;
     }
 
     /** set the data set. If the state of the runner change when a new data
      *  set is set, the user of this class have to overload the udpate() method.
      *  @param y The y data set to run
      */
-    virtual void setY( YArray const& y)
+    virtual void setY( YArray_ const& y)
     {
       p_y_ = &y;
       updateY();
+      this->hasRun_ = false;
     }
     /** set the data set. If the state of the runner change when a new data
      *  set is set, the user of this class have to overload the udpate() method.
      *  @param y The y data set to run
      *  @param x The x data set to run
      */
-    virtual void setData( YArray const& y, XArray const& x)
+    virtual void setData( YArray_ const& y, XArray_ const& x)
     {
       p_y_ = &y;
       p_x_ = &x;
       update();
+      this->hasRun_ = false;
     }
     /** run the computations.
      * @return @c true if no error occur during the running process, @c false
@@ -338,13 +344,13 @@ class IRunnerSupervised: public IRunnerBase
      *  @return @c true if no error occur during the running process, @c false
      *  otherwise
      **/
-    virtual bool run( WColVector const& weights) =0;
+    virtual bool run( Weights_ const& weights) =0;
 
   protected:
     /** A pointer on the y data set. */
-    YArray const* p_y_;
+    YArray_ const* p_y_;
     /** A pointer on the x data set. */
-    XArray const* p_x_;
+    XArray_ const* p_x_;
     /** @brief update the runner when y data set is set.
      * This virtual method will be called when the state of the runner will
      * change, i.e. when a new y data is set is set. By default do nothing.

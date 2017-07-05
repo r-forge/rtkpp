@@ -632,6 +632,12 @@ class ArrayBase :  public ExprBase<Derived>
       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived)
       return elt(this->lastIdx());
     }
+    /** overwrite @c this with @c src.
+     *  @note this method does not take care of the possibility of overlapping
+     *  @param src the array to copy
+     **/
+    template<class OtherDerived>
+    Derived& copy( ExprBase<OtherDerived> const& rhs);
     /** Convenient operator to set the coefficients of a matrix.
      *
      * The coefficients must be provided in the row/column order and exactly
@@ -643,8 +649,6 @@ class ArrayBase :  public ExprBase<Derived>
     template<typename Rhs>
     ArrayInitializer<Derived> operator<<(ArrayBase<Rhs> const& other);
 };
-
-#undef MAKE_BINARY_OPERATOR
 
 } // namespace STK
 

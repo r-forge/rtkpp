@@ -78,6 +78,7 @@ struct Traits<Array2DSquare<Type_> >
       orient_    = Arrays::by_col_,
       sizeRows_  = UnknownSize,
       sizeCols_  = UnknownSize,
+      size_      = UnknownSize,
       storage_   = Arrays::dense_ // always dense
     };
 };

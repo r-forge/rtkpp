@@ -34,4 +34,3 @@ Author: Serge Iovleff \email{contact@stkpp.org}
 }
 \keyword{STK++,}
 \keyword{stkpp}
-

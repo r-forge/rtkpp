@@ -121,11 +121,11 @@ class CArrayVector : public ICArray < CArrayVector<Type_, SizeRows_, Orient_> >
 
     enum
     {
-      structure_ = Arrays::vector_,
-      orient_    = Orient_,
-      sizeRows_  = SizeRows_,
-      sizeCols_  = 1,
-      storage_   = Arrays::dense_
+      structure_ = hidden::Traits<CArrayVector<Type_, SizeRows_, Orient_> >::structure_,
+      orient_    = hidden::Traits<CArrayVector<Type_, SizeRows_, Orient_> >::orient_,
+      sizeRows_  = hidden::Traits<CArrayVector<Type_, SizeRows_, Orient_> >::sizeRows_,
+      sizeCols_  = hidden::Traits<CArrayVector<Type_, SizeRows_, Orient_> >::sizeCols_,
+      storage_   = hidden::Traits<CArrayVector<Type_, SizeRows_, Orient_> >::storage_
     };
 
     /** Default constructor. */

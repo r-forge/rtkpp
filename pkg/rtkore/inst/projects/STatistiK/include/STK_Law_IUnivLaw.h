@@ -63,7 +63,7 @@ namespace Law
  * creation of the object initialize all parameter-dependent variables.
  **/
 template <class Type>
-class IUnivLaw : public ILawBase
+class IUnivLaw: public ILawBase
 {
   protected:
     /** Constructor.

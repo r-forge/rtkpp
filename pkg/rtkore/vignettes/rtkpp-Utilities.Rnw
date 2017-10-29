@@ -62,7 +62,7 @@ subset of theses probabilities are implemented. Probability distribution classes
 
 All probability distribution classes have a similar prototype like the one given below
 \begin{lstlisting}[style=customcpp,caption=Prototype of probability distribution class (example taken from Cauchy class)]
-class Cauchy : public IUnivLaw<Real>
+class Cauchy: public IUnivLaw<Real>
 {
   public:
     Cauchy( Real const& mu=0, Real const& scale=1);

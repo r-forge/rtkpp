@@ -52,7 +52,7 @@ class JointNormal: public JointProbability<RowVector, Law::Normal>
   public:
     typedef JointProbability<RowVector, Law::Normal> Base;
     /** default constructor */
-    JointNormal() : Base(_T("JointNormal")) {}
+    JointNormal(): Base(_T("JointNormal")) {}
     /** constructor */
     JointNormal( int const& nbVar): Base(_T("JointNormal"), nbVar) {}
     /** destructor */

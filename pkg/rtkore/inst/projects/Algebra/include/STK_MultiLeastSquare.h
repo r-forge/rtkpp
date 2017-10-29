@@ -76,7 +76,7 @@ class MultiLeastSquare: public ILeastSquare<MultiLeastSquare<ArrayB, ArrayA> >
      *  @param isBref,isAref are the left hand side and the right hand side references ?
      */
     inline MultiLeastSquare( ArrayB const& b, ArrayA const& a, bool isBref=false, bool isAref=false)
-                           : Base(b, a, isBref, isAref) {}
+                          : Base(b, a, isBref, isAref) {}
     /** Destructor */
     inline virtual ~MultiLeastSquare() {};
     /** compute the multidimensional regression */

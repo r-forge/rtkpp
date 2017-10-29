@@ -62,13 +62,13 @@ namespace Law
  *
  *  @sa STK::Funct::betaRatio
 **/
-class Beta : public IUnivLaw<Real>
+class Beta: public IUnivLaw<Real>
 {
   public:
     typedef IUnivLaw<Real> Base;
     /** default constructor. */
     inline Beta( Real const& alpha = .5, Real const& beta = .5)
-               : Base(String(_T("Beta"))), alpha_(alpha), beta_(beta)
+              : Base(String(_T("Beta"))), alpha_(alpha), beta_(beta)
     {
       if ( !isFinite(alpha) || !isFinite(beta) || alpha <= 0.0 || beta <= 0.0)
         STKDOMAIN_ERROR_2ARG("Beta::Beta",alpha,beta,"argument error");
@@ -122,16 +122,27 @@ class Beta : public IUnivLaw<Real>
 };
 
 #ifdef IS_RTKPP_LIB
-inline Real Beta::rand() const { GetRNGstate(); Real s = Rf_rbeta(alpha_, beta_);
-                                 PutRNGstate(); return s;}
+inline Real Beta::rand() const
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); Real s = Rf_rbeta(alpha_, beta_); PutRNGstate(); return s;
+}
+
 inline Real Beta::pdf( Real const& x) const {  return Rf_dbeta(x,alpha_, beta_, (int)false);}
 inline Real Beta::lpdf( Real const& x) const { return Rf_dbeta(x,alpha_, beta_, (int)true);}
 inline Real Beta::cdf( Real const& t) const { return Rf_pbeta(t, alpha_, beta_, (int)true, (int)false);}
 inline Real Beta::icdf( Real const& p) const { return Rf_qbeta(p , alpha_, beta_, (int)true, (int)false);}
 
 inline Real Beta::rand( Real const& alpha, Real const& beta)
-{ GetRNGstate(); Real s = Rf_rbeta(alpha, beta);
-  PutRNGstate(); return s;}
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); Real s = Rf_rbeta(alpha, beta); PutRNGstate(); return s;
+}
+
 inline Real Beta::pdf(const Real& x, const Real& alpha, const Real& beta)
 { return Rf_dbeta(x,alpha, beta, (int)false);}
 inline Real Beta::lpdf(const Real& x, const Real& alpha, const Real& beta)

@@ -60,7 +60,7 @@ namespace Law
  *   \ \mathrm{ for }\ x > 0\ \mathrm{ and }\ n \geq 0.
  *  \f]
  **/
-class ChiSquared : public IUnivLaw<Real>
+class ChiSquared: public IUnivLaw<Real>
 {
   public:
     typedef IUnivLaw<Real> Base;
@@ -132,21 +132,26 @@ class ChiSquared : public IUnivLaw<Real>
 
 /* @return a pseudo ChiSquared random variate. */
 inline Real ChiSquared::rand() const
-{ GetRNGstate(); Real s = Rf_rchisq(df_);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+ GetRNGstate(); Real s = Rf_rchisq(df_); PutRNGstate(); return s;
 }
-/* @return the value of the pdf
- *  @param x a positive real value
- **/
+
 inline Real ChiSquared::pdf(const Real& x) const { return Rf_dchisq(x, df_, false);}
 inline Real ChiSquared::lpdf(const Real& x) const { return Rf_dchisq(x, df_, true);}
 inline Real ChiSquared::cdf(const Real& t) const { return Rf_pchisq(t, df_, true, false);}
 inline Real ChiSquared::icdf(const Real& p) const { return Rf_qchisq(p, df_, true, false);}
 
 inline Real ChiSquared::rand(int df)
-{ GetRNGstate(); Real s = Rf_rchisq(df);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); Real s = Rf_rchisq(df); PutRNGstate(); return s;
 }
+
 inline Real ChiSquared::pdf(const Real& x, int df) { return Rf_dchisq(x, df, false);}
 inline Real ChiSquared::lpdf(const Real& x, int df) { return Rf_dchisq(x, df, true);}
 inline Real ChiSquared::cdf(const Real& t, int df) { return Rf_pchisq(t, df, true, false);}

@@ -127,10 +127,10 @@ class RowOperator: public ExprBase< RowOperator< Lhs> >, public TRef<1>
 
     /** Constructor */
     inline RowOperator( Lhs const& lhs, int i)
-                      : Base(), i_(i), lhs_(lhs), rows_(i,1), cols_(lhs_.rangeColsInRow(i)) {}
+                     : Base(), i_(i), lhs_(lhs), rows_(i,1), cols_(lhs_.rangeColsInRow(i)) {}
     /** Copy constructor */
     inline RowOperator( RowOperator const& row, bool ref)
-                      : Base(row), i_(row.i_), lhs_(row.lhs_), rows_(row.rows_), cols_(row.cols_) {}
+                     : Base(row), i_(row.i_), lhs_(row.lhs_), rows_(row.rows_), cols_(row.cols_) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the range of the Columns */
@@ -222,10 +222,10 @@ class ColOperator: public ExprBase< ColOperator< Lhs> >, public TRef<1>
 
     /** Constructor */
     inline ColOperator( Lhs const& lhs, int j)
-                      : Base(), j_(j), lhs_(lhs), rows_(lhs_.rangeRowsInCol(j)), cols_(j,1) {}
+                     : Base(), j_(j), lhs_(lhs), rows_(lhs_.rangeRowsInCol(j)), cols_(j,1) {}
     /** Copy constructor */
     inline ColOperator( ColOperator const& col, bool ref)
-                      : Base(col), j_(col.j_), lhs_(col.lhs_), rows_(col.rows_), cols_(col.cols_) {}
+                     : Base(col), j_(col.j_), lhs_(col.lhs_), rows_(col.rows_), cols_(col.cols_) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the columns range */
@@ -319,7 +319,7 @@ class SubOperator: public ExprBase< SubOperator<Lhs, Orient_> >, public TRef<1>
 
     /** Constructor */
     inline SubOperator( Lhs const& lhs, Range const& I, Range const& J)
-                      : Base(), lhs_(lhs), rows_(I), cols_(J) {}
+                     : Base(), lhs_(lhs), rows_(I), cols_(J) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the range of the Columns */
@@ -377,7 +377,7 @@ class SubOperator<Lhs, Arrays::vector_ >: public ExprBase< SubOperator<Lhs, Arra
     typedef TRange<1> ColRange;
 
     /** Constructor */
-    inline SubOperator( Lhs const& lhs, Range const& I) : Base(), lhs_(lhs), rows_(I) {}
+    inline SubOperator( Lhs const& lhs, Range const& I): Base(), lhs_(lhs), rows_(I) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the range of the Columns */
@@ -413,7 +413,7 @@ class SubOperator<Lhs, Arrays::vector_ >: public ExprBase< SubOperator<Lhs, Arra
   * don't have to name SubOperator type explicitly.
   */
 template< typename Lhs>
-class SubOperator<Lhs, Arrays::point_ > : public ExprBase< SubOperator<Lhs, Arrays::point_> >
+class SubOperator<Lhs, Arrays::point_ >: public ExprBase< SubOperator<Lhs, Arrays::point_> >
                                         , public TRef<1>
 {
   public:
@@ -433,7 +433,7 @@ class SubOperator<Lhs, Arrays::point_ > : public ExprBase< SubOperator<Lhs, Arra
     /** Type of the Range for the columns */
     typedef TRange<UnknownSize> ColRange;
     /** Constructor */
-    inline SubOperator( Lhs const& lhs, Range const& J) : Base(), lhs_(lhs), cols_(J) {}
+    inline SubOperator( Lhs const& lhs, Range const& J): Base(), lhs_(lhs), cols_(J) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return lhs_.rows();}
     /** @return the range of the Columns */

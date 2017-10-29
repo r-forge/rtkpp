@@ -133,7 +133,7 @@ struct DiagGaussian_muj_sjParameters
  *
  **/
 template <class Data_, class WColVector_>
-class ModelDiagGaussian_muj_sj : public IMultiStatModel< ModelDiagGaussian_muj_sj<Data_, WColVector_> >
+class ModelDiagGaussian_muj_sj: public IMultiStatModel< ModelDiagGaussian_muj_sj<Data_, WColVector_> >
 {
   public:
     /** Type of the container storing the data */
@@ -154,13 +154,13 @@ class ModelDiagGaussian_muj_sj : public IMultiStatModel< ModelDiagGaussian_muj_s
     using Base::param;
 
     /** default constructor. */
-    ModelDiagGaussian_muj_sj() : Base() {}
+    ModelDiagGaussian_muj_sj(): Base() {}
     /** Constructor with data set. */
-    ModelDiagGaussian_muj_sj(Data const& data) : Base(data) {}
+    ModelDiagGaussian_muj_sj(Data const& data): Base(data) {}
     /** Constructor with a ptr on the data set. */
-    ModelDiagGaussian_muj_sj(Data const* p_data) : Base(p_data) {}
+    ModelDiagGaussian_muj_sj(Data const* p_data): Base(p_data) {}
     /** Copy constructor. */
-    ModelDiagGaussian_muj_sj(ModelDiagGaussian_muj_sj const& model) : Base(model) {}
+    ModelDiagGaussian_muj_sj(ModelDiagGaussian_muj_sj const& model): Base(model) {}
     /** destructor */
     ~ModelDiagGaussian_muj_sj() {}
 

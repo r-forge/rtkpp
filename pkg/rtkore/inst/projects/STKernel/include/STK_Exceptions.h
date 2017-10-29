@@ -70,7 +70,7 @@ class Exception
  *  program runs (e.g., violations of class invariants).
  *  @brief One of two subclasses of Exception.
  */
-class logic_error : public Exception
+class logic_error: public Exception
 {
   public:
     /** Takes a character String describing the error.  */
@@ -81,7 +81,7 @@ class logic_error : public Exception
 /** @ingroup Base
  *  Thrown by the library, or by you, to report domain errors (domain in
  *  the mathematical sense).  */
-class domain_error : public logic_error
+class domain_error: public logic_error
 {
   public:
     explicit domain_error( String const& __arg);
@@ -90,7 +90,7 @@ class domain_error : public logic_error
 
 /** @ingroup Base
  *  Thrown to report invalid arguments to functions.  */
-class invalid_argument : public logic_error
+class invalid_argument: public logic_error
 {
   public:
     explicit invalid_argument( String const& __arg);
@@ -100,7 +100,7 @@ class invalid_argument : public logic_error
 /** @ingroup Base
  *  Thrown when an object is constructed that would exceed its maximum
  *  permitted size (e.g., a basic_String instance).  */
-class length_error : public logic_error
+class length_error: public logic_error
 {
   public:
     explicit length_error( String const& __arg);
@@ -110,7 +110,7 @@ class length_error : public logic_error
 /** @ingroup Base
  *  This represents an argument whose value is not within the expected
  *  range (e.g., boundary checks in basic_String).  */
-class out_of_range : public logic_error
+class out_of_range: public logic_error
 {
   public:
     explicit out_of_range( String const& __arg);
@@ -123,7 +123,7 @@ class out_of_range : public logic_error
  *  the program executes.
  *  @brief One of two subclasses of Exception.
  */
-class runtime_error : public Exception
+class runtime_error: public Exception
 {
   public:
     /** Takes a character String describing the error.  */
@@ -133,7 +133,7 @@ class runtime_error : public Exception
 
 /** @ingroup Base
  *  Thrown to indicate range errors in internal computations.  */
-class range_error : public runtime_error
+class range_error: public runtime_error
 {
   public:
     explicit range_error( String const& __arg);

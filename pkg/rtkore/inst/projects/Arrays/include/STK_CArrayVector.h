@@ -110,7 +110,7 @@ struct Traits< CArrayVector<Type_, SizeRows_, Orient_> >
  * @brief specialization for the vector case.
  */
 template <typename Type_, int SizeRows_, bool Orient_>
-class CArrayVector : public ICArray < CArrayVector<Type_, SizeRows_, Orient_> >
+class CArrayVector: public ICArray < CArrayVector<Type_, SizeRows_, Orient_> >
 {
   public:
     typedef ICArray < CArrayVector<Type_, SizeRows_, Orient_> > Base;
@@ -129,11 +129,11 @@ class CArrayVector : public ICArray < CArrayVector<Type_, SizeRows_, Orient_> >
     };
 
     /** Default constructor. */
-    CArrayVector() : Base() {}
+    CArrayVector(): Base() {}
     /** constructor with specified dimension.
      *  @param sizeRows size of the rows
      **/
-    CArrayVector( int sizeRows) : Base(sizeRows, 1) {}
+    CArrayVector( int sizeRows): Base(sizeRows, 1) {}
     /** constructor with specified ranges.
      *  @param range range of the rows
      **/
@@ -143,7 +143,7 @@ class CArrayVector : public ICArray < CArrayVector<Type_, SizeRows_, Orient_> >
      *  @param sizeRows size of the rows
      *  @param v initial value of the container
      **/
-    CArrayVector( int sizeRows, Type const& v) : Base(sizeRows, 1, v) {}
+    CArrayVector( int sizeRows, Type const& v): Base(sizeRows, 1, v) {}
     /** constructor with range specified, initialization with a constant.
      *  @param range range of the rows
      *  @param v initial value of the container
@@ -154,13 +154,13 @@ class CArrayVector : public ICArray < CArrayVector<Type_, SizeRows_, Orient_> >
      *  @param T the container to copy
      *  @param ref true if T is wrapped
      **/
-    CArrayVector( const CArrayVector &T, bool ref=false) : Base(T, ref) {}
+    CArrayVector( const CArrayVector &T, bool ref=false): Base(T, ref) {}
     /** constructor by reference, ref_=1.
      *  @param T the container to wrap
      *  @param I the columns range to wrap
      **/
     CArrayVector( CArrayVector const& T, Range const& I)
-                : Base(T.allocator(), I, T.cols())
+               : Base(T.allocator(), I, T.cols())
     {}
     /** constructor by reference, ref_=1.
      *  @param T the container to wrap
@@ -169,7 +169,7 @@ class CArrayVector : public ICArray < CArrayVector<Type_, SizeRows_, Orient_> >
      **/
     template<class OtherArray>
     CArrayVector( ICArray<OtherArray> const& T, Range const& I, int col)
-                : Base(T.allocator(), I, Range(col, 1))
+               : Base(T.allocator(), I, Range(col, 1))
     {}
     /** wrapper constructor for 0 based C-Array.
      *  @param q pointer on the array

@@ -54,7 +54,7 @@ namespace STK
  *  decomposition of A.
  **/
 template<class Derived>
-class ILeastSquare : public IRunnerBase, public IRecursiveTemplate<Derived>
+class ILeastSquare: public IRunnerBase, public IRecursiveTemplate<Derived>
 {
   protected:
     typedef typename hidden::AlgebraTraits<Derived>::ArrayB ArrayB;

@@ -222,7 +222,7 @@ class IContainer2D
  * implements @c ITContainer1D. For example
  * <code>
  * template<class Type>
- * class Derived : public ITContainer1D< Derived<Type> >
+ * class Derived: public ITContainer1D< Derived<Type> >
  * {...}
  * </code>
  *
@@ -261,7 +261,7 @@ class IContainer2D
  * are using derived classes for storing any kind of data.
  **/
 template <class Derived>
-class ITContainer2D : public IContainer2D< hidden::Traits<Derived>::sizeRows_, hidden::Traits<Derived>::sizeCols_>
+class ITContainer2D: public IContainer2D< hidden::Traits<Derived>::sizeRows_, hidden::Traits<Derived>::sizeCols_>
                     , public IRecursiveTemplate<Derived>
 {
   public:
@@ -295,15 +295,15 @@ class ITContainer2D : public IContainer2D< hidden::Traits<Derived>::sizeRows_, h
 
   protected:
     /** Default constructor.*/
-    ITContainer2D() : Base2D(), Base() {}
+    ITContainer2D(): Base2D(), Base() {}
     /** constructor with specified Range.
      *  @param I,J range of the rows and columns
      **/
-    inline ITContainer2D( Range const& I, Range const& J) : Base2D(I, J), Base() {}
+    inline ITContainer2D( Range const& I, Range const& J): Base2D(I, J), Base() {}
     /** Copy constructor.
      *  @param T the container to copy
      **/
-    inline ITContainer2D( ITContainer2D const& T) : Base2D(T), Base() {}
+    inline ITContainer2D( ITContainer2D const& T): Base2D(T), Base() {}
     /** destructor. */
     ~ITContainer2D() {}
 

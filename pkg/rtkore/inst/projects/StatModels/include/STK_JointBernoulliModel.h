@@ -102,7 +102,7 @@ class JointBernoulliParameters: public IMultiParameters<JointBernoulliParameters
  *
  **/
 template <class Array, class WColVector = CVectorX>
-class JointBernoulliModel : public IMultiStatModel<Array, WColVector, JointBernoulliParameters >
+class JointBernoulliModel: public IMultiStatModel<Array, WColVector, JointBernoulliParameters >
 {
   public:
     /** Type of the data contained in the container */
@@ -116,13 +116,13 @@ class JointBernoulliModel : public IMultiStatModel<Array, WColVector, JointBerno
     using Base::p_data;
     using Base::p_param;
     /** default constructor. */
-    JointBernoulliModel() : Base() {}
+    JointBernoulliModel(): Base() {}
     /** Constructor with data set. */
-    JointBernoulliModel(Array const& data) : Base(data) {}
+    JointBernoulliModel(Array const& data): Base(data) {}
     /** Constructor with a ptr on the data set. */
-    JointBernoulliModel(Array const* p_data) : Base(p_data) {}
+    JointBernoulliModel(Array const* p_data): Base(p_data) {}
     /** Copy constructor. */
-    JointBernoulliModel(JointBernoulliModel const& model) : Base(model) {}
+    JointBernoulliModel(JointBernoulliModel const& model): Base(model) {}
     /** destructor */
     virtual ~JointBernoulliModel() {}
     /** clone pattern. @return a clone of this. */

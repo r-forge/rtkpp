@@ -66,7 +66,7 @@ namespace Law
  * where \f$ \mu  \mbox{ and } \sigma\f$ are the location and the
  * scale parameters.
 **/
-class LogNormal : public IUnivLaw<Real>
+class LogNormal: public IUnivLaw<Real>
 {
   public:
     typedef IUnivLaw<Real> Base;
@@ -75,7 +75,7 @@ class LogNormal : public IUnivLaw<Real>
      *  @param sigma scale of the LogNormal distribution
      **/
     inline LogNormal( Real const& mu=0., Real const& sigma=1.)
-                    : Base(_T("LogNormal")), mu_(mu), sigma_(sigma) {}
+                   : Base(_T("LogNormal")), mu_(mu), sigma_(sigma) {}
 
     /** Destructor. **/
     inline virtual ~LogNormal() {}
@@ -165,9 +165,13 @@ class LogNormal : public IUnivLaw<Real>
 #ifdef IS_RTKPP_LIB
 
 inline Real LogNormal::rand() const
-{ GetRNGstate(); Real s = Rf_rlnorm(mu_, sigma_);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); Real s = Rf_rlnorm(mu_, sigma_); PutRNGstate(); return s;
 }
+
 inline Real LogNormal::pdf( Real const& x) const
 { return Rf_dlnorm(x, mu_, sigma_, false);}
 inline Real LogNormal::lpdf( Real const& x) const
@@ -178,9 +182,13 @@ inline Real LogNormal::icdf( Real const& p) const
 { return Rf_qlnorm(p, mu_, sigma_, true, false);}
 
 inline Real LogNormal::rand( Real const& mu, Real const& sigma)
-{ GetRNGstate(); Real s = Rf_rlnorm(mu, sigma);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); Real s = Rf_rlnorm(mu, sigma); PutRNGstate(); return s;
 }
+
 inline Real LogNormal::pdf( Real const& x, Real const& mu, Real const& sigma)
 { return Rf_dlnorm(x, mu, sigma, false);}
 inline Real LogNormal::lpdf( Real const& x, Real const& mu, Real const& sigma)

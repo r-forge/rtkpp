@@ -146,7 +146,7 @@ template <class Data_, class WColVector_>
 class ModelGamma_aj_bj: public IMultiStatModel< ModelGamma_aj_bj<Data_, WColVector_> >
 {
   protected:
-    class dloglikelihood : public IFunction<dloglikelihood >
+    class dloglikelihood: public IFunction<dloglikelihood >
     {
       public:
         dloglikelihood( Real const& mean, Real const& meanLog)
@@ -179,13 +179,13 @@ class ModelGamma_aj_bj: public IMultiStatModel< ModelGamma_aj_bj<Data_, WColVect
     using Base::param;
 
     /** default constructor. */
-    ModelGamma_aj_bj() : Base() {}
+    ModelGamma_aj_bj(): Base() {}
     /** Constructor with data set. */
-    ModelGamma_aj_bj(Data const& data) : Base(data){}
+    ModelGamma_aj_bj(Data const& data): Base(data){}
     /** Constructor with a ptr on the data set. */
-    ModelGamma_aj_bj(Data const* p_data) : Base(p_data){}
+    ModelGamma_aj_bj(Data const* p_data): Base(p_data){}
     /** Copy constructor. */
-    ModelGamma_aj_bj(ModelGamma_aj_bj const& model) : Base(model) {}
+    ModelGamma_aj_bj(ModelGamma_aj_bj const& model): Base(model) {}
     /** destructor */
     ~ModelGamma_aj_bj(){}
 

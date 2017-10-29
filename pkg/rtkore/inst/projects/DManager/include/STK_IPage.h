@@ -71,7 +71,7 @@ namespace STK
  *  Every Page of options of a STK program should derive from the IPage class
  *  as in the following example:
  *  @code
- * class Page2 : public IPage
+ * class Page2: public IPage
  * {
  *   public:
  *    Page2() : IPage("test2", 1, false)

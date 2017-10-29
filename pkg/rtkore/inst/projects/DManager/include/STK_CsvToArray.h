@@ -131,7 +131,7 @@ struct CsvToArrayImpl<Type, CArray<Type > >
  *  more missing value will be discarded.
  */
 template<class Array, class Type = typename Array::Type>
-class CsvToArray : public IRunnerBase
+class CsvToArray: public IRunnerBase
 {
   public:
     typedef TReadWriteCsv<Type>  Rw;

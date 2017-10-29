@@ -100,7 +100,7 @@ struct Traits< Array2DVector<Type_> >
  *  @sa Array2DPoint
  **/
 template<class Type_>
-class Array2DVector : public IArray2D< Array2DVector<Type_> >
+class Array2DVector: public IArray2D< Array2DVector<Type_> >
 {
   public:
     typedef IArray2D< Array2DVector<Type_> > Base;
@@ -125,7 +125,7 @@ class Array2DVector : public IArray2D< Array2DVector<Type_> >
       storage_ = Arrays::dense_ // always dense
     };
     /** Default constructor */
-    Array2DVector() : Base( Range(), Range(1)) {}
+    Array2DVector(): Base( Range(), Range(1)) {}
     /** constructor with specified range.
      *  @param I range of the container
      **/
@@ -134,20 +134,20 @@ class Array2DVector : public IArray2D< Array2DVector<Type_> >
      *  @param I range of the container
      *  @param v initial value of the container
      **/
-    Array2DVector( Range const& I, Type const& v) : Base(I, Range(1))
+    Array2DVector( Range const& I, Type const& v): Base(I, Range(1))
     { LowBase::setValue(v);}
     /** Copy constructor
      *  @param T the container to copy
      *  @param ref true if this is a wrapper of T
      **/
     Array2DVector( const Array2DVector &T, bool ref =false)
-                 : Base(T, ref) {}
+                : Base(T, ref) {}
     /** constructor by reference, ref_=1.
      *  @param T the container to wrap
      *  @param I the columns range to wrap
      **/
     Array2DVector( const Array2DVector& T, Range const& I)
-                 : Base(T, I, T.cols())
+                : Base(T, I, T.cols())
     {}
     /** constructor by reference, ref_=1.
      *  @param T the container to wrap
@@ -156,7 +156,7 @@ class Array2DVector : public IArray2D< Array2DVector<Type_> >
      **/
     template<class OtherArray>
     Array2DVector( IArray2D<OtherArray> const& T, Range const& I, int col)
-                : Base(T, I, Range(col, 1))
+               : Base(T, I, Range(col, 1))
     {}
     /** Copy constructor using an expression.
      *  @param T the container to wrap
@@ -170,7 +170,7 @@ class Array2DVector : public IArray2D< Array2DVector<Type_> >
      *  @param col the index of the column to wrap
      **/
      Array2DVector( Type** p_data, Range const& I, int col)
-                  : Base(p_data, I, Range(col, 1))
+                 : Base(p_data, I, Range(col, 1))
     {}
     /** destructor. */
     ~Array2DVector() {}

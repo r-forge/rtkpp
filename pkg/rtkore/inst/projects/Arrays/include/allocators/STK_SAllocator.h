@@ -206,17 +206,17 @@ class OrientedSAllocator<Derived, Arrays::by_col_>: ITContainer2D<Derived>
 
     /** constructor with specified ranges */
     OrientedSAllocator( Range const& I, Range const& J)
-                      : Base(I, J)
+                     : Base(I, J)
     {}
     /** copy constructor */
     OrientedSAllocator( OrientedSAllocator const& A, bool ref)
-                      : Base(A)
+                     : Base(A)
     { if (!ref) allocator_.assign(A.allocator_);}
     /** Reference constructor */
     template<class OtherDerived>
     inline OrientedSAllocator( OrientedCAllocator<OtherDerived, Arrays::by_row_> const& A
                              , Range const& I, Range const& J)
-                             : Base(I, J), ldx_(A.ldx()), allocator_(A.allocator(), true)
+                            : Base(I, J), ldx_(A.ldx()), allocator_(A.allocator(), true)
     {}
 
     /** @return the vector with the pointers on rows or columns */
@@ -259,16 +259,12 @@ class OrientedSAllocator<Derived, Arrays::by_row_>: ITContainer2D<Derived>
  *
  */
 template<typename Type, int Size_, bool Orient_>
-class SAllocator : public OrientedSAllocator<SAllocator<Type, Size_, Orient_>, Orient_>
+class SAllocator: public OrientedSAllocator<SAllocator<Type, Size_, Orient_>, Orient_>
 {
   public:
-    typedef Array1D<int>  VectorIdx;
-    typedef Array1D<Type>  elt_vector_type;
-
-    SAllocator();
     ~SAllocator();
     SAllocator ( int n_rows, int n_cols, int nz_max = 0)
-                    : m_n_rows(n_rows), m_n_cols (n_cols)
+               : m_n_rows(n_rows), m_n_cols (n_cols)
     {
     }
 };

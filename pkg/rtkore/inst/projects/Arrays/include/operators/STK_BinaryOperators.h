@@ -260,7 +260,7 @@ class BinaryOperatorBase;
   * don't have to name BinaryOperator types explicitly.
   **/
 template<typename BinaryOp, typename Lhs, typename Rhs>
-class BinaryOperator : public BinaryOperatorBase< BinaryOp, Lhs, Rhs >
+class BinaryOperator: public BinaryOperatorBase< BinaryOp, Lhs, Rhs >
                      , public TRef<1>
 {
   public:
@@ -293,7 +293,7 @@ class BinaryOperator : public BinaryOperatorBase< BinaryOp, Lhs, Rhs >
 
     /** default constructor */
     inline BinaryOperator( const Lhs& lhs, const Rhs& rhs, const BinaryOp& func = BinaryOp())
-                         : Base(), lhs_(lhs), rhs_(rhs), functor_(func)
+                        : Base(), lhs_(lhs), rhs_(rhs), functor_(func)
                          , rows_(lhs_.beginRows(), (sizeRows_ != UnknownSize) ? sizeRows_ : lhs_.sizeRows())
                          , cols_(lhs_.beginCols(), (sizeCols_ != UnknownSize) ? sizeCols_ : lhs_.sizeCols())
     { // FIXME : not safe. Add more test in the 1D case at compile time (and runtime ?)
@@ -340,14 +340,14 @@ class BinaryOperator : public BinaryOperatorBase< BinaryOp, Lhs, Rhs >
   **/
 template<typename BinaryOp, typename Lhs, typename Rhs>
 class BinaryOperatorBase<BinaryOp, Lhs, Rhs, Arrays::binOp0d_>
-      : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
+     : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
 {
   public:
     typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
     typedef ExprBase< Derived > Base;
     typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
     /** constructor. */
-    inline BinaryOperatorBase() : Base() {}
+    inline BinaryOperatorBase(): Base() {}
     /** access to the element i, j */
     inline ReturnType elt2Impl(int i, int j) const
     { return this->asDerived().functor()( this->asDerived().lhs().elt(i,j), this->asDerived().rhs().elt(i,j));}
@@ -364,14 +364,14 @@ class BinaryOperatorBase<BinaryOp, Lhs, Rhs, Arrays::binOp0d_>
   **/
 template<typename BinaryOp, typename Lhs, typename Rhs>
 class BinaryOperatorBase<BinaryOp, Lhs, Rhs, Arrays::binOp1d_>
-      : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
+     : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
 {
   public:
     typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
     typedef ExprBase< Derived > Base;
     typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
     /** constructor. */
-    inline BinaryOperatorBase() : Base() {}
+    inline BinaryOperatorBase(): Base() {}
     /** access to the element i, j */
     inline ReturnType elt2Impl(int i, int j) const
     { return this->asDerived().functor()( this->asDerived().lhs().elt(i,j), this->asDerived().rhs().elt(i,j));}
@@ -385,14 +385,14 @@ class BinaryOperatorBase<BinaryOp, Lhs, Rhs, Arrays::binOp1d_>
  **/
 template<typename BinaryOp, typename Lhs, typename Rhs>
 class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOp2d_>
-                        : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
+                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
 {
   public:
     typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
     typedef ExprBase< Derived > Base;
     typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
     /** constructor. */
-    inline BinaryOperatorBase() : Base() {}
+    inline BinaryOperatorBase(): Base() {}
     /** access to the element i, j */
     inline ReturnType elt2Impl(int i, int j) const
     { return this->asDerived().functor()( this->asDerived().lhs().elt(i,j), this->asDerived().rhs().elt(i,j));}
@@ -403,7 +403,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOp2d_>
   **/
 template<typename BinaryOp, typename Lhs, typename Rhs>
 class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpDiag2d_>
-                        : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
+                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
 {
   public:
     typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
@@ -411,7 +411,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpDiag2d_>
     typedef typename hidden::Traits< Derived >::Type Type;
     typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
     /** constructor. */
-    inline BinaryOperatorBase() : Base() {}
+    inline BinaryOperatorBase(): Base() {}
     /** accesses to the element i, j */
     inline ReturnType elt2Impl(int i, int j) const
     { return (i==j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i), this->asDerived().rhs().elt(i, j))
@@ -423,7 +423,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpDiag2d_>
   **/
 template<typename BinaryOp, typename Lhs, typename Rhs>
 class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOp2dDiag_>
-                        : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
+                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
 {
   public:
     typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
@@ -431,7 +431,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOp2dDiag_>
     typedef typename hidden::Traits< Derived >::Type Type;
     typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
     /** constructor. */
-    inline BinaryOperatorBase() : Base() {}
+    inline BinaryOperatorBase(): Base() {}
     /** accesses to the element i, j */
     inline ReturnType elt2Impl(int i, int j) const
     { return (i==j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i,j), this->asDerived().rhs().elt(i))
@@ -443,7 +443,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOp2dDiag_>
   **/
 template<typename BinaryOp, typename Lhs, typename Rhs>
 class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOp2dUp_>
-                        : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
+                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
 {
   public:
     typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
@@ -451,7 +451,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOp2dUp_>
     typedef typename hidden::Traits< Derived >::Type Type;
     typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
     /** constructor. */
-    inline BinaryOperatorBase() : Base() {}
+    inline BinaryOperatorBase(): Base() {}
     /** accesses to the element i, j */
     inline ReturnType elt2Impl(int i, int j) const
     { return (i<=j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i,j), this->asDerived().rhs().elt(i,j))
@@ -463,7 +463,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOp2dUp_>
   **/
 template<typename BinaryOp, typename Lhs, typename Rhs>
 class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpUp2d_>
-                        : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
+                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
 {
   public:
     typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
@@ -471,7 +471,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpUp2d_>
     typedef typename hidden::Traits< Derived >::Type Type;
     typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
     /** constructor. */
-    inline BinaryOperatorBase() : Base() {}
+    inline BinaryOperatorBase(): Base() {}
     /** accesses to the element i, j */
     inline ReturnType elt2Impl(int i, int j) const
     { return (i<=j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i,j), this->asDerived().rhs().elt(i,j))
@@ -483,7 +483,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpUp2d_>
   **/
 template<typename BinaryOp, typename Lhs, typename Rhs>
 class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOp2dLow_>
-                        : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
+                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
 {
   public:
     typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
@@ -491,7 +491,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOp2dLow_>
     typedef typename hidden::Traits< Derived >::Type Type;
     typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
     /** constructor. */
-    inline BinaryOperatorBase() : Base() {}
+    inline BinaryOperatorBase(): Base() {}
     /** accesses to the element i, j */
     inline ReturnType elt2Impl(int i, int j) const
     { return (i>=j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i,j), this->asDerived().rhs().elt(i,j))
@@ -503,7 +503,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOp2dLow_>
   **/
 template<typename BinaryOp, typename Lhs, typename Rhs>
 class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpLow2d_>
-                        : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
+                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
 {
   public:
     typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
@@ -511,7 +511,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpLow2d_>
     typedef typename hidden::Traits< Derived >::Type Type;
     typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
     /** constructor. */
-    inline BinaryOperatorBase() : Base() {}
+    inline BinaryOperatorBase(): Base() {}
     /** accesses to the element i, j */
     inline ReturnType elt2Impl(int i, int j) const
     { return (i>=j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i,j), this->asDerived().rhs().elt(i,j))
@@ -523,7 +523,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpLow2d_>
   **/
 template<typename BinaryOp, typename Lhs, typename Rhs>
 class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpDiagUp_>
-                        : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
+                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
 {
   public:
     typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
@@ -531,7 +531,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpDiagUp_>
     typedef typename hidden::Traits< Derived >::Type Type;
     typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
     /** constructor. */
-    inline BinaryOperatorBase() : Base() {}
+    inline BinaryOperatorBase(): Base() {}
     /** accesses to the element i, j */
     inline ReturnType elt2Impl(int i, int j) const
     { return (i==j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i), this->asDerived().rhs().elt(i, j))
@@ -544,7 +544,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpDiagUp_>
   **/
 template<typename BinaryOp, typename Lhs, typename Rhs>
 class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpUpDiag_>
-                        : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
+                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
 {
   public:
     typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
@@ -552,7 +552,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpUpDiag_>
     typedef typename hidden::Traits< Derived >::Type Type;
     typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
     /** constructor. */
-    inline BinaryOperatorBase() : Base() {}
+    inline BinaryOperatorBase(): Base() {}
     /** accesses to the element i, j */
     inline ReturnType elt2Impl(int i, int j) const
     { return (i==j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i,j), this->asDerived().rhs().elt(i))
@@ -565,7 +565,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpUpDiag_>
   **/
 template<typename BinaryOp, typename Lhs, typename Rhs>
 class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpDiagLow_>
-                        : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
+                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
 {
   public:
     typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
@@ -573,7 +573,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpDiagLow_>
     typedef typename hidden::Traits< Derived >::Type Type;
     typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
     /** constructor. */
-    inline BinaryOperatorBase() : Base() {}
+    inline BinaryOperatorBase(): Base() {}
     /** accesses to the element i, j */
     inline ReturnType elt2Impl(int i, int j) const
     { return (i==j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i), this->asDerived().rhs().elt(i, j))
@@ -586,7 +586,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpDiagLow_>
   **/
 template<typename BinaryOp, typename Lhs, typename Rhs>
 class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpLowDiag_>
-                        : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
+                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
 {
   public:
     typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
@@ -594,7 +594,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpLowDiag_>
     typedef typename hidden::Traits< Derived >::Type Type;
     typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
     /** constructor. */
-    inline BinaryOperatorBase() : Base() {}
+    inline BinaryOperatorBase(): Base() {}
     /** accesses to the element i, j */
     inline ReturnType elt2Impl(int i, int j) const
     { return (i==j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i,j), this->asDerived().rhs().elt(i))
@@ -607,7 +607,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpLowDiag_>
   **/
 template<typename BinaryOp, typename Lhs, typename Rhs>
 class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpUpUp_>
-                        : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
+                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
 {
   public:
     typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
@@ -615,7 +615,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpUpUp_>
     typedef typename hidden::Traits< Derived >::Type Type;
     typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
     /** constructor. */
-    inline BinaryOperatorBase() : Base() {}
+    inline BinaryOperatorBase(): Base() {}
     /** accesses to the element i, j */
     inline ReturnType elt2Impl(int i, int j) const
     { return  (i<=j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i, j), this->asDerived().rhs().elt(i, j))
@@ -627,7 +627,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpUpUp_>
   **/
 template<typename BinaryOp, typename Lhs, typename Rhs>
 class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpLowLow_>
-                        : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
+                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
 {
   public:
     typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
@@ -635,7 +635,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpLowLow_>
     typedef typename hidden::Traits< Derived >::Type Type;
     typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
     /** constructor. */
-    inline BinaryOperatorBase() : Base() {}
+    inline BinaryOperatorBase(): Base() {}
     /** accesses to the element i, j */
     inline ReturnType elt2Impl(int i, int j) const
     { return  (i>=j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i, j), this->asDerived().rhs().elt(i, j))
@@ -647,7 +647,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpLowLow_>
   **/
 template<typename BinaryOp, typename Lhs, typename Rhs>
 class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpUpLow_>
-                        : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
+                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
 {
   public:
     typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
@@ -655,7 +655,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpUpLow_>
     typedef typename hidden::Traits< Derived >::Type Type;
     typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
     /** constructor. */
-    inline BinaryOperatorBase() : Base() {}
+    inline BinaryOperatorBase(): Base() {}
     /** accesses to the element i, j */
     inline ReturnType elt2Impl(int i, int j) const
     { return  (i==j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i, j), this->asDerived().rhs().elt(i, j))
@@ -668,7 +668,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpUpLow_>
   **/
 template<typename BinaryOp, typename Lhs, typename Rhs>
 class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpLowUp_>
-                        : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
+                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
 {
   public:
     typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
@@ -676,7 +676,7 @@ class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpLowUp_>
     typedef typename hidden::Traits< Derived >::Type Type;
     typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
     /** constructor. */
-    inline BinaryOperatorBase() : Base() {}
+    inline BinaryOperatorBase(): Base() {}
     /** accesses to the element i, j */
     inline ReturnType elt2Impl(int i, int j) const
     { return  (i==j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i, j), this->asDerived().rhs().elt(i, j))

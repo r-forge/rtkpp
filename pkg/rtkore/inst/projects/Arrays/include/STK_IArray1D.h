@@ -254,13 +254,13 @@ IArray1D<Derived>::IArray1D(): Base()
 
 template<class Derived >
 IArray1D<Derived>::IArray1D( Range const& I)
-                           : Base(I)
+                          : Base(I)
                            , Allocator(Arrays::evalRangeCapacity(I))
 {}
 
 template<class Derived >
 IArray1D<Derived>::IArray1D( Range const& I, Type const& v)
-                           : Base(I)
+                          : Base(I)
                            , Allocator(Arrays::evalRangeCapacity(I))
 { for(int i=this->begin(); i<this->end(); i++) this->data(i) = v;}
 
@@ -270,7 +270,7 @@ IArray1D<Derived>::IArray1D( Range const& I, Type const& v)
  **/
 template<class Derived >
 IArray1D<Derived>::IArray1D( const IArray1D &T, bool ref)
-                           : Base(T)
+                          : Base(T)
                            , Allocator(T, ref)
 {
   if (!ref)
@@ -285,7 +285,7 @@ IArray1D<Derived>::IArray1D( const IArray1D &T, bool ref)
 template<class Derived >
 template<class OtherDerived>
 IArray1D<Derived>::IArray1D( ExprBase<OtherDerived> const& T)
-                           : Base(T.range())
+                          : Base(T.range())
                            , Allocator(Arrays::evalRangeCapacity(T.range()))
 {
   STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(OtherDerived);
@@ -294,7 +294,7 @@ IArray1D<Derived>::IArray1D( ExprBase<OtherDerived> const& T)
 
 template<class Derived >
 IArray1D<Derived>::IArray1D( IArray1D const& T, Range const& I)
-                           : Base(I)
+                          : Base(I)
                            , Allocator(T, true)
 {}
 /* constructor by reference, ref_=1.

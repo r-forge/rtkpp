@@ -87,7 +87,7 @@ struct Traits< RVector<Type_> >
 } // namespace hidden
 
 template <typename Type_>
-class RVector : public ArrayBase< RVector<Type_> >, public TRef<1>
+class RVector: public ArrayBase< RVector<Type_> >, public TRef<1>
 {
   public:
     typedef typename hidden::Traits<RVector<Type_> >::Row Row;

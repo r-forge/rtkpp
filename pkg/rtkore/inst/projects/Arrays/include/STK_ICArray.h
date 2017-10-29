@@ -69,7 +69,7 @@ namespace hidden
   * @tparam Derived is the derived type, e.g., a matrix type.
   */
 template<class Derived>
-class ICArray : public ArrayBase<Derived>
+class ICArray: public ArrayBase<Derived>
 {
   public:
     typedef ArrayBase<Derived> Base;
@@ -100,33 +100,33 @@ class ICArray : public ArrayBase<Derived>
     /** allocator of the memory  */
     Allocator allocator_;
     /** default constructor. */
-    ICArray() : Base(), allocator_() {}
+    ICArray(): Base(), allocator_() {}
     /** constructor with specified sizes.
      *  @param sizeRows,sizeCols size of the rows and columns
      **/
     ICArray( int sizeRows, int sizeCols)
-           : Base(), allocator_(sizeRows, sizeCols)
+          : Base(), allocator_(sizeRows, sizeCols)
     {}
     /** constructor with specified sizes and value.
      *  @param sizeRows,sizeCols size of the rows and columns
      *  @param value the value to set
      **/
     ICArray( int sizeRows, int sizeCols, Type const& value)
-           : Base(), allocator_(sizeRows, sizeCols, value)
+          : Base(), allocator_(sizeRows, sizeCols, value)
     {}
     /** copy or wrapper constructor.
      *  @param T size of the rows
      *  @param ref is this owning its own data ?
      **/
     ICArray( Derived const& T, bool ref = false)
-           : Base(), allocator_(T.allocator_, ref)
+          : Base(), allocator_(T.allocator_, ref)
     {}
     /** wrapper constructor for 0 based C-Array.
      *  @param q pointer on the array
      *  @param sizeRows,sizeCols size of the rows and columns
      **/
     ICArray( Type* const& q, int sizeRows, int sizeCols)
-           : Base(), allocator_(q, sizeRows, sizeCols)
+          : Base(), allocator_(q, sizeRows, sizeCols)
     {}
     /** constructor by reference, ref_=1.
      *  @param allocator the allocator to wrap
@@ -134,14 +134,14 @@ class ICArray : public ArrayBase<Derived>
      **/
     template<class OtherAllocator>
     inline ICArray( ITContainer2D<OtherAllocator> const& allocator, Range const& I, Range const& J)
-                  : Base(), allocator_(allocator.asDerived(), I, J)
+                 : Base(), allocator_(allocator.asDerived(), I, J)
     {}
     /** constructor by reference, ref_=1.
      *  @param allocator with the data
      **/
     template< class OtherAllocator>
     inline ICArray( ITContainer2D<OtherAllocator> const& allocator)
-                  : Base(), allocator_(allocator.asDerived(), true)
+                 : Base(), allocator_(allocator.asDerived(), true)
     {}
     /**  destructor */
     ~ICArray() {}

@@ -93,7 +93,7 @@ namespace STK
  **/
 
 template<class Derived>
-class ExprBase : public ITContainer<Derived, hidden::Traits<Derived>::structure_>
+class ExprBase: public ITContainer<Derived, hidden::Traits<Derived>::structure_>
 {
   public:
     typedef ITContainer<Derived> Base;

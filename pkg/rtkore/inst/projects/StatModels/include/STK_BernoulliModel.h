@@ -54,7 +54,7 @@ namespace STK
  * \f]
  **/
 template <class Array, class WColVector>
-class BernoulliModel : public IUnivStatModel<Array, WColVector, Law::Bernoulli>
+class BernoulliModel: public IUnivStatModel<Array, WColVector, Law::Bernoulli>
 {
   using IUnivStatModel<Array, WColVector, Law::Bernoulli>::p_data;
 
@@ -64,13 +64,13 @@ class BernoulliModel : public IUnivStatModel<Array, WColVector, Law::Bernoulli>
     /** Base class */
     typedef IUnivStatModel<Array, WColVector, Law::Bernoulli> Base;
     /** default constructor. */
-    BernoulliModel() : Base() {}
+    BernoulliModel(): Base() {}
     /** Constructor with data set. */
-    BernoulliModel(Array const& data) : Base(data) {}
+    BernoulliModel(Array const& data): Base(data) {}
     /** Constructor with a ptr on the data set. */
-    BernoulliModel(Array const* p_data) : Base(p_data) {}
+    BernoulliModel(Array const* p_data): Base(p_data) {}
     /** Copy constructor. */
-    BernoulliModel(BernoulliModel const& model) : Base(model) {}
+    BernoulliModel(BernoulliModel const& model): Base(model) {}
     /** clone patern */
     BernoulliModel* clone() const { return new BernoulliModel(*this);}
     /** destructor */

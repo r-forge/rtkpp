@@ -80,7 +80,7 @@ namespace STK
  *  a single row like the CArray class or the Array2D class.
  **/
 template <class Derived>
-class IStatModel : public IStatModelBase
+class IStatModel: public IStatModelBase
 {
   public:
     typedef typename hidden::ModelTraits<Derived>::Data Data;

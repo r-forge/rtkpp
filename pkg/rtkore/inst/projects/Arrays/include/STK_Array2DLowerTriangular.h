@@ -103,7 +103,7 @@ struct Traits< Array2DLowerTriangular<Type_> >
   * is the set of index [i,j], with i<j.
  **/
 template<class Type_ >
-class Array2DLowerTriangular : public IArray2D< Array2DLowerTriangular<Type_> >
+class Array2DLowerTriangular: public IArray2D< Array2DLowerTriangular<Type_> >
 {
   public:
     /** Type for the Interface Class.*/
@@ -130,12 +130,12 @@ class Array2DLowerTriangular : public IArray2D< Array2DLowerTriangular<Type_> >
    };
 
     /** Default constructor */
-    Array2DLowerTriangular() : Base() {}
+    Array2DLowerTriangular(): Base() {}
     /** Constructor with specified ranges
      *  @param I range of the Rows
      *  @param J range of the Cols
      **/
-    Array2DLowerTriangular( Range const& I, Range const& J) : Base(I, J) {}
+    Array2DLowerTriangular( Range const& I, Range const& J): Base(I, J) {}
     /** constructor with rows_ and rageHo_ specified, initialization with a
      *  specified value.
      *  @param I range of the Rows
@@ -143,28 +143,28 @@ class Array2DLowerTriangular : public IArray2D< Array2DLowerTriangular<Type_> >
      *  @param v initial value in the container
      **/
     Array2DLowerTriangular( Range const& I, Range const& J, Type const& v)
-                          : Base(I, J)
+                         : Base(I, J)
     { LowBase::setValue(v);}
     /** Copy constructor
      *  @param T the container to copy
      *  @param ref true if T is wrapped
      **/
     Array2DLowerTriangular( const Array2DLowerTriangular &T, bool ref=false)
-                          : Base(T, ref) {}
+                         : Base(T, ref) {}
     /** constructor by reference, ref_=1.
      *  @param T the container to wrap
      *  @param I range of the Rows to wrap
      *  @param J range of the Cols to wrap
      **/
     Array2DLowerTriangular( const Base& T, Range const& I, Range const& J)
-                          : Base(T, I, J) {}
+                         : Base(T, I, J) {}
     /** Wrapper constructor Contruct a reference container.
      *  @param q pointer on the data
      *  @param I range of the  Rows to wrap
      *  @param J range of the Cols to wrap
      **/
     Array2DLowerTriangular( Type** q, Range const& I, Range const& J)
-                          : Base(q, I, J) {}
+                         : Base(q, I, J) {}
     /** Copy constructor using an expression.
      *  @param T the container to wrap
      **/

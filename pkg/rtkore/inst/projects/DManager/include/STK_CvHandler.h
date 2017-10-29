@@ -29,7 +29,7 @@
  **/
 
 /** @file STK_CvHandler.h
- *  @brief In this file we define and impement the class CvHandler dedicated
+ *  @brief In this file we define and implement the class CvHandler dedicated
  *  to Cross Validation
  **/
 

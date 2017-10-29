@@ -110,7 +110,7 @@ static void leftEliminate( ArrayDiagonalX& D
  *  and it is possible to compute some (all) vectors of Ker(A).
  **/
 template<class Array>
-class Svd : public ISvd<Svd<Array> >
+class Svd: public ISvd<Svd<Array> >
 {
   public :
     typedef ISvd< Svd<Array> > Base;
@@ -134,7 +134,7 @@ class Svd : public ISvd<Svd<Array> >
      *  @param withV if true, we save the right housolder transforms in V_.
      **/
     inline Svd( Array const& A, bool ref= false, bool withU= true, bool withV= true)
-              : Base(A, ref, withU, withV)
+             : Base(A, ref, withU, withV)
     {}
     /** constructor with other kind of array/expression
      *  @param A the matrix/expression to decompose.
@@ -143,7 +143,7 @@ class Svd : public ISvd<Svd<Array> >
      */
     template<class OtherArray>
     inline Svd( ArrayBase<OtherArray> const& A, bool withU = true, bool withV = true)
-              : Base(A, withU, withV) {}
+             : Base(A, withU, withV) {}
     /** Copy Constructor
      *  @param S the Svd to copy
      **/

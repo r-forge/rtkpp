@@ -52,9 +52,9 @@ class JointGamma: public JointProbability<RowVector, Law::Gamma>
   public:
     typedef JointProbability<RowVector, Law::Gamma> Base;
     /** default constructor */
-    JointGamma() : Base(_T("JointGamma")) {}
+    JointGamma(): Base(_T("JointGamma")) {}
     /** constructor */
-    JointGamma( int const& nbVar) : Base(_T("JointGamma"), nbVar) {}
+    JointGamma( int const& nbVar): Base(_T("JointGamma"), nbVar) {}
     /** destructor */
     virtual ~JointGamma() {}
     /** @return the shape of the jth law */

@@ -182,7 +182,7 @@ class DiagonalizeOperator: public ExprBase< DiagonalizeOperator< Lhs> >, public 
     typedef TRange<size_> ColRange;
     /** Constructor */
     inline DiagonalizeOperator( Lhs const& lhs)
-                             : Base(), lhs_(lhs)
+                            : Base(), lhs_(lhs)
     {
       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Lhs);
     }
@@ -252,7 +252,7 @@ class DiagonalOperator: public ExprBase< DiagonalOperator< Lhs> >, public TRef<1
 
     /** Constructor */
     inline DiagonalOperator( Lhs const& lhs)
-                           : Base(), lhs_(lhs)
+                          : Base(), lhs_(lhs)
                            , range_( lhs_.beginRows(), (size_ != UnknownSize) ? size_ : lhs_.sizeRows())
     {
       if (lhs.rows()!=lhs.cols())
@@ -323,7 +323,7 @@ class UpperTriangularizeOperator: public ExprBase< UpperTriangularizeOperator< L
 
     /** Constructor */
     inline UpperTriangularizeOperator( Lhs const& lhs)
-                                     : Base(), lhs_(lhs)
+                                    : Base(), lhs_(lhs)
     {}
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_; }
@@ -383,7 +383,7 @@ class LowerTriangularizeOperator: public ExprBase< LowerTriangularizeOperator< L
 
     /** Constructor */
     inline LowerTriangularizeOperator( Lhs const& lhs)
-                                     : Base(), lhs_(lhs)
+                                    : Base(), lhs_(lhs)
     {}
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_; }

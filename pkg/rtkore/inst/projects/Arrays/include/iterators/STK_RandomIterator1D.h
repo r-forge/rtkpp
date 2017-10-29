@@ -130,9 +130,9 @@ struct ConstRandomIterator1D: public IteratorBase< ConstRandomIterator1D<Derived
     // creating
     ConstRandomIterator1D(): Base(), array_(0) {}
     ConstRandomIterator1D( Derived const& array, int pos)
-                         : Base(pos), array_(&array) {}
+                        : Base(pos), array_(&array) {}
     ConstRandomIterator1D( ConstRandomIterator1D const& it)
-                         : Base(it), array_(it.array_) {}
+                        : Base(it), array_(it.array_) {}
     ~ConstRandomIterator1D() {}
     ConstRandomIterator1D& operator=(ConstRandomIterator1D const& it)
     { array_ = it.array_; pos_= it.pos_; return *this;}

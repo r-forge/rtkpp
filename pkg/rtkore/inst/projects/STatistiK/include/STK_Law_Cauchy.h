@@ -64,7 +64,7 @@ namespace Law
  *  independent standard normal variables and has the probability density
  *  function \f$  f(x;0,1) \f$.
  **/
-class Cauchy : public IUnivLaw<Real>
+class Cauchy: public IUnivLaw<Real>
 {
   public:
     typedef IUnivLaw<Real> Base;
@@ -72,7 +72,7 @@ class Cauchy : public IUnivLaw<Real>
      *  @param mu, scale location and scale of the Cauchy distribution
      **/
     inline Cauchy( Real const& mu=0, Real const& scale=1)
-                 : Base(String(_T("Cauchy")))
+                : Base(String(_T("Cauchy")))
                  , mu_(mu)
                  , scale_(scale)
     {
@@ -180,9 +180,13 @@ class Cauchy : public IUnivLaw<Real>
 
 /*  Generate a pseudo Cauchy random variate. */
 inline Real Cauchy::rand() const
-{ GetRNGstate(); Real s = Rf_rcauchy(mu_, scale_);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); Real s = Rf_rcauchy(mu_, scale_); PutRNGstate(); return s;
 }
+
 inline Real Cauchy::pdf( Real const& x) const { return Rf_dcauchy(x,mu_, scale_, false);}
 inline Real Cauchy::lpdf( Real const& x) const { return Rf_dcauchy(x,mu_, scale_, true);}
 inline Real Cauchy::cdf( Real const& t) const { return Rf_pcauchy(t, mu_, scale_, true, false);}
@@ -190,9 +194,13 @@ inline Real Cauchy::icdf( Real const& p) const { return Rf_qcauchy(p , mu_, scal
 
 // static
 inline Real Cauchy::rand( Real const& mu, Real const& scale)
-{ GetRNGstate(); Real s = Rf_rcauchy(mu, scale);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); Real s = Rf_rcauchy(mu, scale); PutRNGstate(); return s;
 }
+
 inline Real Cauchy::pdf(Real const& x, Real const& mu, Real const& scale)
 { return Rf_dcauchy(x,mu, scale, false);}
 inline Real Cauchy::lpdf(Real const& x, Real const& mu, Real const& scale)

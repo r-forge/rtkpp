@@ -71,7 +71,7 @@ class HyperGeometric: public IUnivLaw<Integer>
      *  @param nbSuccesses, nbFailures, nbDraws number of successes, failures, draws
      **/
     inline HyperGeometric( int nbSuccesses, int nbFailures, int nbDraws)
-                         : Base(_T("HyperGeometric"))
+                        : Base(_T("HyperGeometric"))
                          , nbSuccesses_(nbSuccesses)
                          , nbFailures_(nbFailures)
                          , nbDraws_(nbDraws)
@@ -181,9 +181,13 @@ class HyperGeometric: public IUnivLaw<Integer>
 #ifdef IS_RTKPP_LIB
 
 inline int HyperGeometric::rand() const
-{ GetRNGstate(); int s = Rf_rhyper(nbSuccesses_, nbFailures_, nbDraws_);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); int s = Rf_rhyper(nbSuccesses_, nbFailures_, nbDraws_); PutRNGstate(); return s;
 }
+
 inline Real HyperGeometric::pdf(Integer const& x) const
 { return Rf_dhyper((double)x, nbSuccesses_, nbFailures_, nbDraws_, false);}
 inline Real HyperGeometric::lpdf(Integer const& x) const
@@ -195,9 +199,12 @@ inline int HyperGeometric::icdf(Real const& p) const
 
 inline Integer HyperGeometric::rand( int nbSuccesses, int nbFailures, int nbDraws)
 {
-  GetRNGstate(); int s = Rf_rhyper(nbSuccesses, nbFailures, nbDraws);
-  PutRNGstate(); return s;
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+  GetRNGstate(); int s = Rf_rhyper(nbSuccesses, nbFailures, nbDraws); PutRNGstate(); return s;
 }
+
 inline Real HyperGeometric::pdf(Integer x, int nbSuccesses, int nbFailures, int nbDraws)
 { return Rf_dhyper((double)x, nbSuccesses, nbFailures, nbDraws, false);}
 inline Real HyperGeometric::lpdf(Integer x, int nbSuccesses, int nbFailures, int nbDraws)

@@ -75,7 +75,7 @@ class NegativeBinomial: public IUnivLaw<Integer>
      *  @param prob, size probability of success and number of successes in a NegativeBinomial trial
      **/
     inline NegativeBinomial( int size =1, Real const& prob =0.5)
-                           : Base(_T("Negative Binomial")), size_(size), prob_(prob) {}
+                          : Base(_T("Negative Binomial")), size_(size), prob_(prob) {}
 
     /** destructor */
     inline virtual ~NegativeBinomial() {}
@@ -168,9 +168,13 @@ class NegativeBinomial: public IUnivLaw<Integer>
 #ifdef IS_RTKPP_LIB
 
 inline int NegativeBinomial::rand() const
-{ GetRNGstate(); int s = Rf_rnbinom(size_, prob_);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); int s = Rf_rnbinom(size_, prob_); PutRNGstate(); return s;
 }
+
 inline Real NegativeBinomial::pdf(Integer const& x) const
 { return Rf_dnbinom((double)x, size_, prob_, false);}
 inline Real NegativeBinomial::lpdf(Integer const& x) const
@@ -181,9 +185,13 @@ inline int NegativeBinomial::icdf(Real const& p) const
 { return (int)::Rf_qnbinom(p, size_, prob_, true, false);}
 
 inline int NegativeBinomial::rand(int size, Real const& prob)
-{ GetRNGstate(); int s = Rf_rnbinom(size, prob);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); int s = Rf_rnbinom(size, prob); PutRNGstate(); return s;
 }
+
 inline Real NegativeBinomial::pdf(Integer x, int size, Real const& prob)
 { return Rf_dnbinom((double)x, size, prob, false);}
 inline Real NegativeBinomial::lpdf(Integer x, int size, Real const& prob)

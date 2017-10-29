@@ -49,7 +49,7 @@ namespace STK
  * IFunction takes a function template parameter. This parameter
  * is the type of the class which derives from it. For example
  * @code
- * class Function : public IFunction<Function>
+ * class Function: public IFunction<Function>
  * {...}
  * @endcode
   *
@@ -65,7 +65,7 @@ namespace STK
  * finding algorithms.
  **/
 template <class Function>
-class IFunction : public IRecursiveTemplate<Function>
+class IFunction: public IRecursiveTemplate<Function>
 {
   protected:
     /** Default Constructor*/

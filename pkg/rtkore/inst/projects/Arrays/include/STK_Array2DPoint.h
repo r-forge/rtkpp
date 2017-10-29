@@ -94,7 +94,7 @@ struct Traits< Array2DPoint<Type_> >
  *  modified using the appropriate constructor or using the method @c shift.
  **/
 template<class Type_>
-class Array2DPoint : public IArray2D< Array2DPoint<Type_> >
+class Array2DPoint: public IArray2D< Array2DPoint<Type_> >
 {
   public:
     typedef IArray2D< Array2DPoint<Type_> > Base;
@@ -120,30 +120,30 @@ class Array2DPoint : public IArray2D< Array2DPoint<Type_> >
     };
 
     /** Default constructor */
-    Array2DPoint() : Base(Range(1), Range()) {}
+    Array2DPoint(): Base(Range(1), Range()) {}
     /** constructor with specified range.
      *  @param J range of the container
      **/
-    Array2DPoint( Range const& J) : Base(Range(1), J) {}
+    Array2DPoint( Range const& J): Base(Range(1), J) {}
     /** constructor with specified range, initialization with a constant.
      *  @param J range of the container
      *  @param v initial value of the container
      **/
-    Array2DPoint( Range const& J, Type const& v) : Base(Range(1), J)
+    Array2DPoint( Range const& J, Type const& v): Base(Range(1), J)
     { LowBase::setValue(v);}
     /** Copy constructor
      *  @param T the container to copy
      *  @param ref true if this is a wrapper of T
      **/
     Array2DPoint( Array2DPoint const& T, bool ref =false)
-                : Base(T, ref)
+               : Base(T, ref)
     {}
     /** constructor by reference, ref_=1.
      *  @param T the container to wrap
      *  @param J the columns range to wrap
      **/
     Array2DPoint( Array2DPoint const& T, Range const& J)
-                : Base(T, T.rows(), J) {}
+               : Base(T, T.rows(), J) {}
     /** constructor by reference, ref_=1.
      *  @param T the container to wrap
      *  @param J the range of the data to wrap
@@ -151,7 +151,7 @@ class Array2DPoint : public IArray2D< Array2DPoint<Type_> >
      **/
     template<class OtherArray>
     Array2DPoint( IArray2D<OtherArray> const& T, Range const& J, int row)
-                : Base(T, Range(row, 1), J)
+               : Base(T, Range(row, 1), J)
     {}
     /** Copy constructor using an expression.
      *  @param T the container to wrap
@@ -165,7 +165,7 @@ class Array2DPoint : public IArray2D< Array2DPoint<Type_> >
      *  @param row the index of the row to wrap
      **/
      Array2DPoint( Type** p_data, Range const& J, int row)
-                 : Base(p_data, Range(row, 1), J) {}
+                : Base(p_data, Range(row, 1), J) {}
     /** destructor. */
     ~Array2DPoint() {}
     /** @return a constant reference on the jth element

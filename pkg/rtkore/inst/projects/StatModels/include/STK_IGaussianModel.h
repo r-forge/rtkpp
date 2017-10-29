@@ -159,11 +159,11 @@ class IGaussianModel: public IStatModel< IGaussianModel<Array> >
     /** constructor.
      * @param p_data pointer on the data set
      **/
-    IGaussianModel( Array const* p_data) : Base(p_data) {}
+    IGaussianModel( Array const* p_data): Base(p_data) {}
     /** constructor.
      * @param data reference on the data set
      **/
-    IGaussianModel( Array const& data) : Base(data) {}
+    IGaussianModel( Array const& data): Base(data) {}
 
   public:
     /** destructor. */

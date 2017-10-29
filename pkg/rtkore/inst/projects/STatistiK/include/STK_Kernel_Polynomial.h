@@ -66,7 +66,7 @@ class Polynomial: public IKernelBase<Array>
      *  @param shift the shift to use in the kernel
      **/
     Polynomial( Real const& d=2., Real const& shift= 0)
-              : Base(0), d_(d), shift_(shift)
+             : Base(0), d_(d), shift_(shift)
     {}
     /** constructor with a constant pointer on the data set
      *  @param p_data a pointer on a data set that will be "kernelized"
@@ -74,7 +74,7 @@ class Polynomial: public IKernelBase<Array>
      *  @param shift the shift to use in the kernel
      **/
     Polynomial( Array const* p_data, Real const& d=2., Real const& shift= 0)
-              : Base(p_data), d_(d), shift_(shift)
+             : Base(p_data), d_(d), shift_(shift)
     { if (d_ <= 0.)
       STKDOMAIN_ERROR_2ARG(Polynomial::Polynomial,shift,d,d must be>0);
     }
@@ -84,7 +84,7 @@ class Polynomial: public IKernelBase<Array>
      *  @param shift the shift to use in the kernel
      **/
     Polynomial( Array const& data, Real const& d=2., Real const& shift= 0.)
-              : Base(data), d_(d), shift_(shift)
+             : Base(data), d_(d), shift_(shift)
     { if (d_ <= 0.)
       STKDOMAIN_ERROR_2ARG(Polynomial::Polynomial,shift,d,d must be>0);
     }
@@ -94,7 +94,7 @@ class Polynomial: public IKernelBase<Array>
      **/
     template<class Derived>
     Polynomial( Array const* p_data, ExprBase<Derived> const& param)
-              : Base(p_data)
+             : Base(p_data)
               , d_(param.empty() ? 2. : param.front())
               , shift_(param.empty() ? 2. : param.elt(param.begin()+1))
     {}
@@ -104,7 +104,7 @@ class Polynomial: public IKernelBase<Array>
      **/
     template<class Derived>
     Polynomial( Array const& data, ExprBase<Derived> const& param)
-              : Base(data)
+             : Base(data)
               , d_(param.empty() ? 2. : param.front())
               , shift_(param.empty() ? 2. : param.elt(param.begin()+1))
     {}

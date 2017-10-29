@@ -84,7 +84,7 @@ namespace STK
  *  class IUnivLaw, @sa IUnivLaw.
  **/
 template <class ColVector, class WColVector, class UnivariateLaw>
-class IUnivStatModel : public IStatModelBase, public IRunnerUnsupervised<ColVector, WColVector>
+class IUnivStatModel: public IStatModelBase, public IRunnerUnsupervised<ColVector, WColVector>
 {
   public:
     using IRunnerUnsupervised<ColVector, WColVector>::p_data;

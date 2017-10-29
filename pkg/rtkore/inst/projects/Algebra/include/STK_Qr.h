@@ -106,11 +106,11 @@ class Qr: public IQr<Qr<Array> >
      *  @param data reference on a matrix expression
      */
     template<class Derived>
-    inline Qr( ExprBase<Derived> const& data) : Base(data) {}
+    inline Qr( ExprBase<Derived> const& data): Base(data) {}
     /** Copy constructor.
      *  @param decomp the decomposition  to copy
      **/
-    inline Qr( Qr const& decomp) : Base(decomp) {}
+    inline Qr( Qr const& decomp): Base(decomp) {}
     /** virtual destructor */
     inline virtual ~Qr() {}
     /** clone pattern */

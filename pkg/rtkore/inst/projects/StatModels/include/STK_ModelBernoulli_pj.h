@@ -143,7 +143,7 @@ class Bernoulli_pjParameters
  *
  **/
 template <class Data_, class WColVector_>
-class ModelBernoulli_pj : public IMultiStatModel< ModelBernoulli_pj<Data_, WColVector_> >
+class ModelBernoulli_pj: public IMultiStatModel< ModelBernoulli_pj<Data_, WColVector_> >
 {
   public:
     /** Type of the container storing the data */
@@ -162,13 +162,13 @@ class ModelBernoulli_pj : public IMultiStatModel< ModelBernoulli_pj<Data_, WColV
     using Base::param;
 
     /** default constructor. */
-    ModelBernoulli_pj() : Base() {}
+    ModelBernoulli_pj(): Base() {}
     /** Constructor with data set. */
-    ModelBernoulli_pj( Data const& data) : Base(data) {}
+    ModelBernoulli_pj( Data const& data): Base(data) {}
     /** Constructor with a ptr on the data set. */
-    ModelBernoulli_pj( Data const* p_data) : Base(p_data) {}
+    ModelBernoulli_pj( Data const* p_data): Base(p_data) {}
     /** Copy constructor. */
-    ModelBernoulli_pj( ModelBernoulli_pj const& model) : Base(model) {}
+    ModelBernoulli_pj( ModelBernoulli_pj const& model): Base(model) {}
     /** destructor */
     ~ModelBernoulli_pj() {}
 

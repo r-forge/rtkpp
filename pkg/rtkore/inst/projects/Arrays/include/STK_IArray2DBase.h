@@ -124,7 +124,7 @@ class IArray2DBase: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, h
      *  @param J range of the columns
      **/
     IArray2DBase( Range const& I, Range const& J)
-                : Base2D(I, J), Base(), allocator_()
+               : Base2D(I, J), Base(), allocator_()
                 , availableRows_(), rangeCols_()
                 , availableCols_(0), capacityByCols_(0)
     { mallocCols(this->cols());}
@@ -141,7 +141,7 @@ class IArray2DBase: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, h
      *  @param ref true if we wrap T
      **/
     IArray2DBase( IArray2DBase const& T, bool ref =false)
-                : Base2D(T), Base()
+               : Base2D(T), Base()
                 , allocator_(T.allocator_, ref)
                 , availableRows_(T.availableRows_, ref)
                 , rangeCols_(T.rangeCols_) //  have to be created again, in case T is a temporary
@@ -153,7 +153,7 @@ class IArray2DBase: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, h
      **/
     template<class OtherDerived>
     IArray2DBase( IArray2DBase<PTRCOL, OtherDerived> const& T, Range const& I, Range const& J)
-                : Base2D(I, J), Base()
+               : Base2D(I, J), Base()
                 , allocator_(T.allocator(), J)         // a reference
                 , availableRows_(T.availableRows(), J) // a reference
                 , rangeCols_(T.rangeCols())            // have to be created again
@@ -167,7 +167,7 @@ class IArray2DBase: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, h
      *  @param I,J range of the rows and columns to wrap
      **/
     IArray2DBase( PTRCOL* q, Range const& I, Range const& J)
-                : Base2D(I, J), Base(), allocator_(q, J, true)
+               : Base2D(I, J), Base(), allocator_(q, J, true)
                 , availableRows_(J, I.size()), rangeCols_(J, I)
                 , availableCols_(I.size()), capacityByCols_(J.size())
     {}

@@ -347,7 +347,7 @@ class ArrayBase :  public ExprBase<Derived>
 
   protected:
     /** Default constructor. Default values are cols=(1:0) and rows=(1:0). */
-    ArrayBase() : Base() {}
+    ArrayBase(): Base() {}
     /** destructor */
     ~ArrayBase() {}
 
@@ -634,7 +634,7 @@ class ArrayBase :  public ExprBase<Derived>
     }
     /** overwrite @c this with @c src.
      *  @note this method does not take care of the possibility of overlapping
-     *  @param src the array to copy
+     *  @param rhs the right hand side to copy
      **/
     template<class OtherDerived>
     Derived& copy( ExprBase<OtherDerived> const& rhs);

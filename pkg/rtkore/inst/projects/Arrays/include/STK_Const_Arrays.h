@@ -242,7 +242,7 @@ class IConstArray: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, hi
     /** default constructor */
     IConstArray(): Base2D(), Base() {}
     /** constructor with specified dimension */
-    IConstArray(Range const& rows, Range const& cols) : Base2D(rows, cols), Base() {}
+    IConstArray(Range const& rows, Range const& cols): Base2D(rows, cols), Base() {}
     /** destructor */
     ~IConstArray() {}
 
@@ -301,7 +301,7 @@ class IConstArray: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, hi
  * @tparam Size_ the size of the identity ArrayXX. Default is UnknownSize.
  **/
 template< typename Type_, int Size_ >
-class Identity : public IConstArray<Identity<Type_, Size_> >
+class Identity: public IConstArray<Identity<Type_, Size_> >
 {
   public:
     typedef IConstArray<Identity<Type_, Size_> > Base;
@@ -316,9 +316,9 @@ class Identity : public IConstArray<Identity<Type_, Size_> >
       storage_   = hidden::Traits< Identity <Type_, Size_> >::storage_
     };
     /** default constructor */
-    Identity() : Base() {}
+    Identity(): Base() {}
     /** constructor with specified dimension */
-    Identity(Range I) : Base(I,I) {}
+    Identity(Range I): Base(I,I) {}
     /** @return the element (i,j) of the identity matrix.
      *  @param i index of the row
      *  @param j index of the column
@@ -354,7 +354,7 @@ class Identity : public IConstArray<Identity<Type_, Size_> >
  * @tparam Size_ the size of the square ArrayXX. Default is UnknownSize.
  **/
 template< typename Type_, int Size_ >
-class Square : public IConstArray<Square<Type_, Size_> >
+class Square: public IConstArray<Square<Type_, Size_> >
 {
   public:
     typedef IConstArray<Square<Type_, Size_> > Base;
@@ -369,9 +369,9 @@ class Square : public IConstArray<Square<Type_, Size_> >
       storage_   = hidden::Traits< Square <Type_, Size_> >::storage_
     };
     /** default constructor */
-    Square() : Base() {}
+    Square(): Base() {}
     /** constructor with specified dimension */
-    Square(Range I) : Base(I, I) {}
+    Square(Range I): Base(I, I) {}
     /** @return the element (i,j) of the constant square matrix.
      *  @param i index of the row
      *  @param j index of the column
@@ -403,7 +403,7 @@ class Square : public IConstArray<Square<Type_, Size_> >
  * @tparam SizeCols_ the number of column of the matrix. Default is UnknownSize.
  **/
 template< typename Type_, int SizeRows_, int SizeCols_ >
-class Array : public IConstArray<Array<Type_, SizeRows_, SizeCols_> >
+class Array: public IConstArray<Array<Type_, SizeRows_, SizeCols_> >
 {
   public:
     typedef IConstArray<Array<Type_, SizeRows_, SizeCols_> > Base;
@@ -419,9 +419,9 @@ class Array : public IConstArray<Array<Type_, SizeRows_, SizeCols_> >
       storage_   = hidden::Traits< Array <Type_, SizeRows_, SizeCols_> >::storage_
     };
     /** default constructor */
-    Array() : Base() {}
+    Array(): Base() {}
     /** constructor with specified dimension */
-    Array(Range rangeRows, Range rangeCols) : Base(rangeRows, rangeCols) {}
+    Array(Range rangeRows, Range rangeCols): Base(rangeRows, rangeCols) {}
     /** @return the element (i,j) of the constant square matrix.
      *  @param i index of the row
      *  @param j index of the column
@@ -453,7 +453,7 @@ class Array : public IConstArray<Array<Type_, SizeRows_, SizeCols_> >
  * @tparam SizeCols_ the number of column of the matrix. Default is UnknownSize.
  **/
 template< typename Type_, int SizeRows_, int SizeCols_ >
-class UpperTriangular : public IConstArray<UpperTriangular<Type_, SizeRows_, SizeCols_> >
+class UpperTriangular: public IConstArray<UpperTriangular<Type_, SizeRows_, SizeCols_> >
 {
   public:
     typedef IConstArray<UpperTriangular<Type_, SizeRows_, SizeCols_> > Base;
@@ -469,9 +469,9 @@ class UpperTriangular : public IConstArray<UpperTriangular<Type_, SizeRows_, Siz
       storage_   = hidden::Traits< UpperTriangular <Type_, SizeRows_, SizeCols_> >::storage_
     };
     /** default constructor */
-    UpperTriangular() : Base() {}
+    UpperTriangular(): Base() {}
     /** constructor with specified dimension */
-    UpperTriangular(Range rangeRows, Range rangeCols) : Base(rangeRows, rangeCols) {}
+    UpperTriangular(Range rangeRows, Range rangeCols): Base(rangeRows, rangeCols) {}
     /** @return the element (i,j) of the constant upper triangular matrix.
      *  @param i index of the row
      *  @param j index of the column
@@ -503,7 +503,7 @@ class UpperTriangular : public IConstArray<UpperTriangular<Type_, SizeRows_, Siz
  * @tparam SizeCols_ the number of column of the matrix. Default is UnknownSize.
  **/
 template< typename Type_, int SizeRows_, int SizeCols_ >
-class LowerTriangular : public IConstArray<LowerTriangular<Type_, SizeRows_, SizeCols_> >
+class LowerTriangular: public IConstArray<LowerTriangular<Type_, SizeRows_, SizeCols_> >
 {
   public:
     typedef IConstArray<LowerTriangular<Type_, SizeRows_, SizeCols_> > Base;
@@ -519,9 +519,9 @@ class LowerTriangular : public IConstArray<LowerTriangular<Type_, SizeRows_, Siz
       storage_   = hidden::Traits< LowerTriangular <Type_, SizeRows_, SizeCols_> >::storage_
     };
     /** default constructor */
-    LowerTriangular() : Base() {}
+    LowerTriangular(): Base() {}
     /** constructor with specified dimension */
-    LowerTriangular(Range rangeRows, Range rangeCols) : Base(rangeRows, rangeCols) {}
+    LowerTriangular(Range rangeRows, Range rangeCols): Base(rangeRows, rangeCols) {}
     /** @return the element (i,j) of the constant lower triangular matrix.
      *  @param i index of the row
      *  @param j index of the column
@@ -548,7 +548,7 @@ class LowerTriangular : public IConstArray<LowerTriangular<Type_, SizeRows_, Siz
  * @tparam Size_ the size of the row-vector. Default is UnknownSize.
  **/
 template< typename Type_, int Size_ >
-class Point : public IConstArray<Point<Type_, Size_> >
+class Point: public IConstArray<Point<Type_, Size_> >
 {
   public:
     typedef IConstArray<Point<Type_, Size_> > Base;
@@ -564,9 +564,9 @@ class Point : public IConstArray<Point<Type_, Size_> >
       storage_   = hidden::Traits< Point <Type_, Size_> >::storage_
     };
     /** default constructor */
-    Point() : Base() {}
+    Point(): Base() {}
     /** constructor with specified dimension */
-    Point(Range I) : Base(1, I) {}
+    Point(Range I): Base(1, I) {}
     /** @return the j-th element  of the constant row-vector.
      *  @param j index of the element
      **/
@@ -597,7 +597,7 @@ class Point : public IConstArray<Point<Type_, Size_> >
  * @tparam Size_ the size of the row-vector. Default is UnknownSize.
  **/
 template< typename Type_, int Size_ >
-class Vector : public IConstArray<Vector<Type_, Size_> >
+class Vector: public IConstArray<Vector<Type_, Size_> >
 {
   public:
     typedef IConstArray<Vector<Type_, Size_> > Base;
@@ -613,9 +613,9 @@ class Vector : public IConstArray<Vector<Type_, Size_> >
       storage_   = hidden::Traits< Vector <Type_, Size_> >::storage_
     };
     /** default constructor */
-    Vector() : Base() {}
+    Vector(): Base() {}
     /** constructor with specified dimension */
-    Vector(Range I) : Base(I, 1) {}
+    Vector(Range I): Base(I, 1) {}
     /** @return the i-th element of the constant vector.
      *  @param i index of the element
      **/

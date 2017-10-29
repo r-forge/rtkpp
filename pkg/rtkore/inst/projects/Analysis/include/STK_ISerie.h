@@ -49,7 +49,7 @@ namespace STK
  * ISerie takes a Serie template parameter. This parameter
  * is the type of the class which derives from it. For exemple
  * @code
- * class Serie : public ISerie<Serie>
+ * class Serie: public ISerie<Serie>
  * {...}
  * @endcode
   * 
@@ -64,7 +64,7 @@ namespace STK
  * @endcode
  **/
 template <class Serie>
-class ISerie : public IRecursiveTemplate<Serie>
+class ISerie: public IRecursiveTemplate<Serie>
 {
   protected:
     /** Default Constructor*/

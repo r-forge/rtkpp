@@ -70,7 +70,7 @@ typedef Normal Gaussian;
  *  \f]
  * where \f$ \mu \mbox{ and } \sigma\f$ are the mean and the standard deviation.
 **/
-class Normal : public IUnivLaw<Real>
+class Normal: public IUnivLaw<Real>
 {
   public:
     typedef IUnivLaw<Real> Base;
@@ -79,7 +79,7 @@ class Normal : public IUnivLaw<Real>
      *  @param sigma standard deviation of the Normal distribution
      **/
     Normal( Real const& mu=0., Real const& sigma=1.)
-          : Base(String(_T("Normal")))
+         : Base(String(_T("Normal")))
           , mu_(mu), sigma_(sigma)
     {
       if (!Arithmetic<Real>::isFinite(mu) || !Arithmetic<Real>::isFinite(sigma) || sigma < 0)
@@ -184,19 +184,27 @@ class Normal : public IUnivLaw<Real>
 
 /*  Generate a pseudo Normal random variate. */
 inline Real Normal::rand() const
-{ GetRNGstate(); Real s = Rf_rnorm(mu_, sigma_);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); Real s = Rf_rnorm(mu_, sigma_); PutRNGstate(); return s;
 }
+
 inline Real Normal::pdf( Real const& x) const {   return Rf_dnorm4(x, mu_, sigma_, false);}
 inline Real Normal::lpdf( Real const& x) const {   return Rf_dnorm4(x, mu_, sigma_, true);}
 inline Real Normal::cdf( Real const& t) const { return Rf_pnorm5(t, mu_, sigma_, true, false);}
 inline Real Normal::icdf( Real const& p) const { return Rf_qnorm5(p , mu_, sigma_, true, false);}
 
-// static
+
 inline Real Normal::rand( Real const& mu, Real const& scale)
-{ GetRNGstate(); Real s = Rf_rnorm(mu, scale);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); Real s = Rf_rnorm(mu, scale); PutRNGstate(); return s;
 }
+
 inline Real Normal::pdf(Real const& x, Real const& mu, Real const& scale)
 { return Rf_dnorm4(x,mu, scale, false);}
 inline Real Normal::lpdf(Real const& x, Real const& mu, Real const& scale)

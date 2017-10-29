@@ -64,14 +64,14 @@ class RationalQuadratic: public IKernelBase<Array>
      *  @param shift the shift to use in the kernel
      **/
     RationalQuadratic( Real const& shift= 1.)
-           : Base(0), shift_(shift)
+          : Base(0), shift_(shift)
     {}
    /** constructor with a constant pointer on the data set
      *  @param p_data a pointer on a data set that will be "kernelized"
      *  @param shift the shift to use in the kernel
      **/
     RationalQuadratic( Array const* p_data, Real const& shift= 1.)
-                     : Base(p_data), shift_(shift)
+                    : Base(p_data), shift_(shift)
     { if (shift_ == 0.)
         STKDOMAIN_ERROR_1ARG(RationalQuadratic::RationalQuadratic,shift,shift must be!=0);
     }
@@ -80,7 +80,7 @@ class RationalQuadratic: public IKernelBase<Array>
      *  @param shift the size of the windows to use in the kernel
      **/
     RationalQuadratic( Array const& data, Real const& shift= 1.)
-                     : Base(data),shift_(shift)
+                    : Base(data),shift_(shift)
     { if (shift_ == 0.)
         STKDOMAIN_ERROR_1ARG(RationalQuadratic::RationalQuadratic,shift,shift must be!=0);
     }
@@ -90,7 +90,7 @@ class RationalQuadratic: public IKernelBase<Array>
      **/
     template<class Derived>
     RationalQuadratic( Array const* p_data, ExprBase<Derived> const& param)
-                     : Base(p_data), shift_(param.empty() ? 1. : param.front())
+                    : Base(p_data), shift_(param.empty() ? 1. : param.front())
     {}
     /** constructor with a constant pointer on the data set
      *  @param data a reference on a data set that will be "kernelized"
@@ -98,7 +98,7 @@ class RationalQuadratic: public IKernelBase<Array>
      **/
     template<class Derived>
     RationalQuadratic( Array const& data, ExprBase<Derived> const& param)
-                     : Base(data), shift_(param.empty() ? 1. : param.front())
+                    : Base(data), shift_(param.empty() ? 1. : param.front())
     {}
 
     /** destructor */

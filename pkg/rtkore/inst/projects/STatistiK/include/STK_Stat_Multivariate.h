@@ -50,7 +50,7 @@ namespace Stat
  *  ITContainer and contain elements of type Type.
  **/
 template < class Array, class WColVector, typename Type =  typename Array::Type >
-class Multivariate : public IRunnerUnsupervised< Array, WColVector>
+class Multivariate: public IRunnerUnsupervised< Array, WColVector>
 {
   public:
     typedef IRunnerUnsupervised< Array, WColVector> Runner2D;

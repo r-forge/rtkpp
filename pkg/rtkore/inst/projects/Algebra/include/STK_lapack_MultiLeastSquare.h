@@ -100,14 +100,14 @@ class MultiLeastSquare: public ILeastSquare< MultiLeastSquare<ArrayB, ArrayA> >
      *  @param isBref,isAref are the left hand side and the right hand side references ?
      */
     MultiLeastSquare( ArrayB const& b, ArrayA const& a, bool isBref=false, bool isAref=false)
-                    : Base(b, a, isBref, isAref), rcond_(-1) {};
+                   : Base(b, a, isBref, isAref), rcond_(-1) {};
     /** @brief template constructor
      *  @param b,a the left hand side and the right hand side of the least square
      *  problem.
      */
     template<class ArrayB_, class ArrayA_>
     MultiLeastSquare( ExprBase<ArrayB_> const& b, ExprBase<ArrayA_> const& a)
-                    : Base(b, a), rcond_(-1) {}
+                   : Base(b, a), rcond_(-1) {}
     /** Destructor */
     virtual ~MultiLeastSquare() {};
     /** @return the condition number */

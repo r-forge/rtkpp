@@ -65,7 +65,7 @@ namespace Law
  * \f]
  * It is a long-tailed distribution with mean @e m and variance \f$ \frac{π^2s^2}{3} \f$.
 **/
-class Logistic : public IUnivLaw<Real>
+class Logistic: public IUnivLaw<Real>
 {
   public:
     typedef IUnivLaw<Real> Base;
@@ -74,7 +74,7 @@ class Logistic : public IUnivLaw<Real>
      *  @param scale scale of the Logistic distribution
      **/
     inline Logistic( Real const& mu=0., Real const& scale=1.)
-                   : Base(_T("Logistic")), mu_(mu), scale_(scale) {}
+                  : Base(_T("Logistic")), mu_(mu), scale_(scale) {}
     /** Destructor. **/
     inline virtual ~Logistic() {}
     /** @return mu */
@@ -170,9 +170,13 @@ class Logistic : public IUnivLaw<Real>
 #ifdef IS_RTKPP_LIB
 
 inline Real Logistic::rand() const
-{ GetRNGstate(); Real s = Rf_rlogis(mu_, scale_);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); Real s = Rf_rlogis(mu_, scale_); PutRNGstate(); return s;
 }
+
 inline Real Logistic::pdf( Real const& x) const
 { return Rf_dlogis(x, mu_, scale_, false);}
 inline Real Logistic::lpdf( Real const& x) const
@@ -183,9 +187,13 @@ inline Real Logistic::icdf( Real const& p) const
 { return Rf_qlogis(p, mu_, scale_, true, false);}
 
 inline Real Logistic::rand( Real const& mu, Real const& scale)
-{ GetRNGstate(); Real s = Rf_rlogis(mu, scale);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); Real s = Rf_rlogis(mu, scale); PutRNGstate(); return s;
 }
+
 inline Real Logistic::pdf( Real const& x, Real const& mu, Real const& scale)
 { return Rf_dlogis(x, mu, scale, false);}
 inline Real Logistic::lpdf( Real const& x, Real const& mu, Real const& scale)

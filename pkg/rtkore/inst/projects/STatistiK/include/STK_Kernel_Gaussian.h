@@ -64,21 +64,21 @@ class Gaussian: public IKernelBase<Array>
      *  @param width the size of the windows to use in the kernel
      **/
     Gaussian( Real const& width= 1.)
-            : Base(0), width_(width)
+           : Base(0), width_(width)
     {}
     /** constructor with a constant pointer on the data set
      *  @param p_data a pointer on a data set that will be "kernelized"
      *  @param width the size of the windows to use in the kernel
      **/
     Gaussian( Array const* p_data, Real const& width= 1.)
-            : Base(p_data), width_(width)
+           : Base(p_data), width_(width)
     {}
     /** constructor with a constant pointer on the data set
      *  @param data a reference on a data set that will be "kernelized"
      *  @param width the size of the windows to use in the kernel
      **/
     Gaussian( Array const& data, Real const& width= 1.)
-            : Base(data), width_(width)
+           : Base(data), width_(width)
     {}
 
     /** constructor with an array of parameter.
@@ -87,7 +87,7 @@ class Gaussian: public IKernelBase<Array>
      **/
     template<class Derived>
     Gaussian( Array const* p_data, ExprBase<Derived> const& param)
-            : Base(p_data), width_(param.empty() ? 1. : param.front())
+           : Base(p_data), width_(param.empty() ? 1. : param.front())
     {}
     /** constructor with a constant pointer on the data set
      *  @param data a reference on a data set that will be "kernelized"
@@ -95,7 +95,7 @@ class Gaussian: public IKernelBase<Array>
      **/
     template<class Derived>
     Gaussian( Array const& data, ExprBase<Derived> const& param)
-            : Base(data), width_(param.empty() ? 1. : param.front())
+           : Base(data), width_(param.empty() ? 1. : param.front())
     {}
 
     /** destructor */

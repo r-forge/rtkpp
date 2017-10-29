@@ -93,7 +93,7 @@ struct Traits< Array2DNumber<Type_> >
  *  modified using the appropriate constructor or using the method @c shift.
  **/
 template<class Type_>
-class Array2DNumber : public IArray2D< Array2DNumber<Type_> >
+class Array2DNumber: public IArray2D< Array2DNumber<Type_> >
 {
   public:
     typedef IArray2D< Array2DNumber<Type_> > Base;
@@ -119,24 +119,24 @@ class Array2DNumber : public IArray2D< Array2DNumber<Type_> >
     };
 
     /** Default constructor */
-    Array2DNumber() : Base(Range(1), Range(1)) {}
+    Array2DNumber(): Base(Range(1), Range(1)) {}
     /** constructor with specified range, initialization with a constant.
      *  @param v initial value of the container
      **/
-    Array2DNumber( Type const& v) : Base(Range(1), Range(1))
+    Array2DNumber( Type const& v): Base(Range(1), Range(1))
     { LowBase::setValue(v);}
     /** Copy constructor
      *  @param T the container to copy
      *  @param ref true if this is a wrapper of T
      **/
-    Array2DNumber( Array2DNumber const& T, bool ref =false) : Base(T, ref) {}
+    Array2DNumber( Array2DNumber const& T, bool ref =false): Base(T, ref) {}
     /** constructor by reference, ref_=1.
      *  @param T the container to wrap
      *  @param row, col indexes of the row and column to wrap
      **/
     template<class OtherArray>
     Array2DNumber( IArray2D<OtherArray> const& T, int row, int col)
-                : Base(T, Range(row, 1), Range(col, 1))
+               : Base(T, Range(row, 1), Range(col, 1))
     {}
     /** Copy constructor using an expression.
      *  @param T the container to wrap
@@ -150,7 +150,7 @@ class Array2DNumber : public IArray2D< Array2DNumber<Type_> >
      *  @param col the index of the column to wrap
      **/
      Array2DNumber( Type** p_data, int row, int col)
-                  : Base(p_data, Range(row, 1), Range(col, 1)) {}
+                 : Base(p_data, Range(row, 1), Range(col, 1)) {}
     /** destructor. */
     ~Array2DNumber() {}
     /** @return a constant reference on the jth element

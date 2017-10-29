@@ -71,19 +71,19 @@ class Categorical: public IUnivLaw<int>
   public:
     typedef IUnivLaw<int> Base;
     /** Default constructor. Only one category */
-    inline Categorical() : Base(_T("Categorical")), prob_(1,1) { computeCumProb();}
+    inline Categorical(): Base(_T("Categorical")), prob_(1,1) { computeCumProb();}
     /** constructor with given probabilities.
      *  The probabilities will be normalized in order to have an overall sum of 1
      *  @param prob probabilities of success in a Categorical trial
      **/
-    Categorical(Array2DVector<Real> const& prob) : Base(_T("Categorical")), prob_(prob)
+    Categorical(Array2DVector<Real> const& prob): Base(_T("Categorical")), prob_(prob)
     { computeCumProb();}
     /** constructor with given probabilities.
      *  The probabilities will be normalized in order to have an overall sum of 1
      *  @param prob probabilities of success in a Categorical trial
      **/
     template <class OtherArray>
-    Categorical(OtherArray const& prob) : Base(_T("Categorical"))
+    Categorical(OtherArray const& prob): Base(_T("Categorical"))
     { prob_ = prob; computeCumProb();}
     /** destructor */
     inline virtual ~Categorical() {}

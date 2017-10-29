@@ -62,7 +62,7 @@ template<typename Type> struct IdTypeImpl;
  *  NA (not available) numbers is part of the @c union.
  */
 template<>
-struct Arithmetic<Sign> : public std::numeric_limits<Sign>
+struct Arithmetic<Sign>: public std::numeric_limits<Sign>
 {
    /** Adding a Non Available (NA) special number. */
    static Sign NA() throw() { return signNA_;}

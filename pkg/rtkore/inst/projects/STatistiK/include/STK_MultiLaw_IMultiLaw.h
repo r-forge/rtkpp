@@ -107,13 +107,13 @@ class JointProbability: public IMultiLaw<RowVector>
      *  @param name name of the joint law
      **/
     JointProbability( String const& name)
-                    : Base(name), jointLaw_() {}
+                   : Base(name), jointLaw_() {}
     /** Constructor.
      *  @param name name of the joint law
      *  @param nbVar dimension of the sample
      **/
     JointProbability( String const& name, int nbVar)
-                    : Base(name), jointLaw_(nbVar) {}
+                   : Base(name), jointLaw_(nbVar) {}
     /** destructor */
     virtual ~JointProbability() {}
     /** @return the array with the marginals laws */

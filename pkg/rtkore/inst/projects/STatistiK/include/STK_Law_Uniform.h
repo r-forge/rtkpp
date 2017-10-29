@@ -59,7 +59,7 @@ namespace Law
  *    f(x; a, b) = \frac{1}{b-a} 1_{ a \leq x \leq b}.
  *  \f]
 **/
-class Uniform : public IUnivLaw<Real>
+class Uniform: public IUnivLaw<Real>
 {
   public:
     typedef IUnivLaw<Real> Base;
@@ -67,7 +67,7 @@ class Uniform : public IUnivLaw<Real>
      *  @param a,b the lower and upper bounds
      **/
     inline Uniform( Real const& a =0., Real const& b =1.)
-                  : Base(_T("Uniform")), a_(a), b_(b), range_(b_ - a_)
+                 : Base(_T("Uniform")), a_(a), b_(b), range_(b_ - a_)
     {
       if (range_ <= 0.)
         STKINVALIDARGUMENT_ERROR_2ARG(Uniform::Uniform, a_, b_,invalid parameters);
@@ -150,98 +150,39 @@ class Uniform : public IUnivLaw<Real>
     Real range_;
 };
 
-/* Generate a pseudo Uniform random variate. */
+#ifdef IS_RTKPP_LIB
+
 inline Real Uniform::rand() const
 {
-  return ((range_ <= 1.) || (a_ <=1.)) ? a_ + range_ * generator.randUnif()
-                                       : a_ * (1. + generator.randUnif()*range_/a_) ;
-}
-/* Give the value of the pdf at x.
- *  @param x a real value
- **/
-inline Real Uniform::pdf( Real const& x) const
-{
-  if (!Arithmetic<Real>::isFinite(x) ) return x;
-  if ((x < a_)||(x > b_)) return 0.;
-  return 1./range_;
-}
-/* Give the value of the log-pdf at x.
- *  @param x a real value
- **/
-inline Real Uniform::lpdf( Real const& x) const
-{
-  if (!Arithmetic<Real>::isFinite(x) ) return x;
-  if ((x < a_)||(x > b_)) return -Arithmetic<Real>::infinity();
-  return -std::log(range_);
-}
-/* The cumulative distribution function is
- * \f[
- *  F(t; a,b)= \frac{t - a}{b-a}
- * \f]
- *  @param t a real value
- **/
-inline Real Uniform::cdf( Real const& t) const
-{
-  if (!Arithmetic<Real>::isFinite(t) ) return t;
-  if (t <= a_) return 0.;
-  if (t >= b_) return 1.;
-  return (b_ - t)/range_;
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+  GetRNGstate(); Real s = Rf_runif(a_, b_); PutRNGstate(); return s;
 }
 
-/* The inverse cumulative distribution function is
- * \f[
- * F^{-1}(p; \lambda) = p (b-a) + a.
- * \f]
- *  @param p a probability
- **/
-inline Real Uniform::icdf( Real const& p) const
-{
-  // check parameter
-  if ((p > 1.) || (p < 0.))
-    STKDOMAIN_ERROR_1ARG(Exponential::icdf,p,invalid argument);
+inline Real Uniform::pdf( Real const& x)  const { return Rf_dunif(x, a_, b_, false);}
+inline Real Uniform::lpdf( Real const& x) const { return Rf_dunif(x, a_, b_, true);}
+inline Real Uniform::cdf( Real const& t)  const { return Rf_punif(t, a_, b_, true, false);}
+inline Real Uniform::icdf( Real const& p) const { return Rf_qunif(p , a_, b_, true, false);}
 
-  if (!Arithmetic<Real>::isFinite(p) ) return p;
-  if (p == 1.) return b_;
-  if (p == 0.) return a_;
-  return a_ + p * range_;
-}
-
-/* Generate a pseudo Uniform random variate with the specified
- *  parameter.
- *  @param scale the scale of the distribution
- **/
 inline Real Uniform::rand( Real const& a, Real const& b)
 {
-  return( (b-a <= 1.) ? a + (b-a) * generator.randUnif()
-                      : a + generator.rand(b-a));
-}
-/* Give the value of the pdf at x.
- *  @param x a real value
- *  @param scale the scale of the distribution
- **/
-inline Real Uniform::pdf( Real const& x, Real const& a, Real const& b)
-{
-  if (!Arithmetic<Real>::isFinite(x) ) return x;
-  if ((x < a)||(x > b)) return 0.;
-  return 1./(b-a);
-}
-/* Give the value of the log-pdf at x.
- *  @param x a real value
- *  @param scale the scale of the distribution
- **/
-inline Real Uniform::lpdf( Real const& x, Real const& a, Real const& b)
-{
-  if (!Arithmetic<Real>::isFinite(x) ) return x;
-  if ((x < a)||(x > b)) return -Arithmetic<Real>::infinity();
-  return -std::log(b-a);
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+  GetRNGstate(); Real s = Rf_runif(a, b); PutRNGstate(); return s;
 }
 
+inline Real Uniform::pdf(const Real& x, const Real& a, const Real& b)
+{ return Rf_dunif(x,a, b, false);}
+inline Real Uniform::lpdf(const Real& x, const Real& a, const Real& b)
+{ return Rf_dunif(x, a, b, true);}
 inline Real Uniform::cdf(const Real& t, const Real& a, const Real& b)
-{ return (b - t)/(b-a);}
-
-
+{ return Rf_punif(t, a, b, true, false);}
 inline Real Uniform::icdf(const Real& p, const Real& a, const Real& b)
-{ return std::max(a,std::min((1.-p) * a + p * b, b));}
+{ return Rf_qunif(p , a, b, true, false);}
+
+#endif
 
 } // namespace Law
 

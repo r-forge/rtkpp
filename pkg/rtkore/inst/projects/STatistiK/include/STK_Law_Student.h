@@ -70,14 +70,14 @@ namespace Law
  *  \f]
  *  where \f$ \nu \f$ is the number of degrees of freedom.
  **/
-class Student : public IUnivLaw<Real>
+class Student: public IUnivLaw<Real>
 {
   public:
     typedef IUnivLaw<Real> Base;
     /** Default constructor.
      *  @param df degree of freedom parameter
      **/
-    inline Student( int df = 1.) : Base(_T("Student")), df_(df) {}
+    inline Student( int df = 1.): Base(_T("Student")), df_(df) {}
     /** destructor */
     inline virtual ~Student() {}
     /** @return the number of degree of freedom */
@@ -140,21 +140,29 @@ class Student : public IUnivLaw<Real>
 #ifdef IS_RTKPP_LIB
 
 inline Real Student::rand() const
-{ GetRNGstate(); Real s = Rf_rt(df_);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); Real s = Rf_rt(df_); PutRNGstate(); return s;
 }
-inline Real Student::pdf(Real const& x) const {   return Rf_dt(x, df_, false);}
-inline Real Student::lpdf(Real const& x) const {   return Rf_dt(x, df_, true);}
-inline Real Student::cdf(Real const& t) const { return Rf_pt(t, df_, true, false);}
+
+inline Real Student::pdf(Real const& x) const  { return Rf_dt(x, df_, false);}
+inline Real Student::lpdf(Real const& x) const { return Rf_dt(x, df_, true);}
+inline Real Student::cdf(Real const& t) const  { return Rf_pt(t, df_, true, false);}
 inline Real Student::icdf(Real const& p) const { return Rf_qt(p, df_, true, false);}
 
 inline Real Student::rand( int df)
-{ GetRNGstate(); Real s = Rf_rt(df);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); Real s = Rf_rt(df); PutRNGstate(); return s;
 }
-inline Real Student::pdf(Real const& x, int df) {   return Rf_dt(x, df, false);}
-inline Real Student::lpdf(Real const& x, int df) {   return Rf_dt(x, df, true);}
-inline Real Student::cdf(Real const& t, int df) { return Rf_pt(t, df, true, false);}
+
+inline Real Student::pdf(Real const& x, int df)  { return Rf_dt(x, df, false);}
+inline Real Student::lpdf(Real const& x, int df) { return Rf_dt(x, df, true);}
+inline Real Student::cdf(Real const& t, int df)  { return Rf_pt(t, df, true, false);}
 inline Real Student::icdf(Real const& p, int df) { return Rf_qt(p, df, true, false);}
 
 #endif

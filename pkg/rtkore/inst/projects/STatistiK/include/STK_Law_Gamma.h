@@ -60,7 +60,7 @@ namespace Law
  *  \f]
  *  where @a a is the shape parameter and @e b is the scale parameter.
  **/
-class Gamma : public IUnivLaw<Real>
+class Gamma: public IUnivLaw<Real>
 {
   public:
     typedef IUnivLaw<Real> Base;
@@ -69,7 +69,7 @@ class Gamma : public IUnivLaw<Real>
      *  @param scale scale (dispersion) parameter
      **/
     Gamma( Real const& shape = 1., Real const& scale = 1.)
-         : Base(_T("Gamma")), a_(shape), b_(scale)
+        : Base(_T("Gamma")), a_(shape), b_(scale)
 #ifndef IS_RTKPP_LIB
          , c_(), d_()
 #endif
@@ -183,9 +183,13 @@ class Gamma : public IUnivLaw<Real>
 #ifdef IS_RTKPP_LIB
 
 inline Real Gamma::rand() const
-{ GetRNGstate(); Real s = Rf_rgamma(a_, b_);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); Real s = Rf_rgamma(a_, b_); PutRNGstate(); return s;
 }
+
 inline Real Gamma::pdf( Real const& x) const
 { return Rf_dgamma(x, a_, b_, false);}
 inline Real Gamma::lpdf( Real const& x) const
@@ -196,9 +200,13 @@ inline Real Gamma::icdf( Real const& p) const
 { return Rf_qgamma(p, a_, b_, true, false);}
 
 inline Real Gamma::rand( Real const& a, Real const& b)
-{ GetRNGstate(); Real s = Rf_rgamma(a, b);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); Real s = Rf_rgamma(a, b); PutRNGstate(); return s;
 }
+
 inline Real Gamma::pdf( Real const& x, Real const& a, Real const& b)
 { return Rf_dgamma(x, a, b, false);}
 inline Real Gamma::lpdf( Real const& x, Real const& a, Real const& b)

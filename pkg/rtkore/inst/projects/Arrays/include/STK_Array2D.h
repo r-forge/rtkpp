@@ -111,7 +111,7 @@ struct Traits< Array2D<Type_> >
  * @sa Array2DVector, Array2DPoint, Array2DSquare, Array2DUpperTriangular, Array2DLowerTriangular
  **/
 template<class Type_ >
-class Array2D : public IArray2D< Array2D<Type_> >
+class Array2D: public IArray2D< Array2D<Type_> >
 {
   public:
     /** Type for the Interface base Class. */
@@ -137,30 +137,30 @@ class Array2D : public IArray2D< Array2D<Type_> >
       storage_ = Arrays::dense_ // always dense
     };
     /** Default constructor */
-    Array2D() : Base() {}
+    Array2D(): Base() {}
     /** constructor
      *  @param I,J range of the rows and columns
      **/
-    Array2D( Range const& I, Range const& J) : Base(I, J) {}
+    Array2D( Range const& I, Range const& J): Base(I, J) {}
     /** constructor with rbeg, rend, cbeg and cend specified,
      *  initialization with a constant.
      *  @param I,J range of the rows and columns
      *  @param v initial value of the container
      **/
-    Array2D( Range const& I, Range const& J, Type const& v) : Base(I, J)
+    Array2D( Range const& I, Range const& J, Type const& v): Base(I, J)
     { LowBase::setValue(v);}
     /** Copy constructor
      *  @param T the container to copy
      *  @param ref true if T is wrapped
      **/
-    Array2D( Array2D const& T, bool ref=false) : Base(T, ref) {}
+    Array2D( Array2D const& T, bool ref=false): Base(T, ref) {}
     /** Copy constructor by reference, ref_=1.
      *  @param T the container to wrap
      *  @param I,J range of the rows and columns to wrap
      **/
     template<class OtherArray>
     Array2D( IArray2D<OtherArray> const& T, Range const& I, Range const& J)
-           : Base(T, I, J) {}
+          : Base(T, I, J) {}
     /** Copy constructor using an expression.
      *  @param T the container to wrap
      **/
@@ -171,7 +171,7 @@ class Array2D : public IArray2D< Array2D<Type_> >
      *  @param q pointer on the data
      *  @param I,J range of the rows and columns to wrap
      **/
-    Array2D( Type** q, Range const& I, Range const& J) : Base(q, I, J) {}
+    Array2D( Type** q, Range const& I, Range const& J): Base(q, I, J) {}
     /** destructor. */
     ~Array2D() {}
     /** operator = : overwrite the Array2D with the right hand side T.

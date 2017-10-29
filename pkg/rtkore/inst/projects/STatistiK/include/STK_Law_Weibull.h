@@ -58,7 +58,7 @@ namespace Law
  *  where <em>k > 0</em> is the shape parameter and \f$ λ > 0\f$ is the scale parameter
  *  of the distribution.
  **/
-class Weibull : public IUnivLaw<Real>
+class Weibull: public IUnivLaw<Real>
 {
   public:
     typedef IUnivLaw<Real> Base;
@@ -66,7 +66,7 @@ class Weibull : public IUnivLaw<Real>
      *  @param k, lambda shape and scale (dispersion) parameters
      **/
     inline Weibull( Real const& k = 1., Real const& lambda = 1.)
-                  : Base(_T("Weibull")), k_(k), lambda_(lambda)
+                 : Base(_T("Weibull")), k_(k), lambda_(lambda)
     {}
     /** destructor */
     inline virtual ~Weibull() {}
@@ -146,9 +146,13 @@ class Weibull : public IUnivLaw<Real>
 #ifdef IS_RTKPP_LIB
 
 inline Real Weibull::rand() const
-{ GetRNGstate(); Real s = Rf_rweibull(k_, lambda_);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); Real s = Rf_rweibull(k_, lambda_); PutRNGstate(); return s;
 }
+
 inline Real Weibull::pdf(Real const& x) const
 { return Rf_dweibull(x, k_, lambda_, false);}
 inline Real Weibull::lpdf(Real const& x) const
@@ -159,9 +163,13 @@ inline Real Weibull::icdf(Real const& p) const
 { return Rf_qweibull(p, k_, lambda_, true, false);}
 
 inline Real Weibull::rand( Real const& k, Real const& lambda)
-{ GetRNGstate(); Real s = Rf_rweibull(k, lambda);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); Real s = Rf_rweibull(k, lambda); PutRNGstate(); return s;
 }
+
 inline Real Weibull::pdf(Real const& x, Real const& k, Real const& lambda)
 { return Rf_dweibull(x, k, lambda, false);}
 inline Real Weibull::lpdf(Real const& x, Real const& k, Real const& lambda)

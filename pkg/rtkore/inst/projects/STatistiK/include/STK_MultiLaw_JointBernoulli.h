@@ -52,10 +52,10 @@ class JointBernoulli: public JointProbability<RowVector, Law::Bernoulli>
   public:
     typedef JointProbability<RowVector, Law::Bernoulli> Base;
     /** default constructor */
-    JointBernoulli() : Base(_T("JointBernoulli")) {}
+    JointBernoulli(): Base(_T("JointBernoulli")) {}
     /** constructor */
     JointBernoulli( int const& nbVar)
-                  : Base(_T("JointBernoulli"), nbVar) {}
+                 : Base(_T("JointBernoulli"), nbVar) {}
     /** destructor */
     virtual ~JointBernoulli() {}
     /** @return the probability of success of the jth law */

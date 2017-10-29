@@ -69,7 +69,7 @@ template<class DataHandler, typename Type> struct DataHandlerTraits;
  *  IDataHandler
  */
 template<class Derived>
-class DataHandlerBase : public IRecursiveTemplate<Derived>
+class DataHandlerBase: public IRecursiveTemplate<Derived>
 {
   protected:
     /** default constructor */

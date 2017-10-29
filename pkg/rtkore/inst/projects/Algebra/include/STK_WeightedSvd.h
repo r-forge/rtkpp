@@ -72,7 +72,7 @@ class WeightedSvd: public ISvd< WeightedSvd<Array, WRows, WCols> >
      *  @param dim the number of left and right eigenVectors required
      **/
     WeightedSvd( Array const& a, WRows const& wrows, WCols const& wcols, int dim)
-               : Base(a, false, (dim>0) ? true:false, (dim>0) ? true:false)
+              : Base(a, false, (dim>0) ? true:false, (dim>0) ? true:false)
                , wrows_(wrows), wcols_(wcols), dim_(dim)
 
     {

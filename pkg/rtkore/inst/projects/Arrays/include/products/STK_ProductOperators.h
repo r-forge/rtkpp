@@ -447,7 +447,7 @@ struct Traits< ArrayByArrayProduct<Lhs, Rhs> >
 } // end namespace hidden
 
 template<typename Lhs, typename Rhs>
-class ArrayByDiagonalProduct : public ExprBase< ArrayByDiagonalProduct<Lhs, Rhs> >
+class ArrayByDiagonalProduct: public ExprBase< ArrayByDiagonalProduct<Lhs, Rhs> >
                              , public TRef<1>
 {
   public:
@@ -469,7 +469,7 @@ class ArrayByDiagonalProduct : public ExprBase< ArrayByDiagonalProduct<Lhs, Rhs>
     typedef TRange<sizeCols_> ColRange;
 
     inline ArrayByDiagonalProduct( const Lhs& lhs, const Rhs& rhs)
-                                  : Base(), lhs_(lhs), rhs_(rhs)
+                                 : Base(), lhs_(lhs), rhs_(rhs)
     {
       if (lhs.cols() != rhs.rows())
       { STKRUNTIME_ERROR_NO_ARG(ArrayByDiagonalProduct, sizes mismatch);}
@@ -496,7 +496,7 @@ class ArrayByDiagonalProduct : public ExprBase< ArrayByDiagonalProduct<Lhs, Rhs>
 };
 
 template<typename Lhs, typename Rhs>
-class DiagonalByArrayProduct : public ExprBase< DiagonalByArrayProduct<Lhs, Rhs> >
+class DiagonalByArrayProduct: public ExprBase< DiagonalByArrayProduct<Lhs, Rhs> >
                               , public TRef<1>
 {
   public:
@@ -518,7 +518,7 @@ class DiagonalByArrayProduct : public ExprBase< DiagonalByArrayProduct<Lhs, Rhs>
     typedef TRange<sizeCols_> ColRange;
 
     inline DiagonalByArrayProduct( const Lhs& lhs, const Rhs& rhs)
-                                 : Base(), lhs_(lhs), rhs_(rhs)
+                                : Base(), lhs_(lhs), rhs_(rhs)
     {
       if (lhs.cols() != rhs.rows())
       { STKRUNTIME_ERROR_NO_ARG(DiagonalByArrayProduct, sizes mismatch);}
@@ -546,7 +546,7 @@ class DiagonalByArrayProduct : public ExprBase< DiagonalByArrayProduct<Lhs, Rhs>
 };
 
 template<typename Lhs, typename Rhs>
-class PointByArrayProduct : public ExprBase< PointByArrayProduct<Lhs, Rhs> >
+class PointByArrayProduct: public ExprBase< PointByArrayProduct<Lhs, Rhs> >
                            , public TRef<1>
 {
   public:
@@ -569,7 +569,7 @@ class PointByArrayProduct : public ExprBase< PointByArrayProduct<Lhs, Rhs> >
     typedef TRange<sizeCols_> ColRange;
 
     inline PointByArrayProduct( const Lhs& lhs, const Rhs& rhs)
-                              : Base(), lhs_(lhs), rhs_(rhs)
+                             : Base(), lhs_(lhs), rhs_(rhs)
                               , result_(1, rhs.sizeCols(), Type(0))
     {
       if (lhs.range() != rhs.rows())
@@ -607,7 +607,7 @@ class PointByArrayProduct : public ExprBase< PointByArrayProduct<Lhs, Rhs> >
 
 
 template<typename Lhs, typename Rhs>
-class ArrayByVectorProduct : public ExprBase< ArrayByVectorProduct<Lhs, Rhs> >
+class ArrayByVectorProduct: public ExprBase< ArrayByVectorProduct<Lhs, Rhs> >
                            , public TRef<1>
 {
   public:
@@ -629,7 +629,7 @@ class ArrayByVectorProduct : public ExprBase< ArrayByVectorProduct<Lhs, Rhs> >
     typedef TRange<sizeCols_> ColRange;
 
     ArrayByVectorProduct( const Lhs& lhs, const Rhs& rhs)
-                              : Base(), lhs_(lhs), rhs_(rhs)
+                             : Base(), lhs_(lhs), rhs_(rhs)
                               , result_(lhs.sizeRows(), 1, Type(0))
     {
       if (lhs.cols() != rhs.range())
@@ -665,7 +665,7 @@ class ArrayByVectorProduct : public ExprBase< ArrayByVectorProduct<Lhs, Rhs> >
 };
 
 template<typename Lhs, typename Rhs>
-class VectorByPointProduct : public ExprBase< VectorByPointProduct<Lhs, Rhs> >
+class VectorByPointProduct: public ExprBase< VectorByPointProduct<Lhs, Rhs> >
                            , public TRef<1>
 {
   public:
@@ -687,7 +687,7 @@ class VectorByPointProduct : public ExprBase< VectorByPointProduct<Lhs, Rhs> >
     typedef TRange<sizeCols_> ColRange;
 
     VectorByPointProduct( const Lhs& lhs, const Rhs& rhs)
-                               : Base(), lhs_(lhs), rhs_(rhs)
+                              : Base(), lhs_(lhs), rhs_(rhs)
     {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return lhs_.rows();}
@@ -712,7 +712,7 @@ class VectorByPointProduct : public ExprBase< VectorByPointProduct<Lhs, Rhs> >
 template< typename Lhs, typename Rhs> class ArrayByArrayProductBase;
 
 template<typename Lhs, typename Rhs>
-class ArrayByArrayProduct : public ArrayByArrayProductBase< Lhs, Rhs >, public TRef<1>
+class ArrayByArrayProduct: public ArrayByArrayProductBase< Lhs, Rhs >, public TRef<1>
 {
   public:
     typedef ArrayByArrayProductBase< Lhs, Rhs> Base;
@@ -744,7 +744,7 @@ class ArrayByArrayProduct : public ArrayByArrayProductBase< Lhs, Rhs >, public T
     typedef TRange<sizeCols_> ColRange;
 
     inline ArrayByArrayProduct( const Lhs& lhs, const Rhs& rhs)
-                              : Base(), lhs_(lhs), rhs_(rhs)
+                             : Base(), lhs_(lhs), rhs_(rhs)
                               , result_(lhs.sizeRows(), rhs.sizeCols(), Type(0))
     {
       STK_STATIC_ASSERT_PRODUCT_OPERATOR_MISMATCH( isValid_ );
@@ -778,7 +778,7 @@ class ArrayByArrayProduct : public ArrayByArrayProductBase< Lhs, Rhs >, public T
   * @brief implement the access to the elements in the (2D) general case.
   **/
 template< typename Lhs, typename Rhs>
-class ArrayByArrayProductBase : public ExprBase< ArrayByArrayProduct<Lhs, Rhs> >
+class ArrayByArrayProductBase: public ExprBase< ArrayByArrayProduct<Lhs, Rhs> >
 {
   public:
     typedef ArrayByArrayProduct<Lhs, Rhs> Derived;
@@ -788,7 +788,7 @@ class ArrayByArrayProductBase : public ExprBase< ArrayByArrayProduct<Lhs, Rhs> >
     typedef typename hidden::Traits<Derived>::ReturnType ReturnType;
 
     /** constructor. */
-    inline ArrayByArrayProductBase() : Base() {}
+    inline ArrayByArrayProductBase(): Base() {}
     /** access to the element (i,j) */
     inline Type const& elt2Impl(int i, int j) const
     { return this->asDerived().result().elt(i,j);}

@@ -58,7 +58,7 @@ namespace Law
  *    f(x; a, b) = \frac{1}{b-a+1} 1_{ a \leq x \leq b}, \quad a,b,x\in\mathbb{N}.
  *  \f]
 **/
-class UniformDiscrete : public IUnivLaw<int>
+class UniformDiscrete: public IUnivLaw<int>
 {
   public:
     typedef IUnivLaw<int> Base;
@@ -74,7 +74,7 @@ class UniformDiscrete : public IUnivLaw<int>
      *  @param law the law to copy
      **/
     inline UniformDiscrete( UniformDiscrete const& law)
-                          : Base(law), a_(law.a_), b_(law.b_), n_(law.n_)
+                         : Base(law), a_(law.a_), b_(law.b_), n_(law.n_)
     {}
     /** destructor. */
 	  inline virtual ~UniformDiscrete() {}
@@ -149,33 +149,28 @@ class UniformDiscrete : public IUnivLaw<int>
     Real n_;
 };
 
-/* Generate a pseudo UniformDiscrete random variate. */
+#ifdef IS_RTKPP_LIB
+
 inline int UniformDiscrete::rand() const
-{ return a_ + int(generator.rand(double(n_)));}
-/* Give the value of the pdf at x.
- *  @param x a real value
- **/
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); Real s = a_ + Rf_runif(0, double(n_)); PutRNGstate(); return s;
+}
+
 inline Real UniformDiscrete::pdf( int const& x) const
 {
   if (!Arithmetic<Real>::isFinite(x) ) return x;
   if ((x < a_)||(x > b_)) return 0.;
   return 1./n_;
 }
-/* Give the value of the log-pdf at x.
- *  @param x a real value
- **/
 inline Real UniformDiscrete::lpdf( int const& x) const
 {
   if (!Arithmetic<Real>::isFinite(x) ) return x;
   if ((x < a_)||(x > b_)) return -Arithmetic<Real>::infinity();
   return -std::log(n_);
 }
-/* The cumulative distribution function is
- * \f[
- *  F(t; a,b)= \frac{t - a}{b-a+1}
- * \f]
- *  @param t a real value
- **/
 inline Real UniformDiscrete::cdf( Real const& t) const
 {
   if (!Arithmetic<Real>::isFinite(t) ) return t;
@@ -183,13 +178,6 @@ inline Real UniformDiscrete::cdf( Real const& t) const
   if (t >= b_) return 1.;
   return (b_ - (int)t)/n_;
 }
-
-/* The inverse cumulative distribution function is
- * \f[
- * F^{-1}(p; \lambda) = p (b-a) + a.
- * \f]
- *  @param p a probability
- **/
 inline int UniformDiscrete::icdf( Real const& p) const
 {
   // check parameter
@@ -202,41 +190,32 @@ inline int UniformDiscrete::icdf( Real const& p) const
   return(int)((1.-p) * a_ + p * b_);
 }
 
-/* Generate a pseudo UniformDiscrete random variate with the specified
- *  parameter.
- *  @param scale the scale of the distribution
- **/
 inline int UniformDiscrete::rand( int a, int b)
-{ return a + int(generator.rand(double(b - a +1)));}
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+  GetRNGstate(); Real s = a + Rf_runif(0, double(b - a + 1)); PutRNGstate(); return s;
+}
 
-/* Give the value of the pdf at x.
- *  @param x a real value
- *  @param scale the scale of the distribution
- **/
 inline Real UniformDiscrete::pdf( Real const& x, int a, int b)
 {
   if (!Arithmetic<Real>::isFinite(x) ) return x;
   if ((x < a)||(x > b)) return 0.;
   return 1./Real(b-a+1);
 }
-
-/* Give the value of the log-pdf at x.
- *  @param x a real value
- *  @param scale the scale of the distribution
- **/
 inline Real UniformDiscrete::lpdf( Real const& x, int a, int b)
 {
   if (!Arithmetic<Real>::isFinite(x) ) return x;
   if ((x < a)||(x > b)) return -Arithmetic<Real>::infinity();
   return -std::log(b-a+1);
 }
-
 inline Real UniformDiscrete::cdf(const Real& t, int a, int b)
 { return (b - t)/(b-a+1);}
-
-
 inline int UniformDiscrete::icdf(const Real& p, int a, int b)
 { return (int)((1.-p) * a + p * b);}
+
+#endif
 
 } // namespace Law
 

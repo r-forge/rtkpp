@@ -52,10 +52,10 @@ class JointCauchy: public JointProbability<RowVector, Law::Cauchy>
   public:
     typedef JointProbability<RowVector, Law::Cauchy> Base;
     /** default constructor */
-    JointCauchy() : Base(_T("JointCauchy")) {}
+    JointCauchy(): Base(_T("JointCauchy")) {}
     /** constructor */
     JointCauchy( int const& nbVar)
-               : Base(_T("JointCauchy"), nbVar) {}
+              : Base(_T("JointCauchy"), nbVar) {}
     /** destructor */
     virtual ~JointCauchy() {}
     /** @return the location of the jth law */

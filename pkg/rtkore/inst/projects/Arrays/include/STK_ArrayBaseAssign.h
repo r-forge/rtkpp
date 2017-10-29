@@ -151,9 +151,9 @@ inline Derived& ArrayBase<Derived>::operator/=( Type const& value)
   return this->asDerived();
 }
 
-/** overwrite @c this with @c rhs.
+/* overwrite @c this with @c rhs.
  *  @note this method does not take care of the possibility of overlapping
- *  @param src the array to copy
+ *  @param rhs the array to copy
  **/
 template<class Derived>
 template<class Rhs>

@@ -144,7 +144,7 @@ class TransposeOperator: public ExprBase< TransposeOperator<Lhs> >, public TRef<
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
     /** Constructor */
-    inline TransposeOperator( Lhs const& lhs) : Base(), lhs_(lhs) {}
+    inline TransposeOperator( Lhs const& lhs): Base(), lhs_(lhs) {}
 
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return lhs_.cols();}

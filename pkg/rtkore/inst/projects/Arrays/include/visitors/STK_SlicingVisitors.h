@@ -114,7 +114,7 @@ class VisitorByColBase;
  *  @brief  class allowing to apply a visitor on each columns of an expression.
  **/
 template<typename Derived, template<class> class Visitor>
-class VisitorByCol : public ExprBase< VisitorByCol<Derived, Visitor> >, public TRef<1>
+class VisitorByCol: public ExprBase< VisitorByCol<Derived, Visitor> >, public TRef<1>
 {
   public:
     typedef typename hidden::Traits< VisitorByCol<Derived, Visitor> >::VisitorType VisitorType;
@@ -209,7 +209,7 @@ struct Traits< VisitorByRow <Derived, Visitor> >
  *  @brief  class allowing to apply a visitor on each columns of an expression.
  **/
 template<typename Derived, template<class> class Visitor>
-class VisitorByRow : public ExprBase< VisitorByRow<Derived, Visitor> >, public TRef<1>
+class VisitorByRow: public ExprBase< VisitorByRow<Derived, Visitor> >, public TRef<1>
 {
   public:
 

@@ -95,7 +95,7 @@ struct Traits<Array2DSquare<Type_> >
   * The range of the rows and the columns is the same.
   **/
 template<class Type_>
-class Array2DSquare : public IArray2D< Array2DSquare<Type_> >
+class Array2DSquare: public IArray2D< Array2DSquare<Type_> >
 {
   public:
     /** Type for the Interface Class. */
@@ -137,12 +137,12 @@ class Array2DSquare : public IArray2D< Array2DSquare<Type_> >
      *  @param T the container to copy
      *  @param ref true if T is wrapped
      **/
-    Array2DSquare( Array2DSquare const&T, bool ref=false) : Base(T, ref) {}
+    Array2DSquare( Array2DSquare const&T, bool ref=false): Base(T, ref) {}
     /** constructor by reference, ref_=1 in the range given by I.
      *  @param T the Container to wrap
      *  @param I range of the container to wrap
      **/
-    Array2DSquare( Array2DSquare const& T, Range const& I) : Base(T, I, I) {}
+    Array2DSquare( Array2DSquare const& T, Range const& I): Base(T, I, I) {}
     /** Copy constructor using an expression.
      *  @param T the container to wrap
      **/

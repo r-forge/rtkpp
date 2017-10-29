@@ -61,7 +61,7 @@ typedef std::basic_string<Char> String;
  * NA String.
  */
 template<>
-struct Arithmetic<String> : public std::numeric_limits<String>
+struct Arithmetic<String>: public std::numeric_limits<String>
 {
   /** Adding a Non Available (NA) special String (the empty String) */
   static String NA() throw() { return String();}

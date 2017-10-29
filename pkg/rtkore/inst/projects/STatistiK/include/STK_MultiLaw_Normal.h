@@ -106,7 +106,7 @@ class Normal: public MultiLaw::IMultiLaw<RowVector>
      *  @param sigma covariance matrix of the Normal distribution
      **/
     Normal( RowVector const& mu, ArraySquareX const& sigma)
-          : Base(_T("MultiLaw::Normal"))
+         : Base(_T("MultiLaw::Normal"))
                , mu_()
                , sigma_()
                , decomp_(sigma)

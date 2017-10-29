@@ -107,7 +107,7 @@ struct JointGammaParameters: public IMultiParameters<JointGammaParameters>
  * \f]
  **/
 template <class Array, class WColVector>
-class JointGammaModel : public IMultiStatModel<Array, WColVector, JointGammaParameters >
+class JointGammaModel: public IMultiStatModel<Array, WColVector, JointGammaParameters >
 {
 
   public:
@@ -122,13 +122,13 @@ class JointGammaModel : public IMultiStatModel<Array, WColVector, JointGammaPara
     using Base::p_data;
     using Base::p_param;
     /** default constructor. */
-    JointGammaModel() : Base() {}
+    JointGammaModel(): Base() {}
     /** Constructor with data set. */
-    JointGammaModel(Array const& data) : Base(data){}
+    JointGammaModel(Array const& data): Base(data){}
     /** Constructor with a ptr on the data set. */
-    JointGammaModel(Array const* p_data) : Base(p_data){}
+    JointGammaModel(Array const* p_data): Base(p_data){}
     /** Copy constructor. */
-    JointGammaModel(JointGammaModel const& model) : Base(model) {}
+    JointGammaModel(JointGammaModel const& model): Base(model) {}
     /** destructor */
     virtual ~JointGammaModel(){}
     /** clone pattern. @return a clone of this. */
@@ -157,7 +157,7 @@ class JointGammaModel : public IMultiStatModel<Array, WColVector, JointGammaPara
       return sum;
     }
   protected:
-    class dloglikelihood : public IFunction<dloglikelihood >
+    class dloglikelihood: public IFunction<dloglikelihood >
     {
       public:
         dloglikelihood( Real const& mean, Real const& meanLog)

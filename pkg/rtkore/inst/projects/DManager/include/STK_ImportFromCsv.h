@@ -55,7 +55,7 @@ namespace STK
  *  It will try to convert the given ReadWriteCsv to the predefined
  *  type given by the user.
  **/
-class ImportFromCsv : public IRunnerBase
+class ImportFromCsv: public IRunnerBase
 {
   public:
     /** Constructor. Instantiates an instance of ImportFromCvs with the

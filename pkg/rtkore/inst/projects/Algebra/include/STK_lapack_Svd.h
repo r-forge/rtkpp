@@ -74,7 +74,7 @@ namespace lapack
  *    @brief Svd computes the SVD decomposition of a real matrix using the
  *    Lapack routine dgeqrf.
  */
-class Svd : public ISvd<Svd>
+class Svd: public ISvd<Svd>
 {
   public:
     typedef ISvd< Svd > Base;
@@ -98,7 +98,7 @@ class Svd : public ISvd<Svd>
      *  @param withV if @c true save the right housolder transforms in @c V_.
      **/
     inline Svd( CArrayXX const&  A, bool ref = false, bool withU= true, bool withV= true)
-              : Base(A, ref, withU, withV)
+             : Base(A, ref, withU, withV)
               , jobz_( (withU|withV) ? 'O':'N') {}
     /** constructor with other kind of array/expression
      *  @param A the matrix/expression to decompose.
@@ -107,7 +107,7 @@ class Svd : public ISvd<Svd>
      */
     template<class OtherArray>
     inline Svd( ArrayBase<OtherArray> const& A, bool withU= true, bool withV= true)
-              : Base(A, withU, withV)
+             : Base(A, withU, withV)
               , jobz_( (withU|withV) ? 'O':'N') {}
     /** Copy constructor.
      *  @param decomp the decomposition to copy

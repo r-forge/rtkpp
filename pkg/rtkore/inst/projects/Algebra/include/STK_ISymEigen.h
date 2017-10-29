@@ -209,7 +209,7 @@ class ISymEigen: public IRunnerBase, public IRecursiveTemplate<Derived>
 /* @brief Default constructor */
 template<class Derived>
 ISymEigen<Derived>::ISymEigen()
-         : Base()
+        : Base()
          , range_(), norm_(Type(0)), rank_(Type(0)), det_(Type(0))
          , eigenVectors_()
          , eigenValues_()
@@ -224,7 +224,7 @@ ISymEigen<Derived>::ISymEigen()
  */
 template<class Derived>
 ISymEigen<Derived>::ISymEigen( SquareArray const& data, bool ref)
-         : Base()
+        : Base()
          , range_(data.range()), norm_(Type(0)), rank_(Type(0)), det_(Type(0))
          , eigenVectors_(data, ref)
          , eigenValues_(data.size(), 0.)
@@ -238,7 +238,7 @@ ISymEigen<Derived>::ISymEigen( SquareArray const& data, bool ref)
 template<class Derived>
 template<class OtherDerived>
 ISymEigen<Derived>::ISymEigen( ExprBase<OtherDerived> const& data)
-         : Base()
+        : Base()
          , range_(data.range()), norm_(0.), rank_(0), det_(0.)
          , eigenVectors_(data.asDerived())
          , eigenValues_(data.size(), 0.)
@@ -251,7 +251,7 @@ ISymEigen<Derived>::ISymEigen( ExprBase<OtherDerived> const& data)
  **/
 template<class Derived>
 ISymEigen<Derived>::ISymEigen( ISymEigen const& eigen)
-         : Base(eigen)
+        : Base(eigen)
          , range_(eigen.range_), norm_(eigen.norm_), rank_(eigen.rank_), det_(eigen.det_)
          , eigenVectors_(eigen.eigenVectors_)
          , eigenValues_(eigen.eigenValues_)

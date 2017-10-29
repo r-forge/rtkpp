@@ -87,7 +87,7 @@ struct Traits< RMatrix<Type_> >
 } // namespace hidden
 
 template <typename Type_>
-class RMatrix : public ArrayBase< RMatrix<Type_> >, public TRef<1>
+class RMatrix: public ArrayBase< RMatrix<Type_> >, public TRef<1>
 {
   public:
     typedef typename hidden::Traits<RMatrix<Type_> >::Row Row;

@@ -142,7 +142,7 @@ class CArraySquare: public ICArray < CArraySquare<Type_, Size_, Orient_> >
       storage_   = hidden::Traits< CArraySquare <Type_, Size_, Orient_> >::storage_
     };
     /** Default constructor. */
-    CArraySquare() : Base() {}
+    CArraySquare(): Base() {}
     /** constructor with specified dimension.
      *  @param size range of the columns
      **/

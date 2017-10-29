@@ -99,7 +99,7 @@ struct JointGaussianParameters: public IMultiParameters<JointGaussianParameters>
  *
  **/
 template <class Array, class WColVector = CVectorX>
-class JointGaussianModel : public IMultiStatModel<Array, WColVector, JointGaussianParameters >
+class JointGaussianModel: public IMultiStatModel<Array, WColVector, JointGaussianParameters >
 {
   public:
     /** Type of the data contained in the container */
@@ -113,13 +113,13 @@ class JointGaussianModel : public IMultiStatModel<Array, WColVector, JointGaussi
     using Base::p_data;
     using Base::p_param;
     /** default constructor. */
-    JointGaussianModel() : Base() {}
+    JointGaussianModel(): Base() {}
     /** Constructor with data set. */
-    JointGaussianModel(Array const& data) : Base(data) {}
+    JointGaussianModel(Array const& data): Base(data) {}
     /** Constructor with a ptr on the data set. */
-    JointGaussianModel(Array const* p_data) : Base(p_data) {}
+    JointGaussianModel(Array const* p_data): Base(p_data) {}
     /** Copy constructor. */
-    JointGaussianModel(JointGaussianModel const& model) : Base(model) {}
+    JointGaussianModel(JointGaussianModel const& model): Base(model) {}
     /** destructor */
     virtual ~JointGaussianModel(){}
     /** clone pattern. @return a clone of this. */

@@ -86,7 +86,7 @@ namespace STK
  *  by calling the derived method @c runImpl
  **/
 template <class Derived>
-class IQr : public IRunnerBase, public IRecursiveTemplate<Derived>
+class IQr: public IRunnerBase, public IRecursiveTemplate<Derived>
 {
   protected:
     typedef typename hidden::AlgebraTraits<Derived>::Array Array;

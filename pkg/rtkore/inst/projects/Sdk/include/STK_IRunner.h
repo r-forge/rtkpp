@@ -187,7 +187,7 @@ class IRunnerWithData: public IRunnerBase
  *  @endcode
  **/
 template < class Array, class Weights_>
-class IRunnerUnsupervised : public IRunnerBase
+class IRunnerUnsupervised: public IRunnerBase
 {
   protected:
     /** default constructor. */

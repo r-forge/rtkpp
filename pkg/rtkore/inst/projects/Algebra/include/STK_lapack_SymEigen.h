@@ -72,7 +72,7 @@ namespace lapack
  *    eigenvectors of a symmetric real matrix using the syevr Lapack routine.
  */
 template<class SquareArray>
-class SymEigen : public ISymEigen<SymEigen<SquareArray> >
+class SymEigen: public ISymEigen<SymEigen<SquareArray> >
 {
   public:
     typedef ISymEigen<SymEigen> Base;
@@ -159,7 +159,7 @@ SymEigen<SquareArray>::SymEigen(): Base()
  */
 template<class SquareArray>
 SymEigen<SquareArray>::SymEigen( SquareArray const& data, bool ref)
-                               : Base(data)
+                              : Base(data)
                                , jobz_('V'), RANGE_('A'), UPLO_('U')
                                , VL_(0.0), VU_(0.0), IL_(0), IU_(0)
 {}
@@ -169,7 +169,7 @@ SymEigen<SquareArray>::SymEigen( SquareArray const& data, bool ref)
  */
 template<>
 inline SymEigen<CSquareX>::SymEigen( CSquareX const& data, bool ref)
-                                   : Base(data, ref)
+                                  : Base(data, ref)
                                    , jobz_('V'), RANGE_('A'), UPLO_('U')
                                    , VL_(0.0), VU_(0.0), IL_(0), IU_(0)
 {}
@@ -177,7 +177,7 @@ inline SymEigen<CSquareX>::SymEigen( CSquareX const& data, bool ref)
 template<class SquareArray>
 template<class Derived>
 SymEigen<SquareArray>::SymEigen( ArrayBase<Derived> const& data)
-                               : Base(data)
+                              : Base(data)
                                , jobz_('V'), RANGE_('A'), UPLO_('U')
                                , VL_(0.0), VU_(0.0), IL_(0), IU_(0)
 {}
@@ -186,7 +186,7 @@ SymEigen<SquareArray>::SymEigen( ArrayBase<Derived> const& data)
  */
 template<class SquareArray>
 SymEigen<SquareArray>::SymEigen( SymEigen const& eigen)
-                               : Base(eigen)
+                              : Base(eigen)
                                , jobz_(eigen.jobz_), RANGE_(eigen.RANGE_), UPLO_(eigen.UPLO_)
                                , VL_(eigen.VL_), VU_(eigen.VU_), IL_(eigen.IL_), IU_(eigen.IU_)
  {}

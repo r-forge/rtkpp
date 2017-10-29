@@ -47,7 +47,7 @@ namespace Funct
  *  \f[ \frac{x^n}{n+2} \f]
  *  for @e n >= 0.
  */
-class Serielog1p : public ISerie<Serielog1p>
+class Serielog1p: public ISerie<Serielog1p>
 {
   public:
     inline Serielog1p( Real const& x): x_(x), n_(2), xpown_(1.) {}

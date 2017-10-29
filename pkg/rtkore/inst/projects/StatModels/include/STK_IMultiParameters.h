@@ -46,7 +46,7 @@ namespace STK
  *  @brief Interface base class for the parameters of a multivariate model.
   */
 template<class Parameters>
-class IMultiParameters : public IRecursiveTemplate<Parameters>
+class IMultiParameters: public IRecursiveTemplate<Parameters>
 {
   protected:
     /** default constructor.*/

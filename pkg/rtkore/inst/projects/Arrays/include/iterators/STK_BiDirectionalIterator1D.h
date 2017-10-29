@@ -95,9 +95,9 @@ struct BiDirectionalIterator1D: public IteratorBase< BiDirectionalIterator1D<Der
   public:
     // creating
     BiDirectionalIterator1D( Derived& list1D, int pos)
-                           : Base(pos), list1D_(list1D) {}
+                          : Base(pos), list1D_(list1D) {}
     BiDirectionalIterator1D( BiDirectionalIterator1D const& it)
-                           : Base(it), list1D_(it.list1D_) {}
+                          : Base(it), list1D_(it.list1D_) {}
     ~BiDirectionalIterator1D() {}
     BiDirectionalIterator1D& operator=(BiDirectionalIterator1D const& it)
     { list1D_ = it.list1D_; pos_= it.pos_; return *this;}
@@ -135,9 +135,9 @@ struct ConstBiDirectionalIterator1D:  public IteratorBase< ConstBiDirectionalIte
   public:
     // creating
     ConstBiDirectionalIterator1D( Derived const& list1D, int pos)
-                                : Base(pos), list1D_(list1D) {}
+                               : Base(pos), list1D_(list1D) {}
     ConstBiDirectionalIterator1D( ConstBiDirectionalIterator1D const& it)
-                                : Base(it), list1D_(it.list1D_) {}
+                               : Base(it), list1D_(it.list1D_) {}
     ~ConstBiDirectionalIterator1D() {}
     ConstBiDirectionalIterator1D& operator=(ConstBiDirectionalIterator1D const& it)
     { list1D_ = it.list1D_; pos_= it.pos_; return *this;}

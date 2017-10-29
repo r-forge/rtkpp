@@ -62,13 +62,13 @@ namespace Law
  *  \f]
  *  where \f$\lambda>0\f$ is the scale (inverse rate) parameter.
 **/
-class Exponential : public IUnivLaw<Real>
+class Exponential: public IUnivLaw<Real>
 {
   public:
     typedef IUnivLaw<Real> Base;
     /** constructor. */
     inline Exponential( Real const& scale=1)
-                      : Base(String(_T("Exponential"))), scale_(scale)
+                     : Base(String(_T("Exponential"))), scale_(scale)
     {
       // check parameters
       if ( !Arithmetic<Real>::isFinite(scale) || scale <= 0 )
@@ -136,19 +136,26 @@ class Exponential : public IUnivLaw<Real>
 #ifdef IS_RTKPP_LIB
 
 inline Real Exponential::rand() const
-{ GetRNGstate(); Real s = Rf_rexp(scale_);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); Real s = Rf_rexp(scale_); PutRNGstate(); return s;
 }
+
 inline Real Exponential::pdf( Real const& x) const {   return Rf_dexp(x, scale_, false);}
 inline Real Exponential::lpdf( Real const& x) const {   return Rf_dexp(x, scale_, true);}
 inline Real Exponential::cdf( Real const& t) const { return Rf_pexp(t, scale_, true, false);}
 inline Real Exponential::icdf( Real const& p) const { return Rf_qexp(p , scale_, true, false);}
 
-// static
 inline Real Exponential::rand( Real const& scale)
-{ GetRNGstate(); Real s = Rf_rexp(scale);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); Real s = Rf_rexp(scale); PutRNGstate(); return s;
 }
+
 inline Real Exponential::pdf(Real const& x, Real const& scale)
 { return Rf_dexp(x, scale, false);}
 inline Real Exponential::lpdf(Real const& x, Real const& scale)

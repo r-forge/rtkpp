@@ -184,7 +184,7 @@ namespace STK
   *
   **/
 template<class Type>
-struct Arithmetic : public std::numeric_limits<Type>
+struct Arithmetic: public std::numeric_limits<Type>
 {
   /** True if the type has a representation for a "Not Available."    */
   static const bool hasNA = false;

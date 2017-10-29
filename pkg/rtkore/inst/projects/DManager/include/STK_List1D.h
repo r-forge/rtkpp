@@ -131,11 +131,11 @@ class List1D: public ITContainer1D< List1D<Type_> >, public IContainerRef
 
 
     /** Default constructor : empty List. */
-    List1D() : Base(), IContainerRef(false) { initialize(Range()); }
+    List1D(): Base(), IContainerRef(false) { initialize(Range()); }
     /** constructor with specified Range.
      *  @param I range of the container
      **/
-    List1D( Range const& I) : Base(I), IContainerRef(false)
+    List1D( Range const& I): Base(I), IContainerRef(false)
     { initialize(I); }
     /** Misc constructor, initialization with a constant.
      *  @param I range of the container
@@ -153,7 +153,7 @@ class List1D: public ITContainer1D< List1D<Type_> >, public IContainerRef
     /** Copy constructor
      *  @param T the list to copy
      **/
-    List1D( List1D<Type> const& T) : Base(T), IContainerRef(false)
+    List1D( List1D<Type> const& T): Base(T), IContainerRef(false)
     {
       // initialize container
       initialize(T.range());
@@ -220,7 +220,7 @@ class List1D: public ITContainer1D< List1D<Type_> >, public IContainerRef
      *  @param J range of the data to wrap
      **/
     List1D( Cell* const & p_first, Cell* const & p_last, Range const& J)
-          : Base(J), IContainerRef(true)
+         : Base(J), IContainerRef(true)
           , p_begin_(p_first)
           , p_last_(p_last)
     {

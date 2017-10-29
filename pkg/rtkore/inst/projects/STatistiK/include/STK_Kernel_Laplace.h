@@ -64,27 +64,27 @@ class Laplace: public IKernelBase<Array>
      *  @param width the size of the windows to use in the kernel
      **/
     Laplace( Real const& width= 1.)
-           : Base(0), width_(width)
+          : Base(0), width_(width)
     {}
     /** constructor with a constant pointer on the data set
      *  @param p_data a pointer on a data set that will be "kernelized"
      *  @param width the size of the windows to use in the kernel
      **/
     Laplace( Array const* p_data, Real const& width= 1.)
-               : Base(p_data), width_(width) {}
+              : Base(p_data), width_(width) {}
     /** constructor with a constant pointer on the data set
      *  @param data a reference on a data set that will be "kernelized"
      *  @param width the size of the windows to use in the kernel
      **/
     Laplace( Array const& data, Real const& width= 1.)
-               : Base(data), width_(width) {}
+              : Base(data), width_(width) {}
     /** constructor with an array of parameter.
      *  @param p_data a pointer on a data set that will be "kernelized"
      *  @param param array of parameter
      **/
     template<class Derived>
     Laplace( Array const* p_data, ExprBase<Derived> const& param)
-           : Base(p_data), width_(param.empty() ? 1. : param.front())
+          : Base(p_data), width_(param.empty() ? 1. : param.front())
     {}
     /** constructor with a constant pointer on the data set
      *  @param data a reference on a data set that will be "kernelized"
@@ -92,7 +92,7 @@ class Laplace: public IKernelBase<Array>
      **/
     template<class Derived>
     Laplace( Array const& data, ExprBase<Derived> const& param)
-           : Base(data), width_(param.empty() ? 1. : param.front())
+          : Base(data), width_(param.empty() ? 1. : param.front())
     {}
 
     /** destructor */

@@ -60,7 +60,7 @@ namespace Law
  *                  {x\,\mathrm{B}\!\left(\frac{d_1}{2},\frac{d_2}{2}\right)}
  *  \f]
  **/
-class FisherSnedecor : public IUnivLaw<Real>
+class FisherSnedecor: public IUnivLaw<Real>
 {
   public:
     typedef IUnivLaw<Real> Base;
@@ -68,7 +68,7 @@ class FisherSnedecor : public IUnivLaw<Real>
      *  @param df1, df2 degree of freedom parameters
      **/
     inline FisherSnedecor( int df1 = 1., int df2 = 1)
-                         : Base(_T("Fisher-Snedecor")), df1_(df1), df2_(df2)
+                        : Base(_T("Fisher-Snedecor")), df1_(df1), df2_(df2)
     {};
     /** destructor */
     inline virtual ~FisherSnedecor() {}
@@ -142,9 +142,13 @@ class FisherSnedecor : public IUnivLaw<Real>
 #ifdef IS_RTKPP_LIB
 
 inline Real FisherSnedecor::rand() const
-{ GetRNGstate(); Real s = Rf_rf(df1_, df2_);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); Real s = Rf_rf(df1_, df2_); PutRNGstate(); return s;
 }
+
 inline Real FisherSnedecor::pdf(Real const& x) const
 {   return Rf_df(x, df1_, df2_, false);}
 inline Real FisherSnedecor::lpdf(Real const& x) const
@@ -155,9 +159,13 @@ inline Real FisherSnedecor::icdf(Real const& p) const
 { return Rf_qf(p, df1_, df2_, true, false);}
 
 inline Real FisherSnedecor::rand( int df1, int df2)
-{ GetRNGstate(); Real s = Rf_rf(df1, df2);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); Real s = Rf_rf(df1, df2); PutRNGstate(); return s;
 }
+
 inline Real FisherSnedecor::pdf(Real const& x, int df1, int df2)
 { return Rf_df(x, df1, df2, false);}
 inline Real FisherSnedecor::lpdf(Real const& x, int df1, int df2)

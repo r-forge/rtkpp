@@ -73,7 +73,7 @@ class Binomial: public IUnivLaw<Integer>
      *  @param n the number of trials
      **/
     inline Binomial( int n =1, Real const& prob =0.5)
-                   : Base(_T("Binomial")), n_(n), prob_(prob)
+                  : Base(_T("Binomial")), n_(n), prob_(prob)
     {
       if (prob<0) STKDOMAIN_ERROR_2ARG(Binomial::Binomial,prob,n,prob must be >= 0);
       if (prob>1) STKDOMAIN_ERROR_2ARG(Binomial::Binomial,prob,n,prob must be <= 1);
@@ -172,8 +172,13 @@ class Binomial: public IUnivLaw<Integer>
 #ifdef IS_RTKPP_LIB
 
 inline int Binomial::rand() const
-{ GetRNGstate(); int s = Rf_rbinom(n_, prob_);
-  PutRNGstate(); return s;}
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); int s = Rf_rbinom(n_, prob_); PutRNGstate(); return s;
+}
+
 inline Real Binomial::pdf(int const& x) const
 { return (Real)::Rf_dbinom((double)x, (double)n_, prob_, false);}
 inline Real Binomial::lpdf(int const& x) const
@@ -184,8 +189,13 @@ inline int Binomial::icdf(Real const& p) const
 { return Rf_qbinom(p, (double)n_, prob_, true, false);}
 
 inline int Binomial::rand(int n, Real const& prob)
-{ GetRNGstate(); int s = Rf_rbinom(n, prob);
-  PutRNGstate(); return s;}
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); int s = Rf_rbinom(n, prob); PutRNGstate(); return s;
+}
+
 inline Real Binomial::pdf(int x, int n, Real const& prob)
 { return (Real)::Rf_dbinom(x, (double)n, prob, false);}
 inline Real Binomial::lpdf(int x, int n, Real const& prob)

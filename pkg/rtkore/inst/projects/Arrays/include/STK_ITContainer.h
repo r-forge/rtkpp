@@ -70,7 +70,7 @@ class NoAssignOperator
  * For example
  * @code
  * template<class Type>
- * class Derived : public ITContainer< Derived<Type> >
+ * class Derived: public ITContainer< Derived<Type> >
  * {...}
  * @endcode
  *
@@ -129,7 +129,7 @@ class ITContainerBase: public IRecursiveTemplate<Derived>, hidden::NoAssignOpera
 
   protected:
     /** Default constructor */
-    ITContainerBase() : Base() {}
+    ITContainerBase(): Base() {}
     /** destructor. **/
     ~ITContainerBase() {}
 
@@ -286,7 +286,7 @@ class ITContainer;
 /** @ingroup Arrays
  *  Specialization for array2D_ */
 template <class Derived>
-class ITContainer<Derived, Arrays::array2D_> : public ITContainerBase<Derived>
+class ITContainer<Derived, Arrays::array2D_>: public ITContainerBase<Derived>
 {
   public:
     typedef ITContainerBase<Derived> Base;
@@ -308,14 +308,14 @@ class ITContainer<Derived, Arrays::array2D_> : public ITContainerBase<Derived>
 
   protected:
     /** default constructor. */
-    ITContainer() : Base() {}
+    ITContainer(): Base() {}
     /** destructor. */
     ~ITContainer() {}
 };
 
 /** @ingroup Arrays Specialization for square_ */
 template <class Derived>
-class ITContainer<Derived, Arrays::square_> : public ITContainerBase<Derived>
+class ITContainer<Derived, Arrays::square_>: public ITContainerBase<Derived>
 {
   public:
     typedef ITContainerBase<Derived> Base;
@@ -336,7 +336,7 @@ class ITContainer<Derived, Arrays::square_> : public ITContainerBase<Derived>
 
   protected:
     /** default constructor. */
-    ITContainer() : Base() {}
+    ITContainer(): Base() {}
     /** destructor. */
     ~ITContainer() {}
 
@@ -367,7 +367,7 @@ class ITContainer<Derived, Arrays::square_> : public ITContainerBase<Derived>
 /** @ingroup Arrays
  *  Specialization for lower_triangular_ */
 template <class Derived>
-class ITContainer<Derived, Arrays::lower_triangular_> : public ITContainerBase<Derived>
+class ITContainer<Derived, Arrays::lower_triangular_>: public ITContainerBase<Derived>
 {
   public:
     typedef ITContainerBase<Derived> Base;
@@ -376,7 +376,7 @@ class ITContainer<Derived, Arrays::lower_triangular_> : public ITContainerBase<D
 
   protected:
     /** default constructor. */
-    ITContainer() : Base() {}
+    ITContainer(): Base() {}
     /** destructor. */
     ~ITContainer() {}
 
@@ -430,7 +430,7 @@ class ITContainer<Derived, Arrays::lower_triangular_> : public ITContainerBase<D
 /** @ingroup Arrays
  *  Specialization for upper_triangular_ */
 template <class Derived>
-class ITContainer<Derived, Arrays::upper_triangular_> : public ITContainerBase<Derived>
+class ITContainer<Derived, Arrays::upper_triangular_>: public ITContainerBase<Derived>
 {
   public:
     typedef ITContainerBase<Derived> Base;
@@ -439,7 +439,7 @@ class ITContainer<Derived, Arrays::upper_triangular_> : public ITContainerBase<D
 
   protected:
     /** default constructor. */
-    ITContainer() : Base() {}
+    ITContainer(): Base() {}
     /** destructor. */
     ~ITContainer() {}
 
@@ -494,7 +494,7 @@ class ITContainer<Derived, Arrays::upper_triangular_> : public ITContainerBase<D
 /** @ingroup Arrays
  *  Specialization for diagonal_ */
 template <class Derived>
-class ITContainer<Derived, Arrays::diagonal_> : public ITContainerBase<Derived>
+class ITContainer<Derived, Arrays::diagonal_>: public ITContainerBase<Derived>
 {
   public:
     typedef ITContainerBase<Derived> Base;
@@ -516,7 +516,7 @@ class ITContainer<Derived, Arrays::diagonal_> : public ITContainerBase<Derived>
 
   protected:
     /** default constructor. */
-    ITContainer() : Base() {}
+    ITContainer(): Base() {}
     /** destructor. */
     ~ITContainer() {}
 
@@ -614,7 +614,7 @@ class ITContainer<Derived, Arrays::diagonal_> : public ITContainerBase<Derived>
 /** @ingroup Arrays
  *  Specialization for vector_ */
 template <class Derived>
-class ITContainer<Derived, Arrays::vector_> : public ITContainerBase<Derived>
+class ITContainer<Derived, Arrays::vector_>: public ITContainerBase<Derived>
 {
   public:
     typedef ITContainerBase<Derived> Base;
@@ -636,7 +636,7 @@ class ITContainer<Derived, Arrays::vector_> : public ITContainerBase<Derived>
 
   protected:
     /** default constructor. */
-    ITContainer() : Base() {}
+    ITContainer(): Base() {}
     /** destructor. */
     ~ITContainer() {}
 
@@ -668,7 +668,7 @@ class ITContainer<Derived, Arrays::vector_> : public ITContainerBase<Derived>
 /** @ingroup Arrays
  *  Specialization for point_ */
 template <class Derived>
-class ITContainer<Derived, Arrays::point_> : public ITContainerBase<Derived>
+class ITContainer<Derived, Arrays::point_>: public ITContainerBase<Derived>
 {
   public:
     typedef ITContainerBase<Derived> Base;
@@ -690,7 +690,7 @@ class ITContainer<Derived, Arrays::point_> : public ITContainerBase<Derived>
 
   protected:
     /** default constructor. */
-    ITContainer() : Base() {}
+    ITContainer(): Base() {}
     /** destructor. */
     ~ITContainer() {}
 
@@ -721,7 +721,7 @@ class ITContainer<Derived, Arrays::point_> : public ITContainerBase<Derived>
 /** @ingroup Arrays
  *  Specialization for number_ */
 template <class Derived>
-class ITContainer<Derived, Arrays::number_> : public ITContainerBase<Derived>
+class ITContainer<Derived, Arrays::number_>: public ITContainerBase<Derived>
 {
   public:
     typedef ITContainerBase<Derived> Base;
@@ -730,7 +730,7 @@ class ITContainer<Derived, Arrays::number_> : public ITContainerBase<Derived>
 
   protected:
     /** default constructor. */
-    ITContainer() : Base() {}
+    ITContainer(): Base() {}
     /** destructor. */
     ~ITContainer() {}
 

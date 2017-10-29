@@ -113,16 +113,16 @@ class CArrayNumber: public ICArray < CArrayNumber<Type_, Orient_> >
       storage_   = Arrays::dense_
     };
     /** Default constructor. */
-    CArrayNumber() : Base() {}
+    CArrayNumber(): Base() {}
     /** constructor with an initial value, initialization with a constant.
      *  @param v initial value of the container
      **/
-    CArrayNumber( Type const& v) : Base(1, 1, v) {}
+    CArrayNumber( Type const& v): Base(1, 1, v) {}
     /** Copy constructor
      *  @param T the container to copy
      *  @param ref true if T is wrapped
      **/
-    CArrayNumber( const CArrayNumber &T, bool ref=false) : Base(T, ref) {}
+    CArrayNumber( const CArrayNumber &T, bool ref=false): Base(T, ref) {}
     /** wrapper constructor for 0 based C-Array.
      *  @param q pointer on the array
      **/
@@ -131,7 +131,7 @@ class CArrayNumber: public ICArray < CArrayNumber<Type_, Orient_> >
      *  @param allocator the allocator to wrap
      **/
     template<class OtherAllocator>
-    CArrayNumber( OtherAllocator const& allocator) : Base(allocator) {}
+    CArrayNumber( OtherAllocator const& allocator): Base(allocator) {}
     /** Copy constructor using an expression.
      *  @param T the container to wrap
      **/

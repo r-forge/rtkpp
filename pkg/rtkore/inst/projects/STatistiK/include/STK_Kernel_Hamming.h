@@ -71,7 +71,7 @@ class Hamming: public IKernelBase<Array>
      *  @param lambda the size of the windows to use in the kernel
      **/
     Hamming( Array const* p_data, Real const& lambda= 1.)
-           : Base(p_data), lambda_(lambda), diagElt_(1.), factors_(p_data)
+          : Base(p_data), lambda_(lambda), diagElt_(1.), factors_(p_data)
     {
       if (!p_data)
       { STKRUNTIME_ERROR_NO_ARG(Hamming::Hamming(p_data,lambda),p_data is 0);}
@@ -83,7 +83,7 @@ class Hamming: public IKernelBase<Array>
      *  @param lambda the size of the windows to use in the kernel
      **/
     Hamming( Array const& data, Real const& lambda= 1.)
-           : Base(data), lambda_(lambda), diagElt_(1.), factors_(data)
+          : Base(data), lambda_(lambda), diagElt_(1.), factors_(data)
     {
       factors_.run();
       computeDiagonalElement();
@@ -94,7 +94,7 @@ class Hamming: public IKernelBase<Array>
       **/
      template<class Derived>
      Hamming( Array const* p_data, ExprBase<Derived> const& param)
-            : Base(p_data), lambda_(param.empty() ? 1. : param.front())
+           : Base(p_data), lambda_(param.empty() ? 1. : param.front())
             , diagElt_(1.), factors_(p_data)
      {
          if (!p_data)
@@ -108,7 +108,7 @@ class Hamming: public IKernelBase<Array>
       **/
      template<class Derived>
      Hamming( Array const& data, ExprBase<Derived> const& param)
-            : Base(data), lambda_(param.empty() ? 1. : param.front())
+           : Base(data), lambda_(param.empty() ? 1. : param.front())
             , diagElt_(1.), factors_(data)
      {
          factors_.run();

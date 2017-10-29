@@ -57,7 +57,7 @@ namespace Stat
  *  @c Array with n rows (the samples) and p columns (the variables).
  **/
 template <class Array>
-class Multivariate<Array, Real> : public IRunnerUnsupervised< Array, typename Array::Col>
+class Multivariate<Array, Real>: public IRunnerUnsupervised< Array, typename Array::Col>
 {
   typedef typename Array::Row RowVector;
   typedef typename Array::Col ColVector;

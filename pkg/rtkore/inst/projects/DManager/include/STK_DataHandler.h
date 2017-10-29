@@ -72,7 +72,7 @@ class DataHandler: public DataHandlerBase<DataHandler>
     typedef DataHandlerBase<DataHandler> Base;
     typedef DataHandlerBase<DataHandler>::InfoMap InfoMap;
     /** default constructor */
-    inline DataHandler() : Base(), withNames_(false)
+    inline DataHandler(): Base(), withNames_(false)
     { data_.setWithNames(false); descriptor_.setWithNames(false);}
     /** destructor */
     inline ~DataHandler() {}

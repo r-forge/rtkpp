@@ -90,7 +90,7 @@ struct Traits< Variable<Type_> >
   * class.
  **/
 template<class Type>
-class Variable : public IVariable
+class Variable: public IVariable
                , public IArray1D< Variable<Type> >
 {
   public:

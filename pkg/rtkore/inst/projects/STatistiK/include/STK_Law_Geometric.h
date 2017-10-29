@@ -149,9 +149,13 @@ class Geometric: public IUnivLaw<Integer>
 
 
 inline int Geometric::rand() const
-{ GetRNGstate(); int s = Rf_rgeom(prob_);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); int s = Rf_rgeom(prob_); PutRNGstate(); return s;
 }
+
 inline Real Geometric::pdf(Integer const& x) const
 { return Rf_dgeom((double)x, prob_, false);}
 inline Real Geometric::lpdf(Integer const& x) const
@@ -162,9 +166,13 @@ inline int Geometric::icdf(Real const& p) const
 { return Rf_qgeom(p, prob_, true, false);}
 
 inline int Geometric::rand(Real const& prob)
-{ GetRNGstate(); int s = Rf_rgeom(prob);
-  PutRNGstate(); return s;
+{
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+GetRNGstate(); int s = Rf_rgeom(prob); PutRNGstate(); return s;
 }
+
 inline Real Geometric::pdf(Integer x, Real const& prob)
 { return Rf_dgeom((double)x, prob, false);}
 inline Real Geometric::lpdf(Integer x, Real const& prob)

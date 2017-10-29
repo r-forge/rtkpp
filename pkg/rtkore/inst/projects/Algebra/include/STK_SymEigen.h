@@ -80,7 +80,7 @@ struct AlgebraTraits< SymEigen<SquareArray_> >
  *  a determinant very small (but not exactly 0.0).
  **/
 template<class SquareArray>
-class SymEigen : public ISymEigen<SymEigen<SquareArray> >
+class SymEigen: public ISymEigen<SymEigen<SquareArray> >
 {
   public:
     typedef ISymEigen<SymEigen<SquareArray> > Base;
@@ -148,7 +148,7 @@ SymEigen<SquareArray>::SymEigen(): Base() {}
  */
 template<class SquareArray>
 SymEigen<SquareArray>::SymEigen( SquareArray const& data, bool ref)
-                               : Base(data)
+                              : Base(data)
 {}
 /* @brief Constructor
  *  @param data reference on a symmetric square matrix
@@ -156,7 +156,7 @@ SymEigen<SquareArray>::SymEigen( SquareArray const& data, bool ref)
  */
 template<>
 inline SymEigen<CSquareX>::SymEigen( CSquareX const& data, bool ref)
-                            : Base(data, ref)
+                           : Base(data, ref)
 {}
 
 /* constructor.

@@ -48,7 +48,7 @@ namespace STK
  * virtual function @c run will be implemented in derived class and compute
  * the value_ member.
   */
-class ICriterion : public IRunnerBase
+class ICriterion: public IRunnerBase
 {
   protected:
     /** Default Constructor. */
@@ -95,7 +95,7 @@ class ICriterion : public IRunnerBase
  *  where \f$ L \f$ represents the likelihood of the observations and \f$ D \f$
  *  the number of free parameter of the model.
  **/
-class AICCriterion : public ICriterion
+class AICCriterion: public ICriterion
 {
   public:
     /** Default Constructor. */
@@ -140,7 +140,7 @@ inline bool AICCriterion::run()
  *  where \f$ L \f$ represents the likelihood of the observations, \f$ D \f$ the
  *  number of free parameter of the model and \f$ n \f$ the number of sample.
  **/
-class BICCriterion : public ICriterion
+class BICCriterion: public ICriterion
 {
   public:
     /** Default Constructor. */

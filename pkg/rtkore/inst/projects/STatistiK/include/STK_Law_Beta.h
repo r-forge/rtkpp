@@ -127,7 +127,7 @@ inline Real Beta::rand() const
 #ifdef _OPENMP
 //#pragma omp critical
 #endif
-GetRNGstate(); Real s = Rf_rbeta(alpha_, beta_); PutRNGstate(); return s;
+  GetRNGstate(); Real s = Rf_rbeta(alpha_, beta_); PutRNGstate(); return s;
 }
 
 inline Real Beta::pdf( Real const& x) const {  return Rf_dbeta(x,alpha_, beta_, (int)false);}
@@ -140,7 +140,7 @@ inline Real Beta::rand( Real const& alpha, Real const& beta)
 #ifdef _OPENMP
 //#pragma omp critical
 #endif
-GetRNGstate(); Real s = Rf_rbeta(alpha, beta); PutRNGstate(); return s;
+  GetRNGstate(); Real s = Rf_rbeta(alpha, beta); PutRNGstate(); return s;
 }
 
 inline Real Beta::pdf(const Real& x, const Real& alpha, const Real& beta)

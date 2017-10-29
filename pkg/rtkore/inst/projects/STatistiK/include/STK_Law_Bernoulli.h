@@ -209,7 +209,7 @@ inline Binary Bernoulli::icdf(Real const& prob) const
   if (prob<0) STKDOMAIN_ERROR_1ARG(Bernoulli::icdf,prob,prob must be >= 0);
   if (prob>1) STKDOMAIN_ERROR_1ARG(Bernoulli::icdf,prob,prob must be <= 1);
 #endif
-  return (prob==0) ? zero_ : (prob==1) ? one_ : (prob <= 1.-prob_) ? zero_ :  one_;
+  return (prob==0) ? zero_ : (prob==1) ? one_ : (prob <= 1.-prob) ? zero_ :  one_;
 }
 
 } // namespace Law

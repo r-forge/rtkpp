@@ -108,6 +108,13 @@ class Bernoulli: public IUnivLaw<Binary>
      *  @return the value of the log-pdf
      **/
     virtual Real lpdf(Binary const& x) const;
+    /** @brief inverse cumulative distribution function
+     *  The quantile is defined as the smallest value @e x such that
+     *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.
+     *  @param prob a probability number
+     **/
+    virtual Binary icdf(Real const& prob) const;
+
 
     /** @param prob a probability number
      *  @return a Binary random variate.
@@ -127,12 +134,6 @@ class Bernoulli: public IUnivLaw<Binary>
      *  @return the value of the log-pdf
      **/
     static Real lpdf(Binary const& x, Real const& prob);
-    /** @brief inverse cumulative distribution function
-     *  The quantile is defined as the smallest value @e x such that
-     *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.
-     *  @param prob a probability number
-     **/
-    static Binary icdf(Real const& prob);
 
   protected:
     /** probability of success in a Bernoulli trial */
@@ -164,6 +165,14 @@ inline Real Bernoulli::lpdf(Binary const& x) const
 }
 inline Real Bernoulli::cdf(Real const& t) const
 { return (t<0.) ? 0. : (t<1.) ? 1.-prob_ : 1.;}
+inline Binary Bernoulli::icdf(Real const& prob) const
+{
+#ifdef STK_STATISTIK_DEBUG
+  if (prob<0) STKDOMAIN_ERROR_1ARG(Bernoulli::icdf,prob,prob must be >= 0);
+  if (prob>1) STKDOMAIN_ERROR_1ARG(Bernoulli::icdf,prob,prob must be <= 1);
+#endif
+  return (prob==0) ? zero_ : (prob==1) ? one_ : (prob <= 1.-prob_) ? zero_ :  one_;
+}
 
 
 inline Binary Bernoulli::rand(Real const& prob)
@@ -202,14 +211,6 @@ inline Real Bernoulli::lpdf(Binary const& x, Real const& prob)
     default: break;
   }
   return Arithmetic<Real>::NA();
-}
-inline Binary Bernoulli::icdf(Real const& prob)
-{
-#ifdef STK_STATISTIK_DEBUG
-  if (prob<0) STKDOMAIN_ERROR_1ARG(Bernoulli::icdf,prob,prob must be >= 0);
-  if (prob>1) STKDOMAIN_ERROR_1ARG(Bernoulli::icdf,prob,prob must be <= 1);
-#endif
-  return (prob==0) ? zero_ : (prob==1) ? one_ : (prob <= 1.-prob) ? zero_ :  one_;
 }
 
 } // namespace Law

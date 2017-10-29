@@ -174,7 +174,7 @@ class Binomial: public IUnivLaw<Integer>
 inline int Binomial::rand() const
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); int s = Rf_rbinom(n_, prob_); PutRNGstate(); return s;
 }
@@ -191,7 +191,7 @@ inline int Binomial::icdf(Real const& p) const
 inline int Binomial::rand(int n, Real const& prob)
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); int s = Rf_rbinom(n, prob); PutRNGstate(); return s;
 }

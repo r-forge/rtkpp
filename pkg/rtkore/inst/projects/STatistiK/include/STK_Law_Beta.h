@@ -125,7 +125,7 @@ class Beta: public IUnivLaw<Real>
 inline Real Beta::rand() const
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); Real s = Rf_rbeta(alpha_, beta_); PutRNGstate(); return s;
 }
@@ -138,7 +138,7 @@ inline Real Beta::icdf( Real const& p) const { return Rf_qbeta(p , alpha_, beta_
 inline Real Beta::rand( Real const& alpha, Real const& beta)
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); Real s = Rf_rbeta(alpha, beta); PutRNGstate(); return s;
 }

@@ -172,7 +172,7 @@ class Logistic: public IUnivLaw<Real>
 inline Real Logistic::rand() const
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); Real s = Rf_rlogis(mu_, scale_); PutRNGstate(); return s;
 }
@@ -189,7 +189,7 @@ inline Real Logistic::icdf( Real const& p) const
 inline Real Logistic::rand( Real const& mu, Real const& scale)
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); Real s = Rf_rlogis(mu, scale); PutRNGstate(); return s;
 }

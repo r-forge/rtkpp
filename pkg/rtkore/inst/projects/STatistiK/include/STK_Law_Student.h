@@ -142,7 +142,7 @@ class Student: public IUnivLaw<Real>
 inline Real Student::rand() const
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); Real s = Rf_rt(df_); PutRNGstate(); return s;
 }
@@ -155,7 +155,7 @@ inline Real Student::icdf(Real const& p) const { return Rf_qt(p, df_, true, fals
 inline Real Student::rand( int df)
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); Real s = Rf_rt(df); PutRNGstate(); return s;
 }

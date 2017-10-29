@@ -144,7 +144,7 @@ class FisherSnedecor: public IUnivLaw<Real>
 inline Real FisherSnedecor::rand() const
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); Real s = Rf_rf(df1_, df2_); PutRNGstate(); return s;
 }
@@ -161,7 +161,7 @@ inline Real FisherSnedecor::icdf(Real const& p) const
 inline Real FisherSnedecor::rand( int df1, int df2)
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); Real s = Rf_rf(df1, df2); PutRNGstate(); return s;
 }

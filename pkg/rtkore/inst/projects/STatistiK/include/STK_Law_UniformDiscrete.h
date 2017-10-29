@@ -154,7 +154,7 @@ class UniformDiscrete: public IUnivLaw<int>
 inline int UniformDiscrete::rand() const
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); Real s = a_ + Rf_runif(0, double(n_)); PutRNGstate(); return s;
 }
@@ -193,7 +193,7 @@ inline int UniformDiscrete::icdf( Real const& p) const
 inline int UniformDiscrete::rand( int a, int b)
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
   GetRNGstate(); Real s = a + Rf_runif(0, double(b - a + 1)); PutRNGstate(); return s;
 }

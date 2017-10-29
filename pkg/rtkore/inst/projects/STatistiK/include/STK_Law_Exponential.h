@@ -138,7 +138,7 @@ class Exponential: public IUnivLaw<Real>
 inline Real Exponential::rand() const
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); Real s = Rf_rexp(scale_); PutRNGstate(); return s;
 }
@@ -151,7 +151,7 @@ inline Real Exponential::icdf( Real const& p) const { return Rf_qexp(p , scale_,
 inline Real Exponential::rand( Real const& scale)
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); Real s = Rf_rexp(scale); PutRNGstate(); return s;
 }

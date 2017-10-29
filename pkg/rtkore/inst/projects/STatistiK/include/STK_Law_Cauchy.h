@@ -182,7 +182,7 @@ class Cauchy: public IUnivLaw<Real>
 inline Real Cauchy::rand() const
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); Real s = Rf_rcauchy(mu_, scale_); PutRNGstate(); return s;
 }
@@ -196,7 +196,7 @@ inline Real Cauchy::icdf( Real const& p) const { return Rf_qcauchy(p , mu_, scal
 inline Real Cauchy::rand( Real const& mu, Real const& scale)
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); Real s = Rf_rcauchy(mu, scale); PutRNGstate(); return s;
 }

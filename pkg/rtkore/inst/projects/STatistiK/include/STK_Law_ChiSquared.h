@@ -134,7 +134,7 @@ class ChiSquared: public IUnivLaw<Real>
 inline Real ChiSquared::rand() const
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
  GetRNGstate(); Real s = Rf_rchisq(df_); PutRNGstate(); return s;
 }
@@ -147,7 +147,7 @@ inline Real ChiSquared::icdf(const Real& p) const { return Rf_qchisq(p, df_, tru
 inline Real ChiSquared::rand(int df)
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); Real s = Rf_rchisq(df); PutRNGstate(); return s;
 }

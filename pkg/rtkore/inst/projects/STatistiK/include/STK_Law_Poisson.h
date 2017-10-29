@@ -162,7 +162,7 @@ class Poisson: public IUnivLaw<int>
 inline int Poisson::rand() const
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
   GetRNGstate(); int s = (int)Rf_rpois(lambda_); PutRNGstate(); return s;
 }
@@ -176,7 +176,7 @@ inline int Poisson::icdf(Real const& p) const { return (int)::Rf_qpois(p, lambda
 inline int Poisson::rand(Real const& lambda)
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
   GetRNGstate(); int s = (int)Rf_rpois(lambda); PutRNGstate(); return s;
 }

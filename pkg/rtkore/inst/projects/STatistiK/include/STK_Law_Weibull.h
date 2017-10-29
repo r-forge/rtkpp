@@ -148,7 +148,7 @@ class Weibull: public IUnivLaw<Real>
 inline Real Weibull::rand() const
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); Real s = Rf_rweibull(k_, lambda_); PutRNGstate(); return s;
 }
@@ -165,7 +165,7 @@ inline Real Weibull::icdf(Real const& p) const
 inline Real Weibull::rand( Real const& k, Real const& lambda)
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); Real s = Rf_rweibull(k, lambda); PutRNGstate(); return s;
 }

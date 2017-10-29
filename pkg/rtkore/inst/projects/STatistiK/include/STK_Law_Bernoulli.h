@@ -108,12 +108,6 @@ class Bernoulli: public IUnivLaw<Binary>
      *  @return the value of the log-pdf
      **/
     virtual Real lpdf(Binary const& x) const;
-    /** @brief inverse cumulative distribution function
-     *  The quantile is defined as the smallest value @e x such that
-     *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.
-     *  @param prob a probability number
-     **/
-    virtual Binary icdf(Real const& prob) const;
 
     /** @param prob a probability number
      *  @return a Binary random variate.
@@ -133,31 +127,21 @@ class Bernoulli: public IUnivLaw<Binary>
      *  @return the value of the log-pdf
      **/
     static Real lpdf(Binary const& x, Real const& prob);
+    /** @brief inverse cumulative distribution function
+     *  The quantile is defined as the smallest value @e x such that
+     *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.
+     *  @param prob a probability number
+     **/
+    static Binary icdf(Real const& prob) const;
 
   protected:
     /** probability of success in a Bernoulli trial */
     Real prob_;
 };
 
-/* @return a @c Type random variate . */
 inline Binary Bernoulli::rand() const
 { return (Law::generator.randUnif()<=prob_) ? one_ : zero_;}
 
-/* @return a @c Bernoulli random variate . */
-inline Binary Bernoulli::rand(Real const& prob)
-{
-#ifdef STK_STATISTIK_DEBUG
-  if (prob<0) STKDOMAIN_ERROR_1ARG(Bernoulli::rand,prob,prob must be >= 0);
-  if (prob>1) STKDOMAIN_ERROR_1ARG(Bernoulli::rand,prob,prob must be <= 1);
-#endif
-  return (generator.randUnif()<=prob) ? one_ : zero_;
-}
-
-/* @brief compute the probability distribution function (density)
- *  Give the value of the pdf at the point x.
- *  @param x the value to compute the pdf.
- *  @return the value of the pdf
- **/
 inline Real Bernoulli::pdf(Binary const& x) const
 {
   switch (x)
@@ -168,11 +152,29 @@ inline Real Bernoulli::pdf(Binary const& x) const
   }
   return Arithmetic<Real>::NA();
 }
-/* @brief compute the probability distribution function (density)
- *  Give the value of the pdf at the point x.
- *  @param x the value to compute the pdf.
- *  @return the value of the pdf
- **/
+inline Real Bernoulli::lpdf(Binary const& x) const
+{
+  switch (x)
+  {
+    case zero_: return (prob_ == 1) ? -Arithmetic<Real>::infinity() : std::log(1.-prob_);
+    case one_: return (prob_ == 0) ? -Arithmetic<Real>::infinity() : std::log(prob_);
+    default: break;
+  }
+  return Arithmetic<Real>::NA();
+}
+inline Real Bernoulli::cdf(Real const& t) const
+{ return (t<0.) ? 0. : (t<1.) ? 1.-prob_ : 1.;}
+
+
+inline Binary Bernoulli::rand(Real const& prob)
+{
+#ifdef STK_STATISTIK_DEBUG
+  if (prob<0) STKDOMAIN_ERROR_1ARG(Bernoulli::rand,prob,prob must be >= 0);
+  if (prob>1) STKDOMAIN_ERROR_1ARG(Bernoulli::rand,prob,prob must be <= 1);
+#endif
+  return (generator.randUnif()<=prob) ? one_ : zero_;
+}
+
 inline Real Bernoulli::pdf(Binary const& x, Real const& prob)
 {
 #ifdef STK_STATISTIK_DEBUG
@@ -187,27 +189,6 @@ inline Real Bernoulli::pdf(Binary const& x, Real const& prob)
   }
   return Arithmetic<Real>::NA();
 }
-/* @brief compute the log probability distribution function
- *  Give the value of the log-pdf at the point x.
- *  @param x the value to compute the lpdf.
- *  @return the value of the log-pdf
- **/
-inline Real Bernoulli::lpdf(Binary const& x) const
-{
-  switch (x)
-  {
-    case zero_: return (prob_ == 1) ? -Arithmetic<Real>::infinity() : std::log(1.-prob_);
-    case one_: return (prob_ == 0) ? -Arithmetic<Real>::infinity() : std::log(prob_);
-    default: break;
-  }
-  return Arithmetic<Real>::NA();
-}
-
-/* @brief compute the log probability distribution function
- *  Give the value of the log-pdf at the point x.
- *  @param x the value to compute the lpdf.
- *  @return the value of the log-pdf
- **/
 inline Real Bernoulli::lpdf(Binary const& x, Real const& prob)
 {
 #ifdef STK_STATISTIK_DEBUG
@@ -222,21 +203,6 @@ inline Real Bernoulli::lpdf(Binary const& x, Real const& prob)
   }
   return Arithmetic<Real>::NA();
 }
-
-/* @brief compute the cumulative distribution function
- *  Give the probability that a Bernoulli random variate is less or equal
- *  to t.
- *  @param t the value to compute the cdf.
- *  @return the value of the cdf
- **/
-inline Real Bernoulli::cdf(Real const& t) const
-{ return (t<0.) ? 0. : (t<1.) ? 1.-prob_ : 1.;}
-
-/* @brief inverse cumulative distribution function
- *  Compute the Real quantile t such that the probability of a random
- *  variate less to t is less or equal to p.
- *  @param p value of the probability giving the quantile
- **/
 inline Binary Bernoulli::icdf(Real const& prob) const
 {
 #ifdef STK_STATISTIK_DEBUG

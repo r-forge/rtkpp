@@ -151,7 +151,7 @@ class Geometric: public IUnivLaw<Integer>
 inline int Geometric::rand() const
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); int s = Rf_rgeom(prob_); PutRNGstate(); return s;
 }
@@ -168,7 +168,7 @@ inline int Geometric::icdf(Real const& p) const
 inline int Geometric::rand(Real const& prob)
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); int s = Rf_rgeom(prob); PutRNGstate(); return s;
 }

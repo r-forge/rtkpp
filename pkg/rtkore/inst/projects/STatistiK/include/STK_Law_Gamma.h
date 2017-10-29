@@ -185,7 +185,7 @@ class Gamma: public IUnivLaw<Real>
 inline Real Gamma::rand() const
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); Real s = Rf_rgamma(a_, b_); PutRNGstate(); return s;
 }
@@ -202,7 +202,7 @@ inline Real Gamma::icdf( Real const& p) const
 inline Real Gamma::rand( Real const& a, Real const& b)
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); Real s = Rf_rgamma(a, b); PutRNGstate(); return s;
 }

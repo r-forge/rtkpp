@@ -183,7 +183,7 @@ class HyperGeometric: public IUnivLaw<Integer>
 inline int HyperGeometric::rand() const
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); int s = Rf_rhyper(nbSuccesses_, nbFailures_, nbDraws_); PutRNGstate(); return s;
 }
@@ -200,7 +200,7 @@ inline int HyperGeometric::icdf(Real const& p) const
 inline Integer HyperGeometric::rand( int nbSuccesses, int nbFailures, int nbDraws)
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
   GetRNGstate(); int s = Rf_rhyper(nbSuccesses, nbFailures, nbDraws); PutRNGstate(); return s;
 }

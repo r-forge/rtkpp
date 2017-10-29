@@ -167,7 +167,7 @@ class LogNormal: public IUnivLaw<Real>
 inline Real LogNormal::rand() const
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); Real s = Rf_rlnorm(mu_, sigma_); PutRNGstate(); return s;
 }
@@ -184,7 +184,7 @@ inline Real LogNormal::icdf( Real const& p) const
 inline Real LogNormal::rand( Real const& mu, Real const& sigma)
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); Real s = Rf_rlnorm(mu, sigma); PutRNGstate(); return s;
 }

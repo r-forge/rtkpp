@@ -186,7 +186,7 @@ class Normal: public IUnivLaw<Real>
 inline Real Normal::rand() const
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); Real s = Rf_rnorm(mu_, sigma_); PutRNGstate(); return s;
 }
@@ -200,7 +200,7 @@ inline Real Normal::icdf( Real const& p) const { return Rf_qnorm5(p , mu_, sigma
 inline Real Normal::rand( Real const& mu, Real const& scale)
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); Real s = Rf_rnorm(mu, scale); PutRNGstate(); return s;
 }

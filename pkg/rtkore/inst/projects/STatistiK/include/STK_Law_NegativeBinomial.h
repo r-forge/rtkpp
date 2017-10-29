@@ -170,7 +170,7 @@ class NegativeBinomial: public IUnivLaw<Integer>
 inline int NegativeBinomial::rand() const
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); int s = Rf_rnbinom(size_, prob_); PutRNGstate(); return s;
 }
@@ -187,7 +187,7 @@ inline int NegativeBinomial::icdf(Real const& p) const
 inline int NegativeBinomial::rand(int size, Real const& prob)
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
 GetRNGstate(); int s = Rf_rnbinom(size, prob); PutRNGstate(); return s;
 }

@@ -155,7 +155,7 @@ class Uniform: public IUnivLaw<Real>
 inline Real Uniform::rand() const
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
   GetRNGstate(); Real s = Rf_runif(a_, b_); PutRNGstate(); return s;
 }
@@ -168,7 +168,7 @@ inline Real Uniform::icdf( Real const& p) const { return Rf_qunif(p , a_, b_, tr
 inline Real Uniform::rand( Real const& a, Real const& b)
 {
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
   GetRNGstate(); Real s = Rf_runif(a, b); PutRNGstate(); return s;
 }

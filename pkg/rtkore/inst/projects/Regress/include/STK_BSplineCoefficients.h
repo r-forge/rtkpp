@@ -182,13 +182,17 @@ class BSplineCoefficients: public IRunnerBase
     /** Array2D<Real> of the coefficients */
     ArrayXX coefficients_;
 
-  private:
     /** Minimal value of the knots */
     Real minValue_;
     /** Maximal value of the knots */
     Real maxValue_;
+
     /** compute the position of the knots of the B-spline curves.*/
     bool computeKnots();
+    /** Compute the coefficients of the B-spline curves.*/
+    void computeCoefficients();
+
+  private:
     /** compute the position of the uniform knots.*/
     void computeUniformKnots();
     /** compute the position of the periodic knots.*/
@@ -197,8 +201,6 @@ class BSplineCoefficients: public IRunnerBase
      *  @param isSorted @c true if the data is sorted, @c false otherwise
      **/
     void computeDensityKnots(bool isSorted);
-    /** Compute the coefficients of the B-spline curves.*/
-    void computeCoefficients();
     /** Compute a row of the coefficients matrix for a given value.
      * @param irow index of the row
      * @param value the value to which we want to compute the row
@@ -487,6 +489,23 @@ bool BSplineCoefficients<Vector>::computeKnots()
   return true;
 }
 
+/* Compute the coefficients of the B-spline curves.*/
+template<class Vector>
+void BSplineCoefficients<Vector>::computeCoefficients()
+{
+#ifdef STK_REGRESS_VERBOSE
+  stk_cout << _T("BSplineCoefficients::computeCoefficients()\n");
+#endif
+
+  // compute the coefficients
+  for (int i=p_data_->begin(); i< p_data_->end(); i++)
+  { computeCoefficientsRow(i, (*p_data_)[i]);}
+
+#ifdef STK_REGRESS_VERBOSE
+  stk_cout << _T("BSplineCoefficients::computeCoefficients() done\n");
+#endif
+}
+
 /* compute the position of the uniform knots.*/
 template<class Vector>
 void BSplineCoefficients<Vector>::computeUniformKnots()
@@ -542,23 +561,6 @@ void BSplineCoefficients<Vector>::computeDensityKnots(bool isSorted)
     knots_[k] = xtri[first];
     knots_[j] = xtri[last];
   }
-}
-
-/* Compute the coefficients of the B-spline curves.*/
-template<class Vector>
-void BSplineCoefficients<Vector>::computeCoefficients()
-{
-#ifdef STK_REGRESS_VERBOSE
-  stk_cout << _T("BSplineCoefficients::computeCoefficients()\n");
-#endif
-
-  // compute the coefficients
-  for (int i=p_data_->begin(); i< p_data_->end(); i++)
-  { computeCoefficientsRow(i, (*p_data_)[i]);}
-
-#ifdef STK_REGRESS_VERBOSE
-  stk_cout << _T("BSplineCoefficients::computeCoefficients() done\n");
-#endif
 }
 
 /* Compute a row of the coefficients

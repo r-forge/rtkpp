@@ -132,7 +132,7 @@ class Bernoulli: public IUnivLaw<Binary>
      *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.
      *  @param prob a probability number
      **/
-    static Binary icdf(Real const& prob) const;
+    static Binary icdf(Real const& prob);
 
   protected:
     /** probability of success in a Bernoulli trial */
@@ -203,7 +203,7 @@ inline Real Bernoulli::lpdf(Binary const& x, Real const& prob)
   }
   return Arithmetic<Real>::NA();
 }
-inline Binary Bernoulli::icdf(Real const& prob) const
+inline Binary Bernoulli::icdf(Real const& prob)
 {
 #ifdef STK_STATISTIK_DEBUG
   if (prob<0) STKDOMAIN_ERROR_1ARG(Bernoulli::icdf,prob,prob must be >= 0);

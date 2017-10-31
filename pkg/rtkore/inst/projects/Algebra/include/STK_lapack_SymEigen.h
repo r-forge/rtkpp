@@ -72,10 +72,10 @@ namespace lapack
  *    eigenvectors of a symmetric real matrix using the syevr Lapack routine.
  */
 template<class SquareArray>
-class SymEigen: public ISymEigen<SymEigen<SquareArray> >
+class SymEigen: public ISymEigen< SymEigen<SquareArray> >
 {
   public:
-    typedef ISymEigen<SymEigen> Base;
+    typedef ISymEigen< SymEigen<SquareArray> > Base;
     using Base::eigenValues_;
     using Base::eigenVectors_;
     using Base::range_;
@@ -89,6 +89,12 @@ class SymEigen: public ISymEigen<SymEigen<SquareArray> >
      *  @param data reference on a symmetric square matrix
      *  @param ref @c true if we overwrite the data set, @c false otherwise
      *  @note data can be a reference if and only if it is a CSquareX
+     *  @note Default values for syevr lapack parameters are
+     *  @code
+     *  jobz_ = 'V'; RANGE_ = 'A'; UPLO_ = 'U';
+     *   VL_ = 0.0; VU_ = 0.0; IL_ = 0; IU_ = 0;
+     *  @endcode;
+     *
      */
     SymEigen( SquareArray const& data, bool ref =false);
     /** @brief Constructor

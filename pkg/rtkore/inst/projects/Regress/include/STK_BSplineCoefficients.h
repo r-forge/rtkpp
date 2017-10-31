@@ -187,6 +187,8 @@ class BSplineCoefficients: public IRunnerBase
     /** Maximal value of the knots */
     Real maxValue_;
 
+    /** Initialize the parameters */
+    bool initializeStep();
     /** compute the position of the knots of the B-spline curves.*/
     bool computeKnots();
     /** Compute the coefficients of the B-spline curves.*/
@@ -264,41 +266,6 @@ BSplineCoefficients<Vector>::BSplineCoefficients( BSplineCoefficients const& coe
                                                 , minValue_(coefs.minValue_)
                                                 , maxValue_(coefs.maxValue_)
 {}
-
-/* run the computations. */
-template<class Vector>
-bool BSplineCoefficients<Vector>::run()
-{
-  // check if data exists
-  if (!p_data_)
-  {
-   msg_error_ = _T("Error in BSplineCoefficients::run():\nWhat: p_data_ is not set.");
-   return false;
-  }
-  // resize and initialize coeficients
-  coefficients_.resize(p_data_->range(), Range(0, lastControlPoint_, 0)) =0;
-  // compute min and max value
-  minValue_ =  Arithmetic<Real>::max();
-  maxValue_ = -Arithmetic<Real>::max();
-  for (int i=p_data_->begin(); i< p_data_->end(); i++)
-  {
-    minValue_ = std::min(minValue_, (*p_data_)[i]);
-    maxValue_ = std::max(maxValue_, (*p_data_)[i]);
-  }
-  // if all value are equals, all the knots are equals to this value
-  if (minValue_ == maxValue_)
-  {
-    knots_ = minValue_;
-    msg_error_ = STKERROR_NO_ARG(BSplineCoefficients::computeKnots,All values are equal);
-    return false;
-  }
-  // compute the knots and coefficients
-  if (computeKnots()) { computeCoefficients();}
-  else { return false;}
-  this->hasRun_ = true;
-  return true;
-}
-
 
 /*  run the computations for the given value.
  *  @param p_data the input data values
@@ -397,6 +364,48 @@ void BSplineCoefficients<Vector>::setPosition(Regress::KnotsPosition position)
   this->hasRun_ = false;
 }
 
+
+/* run the computations. */
+template<class Vector>
+bool BSplineCoefficients<Vector>::run()
+{
+  if (!initializeStep()) return false;
+  // compute the knots and coefficients
+  if (computeKnots()) { computeCoefficients();}
+  else                { return false;}
+  this->hasRun_ = true;
+  return true;
+}
+
+/* Initialize the parameters */
+template<class Vector>
+bool BSplineCoefficients<Vector>::initializeStep()
+{
+  // check if data exists
+  if (!p_data_)
+  {
+   msg_error_ = _T("Error in BSplineCoefficients::run():\nWhat: p_data_ is not set.");
+   return false;
+  }
+  // resize and initialize coeficients
+  coefficients_.resize(p_data_->range(), Range(0, lastControlPoint_, 0)) =0;
+  // compute min and max value
+  minValue_ =  Arithmetic<Real>::max();
+  maxValue_ = -Arithmetic<Real>::max();
+  for (int i=p_data_->begin(); i< p_data_->end(); i++)
+  {
+    minValue_ = std::min(minValue_, (*p_data_)[i]);
+    maxValue_ = std::max(maxValue_, (*p_data_)[i]);
+  }
+  // if all value are equals, all the knots are equals to this value
+  if (minValue_ == maxValue_)
+  {
+    knots_ = minValue_;
+    msg_error_ = STKERROR_NO_ARG(BSplineCoefficients::computeKnots,All values are equal);
+    return false;
+  }
+  return true;
+}
 
 /* Extrapolate the matrix of coefficients for a given set of x-values.
  *  @param x the values to extrapolate

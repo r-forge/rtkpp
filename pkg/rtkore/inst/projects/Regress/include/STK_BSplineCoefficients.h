@@ -552,23 +552,20 @@ void BSplineCoefficients<Vector>::computeDensityKnots(bool isSorted)
   if (!isSorted) heapSort< Vector >(xtri);
 
   // compute step
-  Real step = xtri.size()/(Real)(nbKnots_-1);
+  Real step = xtri.size()/(Real)(lastControlPoint_-degree_+1);
+
   // set internal knots
   int first = xtri.begin();
-  const int firstCell = degree_ + 1;
-
-  for (int k = firstCell; k <= lastControlPoint_; k++)
+  for (int k = degree_ + 1, kcell =1; k <= lastControlPoint_; k++, kcell++)
   {
-    int cell = first + int(k* step);
+    int cell = first + int(kcell* step);
     knots_[k] = (xtri[cell] + xtri[cell+1])/2.;
   }
-
   // set external knots
-  int last = xtri.lastIdx();
-  for ( int k=0, j = lastControlPoint_+1; k < firstCell; j++, k++)
+  for ( int k=0, j = lastControlPoint_+1; k <= degree_; j++, k++)
   {
-    knots_[k] = xtri[first];
-    knots_[j] = xtri[last];
+    knots_[k] = xtri.front();
+    knots_[j] = xtri.back();
   }
 }
 

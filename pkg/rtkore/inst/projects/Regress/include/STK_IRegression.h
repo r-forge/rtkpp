@@ -217,6 +217,8 @@ bool IRegression<YArray,XArray,Weights>::run()
   predictionStep();
   // compute residuals
   residualsStep();
+  // perform any post-operation needed before the regression step
+  finalizeStep();
   // return the result of the computations
   this->hasRun_ = true;
   return true;

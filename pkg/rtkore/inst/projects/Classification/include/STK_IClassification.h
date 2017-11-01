@@ -36,7 +36,8 @@
 #ifndef STK_ICLASSIFICATION_H
 #define STK_ICLASSIFICATION_H
 
-#include <STKernel/include/STK_String.h>
+#include <Sdk/include/STK_IRunner.h>
+#include <Sdk/include/STK_Macros.h>
 
 namespace STK
 {
@@ -111,17 +112,18 @@ class IClassification: public IRunnerSupervised<YArray_, XArray_, Weights_>
     /** virtual destructor. */
     virtual ~IClassification() {}
 
-    /** @return the predicted values */
-    inline YArray_ const& predicted() const { return predicted_;}
-    /** @return the pointer on the predicted values */
-    inline YArray_* p_predicted() { return &predicted_;}
-    /**  @return the number of parameter of the classification function */
+    /**  @return number of class */
+    inline int nbClass() const { return nbClass_;}
+    /**  @return number of parameters of the classification function */
     inline int nbFreeParameter() const { return nbFreeParameter_;}
 
     /** run the computations. Default Implementation. */
     virtual bool run()
     {
-      if (!p_x_ || !p_y_) return false;
+      if (!p_x_ || !p_y_)
+      { this->msg_error_ = STKERROR_NO_ARG(IClassification::run,missing data sets);
+        return false;
+      }
       bool flag=true;
       // perform any initialization step needed before the classification step
       if (!initializeStep()) { flag = false;}
@@ -142,7 +144,10 @@ class IClassification: public IRunnerSupervised<YArray_, XArray_, Weights_>
      **/
     virtual bool run( Weights_ const& weights)
     {
-      if (!p_x_ || !p_y_) return false;
+      if (!p_x_ || !p_y_)
+      { this->msg_error_ = STKERROR_NO_ARG(IClassification::run,missing data sets);
+        return false;
+      }
       bool flag=true;
       // perform any pre-operation needed before the classification step
       if (!initializeStep()) { flag = false;}
@@ -160,8 +165,8 @@ class IClassification: public IRunnerSupervised<YArray_, XArray_, Weights_>
     }
 
   protected:
-    /** Container of the predicted output. */
-    YArray_ predicted_;
+    /** number of class */
+    int nbClass_;
     /** number of parameter of the classification method. */
     int nbFreeParameter_;
 
@@ -193,17 +198,17 @@ class IClassification: public IRunnerSupervised<YArray_, XArray_, Weights_>
 
 /* Default constructor. Initialize the data members. */
 template <class YArray_, class XArray_, class Weights_>
-IClassification<YArray_,XArray_,Weights_>::IClassification(): Base(), predicted_(), nbFreeParameter_(0) {}
+IClassification<YArray_,XArray_,Weights_>::IClassification(): Base(), nbClass_(0), nbFreeParameter_(0) {}
 
 /* Constructor. Initialize the data members.
  *  @param p_y,p_x pointer array with the observed output and output
  **/
 template <class YArray_, class XArray_, class Weights_>
 IClassification<YArray_,XArray_,Weights_>::IClassification( YArray_ const* p_y, XArray_ const* p_x)
-                                                        : Base(p_y, p_x)
-                                                         , predicted_()
-                                                         , nbFreeParameter_(0)
- {}
+                                                          : Base(p_y, p_x)
+                                                          , nbClass_(0)
+                                                          , nbFreeParameter_(0)
+{}
 
 /* Constructor. Initialize the data members.
  * @param y,x arrays with the observed output and input
@@ -211,9 +216,9 @@ IClassification<YArray_,XArray_,Weights_>::IClassification( YArray_ const* p_y, 
 template <class YArray_, class XArray_, class Weights_>
 IClassification<YArray_,XArray_,Weights_>::IClassification( YArray_ const& y, XArray_ const& x)
                                                           : Base(y, x)
-                                                           , predicted_()
-                                                           , nbFreeParameter_(0)
- {}
+                                                          , nbClass_(0)
+                                                          , nbFreeParameter_(0)
+{}
 
 } // namespace STK
 

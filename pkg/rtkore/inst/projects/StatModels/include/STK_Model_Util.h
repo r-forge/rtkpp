@@ -90,10 +90,11 @@ enum StatisticalModels
  **/
 enum TypeCriterion
 {
-  unknown_, ///< unknown criterion
+  unknownCriterion_ = -1, ///< unknown criterion
   aic_,     ///< akaike criterion
   bic_,     ///< information criterion
-  icl_      ///< integrated likelihood criterion
+  icl_,      ///< integrated likelihood criterion
+  ml_       ///< Maximum Likelihood criterion
 };
 
 /** @ingroup StatModels
@@ -107,7 +108,8 @@ inline TypeCriterion stringToTypeCriterion(const String & type)
   if (toUpperString(type) == toUpperString(_T("AIC"))) return aic_;
   if (toUpperString(type) == toUpperString(_T("BIC"))) return bic_;
   if (toUpperString(type) == toUpperString(_T("ICL"))) return icl_;
-  return unknown_;
+  if (toUpperString(type) == toUpperString(_T("ML"))) return ml_;
+  return unknownCriterion_;
 }
 
 /** @ingroup StatModels
@@ -125,7 +127,9 @@ inline String typeCriterionToString(const TypeCriterion & type)
       return String(_T("BIC"));
     case icl_:
       return String(_T("ICL"));
-    case unknown_:
+    case ml_:
+      return String(_T("ML"));
+    case unknownCriterion_:
       return String(_T("unknown"));
   }
   return String(_T("unknown"));

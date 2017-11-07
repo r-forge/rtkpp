@@ -89,6 +89,16 @@ namespace STK
  *   virtual void initializeStep();
  * @endcode
  * can be overloaded.
+ *
+ * The default behavior of the @c run methods is
+ * @code
+ *    if (!initializeStep()) { flag = false;}
+ *    if (!estimationStep()) { flag = false;}
+ *    nbFreeParameter_ = computeNbFreeParameter();
+ *    if (!finalizeStep()) { flag = false;}
+ *    if (!predictionStep()) { flag = false;}
+ * @endcode
+ * and it can be overloaded in derived class.
  */
 template <class YArray_, class XArray_, class Weights_>
 class IClassification: public IRunnerSupervised<YArray_, XArray_, Weights_>
@@ -131,10 +141,10 @@ class IClassification: public IRunnerSupervised<YArray_, XArray_, Weights_>
       if (!estimationStep()) { flag = false;}
       // Compute the number of parameter of the classification function.
       nbFreeParameter_ = computeNbFreeParameter();
-      // create array of the predicted value and compute prediction
-      if (!predictionStep()) { flag = false;}
       // perform any post-operation needed after the classification step
       if (!finalizeStep()) { flag = false;}
+      // create array of the predicted value and compute prediction
+      if (!predictionStep()) { flag = false;}
       // return the result of the computations
       this->hasRun_ = true;
       return flag;
@@ -155,10 +165,10 @@ class IClassification: public IRunnerSupervised<YArray_, XArray_, Weights_>
       if (!estimationStep(weights)) { flag = false;}
       // Compute the number of parameter of the classification function.
       nbFreeParameter_ = computeNbFreeParameter();
-      // create array of the predicted value and compute prediction
-      if (!predictionStep()) { flag = false;}
       // perform any post-operation needed after the classification step
       if (!finalizeStep()) { flag = false;}
+      // create array of the predicted value and compute prediction
+      if (!predictionStep()) { flag = false;}
       // return the result of the computations
       this->hasRun_ = true;
       return flag;

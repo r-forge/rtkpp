@@ -224,7 +224,7 @@ BSplineCoefficients<Vector>::BSplineCoefficients( Vector const* p_data
                                                 , position_(position)
                                                 , nbKnots_(nbControlPoints + degree + 1)
                                                 , lastControlPoint_(nbControlPoints_-1)
-                                                , knots_()
+                                                , knots_( Range(0, nbKnots_) )
                                                 , coefficients_()
                                                 , minValue_( Arithmetic<Real>::max())
                                                 , maxValue_(-Arithmetic<Real>::max())
@@ -244,7 +244,7 @@ BSplineCoefficients<Vector>::BSplineCoefficients( Vector const& data
                                                 , position_(position)
                                                 , nbKnots_(nbControlPoints + degree +1)
                                                 , lastControlPoint_(nbControlPoints_-1)
-                                                , knots_()
+                                                , knots_( Range(0, nbKnots_) )
                                                 , coefficients_()
                                                 , minValue_( Arithmetic<Real>::max())
                                                 , maxValue_(-Arithmetic<Real>::max())
@@ -283,7 +283,7 @@ void BSplineCoefficients<Vector>::setData( Vector const& data
   position_ = position;
   nbKnots_ = nbControlPoints_ + degree_ +1;
   lastControlPoint_ = nbControlPoints_-1;
-  knots_.resize(Range(0,nbKnots_-1, 0));
+  knots_.resize( Range(0, nbKnots_) );
   minValue_ =  Arithmetic<Real>::max();
   maxValue_ = -Arithmetic<Real>::max();
   this->hasRun_ = false;
@@ -305,7 +305,7 @@ void BSplineCoefficients<Vector>::setParameters( Vector const& data
   position_ = position;
   nbKnots_ = nbControlPoints_ + degree_ +1;
   lastControlPoint_ = nbControlPoints_-1;
-  knots_.resize(Range(0,nbKnots_-1, 0));
+  knots_.resize( Range(0, nbKnots_) );
   minValue_ =  Arithmetic<Real>::max();
   maxValue_ = -Arithmetic<Real>::max();
   this->hasRun_ = false;
@@ -330,7 +330,7 @@ void BSplineCoefficients<Vector>::setNbControlPoints( int nbControlPoints)
   nbControlPoints_ = nbControlPoints;
   nbKnots_ = nbControlPoints_ + degree_ +1;
   lastControlPoint_ = nbControlPoints_-1;
-  knots_.resize(Range(0,nbKnots_-1, 0));
+  knots_.resize( Range(0, nbKnots_) );
   minValue_ =  Arithmetic<Real>::max();
   maxValue_ = -Arithmetic<Real>::max();
   this->hasRun_ = false;
@@ -345,7 +345,7 @@ void BSplineCoefficients<Vector>::setDegree( int degree)
   degree_ = degree;
   nbKnots_ = nbControlPoints_ + degree_ +1;
   lastControlPoint_ = nbControlPoints_-1;
-  knots_.resize(Range(0,nbKnots_-1, 0));
+  knots_.resize( Range(0, nbKnots_)  );
   minValue_ =  Arithmetic<Real>::max();
   maxValue_ = -Arithmetic<Real>::max();
   this->hasRun_ = false;
@@ -358,7 +358,6 @@ template<class Vector>
 void BSplineCoefficients<Vector>::setPosition(Regress::KnotsPosition position)
 {
   position_ = position;
-  knots_.resize(Range(0,nbKnots_-1, 0));
   minValue_ =  Arithmetic<Real>::max();
   maxValue_ = -Arithmetic<Real>::max();
   this->hasRun_ = false;
@@ -468,7 +467,7 @@ template<class Vector>
 bool BSplineCoefficients<Vector>::computeKnots()
 {
   // resize and initialize knots
-  knots_.resize( Range(0, nbKnots_-1, 0) ) = minValue_;
+  knots_.resize( Range(0, nbKnots_) ) = minValue_;
   // set knots values
   switch (position_)
   {

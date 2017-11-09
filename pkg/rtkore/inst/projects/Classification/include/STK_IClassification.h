@@ -94,8 +94,8 @@ namespace STK
  * @code
  *    if (!initializeStep()) { flag = false;}
  *    if (!estimationStep()) { flag = false;}
- *    nbFreeParameter_ = computeNbFreeParameter();
  *    if (!finalizeStep()) { flag = false;}
+ *    nbFreeParameter_ = computeNbFreeParameter();
  *    if (!predictionStep()) { flag = false;}
  * @endcode
  * and it can be overloaded in derived class.
@@ -139,10 +139,10 @@ class IClassification: public IRunnerSupervised<YArray_, XArray_, Weights_>
       if (!initializeStep()) { flag = false;}
       // compute the classification
       if (!estimationStep()) { flag = false;}
-      // Compute the number of parameter of the classification function.
-      nbFreeParameter_ = computeNbFreeParameter();
       // perform any post-operation needed after the classification step
       if (!finalizeStep()) { flag = false;}
+      // Compute the number of parameter of the classification function.
+      nbFreeParameter_ = computeNbFreeParameter();
       // create array of the predicted value and compute prediction
       if (!predictionStep()) { flag = false;}
       // return the result of the computations
@@ -163,10 +163,10 @@ class IClassification: public IRunnerSupervised<YArray_, XArray_, Weights_>
       if (!initializeStep()) { flag = false;}
       // compute weighted classification
       if (!estimationStep(weights)) { flag = false;}
-      // Compute the number of parameter of the classification function.
-      nbFreeParameter_ = computeNbFreeParameter();
       // perform any post-operation needed after the classification step
       if (!finalizeStep()) { flag = false;}
+      // Compute the number of parameter of the classification function.
+      nbFreeParameter_ = computeNbFreeParameter();
       // create array of the predicted value and compute prediction
       if (!predictionStep()) { flag = false;}
       // return the result of the computations

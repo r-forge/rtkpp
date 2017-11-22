@@ -93,8 +93,7 @@ class SymEigen: public ISymEigen< SymEigen<SquareArray> >
      *  @code
      *  jobz_ = 'V'; RANGE_ = 'A'; UPLO_ = 'U';
      *   VL_ = 0.0; VU_ = 0.0; IL_ = 0; IU_ = 0;
-     *  @endcode;
-     *
+     *  @endcode
      */
     SymEigen( SquareArray const& data, bool ref =false);
     /** @brief Constructor

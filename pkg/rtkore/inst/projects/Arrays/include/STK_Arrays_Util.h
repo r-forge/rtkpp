@@ -44,8 +44,9 @@ namespace STK
 namespace Arrays
 {
 
-/** Intrinsic dimension of the container : 1D, 2D, 3D or 4D. Higher
- *  dimensions are not allowed. */
+/** @ingroup Arrays
+ *  Intrinsic dimension of the container : 1D, 2D, 3D or 4D. 0D is for scalar
+ **/
 enum Dimension
 {
   _0D_ = 0, ///< a single scalar have no dimension
@@ -54,35 +55,44 @@ enum Dimension
   _3D_ = 3,
   _4D_ = 4
 };
-/** Define the Storage Orientation of the container */
+/** @ingroup Arrays
+ *  Define the Storage Orientation of the container
+ **/
 enum Orientation
 {
-  by_row_ =0,  ///< by_row_  storage by row
-  by_col_ =1   ///< by_col_  storage by column
+  by_row_ =0,  ///< storage by row
+  by_col_ =1   ///< storage by column
 };
 
-/** Define the different type of Array that can be handle */
+/** @ingroup Arrays
+ *  Define the different type of Array that can be handle by STK++
+ **/
 enum Storage
 {
-  dense_ =1,      ///< dense_  dense array
-  sparse_=0      ///< sparse_  sparse array
+  dense_ =1,  ///< dense matrix/vector/array/expression
+  sparse_=0   ///< sparse matrix/vector/array/expression
 };
 
-/** Define the different structure of Arrays that can be handle */
+/**  @ingroup Arrays
+ *   structures of Arrays that can be handled by STK++
+ **/
 enum Structure
 {
-  array2D_ =0 ,       ///< array2D_ a general matrix
-  square_,            ///< square_ a square matrix
-  diagonal_,          ///< diagonal_ a diagonal matrix
-  lower_triangular_,  ///< lower_triangular_ a lower triangular matrix
-  upper_triangular_,  ///< upper_triangular_ a upper triangular matrix
-  vector_,            ///< vector_  a column oriented vector
-  point_,             ///< point_   a row oriented vector
-  number_,            ///< number_  1x1 array (like a number)
+  array2D_ =0 ,       ///< general matrix/array/expression
+  square_,            ///< square matrix/array/expression
+  diagonal_,          ///< diagonal matrix/array/expression
+  lower_triangular_,  ///< lower triangular matrix/array/expression
+  upper_triangular_,  ///< upper triangular matrix/array/expression
+  lower_symmetric_,    ///< lower symmetric matrix/array/expression
+  upper_symmetric_,    ///< upper symmetric matrix/array/expression
+  vector_,            ///< column oriented vector/array/expression
+  point_,             ///< row oriented vector/array/expression
+  number_,            ///< (1,1) matrix/vector/array/expression (like a number)
   expression_         ///< An expression that will be evaluated further
 };
 
-/** Return n+m, where n is the first number such that m < 2^n.
+/** @ingroup Arrays
+ *  @return n+m, where n is the first number such that m < 2^n.
  *  @param m the size of the container
  **/
 inline int evalSizeCapacity(int m)
@@ -93,7 +103,8 @@ inline int evalSizeCapacity(int m)
 }
 
 
-/** Return range of size n+m, where n is the first number such that m < 2^n.
+/** @ingroup Arrays
+ *  @return range of size n+m, where n is the first number such that m < 2^n.
  *  @param I the range of the container
  **/
 inline Range evalRangeCapacity(STK::Range const& I)
@@ -104,7 +115,7 @@ inline Range evalRangeCapacity(STK::Range const& I)
 }
 
 /** @ingroup Arrays
- *  convert a Structure to a String.
+ *  convert an Arrays::Structure to a String.
  *  @param type the type of Structure we want to convert
  *  @return the string associated to this type.
  **/

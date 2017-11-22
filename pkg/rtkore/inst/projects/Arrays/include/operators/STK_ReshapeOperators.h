@@ -43,10 +43,12 @@ namespace STK
 {
 
 // forward declaration
-template< typename Array> class DiagonalizeOperator;
-template< typename Array> class DiagonalOperator;
-template< typename Array> class UpperTriangularizeOperator;
-template< typename Array> class LowerTriangularizeOperator;
+template< typename Lhs> class DiagonalizeOperator;
+template< typename Lhs> class DiagonalOperator;
+template< typename Lhs> class UpperTriangularizeOperator;
+template< typename Lhs> class LowerTriangularizeOperator;
+template< typename Lhs> class UpperSymmetrizeOperator;
+template< typename Lhs> class LowerSymmetrizeOperator;
 
 namespace hidden
 {
@@ -138,22 +140,69 @@ struct Traits< LowerTriangularizeOperator<Lhs> >
   typedef typename Lhs::ReturnType ConstReturnType;
 };
 
+/** @ingroup hidden
+ *  @brief Traits class for UpperSymmetrizeOperator operator
+ */
+template<typename Lhs>
+struct Traits< UpperSymmetrizeOperator<Lhs> >
+{
+  enum
+  {
+    structure_ = Arrays::upper_symmetric_,
+    orient_    = Lhs::orient_,
+    sizeRows_  = Lhs::sizeRows_,
+    sizeCols_  = Lhs::sizeCols_,
+    storage_   = Lhs::storage_
+  };
+
+  typedef RowOperator< UpperSymmetrizeOperator< Lhs> > Row;
+  typedef ColOperator< UpperSymmetrizeOperator< Lhs> > Col;
+  typedef typename Lhs::Type Type;
+  typedef typename Lhs::ReturnType ReturnType;
+  typedef typename Lhs::ReturnType ConstReturnType;
+};
+
+/** @ingroup hidden
+ *  @brief Traits class for LowerSymmetrizeOperator operator
+ */
+template<typename Lhs>
+struct Traits< LowerSymmetrizeOperator<Lhs> >
+{
+  enum
+  {
+    structure_ = Arrays::lower_symmetric_,
+    orient_    = Lhs::orient_,
+    sizeRows_  = Lhs::sizeRows_,
+    sizeCols_  = Lhs::sizeCols_,
+    storage_   = Lhs::storage_
+  };
+
+  typedef RowOperator< LowerSymmetrizeOperator< Lhs> > Row;
+  typedef ColOperator< LowerSymmetrizeOperator< Lhs> > Col;
+  typedef typename Lhs::Type Type;
+  typedef typename Lhs::ReturnType ReturnType;
+  typedef typename Lhs::ReturnType ConstReturnType;
+};
+
 } // end namespace hidden
 
 /** @ingroup Arrays
  *  @class DiagonalizeOperator
   *
-  * @brief Generic expression when a vector/point expression is "diagonalized".
+  * @brief Generic expression when a one dimensional vector/point/idagonal
+  * expression is "diagonalized".
   *
   * @tparam Lhs the type of the expression to which we are applying the
-  * asDiagonal operator.
+  * DiagonalizeOperator operator.
   *
   * This class represents an expression where a DiagonalizeOperator operator is
   * applied to a vector/point/diagonal expression. It is the return type of the
-  * asDiagonal operation.
+  * asDiagonal() operation.
   *
   * Most of the time, this is the only way that it is used, so you typically
   * don't have to name DiagonalizeOperator type explicitly.
+  *
+  *
   */
 template< typename Lhs>
 class DiagonalizeOperator: public ExprBase< DiagonalizeOperator< Lhs> >, public TRef<1>
@@ -214,7 +263,7 @@ class DiagonalizeOperator: public ExprBase< DiagonalizeOperator< Lhs> >, public 
  *  @class DiagonalOperator
   *
   * @brief Generic expression when we want to get the diagonal of a
-  * two-dimensional expression.
+  * two-dimensional square expression.
   *
   * @tparam Lhs the type of the expression to which we are applying the
   * DiagonalOperator operator.
@@ -323,7 +372,7 @@ class UpperTriangularizeOperator: public ExprBase< UpperTriangularizeOperator< L
 
     /** Constructor */
     inline UpperTriangularizeOperator( Lhs const& lhs)
-                                    : Base(), lhs_(lhs)
+                                     : Base(), lhs_(lhs)
     {}
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_; }
@@ -335,7 +384,14 @@ class UpperTriangularizeOperator: public ExprBase< UpperTriangularizeOperator< L
     /** @return a constant reference on the (i,j) element of the expression.
      *  @param i, j index of the row and of the column
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const { return (this->asDerived().lhs().elt(i, j));}
+    inline ConstReturnType elt2Impl(int i, int j) const
+    {
+#ifdef STK_BOUNDS_CHECK
+      if (j<i)
+        STKRUNTIME_ERROR_2ARG(UpperTriangularizeOperator::elt2Impl,i,j,use of the lower part);
+#endif
+      return (this->asDerived().lhs().elt(i, j));
+    }
 
   protected:
     Lhs const& lhs_;
@@ -395,7 +451,149 @@ class LowerTriangularizeOperator: public ExprBase< LowerTriangularizeOperator< L
     /** @return a constant reference on the (i,j) element of the expression.
      *  @param i, j index of the row and of the column
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const { return (this->asDerived().lhs().elt(i, j));}
+    inline ConstReturnType elt2Impl(int i, int j) const
+    {
+#ifdef STK_BOUNDS_CHECK
+      if (j>i)
+        STKRUNTIME_ERROR_2ARG(LowerTriangularizeOperator::elt2Impl,i,j,use of the upper part);
+#endif
+      return (this->asDerived().lhs().elt(i, j));
+    }
+
+  protected:
+    Lhs const& lhs_;
+};
+
+/** @ingroup Arrays
+ *  @class UpperSymmetrizeOperator
+  *
+  * @brief Generic expression when we want to get the upper-part of a
+  * two-dimensional symmetric expression.
+  *
+  * @tparam Lhs the type of the expression to which we are applying the
+  * UpperSymmetrizeOperator operator.
+  *
+  * This class represents an expression where an UpperSymmetrizeOperator
+  * operator is applied to an expression. It is the return type of the
+  * upper Symmetrize operation.
+  *
+  * Most of the time, this is the only way that it is used, so you typically
+  * don't have to name UpperSymmetrizeOperator type explicitly.
+  */
+template< typename Lhs>
+class UpperSymmetrizeOperator: public ExprBase< UpperSymmetrizeOperator< Lhs> >, public TRef<1>
+{
+  public:
+    typedef ExprBase< UpperSymmetrizeOperator< Lhs> > Base;
+    typedef typename hidden::Traits< UpperSymmetrizeOperator<Lhs> >::Type Type;
+    typedef typename hidden::Traits< UpperSymmetrizeOperator<Lhs> >::ReturnType ReturnType;
+    typedef typename hidden::Traits< UpperSymmetrizeOperator<Lhs> >::ConstReturnType ConstReturnType;
+
+    typedef typename hidden::Traits< UpperSymmetrizeOperator<Lhs> >::Row Row;
+    typedef typename hidden::Traits< UpperSymmetrizeOperator<Lhs> >::Col Col;
+    enum
+    {
+        structure_ = hidden::Traits< UpperSymmetrizeOperator<Lhs> >::structure_,
+        orient_    = hidden::Traits< UpperSymmetrizeOperator<Lhs> >::orient_,
+        sizeRows_  = hidden::Traits< UpperSymmetrizeOperator<Lhs> >::sizeRows_,
+        sizeCols_  = hidden::Traits< UpperSymmetrizeOperator<Lhs> >::sizeCols_,
+        storage_   = hidden::Traits< UpperSymmetrizeOperator<Lhs> >::storage_
+    };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
+
+    /** Constructor */
+    inline UpperSymmetrizeOperator( Lhs const& lhs)
+                                     : Base(), lhs_(lhs)
+    {}
+    /** @return the left hand side expression */
+    inline Lhs const& lhs() const { return lhs_; }
+    /**  @return the range of the rows */
+    inline RowRange const& rowsImpl() const { return lhs().rows();}
+    /** @return the range of the Columns */
+    inline ColRange const& colsImpl() const { return lhs().cols();}
+
+    /** @return a constant reference on the (i,j) element of the expression.
+     *  @param i, j index of the row and of the column
+     **/
+    inline ConstReturnType elt2Impl(int i, int j) const
+    {
+#ifdef STK_BOUNDS_CHECK
+      if (j<i)
+        STKRUNTIME_ERROR_2ARG(UpperSymmetrizeOperator::elt2Impl,i,j,use of the lower part);
+#endif
+      return (this->asDerived().lhs().elt(i, j));
+    }
+
+  protected:
+    Lhs const& lhs_;
+};
+
+/** @ingroup Arrays
+ *  @class LowerSymmetrizeOperator
+  *
+  * @brief Generic expression when we want to get the lower-part of a
+  * two-dimensional symmetric expression.
+  *
+  * @tparam Lhs the type of the expression to which we are applying the
+  * LowerSymmetrizeOperator operator.
+  *
+  * This class represents an expression where an LowerTriangularizeOperator
+  * operator is applied to an expression. It is the return type of the
+  * lower symmetrize operation.
+  *
+  * Most of the time, this is the only way that it is used, so you typically
+  * don't have to name LowerSymmetrizeOperator type explicitly.
+  */
+template< typename Lhs>
+class LowerSymmetrizeOperator: public ExprBase< LowerSymmetrizeOperator< Lhs> >, public TRef<1>
+{
+  public:
+    typedef ExprBase< LowerSymmetrizeOperator< Lhs> > Base;
+    typedef typename hidden::Traits< LowerSymmetrizeOperator<Lhs> >::Type Type;
+    typedef typename hidden::Traits< LowerSymmetrizeOperator<Lhs> >::ReturnType ReturnType;
+    typedef typename hidden::Traits< LowerSymmetrizeOperator<Lhs> >::ConstReturnType ConstReturnType;
+
+    typedef typename hidden::Traits< LowerSymmetrizeOperator<Lhs> >::Row Row;
+    typedef typename hidden::Traits< LowerSymmetrizeOperator<Lhs> >::Col Col;
+    enum
+    {
+        structure_ = hidden::Traits< LowerSymmetrizeOperator<Lhs> >::structure_,
+        orient_    = hidden::Traits< LowerSymmetrizeOperator<Lhs> >::orient_,
+        sizeRows_  = hidden::Traits< LowerSymmetrizeOperator<Lhs> >::sizeRows_,
+        sizeCols_  = hidden::Traits< LowerSymmetrizeOperator<Lhs> >::sizeCols_,
+        storage_   = hidden::Traits< LowerSymmetrizeOperator<Lhs> >::storage_
+    };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
+
+    /** Constructor */
+    inline LowerSymmetrizeOperator( Lhs const& lhs)
+                                  : Base(), lhs_(lhs)
+    {}
+    /** @return the left hand side expression */
+    inline Lhs const& lhs() const { return lhs_; }
+    /**  @return the range of the rows */
+    inline RowRange const& rowsImpl() const { return lhs().rows();}
+    /** @return the range of the Columns */
+    inline ColRange const& colsImpl() const { return lhs().cols();}
+
+    /** @return a constant reference on the (i,j) element of the expression.
+     *  @param i, j index of the row and of the column
+     **/
+    inline ConstReturnType elt2Impl(int i, int j) const
+    {
+#ifdef STK_BOUNDS_CHECK
+      if (j>i)
+        STKRUNTIME_ERROR_2ARG(LowerSymmetrizeOperator::elt2Impl,i,j,use of the upper part);
+#endif
+      return (this->asDerived().lhs().elt(i, j));
+
+    }
 
   protected:
     Lhs const& lhs_;

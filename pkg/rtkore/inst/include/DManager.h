@@ -82,6 +82,7 @@
 
 /* Interface class for data handlers */
 #include <DManager/include/STK_DataHandlerBase.h>
+#include <DManager/include/STK_IDataHandler.h>
 
 /* Interface class for data wrappers */
 #include <DManager/include/STK_IDataBridge.h>

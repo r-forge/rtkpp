@@ -59,15 +59,15 @@ ostream& operator<< (ostream& s, TRange<Size_> const& I);
 /** @ingroup STKernel
  *  @brief Index sub-vector region with fixed size.
  *
- *  A Range is an ordered pair [first,last] denoting a sub-vector
+ *  A TRange is an ordered pair [first,end) denoting a sub-vector
  *  region, similar to a Fortran 90 or Matlab colon notation.
- *  For example :
+ *  For example:
  *  @code
- *  Vector A(10), B(Range(0,20));
- *  Range I(2,4, false);
- *  A(I) = B(Range(0,2, false));
+ *    Vector A(10), B(Range(0,20));
+ *    Range I(2,4, false);
+ *    A(I) = B(Range(0,2, false));
  *  @endcode
- *  overwrite the elements (2, 3, 4) of A by the elements (0, 1, 2) of B.
+ *  overwrites the elements (2, 3, 4) of A by the elements (0, 1, 2) of B.
  *  There is no stride argument, only contiguous regions are allowed.
  **/
 template<int Size_>
@@ -86,7 +86,7 @@ class TRange
     /** Complete constructor. Give the beginning and the end of the sub-region.
      * @param first is the beginning of the sub-region
      **/
-    inline TRange( int first, int, bool): begin_(first) {}
+    inline TRange( int first, int, bool junk): begin_(first) {}
     /** Create a copy of an existing TRange.
      *  @param I The index to copy
      **/
@@ -253,10 +253,10 @@ class TRange<UnknownSize>
      **/
     inline TRange( int first, int size): begin_(first), end_(size+first), size_(size) {}
     /**  Complete constructor. Give the first and last index of the sub-region.
-     *  @param first is the beginning of the sub-region
-     *  @param last is the index ending the sub-region.
+     *  @param first beginning of the sub-region
+     *  @param last last index of the sub-region.
      **/
-    inline TRange( int first, int last, bool): begin_(first), end_(last+1), size_(end_-first) {}
+    inline TRange( int first, int last, bool junk): begin_(first), end_(last+1), size_(end_-first) {}
     /** @brief Copy constructor.
      *  Create a copy of an existing TRange.
      *  @param I The index to copy

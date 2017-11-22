@@ -439,14 +439,18 @@ class ExprBase: public ITContainer<Derived, hidden::Traits<Derived>::structure_>
 
     /** @return the transposed expression of this. */
     MAKE_RESHAPE_OPERATOR(TransposeOperator,transpose)
-    /** @return this as a diagonal expression (work only with 1D expressions). */
+    /** @return this as a diagonal 1D expression (work only with vector/point/diagonal expressions). */
     MAKE_RESHAPE_OPERATOR(DiagonalizeOperator,asDiagonal)
-    /** @return the diagonal of this expression (work only with square expressions). */
+    /** @return the diagonal of this square expression (work only with square expressions). */
     MAKE_RESHAPE_OPERATOR(DiagonalOperator,diagonalize)
-    /** @return the upper part of this expression. */
+    /** @return the upper triangular part of this expression. */
     MAKE_RESHAPE_OPERATOR(UpperTriangularizeOperator,upperTriangularize)
-    /** @return the lower part of this expression. */
+    /** @return the lower triangular part of this expression. */
     MAKE_RESHAPE_OPERATOR(LowerTriangularizeOperator,lowerTriangularize)
+    /** @return the upper part of this symmetric expression. */
+    MAKE_RESHAPE_OPERATOR(UpperSymmetrizeOperator,upperSymmetrize)
+    /** @return the lower part of this symmetric expression. */
+    MAKE_RESHAPE_OPERATOR(LowerSymmetrizeOperator,lowerSymmetrize)
 
     /** @return the j-th column of this. */
     inline ColOperator<Derived> col(int j) const

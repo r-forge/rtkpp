@@ -46,30 +46,30 @@ template<class Derived> struct ConstRandomIterator1D;
 
 namespace hidden
 {
-  /** @ingroup hidden
-   *  @brief Specialization for the RandomIterator1D iterator class
-   **/
-  template<class Derived>
-  struct IteratorTraits<RandomIterator1D<Derived> >
-  {
-    typedef std::random_access_iterator_tag iterator_category;
-    typedef typename hidden::Traits<Derived>::Type value_type;
-    typedef int difference_type; // using only position
-    typedef value_type* pointer;
-    typedef value_type& reference;
+/** @ingroup hidden
+ *  @brief Specialization of the IteratorTraits class for the RandomIterator1D iterator class
+ **/
+template<class Derived>
+struct IteratorTraits< RandomIterator1D<Derived> >
+{
+  typedef std::random_access_iterator_tag iterator_category;
+  typedef typename hidden::Traits<Derived>::Type value_type;
+  typedef int difference_type; // using only position
+  typedef value_type* pointer;
+  typedef value_type& reference;
 };
 
-  /** @ingroup hidden
-   *  @brief Specialization for the RandomIterator1D iterator class
-   **/
-  template<class Derived>
-  struct IteratorTraits<ConstRandomIterator1D<Derived> >
-  {
-    typedef std::random_access_iterator_tag iterator_category;
-    typedef typename hidden::Traits<Derived>::Type value_type;
-    typedef int difference_type; // using only position
-    typedef value_type const* pointer;
-    typedef value_type const& reference;
+/** @ingroup hidden
+ *  @brief Specialization for the RandomIterator1D iterator class
+ **/
+template<class Derived>
+struct IteratorTraits< ConstRandomIterator1D<Derived> >
+{
+  typedef std::random_access_iterator_tag iterator_category;
+  typedef typename hidden::Traits<Derived>::Type value_type;
+  typedef int difference_type; // using only position
+  typedef value_type const* pointer;
+  typedef value_type const& reference;
 };
 
 } // namespace hidden

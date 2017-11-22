@@ -41,19 +41,19 @@ namespace STK
 {
 
 // forward declaration
-template<class Derived> struct BiDirectionalIterator1D;
-template<class Derived> struct ConstBiDirectionalIterator1D;
+template<class Array> struct BiDirectionalIterator1D;
+template<class Array> struct ConstBiDirectionalIterator1D;
 
 namespace hidden
 {
   /** @ingroup hidden
    *  @brief Specialization for the RandomIterator1D iterator class
    **/
-  template<class Derived>
-  struct IteratorTraits<BiDirectionalIterator1D<Derived> >
+  template<class Array>
+  struct IteratorTraits<BiDirectionalIterator1D<Array> >
   {
     typedef std::bidirectional_iterator_tag iterator_category;
-    typedef typename hidden::Traits<Derived>::Type value_type;
+    typedef typename Array::Type value_type;
     typedef int difference_type;
     typedef value_type* pointer;
     typedef value_type& reference;
@@ -62,11 +62,11 @@ namespace hidden
   /** @ingroup hidden
    *  @brief Specialization for the RandomIterator1D iterator class
    **/
-  template<class Derived>
-  struct IteratorTraits<ConstBiDirectionalIterator1D<Derived> >
+  template<class Array>
+  struct IteratorTraits<ConstBiDirectionalIterator1D<Array> >
   {
     typedef std::bidirectional_iterator_tag iterator_category;
-    typedef typename hidden::Traits<Derived>::Type value_type;
+    typedef typename Array::Type value_type;
     typedef int difference_type;
     typedef value_type const* pointer;
     typedef value_type const& reference;
@@ -81,10 +81,10 @@ namespace hidden
  *
  *  @sa STK::List1D
  **/
-template<class Derived>
-struct BiDirectionalIterator1D: public IteratorBase< BiDirectionalIterator1D<Derived> >
+template<class Array>
+struct BiDirectionalIterator1D: public IteratorBase< BiDirectionalIterator1D<Array> >
 {
-    typedef  IteratorBase< BiDirectionalIterator1D<Derived> > Base;
+    typedef  IteratorBase< BiDirectionalIterator1D<Array> > Base;
     typedef typename Base::iterator_category iterator_category;
     typedef typename Base::value_type value_type;
     typedef typename Base::reference reference;
@@ -94,7 +94,7 @@ struct BiDirectionalIterator1D: public IteratorBase< BiDirectionalIterator1D<Der
 
   public:
     // creating
-    BiDirectionalIterator1D( Derived& list1D, int pos)
+    BiDirectionalIterator1D( Array& list1D, int pos)
                           : Base(pos), list1D_(list1D) {}
     BiDirectionalIterator1D( BiDirectionalIterator1D const& it)
                           : Base(it), list1D_(it.list1D_) {}
@@ -112,7 +112,7 @@ struct BiDirectionalIterator1D: public IteratorBase< BiDirectionalIterator1D<Der
     }
 
   private:
-    Derived& list1D_;
+    Array& list1D_;
 };
 
 /** @ingroup Arrays
@@ -121,10 +121,10 @@ struct BiDirectionalIterator1D: public IteratorBase< BiDirectionalIterator1D<Der
  *
  *  @sa STK::List1D
  **/
-template<class Derived>
-struct ConstBiDirectionalIterator1D:  public IteratorBase< ConstBiDirectionalIterator1D<Derived> >
+template<class Array>
+struct ConstBiDirectionalIterator1D:  public IteratorBase< ConstBiDirectionalIterator1D<Array> >
 {
-    typedef  IteratorBase< ConstBiDirectionalIterator1D<Derived> > Base;
+    typedef  IteratorBase< ConstBiDirectionalIterator1D<Array> > Base;
     typedef typename Base::iterator_category iterator_category;
     typedef typename Base::value_type value_type;
     typedef typename Base::reference reference;
@@ -134,7 +134,7 @@ struct ConstBiDirectionalIterator1D:  public IteratorBase< ConstBiDirectionalIte
 
   public:
     // creating
-    ConstBiDirectionalIterator1D( Derived const& list1D, int pos)
+    ConstBiDirectionalIterator1D( Array const& list1D, int pos)
                                : Base(pos), list1D_(list1D) {}
     ConstBiDirectionalIterator1D( ConstBiDirectionalIterator1D const& it)
                                : Base(it), list1D_(it.list1D_) {}
@@ -152,7 +152,7 @@ struct ConstBiDirectionalIterator1D:  public IteratorBase< ConstBiDirectionalIte
     }
 
   private:
-    Derived const& list1D_;
+    Array const& list1D_;
 };
 
 } // namespace STK

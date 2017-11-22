@@ -36,33 +36,63 @@
 #define STK_ITERATORBASE_H
 
 #include <Sdk/include/STK_IRecursiveTemplate.h>
-#include <STKernel/include/STK_Integer.h>
+#include "../STK_Constants.h"
 
 namespace STK
 {
-
-/** @ingroup Arrays
- *  @brief IteratorBase is a base class for all iterators on containers
- *  @tparam Derived the container on which iterate
- **/
-template<class Derived>
-struct IteratorBase: public IRecursiveTemplate<Derived>
+namespace hidden
 {
-    typedef typename hidden::IteratorTraits<Derived>::iterator_category iterator_category;
-    typedef typename hidden::IteratorTraits<Derived>::value_type value_type;
-    typedef typename hidden::IteratorTraits<Derived>::reference reference;
-    typedef typename hidden::IteratorTraits<Derived>::pointer pointer;
-    typedef typename hidden::IteratorTraits<Derived>::difference_type difference_type;
+/** @ingroup hidden, STKernel
+ *  @brief The traits struct IteratorTraits must be specialized for any iterator
+ *  derived from the base class IteratorBase.
+ *
+ *  @note We use the type names defined by the STL for the iterator_traits class.
+ *
+ *  For example:
+ *  @code
+ *  template<typename Type>
+ *  struct IteratorTraits
+ *  {
+ *    /// One of the iterator_tags types
+ *    typedef std::random_access_iterator_tag  iterator_category;
+ *    /// The type "pointed to" by the iterator.
+ *    typedef Type        value_type;
+ *    /// Distance between iterators is represented as this type.
+ *    typedef int  difference_type;
+ *    /// This type represents a pointer-to-value_type.
+ *    typedef Type*   pointer;
+ *    /// This type represents a reference-to-value_type.
+ *    typedef Type& reference;
+ *  };
+ *  @endcode
+ */
+template <typename Derived> struct IteratorTraits;
+
+} // namespace hidden
+
+/** @ingroup STKernel
+ *  @brief IteratorBase is a base class for all iterators on arrays/matrix/vector/expressions
+ *
+ *  @tparam Array the container on which iterate
+ **/
+template<class Array>
+struct IteratorBase: public IRecursiveTemplate<Array>
+{
+    typedef typename hidden::IteratorTraits<Array>::iterator_category iterator_category;
+    typedef typename hidden::IteratorTraits<Array>::value_type value_type;
+    typedef typename hidden::IteratorTraits<Array>::reference reference;
+    typedef typename hidden::IteratorTraits<Array>::pointer pointer;
+    typedef typename hidden::IteratorTraits<Array>::difference_type difference_type;
 
   protected:
     /** default constructor */
-    IteratorBase(): pos_(Arithmetic<int>::NA()) {}
+    IteratorBase(): pos_(baseIdx) {}
     /** constructor with specified position
-     *  @param pos the position of the iterator on the array
+     *  @param pos position of the iterator on the array
      **/
     IteratorBase( int pos): pos_(pos) {}
     /** copy constructor.
-     *  @param it the iterator to copy
+     *  @param it iterator to copy
      **/
     IteratorBase( IteratorBase const& it):  pos_(it.pos_) {}
     /** destructor */
@@ -73,12 +103,17 @@ struct IteratorBase: public IRecursiveTemplate<Derived>
     int pos() const  { return pos_;}
 
     // moving
-    Derived& operator++()         { ++pos_; return this->asDerived(); }
-    Derived& operator++(int junk) { ++pos_; return this->asDerived(); }
-    Derived& operator--()         { --pos_; return this->asDerived(); }
-    Derived& operator--(int)      { --pos_; return this->asDerived(); }
-    Derived& operator+=(int n)    { pos_+=n; return this->asDerived(); }
-    Derived& operator-=(int n)    { pos_-=n; return this->asDerived(); }
+    /** next position */
+    Array& operator++()         { ++pos_; return this->asDerived(); }
+    /** next position */
+    Array& operator++(int junk) { ++pos_; return this->asDerived(); }
+    /** previous position */
+    Array& operator--()         { --pos_; return this->asDerived(); }
+    /** previous position */
+    Array& operator--(int)      { --pos_; return this->asDerived(); }
+
+    Array& operator+=(int n)    { pos_+=n; return this->asDerived(); }
+    Array& operator-=(int n)    { pos_-=n; return this->asDerived(); }
     friend IteratorBase operator+( IteratorBase const& it, int n)
     { IteratorBase r(it); r+=n ; return r; }
     friend IteratorBase operator+(int n, IteratorBase const& it)
@@ -87,21 +122,30 @@ struct IteratorBase: public IRecursiveTemplate<Derived>
     { IteratorBase r(it); r-=n ; return r; }
     friend IteratorBase operator-(int n, IteratorBase const& it)
     { IteratorBase r(it); r-=n ; return r; }
+
     friend difference_type operator-(IteratorBase it1, IteratorBase it2)
     { return it1.pos_ - it2.pos_;}
-    // comparing (only the position is compared)
+
+    // comparing
+    /** comparing two iterators (only position is compared !) */
     bool operator==( IteratorBase const& rhs) { return(pos_ ==rhs.pos_); }
+    /** comparing two iterators (only position is compared !) */
     bool operator!=( IteratorBase const& rhs) { return(pos_!=rhs.pos_); }
+
+    /** comparing two iterators (only position is compared !) */
     friend bool operator<(IteratorBase const& lhs, IteratorBase const& rhs)
     { return lhs.pos_ < rhs.pos_; };
+    /** comparing two iterators (only position is compared !) */
     friend bool operator>(IteratorBase const& lhs, IteratorBase const& rhs)
     { return lhs.pos_ > rhs.pos_; };
+    /** comparing two iterators (only position is compared !) */
     friend bool operator<=(IteratorBase const& lhs, IteratorBase const& rhs)
     { return lhs.pos_ <= rhs.pos_; };
+    /** comparing two iterators (only position is compared !) */
     friend bool operator>=(IteratorBase const& lhs, IteratorBase const& rhs)
     { return lhs.pos_ >= rhs.pos_; };
 
-    // misc
+    /** swap two iterators (only position is swaped) */
     friend void swap(IteratorBase& lhs, IteratorBase& rhs)
     { std::swap(lhs.pos_, rhs.pos_);}
 

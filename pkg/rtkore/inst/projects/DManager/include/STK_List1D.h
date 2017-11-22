@@ -90,7 +90,7 @@ struct Traits< List1D<Type_> >
 } // namespace hidden
 } // namespace STK
 
-#include <Arrays/include/iterators/STK_BiDirectionalIterator1D.h>
+#include "../../STKernel/include/iterators/STK_BiDirectionalIterator1D.h"
 
 namespace STK
 {

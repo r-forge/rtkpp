@@ -41,32 +41,32 @@
 namespace STK
 {
 // forward declaration
-template<class Derived> struct RandomIterator1D;
-template<class Derived> struct ConstRandomIterator1D;
+template<class Array> struct RandomIterator1D;
+template<class Array> struct ConstRandomIterator1D;
 
 namespace hidden
 {
 /** @ingroup hidden
  *  @brief Specialization of the IteratorTraits class for the RandomIterator1D iterator class
  **/
-template<class Derived>
-struct IteratorTraits< RandomIterator1D<Derived> >
+template<class Array>
+struct IteratorTraits< RandomIterator1D<Array> >
 {
   typedef std::random_access_iterator_tag iterator_category;
-  typedef typename hidden::Traits<Derived>::Type value_type;
+  typedef typename Array::Type value_type;
   typedef int difference_type; // using only position
   typedef value_type* pointer;
   typedef value_type& reference;
 };
 
 /** @ingroup hidden
- *  @brief Specialization for the RandomIterator1D iterator class
+ *  @brief Specialization of the IteratorTraits for the RandomIterator1D iterator class
  **/
-template<class Derived>
-struct IteratorTraits< ConstRandomIterator1D<Derived> >
+template<class Array>
+struct IteratorTraits< ConstRandomIterator1D<Array> >
 {
   typedef std::random_access_iterator_tag iterator_category;
-  typedef typename hidden::Traits<Derived>::Type value_type;
+  typedef typename Array::Type value_type;
   typedef int difference_type; // using only position
   typedef value_type const* pointer;
   typedef value_type const& reference;
@@ -74,14 +74,13 @@ struct IteratorTraits< ConstRandomIterator1D<Derived> >
 
 } // namespace hidden
 
-/** @ingroup Arrays
- *  @brief RandomIterator1D allows to loop over the elements of containers derived
- *  from the interface base class STK::ITContainer1D
+/** @ingroup STKernel
+ *  @brief RandomIterator1D allows to loop over the elements of containers Array
  **/
-template<class Derived>
-struct RandomIterator1D: public IteratorBase< RandomIterator1D<Derived> >
+template<class Array>
+struct RandomIterator1D: public IteratorBase< RandomIterator1D<Array> >
 {
-    typedef  IteratorBase< RandomIterator1D<Derived> > Base;
+    typedef  IteratorBase< RandomIterator1D<Array> > Base;
 
     typedef typename Base::iterator_category iterator_category;
     typedef typename Base::value_type value_type;
@@ -93,7 +92,7 @@ struct RandomIterator1D: public IteratorBase< RandomIterator1D<Derived> >
 
     // creating
     RandomIterator1D(): Base(), array_(0) {}
-    RandomIterator1D( Derived& array, int pos): Base(pos), array_(&array) {}
+    RandomIterator1D( Array& array, int pos): Base(pos), array_(&array) {}
     RandomIterator1D( RandomIterator1D const& it): Base(it), array_(it.array_) {}
     ~RandomIterator1D() {}
     RandomIterator1D& operator=(RandomIterator1D const& it)
@@ -112,12 +111,16 @@ struct RandomIterator1D: public IteratorBase< RandomIterator1D<Derived> >
     }
 
   private:
-    Derived* array_;
+    Array* array_;
 };
-template<class Derived>
-struct ConstRandomIterator1D: public IteratorBase< ConstRandomIterator1D<Derived> >
+
+/** @ingroup STKernel
+ *  @brief ConstRandomIterator1D allows to loop over the elements of containers Array
+ **/
+template<class Array>
+struct ConstRandomIterator1D: public IteratorBase< ConstRandomIterator1D<Array> >
 {
-    typedef  IteratorBase< ConstRandomIterator1D<Derived> > Base;
+    typedef  IteratorBase< ConstRandomIterator1D<Array> > Base;
 
     typedef typename Base::iterator_category iterator_category;
     typedef typename Base::value_type value_type;
@@ -129,7 +132,7 @@ struct ConstRandomIterator1D: public IteratorBase< ConstRandomIterator1D<Derived
 
     // creating
     ConstRandomIterator1D(): Base(), array_(0) {}
-    ConstRandomIterator1D( Derived const& array, int pos)
+    ConstRandomIterator1D( Array const& array, int pos)
                         : Base(pos), array_(&array) {}
     ConstRandomIterator1D( ConstRandomIterator1D const& it)
                         : Base(it), array_(it.array_) {}
@@ -149,7 +152,7 @@ struct ConstRandomIterator1D: public IteratorBase< ConstRandomIterator1D<Derived
     }
 
   private:
-    Derived const* array_;
+    Array const* array_;
 };
 
 } // namespace STK

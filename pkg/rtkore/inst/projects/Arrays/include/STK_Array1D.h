@@ -40,8 +40,6 @@
 namespace STK
 {
 template<class Type, int Size_ = UnknownSize > class Array1D;
-//template<class Derived> struct RandomIterator1D;
-//template<class Derived> struct ConstRandomIterator1D;
 
 namespace hidden
 {
@@ -92,7 +90,7 @@ namespace STK
 {
 /** @ingroup Arrays
  *  @brief template one dimensional Arrays.
- * 
+ *
  * An Array1D is a template non-oriented container (even if the @c Traits
  * struct define it as column oriented) implementing the interface
  * class @c IArray1D.

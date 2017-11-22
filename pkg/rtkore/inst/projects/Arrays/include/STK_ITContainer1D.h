@@ -39,12 +39,12 @@
 
 #include <Sdk/include/STK_IRecursiveTemplate.h>
 #include <Sdk/include/STK_Macros.h>
+#include <STKernel/include/iterators/STK_BiDirectionalIterator1D.h>
+#include <STKernel/include/iterators/STK_RandomIterator1D.h>
 
 #include "STK_ArraysTraits.h"
 #include "STK_Arrays_Util.h"
 
-#include "iterators/STK_RandomIterator1D.h"
-#include "iterators/STK_BiDirectionalIterator1D.h"
 
 namespace STK
 {

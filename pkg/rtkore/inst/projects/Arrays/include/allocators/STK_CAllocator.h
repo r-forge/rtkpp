@@ -90,7 +90,6 @@ struct Traits< CAllocator<Type_, SizeRows_, SizeCols_, Orient_> >
     /** Type of the base allocator allocating data */
     typedef AllocatorBase<Type_, sizeProd_> Allocator;
     typedef Type_  Type;
-    typedef typename RemoveConst<Type_>::Type const& ReturnType;
     typedef typename RemoveConst<Type_>::Type const& ConstReturnType;
 
     // use this as default. FIXME: Not optimal in case we just get a SubArray

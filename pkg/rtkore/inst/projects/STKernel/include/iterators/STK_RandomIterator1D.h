@@ -60,7 +60,7 @@ struct IteratorTraits< RandomIterator1D<Array> >
 };
 
 /** @ingroup hidden
- *  @brief Specialization of the IteratorTraits for the RandomIterator1D iterator class
+ *  @brief Specialization of the IteratorTraits for the ConstRandomIterator1D iterator class
  **/
 template<class Array>
 struct IteratorTraits< ConstRandomIterator1D<Array> >

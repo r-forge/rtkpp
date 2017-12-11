@@ -33,12 +33,12 @@
  *  @brief In this file we define the GramSchidt method.
  *
  **/
- 
+
 #ifndef STK_GRAMSCHMIDT_H
 #define STK_GRAMSCHMIDT_H
 
 // Container classes
-#include "Arrays/include/STK_ArrayBase.h"
+#include <Arrays/include/STK_IArrayBase.h>
 
 namespace STK
 {

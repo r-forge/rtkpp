@@ -92,7 +92,6 @@ struct Traits< CArrayPoint<Type_, SizeCols_, Orient_> >
     typedef CAllocator<Type_, 1, SizeCols_, Orient_> Allocator;
 
     typedef Type_                Type;
-    typedef typename RemoveConst<Type_>::Type const& ReturnType;
     typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
     enum
@@ -119,7 +118,7 @@ class CArrayPoint: public ICArray < CArrayPoint<Type_, SizeCols_, Orient_> >
     typedef ArrayBase < CArrayPoint<Type_, SizeCols_, Orient_> > LowBase;
 
     typedef typename hidden::Traits<CArrayPoint<Type_, SizeCols_, Orient_> >::Type Type;
-    typedef typename hidden::Traits<CArrayPoint<Type_, SizeCols_, Orient_> >::ReturnType ReturnType;
+    typedef typename hidden::Traits<CArrayPoint<Type_, SizeCols_, Orient_> >::ConstReturnType ConstReturnType;
 
     enum
     {

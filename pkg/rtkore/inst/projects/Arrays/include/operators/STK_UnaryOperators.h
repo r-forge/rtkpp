@@ -59,12 +59,11 @@ struct Traits< UnaryOperator <UnaryOp, Lhs> >
       sizeCols_  = Traits<Lhs>::sizeCols_,
       storage_   = Traits<Lhs>::storage_
   };
-  typedef RowOperator<UnaryOperator <UnaryOp, Lhs> > Row;
-  typedef ColOperator<UnaryOperator <UnaryOp, Lhs> > Col;
+//  typedef RowOperator<UnaryOperator <UnaryOp, Lhs> > Row;
+//  typedef ColOperator<UnaryOperator <UnaryOp, Lhs> > Col;
 
   typedef typename UnaryOp::result_type Type;
-  typedef Type ReturnType;
-  typedef Type ConstReturnType;
+  typedef typename UnaryOp::result_type ConstReturnType;
 };
 
 } // end namespace hidden
@@ -97,10 +96,10 @@ class UnaryOperator: public ExprBase< UnaryOperator<UnaryOp, Lhs> >, public TRef
   public:
     typedef ExprBase<  UnaryOperator<UnaryOp, Lhs> > Base;
     typedef typename hidden::Traits< UnaryOperator<UnaryOp, Lhs> >::Type Type;
-    typedef typename hidden::Traits< UnaryOperator<UnaryOp, Lhs> >::ReturnType ReturnType;
+    typedef typename hidden::Traits< UnaryOperator<UnaryOp, Lhs> >::ConstReturnType ConstReturnType;
 
-    typedef typename hidden::Traits< UnaryOperator<UnaryOp, Lhs> >::Row Row;
-    typedef typename hidden::Traits< UnaryOperator<UnaryOp, Lhs> >::Col Col;
+//    typedef typename hidden::Traits< UnaryOperator<UnaryOp, Lhs> >::Row Row;
+//    typedef typename hidden::Traits< UnaryOperator<UnaryOp, Lhs> >::Col Col;
 
     enum
     {
@@ -132,13 +131,13 @@ class UnaryOperator: public ExprBase< UnaryOperator<UnaryOp, Lhs> >, public TRef
      *  @param i index of the row
      *  @param j index of the column
      **/
-    inline ReturnType elt2Impl(int i, int j) const { return functor_(lhs_.elt(i, j));}
+    inline ConstReturnType elt2Impl(int i, int j) const { return functor_(lhs_.elt(i, j));}
     /** @return the ith element of the operator
      *  @param i index of the ith element
      **/
-    inline ReturnType elt1Impl(int i) const { return functor_(lhs_.elt(i));}
+    inline ConstReturnType elt1Impl(int i) const { return functor_(lhs_.elt(i));}
     /** @return the element of the operator */
-    inline ReturnType elt0Impl() const { return functor_(lhs_.elt());}
+    inline ConstReturnType elt0Impl() const { return functor_(lhs_.elt());}
 
   protected:
     Lhs const& lhs_;

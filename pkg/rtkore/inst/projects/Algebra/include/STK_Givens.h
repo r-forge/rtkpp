@@ -33,18 +33,18 @@
  *  @brief In this file we define Givens methods used by the Algebra
  *  classes.
  **/
- 
+
 #ifndef STK_GIVENS_H
 #define STK_GIVENS_H
 
 #include <STKernel/include/STK_Real.h>
-#include <Arrays/include/STK_ArrayBase.h>
+#include <Arrays/include/STK_IArrayBase.h>
 
 namespace STK
 {
 /** @ingroup Algebra
  *  @brief Compute Givens rotation.
- * 
+ *
  * Compute the Givens rotation
  * \f[
  * \begin{bmatrix}
@@ -63,9 +63,9 @@ namespace STK
  * \f]
  *  in order to eliminate the coefficient z and
  * return the value r of the rotated element.
- * 
+ *
  *  @see http://en.wikipedia.org/wiki/Givens_rotation
- * 
+ *
  * @param y The coefficient to rotate (input)
  * @param z the coefficient to eliminate (input)
  * @param cosinus the cosinus of the Givens rotation (output)
@@ -103,14 +103,14 @@ Real compGivens( Type const& y, Type const& z, Type& cosinus, Type& sinus)
 
 /** @ingroup Algebra
  *  @brief Apply Givens rotation.
- * 
+ *
  * Perform a right multiplication of the Container M with a
  * Givens Array on the col1 and col2. col1 should be less than col2.
  * The Array M is passed as const as we are using reference
  * on the two cols we want to rotate.
- * 
+ *
  * @see http://en.wikipedia.org/wiki/Givens_rotation
- * 
+ *
  * @param M the Container to multiply
  * @param j1,j2 the first and second columns
  * @param cosinus,sinus the cosinus and sinus of the givens rotation
@@ -132,14 +132,14 @@ void rightGivens( ArrayBase<TContainer2D>& M, int j1, int j2
 
 /** @ingroup Algebra
  *  @brief left multiplication by a Givens ArrayXX.
- * 
+ *
  * Perform a left multiplication of the matrix M with a Givens ArrayXX
  * on the row1 and row2. row1 should be less than row2.
  * The Array M is passed as const as we are using reference
  * on the two rows we want to rotate.
- * 
+ *
  * @see http://en.wikipedia.org/wiki/Givens_rotation
- * 
+ *
  * @param M the matix to multiply
  * @param i1,i2 the first and second rows
  * @param cosinus,sinus the cosinus and sinus of the givens rotation

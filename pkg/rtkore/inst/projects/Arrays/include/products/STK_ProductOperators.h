@@ -73,7 +73,6 @@ struct ProductTraits<Lhs, Rhs, Arrays::array2D_, RStructure_>
   };
 
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ReturnType;
   typedef typename RemoveConst<Type>::Type const& ConstReturnType;
   typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
 };
@@ -97,7 +96,6 @@ struct ProductTraits<Lhs, Rhs, Arrays::square_, RStructure_>
               ? int(Arrays::dense_) : int(Arrays::sparse_)
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ReturnType;
   typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   typedef CAllocator<Type, sizeRows_,sizeCols_, orient_> Allocator;
@@ -120,7 +118,6 @@ struct ProductTraits<Lhs, Rhs, Arrays::square_, Arrays::square_>
               ? int(Arrays::dense_) : int(Arrays::sparse_)
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ReturnType;
   typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
@@ -145,7 +142,6 @@ struct ProductTraits<Lhs, Rhs, Arrays::lower_triangular_, RStructure_>
               ? int(Arrays::dense_) : int(Arrays::sparse_)
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ReturnType;
   typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
@@ -168,7 +164,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::lower_triangular_, Arrays::lower_triangul
               ? int(Arrays::dense_) : int(Arrays::sparse_)
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ReturnType;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   typedef Array2DLowerTriangular<Type> Allocator; // no CAllocator
 };
@@ -192,7 +188,6 @@ struct ProductTraits<Lhs, Rhs, Arrays::upper_triangular_, RStructure_>
               ? int(Arrays::dense_) : int(Arrays::sparse_)
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ReturnType;
   typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   typedef CAllocator<Type, sizeRows_ , sizeCols_, orient_> Allocator;
@@ -215,7 +210,6 @@ struct ProductTraits<Lhs, Rhs, Arrays::upper_triangular_, Arrays::upper_triangul
               ? int(Arrays::dense_) : int(Arrays::sparse_)
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ReturnType;
   typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   typedef Array2DUpperTriangular<Type> Allocator;  // no CAllocator
@@ -330,8 +324,7 @@ struct Traits< ArrayByDiagonalProduct < Lhs, Rhs> >
     storage_   = Lhs::storage_
   };
   typedef typename Promote<typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type ReturnType;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+  typedef typename RemoveConst<Type>::Type ConstReturnType; // not a reference as it is a temporary
 };
 /** @ingroup hidden
  *  @brief Traits class for the DiagonalByArrayProduct class
@@ -348,8 +341,7 @@ struct Traits< DiagonalByArrayProduct < Lhs, Rhs> >
     storage_   = Rhs::storage_
   };
   typedef typename Promote<typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type ReturnType;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+  typedef typename RemoveConst<Type>::Type ConstReturnType;  // not a reference as it is a temporary
 };
 /** @ingroup hidden
  *  @brief Traits class for the PointByArrayProduct
@@ -368,7 +360,6 @@ struct Traits< PointByArrayProduct < Lhs, Rhs> >
    };
 
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ReturnType;
   typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
@@ -392,7 +383,6 @@ struct Traits< ArrayByVectorProduct < Lhs, Rhs> >
 
   typedef ProductTraits<Lhs, Rhs, Lhs::structure_, Rhs::structure_> Base;
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ReturnType;
   typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
@@ -413,7 +403,6 @@ struct Traits< VectorByPointProduct < Lhs, Rhs> >
                  ? int(Arrays::dense_) : int(Arrays::sparse_)
   };
   typedef typename Promote<typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef Type ReturnType;
   typedef Type ConstReturnType;
 };
 /** @ingroup hidden
@@ -438,7 +427,6 @@ struct Traits< ArrayByArrayProduct<Lhs, Rhs> >
                   ? int(Arrays::dense_) : int(Arrays::sparse_)
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ReturnType;
   typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   typedef typename Base::Allocator Allocator;
@@ -453,7 +441,7 @@ class ArrayByDiagonalProduct: public ExprBase< ArrayByDiagonalProduct<Lhs, Rhs> 
   public:
     typedef ExprBase< ArrayByDiagonalProduct<Lhs, Rhs> > Base;
     typedef typename hidden::Traits<ArrayByDiagonalProduct>::Type Type;
-    typedef typename hidden::Traits<ArrayByDiagonalProduct>::ReturnType ReturnType;
+    typedef typename hidden::Traits<ArrayByDiagonalProduct>::ConstReturnType ConstReturnType;
 
     enum
     {
@@ -479,11 +467,11 @@ class ArrayByDiagonalProduct: public ExprBase< ArrayByDiagonalProduct<Lhs, Rhs> 
     /** @return the columns range */
     inline ColRange const&colsImpl() const { return rhs_.cols();}
 
-    inline ReturnType elt2Impl(int i, int j) const { return lhs_.elt(i,j)*rhs_.elt(j);}
+    inline ConstReturnType elt2Impl(int i, int j) const { return lhs_.elt(i,j)*rhs_.elt(j);}
     /** access to the ith element */
-    inline ReturnType elt1Impl(int i) const { return lhs_.elt(i)*rhs_.elt(i);}
+    inline ConstReturnType elt1Impl(int i) const { return lhs_.elt(i)*rhs_.elt(i);}
     /** access to the element */
-    inline ReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
+    inline ConstReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
 
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_; }
@@ -502,7 +490,7 @@ class DiagonalByArrayProduct: public ExprBase< DiagonalByArrayProduct<Lhs, Rhs> 
   public:
     typedef ExprBase< DiagonalByArrayProduct<Lhs, Rhs> > Base;
     typedef typename hidden::Traits<DiagonalByArrayProduct>::Type Type;
-    typedef typename hidden::Traits<DiagonalByArrayProduct>::ReturnType ReturnType;
+    typedef typename hidden::Traits<DiagonalByArrayProduct>::ConstReturnType ConstReturnType;
 
     enum
     {
@@ -529,11 +517,11 @@ class DiagonalByArrayProduct: public ExprBase< DiagonalByArrayProduct<Lhs, Rhs> 
     inline ColRange const&colsImpl() const { return rhs_.cols();}
 
     /** access to the element (i,j) */
-    inline ReturnType elt2Impl(int i, int j) const { return lhs_.elt(i)*rhs_.elt(i,j);}
+    inline ConstReturnType elt2Impl(int i, int j) const { return lhs_.elt(i)*rhs_.elt(i,j);}
     /** access to the ith element */
-    inline ReturnType elt1Impl(int i) const { return lhs_.elt(i)*rhs_.elt(i);}
+    inline ConstReturnType elt1Impl(int i) const { return lhs_.elt(i)*rhs_.elt(i);}
     /** access to the element */
-    inline ReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
+    inline ConstReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
 
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_; }
@@ -552,7 +540,7 @@ class PointByArrayProduct: public ExprBase< PointByArrayProduct<Lhs, Rhs> >
   public:
     typedef ExprBase< PointByArrayProduct<Lhs, Rhs> > Base;
     typedef typename hidden::Traits<PointByArrayProduct>::Type Type;
-    typedef typename hidden::Traits<PointByArrayProduct>::ReturnType ReturnType;
+    typedef typename hidden::Traits<PointByArrayProduct>::ConstReturnType ConstReturnType;
     typedef typename hidden::Traits<PointByArrayProduct>::Allocator Allocator;
 
     enum
@@ -583,11 +571,11 @@ class PointByArrayProduct: public ExprBase< PointByArrayProduct<Lhs, Rhs> >
     inline ColRange const&colsImpl() const { return result_.cols();}
 
     /** @return the element (i,j) */
-    inline ReturnType elt2Impl(int i, int j) const { return result_.elt(i, j);}
+    inline ConstReturnType elt2Impl(int i, int j) const { return result_.elt(i, j);}
     /** @return the ith element */
-    inline ReturnType elt1Impl(int i) const { return result_.elt(i);}
+    inline ConstReturnType elt1Impl(int i) const { return result_.elt(i);}
     /** @return the element */
-    inline ReturnType elt0Impl() const { return result_.elt();}
+    inline ConstReturnType elt0Impl() const { return result_.elt();}
 
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_; }
@@ -613,7 +601,7 @@ class ArrayByVectorProduct: public ExprBase< ArrayByVectorProduct<Lhs, Rhs> >
   public:
     typedef ExprBase< ArrayByVectorProduct<Lhs, Rhs> > Base;
     typedef typename hidden::Traits<ArrayByVectorProduct>::Type Type;
-    typedef typename hidden::Traits<ArrayByVectorProduct>::ReturnType ReturnType;
+    typedef typename hidden::Traits<ArrayByVectorProduct>::ConstReturnType ConstReturnType;
     typedef typename hidden::Traits<ArrayByVectorProduct>::Allocator Allocator;
     enum
     {
@@ -643,11 +631,11 @@ class ArrayByVectorProduct: public ExprBase< ArrayByVectorProduct<Lhs, Rhs> >
     inline ColRange const&colsImpl() const { return result_.cols();}
 
     /** @return the element (i,j) */
-    inline ReturnType elt2Impl(int i, int j) const { return result_.elt(i, j);}
+    inline ConstReturnType elt2Impl(int i, int j) const { return result_.elt(i, j);}
     /** @return the ith element */
-    inline ReturnType elt1Impl(int i) const { return result_.elt(i);}
+    inline ConstReturnType elt1Impl(int i) const { return result_.elt(i);}
     /** @return the element */
-    inline ReturnType elt0Impl() const { return result_.elt();}
+    inline ConstReturnType elt0Impl() const { return result_.elt();}
 
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_; }
@@ -671,7 +659,7 @@ class VectorByPointProduct: public ExprBase< VectorByPointProduct<Lhs, Rhs> >
   public:
     typedef ExprBase< VectorByPointProduct<Lhs, Rhs> > Base;
     typedef typename hidden::Traits<VectorByPointProduct>::Type Type;
-    typedef typename hidden::Traits<VectorByPointProduct>::ReturnType ReturnType;
+    typedef typename hidden::Traits<VectorByPointProduct>::ConstReturnType ConstReturnType;
 
     enum
     {
@@ -695,9 +683,9 @@ class VectorByPointProduct: public ExprBase< VectorByPointProduct<Lhs, Rhs> >
     inline ColRange const&colsImpl() const { return rhs_.cols();}
 
     /** @return the element (i,j) */
-    inline ReturnType elt2Impl(int i, int j) const { return lhs_.elt(i)*rhs_.elt(j);}
+    inline ConstReturnType elt2Impl(int i, int j) const { return lhs_.elt(i)*rhs_.elt(j);}
     /** @return the element */
-    inline ReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
+    inline ConstReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
 
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_; }
@@ -717,7 +705,7 @@ class ArrayByArrayProduct: public ArrayByArrayProductBase< Lhs, Rhs >, public TR
   public:
     typedef ArrayByArrayProductBase< Lhs, Rhs> Base;
     typedef typename hidden::Traits<ArrayByArrayProduct>::Type Type;
-    typedef typename hidden::Traits<ArrayByArrayProduct>::ReturnType ReturnType;
+    typedef typename hidden::Traits<ArrayByArrayProduct>::ConstReturnType ConstReturnType;
 
     typedef typename hidden::Traits<ArrayByArrayProduct < Lhs, Rhs> >::Allocator Allocator;
 
@@ -785,7 +773,7 @@ class ArrayByArrayProductBase: public ExprBase< ArrayByArrayProduct<Lhs, Rhs> >
     typedef ExprBase< Derived> Base;
 
     typedef typename hidden::Traits<Derived>::Type Type;
-    typedef typename hidden::Traits<Derived>::ReturnType ReturnType;
+    typedef typename hidden::Traits<Derived>::ConstReturnType ConstReturnType;
 
     /** constructor. */
     inline ArrayByArrayProductBase(): Base() {}

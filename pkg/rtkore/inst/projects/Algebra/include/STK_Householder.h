@@ -32,28 +32,29 @@
 /** @file STK_Householder.h
  *  @brief In this file we define the Housolder methods used by the Algebra classes.
  **/
- 
+
 #ifndef STK_HOUSEHOLDER_H
 #define STK_HOUSEHOLDER_H
 
 #include <STKernel/include/STK_Misc.h>
+#include <Arrays/include/STK_IArrayBase.h>
 
 namespace STK
 {
 /** @ingroup Algebra
  *  @brief Compute the Householder vector v of a vector x.
- * 
+ *
  *  Given a vector x, compute the vector v of the matrix of Householder
- *  \f$ P=I-2vv'/(v'v)  \f$ such that \f$ Px = v1 e_1 \f$. 
- *  The vector v is of the form : \f$ (1,x_2/s,...,x_n/s)' \f$ 
+ *  \f$ P=I-2vv'/(v'v)  \f$ such that \f$ Px = v1 e_1 \f$.
+ *  The vector v is of the form : \f$ (1,x_2/s,...,x_n/s)' \f$
  *  and is stored in x. The value 1 is skipped and
  *  \f$ \beta = -2/(v'v) \f$ is stored in front of v.
  *  The method return the value v1.
- * 
+ *
  *  @param x the vector to rotate, it is overwritten by v
  **/
 template <class Vector>
-Real house(ArrayBase< Vector>& x)
+Real house(IArrayBase< Vector>& x)
 {
   // compute L^{\infty} norm of X, declare result and norm2 of X
   Real scale  = x.normInf(), v1, norm2 = 0.0;
@@ -79,7 +80,7 @@ Real house(ArrayBase< Vector>& x)
 
 /** @ingroup Algebra
  *  @brief dot product with a Householder vector.
- * 
+ *
  *  Scalar product of an 1D container with a Householder vector
  *  d = < x,v>. The first composant of a Householder vector is 1.0
  *  @param x first vector
@@ -97,7 +98,7 @@ Real dotHouse( ExprBase< Lhs> const& x, ExprBase< Rhs> const& v)
 
 /** @ingroup Algebra
  *  @brief left multiplication by a Householder vector.
- * 
+ *
  *  Perform a left multiplication of the matrix M with a Householder
  *  matrix \f$ H=I+beta vv' \f$. Overwrite M with HM.
  *  @param M the matrix to multiply (input/output)
@@ -127,10 +128,10 @@ void leftHouseholder( ArrayBase<TContainer2D> const& M, ExprBase<TContainer1D> c
 
 /** @ingroup Algebra
  *  @brief right multiplication by a Householder vector.
- * 
+ *
  *  Perform a right multiplication of the matrix M with a Householder
  *  matrix \f$ H=I+beta vv' \f$. Overwrite M with MH.
- * 
+ *
  *  @param M the matrix to multiply (input/output)
  *  @param v the Householder vector (input)
  **/
@@ -158,11 +159,11 @@ void rightHouseholder( ArrayBase<Lhs> const& M, ExprBase<Rhs> const& v)
 
 /** @ingroup Algebra
  *  @brief left multiplication by a Householder ArrayXX.
- * 
+ *
  * Perform a left multiplication of the Array M with a Householder
  * Marix H. M <- HM with H = I + WZ'. The Householder vectors are
  * stored in the columns of H.
- * 
+ *
  * @param M the matrix to multiply
  * @param H the Householder ArrayXX
  **/
@@ -186,11 +187,11 @@ void leftArrayHouseholder( ArrayBase<Lhs> const& M, ArrayBase<Rhs> const& H)
 
 /** @ingroup Algebra
  *  @brief left multiplication by a Householder ArrayXX.
- * 
+ *
  * Perform a right multiplication of the matrix M with a Householder
  * Marix H. M <- MP with H = I + WZ'. The Householder vectors are
  * stored in the rows of H.
- * 
+ *
  * @param M the Array to multiply
  * @param H the Householder ArrayXX
  **/

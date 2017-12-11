@@ -40,24 +40,24 @@
 /// utility macro allowing to construct binary operators
 #define MAKE_BINARY_OPERATOR(OPERATOR, FUNCTOR) \
   template<typename Rhs> \
-  inline BinaryOperator< FUNCTOR<Type, typename hidden::Traits<Rhs>::Type>, Derived, Rhs> const \
+  inline BinaryOperator< FUNCTOR<Type, typename hidden::Traits<Rhs>::Type>, Derived, Rhs>  const\
   (OPERATOR)( ExprBase<Rhs> const& other) const \
   { return BinaryOperator<FUNCTOR<Type, typename hidden::Traits<Rhs>::Type>, Derived, Rhs>(this->asDerived(), other.asDerived()) ;}
 
 /// utility macro allowing to construct unary operators
 #define MAKE_UNARY_OPERATOR_NOARG(FUNCTION, FUNCTOR) \
-  inline UnaryOperator<FUNCTOR<Type>, Derived> const FUNCTION() const \
+  inline UnaryOperator<FUNCTOR<Type>, Derived> FUNCTION() const \
   { return UnaryOperator<FUNCTOR<Type>, Derived>(this->asDerived()); }
 
-/// utility macro allowing to construct unary operators
+/// utility macro allowing to construct unary operators with one argument
 #define MAKE_UNARY_OPERATOR_1ARG(FUNCTION, FUNCTOR) \
-  inline UnaryOperator<FUNCTOR<Type>, Derived> const FUNCTION(Type const number) const \
+  inline UnaryOperator<FUNCTOR<Type>, Derived> FUNCTION(Type const& number) const \
   { return UnaryOperator<FUNCTOR<Type>, Derived>(this->asDerived(), FUNCTOR<Type>(number)); }
 
-/// utility macro allowing to construct unary operators
+/// utility macro allowing to construct reshape operators
 #define MAKE_RESHAPE_OPERATOR(OPERATOR, SHAPE) \
-  inline OPERATOR< Derived> const SHAPE() const \
-  { return OPERATOR< Derived>(this->asDerived()); }
+  inline OPERATOR##Operator< Derived> const SHAPE() const \
+  { return OPERATOR##Operator< Derived>(this->asDerived()); }
 
 
 // forward declarations
@@ -65,7 +65,7 @@ namespace STK
 {
 template<class Derived> class ExprBase;
 template<class Derived> class ArrayBase;
-template<class Derived, class Rhs> struct  ProductReturnType;
+template<class Derived, class Rhs> struct  ProductProductType;
 template<class Derived> class  ArrayInitializer;
 } // namespace STK
 
@@ -98,15 +98,7 @@ class ExprBase: public ITContainer<Derived, hidden::Traits<Derived>::structure_>
   public:
     typedef ITContainer<Derived> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
-    typedef typename hidden::Traits<Derived>::ReturnType ReturnType;
-
-//    typedef typename hidden::Traits<Derived>::Row Row;
-//    typedef typename hidden::Traits<Derived>::Col Col;
-// To add to the operators
-//    typedef typename hidden::Traits<Derived>::SubRow SubRow;
-//    typedef typename hidden::Traits<Derived>::SubCol SubCol;
-//    typedef typename hidden::Traits<Derived>::SubVector SubVector;
-//    typedef typename hidden::Traits<Derived>::SubArray SubArray;
+    typedef typename hidden::Traits<Derived>::ConstReturnType ConstReturnType;
 
     enum
     {
@@ -116,9 +108,6 @@ class ExprBase: public ITContainer<Derived, hidden::Traits<Derived>::structure_>
       sizeCols_  = hidden::Traits<Derived>::sizeCols_,
       storage_   = hidden::Traits<Derived>::storage_
     };
-
-    /** constant iterator class for compatibility with the stl */
-    class const_iterator;
 
   protected:
     /** Default constructor */
@@ -133,7 +122,7 @@ class ExprBase: public ITContainer<Derived, hidden::Traits<Derived>::structure_>
      *  @param visitor the visitor to run
      **/
     template<typename Visitor>
-    typename Visitor::ReturnType visit(Visitor& visitor) const;
+    typename Visitor::ConstReturnType visit(Visitor& visitor) const;
     /** @brief compute the number of non-zero element in an expression.
      *  For example
      *  @code
@@ -405,11 +394,11 @@ class ExprBase: public ITContainer<Derived, hidden::Traits<Derived>::structure_>
     // handle the case number + expression
     /** @return an expression of number + this */
     inline friend UnaryOperator<AddOp<Type>, Derived> const
-    operator+(Type const number, ExprBase<Derived> const& other)
+    operator+(Type const& number, ExprBase<Derived> const& other)
     { return other.asDerived() + number;}
     /** @return an expression of number - this */
     inline UnaryOperator<AddOp<Type>, Derived> const
-    operator-(Type const number) const
+    operator-(Type const& number) const
     { return UnaryOperator<AddOp<Type>, Derived>(this->asDerived(), AddOp<Type>(-number));}
     /** @return a safe value of this */
     inline UnaryOperator<SafeOp<Type>, Derived> const safe(Type const number = Type()) const
@@ -437,34 +426,50 @@ class ExprBase: public ITContainer<Derived, hidden::Traits<Derived>::structure_>
     inline UnaryOperator<OtherOperator<Type>, Derived> const funct1(Type const number) const
     { return UnaryOperator<OtherOperator<Type>, Derived>(this->asDerived(), OtherOperator<Type>(number));}
 
+    // reshape operations
     /** @return the transposed expression of this. */
-    MAKE_RESHAPE_OPERATOR(TransposeOperator,transpose)
+    MAKE_RESHAPE_OPERATOR(Transpose,transpose)
     /** @return this as a diagonal 1D expression (work only with vector/point/diagonal expressions). */
-    MAKE_RESHAPE_OPERATOR(DiagonalizeOperator,asDiagonal)
+    MAKE_RESHAPE_OPERATOR(Diagonalize,asDiagonal)
     /** @return the diagonal of this square expression (work only with square expressions). */
-    MAKE_RESHAPE_OPERATOR(DiagonalOperator,diagonalize)
+    MAKE_RESHAPE_OPERATOR(Diagonal,diagonalize)
     /** @return the upper triangular part of this expression. */
-    MAKE_RESHAPE_OPERATOR(UpperTriangularizeOperator,upperTriangularize)
+    MAKE_RESHAPE_OPERATOR(UpperTriangularize,upperTriangularize)
     /** @return the lower triangular part of this expression. */
-    MAKE_RESHAPE_OPERATOR(LowerTriangularizeOperator,lowerTriangularize)
-    /** @return the upper part of this symmetric expression. */
-    MAKE_RESHAPE_OPERATOR(UpperSymmetrizeOperator,upperSymmetrize)
-    /** @return the lower part of this symmetric expression. */
-    MAKE_RESHAPE_OPERATOR(LowerSymmetrizeOperator,lowerSymmetrize)
+    MAKE_RESHAPE_OPERATOR(LowerTriangularize,lowerTriangularize)
+    /** @return this as a symmetric expression (work only with square expressions). */
+    MAKE_RESHAPE_OPERATOR(Symmetrize,symmetrize)
+    /** @return the upper part of this symmetric expression (work only with square expressions). */
+    MAKE_RESHAPE_OPERATOR(UpperSymmetrize,upperSymmetrize)
+    /** @return the lower part of this symmetric expression (work only with square expressions). */
+    MAKE_RESHAPE_OPERATOR(LowerSymmetrize,lowerSymmetrize)
 
+    // slice operators
     /** @return the j-th column of this. */
-    inline ColOperator<Derived> col(int j) const
+    inline ColOperator<Derived> const col(int j) const
     { return ColOperator<Derived> (this->asDerived(), j);}
     /** @return the i-th row of this. */
-    inline RowOperator<Derived> row(int i) const
+    inline RowOperator<Derived> const row(int i) const
     { return RowOperator<Derived> (this->asDerived(), i);}
     /** @return the sub-vector(I) of this. */
-    inline SubOperator<Derived> sub(Range I) const
-    { return SubOperator<Derived> (this->asDerived(), I);}
+    template<int Size_>
+    inline SubVectorOperator<Derived, Size_> const sub(TRange<Size_> const& I) const
+    {
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+      return SubVectorOperator<Derived, Size_>(this->asDerived(), I);
+    }
+    /** @return the sub-array(I,J) of this. */
+    template<int SizeRows_, int SizeCols_>
+    inline SubOperator<Derived, SizeRows_, SizeCols_> const sub(TRange<SizeRows_> const& I,TRange<SizeCols_> const& J) const
+    {
+      STK_STATIC_ASSERT_TWO_DIMENSIONS_ONLY(Derived);
+      return SubOperator<Derived, SizeRows_, SizeCols_>(this->asDerived(), I, J);
+    }
 
+    // dot operations
     /** @returns the dot product of this with other.
-      * @sa squaredNorm(), norm(), DotProduct
-      */
+     *  @sa norm2(), norm(), DotProduct
+     */
     template<class Rhs>
     typename hidden::Promote<Type, typename Rhs::Type>::result_type const
     dot(ExprBase<Rhs> const& other) const;
@@ -477,7 +482,7 @@ class ExprBase: public ITContainer<Derived, hidden::Traits<Derived>::structure_>
 
     /** @return the matrix multiplication of this with other.*/
     template<typename Rhs>
-    typename ProductReturnType<Derived, Rhs>::ReturnType const
+    typename ProductProductType<Derived, Rhs>::ProductType const
     operator*( ExprBase<Rhs> const& other) const;
 };
 

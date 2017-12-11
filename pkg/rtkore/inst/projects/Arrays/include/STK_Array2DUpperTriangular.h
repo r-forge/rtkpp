@@ -73,7 +73,6 @@ struct Traits< Array2DUpperTriangular<Type_> >
     typedef Void                          SubVector;
 
     typedef Type_                Type;
-    typedef typename RemoveConst<Type_>::Type const& ReturnType;
     typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
     enum
@@ -116,7 +115,7 @@ class Array2DUpperTriangular: public IArray2D< Array2DUpperTriangular<Type_> >
     typedef typename hidden::Traits<Array2DUpperTriangular<Type_> >::SubArray SubArray;
 
     typedef typename hidden::Traits<Array2DUpperTriangular<Type_> >::Type Type;
-    typedef typename hidden::Traits<Array2DUpperTriangular<Type_> >::ReturnType ReturnType;
+    typedef typename hidden::Traits<Array2DUpperTriangular<Type_> >::ConstReturnType ConstReturnType;
 
     enum
     {

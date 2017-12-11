@@ -42,29 +42,27 @@ namespace STK
 {
 
 /*  @returns the dot product of *this with other. */
-template<class Derived>
+template<class Lhs>
 template<class Rhs>
-typename hidden::Promote<typename hidden::Traits<Derived>::Type, typename Rhs::Type>::result_type const
-inline ExprBase<Derived>::dot(ExprBase<Rhs> const& other) const
+typename hidden::Promote<typename hidden::Traits<Lhs>::Type, typename Rhs::Type>::result_type const
+inline ExprBase<Lhs>::dot(ExprBase<Rhs> const& other) const
 {
-  STK_STATIC_ASSERT_POINT_OR_VECTOR_ONLY(Derived);
+  typedef typename hidden::Traits<Rhs>::Type RType;
+  STK_STATIC_ASSERT_POINT_OR_VECTOR_ONLY(Lhs);
   STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Rhs);
-  return BinaryOperator< ProductOp<Type, typename hidden::Traits<Rhs>::Type>
-                       , Derived
-                       , Rhs>(this->asDerived(), other.asDerived()).sum();
+  return BinaryOperator< ProductOp<Type, RType >, Lhs, Rhs>(this->asDerived(), other.asDerived()).sum();
 }
 
 /*  @returns the dot product of *this with other. */
-template<class Derived>
+template<class Lhs>
 template<class Rhs>
-typename hidden::Promote<typename hidden::Traits<Derived>::Type, typename Rhs::Type>::result_type const
-inline ExprBase<Derived>::dotSafe(ExprBase<Rhs> const& other) const
+typename hidden::Promote<typename hidden::Traits<Lhs>::Type, typename Rhs::Type>::result_type const
+inline ExprBase<Lhs>::dotSafe(ExprBase<Rhs> const& other) const
 {
-  STK_STATIC_ASSERT_POINT_OR_VECTOR_ONLY(Derived);
+    typedef typename hidden::Traits<Rhs>::Type RType;
+  STK_STATIC_ASSERT_POINT_OR_VECTOR_ONLY(Lhs);
   STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Rhs);
-  return BinaryOperator< ProductOp<Type, typename hidden::Traits<Rhs>::Type>
-                       , Derived
-                       , Rhs>(this->asDerived(), other.asDerived()).sumSafe();
+  return BinaryOperator< ProductOp<Type, RType>, Lhs, Rhs>(this->asDerived(), other.asDerived()).sumSafe();
 }
 
 

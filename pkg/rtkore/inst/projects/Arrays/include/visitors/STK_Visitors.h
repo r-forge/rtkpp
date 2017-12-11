@@ -69,12 +69,11 @@ template <typename Type_>
 struct EltVisitor2DBase
 {
   typedef Type_ Type;
-  typedef typename RemoveConst<Type>::Type const& ReturnType;
   typedef typename RemoveConst<Type>::Type const& ConstReturnType;
   inline EltVisitor2DBase() : row_(baseIdx), col_(baseIdx), res_(Arithmetic<Type>::NA()) {};
   int row_, col_;
   Type res_;
-  inline ReturnType result() const { return res_;}
+  inline ConstReturnType result() const { return res_;}
 };
 
 /** @ingroup hidden
@@ -153,7 +152,6 @@ template <typename Type_>
 struct MinVisitor
 {
   typedef Type_ Type;
-  typedef typename RemoveConst<Type>::Type const& ReturnType;
   typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   Type res_;
@@ -162,7 +160,7 @@ struct MinVisitor
   { res_ = std::min(res_,value);}
   inline void operator() ( Type const& value, int i)
   { res_ = std::min(res_,value);}
-  inline ReturnType result() const { return res_;}
+  inline ConstReturnType result() const { return res_;}
 };
 /** @ingroup hidden
  *  @brief Visitor computing safely the min of all the coefficients of the Array
@@ -173,7 +171,6 @@ template <typename Type_>
 struct MinSafeVisitor
 {
   typedef Type_ Type;
-  typedef typename RemoveConst<Type>::Type const& ReturnType;
   typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   Type res_;
@@ -182,7 +179,7 @@ struct MinSafeVisitor
   {  if (Arithmetic<Type>::isFinite(value)) { res_ = std::min(res_,value);} }
   inline void operator() ( Type const& value, int i)
   { if (Arithmetic<Type>::isFinite(value)) { res_ = std::min(res_,value);}}
-  inline ReturnType result() const { return res_;}
+  inline ConstReturnType result() const { return res_;}
 };
 /** @ingroup hidden
  *  @brief Visitor computing the max of all the coefficients of the Array
@@ -193,7 +190,6 @@ template <typename Type_>
 struct MaxVisitor
 {
   typedef Type_ Type;
-  typedef typename RemoveConst<Type>::Type const& ReturnType;
   typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   Type res_;
@@ -202,7 +198,7 @@ struct MaxVisitor
   { res_ = std::max(res_,value);}
   inline void operator() ( Type const& value, int i)
   { res_ = std::max(res_,value);}
-  inline ReturnType result() const { return res_;}
+  inline ConstReturnType result() const { return res_;}
 };
 /** @ingroup hidden
  *  @brief Visitor computing safely the max of all the coefficients of the Array
@@ -213,7 +209,6 @@ template <typename Type_>
 struct MaxSafeVisitor
 {
   typedef Type_ Type;
-  typedef typename RemoveConst<Type>::Type const& ReturnType;
   typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   Type res_;
@@ -222,7 +217,7 @@ struct MaxSafeVisitor
   { if (Arithmetic<Type>::isFinite(value)) { res_ = std::max(res_,value);}}
   inline void operator() ( Type const& value, int i)
   { if (Arithmetic<Type>::isFinite(value)) { res_ = std::max(res_,value);}}
-  inline ReturnType result() const { return res_;}
+  inline ConstReturnType result() const { return res_;}
 };
 /** @ingroup hidden
  *  @brief Visitor computing the sum of all the coefficients of the Array
@@ -233,7 +228,6 @@ template <typename Type_>
 struct SumVisitor
 {
   typedef Type_ Type;
-  typedef typename RemoveConst<Type>::Type const& ReturnType;
   typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   Type res_;
@@ -242,7 +236,7 @@ struct SumVisitor
   { res_ += value;}
   inline void operator() ( Type const& value, int i)
   { res_ += value;}
-  inline ReturnType result() const { return res_;}
+  inline ConstReturnType result() const { return res_;}
 };
 /** @ingroup hidden
  *  @brief Visitor computing the mean of all the coefficients of the Array
@@ -253,7 +247,6 @@ template <typename Type_>
 struct MeanVisitor
 {
   typedef Type_ Type;
-  typedef typename RemoveConst<Type>::Type ReturnType;
   typedef typename RemoveConst<Type>::Type ConstReturnType;
   Type res_;
   int nb_;
@@ -262,7 +255,7 @@ struct MeanVisitor
   { res_ += value; nb_++;}
   inline void operator() ( Type const& value, int i)
   { res_ += value; nb_++;}
-  inline ReturnType result() const { return nb_ == 0  ? Arithmetic<Type>::NA() : res_/nb_;}
+  inline ConstReturnType result() const { return nb_ == 0  ? Arithmetic<Type>::NA() : res_/nb_;}
 };
 /** @ingroup hidden
  *  @brief Visitor computing safely the mean of all the coefficients of the Array
@@ -273,7 +266,6 @@ template <typename Type_>
 struct MeanSafeVisitor
 {
   typedef Type_ Type;
-  typedef typename RemoveConst<Type>::Type ReturnType;
   typedef typename RemoveConst<Type>::Type ConstReturnType;
   Type res_;
   int nb_;
@@ -288,7 +280,7 @@ struct MeanSafeVisitor
     if (Arithmetic<Type>::isFinite(value))
     {  res_ += value; nb_++;}
   }
-  inline ReturnType result() const { return nb_ == 0  ? Arithmetic<Type>::NA() : res_/nb_;}
+  inline ConstReturnType result() const { return nb_ == 0  ? Arithmetic<Type>::NA() : res_/nb_;}
 };
 /** @ingroup hidden
  *  @brief Visitor counting the number of not-zero element in an array
@@ -306,14 +298,13 @@ struct CountVisitor
 {
   int res_;
   typedef int Type;
-  typedef int const& ReturnType;
   typedef int const& ConstReturnType;
   CountVisitor(): res_(0) {}
   inline void operator() ( Type_ const& value, int i, int j)
   { if (value) ++res_;}
   inline void operator() ( Type_ const& value, int i)
   { if (value) ++res_;}
-  inline ReturnType result() const { return res_;}
+  inline ConstReturnType result() const { return res_;}
 };
 
 /** @ingroup hidden
@@ -331,14 +322,13 @@ struct AllVisitor
 {
   bool res_;
   typedef bool Type;
-  typedef bool const& ReturnType;
   typedef bool const& ConstReturnType;
   inline AllVisitor(): res_(true) {}
   inline void operator() ( Type_ const& value, int i, int j)
   { res_ &= (value);}
   inline void operator() ( Type_ const& value, int i)
   { res_ &= (value);}
-  inline ReturnType result() const { return res_;}
+  inline ConstReturnType result() const { return res_;}
 };
 /** @ingroup hidden
  *  @brief Visitor checking if at least, one element of an array is different
@@ -355,12 +345,11 @@ struct AnyVisitor
 {
   bool res_;
   typedef bool Type;
-  typedef bool const& ReturnType;
   typedef bool const& ConstReturnType;
   inline AnyVisitor(): res_(false) {}
   inline void operator() ( Type_ const& value, int i, int j) { res_ |= (value);}
   inline void operator() ( Type_ const& value, int i) { res_ |= (value);}
-  inline ReturnType result() const { return res_;}
+  inline ConstReturnType result() const { return res_;}
 };
 
 /** @ingroup hidden

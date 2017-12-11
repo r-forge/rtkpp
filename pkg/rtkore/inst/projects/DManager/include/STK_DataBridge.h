@@ -61,7 +61,7 @@ struct Traits< DataBridge<Data> >
     typedef typename Traits<Data>::SubArray SubArray;
 
     typedef typename Traits<Data>::Type Type;
-    typedef typename Traits<Data>::ReturnType ReturnType;
+    typedef typename Traits<Data>::ConstReturnType ConstReturnType;
     enum
     {
       structure_ = Traits<Data>::structure_,

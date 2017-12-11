@@ -90,7 +90,7 @@ class ITContainer1D: public IRecursiveTemplate<Derived>
     };
 
     typedef typename hidden::Traits<Derived>::Type Type;
-    typedef typename hidden::Traits<Derived>::ReturnType ReturnType;
+    typedef typename hidden::Traits<Derived>::ConstReturnType ConstReturnType;
 
     typedef typename hidden::Traits<Derived>::Row Row;
     typedef typename hidden::Traits<Derived>::Col Col;
@@ -174,7 +174,7 @@ class ITContainer1D: public IRecursiveTemplate<Derived>
     /** @return a constant reference on the ith element for vector_, point_ and diagonal_ containers
      *  @param i index of the ith element
      **/
-    inline ReturnType elt(int i) const
+    inline ConstReturnType elt(int i) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (this->asDerived().begin() > i)
@@ -191,7 +191,7 @@ class ITContainer1D: public IRecursiveTemplate<Derived>
     /** @return a constant reference on the ith  element
      *  @param i index of the ith element
      **/
-    inline ReturnType operator[](int i) const { return elt(i);}
+    inline ConstReturnType operator[](int i) const { return elt(i);}
     /** @return safely the jth element
      *  @param i index of the element
      **/
@@ -206,7 +206,7 @@ class ITContainer1D: public IRecursiveTemplate<Derived>
     /** @return safely the constant jth element
      *  @param i index of the element
      **/
-    ReturnType at(int i) const
+    ConstReturnType at(int i) const
     {
       if (begin() > i)
       { STKOUT_OF_RANGE_1ARG(ITContainer1D::at, i, begin() > i);}
@@ -232,11 +232,11 @@ class ITContainer1D: public IRecursiveTemplate<Derived>
     /** @return a reference on the first element. */
     inline Type& front() { return elt(begin());}
     /** @return a constant reference on the first element */
-    inline ReturnType front() const { return elt(begin());}
+    inline ConstReturnType front() const { return elt(begin());}
     /** @return a reference on the last element */
     inline Type& back() { return elt(lastIdx());}
     /** @return a constant reference on the last element */
-    inline ReturnType back() const { return elt(lastIdx());}
+    inline ConstReturnType back() const { return elt(lastIdx());}
 
     /**  @param beg the index of the first column to set */
     void shift(int beg)

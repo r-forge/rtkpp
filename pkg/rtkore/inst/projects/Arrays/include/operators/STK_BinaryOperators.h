@@ -43,211 +43,1327 @@
 namespace STK
 {
 
-namespace Arrays
-{
-
-/** @ingroup Arrays
- *  Kind of the operands in a BinaryOperator.
- **/
-enum BinOpKind
-{
-  binOp0d_ = 0, ///< both operand are number_
-  binOp1d_ = 1, ///< both operand are vector_ or point_ or diagonal_
-  binOp2d_ = 2, ///< both operand are array2d_ or square_
-  binOpDiag2d_,
-  binOp2dDiag_,
-  binOp2dUp_,
-  binOpUp2d_,
-  binOp2dLow_,
-  binOpLow2d_,
-  binOpDiagUp_,
-  binOpUpDiag_,
-  binOpDiagLow_,
-  binOpLowDiag_,
-  binOpUpUp_,
-  binOpUpLow_,
-  binOpLowUp_,
-  binOpLowLow_
-};
-
-} // namespace Arrays
-
 namespace hidden
 {
 /** @ingroup hidden
  *  @brief Helper class giving the Structure of a binary operator
  **/
-template<int LStructure_, int RStructure_> struct BinaryTraits;
+template<typename FunctorOp, typename Lhs, typename Rhs, int LStructure_, int RStructure_>
+struct BinaryEltImpl;
 
-// Lhs is array2D_
-template<> struct BinaryTraits<Arrays::array2D_, Arrays::array2D_>
-{ enum { structure_ = Arrays::array2D_, binOpKind_ = Arrays::binOp2d_};};
-template<> struct BinaryTraits<Arrays::array2D_, Arrays::square_>
-{ enum { structure_ = Arrays::square_, binOpKind_ = Arrays::binOp2d_};};
-template<> struct BinaryTraits<Arrays::array2D_, Arrays::diagonal_>
-{ enum { structure_ = Arrays::array2D_, binOpKind_= Arrays::binOp2dDiag_};};
-template<> struct BinaryTraits<Arrays::array2D_, Arrays::upper_triangular_>
-{ enum { structure_ = Arrays::array2D_, binOpKind_= Arrays::binOp2dUp_};};
-template<> struct BinaryTraits<Arrays::array2D_, Arrays::lower_triangular_>
-{ enum { structure_ = Arrays::array2D_, binOpKind_= Arrays::binOp2dLow_};};
+//----------------
+// Lhs array2D_
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::array2D_, Arrays::array2D_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_      = Arrays::array2D_
+       , binary_op_Kind_ = Arrays::binary_op_2D_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return f(l.elt(i,j), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::array2D_, Arrays::square_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_ = Arrays::binary_op_2D_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return f(l.elt(i,j), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::array2D_, Arrays::diagonal_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::array2D_
+       , binary_op_Kind_= Arrays::binary_op_2D_Diag_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i==j) ? f(l.elt(i,j), r.elt(i,j)) : f(l.elt(i,j), RType());}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::array2D_, Arrays::upper_triangular_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::array2D_
+       , binary_op_Kind_= Arrays::binary_op_2D_UpTri_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+      };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i<=j) ? f(l.elt(i,j), r.elt(i,j)) : f(l.elt(i,j), RType());}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::array2D_, Arrays::lower_triangular_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::array2D_
+       , binary_op_Kind_= Arrays::binary_op_2D_LowTri_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i>=j) ? f(l.elt(i,j), r.elt(i,j)) : f(l.elt(i,j), RType());}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::array2D_, Arrays::symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_2D_Sym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return f(l.elt(i,j), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::array2D_, Arrays::upper_symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::array2D_
+       , binary_op_Kind_= Arrays::binary_op_2D_UpSym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i<=j) ? f(l.elt(i,j), r.elt(i,j)) : f(l.elt(i,j), r.elt(j,i));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::array2D_, Arrays::lower_symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::array2D_
+       , binary_op_Kind_= Arrays::binary_op_2D_LowSym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i>=j) ? f(l.elt(i,j), r.elt(i,j)) : f(l.elt(i,j), r.elt(j,i));}
+};
 
-// Lhs is square_
-template<> struct BinaryTraits<Arrays::square_, Arrays::array2D_>
-{ enum { structure_ = Arrays::square_, binOpKind_ = Arrays::binOp2d_};};
-template<> struct BinaryTraits<Arrays::square_, Arrays::square_>
-{ enum { structure_ = Arrays::square_, binOpKind_ = Arrays::binOp2d_};};
-template<> struct BinaryTraits<Arrays::square_, Arrays::diagonal_>
-{ enum { structure_ = Arrays::square_, binOpKind_= Arrays::binOp2dDiag_};};
-template<> struct BinaryTraits<Arrays::square_, Arrays::upper_triangular_>
-{ enum { structure_ = Arrays::square_, binOpKind_= Arrays::binOp2dUp_};};
-template<> struct BinaryTraits<Arrays::square_, Arrays::lower_triangular_>
-{ enum { structure_ = Arrays::square_, binOpKind_= Arrays::binOp2dLow_};};
 
-// lhs is diagonal_
-template<> struct BinaryTraits<Arrays::diagonal_, Arrays::array2D_>
-{ enum { structure_ = Arrays::array2D_, binOpKind_= Arrays::binOpDiag2d_};};
-template<> struct BinaryTraits<Arrays::diagonal_, Arrays::square_>
-{ enum { structure_ = Arrays::square_, binOpKind_= Arrays::binOpDiag2d_};};
-template<> struct BinaryTraits<Arrays::diagonal_, Arrays::diagonal_>
-{ enum { structure_ = Arrays::diagonal_, binOpKind_= Arrays::binOp1d_};};
-template<> struct BinaryTraits<Arrays::diagonal_, Arrays::point_>
-{ enum { structure_ = Arrays::diagonal_, binOpKind_= Arrays::binOp1d_};};
-template<> struct BinaryTraits<Arrays::diagonal_, Arrays::vector_>
-{ enum { structure_ = Arrays::diagonal_, binOpKind_= Arrays::binOp1d_};};
-template<> struct BinaryTraits<Arrays::diagonal_, Arrays::upper_triangular_>
-{ enum { structure_ = Arrays::upper_triangular_, binOpKind_= Arrays::binOpDiagUp_};};
-template<> struct BinaryTraits<Arrays::diagonal_, Arrays::lower_triangular_>
-{ enum { structure_ = Arrays::lower_triangular_, binOpKind_= Arrays::binOpDiagLow_};};
+
+//----------------
+// Lhs square_
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::square_, Arrays::array2D_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_ = Arrays::binary_op_2D_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return f(l.elt(i,j), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::square_, Arrays::square_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_ = Arrays::binary_op_2D_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return f(l.elt(i,j), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::square_, Arrays::diagonal_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_2D_Diag_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i==j) ? f(l.elt(i,j), r.elt(i,j)) : f(l.elt(i,j), RType());}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::square_, Arrays::upper_triangular_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_2D_UpTri_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i<=j) ? f(l.elt(i,j), r.elt(i,j)) : f(l.elt(i,j), RType());}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::square_, Arrays::lower_triangular_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_2D_LowTri_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i>=j) ? f(l.elt(i,j), r.elt(i,j)) : f(l.elt(i,j), RType());}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::square_, Arrays::symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_2D_Sym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return f(l.elt(i,j), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::square_, Arrays::upper_symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_2D_UpSym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i<=j) ? f(l.elt(i,j), r.elt(i,j)) : f(l.elt(i,j), r.elt(j,i));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::square_, Arrays::lower_symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_2D_LowSym_
+       , sizeRows_  = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_  = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i>=j) ? f(l.elt(i,j), r.elt(i,j)) : f(l.elt(i,j), r.elt(j,i));}
+};
+
+
+//----------------
+// lhs diagonal_
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::diagonal_, Arrays::array2D_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  enum { structure_ = Arrays::array2D_
+       , binary_op_Kind_= Arrays::binary_op_Diag_2D_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i==j) ? f(l.elt(i,j), r.elt(i,j)) : f( LType(), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::diagonal_, Arrays::square_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_Diag_2D_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i==j) ? f(l.elt(i,j), r.elt(i,j)) : f( LType(), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::diagonal_, Arrays::upper_triangular_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::upper_triangular_
+       , binary_op_Kind_= Arrays::binary_op_Diag_UpTri_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i==j) ? f(l.elt(i,j), r.elt(i,j)) : (i<j) ? f( LType(), r.elt(i,j)) : f( LType(), RType());}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::diagonal_, Arrays::lower_triangular_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::lower_triangular_
+       , binary_op_Kind_= Arrays::binary_op_Diag_LowTri_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i==j) ? f(l.elt(i,j), r.elt(i,j)) : (i>j) ? f( LType(), r.elt(i,j)) : f( LType(), RType());}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::diagonal_, Arrays::symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  enum { structure_ = Arrays::symmetric_
+       , binary_op_Kind_= Arrays::binary_op_Diag_Sym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i==j) ? f(l.elt(i,j), r.elt(i,j)) : f( LType(), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::diagonal_, Arrays::upper_symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  enum { structure_ = Arrays::upper_symmetric_
+       , binary_op_Kind_= Arrays::binary_op_Diag_UpSym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i==j) ? f(l.elt(i,j), r.elt(i,j)) : (i<j) ? f( LType(), r.elt(i,j)) : f( LType(), r.elt(j,i));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::diagonal_, Arrays::lower_symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  enum { structure_ = Arrays::lower_symmetric_
+       , binary_op_Kind_= Arrays::binary_op_Diag_LowSym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i==j) ? f(l.elt(i,j), r.elt(i,j)) : (i>j) ? f( LType(), r.elt(i,j)) : f( LType(), r.elt(j,i));}
+};
+
+
+
+//-------------------------
+// lhs upper_triangular_
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::upper_triangular_, Arrays::array2D_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  enum { structure_ = Arrays::array2D_
+       , binary_op_Kind_= Arrays::binary_op_UpTri_2D_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i<=j) ? f(l.elt(i,j), r.elt(i,j)) : f( LType(), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::upper_triangular_, Arrays::square_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_UpTri_2D_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+      };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i<=j) ? f(l.elt(i,j), r.elt(i,j)) : f( LType(), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::upper_triangular_, Arrays::diagonal_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::upper_triangular_
+       , binary_op_Kind_= Arrays::binary_op_UpTri_Diag_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i==j) ? f(l.elt(i,j), r.elt(i,j)) : (i<j) ? f(l.elt(i,j), RType()) : f(LType(), RType());}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::upper_triangular_, Arrays::upper_triangular_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::upper_triangular_
+       , binary_op_Kind_= Arrays::binary_op_UpTri_UpTri_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i<=j) ? f(l.elt(i,j), r.elt(i,j)) : f(LType(), RType());}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::upper_triangular_, Arrays::lower_triangular_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::array2D_
+       , binary_op_Kind_= Arrays::binary_op_UpTri_LowTri_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i==j) ? f(l.elt(i,j), r.elt(i,j)) : (i<j) ? f(l.elt(i,j), RType()) : f(LType(), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::upper_triangular_, Arrays::symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_UpTri_Sym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i<=j) ? f(l.elt(i,j), r.elt(i,j)) : f( LType(), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::upper_triangular_, Arrays::upper_symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_UpTri_UpSym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i<=j) ? f(l.elt(i,j), r.elt(i,j)) : f( LType(), r.elt(j,i));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::upper_triangular_, Arrays::lower_symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_UpTri_LowSym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i<=j) ? f(l.elt(i,j), r.elt(j,i)) : f( LType(), r.elt(i,j));}
+};
+
+
 
 // lhs is lower_triangular_
-template<> struct BinaryTraits<Arrays::lower_triangular_, Arrays::array2D_>
-{ enum { structure_ = Arrays::array2D_, binOpKind_= Arrays::binOpLow2d_};};
-template<> struct BinaryTraits<Arrays::lower_triangular_, Arrays::square_>
-{ enum { structure_ = Arrays::square_, binOpKind_= Arrays::binOpLow2d_};};
-template<> struct BinaryTraits<Arrays::lower_triangular_, Arrays::diagonal_>
-{ enum { structure_ = Arrays::lower_triangular_, binOpKind_= Arrays::binOpLowDiag_};};
-template<> struct BinaryTraits<Arrays::lower_triangular_, Arrays::lower_triangular_>
-{ enum { structure_ = Arrays::lower_triangular_, binOpKind_= Arrays::binOpLowLow_};};
-template<> struct BinaryTraits<Arrays::lower_triangular_, Arrays::upper_triangular_>
-{ enum { structure_ = Arrays::array2D_, binOpKind_= Arrays::binOpLowUp_};};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::lower_triangular_, Arrays::array2D_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  enum { structure_ = Arrays::array2D_
+       , binary_op_Kind_= Arrays::binary_op_LowTri_2D_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i>=j) ? f(l.elt(i,j), r.elt(i,j)) : f( LType(), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::lower_triangular_, Arrays::square_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_LowTri_2D_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i>=j) ? f(l.elt(i,j), r.elt(i,j)) : f( LType(), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::lower_triangular_, Arrays::diagonal_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::lower_triangular_
+       , binary_op_Kind_= Arrays::binary_op_LowTri_Diag_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i==j) ? f(l.elt(i,j), r.elt(i,j)) : (i>j) ? f(l.elt(i,j), RType()) : f( LType(), RType());}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::lower_triangular_, Arrays::upper_triangular_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::array2D_
+       , binary_op_Kind_= Arrays::binary_op_LowTri_UpTri_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i==j) ? f(l.elt(i,j), r.elt(i,j)) : (i>j) ? f(l.elt(i,j), RType()) : f( LType(), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::lower_triangular_, Arrays::lower_triangular_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::lower_triangular_
+       , binary_op_Kind_= Arrays::binary_op_LowTri_LowTri_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i>=j) ? f(l.elt(i,j), r.elt(i,j)) : f( LType(), RType());}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::lower_triangular_, Arrays::symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_LowTri_Sym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i>=j) ? f(l.elt(i,j), r.elt(i,j)) : f( LType(), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::lower_triangular_, Arrays::upper_symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_LowTri_UpSym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i>=j) ? f(l.elt(i,j), r.elt(j,i)) : f( LType(), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::lower_triangular_, Arrays::lower_symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_LowTri_LowSym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i>=j) ? f(l.elt(i,j), r.elt(i,j)) : f( LType(), r.elt(j,i));}
+};
 
-// lhs is upper_triangular_
-template<> struct BinaryTraits<Arrays::upper_triangular_, Arrays::array2D_>
-{ enum { structure_ = Arrays::array2D_, binOpKind_= Arrays::binOpUp2d_};};
-template<> struct BinaryTraits<Arrays::upper_triangular_, Arrays::square_>
-{ enum { structure_ = Arrays::square_, binOpKind_= Arrays::binOpUp2d_};};
-template<> struct BinaryTraits<Arrays::upper_triangular_, Arrays::diagonal_>
-{ enum { structure_ = Arrays::upper_triangular_, binOpKind_= Arrays::binOpUpDiag_};};
-template<> struct BinaryTraits<Arrays::upper_triangular_, Arrays::lower_triangular_>
-{ enum { structure_ = Arrays::array2D_, binOpKind_= Arrays::binOpUpLow_};};
-template<> struct BinaryTraits<Arrays::upper_triangular_, Arrays::upper_triangular_>
-{ enum { structure_ = Arrays::upper_triangular_, binOpKind_= Arrays::binOpUpUp_};};
 
-// Lhs is vector_
-template<> struct BinaryTraits<Arrays::vector_, Arrays::diagonal_>
-{ enum { structure_ = Arrays::vector_, binOpKind_= Arrays::binOp1d_};};
-template<> struct BinaryTraits<Arrays::vector_, Arrays::vector_>
-{ enum { structure_ = Arrays::vector_, binOpKind_= Arrays::binOp1d_};};
-template<> struct BinaryTraits<Arrays::vector_, Arrays::point_>
-{ enum { structure_ = Arrays::vector_, binOpKind_= Arrays::binOp1d_};};
 
-// Lhs is point_
-template<> struct BinaryTraits<Arrays::point_, Arrays::diagonal_>
-{ enum { structure_ = Arrays::point_, binOpKind_= Arrays::binOp1d_};};
-template<> struct BinaryTraits<Arrays::point_, Arrays::vector_>
-{ enum { structure_ = Arrays::point_, binOpKind_= Arrays::binOp1d_};};
-template<> struct BinaryTraits<Arrays::point_, Arrays::point_>
-{ enum { structure_ = Arrays::point_, binOpKind_= Arrays::binOp1d_};};
+// lhs is symmetric_
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::symmetric_, Arrays::array2D_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_Sym_2D_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+      };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return f(l.elt(i,j), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::symmetric_, Arrays::square_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_Sym_2D_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+      };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return f(l.elt(i,j), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::symmetric_, Arrays::diagonal_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::symmetric_
+       , binary_op_Kind_= Arrays::binary_op_Sym_Diag_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i==j) ? f(l.elt(i,j), r.elt(i,j)) : f(l.elt(i,j), RType());}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::symmetric_, Arrays::upper_triangular_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_Sym_UpTri_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i<=j) ? f(l.elt(i,j), r.elt(i,j)) : f(l.elt(i,j), RType());}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::symmetric_, Arrays::lower_triangular_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_Sym_LowTri_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i<=j) ? f(l.elt(i,j), r.elt(i,j)) : f(l.elt(i,j), RType());}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::symmetric_, Arrays::symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::symmetric_
+       , binary_op_Kind_= Arrays::binary_op_Sym_Sym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return f(l.elt(i,j), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::symmetric_, Arrays::upper_symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::symmetric_
+       , binary_op_Kind_= Arrays::binary_op_Sym_UpSym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i<=j) ? f(l.elt(i,j), r.elt(i,j)) : f(l.elt(i,j), r.elt(j,i));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::symmetric_, Arrays::lower_symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::symmetric_
+       , binary_op_Kind_= Arrays::binary_op_Sym_LowSym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i>=j) ? f(l.elt(i,j), r.elt(i,j)) : f(l.elt(i,j), r.elt(j,i));}
+};
 
-// Lhs is number_
-template<> struct BinaryTraits<Arrays::number_, Arrays::number_>
-{ enum { structure_ = Arrays::number_, binOpKind_= Arrays::binOp0d_};};
+
+//---------------------
+// lhs upper_symmetric_
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::upper_symmetric_, Arrays::array2D_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_UpSym_2D_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i<=j) ? f(l.elt(i,j), r.elt(i,j)) : f( l.elt(j,i), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::upper_symmetric_, Arrays::square_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_UpSym_2D_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i<=j) ? f(l.elt(i,j), r.elt(i,j)) : f( l.elt(j,i), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::upper_symmetric_, Arrays::diagonal_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::upper_symmetric_
+       , binary_op_Kind_= Arrays::binary_op_UpSym_Diag_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+      };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i==j) ? f(l.elt(i,j), r.elt(i,j)) : (i<j) ? f(l.elt(i,j), RType()) : f(l.elt(j,i), RType());}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::upper_symmetric_, Arrays::upper_triangular_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::upper_triangular_
+       , binary_op_Kind_= Arrays::binary_op_UpSym_UpTri_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i<=j) ? f(l.elt(i,j), r.elt(i,j)) : f(l.elt(j,i), RType());}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::upper_symmetric_, Arrays::lower_triangular_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_UpSym_LowTri_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i==j) ? f(l.elt(i,j), r.elt(i,j)) : (i<j) ? f(l.elt(i,j), RType()) : f(l.elt(j,i), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::upper_symmetric_, Arrays::symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::symmetric_
+       , binary_op_Kind_= Arrays::binary_op_UpSym_Sym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i<=j) ? f(l.elt(i,j), r.elt(i,j)) : f( l.elt(j,i), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::upper_symmetric_, Arrays::upper_symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::upper_symmetric_
+       , binary_op_Kind_= Arrays::binary_op_UpSym_UpSym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i<=j) ? f(l.elt(i,j), r.elt(i,j)) : f( l.elt(j,i), r.elt(j,i));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::upper_symmetric_, Arrays::lower_symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::symmetric_
+       , binary_op_Kind_= Arrays::binary_op_UpSym_LowSym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i<=j) ? f(l.elt(i,j), r.elt(j,i)) : f( l.elt(j,i), r.elt(i,j));}
+};
+
+
+//-----------------------
+// lhs lower_symmetric_
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::lower_symmetric_, Arrays::array2D_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_LowTri_2D_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i>=j) ? f(l.elt(i,j), r.elt(i,j)) : f( l.elt(j, i), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::lower_symmetric_, Arrays::square_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_LowTri_2D_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i>=j) ? f(l.elt(i,j), r.elt(i,j)) : f( l.elt(j, i), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::lower_symmetric_, Arrays::diagonal_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::lower_symmetric_
+       , binary_op_Kind_= Arrays::binary_op_LowTri_Diag_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i==j) ? f(l.elt(i,j), r.elt(i,j)) : (i>j) ? f(l.elt(i,j), RType()) : f(l.elt(j,i), RType());}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::lower_symmetric_, Arrays::upper_triangular_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::square_
+       , binary_op_Kind_= Arrays::binary_op_LowSym_UpTri_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i==j) ? f(l.elt(i,j), r.elt(i,j)) : (i>j) ? f(l.elt(i,j), RType()) : f(l.elt(j,i), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::lower_symmetric_, Arrays::lower_triangular_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::lower_triangular_
+       , binary_op_Kind_= Arrays::binary_op_LowSym_LowTri_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i>=j) ? f(l.elt(i,j), r.elt(i,j)) : f(l.elt(j,i), RType());}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::lower_symmetric_, Arrays::symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::symmetric_
+       , binary_op_Kind_= Arrays::binary_op_LowSym_Sym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i>=j) ? f(l.elt(i,j), r.elt(i,j)) : f( l.elt(j, i), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::lower_symmetric_, Arrays::upper_symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::symmetric_
+       , binary_op_Kind_= Arrays::binary_op_LowSym_UpSym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i>=j) ? f(l.elt(i,j), r.elt(j,i)) : f(l.elt(j,i), r.elt(i,j));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::lower_symmetric_, Arrays::lower_symmetric_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::lower_symmetric_
+       , binary_op_Kind_= Arrays::binary_op_LowSym_LowSym_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i>=j) ? f(l.elt(i,j), r.elt(i,j)) : f(l.elt(j,i), r.elt(j,i));}
+};
+
+
+//--------------------------------------------------------------------------------------------
+// 1D case
+
+//-----------------------
+// Lhs diagonal_, Rhs 1D
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::diagonal_, Arrays::diagonal_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  typedef typename Lhs::Type LType;
+  typedef typename Rhs::Type RType;
+  enum { structure_ = Arrays::diagonal_
+       , binary_op_Kind_= Arrays::binary_op_1D_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return (i==j) ? f(l.elt(i,j), r.elt(i,j)) : f(LType(), RType());}
+  inline static result_type elt1Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i)
+  { return f(l.elt(i), r.elt(i));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::diagonal_, Arrays::point_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::diagonal_
+       , binary_op_Kind_= Arrays::binary_op_1D_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeCols_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsOtherSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return f(l.elt(i,j), r.elt(i,j));}
+  inline static result_type elt1Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i)
+  { return f(l.elt(i), r.elt(i));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::diagonal_, Arrays::vector_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::diagonal_
+       , binary_op_Kind_= Arrays::binary_op_1D_
+       , sizeRows_   = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_   = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeRows_)
+       , useLhsRows_ = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_ = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsOtherSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return f(l.elt(i,j), r.elt(i,j));}
+  inline static result_type elt1Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i)
+  { return f(l.elt(i), r.elt(i));}
+};
+
+//-----------------------
+// Lhs vector_
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::vector_, Arrays::diagonal_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_     = Arrays::diagonal_
+       , binary_op_Kind_= Arrays::binary_op_1D_
+       , sizeRows_      = Rhs::sizeRows_ != UnknownSize ? int(Rhs::sizeRows_) : int(Lhs::sizeCols_)
+       , sizeCols_      = Rhs::sizeCols_ != UnknownSize ? int(Rhs::sizeCols_) : int(Lhs::sizeCols_)
+       , useLhsRows_    = Rhs::sizeRows_ != UnknownSize ? Arrays::useRhsSize_ : Arrays::useLhsSize_
+       , useLhsCols_    = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return f(l.elt(i,j), r.elt(i,j));}
+  inline static result_type elt1Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i)
+  { return f(l.elt(i), r.elt(i));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::vector_, Arrays::vector_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::vector_
+       , binary_op_Kind_= Arrays::binary_op_1D_
+       , sizeRows_      = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)
+       , sizeCols_      = 1
+       , useLhsRows_    = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       , useLhsCols_    = Arrays::useLhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return f(l.elt(i,j), r.elt(i,j));}
+  inline static result_type elt1Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i)
+  { return f(l.elt(i), r.elt(i));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::vector_, Arrays::point_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_     = Arrays::vector_ // vector + point is vector (somehow an arbitrary choice)
+       , binary_op_Kind_= Arrays::binary_op_1D_
+       , sizeRows_      = Lhs::sizeRows_ != UnknownSize ? Lhs::sizeRows_ : Rhs::sizeCols_
+       , sizeCols_      = 1
+       , useLhsRows_    = Lhs::sizRows != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsOtherSize_
+       , useLhsCols_    = Arrays::useLhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return f(l.elt(i,j), r.elt(i,j));}
+  inline static result_type elt1Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i)
+  { return f(l.elt(i), r.elt(i));}
+};
+
+//-----------------------
+// Lhs point_
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::point_, Arrays::diagonal_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_     = Arrays::diagonal_ // point_ + diagonal_ is diagonal_
+       , binary_op_Kind_= Arrays::binary_op_1D_
+       , sizeRows_      = Rhs::sizeRows_ != UnknownSize ? int(Rhs::sizeRows_) : int(Lhs::sizeCols_)
+       , sizeCols_      = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_    = Rhs::sizeRows_ != UnknownSize ? Arrays::useRhsSize_ : Arrays::useLhsOtherSize_
+       , useLhsCols_    = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return f(l.elt(i,j), r.elt(i,j));}
+  inline static result_type elt1Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i)
+  { return f(l.elt(i), r.elt(i));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::point_, Arrays::vector_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_     = Arrays::point_ // point + vector_ is point_
+       , binary_op_Kind_= Arrays::binary_op_1D_
+       , sizeRows_      = 1
+       , sizeCols_      = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeRows_)
+       , useLhsRows_    = Arrays::useLhsSize_
+       , useLhsCols_    = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsOtherSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return f(l.elt(i,j), r.elt(i,j));}
+  inline static result_type elt1Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i)
+  { return f(l.elt(i), r.elt(i));}
+};
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::point_, Arrays::point_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_ = Arrays::point_
+       , binary_op_Kind_= Arrays::binary_op_1D_
+       , sizeRows_      = 1
+       , sizeCols_      = Lhs::sizeCols_ != UnknownSize ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)
+       , useLhsRows_    = Arrays::useLhsSize_
+       , useLhsCols_    = Lhs::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return f(l.elt(i,j), r.elt(i,j));}
+  inline static result_type elt1Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i)
+  { return f(l.elt(i), r.elt(i));}
+};
+
+//-----------------------
+// Lhs number_
+template< typename FunctorOp, typename Lhs, typename Rhs>
+struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::number_, Arrays::number_>
+{
+  typedef typename FunctorOp::result_type result_type;
+  enum { structure_     = Arrays::number_
+       , binary_op_Kind_= Arrays::binary_op_0D_
+       , sizeRows_      = 1
+       , sizeCols_      = 1
+       , useLhsRows_    = Arrays::useLhsSize_
+       , useLhsCols_    = Arrays::useLhsSize_
+       };
+  inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)
+  { return f(l.elt(i,j), r.elt(i,j));}
+  inline static result_type elt1Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i)
+  { return f(l.elt(i), r.elt(i));}
+  inline static result_type elt0Impl(FunctorOp const& f, Lhs const& l, Rhs const& r)
+  { return f(l.elt(), r.elt());}
+};
 
 } //namespace hidden
 
 
-/** @ingroup Arrays
-  * @brief Generic expression where a binary operator is
-  * applied to two expressions
-  *
-  * @tparam BinaryOp template functor implementing the operator
-  * @tparam Lhs the type of the left-hand side
-  * @tparam Rhs the type of the right-hand side
-  *
-  * This class represents an expression  where a binary operator is applied to
-  * two expressions.
-  * It is the return type of binary operators, by which we mean only those
-  * binary operators where both the left-hand side and the right-hand side
-  * are expressions. For example, the return type of matrix1+matrix2 is a
-  * BinaryOperator. The return type of number+matrix is a unary operator.
-  *
-  * Most of the time, this is the only way that it is used, so you typically
-  * don't have to name BinaryOperator types explicitly.
-  **/
-template<typename BinaryOp, typename Lhs, typename Rhs>
+// forward declaration
+template<typename FunctorOp, typename Lhs, typename Rhs>
 class BinaryOperator;
 
 namespace hidden {
 
 /** @ingroup hidden
+ *  @brief implement the access to the rows of the BinaryOperator
+ *  Possible cases are:
+ *  - use lhs.rows()
+ *  - use rhs.rows()
+ *  - use lhs.cols()
+ *  - use rhs.cols()
+ **/
+template< typename Lhs, typename Rhs, int Size_, int useLhsRows_>
+struct BinaryRowsImpl;
+/** @ingroup hidden
+ *  @brief implement the access to the columns of the BinaryOperator
+ *  Possible cases are:
+ *  - use lhs.cols()
+ *  - use rhs.cols()
+ *  - use lhs.rows()
+ **/
+template< typename Lhs, typename Rhs, int Size_, int useLhsCols_>
+struct BinaryColsImpl;
+/** @ingroup hidden
+  * @brief specialization for the case useLhsSize_
+  **/
+template<typename Lhs, typename Rhs, int Size_>
+struct BinaryRowsImpl< Lhs, Rhs,  Size_, Arrays::useLhsSize_>
+{
+  /** Type of the Range for the rows */
+  typedef TRange<Size_> RowRange;
+  /**  @return the range of the rows */
+  inline static RowRange const& rowsImpl(Lhs const& lhs, Rhs const& rhs) { return lhs.rows();}
+};
+/** @ingroup hidden
+  * @brief specialization for the case useRhsSize_
+  **/
+template<typename Lhs, typename Rhs, int Size_>
+struct BinaryRowsImpl<Lhs, Rhs, Size_, Arrays::useRhsSize_>
+{
+  /** Type of the Range for the rows */
+  typedef TRange<Size_> RowRange;
+  /**  @return the range of the rows */
+  inline static RowRange const& rowsImpl(Lhs const& lhs, Rhs const& rhs) { return rhs.rows();}
+};
+/** @ingroup hidden
+  * @brief specialization for the case useLhsOtherSize_
+  **/
+template<typename Lhs, typename Rhs, int Size_>
+struct BinaryRowsImpl<Lhs, Rhs, Size_, Arrays::useLhsOtherSize_>
+{
+  /** Type of the Range for the rows */
+  typedef TRange<Size_> RowRange;
+  /**  @return the range of the rows */
+  inline static RowRange const& rowsImpl(Lhs const& lhs, Rhs const& rhs) { return lhs.cols();}
+};
+/** @ingroup hidden
+  * @brief specialization for the case useRhsOtherSize_
+  **/
+template<typename Lhs, typename Rhs, int Size_>
+struct BinaryRowsImpl<Lhs, Rhs, Size_, Arrays::useRhsOtherSize_>
+{
+  /** Type of the Range for the rows */
+  typedef TRange<Size_> RowRange;
+  /**  @return the range of the rows */
+  inline static RowRange const& rowsImpl(Lhs const& lhs, Rhs const& rhs) { return rhs.cols();}
+};
+/** @ingroup hidden
+  * @brief specialization for the case useLhsSize_
+  **/
+template<typename Lhs, typename Rhs, int Size_>
+struct BinaryColsImpl<Lhs, Rhs, Size_, Arrays::useLhsSize_>
+{
+  /** Type of the Range for the columns */
+  typedef TRange<Size_> ColRange;
+  /**  @return the range of the columns */
+  inline static ColRange const& colsImpl(Lhs const& lhs, Rhs const& rhs) { return lhs.cols();}
+};
+/** @ingroup hidden
+  * @brief specialization for the case useRhsSize_
+  **/
+template<typename Lhs, typename Rhs, int Size_>
+struct BinaryColsImpl< Lhs, Rhs, Size_, Arrays::useRhsSize_>
+{
+  /** Type of the Range for the columns */
+  typedef TRange<Size_> ColRange;
+  /**  @return the range of the columns */
+  inline static ColRange const& colsImpl(Lhs const& lhs, Rhs const& rhs) { return rhs.cols();}
+};
+/** @ingroup hidden
+  * @brief specialization for the case useLhsOtherSize_
+  **/
+template<typename Lhs, typename Rhs, int Size_>
+struct BinaryColsImpl< Lhs, Rhs, Size_, Arrays::useLhsOtherSize_>
+{
+  /** Type of the Range for the columns */
+  typedef TRange<Size_> ColRange;
+  /**  @return the range of the columns */
+  inline static ColRange const& colsImpl(Lhs const& lhs, Rhs const& rhs) { return lhs.rows();}
+};
+/** @ingroup hidden
+  * @brief specialization for the case useRhsOtherSize_
+  **/
+template<typename Lhs, typename Rhs, int Size_>
+struct BinaryColsImpl< Lhs, Rhs,Size_, Arrays::useRhsOtherSize_>
+{
+  /** Type of the Range for the columns */
+  typedef TRange<Size_> ColRange;
+  /**  @return the range of the columns */
+  inline static ColRange const& colsImpl(Lhs const& lhs, Rhs const& rhs) { return rhs.rows();}
+};
+
+
+/** @ingroup hidden
  *  @brief Traits class for the BinaryOperator
  */
-template<typename BinaryOp, typename Lhs, typename Rhs>
-struct Traits< BinaryOperator<BinaryOp, Lhs, Rhs> >
+template<typename FunctorOp, typename Lhs, typename Rhs>
+struct Traits< BinaryOperator<FunctorOp, Lhs, Rhs> >
 {
   enum
   {
-    // find the kind of binary operator and the Structure using helper class BinaryTraits
-    binOpKind_ = BinaryTraits<Lhs::structure_, Rhs::structure_>::binOpKind_,
-    // helper flags
+    // find the kind of binary operator and the Structure using helper class BinaryEltImpl
+    binary_op_Kind_ = BinaryEltImpl<FunctorOp, Lhs, Rhs, Lhs::structure_, Rhs::structure_>::binary_op_Kind_,
+
     isLhs1D_ = EGAL(Lhs,vector_)||EGAL(Lhs,point_)||EGAL(Lhs,diagonal_),
     isRhs1D_ = EGAL(Rhs,vector_)||EGAL(Rhs,point_)||EGAL(Rhs,diagonal_),
-    isLhs2D_ = EGAL(Lhs,array2D_)||EGAL(Lhs,square_)||EGAL(Lhs,diagonal_)||EGAL(Lhs,lower_triangular_)||EGAL(Lhs,upper_triangular_),
-    isRhs2D_ = EGAL(Rhs,array2D_)||EGAL(Rhs,square_)||EGAL(Rhs,diagonal_)||EGAL(Rhs,lower_triangular_)||EGAL(Rhs,upper_triangular_),
+
+    isRhs2D_ = EGAL(Rhs,array2D_)||EGAL(Rhs,square_)||EGAL(Rhs,diagonal_)
+             ||EGAL(Rhs,lower_triangular_)||EGAL(Rhs,upper_triangular_)
+             ||EGAL(Rhs,symmetric_)||EGAL(Rhs,lower_symmetric_)||EGAL(Rhs,upper_symmetric_),
+    isLhs2D_ = EGAL(Lhs,array2D_)||EGAL(Lhs,square_)||EGAL(Lhs,diagonal_)
+             ||EGAL(Lhs,lower_triangular_)||EGAL(Lhs,upper_triangular_)
+             ||EGAL(Lhs,symmetric_)||EGAL(Lhs,lower_symmetric_)||EGAL(Lhs,upper_symmetric_),
+
+
     isRes0D_ = EGAL(Lhs,number_) && EGAL(Rhs,number_),
     isRes1D_ = (EGAL(Lhs,vector_)||EGAL(Lhs,point_)) && (EGAL(Rhs,vector_)||EGAL(Rhs,point_)),
     isRes2D_ = isLhs2D_ && isRhs2D_,
+
     is1D1D_  = isLhs1D_ && isRhs1D_,
-    // get the structure from the helper class BinaryTraits
-    structure_ = hidden::BinaryTraits<Lhs::structure_, Rhs::structure_>::structure_,
-    // preserve the Lhs storage orientation. Could be optimized ?
-    orient_    = Lhs::orient_,
-    // try fixed sizes for 2D containers but take care to the 1D-1D case
-    sizeRows_  = (EGAL(Lhs,point_)||EGAL(Lhs,number_))
-               ? 1 : ( (Lhs::sizeRows_!= UnknownSize)||(Rhs::sizeRows_ == 1) ? int(Lhs::sizeRows_) : int(Rhs::sizeRows_)),
-    sizeCols_  = (EGAL(Lhs,vector_)||EGAL(Lhs,number_))
-               ? 1 : ( (Lhs::sizeCols_!= UnknownSize)||(Rhs::sizeCols_ == 1) ? int(Lhs::sizeCols_) : int(Rhs::sizeCols_)),
+
+    // get the structure from the helper class BinaryEltImpl
+    structure_ = hidden::BinaryEltImpl<FunctorOp, Lhs, Rhs, Lhs::structure_, Rhs::structure_>::structure_,
+    orient_    = Lhs::orient_,    // preserve the Lhs storage orientation. Could be optimized ?
+    sizeRows_  = BinaryEltImpl<FunctorOp, Lhs, Rhs, Lhs::structure_, Rhs::structure_>::sizeRows_,
+    sizeCols_  = BinaryEltImpl<FunctorOp, Lhs, Rhs, Lhs::structure_, Rhs::structure_>::sizeCols_,
     storage_   = (Lhs::storage_ == int(Arrays::dense_)) || (Rhs::storage_ == int(Arrays::dense_))
-               ?  int(Arrays::dense_) : int(Arrays::sparse_)
+               ?  int(Arrays::dense_) : int(Arrays::sparse_),
+
+    useLhsRows_    = BinaryEltImpl<FunctorOp, Lhs, Rhs, Lhs::structure_, Rhs::structure_>::useLhsRows_,
+    useLhsCols_    = BinaryEltImpl<FunctorOp, Lhs, Rhs, Lhs::structure_, Rhs::structure_>::useLhsCols_
   };
-  // handle the case when the type is different in LHS and Rhs.
-  typedef typename BinaryOp::result_type Type;
-  typedef typename RemoveConst<Type>::Type ReturnType;
-  typedef typename RemoveConst<Type>::Type ConstReturnType;
-
-  typedef RowOperator< BinaryOperator<BinaryOp, Lhs, Rhs> > Row;
-  typedef ColOperator< BinaryOperator<BinaryOp, Lhs, Rhs> > Col;
-
+  typedef RowOperator<BinaryOperator<FunctorOp, Lhs, Rhs> > Row;
+  typedef ColOperator<BinaryOperator<FunctorOp, Lhs, Rhs> > Col;
+  typedef typename FunctorOp::result_type Type;
+  typedef typename FunctorOp::result_type ConstReturnType;
 };
 
 } // end namespace hidden
 
 
 /** @ingroup Arrays
- *  @brief implement the access to the elements of the BinaryOperator.
- *  This class is specialized for all kind of BinOpKind.
- **/
-template< typename BinaryOp, typename Lhs, typename Rhs
-        , int kind = hidden::Traits< BinaryOperator <BinaryOp, Lhs, Rhs> >::binOpKind_ >
-class BinaryOperatorBase;
-
-/** @ingroup Arrays
-  * @brief Generic expression where a binary operator is
-  * applied to two expressions
+  * @brief Generic expression where a binary operator is applied to two expressions
   *
-  * @tparam BinaryOp template functor implementing the operator
-  * @tparam Lhs the type of the left-hand side
-  * @tparam Rhs the type of the right-hand side
+  * @tparam FunctorOp template functor implementing the binary operator
+  * @tparam Lhs left-hand side type
+  * @tparam Rhs right-hand side type
   *
   * This class represents an expression  where a binary operator is applied to
   * two expressions.
@@ -259,16 +1375,19 @@ class BinaryOperatorBase;
   * Most of the time, this is the only way that it is used, so you typically
   * don't have to name BinaryOperator types explicitly.
   **/
-template<typename BinaryOp, typename Lhs, typename Rhs>
-class BinaryOperator: public BinaryOperatorBase< BinaryOp, Lhs, Rhs >
-                     , public TRef<1>
+template<typename FunctorOp, typename Lhs, typename Rhs>
+class BinaryOperator: public ExprBase< BinaryOperator<FunctorOp, Lhs, Rhs> >
+                    , public TRef<1>
 {
   public:
-    typedef BinaryOperatorBase<BinaryOp, Lhs, Rhs, hidden::Traits< BinaryOperator <BinaryOp, Lhs, Rhs> >::binOpKind_> Base;
+    typedef hidden::BinaryEltImpl<FunctorOp, Lhs, Rhs, Lhs::structure_, Rhs::structure_> EltImpl;
+    typedef hidden::BinaryRowsImpl< Lhs, Rhs, EltImpl::sizeRows_, EltImpl::useLhsRows_ > RowsImpl;
+    typedef hidden::BinaryColsImpl< Lhs, Rhs, EltImpl::sizeCols_, EltImpl::useLhsCols_ > ColsImpl;
 
+    typedef typename hidden::Traits< BinaryOperator >::ConstReturnType ConstReturnType;
     typedef typename hidden::Traits<BinaryOperator >::Type Type;
-    typedef typename hidden::Traits<BinaryOperator >::Row Row;
-    typedef typename hidden::Traits<BinaryOperator >::Col Col;
+//    typedef typename hidden::Traits<BinaryOperator >::Row Row;
+//    typedef typename hidden::Traits<BinaryOperator >::Col Col;
 
     enum
     {
@@ -292,400 +1411,54 @@ class BinaryOperator: public BinaryOperatorBase< BinaryOp, Lhs, Rhs >
     typedef TRange<sizeCols_> ColRange;
 
     /** default constructor */
-    inline BinaryOperator( const Lhs& lhs, const Rhs& rhs, const BinaryOp& func = BinaryOp())
-                        : Base(), lhs_(lhs), rhs_(rhs), functor_(func)
-                         , rows_(lhs_.beginRows(), (sizeRows_ != UnknownSize) ? sizeRows_ : lhs_.sizeRows())
-                         , cols_(lhs_.beginCols(), (sizeCols_ != UnknownSize) ? sizeCols_ : lhs_.sizeCols())
-    { // FIXME : not safe. Add more test in the 1D case at compile time (and runtime ?)
+    inline BinaryOperator( Lhs const& lhs, Rhs const& rhs, FunctorOp const& func = FunctorOp())
+                         : lhs_(lhs), rhs_(rhs), functor_(func)
+    {
+      // FIXME : not safe. Add more test in the 1D case at compile time (and runtime ?)
       STK_STATIC_ASSERT_BINARY_OPERATOR_MISMATCH( isValid_ );
       STK_STATIC_ASSERT_COLS_DIMENSIONS_MISMATCH(!( (int(Lhs::sizeCols_) != UnknownSize)
-                                               &&  (int(Rhs::sizeCols_) != UnknownSize)
-                                               &&  (int(Lhs::sizeCols_) != int(Rhs::sizeCols_))
-                                               &&  (isRes2D_)
+                                                &&  (int(Rhs::sizeCols_) != UnknownSize)
+                                                &&  (int(Lhs::sizeCols_) != int(Rhs::sizeCols_))
+                                                &&  (isRes2D_)
                                                  ));
       STK_STATIC_ASSERT_ROWS_DIMENSIONS_MISMATCH(!( (int(Lhs::sizeRows_) != UnknownSize)
-                                               &&  (int(Rhs::sizeRows_) != UnknownSize)
-                                               &&  (int(Lhs::sizeRows_) != int(Rhs::sizeRows_))
-                                               &&  (isRes2D_)
+                                                &&  (int(Rhs::sizeRows_) != UnknownSize)
+                                                &&  (int(Lhs::sizeRows_) != int(Rhs::sizeRows_))
+                                                &&  (isRes2D_)
                                                  ));
+#ifdef STK_BOUNDS_CHECK
       if ((lhs.rows() != rhs.rows()) && (isRes2D_))
-      { STKRUNTIME_ERROR_2ARG(BinaryOperator, lhs.rows(), rhs.rows(), Rows sizes mismatch for 2D array);}
+      { STKRUNTIME_ERROR_2ARG(BinaryOperator, lhs.rows(), rhs.rows(), Rows range mismatch in BinaryOperator);}
       if (( lhs.cols() != rhs.cols()) && (isRes2D_))
-      { STKRUNTIME_ERROR_2ARG(BinaryOperator, lhs.cols(), rhs.cols(), Columns sizes mismatch for 2D array);}
+      { STKRUNTIME_ERROR_2ARG(BinaryOperator, lhs.cols(), rhs.cols(), Columns range mismatch in BinaryOperator);}
+#endif
     }
-    /**  @return the range of the rows */
-    inline RowRange const& rowsImpl() const { return rows_;}
-    /**  @return the range of the columns */
-    inline ColRange const& colsImpl() const { return cols_;}
-    /**  @return the range */
-    inline Range range() const { return this->asDerived().lhs().range();}
 
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_; }
     /** @return the right hand side nested expression */
     inline Rhs const& rhs() const { return rhs_; }
     /** @return the functor representing the binary operation */
-    inline BinaryOp const& functor() const { return functor_; }
+    inline FunctorOp const& functor() const { return functor_; }
+
+    /** @return element (i,j) */
+    inline ConstReturnType elt2Impl(int i, int j) const { return EltImpl::elt2Impl(functor_, lhs_, rhs_, i, j);}
+    /** @return element i */
+    inline ConstReturnType elt1Impl(int i) const { return EltImpl::elt1Impl(functor_, lhs_, rhs_, i);}
+    /** @return element */
+    inline ConstReturnType elt0Impl() const { return EltImpl::elt0Impl(functor_, lhs_, rhs_);}
+    /** @return range of the rows */
+    inline RowRange const& rowsImpl() const { return RowsImpl::rowsImpl(lhs_, rhs_);}
+    /** @return range of the columns */
+    inline ColRange const& colsImpl() const { return ColsImpl::colsImpl(lhs_, rhs_);}
 
   protected:
     Lhs const& lhs_;
     Rhs const& rhs_;
-    BinaryOp const functor_;
-    RowRange rows_;
-    ColRange cols_;
+    FunctorOp const functor_;
 };
 
-/** @ingroup Arrays
-  * @brief specialization in the number-number case.
-  **/
-template<typename BinaryOp, typename Lhs, typename Rhs>
-class BinaryOperatorBase<BinaryOp, Lhs, Rhs, Arrays::binOp0d_>
-     : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
-{
-  public:
-    typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
-    /** constructor. */
-    inline BinaryOperatorBase(): Base() {}
-    /** access to the element i, j */
-    inline ReturnType elt2Impl(int i, int j) const
-    { return this->asDerived().functor()( this->asDerived().lhs().elt(i,j), this->asDerived().rhs().elt(i,j));}
-    /** accesses to the element i */
-    inline ReturnType elt1Impl(int i) const
-    { return this->asDerived().functor()( this->asDerived().lhs().elt(i), this->asDerived().rhs().elt(i));}
-    /** accesses to the element */
-    inline ReturnType elt0Impl() const
-    { return this->asDerived().functor()( this->asDerived().lhs().elt(), this->asDerived().rhs().elt());}
-};
-
-/** @ingroup Arrays
-  * @brief specialization in the diagonal-vector case.
-  **/
-template<typename BinaryOp, typename Lhs, typename Rhs>
-class BinaryOperatorBase<BinaryOp, Lhs, Rhs, Arrays::binOp1d_>
-     : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
-{
-  public:
-    typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
-    /** constructor. */
-    inline BinaryOperatorBase(): Base() {}
-    /** access to the element i, j */
-    inline ReturnType elt2Impl(int i, int j) const
-    { return this->asDerived().functor()( this->asDerived().lhs().elt(i,j), this->asDerived().rhs().elt(i,j));}
-    /** accesses to the element i */
-    inline ReturnType elt1Impl(int i) const
-    { return this->asDerived().functor()( this->asDerived().lhs().elt(i), this->asDerived().rhs().elt(i));}
-};
-
-/** @ingroup Arrays
- *  @brief implement the access to the elements in the (2D) general case.
- **/
-template<typename BinaryOp, typename Lhs, typename Rhs>
-class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOp2d_>
-                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
-{
-  public:
-    typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
-    /** constructor. */
-    inline BinaryOperatorBase(): Base() {}
-    /** access to the element i, j */
-    inline ReturnType elt2Impl(int i, int j) const
-    { return this->asDerived().functor()( this->asDerived().lhs().elt(i,j), this->asDerived().rhs().elt(i,j));}
-};
-
-/** @ingroup Arrays
-  * @brief specialization in the diagonal-* case.
-  **/
-template<typename BinaryOp, typename Lhs, typename Rhs>
-class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpDiag2d_>
-                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
-{
-  public:
-    typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits< Derived >::Type Type;
-    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
-    /** constructor. */
-    inline BinaryOperatorBase(): Base() {}
-    /** accesses to the element i, j */
-    inline ReturnType elt2Impl(int i, int j) const
-    { return (i==j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i), this->asDerived().rhs().elt(i, j))
-                    : this->asDerived().functor()( Type(), this->asDerived().rhs().elt(i, j));}
-};
-
-/** @ingroup Arrays
-  * @brief specialization in the *-diagonal case.
-  **/
-template<typename BinaryOp, typename Lhs, typename Rhs>
-class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOp2dDiag_>
-                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
-{
-  public:
-    typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits< Derived >::Type Type;
-    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
-    /** constructor. */
-    inline BinaryOperatorBase(): Base() {}
-    /** accesses to the element i, j */
-    inline ReturnType elt2Impl(int i, int j) const
-    { return (i==j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i,j), this->asDerived().rhs().elt(i))
-                    : this->asDerived().functor()( this->asDerived().lhs().elt(i, j), Type());}
-};
-
-/** @ingroup Arrays
-  * @brief specialization in the *-upper_triangular_ case.
-  **/
-template<typename BinaryOp, typename Lhs, typename Rhs>
-class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOp2dUp_>
-                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
-{
-  public:
-    typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits< Derived >::Type Type;
-    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
-    /** constructor. */
-    inline BinaryOperatorBase(): Base() {}
-    /** accesses to the element i, j */
-    inline ReturnType elt2Impl(int i, int j) const
-    { return (i<=j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i,j), this->asDerived().rhs().elt(i,j))
-                    : this->asDerived().functor()( this->asDerived().lhs().elt(i,j), Type());}
-};
-
-/** @ingroup Arrays
-  * @brief specialization in the upper_triangular_-* case.
-  **/
-template<typename BinaryOp, typename Lhs, typename Rhs>
-class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpUp2d_>
-                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
-{
-  public:
-    typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits< Derived >::Type Type;
-    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
-    /** constructor. */
-    inline BinaryOperatorBase(): Base() {}
-    /** accesses to the element i, j */
-    inline ReturnType elt2Impl(int i, int j) const
-    { return (i<=j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i,j), this->asDerived().rhs().elt(i,j))
-                    : this->asDerived().functor()( Type(), this->asDerived().rhs().elt(i,j));}
-};
-
-/** @ingroup Arrays
-  * @brief specialization in the *-lower_triangular_ case.
-  **/
-template<typename BinaryOp, typename Lhs, typename Rhs>
-class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOp2dLow_>
-                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
-{
-  public:
-    typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits< Derived >::Type Type;
-    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
-    /** constructor. */
-    inline BinaryOperatorBase(): Base() {}
-    /** accesses to the element i, j */
-    inline ReturnType elt2Impl(int i, int j) const
-    { return (i>=j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i,j), this->asDerived().rhs().elt(i,j))
-                    : this->asDerived().functor()( this->asDerived().lhs().elt(i,j), Type());}
-};
-
-/** @ingroup Arrays
-  * @brief specialization in the lower_triangular_-* case.
-  **/
-template<typename BinaryOp, typename Lhs, typename Rhs>
-class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpLow2d_>
-                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
-{
-  public:
-    typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits< Derived >::Type Type;
-    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
-    /** constructor. */
-    inline BinaryOperatorBase(): Base() {}
-    /** accesses to the element i, j */
-    inline ReturnType elt2Impl(int i, int j) const
-    { return (i>=j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i,j), this->asDerived().rhs().elt(i,j))
-                    : this->asDerived().functor()( Type(0), this->asDerived().rhs().elt(i,j));}
-};
-
-/** @ingroup Arrays
-  * @brief specialization in the diagonal-upper_triangular_ case.
-  **/
-template<typename BinaryOp, typename Lhs, typename Rhs>
-class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpDiagUp_>
-                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
-{
-  public:
-    typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits< Derived >::Type Type;
-    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
-    /** constructor. */
-    inline BinaryOperatorBase(): Base() {}
-    /** accesses to the element i, j */
-    inline ReturnType elt2Impl(int i, int j) const
-    { return (i==j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i), this->asDerived().rhs().elt(i, j))
-                    : (i<j) ? this->asDerived().functor()( Type(), this->asDerived().rhs().elt(i, j))
-                            : this->asDerived().functor()( Type(), Type());}
-};
-
-/** @ingroup Arrays
-  * @brief specialization in the upper_triangular_-diagonal case.
-  **/
-template<typename BinaryOp, typename Lhs, typename Rhs>
-class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpUpDiag_>
-                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
-{
-  public:
-    typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits< Derived >::Type Type;
-    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
-    /** constructor. */
-    inline BinaryOperatorBase(): Base() {}
-    /** accesses to the element i, j */
-    inline ReturnType elt2Impl(int i, int j) const
-    { return (i==j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i,j), this->asDerived().rhs().elt(i))
-                    : (i<j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i, j), Type())
-                            : this->asDerived().functor()( Type(), Type());}
-};
-
-/** @ingroup Arrays
-  * @brief specialization in the diagonal-lower_triangular_ case.
-  **/
-template<typename BinaryOp, typename Lhs, typename Rhs>
-class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpDiagLow_>
-                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
-{
-  public:
-    typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits< Derived >::Type Type;
-    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
-    /** constructor. */
-    inline BinaryOperatorBase(): Base() {}
-    /** accesses to the element i, j */
-    inline ReturnType elt2Impl(int i, int j) const
-    { return (i==j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i), this->asDerived().rhs().elt(i, j))
-                    : (i>j) ? this->asDerived().functor()( Type(), this->asDerived().rhs().elt(i, j))
-                            : this->asDerived().functor()( Type(), Type());}
-};
-
-/** @ingroup Arrays
-  * @brief specialization in the lower_triangular_-diagonal case.
-  **/
-template<typename BinaryOp, typename Lhs, typename Rhs>
-class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpLowDiag_>
-                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
-{
-  public:
-    typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits< Derived >::Type Type;
-    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
-    /** constructor. */
-    inline BinaryOperatorBase(): Base() {}
-    /** accesses to the element i, j */
-    inline ReturnType elt2Impl(int i, int j) const
-    { return (i==j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i,j), this->asDerived().rhs().elt(i))
-                    : (i>j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i, j), Type())
-                            : this->asDerived().functor()( Type(), Type());}
-};
-
-/** @ingroup Arrays
-  * @brief specialization in the upper_triangular_-upper_triangular_ case.
-  **/
-template<typename BinaryOp, typename Lhs, typename Rhs>
-class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpUpUp_>
-                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
-{
-  public:
-    typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits< Derived >::Type Type;
-    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
-    /** constructor. */
-    inline BinaryOperatorBase(): Base() {}
-    /** accesses to the element i, j */
-    inline ReturnType elt2Impl(int i, int j) const
-    { return  (i<=j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i, j), this->asDerived().rhs().elt(i, j))
-                     : this->asDerived().functor()( Type(), Type());}
-};
-
-/** @ingroup Arrays
-  * @brief specialization in the lower_triangular_-lower_triangular_ case.
-  **/
-template<typename BinaryOp, typename Lhs, typename Rhs>
-class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpLowLow_>
-                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
-{
-  public:
-    typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits< Derived >::Type Type;
-    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
-    /** constructor. */
-    inline BinaryOperatorBase(): Base() {}
-    /** accesses to the element i, j */
-    inline ReturnType elt2Impl(int i, int j) const
-    { return  (i>=j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i, j), this->asDerived().rhs().elt(i, j))
-                    : this->asDerived().functor()( Type(), Type());}
-};
-
-/** @ingroup Arrays
-  * @brief specialization in the upper_triangular_-lower_triangular_ case.
-  **/
-template<typename BinaryOp, typename Lhs, typename Rhs>
-class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpUpLow_>
-                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
-{
-  public:
-    typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits< Derived >::Type Type;
-    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
-    /** constructor. */
-    inline BinaryOperatorBase(): Base() {}
-    /** accesses to the element i, j */
-    inline ReturnType elt2Impl(int i, int j) const
-    { return  (i==j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i, j), this->asDerived().rhs().elt(i, j))
-                     : (i<j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i, j), Type())
-                             : this->asDerived().functor()( Type(), this->asDerived().rhs().elt(i, j));}
-};
-
-/** @ingroup Arrays
-  * @brief specialization in the lower_triangular_-upper_triangular_ case.
-  **/
-template<typename BinaryOp, typename Lhs, typename Rhs>
-class BinaryOperatorBase< BinaryOp, Lhs, Rhs, Arrays::binOpLowUp_>
-                       : public ExprBase< BinaryOperator<BinaryOp, Lhs, Rhs> >
-{
-  public:
-    typedef BinaryOperator<BinaryOp, Lhs, Rhs> Derived;
-    typedef ExprBase< Derived > Base;
-    typedef typename hidden::Traits< Derived >::Type Type;
-    typedef typename hidden::Traits< Derived >::ReturnType ReturnType;
-    /** constructor. */
-    inline BinaryOperatorBase(): Base() {}
-    /** accesses to the element i, j */
-    inline ReturnType elt2Impl(int i, int j) const
-    { return  (i==j) ? this->asDerived().functor()( this->asDerived().lhs().elt(i, j), this->asDerived().rhs().elt(i, j))
-                     : (i<j) ? this->asDerived().functor()( Type(), this->asDerived().rhs().elt(i, j))
-                             : this->asDerived().functor()( this->asDerived().lhs().elt(i, j), Type());}
-};
 
 } // namespace STK
-
-#undef EGAL
 
 #endif /* STK_BINARYOPERATORS_H */

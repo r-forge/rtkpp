@@ -60,7 +60,6 @@ struct Traits< SAllocator<Type_, Size_, Orient_> >
 
   public:
     typedef Type_  Type;
-    typedef typename RemoveConst<Type_>::Type const& ReturnType;
     typedef typename RemoveConst<Type_>::Type const& ConstReturnType;
 
     enum

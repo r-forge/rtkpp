@@ -67,12 +67,14 @@ struct FunctorSelector;
 template<class Derived, template<class> class Functor>
 struct FunctorSelector<Derived, Functor, false>
 {
-  typedef typename Derived::Col Col;
+  //typedef typename Derived::Col Col;
+  typedef typename hidden::Traits<Derived>::Col Col;
   typedef Functor<Col> ByColFunctor;
   typedef ApplyFunctorByCol<Derived, ByColFunctor> ColOp;
   typedef ApplyWeightedFunctorByCol<Derived, ByColFunctor> ColWeightedOp;
 
-  typedef typename Derived::Row Row;
+  //typedef typename Derived::Row Row;
+  typedef typename hidden::Traits<Derived >::Row Row;
   typedef Functor<Row> ByRowFunctor;
   typedef ApplyFunctorByRow<Derived, ByRowFunctor> RowOp;
   typedef ApplyWeightedFunctorByRow<Derived, ByRowFunctor> RowWeightedOp;

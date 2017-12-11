@@ -39,276 +39,16 @@
 #include "STK_ExprBase.h"
 #include "STatistiK/include/STK_Law_IUnivLaw.h"
 
+/// utility macro allowing to construct unary operators
+#define MAKE_RESHAPE_OPERATOR(OPERATOR, SHAPE) \
+  inline OPERATOR##Operator< Derived> const SHAPE() const \
+  { return OPERATOR##Operator< Derived>(this->asDerived()); } \
+  inline OPERATOR##Accessor< Derived> SHAPE() \
+  { return OPERATOR##Accessor< Derived>(this->asDerived()); }
 
 namespace STK
 {
 
-namespace hidden
-{
-/** @ingroup hidden
- *  Utility class allowing to know if in an assignment the dimensions are
- *  correct
- **/
-template<class Derived, int Structure_, int RhsStucture_>
-struct CheckAssign;
-
-/** @ingroup hidden
- *  Utility class allowing to know if in an assignment the destination must
- *   be resized or shifted
- **/
-template<class Derived, int Structure_>
-struct CheckShift;
-
-/** @ingroup hidden
- *  Specialization for general array2D_
- **/
-template<class Derived,int RhsStructure_>
-struct CheckAssign<Derived, Arrays::array2D_, RhsStructure_>
-{
-  // all range are authorized for array2D_
-  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
-  { return true;}
-};
-/** @ingroup hidden
- *  Specialization for square_
- **/
-template<class Derived, int RhsStructure_>
-struct CheckAssign<Derived, Arrays::square_, RhsStructure_>
-{
-  // same ranges for square_ arrays
-  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
-  { return I==J;}
-};
-
-/** @ingroup hidden
- *  Specialization for upper_triangular_
- **/
-template<class Derived>
-struct CheckAssign<Derived, Arrays::upper_triangular_, Arrays::upper_triangular_>
-{
-  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
-  { return true;}
-};
-/** @ingroup hidden
- *  Specialization for lower_triangular_
- **/
-template<class Derived>
-struct CheckAssign<Derived, Arrays::lower_triangular_, Arrays::lower_triangular_>
-{
-  // all range are authorized for lower_triangular_
-  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
-  { return true;}
-};
-
-/** @ingroup hidden
- *  Specialization for diagonal_
- **/
-template<class Derived>
-struct CheckAssign<Derived, Arrays::diagonal_, Arrays::diagonal_>
-{
-  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
-  { return true;}
-};
-template<class Derived>
-struct CheckAssign<Derived, Arrays::diagonal_, Arrays::vector_>
-{
-  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
-  { return true;}
-};
-template<class Derived>
-struct CheckAssign<Derived, Arrays::diagonal_, Arrays::point_>
-{
-  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
-  { return true;}
-};
-
-/** @ingroup hidden
- *  Specialization for vector_
- **/
-template<class Derived>
-struct CheckAssign<Derived, Arrays::vector_, Arrays::diagonal_>
-{
-  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
-  { return true;}
-};
-template<class Derived>
-struct CheckAssign<Derived, Arrays::vector_, Arrays::vector_>
-{
-  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
-  { return true;}
-};
-template<class Derived>
-struct CheckAssign<Derived, Arrays::vector_, Arrays::point_>
-{
-  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
-  { return true;}
-};
-/** @ingroup hidden
- *  Specialization for point_
- **/
-template<class Derived>
-struct CheckAssign<Derived, Arrays::point_, Arrays::diagonal_>
-{
-  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
-  { return true;}
-};
-template<class Derived>
-struct CheckAssign<Derived, Arrays::point_, Arrays::vector_>
-{
-  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
-  { return true;}
-};
-template<class Derived>
-struct CheckAssign<Derived, Arrays::point_, Arrays::point_>
-{
-  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
-  { return true;}
-};
-// for number_
-template<class Derived>
-struct CheckAssign<Derived, Arrays::number_, Arrays::number_>
-{
-  // same range only for diagonal_ arrays
-  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
-  { return (I.size() == 1 && J.size() == 1);}
-};
-
-/** @ingroup hidden
- *  Specialization for general array2D_
- **/
-template<class Derived>
-struct CheckShift<Derived, Arrays::array2D_>
-{
-  // all range are authorized for array2D_
-  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
-  { return true;}
-  // check if resize is necessary
-  static bool resize(Derived const& array, Range const& I, Range const& J)
-  { return (array.rows() != I || array.cols() != J);}
-  // check if shift is necessary
-  static bool shift(Derived const& array, int beginRow, int beginCol)
-  { return (array.beginRows() != beginRow || array.beginCols() != beginCol);}
-  // check if resize is necessary
-  static bool resize(Derived const& array, Range const& I)
-  { return (array.rows() != I || array.cols() != I);}
-  // check if shift is necessary
-  static bool shift(Derived const& array, int begin)
-  { return (array.beginRows() != begin || array.beginCols() != begin);}
-};
-/** @ingroup hidden
- *  Specialization for upper_triangular_
- **/
-template<class Derived>
-struct CheckShift<Derived, Arrays::upper_triangular_>
-{
-  // all range are authorized for upper_triangular_
-  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
-  { return true;}
-  static bool resize(Derived const& array, Range const& I, Range const& J)
-  { return (array.rows() != I || array.cols() != J);}
-  static bool shift(Derived const& array, int beginRow, int beginCol)
-  { return (array.beginRows() != beginRow || array.beginCols() != beginCol);}
-  static bool resize(Derived const& array, Range const& I)
-  { return (array.rows() != I || array.cols() != I);}
-  static bool shift(Derived const& array, int begin)
-  { return (array.beginRows() != begin || array.beginCols() != begin);}
-};
-/** @ingroup hidden
- *  Specialization for lower_triangular_
- **/
-template<class Derived>
-struct CheckShift<Derived, Arrays::lower_triangular_>
-{
-  // all range are authorized for lower_triangular_
-  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
-  { return true;}
-  static bool resize(Derived const& array, Range const& I, Range const& J)
-  { return (array.rows() != I || array.cols() != J);}
-  static bool shift(Derived const& array, int beginRow, int beginCol)
-  { return (array.beginRows() != beginRow || array.beginCols() != beginCol);}
-  static bool resize(Derived const& array, Range const& I)
-  { return (array.rows() != I || array.cols() != I);}
-  static bool shift(Derived const& array, int begin)
-  { return (array.beginRows() != begin || array.beginCols() != begin);}
-};
-
-/** @ingroup hidden
- *  Specialization for square_
- **/
-template<class Derived>
-struct CheckShift<Derived, Arrays::square_>
-{
-  // same range only for square_ arrays
-  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
-  { return I==J;}
-  static bool resize(Derived const& array, Range const& I, Range const& J)
-  { return (array.rows() != I || array.cols() != J);}
-  static bool shift(Derived const& array, int beginRow, int beginCol)
-  { return (array.beginRows() != beginRow || array.beginCols() != beginCol);}
-  static bool resize(Derived const& array, Range const& I)
-  { return (array.range() != I);}
-  static bool shift(Derived const& array, int begin)
-  { return (array.beginRows() != begin || array.beginCols() != begin);}
-};
-
-/** @ingroup hidden
- *  Specialization for diagonal_
- **/
-template<class Derived>
-struct CheckShift<Derived, Arrays::diagonal_>
-{
-  // same range only for diagonal_ arrays
-  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
-  { return I==J;}
-  static bool resize(Derived const& array, Range const& I, Range const& J)
-  { return (array.rows() != I || array.cols() != J);}
-  static bool shift(Derived const& array, int beginRow, int beginCol)
-  { return (array.beginRows() != beginRow || array.beginCols() != beginCol);}
-  static bool resize(Derived const& array, Range const& I)
-  { return (array.range() != I);}
-  static bool shift(Derived const& array, int begin)
-  { return (array.beginRows() != begin || array.beginCols() != begin);}
-};
-
-// for vectors
-template<class Derived>
-struct CheckShift<Derived, Arrays::vector_>
-{
-  // same range only for vector_ arrays
-  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
-  { return J.size() == 1;}
-  static bool resize(Derived const& array, Range const& I)
-  { return (array.range() != I);}
-  static bool shift(Derived const& array, int begin)
-  { return (array.begin() != begin);}
-};
-
-// for point
-template<class Derived>
-struct CheckShift<Derived, Arrays::point_>
-{
-  // same range only for diagonal_ arrays
-  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
-  { return I.size() == 1;}
-  static bool resize(Derived const& array, Range const& I)
-  { return (array.range() == I) ? false : true;}
-  static bool shift(Derived const& array, int begin)
-  { return (array.begin() == begin) ? false : true;}
-};
-// for point
-template<class Derived>
-struct CheckShift<Derived, Arrays::number_>
-{
-  // same range only for diagonal_ arrays
-  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
-  { return (I.size() == 1 && J.size() == 1);}
-  static bool resize(Derived const& array, Range const& I)
-  { return (array.range() == I) ? false : true;}
-  static bool shift(Derived const& array, int begin)
-  { return (array.begin() == begin) ? false : true;}
-};
-
-} // namespace hidden
 /** @ingroup Arrays
  *  @brief base class for template arrays.
  *
@@ -322,19 +62,12 @@ struct CheckShift<Derived, Arrays::number_>
  *  an expression.
  **/
 template< class Derived>
-class ArrayBase :  public ExprBase<Derived>
+class ArrayBase: public ExprBase<Derived>
 {
   public:
     typedef ExprBase<Derived> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
-    typedef typename hidden::Traits<Derived>::ReturnType ReturnType;
-
-    typedef typename hidden::Traits<Derived>::Row Row;
-    typedef typename hidden::Traits<Derived>::Col Col;
-    typedef typename hidden::Traits<Derived>::SubRow SubRow;
-    typedef typename hidden::Traits<Derived>::SubCol SubCol;
-    typedef typename hidden::Traits<Derived>::SubVector SubVector;
-    typedef typename hidden::Traits<Derived>::SubArray SubArray;
+    typedef typename hidden::Traits<Derived>::ConstReturnType ConstReturnType;
 
     enum
     {
@@ -399,245 +132,99 @@ class ArrayBase :  public ExprBase<Derived>
     template<class Rhs> Derived& assign(ExprBase<Rhs> const& rhs);
 
     /** @return the matrix or vector obtained by setting this constant*/
-    Derived& operator=( Type const& rhs) { return setValue(rhs);}
+    Derived& operator=( Type const& value);
     /** @return the matrix or vector obtained by evaluating this expression */
-    Derived& operator=( Derived const& rhs) { return assign(rhs);}
+    Derived& operator=( Derived const& rhs);
     /** @return the matrix or vector obtained by evaluating this expression */
     template<typename Rhs>
-    inline Derived& operator=( ExprBase<Rhs> const& rhs)
-    { return assign(rhs.asDerived());}
+    Derived& operator=( ExprBase<Rhs> const& rhs);
     /** Adding a Rhs to this. */
     template<typename Rhs>
-    inline Derived& operator+=( ExprBase<Rhs> const& other);
+    Derived& operator+=( ExprBase<Rhs> const& other);
     /** subtract a Rhs to this. */
     template<typename Rhs>
-    inline Derived& operator-=( ExprBase<Rhs> const& other);
+    Derived& operator-=( ExprBase<Rhs> const& other);
     /** divide this by Rhs. */
     template<typename Rhs>
-    inline Derived& operator/=( ExprBase<Rhs> const& other);
+    Derived& operator/=( ExprBase<Rhs> const& other);
     /** multiply this by Rhs. */
     template<typename Rhs>
-    inline Derived& operator*=( ExprBase<Rhs> const& other);
+    Derived& operator*=( ExprBase<Rhs> const& other);
     /** Adding a constant to this. */
-    inline Derived& operator+=( Type const& other);
+    Derived& operator+=( Type const& other);
     /** Substract a constant to this. */
-    inline Derived& operator-=( Type const& other);
+    Derived& operator-=( Type const& other);
     /** product of this by a constant. */
-    inline Derived& operator*=( Type const& other);
+    Derived& operator*=( Type const& other);
     /** dividing this by a constant. */
-    inline Derived& operator/=( Type const& other);
+    Derived& operator/=( Type const& other);
 
-    /** @return the jth column of this */
-    inline Col col(int j) const { return this->asDerived().colImpl(j);}
-    /** @return the jth column of this in the range I*/
-    inline SubCol col(Range const& I, int j) const
-    {
-      STK_STATIC_ASSERT_TWO_DIMENSIONS_ONLY(Derived)
-#ifdef STK_BOUNDS_CHECK
-      if (this->beginRows() > I.begin())
-      { STKOUT_OF_RANGE_2ARG(ArrayBase::col, I, j, beginRows() > I.begin());}
-      if (this->endRows() < I.end())
-      { STKOUT_OF_RANGE_2ARG(ArrayBase::col, I, j, endRows() < I.end());}
-      if (this->beginCols() > j)
-      { STKOUT_OF_RANGE_2ARG(ArrayBase::col, I, j, beginCols() > j);}
-      if (this->endCols() <= j)
-      { STKOUT_OF_RANGE_2ARG(ArrayBase::col, I, j, endCols() <= j);}
-#endif
-      return this->asDerived().colImpl(I, j);
-    }
-    /** @return the sub array with the column in the range J */
-    inline SubArray col(Range const& J) const
-    {
-      STK_STATIC_ASSERT_TWO_DIMENSIONS_ONLY(Derived)
-#ifdef STK_BOUNDS_CHECK
-      if (this->beginCols() > J.begin())
-      { STKOUT_OF_RANGE_1ARG(ArrayBase::col, J, beginCols() > J.begin());}
-      if (this->endCols() < J.end())
-      { STKOUT_OF_RANGE_1ARG(ArrayBase::col, J, endCols() < J.end());}
-#endif
-      return this->asDerived().colImpl(J);
-    }
-    /** @return the ith row of this */
-    inline Row row(int i) const
-    {
-#ifdef STK_BOUNDS_CHECK
-      if (this->beginRows() > i)
-      { STKOUT_OF_RANGE_1ARG(ArrayBase::row, i, beginRows() > i);}
-      if (this->endRows() <= i)
-      { STKOUT_OF_RANGE_1ARG(ArrayBase::row, i, endRows() <= i);}
-#endif
-      return this->asDerived().rowImpl(i);
-    }
-    /** @return the ith row of this in the range J */
-    inline SubRow row(int i, Range const& J) const
-    {
-      STK_STATIC_ASSERT_TWO_DIMENSIONS_ONLY(Derived)
-      return this->asDerived().rowImpl(i,J);
-    }
-    /** @return the sub array with the rows in the range J */
-    inline SubArray row(Range const& I) const
-    {
-      STK_STATIC_ASSERT_TWO_DIMENSIONS_ONLY(Derived)
-      return this->asDerived().rowImpl(I);
-    }
-    /** @return the sub-array (I,J)*/
-    inline SubArray sub(Range const& I, Range const& J) const
-    {
-      STK_STATIC_ASSERT_TWO_DIMENSIONS_ONLY(Derived)
-      return this->asDerived().subImpl(I, J);
-    }
-    /** @return the sub-vector in the range I*/
-    inline SubVector sub(Range const& I) const
-    {
-      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived)
-      return this->asDerived().subImpl(I);
-    }
-    /** @return the element (i,j) of the 2D container.
-     *  @param i,j indexes of the row and column
-     **/
-    inline Type& elt(int i, int j)
-    {
-#ifdef STK_BOUNDS_CHECK
-      if (this->beginRows() > i)
-      { STKOUT_OF_RANGE_2ARG(Type& ArrayBase::elt, i, j, beginRows() > i);}
-      if (this->endRows() <= i)
-      { STKOUT_OF_RANGE_2ARG(Type& ArrayBase::elt, i, j, endRows() <= i);}
-      if (this->beginCols() > j)
-      { STKOUT_OF_RANGE_2ARG(Type& ArrayBase::elt, i, j, beginCols() > j);}
-      if (this->endCols() <= j)
-      { STKOUT_OF_RANGE_2ARG(Type& ArrayBase::elt, i, j, endCols() <= j);}
-#endif
-      return this->asDerived().elt2Impl(i,j);
-    }
-    /** @return a constant reference on element (i,j) of the 2D container
-     *  @param i, j indexes of the row and of the column
-     **/
-    inline Type const& elt(int i, int j) const
-    {
-#ifdef STK_BOUNDS_CHECK
-      if (this->beginRows() > i)
-      { STKOUT_OF_RANGE_2ARG(Type const& ArrayBase::elt, i, j, beginRows() > i);}
-      if (this->endRows() <= i)
-      { STKOUT_OF_RANGE_2ARG(Type const& ArrayBase::elt, i, j, endRows() <= i);}
-      if (this->beginCols() > j)
-      { STKOUT_OF_RANGE_2ARG(Type const& ArrayBase::elt, i, j, beginCols() > j);}
-      if (this->endCols() <= j)
-      { STKOUT_OF_RANGE_2ARG(Type const& ArrayBase::elt, i, j, endCols() <= j);}
-#endif
-      return this->asDerived().elt2Impl(i,j);
-    }
-    /** @return a reference on the ith element
-     *  @param i index of the ith element
-     **/
-    inline Type& elt(int i)
-    {
-      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived)
-#ifdef STK_BOUNDS_CHECK
-      if (this->begin() > i)
-      { STKOUT_OF_RANGE_1ARG(Type& ArrayBase::elt, i, begin() > i);}
-      if (this->end() <= i)
-      { STKOUT_OF_RANGE_1ARG(Type& ArrayBase::elt, i, end() <= i);}
-#endif
-      return this->asDerived().elt1Impl(i);
-    }
-    /** @return the constant ith element
-     *  @param i index of the ith element
-     **/
-    inline Type const& elt(int i) const
-    {
-      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived)
-#ifdef STK_BOUNDS_CHECK
-      if (this->begin() > i)
-      { STKOUT_OF_RANGE_1ARG(Type const& ArrayBase::elt, i, begin() > i);}
-      if (this->end() <= i)
-      { STKOUT_OF_RANGE_1ARG(Type const& ArrayBase::elt, i, end() <= i);}
-#endif
-      return this->asDerived().elt1Impl(i);
-    }
-    /** @return a reference on the number */
-    inline Type& elt()
-    {
-      STK_STATIC_ASSERT_ZERO_DIMENSION_ONLY(Derived)
-      return this->asDerived().elt0Impl();
-    }
-    /** @return a constant reference on the number */
-    inline Type const& elt() const
-    {
-      STK_STATIC_ASSERT_ZERO_DIMENSION_ONLY(Derived)
-      return this->asDerived().elt0Impl();
-    }
-    // overloaded operators
-    /** @return a reference on the ith element
-     *  @param i index of the ith element
-     **/
-    inline Type& operator[](int i) { return elt(i);}
-    /** @return the ith element
-     *  @param i index of the ith element
-     **/
-    inline Type const& operator[](int i) const { return elt(i);}
-    /** @return the ith element
-     *  @param I range to get
-     **/
-    inline SubVector operator[](Range const& I) const { return sub(I);}
-    /** @return a reference on the element (i,j) of the 2D container.
-     *  @param i, j indexes of the row and of the column
-     **/
-    inline Type& operator()(int i, int j) { return elt(i,j);}
-    /** @return a constant reference on the element (i,j) of the 2D container.
-     *  @param i,j indexes of the row and column
-     **/
-    inline Type const& operator()(int i, int j) const { return elt(i,j);}
-    /** @return a constant reference on the number */
-    inline Type const& operator()() const { return elt();}
-    /** @return the number */
-    inline Type& operator()() { return elt();}
-    /** @param I range of the index of the rows
-     *  @param j index of the column
-     *  @return a Vertical container containing the column @c j of this
-     *  in the range @c I
-     **/
-    inline SubCol operator()(Range const& I, int j) const { return col(I, j);}
-    /** @param i index of the row
-     *  @param J range of the columns
-     *  @return an Horizontal container containing the row @c i of this
-     *  in the range @c J
-     **/
-    inline SubRow operator()(int i, Range const& J) const { return row(i, J);}
-    /** @param I,J range of the rows and of the columns
-     *  @return a 2D container containing this in the range @c I, @c J
-     **/
-    inline SubArray operator()(Range const& I, Range const& J) const { return sub(I, J);}
-    //
-    /** @return the first element */
-    inline Type& front()
-    {
-      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived)
-      return elt(this->begin());
-    }
-    /** @return the last element */
-    inline Type& back()
-    {
-      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived)
-      return elt(this->lastIdx());
-    }
-    /** @return the first element */
-    inline Type const& front() const
-    {
-      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived)
-      return elt(this->begin());
-    }
-    /** @return the last element */
-    inline Type const& back() const
-    {
-      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived)
-      return elt(this->lastIdx());
-    }
     /** overwrite @c this with @c src.
      *  @note this method does not take care of the possibility of overlapping
      *  @param rhs the right hand side to copy
      **/
-    template<class OtherDerived>
-    Derived& copy( ExprBase<OtherDerived> const& rhs);
+    template<class Rhs>
+    Derived& copy( ExprBase<Rhs> const& rhs);
+
+    /** @return the transposed expression of this. */
+    MAKE_RESHAPE_OPERATOR(Transpose,transpose)
+    /** @return this as a diagonal 1D expression (work only with vector/point/diagonal expressions). */
+    MAKE_RESHAPE_OPERATOR(Diagonalize,asDiagonal)
+    /** @return the diagonal of this square expression (work only with square expressions). */
+    MAKE_RESHAPE_OPERATOR(Diagonal,diagonalize)
+    /** @return the upper triangular part of this expression. */
+    MAKE_RESHAPE_OPERATOR(UpperTriangularize,upperTriangularize)
+    /** @return the lower triangular part of this expression. */
+    MAKE_RESHAPE_OPERATOR(LowerTriangularize,lowerTriangularize)
+    /** @return this as a symmetric expression (work only with square expressions). */
+    MAKE_RESHAPE_OPERATOR(Symmetrize,symmetrize)
+    /** @return the upper part of this symmetric expression (work only with square expressions). */
+    MAKE_RESHAPE_OPERATOR(UpperSymmetrize,upperSymmetrize)
+    /** @return the lower part of this symmetric expression (work only with square expressions). */
+    MAKE_RESHAPE_OPERATOR(LowerSymmetrize,lowerSymmetrize)
+
+    // slice operators and accessors
+    /** @return the j-th column of this. */
+    inline ColOperator<Derived> const col(int j) const
+    { return ColOperator<Derived> (this->asDerived(), j);}
+    /** @return the i-th row of this. */
+    inline RowOperator<Derived> const row(int i) const
+    { return RowOperator<Derived> (this->asDerived(), i);}
+    /** @return the sub-vector(I) of this. */
+    template<int Size_>
+    inline SubVectorOperator<Derived, Size_> const sub(TRange<Size_> const& I) const
+    {
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+      return SubVectorOperator<Derived, Size_>(this->asDerived(), I);
+    }
+    /** @return the sub-array(I,J) of this. */
+    template<int SizeRows_, int SizeCols_>
+    inline SubOperator<Derived, SizeRows_, SizeCols_> const sub(TRange<SizeRows_> const& I,TRange<SizeCols_> const& J) const
+    {
+      STK_STATIC_ASSERT_TWO_DIMENSIONS_ONLY(Derived);
+      return SubOperator<Derived, SizeRows_, SizeCols_>(this->asDerived(), I, J);
+    }
+    /** @return the j-th column of this. */
+    inline ColAccessor<Derived> col(int j)
+    { return ColAccessor<Derived> (this->asDerived(), j);}
+    /** @return the i-th row of this. */
+    inline RowAccessor<Derived> row(int i)
+    { return RowAccessor<Derived> (this->asDerived(), i);}
+    /** @return the sub-vector(I) of this. */
+    template<int Size_>
+    inline SubVectorAccessor<Derived, Size_> sub(TRange<Size_> const& I)
+    {
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+      return SubVectorAccessor<Derived, Size_>(this->asDerived(), I);
+    }
+    /** @return the sub-array(I,J) of this. */
+    template<int SizeRows_, int SizeCols_>
+    inline SubAccessor<Derived, SizeRows_, SizeCols_> sub(TRange<SizeRows_> const& I,TRange<SizeCols_> const& J)
+    {
+      STK_STATIC_ASSERT_TWO_DIMENSIONS_ONLY(Derived);
+      return SubAccessor<Derived, SizeRows_, SizeCols_>(this->asDerived(), I, J);
+    }
+
     /** Convenient operator to set the coefficients of a matrix.
      *
      * The coefficients must be provided in the row/column order and exactly
@@ -651,5 +238,7 @@ class ArrayBase :  public ExprBase<Derived>
 };
 
 } // namespace STK
+
+#undef MAKE_RESHAPE_OPERATOR
 
 #endif /* STK_ARRAYBASE_H_ */

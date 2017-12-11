@@ -36,7 +36,7 @@
 #ifndef STK_ARRAY_UTIL_H
 #define STK_ARRAY_UTIL_H
 
-#include "STKernel/include/STK_Range.h"
+#include <STKernel/include/STK_Range.h>
 
 namespace STK
 {
@@ -45,7 +45,7 @@ namespace Arrays
 {
 
 /** @ingroup Arrays
- *  Intrinsic dimension of the container : 1D, 2D, 3D or 4D. 0D is for scalar
+ *  Intrinsic dimension of the container : 0D, 1D, 2D, 3D or 4D. 0D is for scalar
  **/
 enum Dimension
 {
@@ -78,17 +78,90 @@ enum Storage
  **/
 enum Structure
 {
-  array2D_ =0 ,       ///< general matrix/array/expression
-  square_,            ///< square matrix/array/expression
-  diagonal_,          ///< diagonal matrix/array/expression
-  lower_triangular_,  ///< lower triangular matrix/array/expression
-  upper_triangular_,  ///< upper triangular matrix/array/expression
+  array2D_ =0 ,        ///< general matrix/array/expression
+  square_,             ///< square matrix/array/expression
+  diagonal_,           ///< diagonal matrix/array/expression
+  lower_triangular_,   ///< lower triangular matrix/array/expression
+  upper_triangular_,   ///< upper triangular matrix/array/expression
+  symmetric_,          ///< symmetric matrix/array/expression
   lower_symmetric_,    ///< lower symmetric matrix/array/expression
   upper_symmetric_,    ///< upper symmetric matrix/array/expression
-  vector_,            ///< column oriented vector/array/expression
-  point_,             ///< row oriented vector/array/expression
-  number_,            ///< (1,1) matrix/vector/array/expression (like a number)
-  expression_         ///< An expression that will be evaluated further
+  vector_,             ///< column oriented vector/array/expression
+  point_,              ///< row oriented vector/array/expression
+  number_,             ///< (1,1) matrix/vector/array/expression (like a number)
+  expression_          ///< An expression that will be evaluated further
+};
+
+/** @ingroup Arrays
+ *  Kind of operands in a BinaryOperator.
+ **/
+enum BinaryOpKind
+{
+  binary_op_0D_  = 0,     ///< both operand are number_
+  binary_op_1D_  = 1,     ///< both operand are vector or point or diagonal
+  binary_op_2D_  = 2,     ///< both operand are array2d or square
+  binary_op_Diag_2D_,     ///< left operand is diagonal, right operand is 2D
+  binary_op_Diag_UpTri_,
+  binary_op_Diag_LowTri_,
+  binary_op_Diag_Sym_,
+  binary_op_Diag_UpSym_,
+  binary_op_Diag_LowSym_,
+  binary_op_2D_Diag_,     ///< left operand is 2D, right operand is diagonal
+  binary_op_2D_UpTri_,
+  binary_op_2D_LowTri_,
+  binary_op_2D_Sym_,
+  binary_op_2D_UpSym_,
+  binary_op_2D_LowSym_,
+  binary_op_UpTri_2D_,       ///< left operand is upper triangular, right operand is 2D
+  binary_op_UpTri_Diag_,
+  binary_op_UpTri_UpTri_,
+  binary_op_UpTri_LowTri_,
+  binary_op_UpTri_Sym_,
+  binary_op_UpTri_UpSym_,
+  binary_op_UpTri_LowSym_,
+  binary_op_LowTri_2D_,      ///< left operand is lower triangular, right operand is 2D
+  binary_op_LowTri_Diag_,
+  binary_op_LowTri_UpTri_,
+  binary_op_LowTri_LowTri_,
+  binary_op_LowTri_Sym_,
+  binary_op_LowTri_UpSym_,
+  binary_op_LowTri_LowSym_,
+  binary_op_Sym_2D_,    ///< left operand is symmetric, right operand is 2D
+  binary_op_Sym_Diag_,
+  binary_op_Sym_UpTri_,
+  binary_op_Sym_LowTri_,
+  binary_op_Sym_Sym_,
+  binary_op_Sym_UpSym_,
+  binary_op_Sym_LowSym_,
+  binary_op_UpSym_2D_,    ///< left operand is upper symmetric, right operand is 2D
+  binary_op_UpSym_Diag_,
+  binary_op_UpSym_UpTri_,
+  binary_op_UpSym_LowTri_,
+  binary_op_UpSym_Sym_,
+  binary_op_UpSym_UpSym_,
+  binary_op_UpSym_LowSym_,
+  binary_op_LowSym_2D_,   ///< left operand is lower symmetric, right operand is 2D
+  binary_op_LowSym_Diag_,
+  binary_op_LowSym_UpTri_,
+  binary_op_LowSym_LowTri_,
+  binary_op_LowSym_Sym_,
+  binary_op_LowSym_UpSym_,
+  binary_op_LowSym_LowSym_
+
+};
+
+/** @ingroup Arrays
+ *  @brief Allow to disambiguate which rows() or cols() methods must be used
+ *  which array to use when calling rows(), cols(), range() in Unary, Binary, Reshape,... operators ?
+ **/
+enum RangeOpUse
+{
+  useLhsSize_,      ///< use lhs.rows() (resp. lhs.cols())  in order to get rows() (resp. cols())
+  useRhsSize_,      ///< use rhs.rows() (resp. rhs.cols())  in order to get rows() (resp. cols())
+  useLhsOtherSize_, ///< use lhs.cols() in order to get rows() or lhs.rows() in order to get cols()
+  useRhsOtherSize_, ///< use rhs.cols() in order to get rows() or rhs.rows() in order to get cols()
+  useLhsRange_,     ///< use lhs.range() in order to get range()
+  useRhsRange_      ///< use rhs.range() in order to get range()
 };
 
 /** @ingroup Arrays
@@ -121,15 +194,18 @@ inline Range evalRangeCapacity(STK::Range const& I)
  **/
 inline std::string structureToString( Structure const& type)
 {
-  if (type == array2D_)          return String(_T("array2D_"));
-  if (type == square_)           return String(_T("square_"));
-  if (type == diagonal_)         return String(_T("diagonal_"));
-  if (type == lower_triangular_) return String(_T("lower_triangular_"));
-  if (type == upper_triangular_) return String(_T("upper_triangular_"));
-  if (type == vector_)           return String(_T("vector_"));
-  if (type == point_)            return String(_T("point_"));
-  if (type == number_)           return String(_T("number_"));
-  if (type == expression_)       return String(_T("expression_"));
+  if (type == array2D_)          return String(_T("array2D"));
+  if (type == square_)           return String(_T("square"));
+  if (type == diagonal_)         return String(_T("diagonal"));
+  if (type == lower_triangular_) return String(_T("lower_triangular"));
+  if (type == upper_triangular_) return String(_T("upper_triangular"));
+  if (type == symmetric_)        return String(_T("symmetric"));
+  if (type == lower_symmetric_)  return String(_T("lower_symmetric"));
+  if (type == upper_symmetric_)  return String(_T("upper_symmetric"));
+  if (type == vector_)           return String(_T("vector"));
+  if (type == point_)            return String(_T("point"));
+  if (type == number_)           return String(_T("number"));
+  if (type == expression_)       return String(_T("expression"));
   return String(_T("unknown"));
 }
 

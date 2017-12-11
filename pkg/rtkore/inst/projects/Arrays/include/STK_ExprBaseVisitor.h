@@ -57,7 +57,7 @@ namespace STK
   */
 template<typename Derived>
 template<typename Visitor>
-inline typename Visitor::ReturnType ExprBase<Derived>::visit(Visitor& visitor) const
+inline typename Visitor::ConstReturnType ExprBase<Derived>::visit(Visitor& visitor) const
 {
   typedef typename hidden::VisitorSelector<Visitor, Derived>::Impl Impl;
   Impl::run(this->asDerived(), visitor);

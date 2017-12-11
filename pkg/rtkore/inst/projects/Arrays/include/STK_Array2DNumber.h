@@ -68,7 +68,6 @@ struct Traits< Array2DNumber<Type_> >
   typedef Array2DNumber<Type_>  SubVector;
 
   typedef Type_                Type;
-  typedef typename RemoveConst<Type_>::Type const& ReturnType;
   typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   enum
@@ -85,10 +84,10 @@ struct Traits< Array2DNumber<Type_> >
 
 /** @ingroup Arrays
  *  @brief template number Array.
- * 
+ *
  * An Array2DNumber is an implementation of the interface IArray2D.
  * It's a number container and is referred as a number.
- * 
+ *
  *  By default the index of the first element is 1 but this can be
  *  modified using the appropriate constructor or using the method @c shift.
  **/
@@ -107,7 +106,7 @@ class Array2DNumber: public IArray2D< Array2DNumber<Type_> >
     typedef typename hidden::Traits<Array2DNumber<Type_> >::SubArray SubArray;
 
     typedef typename hidden::Traits<Array2DNumber<Type_> >::Type Type;
-    typedef typename hidden::Traits<Array2DNumber<Type_> >::ReturnType ReturnType;
+    typedef typename hidden::Traits<Array2DNumber<Type_> >::ConstReturnType ConstReturnType;
 
    enum
     {
@@ -132,7 +131,7 @@ class Array2DNumber: public IArray2D< Array2DNumber<Type_> >
     Array2DNumber( Array2DNumber const& T, bool ref =false): Base(T, ref) {}
     /** constructor by reference, ref_=1.
      *  @param T the container to wrap
-     *  @param row, col indexes of the row and column to wrap
+     *  @param row, col row and column indexes to wrap
      **/
     template<class OtherArray>
     Array2DNumber( IArray2D<OtherArray> const& T, int row, int col)

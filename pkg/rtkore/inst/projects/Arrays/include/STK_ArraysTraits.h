@@ -61,7 +61,6 @@ namespace hidden
  *     typedef Array1D<Type_, UnknownSize> SubVector;
  *
  *     typedef Type_ Type;
- *     typedef typename RemoveConst<Type_>::Type const& ReturnType;
  *     typedef typename RemoveConst<Type>::Type const& ConstReturnType;
  *
  *     enum

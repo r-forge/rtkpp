@@ -68,7 +68,6 @@ struct Traits<Array2DDiagonal<Type_> >
     typedef Array2DDiagonal<Type_> SubVector;
 
     typedef Type_                Type;
-    typedef typename RemoveConst<Type_>::Type const& ReturnType;
     typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
     enum
@@ -108,7 +107,7 @@ class Array2DDiagonal: public IArray2D< Array2DDiagonal<Type_> >
     typedef typename hidden::Traits<Array2DDiagonal<Type_> >::SubArray SubArray;
 
     typedef typename hidden::Traits<Array2DDiagonal<Type_> >::Type Type;
-    typedef typename hidden::Traits<Array2DDiagonal<Type_> >::ReturnType ReturnType;
+    typedef typename hidden::Traits<Array2DDiagonal<Type_> >::ConstReturnType ConstReturnType;
 
     enum
     {

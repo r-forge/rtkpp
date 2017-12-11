@@ -51,8 +51,8 @@ template<class Type>
 struct Panel
 {
   Type panel[blockSize*panelSize];
-      inline Type const& operator[](int i) const { return panel[i];}
-  Type& operator[](int i) { return panel[i];}
+  inline Type const& operator[](int i) const { return panel[i];}
+  inline Type& operator[](int i) { return panel[i];}
 };
 
 /** @ingroup hidden
@@ -63,7 +63,7 @@ struct Block
 {
   Type block[blockSize*blockSize];
   inline Type const& operator[](int i) const { return block[i];}
-  Type& operator[](int i) { return block[i];}
+  inline Type& operator[](int i) { return block[i];}
 };
 
 /** @ingroup hidden
@@ -74,7 +74,7 @@ struct RawVec
 {
   Type vec[panelSize];
   inline Type const& operator[](int i) const { return vec[i];}
-  Type& operator[](int i) { return vec[i];}
+  inline Type& operator[](int i) { return vec[i];}
 };
 
 /** @ingroup hidden
@@ -85,13 +85,7 @@ template<typename Lhs, typename Rhs, typename Result>
 struct MultCoefImpl
 {
   typedef typename Result::Type Type;
-  enum
-  {
-    sizeRows_  = Result::sizeRows_,
-    sizeCols_  = Result::sizeCols_,
-    orient_    = Result::orient_,
-    storage_   = Result::storage_
-  };
+
   /** dot product. general by general*/
   static void dot( Lhs const& lhs, Rhs const& rhs, Result& res, int iRow, int jCol)
   {
@@ -109,7 +103,7 @@ struct MultCoefImpl
     for (int k=dotRange.begin(); k< dotRange.end(); ++k)
       res.elt(iRow) += lhs.elt(iRow, k) * rhs.elt(k);
   }
-  /** dot product. general by vector */
+  /** dot product. point by general */
   static void dot( ITContainer<Lhs, Arrays::point_> const& lhs
                  , Rhs const& rhs, ITContainer2D<Result>& res, int jCol)
   {

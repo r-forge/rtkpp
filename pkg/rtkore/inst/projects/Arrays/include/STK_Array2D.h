@@ -73,7 +73,6 @@ struct Traits< Array2D<Type_> >
     typedef Void                 SubVector;
 
     typedef Type_                Type;
-    typedef typename RemoveConst<Type_>::Type const& ReturnType;
     typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
     enum
@@ -126,7 +125,7 @@ class Array2D: public IArray2D< Array2D<Type_> >
     typedef typename hidden::Traits<Array2D<Type_> >::SubArray SubArray;
 
     typedef typename hidden::Traits<Array2D<Type_> >::Type Type;
-    typedef typename hidden::Traits<Array2D<Type_> >::ReturnType ReturnType;
+    typedef typename hidden::Traits<Array2D<Type_> >::ConstReturnType ConstReturnType;
 
     enum
     {

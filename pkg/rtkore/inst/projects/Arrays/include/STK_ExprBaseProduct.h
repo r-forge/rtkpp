@@ -67,81 +67,81 @@ namespace hidden
  **/
 template<typename Lhs, typename Rhs, int LStructure_, int RStructure_>
 struct ProductSelector
-{ typedef ArrayByArrayProduct<Lhs, Rhs> ReturnType;};
+{ typedef ArrayByArrayProduct<Lhs, Rhs> ProductType;};
 
 template<typename Lhs, typename Rhs, int LStructure_>
 struct ProductSelector<Lhs, Rhs, LStructure_, Arrays::vector_>
-{ typedef ArrayByVectorProduct<Lhs, Rhs> ReturnType;};
+{ typedef ArrayByVectorProduct<Lhs, Rhs> ProductType;};
 
 template<typename Lhs, typename Rhs, int LStructure_>
 struct ProductSelector<Lhs, Rhs, LStructure_, Arrays::diagonal_>
-{ typedef ArrayByDiagonalProduct<Lhs, Rhs> ReturnType;};
+{ typedef ArrayByDiagonalProduct<Lhs, Rhs> ProductType;};
 
 
 // point at left hand side
 template<typename Lhs, typename Rhs, int RStructure_>
 struct ProductSelector<Lhs, Rhs, Arrays::point_, RStructure_>
-{ typedef PointByArrayProduct<Lhs, Rhs> ReturnType;};
+{ typedef PointByArrayProduct<Lhs, Rhs> ProductType;};
 
 template<typename Lhs, typename Rhs>
 struct ProductSelector<Lhs, Rhs, Arrays::point_, Arrays::diagonal_>
-{ typedef ArrayByDiagonalProduct<Lhs, Rhs> ReturnType;};
+{ typedef ArrayByDiagonalProduct<Lhs, Rhs> ProductType;};
 
 template<typename Lhs, typename Rhs>
 struct ProductSelector<Lhs, Rhs, Arrays::point_, Arrays::point_>
 {
   typedef typename Lhs::Type LType;
   typedef typename Rhs::Type RType;
-  typedef BinaryOperator<ProductOp<LType, RType>, Lhs, Rhs> ReturnType;
+  typedef BinaryOperator<ProductOp<LType, RType>, Lhs, Rhs> ProductType;
 };
 
 template<typename Lhs, typename Rhs>
 struct ProductSelector<Lhs, Rhs, Arrays::point_, Arrays::vector_>
 { typedef typename Traits<Lhs>::Type LType;
   typedef typename Traits<Rhs>::Type RType;
-  typedef DotProduct<Lhs, Rhs> ReturnType;
+  typedef DotProduct<Lhs, Rhs> ProductType;
 };
 
 // vector as left hand side
 template<typename Lhs, typename Rhs>
 struct ProductSelector<Lhs, Rhs, Arrays::vector_, Arrays::point_>
-{  typedef VectorByPointProduct<Lhs, Rhs> ReturnType;};
+{  typedef VectorByPointProduct<Lhs, Rhs> ProductType;};
 
 template<typename Lhs, typename Rhs>
 struct ProductSelector<Lhs, Rhs, Arrays::vector_, Arrays::vector_>
 { typedef typename Lhs::Type LType;
   typedef typename Rhs::Type RType;
-  typedef BinaryOperator<ProductOp<LType, RType>, Lhs, Rhs> ReturnType;
+  typedef BinaryOperator<ProductOp<LType, RType>, Lhs, Rhs> ProductType;
 };
 
 template<typename Lhs, typename Rhs, int RStructure_>
 struct ProductSelector<Lhs, Rhs, Arrays::diagonal_, RStructure_>
-{ typedef DiagonalByArrayProduct<Lhs, Rhs> ReturnType;};
+{ typedef DiagonalByArrayProduct<Lhs, Rhs> ProductType;};
 
 // diagonal as left hand side
 template<typename Lhs, typename Rhs>
 struct ProductSelector<Lhs, Rhs, Arrays::diagonal_, Arrays::vector_>
-{ typedef DiagonalByArrayProduct<Lhs, Rhs> ReturnType;};
+{ typedef DiagonalByArrayProduct<Lhs, Rhs> ProductType;};
 
 template<typename Lhs, typename Rhs>
 struct ProductSelector<Lhs, Rhs, Arrays::diagonal_, Arrays::diagonal_>
 { typedef typename Lhs::Type LType;
   typedef typename Rhs::Type RType;
-  typedef BinaryOperator<ProductOp<LType, RType>, Lhs, Rhs> ReturnType;
+  typedef BinaryOperator<ProductOp<LType, RType>, Lhs, Rhs> ProductType;
 };
 
 // FIXME: will not work as UnaryOperator constructor take only Lhs
 template<typename Lhs, typename Rhs, int RStructure_>
 struct ProductSelector<Lhs, Rhs, Arrays::number_, RStructure_>
 { typedef typename Rhs::Type Type;
-  typedef UnaryOperator<MultipleOp<Type>, Rhs> ReturnType;
+  typedef UnaryOperator<MultipleOp<Type>, Rhs> ProductType;
 };
 
 // FIXME: will not work as UnaryOperator constructor take only Lhs
 template<typename Lhs, typename Rhs, int LStructure_>
 struct ProductSelector<Lhs, Rhs, LStructure_, Arrays::number_>
 { typedef typename Lhs::Type Type;
-  typedef UnaryOperator<MultipleOp<Type>, Lhs> ReturnType;
+  typedef UnaryOperator<MultipleOp<Type>, Lhs> ProductType;
 };
 
 } // namespace hidden
@@ -153,52 +153,56 @@ struct ProductSelector<Lhs, Rhs, LStructure_, Arrays::number_>
   * @tparam Lhs the type of the left-hand side
   * @tparam Rhs the type of the right-hand side
   *
-  * This class defines the typename ReturnType representing the product
+  * This class defines the typename ProductType representing the product
   * expression between two matrix expressions. In practice, using
-  * ProductReturnType<Lhs,Rhs>::ReturnType is the recommended way to define the
+  * ProductProductType<Lhs,Rhs>::ProductType is the recommended way to define the
   * result type of a function returning an expression
   * which involve a matrix product.
   **/
 template<typename Lhs, typename Rhs>
-struct ProductReturnType
+struct ProductProductType
 {
   enum
   {
     lhs_structure_ = Lhs::structure_,
     rhs_structure_ = Rhs::structure_
   };
-  typedef typename hidden::ProductSelector<Lhs, Rhs, lhs_structure_, rhs_structure_>::ReturnType ReturnType;
+  typedef typename hidden::ProductSelector<Lhs, Rhs, lhs_structure_, rhs_structure_>::ProductType ProductType;
 };
 
 
 template<typename Derived>
 template<typename Rhs>
-typename ProductReturnType<Derived, Rhs>::ReturnType const
+typename ProductProductType<Derived, Rhs>::ProductType const
 inline ExprBase<Derived>::operator*( ExprBase<Rhs> const& other) const
 {
   enum
   {
-    productSizeIsValid_ =(  Derived::sizeCols_ == UnknownSize
-                         || Rhs::sizeRows_     == UnknownSize
+    lhs_structure_ = Derived::structure_,
+    rhs_structure_ = Rhs::structure_,
+    productSizeIsValid_ =(  Derived::sizeCols_      == UnknownSize
+                         || Rhs::sizeRows_      == UnknownSize
                          || int(Derived::sizeCols_) == int(Rhs::sizeRows_)
                          ),
     areVectors_   = (  Derived::structure_ == int(Arrays::vector_)
-                    && Rhs::structure_     == int(Arrays::vector_)),
+                    && Rhs::structure_ == int(Arrays::vector_)),
     arePoints_    = (  Derived::structure_ == int(Arrays::point_)
-                    && Rhs::structure_     == int(Arrays::point_)),
+                    && Rhs::structure_ == int(Arrays::point_)),
     haveSameSizeRows_ = (  Derived::sizeRows_ == UnknownSize
-                        || Rhs::sizeRows_     == UnknownSize
+                        || Rhs::sizeRows_ == UnknownSize
                         || int(Derived::sizeRows_) == int(Rhs::sizeRows_)
                         ),
     haveSameSizeCols_ = (  Derived::sizeCols_ == UnknownSize
-                        || Rhs::sizeCols_     == UnknownSize
+                        || Rhs::sizeCols_ == UnknownSize
                         || int(Derived::sizeCols_) == int(Rhs::sizeCols_)
                         )
   };
+  //typedef typename hidden::ProductSelector<Derived, Rhs, lhs_structure_, rhs_structure_>::ProductType ProductType;
+
   STK_STATIC_ASSERT(productSizeIsValid_ || !(areVectors_ && haveSameSizeRows_),INVALID_VECTOR_VECTOR_PRODUCT);
   STK_STATIC_ASSERT(productSizeIsValid_ || !(arePoints_  && haveSameSizeCols_),INVALID_POINT_POINT_PRODUCT);
 
-  return typename ProductReturnType<Derived, Rhs>::ReturnType(this->asDerived(), other.asDerived());
+  return typename ProductProductType<Derived, Rhs>::ProductType(this->asDerived(), other.asDerived());
 }
 
 } // namespace STK

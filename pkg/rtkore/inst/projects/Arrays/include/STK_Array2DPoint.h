@@ -69,7 +69,6 @@ struct Traits< Array2DPoint<Type_> >
   typedef Array2DPoint<Type_>  SubVector;
 
   typedef Type_                Type;
-  typedef typename RemoveConst<Type_>::Type const& ReturnType;
   typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   enum
@@ -85,11 +84,11 @@ struct Traits< Array2DPoint<Type_> >
 } // namespace hidden
 
 /** @ingroup Arrays
- *  @brief template one dimensional horizontal Array. 
- * 
+ *  @brief template one dimensional horizontal Array.
+ *
  * An Array2DPoint is an implementation of the interface IArray2D.
  * It's a one dimensional row-vector and is refered as a point.
- * 
+ *
  *  By default the index of the first element is 1 but this can be
  *  modified using the appropriate constructor or using the method @c shift.
  **/
@@ -108,7 +107,7 @@ class Array2DPoint: public IArray2D< Array2DPoint<Type_> >
     typedef typename hidden::Traits<Array2DPoint<Type_> >::SubArray SubArray;
 
     typedef typename hidden::Traits<Array2DPoint<Type_> >::Type Type;
-    typedef typename hidden::Traits<Array2DPoint<Type_> >::ReturnType ReturnType;
+    typedef typename hidden::Traits<Array2DPoint<Type_> >::ConstReturnType ConstReturnType;
 
    enum
     {

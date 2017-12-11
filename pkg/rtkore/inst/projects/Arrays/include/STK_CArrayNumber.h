@@ -75,7 +75,6 @@ struct Traits< CArrayNumber<Type_, Orient_> >
     typedef CAllocator<Type_, 1, 1, Orient_> Allocator;
 
     typedef Type_                Type;
-    typedef typename RemoveConst<Type_>::Type const& ReturnType;
     typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
     enum
@@ -102,7 +101,7 @@ class CArrayNumber: public ICArray < CArrayNumber<Type_, Orient_> >
     typedef ArrayBase < CArrayNumber<Type_, Orient_> > LowBase;
 
     typedef typename hidden::Traits<CArrayNumber<Type_, Orient_> >::Type Type;
-    typedef typename hidden::Traits<CArrayNumber<Type_, Orient_> >::ReturnType ReturnType;
+    typedef typename hidden::Traits<CArrayNumber<Type_, Orient_> >::ConstReturnType ConstReturnType;
 
     enum
     {

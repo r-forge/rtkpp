@@ -62,13 +62,13 @@ struct Traits< RMatrix<Type_> >
   private:
     class Void {};
   public:
-    typedef RowOperator< RMatrix<Type_> > Row;
-    typedef RowOperator< RMatrix<Type_> > SubRow;
-    typedef ColOperator< RMatrix<Type_> > Col;
-    typedef ColOperator< RMatrix<Type_> > SubCol;
-    typedef Void SubVector;
-    typedef Void SubArray;
-    typedef Void Number;
+//    typedef RowOperator< RMatrix<Type_> > Row;
+//    typedef RowOperator< RMatrix<Type_> > SubRow;
+//    typedef ColOperator< RMatrix<Type_> > Col;
+//    typedef ColOperator< RMatrix<Type_> > SubCol;
+//    typedef Void SubVector;
+//    typedef Void SubArray;
+//    typedef Void Number;
 
     typedef Type_ Type;
     typedef Type const& ReturnType;
@@ -161,10 +161,10 @@ class RMatrix: public ArrayBase< RMatrix<Type_> >, public TRef<1>
     /** @return the number of columns */
     inline int sizeCols() const { return matrix_.cols();}
 
-    /** @return the j-th column of this. */
-    inline Col colImpl(int j) const { return Col(this->asDerived(), j);}
-    /** @return the i-th row of this. */
-    inline Row rowImpl(int i) const { return Row(this->asDerived(), i);}
+//    /** @return the j-th column of this. */
+//    inline Col colImpl(int j) const { return Col(this->asDerived(), j);}
+//    /** @return the i-th row of this. */
+//    inline Row rowImpl(int i) const { return Row(this->asDerived(), i);}
    /** @return a constant reference on element (i,j)
      *  @param i, j indexes of the row and of the column
      **/

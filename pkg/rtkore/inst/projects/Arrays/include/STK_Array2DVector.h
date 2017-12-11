@@ -31,7 +31,7 @@
 
 /** @file STK_Array2DVector.h
   * @brief A Array2DVector is a one dimensional horizontal container
-  * 
+  *
   * An Array2DVector is an implementation of the interface IArray2D.
   * It's a one dimensional horizontal container.
  **/
@@ -74,7 +74,6 @@ struct Traits< Array2DVector<Type_> >
   typedef Array2DVector<Type_> SubVector;
 
   typedef Type_                Type;
-  typedef typename RemoveConst<Type_>::Type const& ReturnType;
   typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
   enum
@@ -90,10 +89,10 @@ struct Traits< Array2DVector<Type_> >
 } // namespace hidden
 
 /** @ingroup Arrays
- *  @brief template one dimensional horizontal Array. 
- * 
+ *  @brief template one dimensional horizontal Array.
+ *
  *  An Array2DVector is a Vertical container of a single column.
- * 
+ *
  *  By default the index of the first element is 1 but this can be
  *  modified using the appropriate constructor or using the method @c shift.
  *
@@ -114,7 +113,7 @@ class Array2DVector: public IArray2D< Array2DVector<Type_> >
     typedef typename hidden::Traits<Array2DVector<Type_> >::SubArray SubArray;
 
     typedef typename hidden::Traits<Array2DVector<Type_> >::Type Type;
-    typedef typename hidden::Traits<Array2DVector<Type_> >::ReturnType ReturnType;
+    typedef typename hidden::Traits<Array2DVector<Type_> >::ConstReturnType ConstReturnType;
 
     enum
     {

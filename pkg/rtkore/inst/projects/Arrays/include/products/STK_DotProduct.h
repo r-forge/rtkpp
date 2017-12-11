@@ -61,7 +61,6 @@ struct Traits< DotProduct < Lhs, Rhs> >
     storage_   = Arrays::dense_
   };
   typedef typename Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ReturnType;
   typedef typename RemoveConst<Type>::Type const& ConstReturnType;
   typedef CAllocator<Type, sizeRows_, sizeCols_, (bool)orient_> Allocator;
 };
@@ -89,7 +88,6 @@ class DotProduct: public ExprBase< DotProduct<Lhs, Rhs> >
 {
   public:
     typedef typename hidden::Traits<DotProduct>::Type Type;
-    typedef typename hidden::Traits<DotProduct>::ReturnType ReturnType;
     typedef typename hidden::Traits<DotProduct>::ConstReturnType ConstReturnType;
     typedef typename hidden::Traits<DotProduct>::Allocator Allocator;
 

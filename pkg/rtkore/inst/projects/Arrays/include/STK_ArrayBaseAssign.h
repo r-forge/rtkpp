@@ -39,12 +39,15 @@
 #include "assign/STK_AssignSelector.h"
 
 // this macro will be true if the assignation is correct and false otherwise
-#define CHECK_CORRECT_ASSIGN(lhs,rhs) \
+#define IS_VALID_ASSIGN(lhs,rhs) \
 ( (  ( lhs==Arrays::array2D_  || lhs==Arrays::square_) \
      && \
      ( rhs==Arrays::array2D_           || rhs==Arrays::square_  \
      || rhs==Arrays::diagonal_         || rhs==Arrays::number_ \
-     || rhs==Arrays::lower_triangular_ || rhs==Arrays::upper_triangular_) \
+     || rhs==Arrays::lower_triangular_ || rhs==Arrays::upper_triangular_ \
+     || rhs==Arrays::lower_symmetric_  || rhs==Arrays::upper_symmetric_ \
+     || rhs==Arrays::symmetric_ \
+     ) \
   )  \
   || \
   (  ( lhs==Arrays::array2D_) \
@@ -77,24 +80,39 @@ inline Derived& ArrayBase<Derived>::assign(ExprBase<Rhs> const& rhs)
   , rhs_orient_    = hidden::Traits<Rhs>::orient_
   , rhs_sizeRows_  = hidden::Traits<Rhs>::sizeRows_
   , rhs_sizeCols_  = hidden::Traits<Rhs>::sizeCols_
+  , is_valid_ = IS_VALID_ASSIGN((Arrays::Structure)structure_, (Arrays::Structure)rhs_structure_)
   };
-  STK_STATIC_ASSERT(CHECK_CORRECT_ASSIGN((Arrays::Structure)structure_, (Arrays::Structure)rhs_structure_),YOU_TRIED_TO_ASSIGN_A_NOT_COMPATIBLE_ARRAY);
+  STK_STATIC_ASSERT(is_valid_,YOU_TRIED_TO_ASSIGN_A_NOT_COMPATIBLE_ARRAY);
   // check if assignment is possible
-  if (!hidden::CheckAssign<Derived, structure_, rhs_structure_>::isAllowed(this->asDerived(), rhs.rows(), rhs.cols()))
+  if (structure_ == int(Arrays::square_) && rhs.cols() != rhs.rows() )
   { STKRUNTIME_ERROR_2ARG(ArrayBase::assign,Arrays::structureToString((Arrays::Structure)structure_),Arrays::structureToString((Arrays::Structure)rhs_structure_),is not permited);}
-  // choose the correct way to resize if necessary
+  // choose the correct way to resize this if necessary
   hidden::resizeSelector<Derived, Rhs, rhs_structure_>::run(this->asDerived(), rhs.asDerived());
   // choose the correct way to copy
-  hidden::CopycatSelector<Derived, Rhs,  orient_>::run(this->asDerived(), rhs.asDerived());
+  hidden::CopycatSelector<Derived, Rhs,  rhs_orient_>::run(this->asDerived(), rhs.asDerived());
   return this->asDerived();
 }
+
+/** @return the matrix or vector obtained by setting this constant*/
+template<class Derived>
+inline Derived& ArrayBase<Derived>::operator=( Type const& value) { return setValue(value);}
+/** @return the matrix or vector obtained by evaluating this expression */
+template<class Derived>
+inline Derived& ArrayBase<Derived>::operator=( Derived const& rhs) { return assign(rhs);}
+/* @return the matrix or vector obtained by evaluating this expression */
+template<class Derived>
+template<typename Rhs>
+inline Derived& ArrayBase<Derived>::operator=( ExprBase<Rhs> const& rhs)
+{ return assign(rhs.asDerived());}
 
 /* Adding a Rhs to this. */
 template<class Derived>
 template<typename Rhs>
 inline Derived&  ArrayBase<Derived>::operator+=( ExprBase<Rhs> const& rhs)
 {
-  this->asDerived() = this->asDerived() + rhs;
+  enum { orient_ = hidden::Traits<Derived>::orient_};
+  typedef BinaryOperator< SumOp<Type, typename hidden::Traits<Rhs>::Type>, Derived, Rhs> Res;
+  hidden::CopycatSelector<Derived, Res, orient_>::run(this->asDerived(), this->asDerived() + rhs.asDerived());
   return this->asDerived();
 }
 /* subtract a Rhs to this. */
@@ -102,7 +120,9 @@ template<class Derived>
 template<typename Rhs>
 inline Derived&  ArrayBase<Derived>::operator-=( ExprBase<Rhs> const& rhs)
 {
-  this->asDerived() = this->asDerived() - rhs;
+  enum { orient_ = hidden::Traits<Derived>::orient_};
+  typedef BinaryOperator< DifferenceOp<Type, typename hidden::Traits<Rhs>::Type>, Derived, Rhs> Res;
+  hidden::CopycatSelector<Derived, Res, orient_>::run(this->asDerived(), this->asDerived() - rhs.asDerived());
   return this->asDerived();
 }
 
@@ -110,7 +130,9 @@ template<class Derived>
 template<typename Rhs>
 inline Derived&  ArrayBase<Derived>::operator/=( ExprBase<Rhs> const& rhs)
 {
-  this->asDerived() = this->asDerived() / rhs;
+  enum { orient_ = hidden::Traits<Derived>::orient_};
+  typedef BinaryOperator< DivOp<Type, typename hidden::Traits<Rhs>::Type>, Derived, Rhs> Res;
+  hidden::CopycatSelector<Derived, Res, orient_>::run(this->asDerived(), this->asDerived() / rhs.asDerived());
   return this->asDerived();
 }
 /* mult a Rhs to this. */
@@ -118,7 +140,9 @@ template<class Derived>
 template<typename Rhs>
 inline Derived&  ArrayBase<Derived>::operator*=( ExprBase<Rhs> const& rhs)
 {
-  this->asDerived() = this->asDerived() * rhs;
+  enum { orient_ = hidden::Traits<Derived>::orient_};
+  typedef BinaryOperator< ProductOp<Type, typename hidden::Traits<Rhs>::Type>, Derived, Rhs> Res;
+  hidden::CopycatSelector<Derived, Res, orient_>::run(this->asDerived(), this->asDerived() * rhs.asDerived());
   return this->asDerived();
 }
 
@@ -126,28 +150,36 @@ inline Derived&  ArrayBase<Derived>::operator*=( ExprBase<Rhs> const& rhs)
 template<class Derived>
 inline Derived& ArrayBase<Derived>::operator+=( Type const& value)
 {
-  this->asDerived() = this->asDerived() + value;
+  enum { orient_ = hidden::Traits<Derived>::orient_};
+  typedef UnaryOperator<AddOp<Type>, Derived> Rhs;
+  hidden::CopycatSelector<Derived, Rhs, orient_>::run(this->asDerived(), this->asDerived() + value);
   return this->asDerived();
 }
 /* Substract a constant to this. */
 template<class Derived>
 inline Derived& ArrayBase<Derived>::operator-=( Type const& value)
 {
-  this->asDerived() = this->asDerived() - value;
+  enum { orient_ = hidden::Traits<Derived>::orient_};
+  typedef UnaryOperator<AddOppositeOp<Type>, Derived> Rhs;
+  hidden::CopycatSelector<Derived, Rhs, orient_>::run(this->asDerived(), this->asDerived() - value);
   return this->asDerived();
 }
 /* product of this by a constant. */
 template<class Derived>
 inline Derived& ArrayBase<Derived>::operator*=( Type const& value)
 {
-  this->asDerived() = this->asDerived() * value;
+  enum { orient_ = hidden::Traits<Derived>::orient_};
+  typedef UnaryOperator<MultipleOp<Type>, Derived> Rhs;
+  hidden::CopycatSelector<Derived, Rhs, orient_>::run(this->asDerived(), this->asDerived() * value);
   return this->asDerived();
 }
 /* dividing this by a constant. */
 template<class Derived>
 inline Derived& ArrayBase<Derived>::operator/=( Type const& value)
 {
-  this->asDerived() = this->asDerived() / value;
+  enum { orient_ = hidden::Traits<Derived>::orient_};
+  typedef UnaryOperator<QuotientOp<Type>, Derived> Rhs;
+  hidden::CopycatSelector<Derived, Rhs, orient_>::run(this->asDerived(), this->asDerived() / value);
   return this->asDerived();
 }
 
@@ -174,6 +206,6 @@ inline Derived& ArrayBase<Derived>::copy( ExprBase<Rhs> const& rhs)
 
 } // namespace STK
 
-#undef CHECK_CORRECT_ASSIGN
+#undef IS_VALID_ASSIGN
 
 #endif /* STK_ARRAYBASEASSIGN_H */

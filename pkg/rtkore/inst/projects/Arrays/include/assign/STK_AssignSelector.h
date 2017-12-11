@@ -44,6 +44,198 @@ namespace STK
 
 namespace hidden
 {
+
+/** @ingroup hidden
+ *  Utility class allowing to know if in an assignment the destination must
+ *  be resized or shifted
+ **/
+template<class Derived, int Structure_>
+struct CheckShift;
+
+/** @ingroup hidden
+ *  Specialization for general array2D_
+ **/
+template<class Derived>
+struct CheckShift<Derived, Arrays::array2D_>
+{
+  // all range are authorized for array2D_
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J) { return true;}
+  // check if resize is necessary
+  static bool resize(Derived const& array, Range const& I, Range const& J)
+  { return (array.rows() != I || array.cols() != J);}
+  // check if shift is necessary
+  static bool shift(Derived const& array, int beginRow, int beginCol)
+  { return (array.beginRows() != beginRow || array.beginCols() != beginCol);}
+  // check if resize is necessary
+  static bool resize(Derived const& array, Range const& I)
+  { return (array.rows() != I || array.cols() != I);}
+  // check if shift is necessary
+  static bool shift(Derived const& array, int begin)
+  { return (array.beginRows() != begin || array.beginCols() != begin);}
+};
+/** @ingroup hidden
+ *  Specialization for upper_triangular_
+ **/
+template<class Derived>
+struct CheckShift<Derived, Arrays::upper_triangular_>
+{
+  // all range are authorized for upper_triangular_
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return true;}
+  static bool resize(Derived const& array, Range const& I, Range const& J)
+  { return (array.rows() != I || array.cols() != J);}
+  static bool shift(Derived const& array, int beginRow, int beginCol)
+  { return (array.beginRows() != beginRow || array.beginCols() != beginCol);}
+  static bool resize(Derived const& array, Range const& I)
+  { return (array.rows() != I || array.cols() != I);}
+  static bool shift(Derived const& array, int begin)
+  { return (array.beginRows() != begin || array.beginCols() != begin);}
+};
+/** @ingroup hidden
+ *  Specialization for lower_triangular_
+ **/
+template<class Derived>
+struct CheckShift<Derived, Arrays::lower_triangular_>
+{
+  // all range are authorized for lower_triangular_
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return true;}
+  static bool resize(Derived const& array, Range const& I, Range const& J)
+  { return (array.rows() != I || array.cols() != J);}
+  static bool shift(Derived const& array, int beginRow, int beginCol)
+  { return (array.beginRows() != beginRow || array.beginCols() != beginCol);}
+  static bool resize(Derived const& array, Range const& I)
+  { return (array.rows() != I || array.cols() != I);}
+  static bool shift(Derived const& array, int begin)
+  { return (array.beginRows() != begin || array.beginCols() != begin);}
+};
+/** @ingroup hidden
+ *  Specialization for square_
+ **/
+template<class Derived>
+struct CheckShift<Derived, Arrays::square_>
+{
+  // same range only for square_ arrays
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return I==J;}
+  static bool resize(Derived const& array, Range const& I, Range const& J)
+  { return (array.rows() != I || array.cols() != J);}
+  static bool shift(Derived const& array, int beginRow, int beginCol)
+  { return (array.beginRows() != beginRow || array.beginCols() != beginCol);}
+  static bool resize(Derived const& array, Range const& I)
+  { return (array.range() != I);}
+  static bool shift(Derived const& array, int begin)
+  { return (array.beginRows() != begin || array.beginCols() != begin);}
+};
+
+/** @ingroup hidden
+ *  Specialization for diagonal_
+ **/
+template<class Derived>
+struct CheckShift<Derived, Arrays::diagonal_>
+{
+  // same range only for diagonal_ arrays
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return I==J;}
+  static bool resize(Derived const& array, Range const& I, Range const& J)
+  { return (array.rows() != I || array.cols() != J);}
+  static bool shift(Derived const& array, int beginRow, int beginCol)
+  { return (array.beginRows() != beginRow || array.beginCols() != beginCol);}
+  static bool resize(Derived const& array, Range const& I)
+  { return (array.range() != I);}
+  static bool shift(Derived const& array, int begin)
+  { return (array.beginRows() != begin || array.beginCols() != begin);}
+};
+
+// for vectors
+template<class Derived>
+struct CheckShift<Derived, Arrays::vector_>
+{
+  // same range only for vector_ arrays
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return J.size() == 1;}
+  static bool resize(Derived const& array, Range const& I)
+  { return (array.range() != I);}
+  static bool shift(Derived const& array, int begin)
+  { return (array.begin() != begin);}
+};
+
+// for point
+template<class Derived>
+struct CheckShift<Derived, Arrays::point_>
+{
+  // same range only for diagonal_ arrays
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return (I.size() == 1);}
+  static bool resize(Derived const& array, Range const& I)
+  { return (array.range() != I);}
+  static bool shift(Derived const& array, int begin)
+  { return (array.begin() != begin);}
+};
+// for point
+template<class Derived>
+struct CheckShift<Derived, Arrays::number_>
+{
+  // same range only for diagonal_ arrays
+  static bool isAllowed(Derived const& array, Range const& I, Range const& J)
+  { return (I.size() == 1 && J.size() == 1);}
+  static bool resize(Derived const& array, Range const& I)
+  { return (array.range() == I) ? false : true;}
+  static bool shift(Derived const& array, int begin)
+  { return (array.begin() != begin);}
+};
+
+/** @ingroup hidden
+ * utility class that select the resize method to call
+ **/
+template< typename Lhs, typename Rhs, int TStructure_>
+struct resizeSelector;
+
+/** 2D general case */
+template< typename Lhs, typename Rhs, int TStructure_>
+struct resizeSelector
+{
+  inline static void run(Lhs& lhs, ExprBase<Rhs> const& rhs )
+  { lhs.resize(rhs.rows(), rhs.cols());}
+};
+/** specialization for the square_ case */
+template< typename Lhs, typename Rhs>
+struct resizeSelector<Lhs, Rhs, Arrays::square_>
+{
+  inline static void run(Lhs& lhs, ExprBase<Rhs> const& rhs )
+  { lhs.resize(rhs.range());}
+};
+/** specialization for the diagonal_ case */
+template< typename Lhs, typename Rhs>
+struct resizeSelector<Lhs, Rhs, Arrays::diagonal_>
+{
+  inline static void run(Lhs& lhs, ExprBase<Rhs> const& rhs )
+  { lhs.resize(rhs.range());}
+};
+/** specialization for the vector_ case */
+template< typename Lhs, typename Rhs>
+struct resizeSelector<Lhs, Rhs, Arrays::vector_>
+{
+  inline static void run(Lhs& lhs, ExprBase<Rhs> const& rhs )
+  { lhs.resize(rhs.range());}
+};
+/** specialization for the point_ case */
+template< typename Lhs, typename Rhs>
+struct resizeSelector<Lhs, Rhs, Arrays::point_>
+{
+  inline static void run(Lhs& lhs, ExprBase<Rhs> const& rhs )
+  { lhs.resize(rhs.range());}
+};
+
+/** specialization for the number_ case */
+template< typename Lhs, typename Rhs>
+struct resizeSelector<Lhs, Rhs, Arrays::number_>
+{
+  inline static void run(Lhs& lhs, ExprBase<Rhs> const& rhs )
+  { /* nothing to do */;}
+};
+
+
 /** @ingroup hidden
  *  @brief Copycat to use at compile time.
  *  If n is the number of structures, there is potentially n^2 ways to
@@ -69,18 +261,6 @@ struct Copycat<  Lhs,  Rhs, Arrays::array2D_, Arrays::array2D_>
       for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
       { lhs.elt(i, j) = rhs.elt(i, j);}
   }
-  static void copyByCol(Lhs& lhs, Rhs const& rhs )
-  {
-    for ( int jRhs=rhs.beginCols(), jLhs=lhs.beginCols(); jRhs<rhs.endCols(); jLhs++, jRhs++)
-      for ( int iRhs=rhs.beginRows(), iLhs=lhs.beginRows(); iRhs<rhs.endRows(); iLhs++, iRhs++)
-    { lhs.elt(iLhs, jLhs) = rhs.elt(iRhs, jRhs);}
-  }
-  static void copyByRow(Lhs& lhs, Rhs const& rhs )
-  {
-    for ( int iRhs=rhs.beginRows(), iLhs=lhs.beginRows(); iRhs<rhs.endRows(); iLhs++, iRhs++)
-      for ( int jRhs=rhs.beginCols(), jLhs=lhs.beginCols(); jRhs<rhs.endCols(); jLhs++, jRhs++)
-      { lhs.elt(iLhs, jLhs) = rhs.elt(iRhs, jRhs);}
-  }
 };
 
 // general <- square
@@ -98,18 +278,6 @@ struct Copycat<  Lhs,  Rhs, Arrays::array2D_, Arrays::square_>
     for (int j = rhs.begin(); j < rhs.lend(); ++j)
       for (int i = rhs.begin(); i< rhs.end(); ++i)
       { lhs.elt(i, j) = rhs.elt(i, j);}
-  }
-  static void copyByCol(Lhs& lhs, Rhs const& rhs )
-  {
-    for ( int jRhs=rhs.beginCols(), jLhs=lhs.beginCols(); jRhs<rhs.endCols(); jLhs++, jRhs++)
-      for ( int iRhs=rhs.beginRows(), iLhs=lhs.beginRows(); iRhs<rhs.endRows(); iLhs++, iRhs++)
-    { lhs.elt(iLhs, jLhs) = rhs.elt(iRhs, jRhs);}
-  }
-  static void copyByRow(Lhs& lhs, Rhs const& rhs )
-  {
-    for ( int iRhs=rhs.beginRows(), iLhs=lhs.beginRows(); iRhs<rhs.endRows(); iLhs++, iRhs++)
-      for ( int jRhs=rhs.beginCols(), jLhs=lhs.beginCols(); jRhs<rhs.endCols(); jLhs++, jRhs++)
-      { lhs.elt(iLhs, jLhs) = rhs.elt(iRhs, jRhs);}
   }
 };
 
@@ -188,13 +356,49 @@ struct Copycat<  Lhs,  Rhs, Arrays::array2D_, Arrays::upper_triangular_>
   }
 };
 
+// general <- symmetric
+template < typename Lhs, typename Rhs>
+struct Copycat<  Lhs,  Rhs, Arrays::array2D_, Arrays::symmetric_>
+{
+  static void runByCol(Lhs& lhs, Rhs const& rhs )
+  {
+    for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
+      for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
+      { lhs.elt(i, j) = rhs.elt(i, j);}
+  }
+  static void runByRow(Lhs& lhs, Rhs const& rhs )
+  {
+    for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
+      for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
+      { lhs.elt(i, j) = rhs.elt(i, j);}
+  }
+};
+
+// general <- upper_symmetric
+template < typename Lhs, typename Rhs>
+struct Copycat<  Lhs,  Rhs, Arrays::array2D_, Arrays::upper_symmetric_>
+{
+  static void runByCol(Lhs& lhs, Rhs const& rhs )
+  {
+    for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
+      for (int i = rhs.beginRows(); i <=j; ++i)
+      { lhs.elt(i, j) = ( lhs.elt(j, i) = rhs.elt(i, j) );}
+  }
+  static void runByRow(Lhs& lhs, Rhs const& rhs )
+  {
+    for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
+      for (int j = i; j < rhs.endCols(); ++j)
+      { lhs.elt(i, j) = (lhs.elt(j, i) = rhs.elt(i, j));}
+  }
+};
+
 // general <- vector
 template < typename Lhs, typename Rhs>
 struct Copycat<  Lhs,  Rhs, Arrays::array2D_, Arrays::vector_>
 {
   static void runByCol(Lhs& lhs, Rhs const& rhs )
   {
-    int j = rhs.beginCols();
+    int j = lhs.beginCols();
     for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
     { lhs.elt(i, j) = rhs.elt(i);}
   }
@@ -212,17 +416,19 @@ struct Copycat<  Lhs,  Rhs, Arrays::array2D_, Arrays::point_>
 {
   static void runByCol(Lhs& lhs, Rhs const& rhs )
   {
-    int i = rhs.beginRows();
+    int i = lhs.beginRows();
     for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
     { lhs.elt(i, j) = rhs.elt(j);}
   }
   static void runByRow(Lhs& lhs, Rhs const& rhs )
   {
-    int i = rhs.beginRows();
+    int i = lhs.beginRows();
     for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
     { lhs.elt(i, j) = rhs.elt(j);}
   }
 };
+
+
 
 //---------------------SQUARE----------------------------------
 // square <- general
@@ -502,11 +708,11 @@ template< typename Lhs, typename Rhs>
 struct CopycatSelector< Lhs, Rhs, Arrays::by_col_>
 {
   enum
-  { tstructure_ = hidden::Traits<Lhs>::structure_
-  , sstructure_ = hidden::Traits<Rhs>::structure_
+  { lhs_structure_ = hidden::Traits<Lhs>::structure_
+  , rhs_structure_ = hidden::Traits<Rhs>::structure_
   };
   inline static void run(Lhs& lhs, Rhs const& rhs )
-  { Copycat<Lhs, Rhs, tstructure_, sstructure_>::runByCol(lhs, rhs );}
+  { Copycat<Lhs, Rhs, lhs_structure_, rhs_structure_>::runByCol(lhs, rhs );}
 };
 
 /** specialization for row oriented arrays */
@@ -514,61 +720,11 @@ template< typename Lhs, typename Rhs>
 struct CopycatSelector< Lhs, Rhs, Arrays::by_row_>
 {
   enum
-  { tstructure_ = hidden::Traits<Lhs>::structure_
-  , sstructure_ = hidden::Traits<Rhs>::structure_
+  { lhs_structure_ = hidden::Traits<Lhs>::structure_
+  , rhs_structure_ = hidden::Traits<Rhs>::structure_
   };
   inline static void run(Lhs& lhs, Rhs const& rhs )
-  { Copycat<Lhs, Rhs, tstructure_, sstructure_>::runByRow(lhs, rhs );}
-};
-
-/** @ingroup hidden
- * utility class that select the resize method to call
- **/
-template< typename Lhs, typename Rhs, int TStructure_>
-struct resizeSelector;
-
-/** 2D general case */
-template< typename Lhs, typename Rhs, int TStructure_>
-struct resizeSelector
-{
-  inline static void run(Lhs& lhs, ExprBase<Rhs> const& rhs )
-  { lhs.resize(rhs.rows(), rhs.cols());}
-};
-/** specialization for the square_ case */
-template< typename Lhs, typename Rhs>
-struct resizeSelector<Lhs, Rhs, Arrays::square_>
-{
-  inline static void run(Lhs& lhs, ExprBase<Rhs> const& rhs )
-  { lhs.resize(rhs.range());}
-};
-/** specialization for the diagonal_ case */
-template< typename Lhs, typename Rhs>
-struct resizeSelector<Lhs, Rhs, Arrays::diagonal_>
-{
-  inline static void run(Lhs& lhs, ExprBase<Rhs> const& rhs )
-  { lhs.resize(rhs.range());}
-};
-/** specialization for the vector_ case */
-template< typename Lhs, typename Rhs>
-struct resizeSelector<Lhs, Rhs, Arrays::vector_>
-{
-  inline static void run(Lhs& lhs, ExprBase<Rhs> const& rhs )
-  { lhs.resize(rhs.range());}
-};
-/** specialization for the point_ case */
-template< typename Lhs, typename Rhs>
-struct resizeSelector<Lhs, Rhs, Arrays::point_>
-{
-  inline static void run(Lhs& lhs, ExprBase<Rhs> const& rhs )
-  { lhs.resize(rhs.range());}
-};
-
-/** specialization for the number_ case */
-template< typename Lhs, typename Rhs>
-struct resizeSelector<Lhs, Rhs, Arrays::number_>
-{
-  inline static void run(Lhs& lhs, ExprBase<Rhs> const& rhs )
-  { /* nothing to do */;}
+  { Copycat<Lhs, Rhs, lhs_structure_, rhs_structure_>::runByRow(lhs, rhs );}
 };
 
 }  // namespace hidden

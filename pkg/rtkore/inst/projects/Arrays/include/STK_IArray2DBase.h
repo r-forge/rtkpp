@@ -41,7 +41,7 @@
 #ifndef STK_IARRAY2DBASE_H
 #define STK_IARRAY2DBASE_H
 
-#include "STK_ArrayBase.h"
+#include "STK_IArrayBase.h"
 
 #include "STK_ExprBaseProduct.h"
 #include "STK_ExprBaseDot.h"
@@ -54,15 +54,12 @@
 
 namespace STK
 {
-// forward declaration
-template < class PTRCOL, class Derived>
-class IArray2DBase;
 /** @ingroup Arrays
  *  @brief template interface base class for two-dimensional arrays.
  *
  * A IArray2DBase is an interface class for two-dimensional Arrays
  * stored in columns and having flexible dimensions. It is possible
- * to add, remove easily columns and rows to the Derived class.
+ * to add, remove easily columns and rows in Derived class.
  *
  * Each column has a Range stored in the array @c rangeCols_ and a
  * capacity stored in the array @c availableRows_. It should be worth
@@ -78,7 +75,7 @@ class IArray2DBase;
  **/
 template < class PTRCOL, class Derived>
 class IArray2DBase: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, hidden::Traits<Derived>::sizeCols_>
-                  , public ArrayBase<Derived>
+                  , public IArrayBase<Derived>
 {
    // needed by merge
    template <class OTHERPTRCOL, class OtherDerived>
@@ -111,7 +108,7 @@ class IArray2DBase: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, h
     /** Type for the Base Class. */
     typedef AllocatorBase<PTRCOL, sizeCols_> Allocator;
     /** type of the Base Container Class. */
-    typedef ArrayBase<Derived> Base;
+    typedef IArrayBase<Derived> Base;
 
   protected:
     /** Default constructor */
@@ -120,8 +117,7 @@ class IArray2DBase: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, h
                   , availableCols_(0), capacityByCols_(0)
     { mallocCols(this->cols());}
     /** constructor with specified ranges
-     *  @param I range of the Rows
-     *  @param J range of the columns
+     *  @param I,J rows and columns range
      **/
     IArray2DBase( Range const& I, Range const& J)
                : Base2D(I, J), Base(), allocator_()
@@ -148,8 +144,8 @@ class IArray2DBase: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, h
                 , availableCols_(T.availableCols_), capacityByCols_(T.capacityByCols_)
     { if (!ref) mallocCols(this->cols());}
     /** constructor by reference, ref_=1.
-     *  @param T the container to copy
-     *  @param I,J ranges of the rows and columns to wrap
+     *  @param T the container to wrap
+     *  @param I,J rows and columns to wrap
      **/
     template<class OtherDerived>
     IArray2DBase( IArray2DBase<PTRCOL, OtherDerived> const& T, Range const& I, Range const& J)
@@ -162,7 +158,7 @@ class IArray2DBase: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, h
       for (int j=J.begin(); j<J.end(); j++)
       { rangeCols_[j] = Range::inf(I, T.rangeCols()[j]);}
     }
-    /** Wrapper constructor We get a reference of the data.
+    /** Wrapper constructor. We get a reference of the data.
      *  @param q pointer on data
      *  @param I,J range of the rows and columns to wrap
      **/

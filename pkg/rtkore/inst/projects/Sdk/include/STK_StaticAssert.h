@@ -132,8 +132,12 @@ if (STK::StaticAssert<bool(COND)>::MSG) {}
 STK_STATIC_ASSERT( (hidden::Traits<EXPR>::structure_==(int)Arrays::array2D_) \
                  ||(hidden::Traits<EXPR>::structure_==(int)Arrays::square_) \
                  ||(hidden::Traits<EXPR>::structure_==(int)Arrays::diagonal_) \
+                 ||(hidden::Traits<EXPR>::structure_==(int)Arrays::number_) \
                  ||(hidden::Traits<EXPR>::structure_==(int)Arrays::lower_triangular_) \
                  ||(hidden::Traits<EXPR>::structure_==(int)Arrays::upper_triangular_) \
+                 ||(hidden::Traits<EXPR>::structure_==(int)Arrays::symmetric_) \
+                 ||(hidden::Traits<EXPR>::structure_==(int)Arrays::lower_symmetric_) \
+                 ||(hidden::Traits<EXPR>::structure_==(int)Arrays::upper_symmetric_) \
                  ,YOU_TRIED_CALLING_A_MATRIX_METHOD_ON_A_VECTOR)
 
 #define STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(EXPR) \

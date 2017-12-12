@@ -1111,7 +1111,7 @@ struct BinaryEltImpl< FunctorOp, Lhs, Rhs, Arrays::vector_, Arrays::point_>
        , binary_op_Kind_= Arrays::binary_op_1D_
        , sizeRows_      = Lhs::sizeRows_ != UnknownSize ? int(Lhs::sizeRows_) : int(Rhs::sizeCols_)
        , sizeCols_      = 1
-       , useLhsRows_    = Lhs::sizRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsOtherSize_
+       , useLhsRows_    = Lhs::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsOtherSize_
        , useLhsCols_    = Arrays::useLhsSize_
        };
   inline static result_type elt2Impl(FunctorOp const& f, Lhs const& l, Rhs const& r, int i, int j)

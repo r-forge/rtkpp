@@ -168,12 +168,12 @@ template <class YArray, class XVector, class Weights>
 bool BSplineRegression<YArray, XVector, Weights>::regressionStep(Weights const& weights)
 {
   // compute X'X
-  ArraySquareX prod = coefs_.coefficients().transpose() * weights.asDiagonal() * coefs_.coefficients();
+  ArraySquareX prod = coefs_.coefficients().transpose() * weights.diagonalize() * coefs_.coefficients();
   // compute (X'X)^{-1}
   GInvertSymMatrix inv;
   inv(prod);
   // compute (X'X)^{-1}X'Y
-  controlPoints_ = prod * coefs_.coefficients().transpose() * weights.asDiagonal() * p_y_->asDerived();
+  controlPoints_ = prod * coefs_.coefficients().transpose() * weights.diagonalize() * p_y_->asDerived();
   return true;
 }
 

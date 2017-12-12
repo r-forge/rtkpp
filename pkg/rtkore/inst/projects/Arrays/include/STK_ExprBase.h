@@ -430,9 +430,9 @@ class ExprBase: public ITContainer<Derived, hidden::Traits<Derived>::structure_>
     /** @return the transposed expression of this. */
     MAKE_RESHAPE_OPERATOR(Transpose,transpose)
     /** @return this as a diagonal 1D expression (work only with vector/point/diagonal expressions). */
-    MAKE_RESHAPE_OPERATOR(Diagonalize,asDiagonal)
+    MAKE_RESHAPE_OPERATOR(Diagonalize,diagonalize)
     /** @return the diagonal of this square expression (work only with square expressions). */
-    MAKE_RESHAPE_OPERATOR(Diagonal,diagonalize)
+    MAKE_RESHAPE_OPERATOR(DiagonalGetter,getDiagonal)
     /** @return the upper triangular part of this expression. */
     MAKE_RESHAPE_OPERATOR(UpperTriangularize,upperTriangularize)
     /** @return the lower triangular part of this expression. */

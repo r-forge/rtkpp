@@ -208,7 +208,7 @@ static typename Matrix::Type invertSymMatrixXX( Matrix const& m, CArraySquare<ty
   Type tol = Arithmetic<Type>::epsilon() *decomp.norm();
   if (tol == 0) { tol = Arithmetic<Type>::min();}
   // compute (generalized) inverse matrix
-  inv = decomp.rotation() * decomp.eigenValues().safeInverse(tol).asDiagonal() * decomp.rotation().transpose();
+  inv = decomp.rotation() * decomp.eigenValues().safeInverse(tol).diagonalize() * decomp.rotation().transpose();
   return decomp.det();
 }
 

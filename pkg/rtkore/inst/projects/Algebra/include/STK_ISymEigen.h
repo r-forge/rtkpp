@@ -138,7 +138,7 @@ class ISymEigen: public IRunnerBase, public IRecursiveTemplate<Derived>
       Type tol = Arithmetic<Type>::epsilon() * norm_;
       if(tol==0) { tol = Arithmetic<Type>::min();}
       // compute and return PD^{-1}P'
-      return (res = eigenVectors_ * eigenValues_.asDiagonal().safeInverse(tol) * eigenVectors_.transpose());
+      return (res = eigenVectors_ * eigenValues_.diagonalize().safeInverse(tol) * eigenVectors_.transpose());
     }
     /** Compute the generalized square root inverse of the symmetric matrix and
      *  put the result in res.
@@ -151,7 +151,7 @@ class ISymEigen: public IRunnerBase, public IRecursiveTemplate<Derived>
       Type tol = Arithmetic<Type>::epsilon() * norm_;
       if(tol==0) { tol = Arithmetic<Type>::min();}
       // compute and return PD^{-1/2}P'
-      return(res = eigenVectors_ * eigenValues_.asDiagonal().sqrt().safeInverse(tol) * eigenVectors_.transpose());
+      return(res = eigenVectors_ * eigenValues_.diagonalize().sqrt().safeInverse(tol) * eigenVectors_.transpose());
     }
     /** Compute the square root of the symmetric matrix and put the result in res.
      *  @param res array with the result
@@ -163,7 +163,7 @@ class ISymEigen: public IRunnerBase, public IRecursiveTemplate<Derived>
       Type tol = Arithmetic<Type>::epsilon() * norm_;
       if(tol==0) { tol = Arithmetic<Type>::min();}
       // compute and return PD^{1/2}P'
-      return(res = eigenVectors_ * eigenValues_.asDiagonal().sqrt() * eigenVectors_.transpose());
+      return(res = eigenVectors_ * eigenValues_.diagonalize().sqrt() * eigenVectors_.transpose());
     }
     /** overloading of setData.
      * @param data the data set to set.

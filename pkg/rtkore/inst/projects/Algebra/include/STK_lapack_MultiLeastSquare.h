@@ -165,8 +165,8 @@ bool MultiLeastSquare<ArrayB, ArrayA>::runImpl(Weights const& w)
   STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Weights);
   Range brows = (b_.sizeRows()< a_.sizeCols()) ? a_.cols() : b_.rows();
   // local arrays, b is resized if necessary
-  CArrayXX a(w.sqrt().asDiagonal() * a_), b(brows, b_.cols());
-  b.sub(b_.rows(), b_.cols()) = w.sqrt().asDiagonal() * b_;
+  CArrayXX a(w.sqrt().diagonalize() * a_), b(brows, b_.cols());
+  b.sub(b_.rows(), b_.cols()) = w.sqrt().diagonalize() * b_;
   // start
   return computeLS(b,a);
 }

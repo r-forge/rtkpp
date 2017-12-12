@@ -29,7 +29,7 @@
  **/
 
 /** @file STK_ReshapeOperators.h
- *  @brief In this file we implement the DiagonalOperator and DiagonalizeOperator classes.
+ *  @brief In this file we implement the DiagonalGetterOperator and DiagonalizeOperator classes.
  **/
 
 #ifndef STK_RESHAPEOPERATORS_H
@@ -46,7 +46,7 @@ namespace STK
 
 // forward declaration
 template< typename Lhs> class DiagonalizeOperator;
-template< typename Lhs> class DiagonalOperator;
+template< typename Lhs> class DiagonalGetterOperator;
 template< typename Lhs> class UpperTriangularizeOperator;
 template< typename Lhs> class LowerTriangularizeOperator;
 template< typename Lhs> class SymmetrizeOperator;
@@ -54,7 +54,7 @@ template< typename Lhs> class UpperSymmetrizeOperator;
 template< typename Lhs> class LowerSymmetrizeOperator;
 
 template< typename Lhs> class DiagonalizeAccessor;
-template< typename Lhs> class DiagonalAccessor;
+template< typename Lhs> class DiagonalGetterAccessor;
 template< typename Lhs> class UpperTriangularizeAccessor;
 template< typename Lhs> class LowerTriangularizeAccessor;
 template< typename Lhs> class SymmetrizeAccessor;
@@ -123,7 +123,7 @@ struct Traits< DiagonalizeAccessor <Lhs> >
   *
   * This class represents an expression where a DiagonalizeOperator operator is
   * applied to a vector/point/diagonal expression. It is the return type of the
-  * asDiagonal() const operation.
+  * diagonalize() const operation.
   *
   * Most of the time, this is the only way that it is used, so you typically
   * don't have to name DiagonalizeOperator type explicitly.
@@ -187,7 +187,7 @@ class DiagonalizeOperator: public ExprBase< DiagonalizeOperator< Lhs> >, public 
   *
   * This class represents an expression where a DiagonalizeAccessor operator is
   * applied to a vector/point/diagonal array. It is the return type of the
-  * asDiagonal() operation.
+  * diagonalizeize() operation.
   *
   * Most of the time, this is the only way that it is used, so you typically
   * don't have to name DiagonalizeAccessor type explicitly.
@@ -255,10 +255,10 @@ class DiagonalizeAccessor: public ArrayBase< DiagonalizeAccessor< Lhs> >, public
 namespace hidden
 {
 /** @ingroup hidden
- *  @brief Traits class for DiagonalOperator operator
+ *  @brief Traits class for DiagonalGetterOperator operator
  */
 template<typename Lhs>
-struct Traits< DiagonalOperator <Lhs> >
+struct Traits< DiagonalGetterOperator <Lhs> >
 {
   enum
   {
@@ -279,17 +279,17 @@ struct Traits< DiagonalOperator <Lhs> >
     use_       = (sizeRows_ != UnknownSize) ? Arrays::useLhsSize_ : Arrays::useLhsOtherSize_,
     size_      = (sizeRows_ != UnknownSize) ? sizeRows_ : sizeCols_
   };
-  typedef RowOperator<DiagonalOperator < Lhs> > Row;
-  typedef ColOperator<DiagonalOperator < Lhs> > Col;
+  typedef RowOperator<DiagonalGetterOperator < Lhs> > Row;
+  typedef ColOperator<DiagonalGetterOperator < Lhs> > Col;
   typedef typename Lhs::Type Type;
   typedef typename Lhs::ConstReturnType ConstReturnType;
 };
 
 /** @ingroup hidden
- *  @brief Traits class for DiagonalAccessor operator
+ *  @brief Traits class for DiagonalGetterAccessor operator
  */
 template<typename Lhs>
-struct Traits< DiagonalAccessor <Lhs> >
+struct Traits< DiagonalGetterAccessor <Lhs> >
 {
   enum
   {
@@ -310,8 +310,8 @@ struct Traits< DiagonalAccessor <Lhs> >
     use_       = (sizeRows_ != UnknownSize) ? Arrays::useLhsSize_ : Arrays::useLhsOtherSize_,
     size_      = (sizeRows_ != UnknownSize) ? sizeRows_ : sizeCols_
   };
-  typedef RowOperator<DiagonalAccessor < Lhs> > Row;
-  typedef ColOperator<DiagonalAccessor < Lhs> > Col;
+  typedef RowOperator<DiagonalGetterAccessor < Lhs> > Row;
+  typedef ColOperator<DiagonalGetterAccessor < Lhs> > Col;
   typedef typename Lhs::Type Type;
   typedef typename Lhs::ConstReturnType ConstReturnType;
 };
@@ -350,38 +350,38 @@ struct DiagonalRangeImpl<Lhs, Size_, Arrays::useLhsOtherSize_>
 
 
 /** @ingroup Arrays
- *  @class DiagonalOperator
+ *  @class DiagonalGetterOperator
   *
   * @brief Generic expression when we want to get the diagonal of a
   * two-dimensional square expression.
   *
   * @tparam Lhs the type of the expression to which we are applying the
-  * DiagonalOperator operator.
+  * DiagonalGetterOperator operator.
   *
   * This class represents an expression where a diagonal operator is applied to
   * an expression. It is the return type of the diagonal operation.
   *
   * Most of the time, this is the only way that it is used, so you typically
-  * don't have to name DiagonalOperator type explicitly.
+  * don't have to name DiagonalGetterOperator type explicitly.
   */
 template< typename Lhs>
-class DiagonalOperator: public ExprBase< DiagonalOperator< Lhs> >, public TRef<1>
+class DiagonalGetterOperator: public ExprBase< DiagonalGetterOperator< Lhs> >, public TRef<1>
 {
   public:
-    typedef ExprBase< DiagonalOperator< Lhs> > Base;
-    typedef typename hidden::Traits< DiagonalOperator<Lhs> >::Type Type;
-    typedef typename hidden::Traits< DiagonalOperator<Lhs> >::ConstReturnType ConstReturnType;
+    typedef ExprBase< DiagonalGetterOperator< Lhs> > Base;
+    typedef typename hidden::Traits< DiagonalGetterOperator<Lhs> >::Type Type;
+    typedef typename hidden::Traits< DiagonalGetterOperator<Lhs> >::ConstReturnType ConstReturnType;
 
     enum
     {
-        structure_ = hidden::Traits< DiagonalOperator<Lhs> >::structure_,
-        orient_    = hidden::Traits< DiagonalOperator<Lhs> >::orient_,
-        sizeRows_  = hidden::Traits< DiagonalOperator<Lhs> >::sizeRows_,
-        sizeCols_  = hidden::Traits< DiagonalOperator<Lhs> >::sizeCols_,
-        storage_   = hidden::Traits< DiagonalOperator<Lhs> >::storage_,
-        isValid_   = hidden::Traits< DiagonalOperator<Lhs> >::isValid_,
-        use_       = hidden::Traits< DiagonalOperator<Lhs> >::use_,
-        size_      = hidden::Traits< DiagonalOperator<Lhs> >::size_
+        structure_ = hidden::Traits< DiagonalGetterOperator<Lhs> >::structure_,
+        orient_    = hidden::Traits< DiagonalGetterOperator<Lhs> >::orient_,
+        sizeRows_  = hidden::Traits< DiagonalGetterOperator<Lhs> >::sizeRows_,
+        sizeCols_  = hidden::Traits< DiagonalGetterOperator<Lhs> >::sizeCols_,
+        storage_   = hidden::Traits< DiagonalGetterOperator<Lhs> >::storage_,
+        isValid_   = hidden::Traits< DiagonalGetterOperator<Lhs> >::isValid_,
+        use_       = hidden::Traits< DiagonalGetterOperator<Lhs> >::use_,
+        size_      = hidden::Traits< DiagonalGetterOperator<Lhs> >::size_
     };
     typedef hidden::DiagonalRangeImpl<Lhs, size_, use_> RangeImpl;
     /** Type of the Range for the rows */
@@ -390,12 +390,12 @@ class DiagonalOperator: public ExprBase< DiagonalOperator< Lhs> >, public TRef<1
     typedef TRange<size_> ColRange;
 
     /** Constructor */
-    inline DiagonalOperator( Lhs const& lhs): Base(), lhs_(lhs)
+    inline DiagonalGetterOperator( Lhs const& lhs): Base(), lhs_(lhs)
     {
       STK_STATIC_ASSERT(isValid_,YOU_TRIED_CALLING_A_MATRIX_METHOD_ON_A_VECTOR);
 #ifdef STK_BOUNDS_CHECK
       if (lhs.rows()!=lhs.cols())
-        STKRUNTIME_ERROR_NO_ARG(DiagonalOperatorBase,lhs.rows()!=lhs.cols());
+        STKRUNTIME_ERROR_NO_ARG(DiagonalGetterOperatorBase,lhs.rows()!=lhs.cols());
 #endif
     }
     /** @return the left hand side expression */
@@ -421,38 +421,38 @@ class DiagonalOperator: public ExprBase< DiagonalOperator< Lhs> >, public TRef<1
 };
 
 /** @ingroup Arrays
- *  @class DiagonalAccessor
+ *  @class DiagonalGetterAccessor
   *
   * @brief Generic expression when we want to get the diagonal of a
   * two-dimensional square expression.
   *
   * @tparam Lhs the type of the expression to which we are applying the
-  * DiagonalOperator operator.
+  * DiagonalGetterOperator operator.
   *
   * This class represents an expression where a diagonal operator is applied to
   * an expression. It is the return type of the diagonal operation.
   *
   * Most of the time, this is the only way that it is used, so you typically
-  * don't have to name DiagonalAccessor type explicitly.
+  * don't have to name DiagonalGetterAccessor type explicitly.
   */
 template< typename Lhs>
-class DiagonalAccessor: public ArrayBase< DiagonalAccessor< Lhs> >, public TRef<1>
+class DiagonalGetterAccessor: public ArrayBase< DiagonalGetterAccessor< Lhs> >, public TRef<1>
 {
   public:
-    typedef ArrayBase< DiagonalAccessor< Lhs> > Base;
-    typedef typename hidden::Traits< DiagonalAccessor<Lhs> >::Type Type;
-    typedef typename hidden::Traits< DiagonalAccessor<Lhs> >::ConstReturnType ConstReturnType;
+    typedef ArrayBase< DiagonalGetterAccessor< Lhs> > Base;
+    typedef typename hidden::Traits< DiagonalGetterAccessor<Lhs> >::Type Type;
+    typedef typename hidden::Traits< DiagonalGetterAccessor<Lhs> >::ConstReturnType ConstReturnType;
 
     enum
     {
-        structure_ = hidden::Traits< DiagonalAccessor<Lhs> >::structure_,
-        orient_    = hidden::Traits< DiagonalAccessor<Lhs> >::orient_,
-        sizeRows_  = hidden::Traits< DiagonalAccessor<Lhs> >::sizeRows_,
-        sizeCols_  = hidden::Traits< DiagonalAccessor<Lhs> >::sizeCols_,
-        storage_   = hidden::Traits< DiagonalAccessor<Lhs> >::storage_,
-        isValid_   = hidden::Traits< DiagonalAccessor<Lhs> >::isValid_,
-        use_       = hidden::Traits< DiagonalAccessor<Lhs> >::use_,
-        size_      = hidden::Traits< DiagonalAccessor<Lhs> >::size_
+        structure_ = hidden::Traits< DiagonalGetterAccessor<Lhs> >::structure_,
+        orient_    = hidden::Traits< DiagonalGetterAccessor<Lhs> >::orient_,
+        sizeRows_  = hidden::Traits< DiagonalGetterAccessor<Lhs> >::sizeRows_,
+        sizeCols_  = hidden::Traits< DiagonalGetterAccessor<Lhs> >::sizeCols_,
+        storage_   = hidden::Traits< DiagonalGetterAccessor<Lhs> >::storage_,
+        isValid_   = hidden::Traits< DiagonalGetterAccessor<Lhs> >::isValid_,
+        use_       = hidden::Traits< DiagonalGetterAccessor<Lhs> >::use_,
+        size_      = hidden::Traits< DiagonalGetterAccessor<Lhs> >::size_
     };
     typedef hidden::DiagonalRangeImpl<Lhs, size_, use_> RangeImpl;
     /** Type of the Range for the rows */
@@ -461,12 +461,12 @@ class DiagonalAccessor: public ArrayBase< DiagonalAccessor< Lhs> >, public TRef<
     typedef TRange<size_> ColRange;
 
     /** Constructor */
-    inline DiagonalAccessor( Lhs& lhs): Base(), lhs_(lhs)
+    inline DiagonalGetterAccessor( Lhs& lhs): Base(), lhs_(lhs)
     {
       STK_STATIC_ASSERT(isValid_,YOU_TRIED_CALLING_A_MATRIX_METHOD_ON_A_VECTOR);
 #ifdef STK_BOUNDS_CHECK
       if (lhs.rows()!=lhs.cols())
-        STKRUNTIME_ERROR_NO_ARG(DiagonalOperatorBase,lhs.rows()!=lhs.cols());
+        STKRUNTIME_ERROR_NO_ARG(DiagonalGetterOperatorBase,lhs.rows()!=lhs.cols());
 #endif
     }
     /** @return the left hand side expression */

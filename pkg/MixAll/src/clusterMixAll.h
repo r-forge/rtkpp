@@ -28,20 +28,22 @@
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
 
-/** @file clusterMixture.cpp
+/** @file clusterMixAll.h
  *  @brief In this file we launch the computation for estimating a mixture model.
  **/
 
-
-#include "RTKpp.h"
 
 /** @param model ClusterDiagModel S4 class
  *  @param nbCluster a vector with the number of clusters to test
  *  @param models a vector of string with the model names to try
  */
-RcppExport SEXP clusterMixture( SEXP model, SEXP nbCluster, SEXP models
-                              , SEXP strategy, SEXP critName
-                              , SEXP nbCore);
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+SEXP clusterMixture( SEXP model, SEXP nbCluster, SEXP models
+                   , SEXP strategy, SEXP critName
+                   , SEXP nbCore);
 
 /** @param model ClusterMixedData S4 class
  *  @param nbCluster a vector with the number of clusters to test
@@ -49,7 +51,7 @@ RcppExport SEXP clusterMixture( SEXP model, SEXP nbCluster, SEXP models
  *  @param critName name criteria string
  *  @param nbCore number of core to use
  */
-RcppExport SEXP clusterMixedData( SEXP model, SEXP nbCluster
+SEXP clusterMixedData( SEXP model, SEXP nbCluster
                                 , SEXP strategy, SEXP critName
                                 , SEXP nbCore);
 
@@ -57,7 +59,7 @@ RcppExport SEXP clusterMixedData( SEXP model, SEXP nbCluster
  *  @param nbCluster a vector with the number of clusters to test
  *  @param models a vector of string with the model names to try
  */
-RcppExport SEXP clusterKernelMixture( SEXP model, SEXP nbCluster, SEXP models
+SEXP clusterKernelMixture( SEXP model, SEXP nbCluster, SEXP models
                                     , SEXP strategy, SEXP critName
                                     , SEXP nbCore);
 
@@ -66,8 +68,11 @@ RcppExport SEXP clusterKernelMixture( SEXP model, SEXP nbCluster, SEXP models
  *  @param kernelName a string with the name of the kernel to use
  *  @param kernelParameters a vector with the optional parameters
  */
-RcppExport SEXP clusterKernelCompute( SEXP component
+SEXP clusterKernelCompute( SEXP component
                                     , SEXP kernelName
                                     , SEXP kernelParameters
                                     );
 
+#ifdef __cplusplus
+}
+#endif

@@ -25,16 +25,16 @@ of parameters.
 \item{\code{component}}{A [\code{\linkS4class{ClusterDiagGaussianComponent}}] with the
 mean and standard deviation of the diagonal mixture model.}
 }}
+
 \examples{
 getSlots("ClusterDiagGaussian")
 data(geyser)
 new("ClusterDiagGaussian", data=geyser)
 
 }
-\author{
-Serge Iovleff
-}
 \seealso{
 [\code{\linkS4class{IClusterModel}}] class
 }
-
+\author{
+Serge Iovleff
+}

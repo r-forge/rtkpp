@@ -22,16 +22,16 @@ of parameters.
 \item{\code{component}}{A [\code{\linkS4class{ClusterGammaComponent}}] with the
 shapes and the scales of the component mixture model.}
 }}
+
 \examples{
   getSlots("ClusterGamma")
   data(geyser)
   new("ClusterGamma", data=geyser)
 
 }
-\author{
-Serge Iovleff
-}
 \seealso{
 [\code{\linkS4class{IClusterModel}}] class
 }
-
+\author{
+Serge Iovleff
+}

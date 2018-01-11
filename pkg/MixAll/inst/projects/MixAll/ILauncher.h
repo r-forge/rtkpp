@@ -84,6 +84,13 @@ class ILauncher: public IRunnerBase
     /** get the kernel parameters */
     void getKernelParameters(IMixtureStatModel* p_model, std::string const& idData, Rcpp::S4& s4_component);
 
+    /** model from the R side */
+    Rcpp::S4 s4_model_;
+    /** vector with the model names to try */
+    Rcpp::CharacterVector v_models_;
+
+    /** data handler */
+    RDataHandler handler_;
     /** diagonal Gaussian mixture models manager */
     DiagGaussianMixtureManager<RDataHandler> diagGaussianManager_;
     /** Poisson mixture models manager */
@@ -95,12 +102,6 @@ class ILauncher: public IRunnerBase
     /** kernel mixture models manager */
     KernelMixtureManager<RDataHandler> kernelManager_;
 
-    /** data handler */
-    RDataHandler handler_;
-    /** model from the R side */
-    Rcpp::S4              s4_model_;
-    /** vector with the model names to try */
-    Rcpp::CharacterVector v_models_;
     /** Is the model with mixed data ? */
     bool isMixedData_;
 };

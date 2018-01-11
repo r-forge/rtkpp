@@ -45,32 +45,32 @@ namespace STK
  * with less effort
  **/
 ILauncher::ILauncher( SEXP model, SEXP models)
-                            : IRunnerBase()
-                            , s4_model_(model)
-                            , v_models_(models)
-                            , handler_()
-                            , diagGaussianManager_(handler_)
-                            , poissonManager_(handler_)
-                            , gammaManager_(handler_)
-                            , categoricalManager_(handler_)
-                            , kernelManager_(handler_)
-                            , isMixedData_(false)
+                    : IRunnerBase()
+                    , s4_model_(model)
+                    , v_models_(models)
+                    , handler_()
+                    , diagGaussianManager_(handler_)
+                    , poissonManager_(handler_)
+                    , gammaManager_(handler_)
+                    , categoricalManager_(handler_)
+                    , kernelManager_(handler_)
+                    , isMixedData_(false)
 {}
 /* facade design pattern.
  * The ILauncher allow to create the strategy for estimating a mixture model
  * with less effort
  **/
 ILauncher::ILauncher( SEXP model)
-                            : IRunnerBase()
-                            , s4_model_(model)
-                            , v_models_()
-                            , handler_()
-                            , diagGaussianManager_(handler_)
-                            , poissonManager_(handler_)
-                            , gammaManager_(handler_)
-                            , categoricalManager_(handler_)
-                            , kernelManager_(handler_)
-                            , isMixedData_(true)
+                    : IRunnerBase()
+                    , s4_model_(model)
+                    , v_models_()
+                    , handler_()
+                    , diagGaussianManager_(handler_)
+                    , poissonManager_(handler_)
+                    , gammaManager_(handler_)
+                    , categoricalManager_(handler_)
+                    , kernelManager_(handler_)
+                    , isMixedData_(true)
 {}
 /* destructor. */
 ILauncher::~ILauncher()

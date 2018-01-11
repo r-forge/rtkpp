@@ -43,4 +43,3 @@ clusterCategoricalNames()
 clusterCategoricalNames("all", "equal") # same as c( "categorical_pk_pk", "categorical_p_pk")
 
 }
-

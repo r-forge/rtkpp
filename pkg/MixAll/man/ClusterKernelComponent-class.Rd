@@ -20,14 +20,14 @@ from [\code{\linkS4class{IClusterComponent}}].
 from [\code{\linkS4class{IClusterComponent}}] will be overwrite by the gram
 matrix.}
 }}
+
 \examples{
 getSlots("ClusterKernelComponent")
 
 }
-\author{
-Serge Iovleff
-}
 \seealso{
 [\code{\linkS4class{IClusterComponent}}] class
 }
-
+\author{
+Serge Iovleff
+}

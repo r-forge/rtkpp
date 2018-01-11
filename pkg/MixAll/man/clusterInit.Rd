@@ -52,4 +52,3 @@ point with the best log-likelihood is conserved as the initial starting point.
 \author{
 Serge Iovleff
 }
-

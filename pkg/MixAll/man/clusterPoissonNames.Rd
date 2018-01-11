@@ -45,4 +45,3 @@ clusterPoissonNames()
 clusterPoissonNames("all", "proportional") # same as c( "poisson_pk_ljlk", "poisson_p_ljlk")
 
 }
-

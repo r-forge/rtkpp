@@ -33,6 +33,10 @@
  **/
 
 
+
+#include "RTKpp.h"
+#include "../inst/projects/MixAll/LearnLauncher.h"
+#include "../inst/projects/MixAll/RDataHandler.h"
 #include "learnMixAll.h"
 #include "clusterMixAll.h"
 

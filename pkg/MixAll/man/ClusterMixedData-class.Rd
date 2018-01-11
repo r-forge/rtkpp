@@ -24,14 +24,14 @@ can be any implemented model (Gaussian, Poisson,...).
 \describe{
 \item{\code{ldata}}{a list of IClusterComponent.}
 }}
+
 \examples{
 getSlots("ClusterMixedData")
 
 }
-\author{
-Serge Iovleff
-}
 \seealso{
 [\code{\linkS4class{IClusterModel}}] class
 }
-
+\author{
+Serge Iovleff
+}

@@ -18,6 +18,7 @@ This class encapsulates the parameters of clustering initialization methods.
 \item{\code{algo}}{An instance of \code{\linkS4class{ClusterAlgo}} class.
 Default value: \code{clusterAlgo("EM", 20, 0.01)}.}
 }}
+
 \examples{
   getSlots("ClusterInit")
   new("ClusterInit")
@@ -27,4 +28,3 @@ Default value: \code{clusterAlgo("EM", 20, 0.01)}.}
 \author{
 Serge Iovleff
 }
-

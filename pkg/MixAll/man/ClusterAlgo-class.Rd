@@ -20,10 +20,10 @@ Possible values: "SEM", "CEM", "EM", "SemiSEM". Default value: "EM".}
 \item{\code{epsilon}}{real defining the epsilon value for the algorithm. epsilon is
 note used if \code{algo} is "SEM" or "SemiSEM". Default value: 1e-07.}
 }}
+
 \examples{
 getSlots("ClusterAlgo")
 new("ClusterAlgo")
 new("ClusterAlgo", algo="SEM", nbIteration=1000)
 
 }
-

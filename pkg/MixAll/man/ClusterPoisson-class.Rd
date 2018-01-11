@@ -20,6 +20,7 @@ A poisson mixture model is a mixture model of the form:
 \item{\code{component}}{A [\code{\linkS4class{ClusterPoissonComponent}}] with the
 lambda of the component mixture model.}
 }}
+
 \examples{
   getSlots("ClusterPoisson")
   data(DebTrivedi)
@@ -27,10 +28,9 @@ lambda of the component mixture model.}
   new("ClusterPoisson", data=dt)
 
 }
-\author{
-Serge Iovleff
-}
 \seealso{
 [\code{\linkS4class{IClusterModel}}] class
 }
-
+\author{
+Serge Iovleff
+}

@@ -24,6 +24,7 @@ reduce the number of parameters.
 \item{\code{component}}{A [\code{\linkS4class{ClusterCategoricalComponent}}] with the
 probabilities of the categorical component}
 }}
+
 \examples{
   getSlots("ClusterCategorical")
   data(birds)
@@ -33,4 +34,3 @@ probabilities of the categorical component}
 \author{
 Serge Iovleff
 }
-

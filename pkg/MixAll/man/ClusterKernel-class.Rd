@@ -32,16 +32,16 @@ dim and standard deviation of the kernel mixture model.}
 
 \item{\code{kernelParameters}}{vector with the parameters of the kernel.}
 }}
+
 \examples{
 getSlots("ClusterKernel")
 data(geyser)
 new("ClusterKernel", data=geyser)
 
 }
-\author{
-Serge Iovleff
-}
 \seealso{
 [\code{\linkS4class{IClusterModel}}] class
 }
-
+\author{
+Serge Iovleff
+}

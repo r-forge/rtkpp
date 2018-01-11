@@ -35,4 +35,3 @@ using the estimated parameters and partition.
 \seealso{
 \code{\link{plot}}
 }
-

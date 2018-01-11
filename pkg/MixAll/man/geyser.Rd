@@ -37,4 +37,3 @@ Hardle, W. (1991). "Smoothing Techniques with Implementation in S". Springer-Ver
 Azzalini, A. and Bowman, A. W. (1990). "A look at some data on the Old Faithful geyser". Applied Statistics 39, 357-365.
 }
 \keyword{datasets}
-

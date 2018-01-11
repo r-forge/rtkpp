@@ -45,4 +45,3 @@ clusterKernelNames()
 clusterKernelNames(prop="all", sdBetweenCluster= "free")
 
 }
-

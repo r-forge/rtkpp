@@ -29,4 +29,3 @@ Expert system for decision making.
   data(car)
 }
 \keyword{datasets}
-

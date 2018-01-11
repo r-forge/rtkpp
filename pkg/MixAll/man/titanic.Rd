@@ -46,4 +46,3 @@ passengers is now available on the Internet, at sites such as
   data(titanic)
 }
 \keyword{datasets}
-

@@ -2,9 +2,9 @@
 % Please edit documentation in R/ClusterPoisson.R
 \docType{methods}
 \name{plot,ClusterPoisson-method}
-\alias{ClusterPoisson-method}
 \alias{plot,ClusterPoisson-method}
 \alias{plot-ClusterPoisson,}
+\alias{ClusterPoisson-method}
 \title{Plotting of a class [\code{\linkS4class{ClusterPoisson}}]}
 \usage{
 \S4method{plot}{ClusterPoisson}(x, y, ...)
@@ -35,4 +35,3 @@ using the estimated parameters and partition.
 \seealso{
 \code{\link{plot}}
 }
-

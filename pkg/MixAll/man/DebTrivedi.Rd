@@ -25,4 +25,3 @@ outpatient visits- by the covariates available for the patients.
 Zeileis, A. and Kleiber, C. and Jackma, S. (2008). "Regression Models for Count Data in R". JSS 27, 8, 1--25.
 }
 \keyword{datasets}
-

@@ -12,4 +12,3 @@ shapes (circles)
   data(bullsEye)
 }
 \keyword{datasets}
-

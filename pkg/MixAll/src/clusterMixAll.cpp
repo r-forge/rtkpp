@@ -33,6 +33,8 @@
  **/
 
 
+
+#include "RTKpp.h"
 #include "clusterMixAll.h"
 #include "../inst/projects/MixAll/ClusterFacade.h"
 #include "../inst/projects/MixAll/ClusterLauncher.h"

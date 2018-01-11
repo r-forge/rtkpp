@@ -2,8 +2,8 @@
 % Please edit documentation in R/MixAll.R
 \docType{data}
 \name{HeartDisease.cat}
-\alias{HeartDisease}
 \alias{HeartDisease.cat}
+\alias{HeartDisease}
 \alias{HeartDisease.cont}
 \alias{HeartDisease.target}
 \title{Mixed data : Cleveland Heart Disease Data}
@@ -69,4 +69,3 @@ summary(data(HeartDisease.cont))
 summary(data(HeartDisease.target))
 }
 \keyword{datasets}
-

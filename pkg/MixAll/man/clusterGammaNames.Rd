@@ -64,4 +64,3 @@ clusterGammaNames()
 clusterGammaNames("all", "equal", "free", "free", "equal")
 
 }
-

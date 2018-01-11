@@ -16,14 +16,14 @@ from [\code{\linkS4class{IClusterComponent}}].
 
 \item{\code{scale}}{Matrix with the scales of the jth variable in the kth cluster.}
 }}
+
 \examples{
 getSlots("ClusterGammaComponent")
 
 }
-\author{
-Serge Iovleff
-}
 \seealso{
 [\code{\linkS4class{IClusterComponent}}] class
 }
-
+\author{
+Serge Iovleff
+}

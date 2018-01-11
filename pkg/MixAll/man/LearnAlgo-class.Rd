@@ -20,10 +20,10 @@ Possible values: "Simul", "Impute. Default value: "Simul".}
 \item{\code{epsilon}}{real defining the epsilon value for the algorithm. epsilon is
 note used if \code{algo} is "Simul". Default value: 1e-07.}
 }}
+
 \examples{
 getSlots("LearnAlgo")
 new("LearnAlgo")
 new("LearnAlgo", algo="Impute", nbIteration=100)
 
 }
-

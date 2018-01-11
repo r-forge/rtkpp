@@ -2,9 +2,9 @@
 % Please edit documentation in R/ClusterGamma.R
 \docType{methods}
 \name{plot,ClusterGamma-method}
-\alias{ClusterGamma-method}
 \alias{plot,ClusterGamma-method}
 \alias{plot-ClusterGamma,}
+\alias{ClusterGamma-method}
 \title{Plotting of a class [\code{\linkS4class{ClusterGamma}}]}
 \usage{
 \S4method{plot}{ClusterGamma}(x, y, ...)
@@ -37,4 +37,3 @@ using the estimated parameters and partition.
 \seealso{
 \code{\link{plot}}
 }
-

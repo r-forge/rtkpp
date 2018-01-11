@@ -28,19 +28,19 @@
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
 
-/** @file learnMixture.cpp
+/** @file learnMixture.h
  *  @brief In this file we launch the computation for estimating a mixture model.
  **/
 
 
-#include "RTKpp.h"
-#include "../inst/projects/MixAll/LearnLauncher.h"
-#include "../inst/projects/MixAll/RDataHandler.h"
-
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 /** @param model ClusterDiagModel S4 class
  *  @param models a vector of string with the model names to try
  */
-RcppExport SEXP learnMixture( SEXP model, SEXP models
+SEXP learnMixture( SEXP model, SEXP models
                             , SEXP algo, SEXP critName
                             , SEXP nbCore);
 
@@ -49,14 +49,18 @@ RcppExport SEXP learnMixture( SEXP model, SEXP models
  *  @param critName name criteria string
  *  @param nbCore number of core to use
  */
-RcppExport SEXP learnMixedData( SEXP model
+SEXP learnMixedData( SEXP model
                               , SEXP algo, SEXP critName
                               , SEXP nbCore);
 
 /** @param model a ClusterDiagModel S4 class
  *  @param models a vector of string with the model names to try
  */
-RcppExport SEXP learnKernelMixture( SEXP model, SEXP models
+SEXP learnKernelMixture( SEXP model, SEXP models
                                   , SEXP algo, SEXP critName
                                   , SEXP nbCore);
+
+#ifdef __cplusplus
+}
+#endif
 

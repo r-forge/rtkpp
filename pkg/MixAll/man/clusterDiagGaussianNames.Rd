@@ -54,4 +54,3 @@ clusterDiagGaussianNames()
 clusterDiagGaussianNames(prop="all", sdInCluster="equal", sdBetweenCluster= "free")
 
 }
-

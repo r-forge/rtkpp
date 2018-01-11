@@ -29,4 +29,3 @@ This data set is also part of the Rmixmod package.
   data(birds)
 }
 \keyword{datasets}
-

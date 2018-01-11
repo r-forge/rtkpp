@@ -16,14 +16,14 @@ from [\code{\linkS4class{IClusterComponent}}].
 
 \item{\code{sigma}}{Matrix with the standard deviation of the jth variable in the kth cluster.}
 }}
+
 \examples{
 getSlots("ClusterDiagGaussianComponent")
 
 }
-\author{
-Serge Iovleff
-}
 \seealso{
 [\code{\linkS4class{IClusterComponent}}] class
 }
-
+\author{
+Serge Iovleff
+}

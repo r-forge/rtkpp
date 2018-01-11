@@ -64,4 +64,3 @@ plot(model)
 \author{
 Serge Iovleff
 }
-

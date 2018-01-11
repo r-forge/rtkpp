@@ -47,4 +47,3 @@ clusterAlgo(algo="CEM", epsilon = 1e-06)
 \author{
 Serge Iovleff
 }
-

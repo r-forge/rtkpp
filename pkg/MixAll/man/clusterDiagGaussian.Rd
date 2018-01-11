@@ -68,4 +68,3 @@ missingValues(model)
 \author{
 Serge Iovleff
 }
-

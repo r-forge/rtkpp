@@ -43,6 +43,7 @@ the ith individual to belong to kth cluster.}
 \item{\code{strategy}}{the instance of the [\code{\linkS4class{ClusterStrategy}}] used in the
 estimation process of the mixture. Default is clusterStrategy().}
 }}
+
 \examples{
   getSlots("IClusterModel")
 
@@ -50,4 +51,3 @@ estimation process of the mixture. Default is clusterStrategy().}
 \author{
 Serge Iovleff
 }
-

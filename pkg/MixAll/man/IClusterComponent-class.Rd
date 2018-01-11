@@ -2,10 +2,10 @@
 % Please edit documentation in R/IClusterModel.R, R/ClusterPoisson.R
 \docType{class}
 \name{IClusterComponent}
-\alias{ClusterPoissonComponent}
-\alias{ClusterPoissonComponent-class}
 \alias{IClusterComponent}
 \alias{IClusterComponent-class}
+\alias{ClusterPoissonComponent}
+\alias{ClusterPoissonComponent-class}
 \title{Definition of the [\code{\linkS4class{IClusterComponent}}] class}
 \description{
 This class defines a component of a mixture Model
@@ -24,18 +24,18 @@ from [\code{\linkS4class{IClusterComponent}}].
 
 \item{\code{lambda}}{Matrix with the mean of the jth variable in the kth cluster.}
 }}
+
 \examples{
 getSlots("IClusterComponent")
 
 getSlots("ClusterPoissonComponent")
 
 }
+\seealso{
+[\code{\linkS4class{IClusterComponent}}] class
+}
 \author{
 Serge Iovleff
 
 Serge Iovleff
 }
-\seealso{
-[\code{\linkS4class{IClusterComponent}}] class
-}
-

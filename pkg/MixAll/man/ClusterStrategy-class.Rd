@@ -32,4 +32,3 @@ This class encapsulate the parameters of the clustering estimation strategies.
 \author{
 Serge Iovleff
 }
-

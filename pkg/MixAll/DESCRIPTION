@@ -1,6 +1,6 @@
 Package: MixAll
-Version: 1.2.0
-Date: 2016-08-01
+Version: 1.2.1
+Date: 2018-01-11
 Title: Clustering using Mixture Models
 Authors@R: c(person("Serge", "Iovleff", role = c("aut","cre"), email = "Serge.Iovleff@stkpp.org"))
 Copyright: inria, University Lille 1
@@ -9,13 +9,13 @@ Depends:
     rtkore (>= 1.1.0)
 Imports:
     methods
-Description: Algorithms and methods for estimating parametric mixture models for
-    mixed data and with missing data.
+Description: Algorithms and methods for estimating parametric mixture models for mixed data
+    and with missing data.
 License: GPL (>= 2)
 LinkingTo: Rcpp
 Roxygen: list(wrap = FALSE)
 SystemRequirements: GNU make
-Collate:
+Collate: 
     'ClusterAlgo.R'
     'ClusterInit.R'
     'ClusterStrategy.R'
@@ -33,4 +33,4 @@ Collate:
     'Learners.R'
     'MixAll.R'
     'missingValues.R'
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

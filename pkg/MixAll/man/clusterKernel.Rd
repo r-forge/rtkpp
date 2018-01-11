@@ -71,4 +71,3 @@ print(model)
 \author{
 Serge Iovleff
 }
-

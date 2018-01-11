@@ -3,17 +3,18 @@
 \docType{methods}
 \name{missingValues}
 \alias{missingValues}
-\alias{missingValues,ClusterCategorical-method}
-\alias{missingValues,ClusterCategoricalComponent-method}
+\alias{missingValues,ClusterMixedData-method}
 \alias{missingValues,ClusterDiagGaussian-method}
 \alias{missingValues,ClusterDiagGaussianComponent-method}
-\alias{missingValues,ClusterGamma-method}
+\alias{missingValues,ClusterDiagGaussian-method}
 \alias{missingValues,ClusterGammaComponent-method}
-\alias{missingValues,ClusterKernel-method}
-\alias{missingValues,ClusterKernelComponent-method}
-\alias{missingValues,ClusterMixedData-method}
-\alias{missingValues,ClusterPoisson-method}
+\alias{missingValues,ClusterGamma-method}
+\alias{missingValues,ClusterCategoricalComponent-method}
+\alias{missingValues,ClusterCategorical-method}
 \alias{missingValues,ClusterPoissonComponent-method}
+\alias{missingValues,ClusterPoisson-method}
+\alias{missingValues,ClusterKernelComponent-method}
+\alias{missingValues,ClusterKernel-method}
 \title{Return the missing values of a component or a cluster class.}
 \usage{
 missingValues(x)
@@ -62,4 +63,3 @@ model <- clusterDiagGaussian(data=x, nbCluster=2:3, strategy = clusterFastStrate
 missingValues(model)
 }
 }
-

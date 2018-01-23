@@ -1,6 +1,15 @@
 \name{NEWS}
 \title{News for Package 'rtkore}
 
+\section{Changes in rtkore version 1.5.0 (2018-01-23)}{
+  \itemize{
+    \item Accelerating template expression core
+    \item Adding support for binary operators expr + expr_number
+    \item Adding support for functional basis in Regress project
+    \item Updating documentation 
+  }
+}
+
 \section{Changes in rtkore version 1.2.2 (2017-03-29)}{
   \itemize{
     \item Vignettes are renamed

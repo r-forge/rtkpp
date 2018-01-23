@@ -66,13 +66,15 @@ class ChebyshevCoefficients: public IBasis<Data, Coefs>
      *  @param p_data pointer on the data set
      *  @param dim number of basis to use
      *  @param useDataValues if @c true use data in order to find the minValue_ and maxValue_, use
-     *  values set otherwise.
+     *  values set otherwise
      **/
     ChebyshevCoefficients( Data const* p_data =0, int dim =1, bool useDataValues = true)
                          : Base(p_data, dim, useDataValues){}
     /** @brief constructor
      *  @param data reference on the data set
      *  @param dim number of basis to use
+     *  @param useDataValues  if @c true use data in order to find the minValue_ and maxValue_, use
+     *  values set otherwise
      **/
     ChebyshevCoefficients( Data const& data, int dim, bool useDataValues = true)
                          : Base(data, dim, useDataValues){}

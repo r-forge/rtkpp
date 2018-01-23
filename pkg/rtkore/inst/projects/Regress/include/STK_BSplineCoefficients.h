@@ -36,10 +36,8 @@
 #ifndef STK_BSPLINECOEFFICIENTS_H
 #define STK_BSPLINECOEFFICIENTS_H
 
-#include "STK_Regress_Util.h"
+#include "STK_IBasis.h"
 
-#include <Sdk/include/STK_IRunner.h>
-#include <Arrays/include/STK_Array2D.h>
 #include <Arrays/include/STK_Array2DVector.h>
 #include <DManager/include/STK_HeapSort.h>
 
@@ -60,10 +58,19 @@ namespace STK
  * @note If the input data set is a vector of size @c n the output matrix of the
  * coefficients @c Coefficients() is a matrix of size @c (n, nbControlPoints).
  */
-template<class Vector>
-class BSplineCoefficients: public IRunnerBase
+template<class Data>
+class BSplineCoefficients: public IBasis<Data, ArrayXX>
 {
   public:
+    typedef IBasis<Data, ArrayXX> Base;
+    using Base::p_data_;
+    using Base::coefficients_;
+    using Base::dim_;
+    using Base::msg_error_;
+    using Base::hasRun_;
+    using Base::minValue_;
+    using Base::maxValue_;
+
     /** @brief Default constructor : initialize the data members with default
      *  values.
      *  The number of knots is given by the formula
@@ -72,11 +79,14 @@ class BSplineCoefficients: public IRunnerBase
      *  @param nbControlPoints number of control points
      *  @param degree degree of the B-spline curves
      *  @param position method to use for positioning the knots
+     *  @param useDataValues if @c true use data in order to find the minValue_ and maxValue_, use
+     *  values set otherwise.
      **/
-    BSplineCoefficients( Vector const* p_data =0
+    BSplineCoefficients( Data const* p_data =0
                        , int nbControlPoints =1
                        , int degree = 3
                        , Regress::KnotsPosition position = Regress::uniformKnotsPositions_
+                       , bool useDataValues = true
                        );
     /** Constructor : initialize the data members. The number of knots is given
      *  by the formula nbKnots = nbControlPoints + degree +1.
@@ -84,11 +94,14 @@ class BSplineCoefficients: public IRunnerBase
      *  @param nbControlPoints number of control points
      *  @param degree degree of the B-spline curves
      *  @param position method to use for positioning the knots
+     *  @param useDataValues if @c true use data in order to find the minValue_ and maxValue_, use
+     *  values set otherwise.
      **/
-    BSplineCoefficients( Vector const& data
+    BSplineCoefficients( Data const& data
                        , int nbControlPoints
                        , int degree = 3
                        , Regress::KnotsPosition position = Regress::uniformKnotsPositions_
+                       , bool useDataValues = true
                        );
     /** copy constructor.
      *  @param coefs the coefficients to copy
@@ -105,17 +118,11 @@ class BSplineCoefficients: public IRunnerBase
     inline int degree() const { return degree_;}
     /** @return the number of knots of the B-spline curve */
     inline int nbKnots() const { return nbKnots_;}
-    /** @return the number of control points of the curve */
-    inline int nbControlPoints() const { return nbControlPoints_;}
+    /** @return the number of control points of the curve (as dim())*/
+    inline int nbControlPoints() const { return dim_;}
     /** @return the vector of knots of the B-spline curve */
     inline VectorX const& knots() const { return knots_;}
-    /** @return the matrix with the coefficients of the B-spline curve. */
-    inline ArrayXX const& coefficients() const { return coefficients_;}
     // setters
-    /** Set the data set
-     *  @param data the input data values
-     **/
-    void setData( Vector const& data);
     /** Set the number of control point (the number of BSpline)
      *  @param nbControlPoints number of control points
      **/
@@ -138,7 +145,7 @@ class BSplineCoefficients: public IRunnerBase
      *  @param degree degree of the B-spline curves (default is 3)
      *  @param position method to use for positioning the knots (default is uniform)
      **/
-    void setParameters( Vector const& data
+    void setParameters( Data const& data
                       , int nbControlPoints
                       , int degree = 3
                       , Regress::KnotsPosition position = Regress::uniformKnotsPositions_
@@ -150,7 +157,7 @@ class BSplineCoefficients: public IRunnerBase
      *  @param degree degree of the B-spline curves (default is 3)
      *  @param position method to use for positioning the knots (default is uniform)
      **/
-    void setData( Vector const& data
+    void setData( Data const& data
                 , int nbControlPoints
                 , int degree = 3
                 , Regress::KnotsPosition position = Regress::uniformKnotsPositions_
@@ -163,10 +170,6 @@ class BSplineCoefficients: public IRunnerBase
     ArrayXX extrapolate(OtherVector const& x) const;
 
   protected:
-    /** the input data set */
-    Vector const* p_data_;
-    /** number of control points of the B-spline curves.*/
-    int nbControlPoints_;
     /** degree of the B-splines curves. */
     int degree_;
     /** Method used in order to position the knots. */
@@ -174,21 +177,12 @@ class BSplineCoefficients: public IRunnerBase
     /** number of knots of the B-spline curves.*/
     int nbKnots_;
     /** Index of the last control point of the B-spline curves.
-     *  This is nbControlPoints_ - 1.
+     *  This is dim_ - 1.
      **/
     int lastControlPoint_;
-    /** Vector of the knots */
+    /** Data of the knots */
     VectorX knots_;
-    /** Array2D<Real> of the coefficients */
-    ArrayXX coefficients_;
 
-    /** Minimal value of the knots */
-    Real minValue_;
-    /** Maximal value of the knots */
-    Real maxValue_;
-
-    /** Initialize the parameters */
-    bool initializeStep();
     /** compute the position of the knots of the B-spline curves.*/
     bool computeKnots();
     /** Compute the coefficients of the B-spline curves.*/
@@ -211,164 +205,137 @@ class BSplineCoefficients: public IRunnerBase
 };
 
 /* constructor */
-template<class Vector>
-BSplineCoefficients<Vector>::BSplineCoefficients( Vector const* p_data
+template<class Data>
+BSplineCoefficients<Data>::BSplineCoefficients( Data const* p_data
                                                 , int nbControlPoints
                                                 , int degree
                                                 , Regress::KnotsPosition position
+                                                , bool useDataValues
                                                 )
-                                                : IRunnerBase()
-                                                , p_data_(p_data)
-                                                , nbControlPoints_(nbControlPoints)
+                                                : Base(p_data, nbControlPoints, useDataValues)
                                                 , degree_(degree)
                                                 , position_(position)
                                                 , nbKnots_(nbControlPoints + degree + 1)
-                                                , lastControlPoint_(nbControlPoints_-1)
+                                                , lastControlPoint_(dim_-1)
                                                 , knots_( Range(0, nbKnots_) )
-                                                , coefficients_()
-                                                , minValue_( Arithmetic<Real>::max())
-                                                , maxValue_(-Arithmetic<Real>::max())
 { }
 
 /* constructor */
-template<class Vector>
-BSplineCoefficients<Vector>::BSplineCoefficients( Vector const& data
-                                                , int nbControlPoints
-                                                , int degree
-                                                , Regress::KnotsPosition position
-                                                )
-                                                : IRunnerBase()
-                                                , p_data_(&data)
-                                                , nbControlPoints_(nbControlPoints)
-                                                , degree_(degree)
-                                                , position_(position)
-                                                , nbKnots_(nbControlPoints + degree +1)
-                                                , lastControlPoint_(nbControlPoints_-1)
-                                                , knots_( Range(0, nbKnots_) )
-                                                , coefficients_()
-                                                , minValue_( Arithmetic<Real>::max())
-                                                , maxValue_(-Arithmetic<Real>::max())
+template<class Data>
+BSplineCoefficients<Data>::BSplineCoefficients( Data const& data
+                                              , int nbControlPoints
+                                              , int degree
+                                              , Regress::KnotsPosition position
+                                              , bool useDataValues
+                                              )
+                                              : Base(data, nbControlPoints, useDataValues)
+                                              , degree_(degree)
+                                              , position_(position)
+                                              , nbKnots_(nbControlPoints + degree +1)
+                                              , lastControlPoint_(dim_-1)
+                                              , knots_( Range(0, nbKnots_) )
 {}
 /* copy constructor.
  *  @param coefs the coefficients to copy
  **/
-template<class Vector>
-BSplineCoefficients<Vector>::BSplineCoefficients( BSplineCoefficients const& coefs)
-                                                : IRunnerBase()
-                                                , p_data_(coefs.p_data_)
-                                                , nbControlPoints_(coefs.nbControlPoints_)
-                                                , degree_(coefs.degree_)
-                                                , position_(coefs.position_)
-                                                , nbKnots_(coefs.nbKnots_)
-                                                , lastControlPoint_(coefs.lastControlPoint_)
-                                                , knots_(coefs.knots_)
-                                                , coefficients_(coefs.coefficients_)
-                                                , minValue_(coefs.minValue_)
-                                                , maxValue_(coefs.maxValue_)
+template<class Data>
+BSplineCoefficients<Data>::BSplineCoefficients( BSplineCoefficients const& coefs)
+                                              : Base(coefs)
+                                              , degree_(coefs.degree_)
+                                              , position_(coefs.position_)
+                                              , nbKnots_(coefs.nbKnots_)
+                                              , lastControlPoint_(coefs.lastControlPoint_)
+                                              , knots_(coefs.knots_)
 {}
 
 /*  run the computations for the given value.
  *  @param p_data the input data values
  **/
-template<class Vector>
-void BSplineCoefficients<Vector>::setData( Vector const& data
-                                         , int nbControlPoints
-                                         , int degree
-                                         , Regress::KnotsPosition position
-                                         )
+template<class Data>
+void BSplineCoefficients<Data>::setData( Data const& data
+                                       , int nbControlPoints
+                                       , int degree
+                                       , Regress::KnotsPosition position
+                                       )
 { // set data
   p_data_ = &data;
-  nbControlPoints_ = nbControlPoints;
+  dim_ = nbControlPoints;
   degree_ = degree;
   position_ = position;
-  nbKnots_ = nbControlPoints_ + degree_ +1;
-  lastControlPoint_ = nbControlPoints_-1;
-  knots_.resize( Range(0, nbKnots_) );
-  minValue_ =  Arithmetic<Real>::max();
-  maxValue_ = -Arithmetic<Real>::max();
-  this->hasRun_ = false;
+  nbKnots_ = dim_ + degree_ +1;
+  lastControlPoint_ = dim_-1;
+  Base::update();
 }
 
 /*  run the computations for the given value.
  *  @param p_data the input data values
  **/
-template<class Vector>
-void BSplineCoefficients<Vector>::setParameters( Vector const& data
-                                               , int nbControlPoints
-                                               , int degree
-                                               , Regress::KnotsPosition position
-                                               )
+template<class Data>
+void BSplineCoefficients<Data>::setParameters( Data const& data
+                                             , int nbControlPoints
+                                             , int degree
+                                             , Regress::KnotsPosition position
+                                             )
 { // set data
   p_data_ = &data;
-  nbControlPoints_ = nbControlPoints;
+  dim_ = nbControlPoints;
   degree_ = degree;
   position_ = position;
-  nbKnots_ = nbControlPoints_ + degree_ +1;
-  lastControlPoint_ = nbControlPoints_-1;
+  nbKnots_ = dim_ + degree_ +1;
+  lastControlPoint_ = dim_-1;
   knots_.resize( Range(0, nbKnots_) );
-  minValue_ =  Arithmetic<Real>::max();
-  maxValue_ = -Arithmetic<Real>::max();
-  this->hasRun_ = false;
+  Base::update();
 }
 
 /*  run the computations for the given value.
  *  @param p_data the input data values
  **/
-template<class Vector>
-void BSplineCoefficients<Vector>::setData( Vector const& data)
-{ // set data
-  p_data_ = &data;
-  this->hasRun_ = false;
-}
-
-/*  run the computations for the given value.
- *  @param p_data the input data values
- **/
-template<class Vector>
-void BSplineCoefficients<Vector>::setNbControlPoints( int nbControlPoints)
+template<class Data>
+void BSplineCoefficients<Data>::setNbControlPoints( int nbControlPoints)
 {
-  nbControlPoints_ = nbControlPoints;
-  nbKnots_ = nbControlPoints_ + degree_ +1;
-  lastControlPoint_ = nbControlPoints_-1;
+  dim_ = nbControlPoints;
+  nbKnots_ = dim_ + degree_ +1;
+  lastControlPoint_ = dim_-1;
   knots_.resize( Range(0, nbKnots_) );
-  minValue_ =  Arithmetic<Real>::max();
-  maxValue_ = -Arithmetic<Real>::max();
-  this->hasRun_ = false;
+  Base::update();
 }
 
 /* Set the degree of the BSpline basis
  *  @param degree degree of the B-spline curves (default is 3)
  **/
-template<class Vector>
-void BSplineCoefficients<Vector>::setDegree( int degree)
+template<class Data>
+void BSplineCoefficients<Data>::setDegree( int degree)
 {
   degree_ = degree;
-  nbKnots_ = nbControlPoints_ + degree_ +1;
-  lastControlPoint_ = nbControlPoints_-1;
+  nbKnots_ = dim_ + degree_ +1;
+  lastControlPoint_ = dim_-1;
   knots_.resize( Range(0, nbKnots_)  );
-  minValue_ =  Arithmetic<Real>::max();
-  maxValue_ = -Arithmetic<Real>::max();
-  this->hasRun_ = false;
+  Base::update();
 }
 
 /* Set the kind of position to use for the knots
  *  @param position method to use for positioning the knots (default is uniform)
  **/
-template<class Vector>
-void BSplineCoefficients<Vector>::setPosition(Regress::KnotsPosition position)
+template<class Data>
+void BSplineCoefficients<Data>::setPosition(Regress::KnotsPosition position)
 {
   position_ = position;
-  minValue_ =  Arithmetic<Real>::max();
-  maxValue_ = -Arithmetic<Real>::max();
-  this->hasRun_ = false;
+  Base::update();
 }
 
 
 /* run the computations. */
-template<class Vector>
-bool BSplineCoefficients<Vector>::run()
+template<class Data>
+bool BSplineCoefficients<Data>::run()
 {
-  if (!initializeStep()) return false;
+  // check if data exists
+  if (!p_data_)
+  {
+   msg_error_ = STKERROR_NO_ARG(Error in BSplineCoefficients::run,p_data_ is null);
+   return false;
+  }
+  if (!this->initializeStep()) return false;
+  knots_ = minValue_;
   // compute the knots and coefficients
   if (computeKnots()) { computeCoefficients();}
   else                { return false;}
@@ -376,43 +343,13 @@ bool BSplineCoefficients<Vector>::run()
   return true;
 }
 
-/* Initialize the parameters */
-template<class Vector>
-bool BSplineCoefficients<Vector>::initializeStep()
-{
-  // check if data exists
-  if (!p_data_)
-  {
-   msg_error_ = _T("Error in BSplineCoefficients::run():\nWhat: p_data_ is not set.");
-   return false;
-  }
-  // resize and initialize coeficients
-  coefficients_.resize(p_data_->range(), Range(0, lastControlPoint_, 0)) =0;
-  // compute min and max value
-  minValue_ =  Arithmetic<Real>::max();
-  maxValue_ = -Arithmetic<Real>::max();
-  for (int i=p_data_->begin(); i< p_data_->end(); i++)
-  {
-    minValue_ = std::min(minValue_, (*p_data_)[i]);
-    maxValue_ = std::max(maxValue_, (*p_data_)[i]);
-  }
-  // if all value are equals, all the knots are equals to this value
-  if (minValue_ == maxValue_)
-  {
-    knots_ = minValue_;
-    msg_error_ = STKERROR_NO_ARG(BSplineCoefficients::computeKnots,All values are equal);
-    return false;
-  }
-  return true;
-}
-
 /* Extrapolate the matrix of coefficients for a given set of x-values.
  *  @param x the values to extrapolate
  *  @param coefs the matrix of coefficients for each values.
  **/
-template<class Vector>
+template<class Data>
 template<class OtherVector>
-ArrayXX BSplineCoefficients<Vector>::extrapolate(OtherVector const& x) const
+ArrayXX BSplineCoefficients<Data>::extrapolate(OtherVector const& x) const
 {
   // check if knots exists
   if (!this->hasRun_)
@@ -463,8 +400,8 @@ ArrayXX BSplineCoefficients<Vector>::extrapolate(OtherVector const& x) const
 }
 
 /* compute the knots of the B-spline curves.*/
-template<class Vector>
-bool BSplineCoefficients<Vector>::computeKnots()
+template<class Data>
+bool BSplineCoefficients<Data>::computeKnots()
 {
   // resize and initialize knots
   knots_.resize( Range(0, nbKnots_) ) = minValue_;
@@ -498,8 +435,8 @@ bool BSplineCoefficients<Vector>::computeKnots()
 }
 
 /* Compute the coefficients of the B-spline curves.*/
-template<class Vector>
-void BSplineCoefficients<Vector>::computeCoefficients()
+template<class Data>
+void BSplineCoefficients<Data>::computeCoefficients()
 {
 #ifdef STK_REGRESS_VERBOSE
   stk_cout << _T("BSplineCoefficients::computeCoefficients()\n");
@@ -515,11 +452,11 @@ void BSplineCoefficients<Vector>::computeCoefficients()
 }
 
 /* compute the position of the uniform knots.*/
-template<class Vector>
-void BSplineCoefficients<Vector>::computeUniformKnots()
+template<class Data>
+void BSplineCoefficients<Data>::computeUniformKnots()
 {
   // compute step
-  Real step = 1.0/(nbControlPoints_ - degree_);
+  Real step = 1.0/(dim_ - degree_);
   // set internal knots
   const int first = degree_ + 1;
   for (int k = first, j = 1; k <= lastControlPoint_; j++, k++)  knots_[k] = j * step;
@@ -531,24 +468,24 @@ void BSplineCoefficients<Vector>::computeUniformKnots()
   }
 }
 /* compute the position of the periodic knots.*/
-template<class Vector>
-void BSplineCoefficients<Vector>::computePeriodicKnots()
+template<class Data>
+void BSplineCoefficients<Data>::computePeriodicKnots()
 {
   // compute step
-  Real step = 1.0/(nbControlPoints_ - degree_);
+  Real step = 1.0/(dim_ - degree_);
   // set knots
   for (int k = 0, j = -degree_; k < nbKnots_; j++, k++)
     knots_[k] = j * step;
 ;
 }
 /* compute the position of the density knots. */
-template<class Vector>
-void BSplineCoefficients<Vector>::computeDensityKnots(bool isSorted)
+template<class Data>
+void BSplineCoefficients<Data>::computeDensityKnots(bool isSorted)
 {
   // sorted data
-  Vector xtri(*p_data_, true);
+  Data xtri(*p_data_, true);
   // sort the data
-  if (!isSorted) heapSort< Vector >(xtri);
+  if (!isSorted) heapSort< Data >(xtri);
 
   // compute step
   Real step = xtri.size()/(Real)(lastControlPoint_-degree_+1);
@@ -571,8 +508,8 @@ void BSplineCoefficients<Vector>::computeDensityKnots(bool isSorted)
 /* Compute a row of the coefficients
  * @param irow index of the row
  **/
-template<class Vector>
-void BSplineCoefficients<Vector>::computeCoefficientsRow(int irow, Real const& value)
+template<class Data>
+void BSplineCoefficients<Data>::computeCoefficientsRow(int irow, Real const& value)
 {
   // value outside the range of the knots case
   if (value <= minValue_)

@@ -94,17 +94,17 @@ struct bp<Lhs, Rhs, Result, (bool)Arrays::by_row_>
       default: break;
     }
     // compute dimensions
-    int nbInnerLoop = lhs.sizeCols()/blockSize; // = rhs.sizeRows()/blockSize;
-    int nbBlocks    = lhs.sizeRows()/blockSize;
-    int nbPanels    = rhs.sizeCols()/panelSize;
+    int nbInnerLoop = lhs.sizeCols()/blockSize_; // = rhs.sizeRows()/blockSize_;
+    int nbBlocks    = lhs.sizeRows()/blockSize_;
+    int nbPanels    = rhs.sizeCols()/panelSize_;
     // remaining sizes in the matrices
-    int pSize = rhs.sizeCols() - panelSize*nbPanels;
-    int bSize = lhs.sizeRows() - blockSize*nbBlocks;
-    int tSize = lhs.sizeCols() - blockSize*nbInnerLoop;
-              // = rhs.sizeRows() -  rhs.sizeRows()/blockSize
-    int iLastRow = lhs.beginRows() + nbBlocks * blockSize;
-    int jLastCol = rhs.beginCols() + nbPanels * panelSize;
-    int kLastPos = lhs.beginCols() + blockSize * nbInnerLoop;
+    int pSize = rhs.sizeCols() - panelSize_*nbPanels;
+    int bSize = lhs.sizeRows() - blockSize_*nbBlocks;
+    int tSize = lhs.sizeCols() - blockSize_*nbInnerLoop;
+              // = rhs.sizeRows() -  rhs.sizeRows()/blockSize_
+    int iLastRow = lhs.beginRows() + nbBlocks * blockSize_;
+    int jLastCol = rhs.beginCols() + nbPanels * panelSize_;
+    int kLastPos = lhs.beginCols() + blockSize_ * nbInnerLoop;
     if (nbInnerLoop)
     {
       // create panels and blocks
@@ -113,16 +113,16 @@ struct bp<Lhs, Rhs, Result, (bool)Arrays::by_row_>
       // start blocks by panel
       for (int k = 0; k<nbInnerLoop; ++k)
       {
-        int kPos = lhs.beginCols() + k * blockSize;
+        int kPos = lhs.beginCols() + k * blockSize_;
         for (int i = 0; i<nbBlocks; ++i)
         {
-          int iRow = lhs.beginRows() + i * blockSize;
+          int iRow = lhs.beginRows() + i * blockSize_;
           arrayToBlock( lhs, tabBlock[i], iRow, kPos);
         }
         arrayToBlock( lhs, tabBlock[nbBlocks], iLastRow, kPos, bSize);
         for (int j = 0; j<nbPanels; ++j)
         {
-          int jCol = rhs.beginCols() + j*panelSize;
+          int jCol = rhs.beginCols() + j*panelSize_;
           arrayToPanel( rhs, tabPanel[j], kPos, jCol);
         }
         arrayToPanel( rhs, tabPanel[nbPanels], kPos, jLastCol, pSize);
@@ -131,16 +131,16 @@ struct bp<Lhs, Rhs, Result, (bool)Arrays::by_row_>
 #endif
         for (int i = 0; i<nbBlocks; ++i)
         {
-          int iRow = lhs.beginRows() + i * blockSize;
+          int iRow = lhs.beginRows() + i * blockSize_;
           for (int j = 0; j<nbPanels; ++j)
           {
-            int jCol = rhs.beginCols() + j * panelSize;
+            int jCol = rhs.beginCols() + j * panelSize_;
             blockByPanel( tabBlock[i], tabPanel[j], res, iRow, jCol);
           }
         }
         for (int i = 0; i<nbBlocks; ++i)
         {
-          int iRow = lhs.beginRows() + i * blockSize;
+          int iRow = lhs.beginRows() + i * blockSize_;
           blockByPanel( tabBlock[i], tabPanel[nbPanels], res, iRow, jLastCol, pSize);
         }
 #ifdef _OPENMP
@@ -148,8 +148,8 @@ struct bp<Lhs, Rhs, Result, (bool)Arrays::by_row_>
 #endif
         for (int j = 0; j<nbPanels; ++j)
         {
-          int jCol = rhs.beginCols() + j * panelSize;
-          blockByPanel( tabBlock[nbBlocks], tabPanel[j], res, iLastRow, jCol, panelSize, bSize);
+          int jCol = rhs.beginCols() + j * panelSize_;
+          blockByPanel( tabBlock[nbBlocks], tabPanel[j], res, iLastRow, jCol, panelSize_, bSize);
         }
         blockByPanel( tabBlock[nbBlocks], tabPanel[nbPanels], res, iLastRow, jLastCol, pSize, bSize);
       } // InnerLoop
@@ -197,21 +197,21 @@ struct bp<Lhs, Rhs, Result, (bool)Arrays::by_row_>
   {
     for (int i=0; i<bSize; ++i)
     {
-      block[i*blockSize]    = lhs.elt(iRow+i, jCol);
-      block[i*blockSize+1]  = lhs.elt(iRow+i, jCol+1);
-      block[i*blockSize+2]  = lhs.elt(iRow+i, jCol+2);
-      block[i*blockSize+3]  = lhs.elt(iRow+i, jCol+3);
+      block[i*blockSize_]    = lhs.elt(iRow+i, jCol);
+      block[i*blockSize_+1]  = lhs.elt(iRow+i, jCol+1);
+      block[i*blockSize_+2]  = lhs.elt(iRow+i, jCol+2);
+      block[i*blockSize_+3]  = lhs.elt(iRow+i, jCol+3);
     }
   }
   /** Default dimension */
   static void arrayToPanel( Rhs const& rhs, Panel<Type>& panel, int iRow, int jCol)
   {
-    for (int j=0; j<panelSize; ++j)
+    for (int j=0; j<panelSize_; ++j)
     {
-      panel[j*blockSize]   = rhs.elt(iRow,   jCol+j);
-      panel[j*blockSize+1] = rhs.elt(iRow+1, jCol+j);
-      panel[j*blockSize+2] = rhs.elt(iRow+2, jCol+j);
-      panel[j*blockSize+3] = rhs.elt(iRow+3, jCol+j);
+      panel[j*blockSize_]   = rhs.elt(iRow,   jCol+j);
+      panel[j*blockSize_+1] = rhs.elt(iRow+1, jCol+j);
+      panel[j*blockSize_+2] = rhs.elt(iRow+2, jCol+j);
+      panel[j*blockSize_+3] = rhs.elt(iRow+3, jCol+j);
     }
   }
   /** with panel size given */
@@ -219,34 +219,34 @@ struct bp<Lhs, Rhs, Result, (bool)Arrays::by_row_>
   {
     for (int j=0; j<pSize; ++j)
     {
-      panel[j*blockSize]   = rhs.elt(iRow,   jCol+j);
-      panel[j*blockSize+1] = rhs.elt(iRow+1, jCol+j);
-      panel[j*blockSize+2] = rhs.elt(iRow+2, jCol+j);
-      panel[j*blockSize+3] = rhs.elt(iRow+3, jCol+j);
+      panel[j*blockSize_]   = rhs.elt(iRow,   jCol+j);
+      panel[j*blockSize_+1] = rhs.elt(iRow+1, jCol+j);
+      panel[j*blockSize_+2] = rhs.elt(iRow+2, jCol+j);
+      panel[j*blockSize_+3] = rhs.elt(iRow+3, jCol+j);
     }
   }
   /** Default dimension */
   static void blockByPanel( Block<Type> const& block, Panel<Type> const& panel
                           , Result& res, int iRow, int jCol)
   {
-    for (int j=0; j<panelSize; ++j)
+    for (int j=0; j<panelSize_; ++j)
     {
-      res.elt(iRow  ,jCol+j) += panel[j*blockSize]    * block[0]
-                              + panel[j*blockSize+ 1] * block[1]
-                              + panel[j*blockSize+ 2] * block[2]
-                              + panel[j*blockSize+ 3] * block[3];
-      res.elt(iRow+1,jCol+j) += panel[j*blockSize]    * block[4]
-                              + panel[j*blockSize+ 1] * block[5]
-                              + panel[j*blockSize+ 2] * block[6]
-                              + panel[j*blockSize+ 3] * block[7];
-      res.elt(iRow+2,jCol+j) += panel[j*blockSize]    * block[8]
-                              + panel[j*blockSize+ 1] * block[9]
-                              + panel[j*blockSize+ 2] * block[10]
-                              + panel[j*blockSize+ 3] * block[11];
-      res.elt(iRow+3,jCol+j) += panel[j*blockSize]    * block[12]
-                              + panel[j*blockSize+ 1] * block[13]
-                              + panel[j*blockSize+ 2] * block[14]
-                              + panel[j*blockSize+ 3] * block[15];
+      res.elt(iRow  ,jCol+j) += panel[j*blockSize_]    * block[0]
+                              + panel[j*blockSize_+ 1] * block[1]
+                              + panel[j*blockSize_+ 2] * block[2]
+                              + panel[j*blockSize_+ 3] * block[3];
+      res.elt(iRow+1,jCol+j) += panel[j*blockSize_]    * block[4]
+                              + panel[j*blockSize_+ 1] * block[5]
+                              + panel[j*blockSize_+ 2] * block[6]
+                              + panel[j*blockSize_+ 3] * block[7];
+      res.elt(iRow+2,jCol+j) += panel[j*blockSize_]    * block[8]
+                              + panel[j*blockSize_+ 1] * block[9]
+                              + panel[j*blockSize_+ 2] * block[10]
+                              + panel[j*blockSize_+ 3] * block[11];
+      res.elt(iRow+3,jCol+j) += panel[j*blockSize_]    * block[12]
+                              + panel[j*blockSize_+ 1] * block[13]
+                              + panel[j*blockSize_+ 2] * block[14]
+                              + panel[j*blockSize_+ 3] * block[15];
     }
   }
   /** with panel size given */
@@ -255,22 +255,22 @@ struct bp<Lhs, Rhs, Result, (bool)Arrays::by_row_>
   {
     for (int j=0; j<pSize; ++j)
     {
-      res.elt(iRow  ,jCol+j) += panel[j*blockSize]    * block[0]
-                              + panel[j*blockSize+ 1] * block[1]
-                              + panel[j*blockSize+ 2] * block[2]
-                              + panel[j*blockSize+ 3] * block[3];
-      res.elt(iRow+1,jCol+j) += panel[j*blockSize]    * block[4]
-                              + panel[j*blockSize+ 1] * block[5]
-                              + panel[j*blockSize+ 2] * block[6]
-                              + panel[j*blockSize+ 3] * block[7];
-      res.elt(iRow+2,jCol+j) += panel[j*blockSize]    * block[8]
-                              + panel[j*blockSize+ 1] * block[9]
-                              + panel[j*blockSize+ 2] * block[10]
-                              + panel[j*blockSize+ 3] * block[11];
-      res.elt(iRow+3,jCol+j) += panel[j*blockSize]    * block[12]
-                              + panel[j*blockSize+ 1] * block[13]
-                              + panel[j*blockSize+ 2] * block[14]
-                              + panel[j*blockSize+ 3] * block[15];
+      res.elt(iRow  ,jCol+j) += panel[j*blockSize_]    * block[0]
+                              + panel[j*blockSize_+ 1] * block[1]
+                              + panel[j*blockSize_+ 2] * block[2]
+                              + panel[j*blockSize_+ 3] * block[3];
+      res.elt(iRow+1,jCol+j) += panel[j*blockSize_]    * block[4]
+                              + panel[j*blockSize_+ 1] * block[5]
+                              + panel[j*blockSize_+ 2] * block[6]
+                              + panel[j*blockSize_+ 3] * block[7];
+      res.elt(iRow+2,jCol+j) += panel[j*blockSize_]    * block[8]
+                              + panel[j*blockSize_+ 1] * block[9]
+                              + panel[j*blockSize_+ 2] * block[10]
+                              + panel[j*blockSize_+ 3] * block[11];
+      res.elt(iRow+3,jCol+j) += panel[j*blockSize_]    * block[12]
+                              + panel[j*blockSize_+ 1] * block[13]
+                              + panel[j*blockSize_+ 2] * block[14]
+                              + panel[j*blockSize_+ 3] * block[15];
     }
   }
   /** with panel size given */
@@ -279,10 +279,10 @@ struct bp<Lhs, Rhs, Result, (bool)Arrays::by_row_>
   {
     for (int j=0; j<pSize; ++j)
       for (int i=0; i<bSize; ++i)
-      { res.elt(iRow+i,jCol+j) += panel[j*blockSize]   * block[i*blockSize]
-                                + panel[j*blockSize+1] * block[i*blockSize+1]
-                                + panel[j*blockSize+2] * block[i*blockSize+2]
-                                + panel[j*blockSize+3] * block[i*blockSize+3];}
+      { res.elt(iRow+i,jCol+j) += panel[j*blockSize_]   * block[i*blockSize_]
+                                + panel[j*blockSize_+1] * block[i*blockSize_+1]
+                                + panel[j*blockSize_+2] * block[i*blockSize_+2]
+                                + panel[j*blockSize_+3] * block[i*blockSize_+3];}
   }
 }; // struct bp
 
@@ -334,18 +334,18 @@ struct bp<Lhs, Rhs, Result, (bool)Arrays::by_col_>
       default: break;
     }
     // compute dimensions
-    int nbInnerLoop = lhs.sizeCols()/blockSize; // = rhs.sizeRows()/blockSize;
-    int nbBlocks = rhs.sizeCols()/blockSize;
-    int nbPanels = lhs.sizeRows()/panelSize;
+    int nbInnerLoop = lhs.sizeCols()/blockSize_; // = rhs.sizeRows()/blockSize_;
+    int nbBlocks = rhs.sizeCols()/blockSize_;
+    int nbPanels = lhs.sizeRows()/panelSize_;
 
     // remaining sizes in the matrices
-    int pSize = lhs.sizeRows() - panelSize*nbPanels;
-    int bSize = rhs.sizeCols() - blockSize*nbBlocks;
-    int tSize = lhs.sizeCols() - blockSize*nbInnerLoop;
+    int pSize = lhs.sizeRows() - panelSize_*nbPanels;
+    int bSize = rhs.sizeCols() - blockSize_*nbBlocks;
+    int tSize = lhs.sizeCols() - blockSize_*nbInnerLoop;
     //
-    int lastCol = rhs.beginCols() + blockSize * nbBlocks;
-    int lastRow = lhs.beginRows() + panelSize * nbPanels;
-    int lastPos = rhs.beginRows() + blockSize * nbInnerLoop;
+    int lastCol = rhs.beginCols() + blockSize_ * nbBlocks;
+    int lastRow = lhs.beginRows() + panelSize_ * nbPanels;
+    int lastPos = rhs.beginRows() + blockSize_ * nbInnerLoop;
 
     if (nbInnerLoop)
     {
@@ -355,13 +355,13 @@ struct bp<Lhs, Rhs, Result, (bool)Arrays::by_col_>
       // start blocks by panel
       for (int k = 0; k<nbInnerLoop; ++k)
       {
-        int kPos = rhs.beginRows() + k * blockSize;
+        int kPos = rhs.beginRows() + k * blockSize_;
         // get panels
-        for (int i = 0, iRow= lhs.beginRows(); i<nbPanels; ++i, iRow+= panelSize)
+        for (int i = 0, iRow= lhs.beginRows(); i<nbPanels; ++i, iRow+= panelSize_)
         { arrayToPanel( lhs, tabPanel[i], iRow, kPos);}
         arrayToPanel( lhs, tabPanel[nbPanels], lastRow, kPos, pSize);
         // get blocks
-        for (int j = 0, jCol = rhs.beginCols(); j<nbBlocks; ++j, jCol+=blockSize)
+        for (int j = 0, jCol = rhs.beginCols(); j<nbBlocks; ++j, jCol+=blockSize_)
         { arrayToBlock( rhs, tabBlock[j], kPos, jCol);}
         arrayToBlock( rhs, tabBlock[nbBlocks], kPos, lastCol, bSize);
         // perform the products blocks * panel
@@ -370,16 +370,16 @@ struct bp<Lhs, Rhs, Result, (bool)Arrays::by_col_>
 #endif
         for (int j = 0; j<nbBlocks; ++j)
         {
-          int jCol = rhs.beginCols() + j * blockSize;
+          int jCol = rhs.beginCols() + j * blockSize_;
           for (int i = 0; i<nbPanels; ++i)
           {
-            int iRow = lhs.beginRows() + i * panelSize;
+            int iRow = lhs.beginRows() + i * panelSize_;
             panelByBlock( tabPanel[i], tabBlock[j], res, iRow, jCol);
           }
         }
         for (int j = 0; j<nbBlocks; ++j)
         {
-          int jCol = rhs.beginCols() + j * blockSize;
+          int jCol = rhs.beginCols() + j * blockSize_;
           panelByBlock( tabPanel[nbPanels], tabBlock[j], res, lastRow, jCol, pSize);
         }
 #ifdef _OPENMP
@@ -387,8 +387,8 @@ struct bp<Lhs, Rhs, Result, (bool)Arrays::by_col_>
 #endif
         for (int i = 0; i<nbPanels; ++i)
         {
-          int iRow= lhs.beginRows() + i * panelSize;
-          panelByBlock( tabPanel[i],  tabBlock[nbBlocks], res, iRow, lastCol, panelSize, bSize);
+          int iRow= lhs.beginRows() + i * panelSize_;
+          panelByBlock( tabPanel[i],  tabBlock[nbBlocks], res, iRow, lastCol, panelSize_, bSize);
         }
         panelByBlock( tabPanel[nbPanels],  tabBlock[nbBlocks], res, lastRow, lastCol, pSize, bSize);
       } // k loop
@@ -436,21 +436,21 @@ struct bp<Lhs, Rhs, Result, (bool)Arrays::by_col_>
   {
     for (int j=0; j<bSize; ++j)
     {
-      block[j*blockSize]    = rhs.elt(iRow,   jCol+j);
-      block[j*blockSize+1]  = rhs.elt(iRow+1, jCol+j);
-      block[j*blockSize+2]  = rhs.elt(iRow+2, jCol+j);
-      block[j*blockSize+3]  = rhs.elt(iRow+3, jCol+j);
+      block[j*blockSize_]    = rhs.elt(iRow,   jCol+j);
+      block[j*blockSize_+1]  = rhs.elt(iRow+1, jCol+j);
+      block[j*blockSize_+2]  = rhs.elt(iRow+2, jCol+j);
+      block[j*blockSize_+3]  = rhs.elt(iRow+3, jCol+j);
     }
   }
   /** default dimensions */
   static void arrayToPanel( Lhs const& lhs, Panel<Type>& panel, int iRow, int kPos)
   {
-    for (int i=0; i<panelSize; ++i)
+    for (int i=0; i<panelSize_; ++i)
     {
-      panel[i*blockSize]   = lhs.elt(iRow+i,kPos);
-      panel[i*blockSize+1] = lhs.elt(iRow+i,kPos+1);
-      panel[i*blockSize+2] = lhs.elt(iRow+i,kPos+2);
-      panel[i*blockSize+3] = lhs.elt(iRow+i,kPos+3);
+      panel[i*blockSize_]   = lhs.elt(iRow+i,kPos);
+      panel[i*blockSize_+1] = lhs.elt(iRow+i,kPos+1);
+      panel[i*blockSize_+2] = lhs.elt(iRow+i,kPos+2);
+      panel[i*blockSize_+3] = lhs.elt(iRow+i,kPos+3);
     }
   }
   /** with panel size dimension given */
@@ -458,34 +458,34 @@ struct bp<Lhs, Rhs, Result, (bool)Arrays::by_col_>
   {
     for (int i=0; i<pSize; ++i)
     {
-      panel[i*blockSize]   = lhs.elt(iRow+i,kPos);
-      panel[i*blockSize+1] = lhs.elt(iRow+i,kPos+1);
-      panel[i*blockSize+2] = lhs.elt(iRow+i,kPos+2);
-      panel[i*blockSize+3] = lhs.elt(iRow+i,kPos+3);
+      panel[i*blockSize_]   = lhs.elt(iRow+i,kPos);
+      panel[i*blockSize_+1] = lhs.elt(iRow+i,kPos+1);
+      panel[i*blockSize_+2] = lhs.elt(iRow+i,kPos+2);
+      panel[i*blockSize_+3] = lhs.elt(iRow+i,kPos+3);
     }
   }
   /** Default dimension */
   static void panelByBlock( Panel<Type> const& panel, Block<Type> const& block
                           , Result& res, int iRow, int jCol)
   {
-    for (int i=0; i<panelSize; ++i)
+    for (int i=0; i<panelSize_; ++i)
     {
-      res.elt(iRow+i,jCol)   += panel[i*blockSize]    * block[0]
-                              + panel[i*blockSize+ 1] * block[1]
-                              + panel[i*blockSize+ 2] * block[2]
-                              + panel[i*blockSize+ 3] * block[3];
-      res.elt(iRow+i,jCol+1) += panel[i*blockSize]    * block[4]
-                              + panel[i*blockSize+ 1] * block[5]
-                              + panel[i*blockSize+ 2] * block[6]
-                              + panel[i*blockSize+ 3] * block[7];
-      res.elt(iRow+i,jCol+2) += panel[i*blockSize]    * block[8]
-                              + panel[i*blockSize+ 1] * block[9]
-                              + panel[i*blockSize+ 2] * block[10]
-                              + panel[i*blockSize+ 3] * block[11];
-      res.elt(iRow+i,jCol+3) += panel[i*blockSize]    * block[12]
-                              + panel[i*blockSize+ 1] * block[13]
-                              + panel[i*blockSize+ 2] * block[14]
-                              + panel[i*blockSize+ 3] * block[15];
+      res.elt(iRow+i,jCol)   += panel[i*blockSize_]    * block[0]
+                              + panel[i*blockSize_+ 1] * block[1]
+                              + panel[i*blockSize_+ 2] * block[2]
+                              + panel[i*blockSize_+ 3] * block[3];
+      res.elt(iRow+i,jCol+1) += panel[i*blockSize_]    * block[4]
+                              + panel[i*blockSize_+ 1] * block[5]
+                              + panel[i*blockSize_+ 2] * block[6]
+                              + panel[i*blockSize_+ 3] * block[7];
+      res.elt(iRow+i,jCol+2) += panel[i*blockSize_]    * block[8]
+                              + panel[i*blockSize_+ 1] * block[9]
+                              + panel[i*blockSize_+ 2] * block[10]
+                              + panel[i*blockSize_+ 3] * block[11];
+      res.elt(iRow+i,jCol+3) += panel[i*blockSize_]    * block[12]
+                              + panel[i*blockSize_+ 1] * block[13]
+                              + panel[i*blockSize_+ 2] * block[14]
+                              + panel[i*blockSize_+ 3] * block[15];
     }
   }
   static void panelByBlock( Panel<Type> const& panel, Block<Type> const& block
@@ -493,22 +493,22 @@ struct bp<Lhs, Rhs, Result, (bool)Arrays::by_col_>
   {
     for (int i=0; i<pSize; ++i)
     {
-      res.elt(iRow+i,jCol)   += panel[i*blockSize]    * block[0]
-                              + panel[i*blockSize+ 1] * block[1]
-                              + panel[i*blockSize+ 2] * block[2]
-                              + panel[i*blockSize+ 3] * block[3];
-      res.elt(iRow+i,jCol+1) += panel[i*blockSize]    * block[4]
-                              + panel[i*blockSize+ 1] * block[5]
-                              + panel[i*blockSize+ 2] * block[6]
-                              + panel[i*blockSize+ 3] * block[7];
-      res.elt(iRow+i,jCol+2) += panel[i*blockSize]    * block[8]
-                              + panel[i*blockSize+ 1] * block[9]
-                              + panel[i*blockSize+ 2] * block[10]
-                              + panel[i*blockSize+ 3] * block[11];
-      res.elt(iRow+i,jCol+3) += panel[i*blockSize]    * block[12]
-                              + panel[i*blockSize+ 1] * block[13]
-                              + panel[i*blockSize+ 2] * block[14]
-                              + panel[i*blockSize+ 3] * block[15];
+      res.elt(iRow+i,jCol)   += panel[i*blockSize_]    * block[0]
+                              + panel[i*blockSize_+ 1] * block[1]
+                              + panel[i*blockSize_+ 2] * block[2]
+                              + panel[i*blockSize_+ 3] * block[3];
+      res.elt(iRow+i,jCol+1) += panel[i*blockSize_]    * block[4]
+                              + panel[i*blockSize_+ 1] * block[5]
+                              + panel[i*blockSize_+ 2] * block[6]
+                              + panel[i*blockSize_+ 3] * block[7];
+      res.elt(iRow+i,jCol+2) += panel[i*blockSize_]    * block[8]
+                              + panel[i*blockSize_+ 1] * block[9]
+                              + panel[i*blockSize_+ 2] * block[10]
+                              + panel[i*blockSize_+ 3] * block[11];
+      res.elt(iRow+i,jCol+3) += panel[i*blockSize_]    * block[12]
+                              + panel[i*blockSize_+ 1] * block[13]
+                              + panel[i*blockSize_+ 2] * block[14]
+                              + panel[i*blockSize_+ 3] * block[15];
     }
   }
   /** with panel size dimension given */
@@ -517,10 +517,10 @@ struct bp<Lhs, Rhs, Result, (bool)Arrays::by_col_>
   {
     for (int i=0; i<pSize; ++i)
       for (int j=0; j<bSize; ++j)
-        res.elt(iRow+i,jCol+j) += panel[i*blockSize]   * block[j*blockSize]
-                                + panel[i*blockSize+1] * block[j*blockSize+1]
-                                + panel[i*blockSize+2] * block[j*blockSize+2]
-                                + panel[i*blockSize+3] * block[j*blockSize+3];
+        res.elt(iRow+i,jCol+j) += panel[i*blockSize_]   * block[j*blockSize_]
+                                + panel[i*blockSize_+1] * block[j*blockSize_+1]
+                                + panel[i*blockSize_+2] * block[j*blockSize_+2]
+                                + panel[i*blockSize_+3] * block[j*blockSize_+3];
   }
 }; // struct pb
 

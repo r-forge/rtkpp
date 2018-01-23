@@ -63,7 +63,7 @@ namespace STK
       *  @param x the object to wrap
       **/
      template< typename U >
-     Proxy( typename hidden::If< hidden::isSame<Type const, U>::value, Type, U>::Result& x)
+     Proxy( typename hidden::If< hidden::isSame<Type const, U>::value_, Type, U>::Result& x)
           : x_(x), y_(x) {}
      /** constructor : create a reference of the Real x.
       *  @param x the object to wrap

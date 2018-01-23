@@ -1,13 +1,11 @@
 Package: rtkore
 Type: Package
 Title: 'STK++' Core Library Integration to 'R' using 'Rcpp'
-Version: 1.4.2
+Version: 1.5.0
 Encoding: UTF-8
-Date: 2017-12-11
-Authors@R: c(person("Serge", "Iovleff", role=c("aut","cre"),
-    email="serge.iovleff@stkpp.org"),
-    person("Parmeet", "Bhatia", role="ctb",
-    email="bhatia.parmeet@gmail.com"))
+Date: 2018-01-23
+Authors@R: c( person("Serge", "Iovleff", role=c("aut","cre"), email="serge.iovleff@stkpp.org")
+            , person("Parmeet", "Bhatia", role="ctb", email="bhatia.parmeet@gmail.com"))
 Copyright: Inria, University Lille 1 and specifically inst/COPYRIGHTS for the
     STK++ library
 Maintainer: Serge Iovleff <serge.iovleff@stkpp.org>

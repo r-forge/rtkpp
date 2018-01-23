@@ -371,7 +371,6 @@ lapack::MultiLeastSquare & MultiLeastSquare( b, a, isBref = false, isBref=false)
 
 \textbf{To be continued...}
 
-\section{Handling data sets (DManager project)}
 
 
 

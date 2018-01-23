@@ -233,8 +233,11 @@ struct ProductDispatcher<Lhs, Rhs, Result, Arrays::point_, Arrays::array2D_>
     orient_    = Traits<Result>::orient_,
     storage_   = Traits<Result>::storage_
   };
-  static void run(Lhs const& lhs, Rhs const& rhs, Result& res )
-  { vb<Lhs,Rhs,Result>::run(lhs, rhs, res);}
+  static void run(Lhs const& l, Rhs const& r, Result& res )
+  {
+    MultPointArray<Lhs, Rhs, Result>::run(l, r, res);
+    //vb<Lhs,Rhs,Result>::run(l, r, res);
+  }
 };
 
 template <class Lhs, class Rhs, class Result>
@@ -248,8 +251,11 @@ struct ProductDispatcher<Lhs, Rhs, Result, Arrays::point_, Arrays::square_>
     orient_    = Traits<Result>::orient_,
     storage_   = Traits<Result>::storage_
   };
-  static void run(Lhs const& lhs, Rhs const& rhs, Result& res )
-  { vb<Lhs,Rhs,Result>::run(lhs, rhs, res);}
+  static void run(Lhs const& l, Rhs const& r, Result& res )
+  {
+    MultPointArray<Lhs, Rhs, Result>::run(l, r, res);
+    //vb<Lhs,Rhs,Result>::run(lhs, rhs, res);
+  }
 };
 
 } // namespace hidden

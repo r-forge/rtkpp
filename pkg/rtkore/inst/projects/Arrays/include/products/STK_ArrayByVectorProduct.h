@@ -42,6 +42,14 @@ namespace STK
 namespace hidden
 {
 
+// point by array product
+const int pointByArrayRowSize_ = 256;
+const int pointByArrayColSize_ = 8;
+
+typedef TRange<pointByArrayRowSize_> pointByArrayRowRange;
+typedef TRange<pointByArrayColSize_> PointByArrayColRange;
+
+
 /** @ingroup hidden
  *  this structure regroup all the methods using only pointers on the Type
  **/
@@ -65,7 +73,7 @@ struct MultImpl
 };
 
 /** @ingroup hidden
- *  Methods to use for C=AB with A a general matrix and B a vector.
+ *  Methods to use for C=AV with A a general matrix and V a vector.
  *  The structure bv contains only static methods and typedef and should normally
  *  not be used directly.
  **/
@@ -73,7 +81,6 @@ template<typename Lhs, typename Rhs, typename Result>
 struct bv
 {
   typedef typename Result::Type Type;
-  typedef hidden::MultImpl<Type> Cmult;
   /** Main method for Matrices by vector multiplication implementation
    *  res have been resized and initialized to zero outside
    *  this method.
@@ -86,80 +93,11 @@ struct bv
       { res.elt(i) += lhs(i,j) * rhs[j];}
     }
     return;
-//    // compute dimensions
-//    int nbRawVec = rhs.size()/panelSize;
-//    int nbPanels = lhs.sizeRows()/blockSize;
-//    // create panels and blocks
-//    Panel<Type>* tabPanel = new Panel<Type>[nbPanels];
-//    RawVec<Type> vec;
-//    // start panels by RawVec
-//    for (int k = 0, kPos = rhs.begin(); k<nbRawVec; ++k, kPos += panelSize)
-//    {
-//      vectorToRawVec(rhs, vec, kPos);
-//      for (int i = 0, iRow = lhs.beginRows(); i<nbPanels; ++i, iRow += blockSize)
-//      { arrayToPanel( lhs, tabPanel[i], iRow, kPos);}
-//#ifdef _OPENMP
-//#pragma omp parallel for
-//#endif
-//      for (int i = 0; i<nbPanels; ++i)
-//      {
-//        int iRow = lhs.beginRows() + i * blockSize;
-//        PanelByRawVec(tabPanel[i],vec,res, iRow);
-//      }
-//      // last rows
-//      for (int iRow=lhs.beginRows() + nbPanels * blockSize; iRow<rhs.endRows(); ++iRow)
-//      { ArrayByRawVec(lhs,vec,res, iRow, kPos);}
-//    }
-//    delete[] tabPanel;
-//    // remaining columns
-//    for (int j= lhs.beginCols() + nbRawVec * panelSize; j<lhs.endCols(); ++j)
-//    {
-//      for (int i= lhs.beginRows(); i< lhs.endRows(); ++i)
-//      { res.elt(i) += lhs(i,j) * rhs[j];}
-//    }
-  }
-  /** Default dimension */
-  static void vectorToRawVec( Rhs const& rhs, RawVec<Type>& vec, int iRow)
-  {
-    for (int j=0; j<panelSize; ++j)
-    { vec[j] = rhs[iRow + j];}
-  }
-  /** Default dimension */
-  static void arrayToPanel( Lhs const& lhs, Panel<Type>& panel, int iRow, int jCol)
-  {
-    for (int j=0; j<panelSize; ++j)
-    { panel[j] = lhs(iRow  , jCol+j);}
-    for (int j=0; j<panelSize; ++j)
-    { panel[ panelSize+j] = lhs(iRow+1, jCol+j);}
-    for (int j=0; j<panelSize; ++j)
-    { panel[2*panelSize+j] = lhs(iRow+2, jCol+j);}
-    for (int j=0; j<panelSize; ++j)
-    { panel[3*panelSize+j] = lhs(iRow+3, jCol+j);}
-  }
-  /** Default dimension */
-  static void PanelByRawVec( Panel<Type> const& panel, RawVec<Type> const& vec
-                           , Result& res, int iRow)
-  {
-    for (int j=0; j<panelSize; ++j)
-    { res.elt(iRow)   += panel[            j] * vec[j];}
-    for (int j=0; j<panelSize; ++j)
-    { res.elt(iRow+1) += panel[  panelSize+j] * vec[j];}
-    for (int j=0; j<panelSize; ++j)
-    { res.elt(iRow+2) += panel[2*panelSize+j] * vec[j];}
-    for (int j=0; j<panelSize; ++j)
-    { res.elt(iRow+3) += panel[3*panelSize+j] * vec[j];}
-  }
-  /** Default dimension */
-  static void ArrayByRawVec( Lhs const& lhs, RawVec<Type> const& vec
-                           , Result& res, int iRow, int jCol)
-  {
-    for (int j=0; j<panelSize; ++j)
-    { res.elt(iRow) += lhs(iRow, jCol+j) * vec[j];}
   }
 }; // struct bv
 
 /** @ingroup hidden
- *  Methods to use for C=AB with A a point and B a matrix.
+ *  Methods to use for C=PB with P a point and B a matrix.
  *  The structure vb contains only static method and typedef and should normally
  *  not be used directly.
  **/
@@ -167,7 +105,6 @@ template<typename Lhs, typename Rhs, typename Result>
 struct vb
 {
   typedef typename Result::Type Type;
-  typedef hidden::MultImpl<Type> Cmult;
   /** Main method for point by Matrices multiplication implementation.
    *  res have been resized and initialized to zero outside
    *  this method.
@@ -179,32 +116,60 @@ struct vb
       for (int i= rhs.beginRows(); i< rhs.endRows(); ++i)
       { res.elt(j) += lhs[i] * rhs(i,j);}
     }
-//    int nbInnerLoop = rhs.sizeRows()/vectorSize; // = rhs.sizeRows()/blockSize;
-//    int vSize = rhs.sizeRows() - nbInnerLoop * vectorSize;
-//    Type p_lhs[vectorSize];
-//    Type p_rhs[vectorSize];
-//#ifdef _OPENMP
-//#pragma omp parallel for
-//#endif
-//    for (int k = 0; k<nbInnerLoop; ++k)
-//    {
-//      int iPos = lhs.begin() + k * vectorSize;
-//      for (int j=0; j<vectorSize; ++j) p_lhs[j]  = lhs.elt(iPos+j);
-//      for (int j=rhs.beginCols(); j< rhs.endCols(); ++j)
-//      {
-//        for (int i=0; i<vectorSize; ++i) p_rhs[i]  = rhs.elt(iPos+i, j);
-//        res.elt(j) += Cmult::vectorByVector(p_lhs, p_rhs);
-//      }
-//    } // k loop
-//    int iPos = lhs.begin()+vectorSize*nbInnerLoop;
-//    for (int j=0; j<vSize; ++j) p_lhs[j]  = lhs.elt(iPos+j);
-//    for (int j=rhs.beginCols(); j< rhs.endCols(); ++j)
-//    {
-//      for (int i=0; i<vSize; ++i) p_rhs[i]  = rhs.elt(iPos+i, j);
-//      for (int k=0; k<vSize; ++k) res.elt(j) += p_lhs[k] * p_rhs[k];
-//    } // j loop
   }
 }; // struct pb
+
+/** @ingroup hidden
+ *  This structure regroup the products between a point and different kind of array
+ **/
+template<typename Lhs, typename Rhs, typename Result>
+struct MultPointArray
+{
+//  enum
+//  {
+//
+//  };
+  typedef typename Result::Type Type;
+   /** Compute the product res = l*r with l a point (a row-vector) and r a matrix
+   *   using the standard formula \f$ \mathrm{res}_j = \sum_{i=1}^n l_i r_{ij} \f$
+   **/
+  template<class SubLhs, class SubRhs>
+  static void mult(SubLhs const& l, SubRhs const& r, Result& res)
+  {
+    // loop over the column of the right hand side
+    for (int j=r.beginCols(); j< r.endCols(); ++j)
+    {
+      Type sum(0); // compute dot product
+      for (int i=l.begin(); i<l.end(); ++i) { sum += l.elt(i) * r.elt(i,j); }
+      res.elt(j) += sum;
+    }
+  }
+  /** Compute the product res = l*r with l a point (a row-vector) and r a matrix
+   *  using column decomposition.
+   **/
+  static void run( ExprBase<Lhs> const& l, ExprBase<Rhs> const& r, Result& res)
+  {
+    pointByArrayRowRange rowRange(r.beginRows(), pointByArrayRowSize_);
+    for(;rowRange.end()<r.endRows(); rowRange += pointByArrayRowSize_)
+    {
+      PointByArrayColRange colRange(r.beginCols(), pointByArrayColSize_); // create fixed size col range
+      for(; colRange.end() < r.endCols(); colRange += pointByArrayColSize_)
+      {
+        mult(l.sub(rowRange), r.sub(rowRange, colRange), res);
+      }
+      Range lastColRange(colRange.begin(), r.lastIdxCols(), 0);
+      mult(l.sub(rowRange), r.sub(rowRange, lastColRange ), res);
+    }
+    // end
+    Range lastRowRange(rowRange.begin(), r.lastIdxRows(), 0);
+    PointByArrayColRange colRange(r.beginCols(), pointByArrayColSize_); // create fixed size col range
+    for(; colRange.end() < r.endCols(); colRange += pointByArrayColSize_)
+    { mult(l.sub(lastRowRange), r.sub(lastRowRange, colRange), res);}
+    // last term
+    Range lastColRange(colRange.begin(), r.lastIdxCols(), 0);
+    mult(l.sub(lastRowRange), r.sub(lastRowRange, lastColRange ), res);
+  }
+};
 
 } // namespace hidden
 

@@ -62,13 +62,13 @@ struct Traits< RVector<Type_> >
   private:
     class Void {};
   public:
-//    typedef RowOperator< RVector<Type_> > Row;
-//    typedef ColOperator< RVector<Type_> > Col;
-//    typedef RowOperator< RMatrix<Type_> > SubRow;
-//    typedef ColOperator< RMatrix<Type_> > SubCol;
-//    typedef SubOperator< RMatrix<Type_> > SubVector;
-//    typedef Void SubArray;
-//    typedef Void Number;
+    typedef RowOperator< RVector<Type_> > Row;
+    typedef ColOperator< RVector<Type_> > Col;
+    typedef RowOperator< RMatrix<Type_> > SubRow;
+    typedef ColOperator< RMatrix<Type_> > SubCol;
+    typedef SubVectorOperator< RMatrix<Type_>, UnknownSize > SubVector;
+    typedef Void SubArray;
+    typedef Void Number;
 
     typedef Type_ Type;
     typedef Type const& ReturnType;
@@ -90,12 +90,6 @@ template <typename Type_>
 class RVector: public ArrayBase< RVector<Type_> >, public TRef<1>
 {
   public:
-//    typedef typename hidden::Traits<RVector<Type_> >::Row Row;
-//    typedef typename hidden::Traits<RVector<Type_> >::Col Col;
-//    typedef typename hidden::Traits<RVector<Type_> >::SubRow SubRow;
-//    typedef typename hidden::Traits<RVector<Type_> >::SubCol SubCol;
-//    typedef typename hidden::Traits<RVector<Type_> >::SubVector SubVector;
-
     typedef typename hidden::Traits<RVector<Type_> >::Type Type;
     typedef typename hidden::Traits<RVector<Type_> >::ReturnType ReturnType;
     enum
@@ -154,12 +148,6 @@ class RVector: public ArrayBase< RVector<Type_> >, public TRef<1>
     /** @return the number of columns */
     inline int sizeCols() const { return 1;}
 
-//    /** @return the j-th column of this. */
-//    inline Col colImpl(int j) const { return Col(this->asDerived(), j);}
-//    /** @return the i-th row of this. */
-//    inline Row rowImpl(int i) const { return Row(this->asDerived(), i);}
-//    /** @return the i-th row of this. */
-//    inline SubVector sub(Range I) const { return SubVector(this->asDerived(), I);}
     /** @return a constant reference on ith element
      *  @param i index of the ith element
      **/

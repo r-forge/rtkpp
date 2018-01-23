@@ -54,7 +54,7 @@ struct Online<Array, Real>
   typedef typename Array::Type Type_;
   enum
   {
-    value_ = hidden::isSame<Type_, Real>::value
+    value_ = hidden::isSame<Type_, Real>::value_
   };
   /** default constructor*/
   inline Online(): mean_(), variance_(), iter_(0)

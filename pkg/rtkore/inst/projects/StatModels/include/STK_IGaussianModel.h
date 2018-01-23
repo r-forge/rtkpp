@@ -152,8 +152,8 @@ template <class Array>
 class IGaussianModel: public IStatModel< IGaussianModel<Array> >
 {
   typedef IStatModel< IGaussianModel<Array> > Base;
-  typedef typename Array::Row RowVector;
-  typedef typename Array::Col ColVector;
+  typedef typename hidden::Traits<Array>::Row RowVector;
+  typedef typename hidden::Traits<Array>::Col ColVector;
 
   protected:
     /** constructor.

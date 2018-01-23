@@ -87,6 +87,7 @@ class DataBridge: public IDataBridge, public ITContainer2D< DataBridge<Data> >
     typedef std::vector<std::pair<int,int> > MissingIndexes;
 
     typedef typename hidden::Traits< DataBridge<Data> >::Type Type;
+    typedef typename hidden::Traits< DataBridge<Data> >::ConstReturnType ConstReturnType;
     typedef typename hidden::Traits< DataBridge<Data> >::Row Row;
     typedef typename hidden::Traits< DataBridge<Data> >::Col Col;
     typedef typename hidden::Traits< DataBridge<Data> >::SubRow SubRow;
@@ -171,7 +172,7 @@ class DataBridge: public IDataBridge, public ITContainer2D< DataBridge<Data> >
    /** @return a constant reference of the element (i,j) of the 2D container.
     *  @param i, j indexes of the row and of the column
     **/
-   inline Type const& elt2Impl(int i, int j) const { return dataij_.elt2Impl(i,j);}
+   inline ConstReturnType elt2Impl(int i, int j) const { return dataij_.elt2Impl(i,j);}
    /** @return a reference on the ith element
     *  @param i index of the ith element
     **/
@@ -179,11 +180,11 @@ class DataBridge: public IDataBridge, public ITContainer2D< DataBridge<Data> >
    /** @return the constant ith element
     *  @param i index of the ith element
     **/
-   inline Type const& elt1Impl(int i) const { return dataij_.elt(i);}
+   inline ConstReturnType elt1Impl(int i) const { return dataij_.elt(i);}
    /** @return a reference on the number */
    inline Type& elt0Impl() { return dataij_.elt();}
    /** @return a constant reference on the number */
-   inline Type const& elt0Impl() const  { return dataij_.elt();}
+   inline ConstReturnType elt0Impl() const  { return dataij_.elt();}
    /** Access to the ith row of the Allocator.
     *  @param i index of the row
     *  @return a reference on the ith row

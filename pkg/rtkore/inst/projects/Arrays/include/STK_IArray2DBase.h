@@ -43,9 +43,6 @@
 
 #include "STK_IArrayBase.h"
 
-#include "STK_ExprBaseProduct.h"
-#include "STK_ExprBaseDot.h"
-#include "STK_ExprBaseVisitor.h"
 #include "STK_ArrayBaseApplier.h"
 #include "STK_ArrayBaseAssign.h"
 #include "STK_ArrayBaseInitializer.h"
@@ -156,7 +153,7 @@ class IArray2DBase: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, h
                 , availableCols_(J.size()), capacityByCols_(I.size())
     {
       for (int j=J.begin(); j<J.end(); j++)
-      { rangeCols_[j] = Range::inf(I, T.rangeCols()[j]);}
+      { rangeCols_[j] = inf(I, T.rangeCols()[j]);}
     }
     /** Wrapper constructor. We get a reference of the data.
      *  @param q pointer on data
@@ -227,7 +224,7 @@ class IArray2DBase: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, h
      *  @return a reference in the range I of the column j of this
      **/
     inline SubCol colImpl(Range const& I, int j) const
-    { return SubCol( this->asDerived(), Range::inf(I, this->rangeRowsInCol(j)), j);}
+    { return SubCol( this->asDerived(), inf(I, this->rangeRowsInCol(j)), j);}
     /** access to many columns.
      *  @param J range of the index of the cols
      *  @return a 2D array containing the Container in the Horizontal range @c J
@@ -246,7 +243,7 @@ class IArray2DBase: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, h
      *  @return a reference of the row i.
      **/
     inline SubRow rowImpl(int i, Range const& J) const
-    { return SubRow( this->asDerived(), Range::inf(J, this->rangeColsInRow(i)), i);}
+    { return SubRow( this->asDerived(), inf(J, this->rangeColsInRow(i)), i);}
     /** access to many rows.
      *  @param I range of the index of the rows
      *  @return a 2D array containing the Container in the vertical range @c I

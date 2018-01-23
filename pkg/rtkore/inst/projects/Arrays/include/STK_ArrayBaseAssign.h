@@ -69,6 +69,7 @@
 
 namespace STK
 {
+
 /* @brief assign rhs to this **/
 template<class Derived>
 template<class Rhs>
@@ -93,10 +94,10 @@ inline Derived& ArrayBase<Derived>::assign(ExprBase<Rhs> const& rhs)
   return this->asDerived();
 }
 
-/** @return the matrix or vector obtained by setting this constant*/
+/* @return the matrix or vector obtained by setting this constant*/
 template<class Derived>
 inline Derived& ArrayBase<Derived>::operator=( Type const& value) { return setValue(value);}
-/** @return the matrix or vector obtained by evaluating this expression */
+/* @return the matrix or vector obtained by evaluating this expression */
 template<class Derived>
 inline Derived& ArrayBase<Derived>::operator=( Derived const& rhs) { return assign(rhs);}
 /* @return the matrix or vector obtained by evaluating this expression */
@@ -105,23 +106,27 @@ template<typename Rhs>
 inline Derived& ArrayBase<Derived>::operator=( ExprBase<Rhs> const& rhs)
 { return assign(rhs.asDerived());}
 
-/* Adding a Rhs to this. */
+//------------------------------------------------
+// Rhs array
 template<class Derived>
 template<typename Rhs>
 inline Derived&  ArrayBase<Derived>::operator+=( ExprBase<Rhs> const& rhs)
 {
-  enum { orient_ = hidden::Traits<Derived>::orient_};
-  typedef BinaryOperator< SumOp<Type, typename hidden::Traits<Rhs>::Type>, Derived, Rhs> Res;
+  enum { orient_     = hidden::Traits<Derived>::orient_
+       , RStructure_ = hidden::Traits<Rhs>::structure_
+       };
+  typedef typename hidden::OperatorHelper<Derived, Rhs, Arrays::sumOp_>::Result Res;
   hidden::CopycatSelector<Derived, Res, orient_>::run(this->asDerived(), this->asDerived() + rhs.asDerived());
   return this->asDerived();
 }
-/* subtract a Rhs to this. */
 template<class Derived>
 template<typename Rhs>
 inline Derived&  ArrayBase<Derived>::operator-=( ExprBase<Rhs> const& rhs)
 {
-  enum { orient_ = hidden::Traits<Derived>::orient_};
-  typedef BinaryOperator< DifferenceOp<Type, typename hidden::Traits<Rhs>::Type>, Derived, Rhs> Res;
+    enum { orient_     = hidden::Traits<Derived>::orient_
+         , RStructure_ = hidden::Traits<Rhs>::structure_
+         };
+  typedef typename hidden::OperatorHelper<Derived, Rhs, Arrays::differenceOp_>::Result Res;
   hidden::CopycatSelector<Derived, Res, orient_>::run(this->asDerived(), this->asDerived() - rhs.asDerived());
   return this->asDerived();
 }
@@ -130,56 +135,80 @@ template<class Derived>
 template<typename Rhs>
 inline Derived&  ArrayBase<Derived>::operator/=( ExprBase<Rhs> const& rhs)
 {
-  enum { orient_ = hidden::Traits<Derived>::orient_};
-  typedef BinaryOperator< DivOp<Type, typename hidden::Traits<Rhs>::Type>, Derived, Rhs> Res;
+    enum { orient_     = hidden::Traits<Derived>::orient_
+         , RStructure_ = hidden::Traits<Rhs>::structure_
+         };
+  typedef typename hidden::OperatorHelper<Derived, Rhs, Arrays::divisionOp_>::Result Res;
   hidden::CopycatSelector<Derived, Res, orient_>::run(this->asDerived(), this->asDerived() / rhs.asDerived());
   return this->asDerived();
 }
-/* mult a Rhs to this. */
+// TODO: implement direct call to CopyCat
 template<class Derived>
 template<typename Rhs>
 inline Derived&  ArrayBase<Derived>::operator*=( ExprBase<Rhs> const& rhs)
 {
-  enum { orient_ = hidden::Traits<Derived>::orient_};
-  typedef BinaryOperator< ProductOp<Type, typename hidden::Traits<Rhs>::Type>, Derived, Rhs> Res;
-  hidden::CopycatSelector<Derived, Res, orient_>::run(this->asDerived(), this->asDerived() * rhs.asDerived());
+    enum { orient_     = hidden::Traits<Derived>::orient_
+         , RStructure_ = hidden::Traits<Rhs>::structure_
+         };
+  //typedef typename ProductProductType<Derived, Rhs>::ProductType Res;
+//  typedef BinaryOperator< ProductOp<Type, typename hidden::Traits<Rhs>::Type>, Derived, Rhs> Res;
+//  hidden::CopycatSelector<Derived, Res, orient_>::run(this->asDerived(), this->asDerived() * rhs.asDerived());
+  this->asDerived() = this->asDerived() * rhs.asDerived();
   return this->asDerived();
 }
 
-/* Adding a constant to this. */
+template<class Derived>
+template<typename Rhs>
+inline Derived&  ArrayBase<Derived>::operator%=( ExprBase<Rhs> const& rhs)
+{
+    enum { orient_     = hidden::Traits<Derived>::orient_
+         , RStructure_ = hidden::Traits<Rhs>::structure_
+         };
+  typedef typename hidden::OperatorHelper<Derived, Rhs, Arrays::moduloOp_>::Result Res;
+  hidden::CopycatSelector<Derived, Res, orient_>::run(this->asDerived(), this->asDerived() % rhs.asDerived());
+  return this->asDerived();
+}
+
+//------------------------------------------------
+// rhs value
 template<class Derived>
 inline Derived& ArrayBase<Derived>::operator+=( Type const& value)
 {
   enum { orient_ = hidden::Traits<Derived>::orient_};
-  typedef UnaryOperator<AddOp<Type>, Derived> Rhs;
+  typedef UnaryOperator<SumWithOp<Type>, Derived> Rhs;
   hidden::CopycatSelector<Derived, Rhs, orient_>::run(this->asDerived(), this->asDerived() + value);
   return this->asDerived();
 }
-/* Substract a constant to this. */
 template<class Derived>
 inline Derived& ArrayBase<Derived>::operator-=( Type const& value)
 {
   enum { orient_ = hidden::Traits<Derived>::orient_};
-  typedef UnaryOperator<AddOppositeOp<Type>, Derived> Rhs;
-  hidden::CopycatSelector<Derived, Rhs, orient_>::run(this->asDerived(), this->asDerived() - value);
+  typedef UnaryOperator<SumWithOp<Type>, Derived> Rhs;
+  hidden::CopycatSelector<Derived, Rhs, orient_>::run(this->asDerived(), this->asDerived() + (-value));
   return this->asDerived();
 }
-/* product of this by a constant. */
 template<class Derived>
 inline Derived& ArrayBase<Derived>::operator*=( Type const& value)
 {
   enum { orient_ = hidden::Traits<Derived>::orient_};
-  typedef UnaryOperator<MultipleOp<Type>, Derived> Rhs;
+  typedef UnaryOperator<ProductWithOp<Type>, Derived> Rhs;
   hidden::CopycatSelector<Derived, Rhs, orient_>::run(this->asDerived(), this->asDerived() * value);
   return this->asDerived();
 }
-/* dividing this by a constant. */
 template<class Derived>
 inline Derived& ArrayBase<Derived>::operator/=( Type const& value)
 {
   enum { orient_ = hidden::Traits<Derived>::orient_};
-  typedef UnaryOperator<QuotientOp<Type>, Derived> Rhs;
+  typedef UnaryOperator<DivisionWithOp<Type>, Derived> Rhs;
   hidden::CopycatSelector<Derived, Rhs, orient_>::run(this->asDerived(), this->asDerived() / value);
+  return this->asDerived();
+}
+template<class Derived>
+inline Derived& ArrayBase<Derived>::operator%=( Type const& value)
+{
+  enum { orient_ = hidden::Traits<Derived>::orient_};
+  typedef UnaryOperator<ModuloWithOp<Type>, Derived> Rhs;
+  hidden::CopycatSelector<Derived, Rhs, orient_>::run(this->asDerived(), this->asDerived() % value);
   return this->asDerived();
 }
 

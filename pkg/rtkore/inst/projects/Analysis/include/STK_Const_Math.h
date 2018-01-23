@@ -31,7 +31,7 @@
 
 /** @file STK_Const_Math.h
  *  @brief In this file we give the main mathematical constants.
- * 
+ *
  *  Many of them have been obtained using the infinite precision
  *  calculator bc.
  **/
@@ -49,9 +49,9 @@ namespace Const
 /// e
 static const Real _E_          = 2.718281828459045235360287471353;
 /// pi
-static const Real _PI_   = 3.141592653589793238462643383279502884197169399375;
+static const Real _PI_         = 3.141592653589793238462643383279502884197169399375;
  /// gamma
-static const Real _EULER_  = 0.57721566490153286060651209008240243104215933594;
+static const Real _EULER_      = 0.57721566490153286060651209008240243104215933594;
 /// 2*pi
 static const Real _2PI_        = 6.283185307179586476925286766559;
 /// pi/2
@@ -59,9 +59,9 @@ static const Real _PI_2_       = 1.570796326794896619231321691640;
 /// pi/4
 static const Real _PI_4_       = 0.785398163397448309615660845820;
 /// 1/pi
-static const Real _1_PI     = 0.318309886183790671537767526745;
+static const Real _1_PI        = 0.318309886183790671537767526745;
 /// 2/pi
-static const Real _2_PI_     = 0.636619772367581343075535053490;
+static const Real _2_PI_       = 0.636619772367581343075535053490;
 /// log10(2)
 static const Real _LOG2_       = 0.301029995663981195213738894724;
 /// log10(e)
@@ -77,7 +77,7 @@ static const Real _SQRT3_      = 1.732050807568877293527446341506;
 /// sqrt(32)
 static const Real _SQRT32_     = 5.656854249492380195206754896838;
 /// 1/sqrt(2)
-static const Real _1_SQRT2_  = 0.707106781186547524400844362105;
+static const Real _1_SQRT2_    = 0.707106781186547524400844362105;
 /// sqrt(pi)
 static const Real _SQRTPI_     = 1.772453850905516027298167483341;
 /// sqrt(2/pi)
@@ -85,15 +85,15 @@ static const Real _SQRT2_PI_   = 0.797884560802865355879892119869;
 /// sqrt(2pi)
 static const Real _SQRT2PI_    = 2.506628274631000502415765284811045253007;
 /// 1/sqrt(pi)
-static const Real _1_SQRTPI_ = 0.564189583547756286948079451561;
+static const Real _1_SQRTPI_   = 0.564189583547756286948079451561;
 /// 2/sqrt(pi)
-static const Real _2_SQRTPI_ = 1.128379167095512573896158903122;
+static const Real _2_SQRTPI_   = 1.128379167095512573896158903122;
 /// 1/sqrt(2pi)
-static const Real _1_SQRT2PI_= 0.398942280401432677939946059934;
+static const Real _1_SQRT2PI_  = 0.398942280401432677939946059934;
 /// ln(sqrt(pi))
 static const Real _LNSQRTPI_   = 0.572364942924700087071713675677;
 /// ln(sqrt(2*pi))
-static const Real _LNSQRT2PI_ = 0.918938533204672741780329736406;
+static const Real _LNSQRT2PI_  = 0.918938533204672741780329736406;
 /// ln(sqrt(pi/2))
 static const Real _LNSQRTPI_2_ = 0.225791352644727432363097614947;
 

@@ -66,7 +66,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::array2D_, RStructure_>
     // if there is more block on the left side, we use bp --> result is by_col_
     orient_   =  ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
                  ? Traits<Rhs>::orient_
-                 : (Traits<Lhs>::sizeRows_)/blockSize < (Traits<Rhs>::sizeCols_)/blockSize
+                 : (Traits<Lhs>::sizeRows_)/blockSize_ < (Traits<Rhs>::sizeCols_)/blockSize_
                    ? int(Arrays::by_row_) : int(Arrays::by_col_),
     storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
                 ? int(Arrays::dense_) : int(Arrays::sparse_)
@@ -90,7 +90,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::square_, RStructure_>
     // if there is more block on the left side, we use bp --> result is by_col_
     orient_   =  ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
                  ? Traits<Rhs>::orient_
-                 : (Traits<Lhs>::sizeRows_)/blockSize < (Traits<Rhs>::sizeCols_)/blockSize
+                 : (Traits<Lhs>::sizeRows_)/blockSize_ < (Traits<Rhs>::sizeCols_)/blockSize_
                    ? int(Arrays::by_row_) : int(Arrays::by_col_),
     storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
               ? int(Arrays::dense_) : int(Arrays::sparse_)
@@ -112,7 +112,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::square_, Arrays::square_>
     // if there is more block on the left side, we use bp --> result is by_col_
     orient_   =  ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
                  ? Traits<Rhs>::orient_
-                 : (Traits<Lhs>::sizeRows_)/blockSize < (Traits<Rhs>::sizeCols_)/blockSize
+                 : (Traits<Lhs>::sizeRows_)/blockSize_ < (Traits<Rhs>::sizeCols_)/blockSize_
                    ? int(Arrays::by_row_) : int(Arrays::by_col_),
     storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
               ? int(Arrays::dense_) : int(Arrays::sparse_)
@@ -136,7 +136,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::lower_triangular_, RStructure_>
     // if there is more block on the left side, we use bp --> result is by_col_
     orient_   =  ( sizeRows_ == UnknownSize || sizeCols_ == UnknownSize)
                  ? Traits<Rhs>::orient_
-                 : sizeRows_/blockSize < sizeCols_/blockSize
+                 : sizeRows_/blockSize_ < sizeCols_/blockSize_
                    ? int(Arrays::by_row_) : int(Arrays::by_col_),
     storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
               ? int(Arrays::dense_) : int(Arrays::sparse_)
@@ -158,7 +158,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::lower_triangular_, Arrays::lower_triangul
     // if there is more block on the left side, we use bp --> result is by_col_
     orient_   =  ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
                  ? Traits<Rhs>::orient_
-                 : (Traits<Lhs>::sizeRows_)/blockSize < (Traits<Rhs>::sizeCols_)/blockSize
+                 : (Traits<Lhs>::sizeRows_)/blockSize_ < (Traits<Rhs>::sizeCols_)/blockSize_
                    ? int(Arrays::by_row_) : int(Arrays::by_col_),
     storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
               ? int(Arrays::dense_) : int(Arrays::sparse_)
@@ -182,7 +182,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::upper_triangular_, RStructure_>
     // if there is more block on the left side, we use bp --> result is by_col_
     orient_   =  ( sizeRows_ == UnknownSize || sizeCols_ == UnknownSize)
                  ? Traits<Rhs>::orient_
-                 : (Traits<Lhs>::sizeRows_)/blockSize < (Traits<Rhs>::sizeCols_)/blockSize
+                 : (Traits<Lhs>::sizeRows_)/blockSize_ < (Traits<Rhs>::sizeCols_)/blockSize_
                    ? int(Arrays::by_row_) : int(Arrays::by_col_),
     storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
               ? int(Arrays::dense_) : int(Arrays::sparse_)
@@ -204,7 +204,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::upper_triangular_, Arrays::upper_triangul
     // if there is more block on the left side, we use bp --> result is by_col_
     orient_   =  ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
                  ? Traits<Rhs>::orient_
-                 : (Traits<Lhs>::sizeRows_)/blockSize < (Traits<Rhs>::sizeCols_)/blockSize
+                 : (Traits<Lhs>::sizeRows_)/blockSize_ < (Traits<Rhs>::sizeCols_)/blockSize_
                    ? int(Arrays::by_row_) : int(Arrays::by_col_),
     storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
               ? int(Arrays::dense_) : int(Arrays::sparse_)
@@ -326,117 +326,27 @@ struct Traits< ArrayByDiagonalProduct < Lhs, Rhs> >
   typedef typename Promote<typename Lhs::Type, typename Rhs::Type>::result_type Type;
   typedef typename RemoveConst<Type>::Type ConstReturnType; // not a reference as it is a temporary
 };
-/** @ingroup hidden
- *  @brief Traits class for the DiagonalByArrayProduct class
- */
-template< typename Lhs, typename Rhs>
-struct Traits< DiagonalByArrayProduct < Lhs, Rhs> >
-{
-  enum
-  {
-    structure_ = Rhs::structure_,
-    sizeRows_  = Lhs::sizeRows_,
-    sizeCols_  = Rhs::sizeCols_,
-    orient_    = Rhs::orient_,
-    storage_   = Rhs::storage_
-  };
-  typedef typename Promote<typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type ConstReturnType;  // not a reference as it is a temporary
-};
-/** @ingroup hidden
- *  @brief Traits class for the PointByArrayProduct
- */
-template< typename Lhs, typename Rhs>
-struct Traits< PointByArrayProduct < Lhs, Rhs> >
-{
-  enum
-   {
-     structure_ = Arrays::point_,
-     sizeRows_  = 1,
-     sizeCols_  = Traits<Rhs>::sizeCols_,
-     orient_    = Arrays::by_row_,
-     storage_   = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
-                  ? int(Arrays::dense_) : int(Arrays::sparse_)
-   };
 
-  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+} // namespace hidden
 
-  typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
-};
-
-/** @ingroup hidden
- *  @brief Traits class for the ArrayByVectorProduct class
- */
-template< typename Lhs, typename Rhs>
-struct Traits< ArrayByVectorProduct < Lhs, Rhs> >
-{
-  enum
-   {
-     structure_ = Arrays::vector_,
-     orient_    = Arrays::by_col_,
-     sizeRows_  = Traits<Lhs>::sizeRows_,
-     sizeCols_  = 1,
-     storage_   = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
-                  ? int(Arrays::dense_) : int(Arrays::sparse_)
-   };
-
-  typedef ProductTraits<Lhs, Rhs, Lhs::structure_, Rhs::structure_> Base;
-  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
-
-  typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
-};
-/** @ingroup hidden
- *  @brief Traits class for the DiagonalByArrayProduct class
- */
-template< typename Lhs, typename Rhs>
-struct Traits< VectorByPointProduct < Lhs, Rhs> >
-{
-  enum
-  {
-    structure_ = Arrays::array2D_,
-    sizeRows_  = Traits<Lhs>::sizeRows_,
-    sizeCols_  = Traits<Rhs>::sizeCols_,
-    orient_    = Arrays::by_col_,
-    storage_   = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
-                 ? int(Arrays::dense_) : int(Arrays::sparse_)
-  };
-  typedef typename Promote<typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef Type ConstReturnType;
-};
-/** @ingroup hidden
- *  @brief Traits class for the ArrayByArrayProduct class
- */
-template< typename Lhs, typename Rhs>
-struct Traits< ArrayByArrayProduct<Lhs, Rhs> >
-{
-  typedef ProductTraits<Lhs, Rhs, Traits<Lhs>::structure_, Traits<Rhs>::structure_> Base;
-
-  enum
-  {
-    structure_ = Base::structure_,
-    sizeRows_ = Traits<Lhs>::sizeRows_,
-    sizeCols_ = Traits<Rhs>::sizeCols_,
-    // if there is more block on the left side, we use bp --> result is by_col_
-    orient_   =  ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
-                 ? Traits<Rhs>::orient_
-                 : (Traits<Lhs>::sizeRows_)/blockSize < (Traits<Rhs>::sizeCols_)/blockSize
-                   ? int(Arrays::by_row_) : int(Arrays::by_col_),
-    storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
-                  ? int(Arrays::dense_) : int(Arrays::sparse_)
-  };
-  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
-
-  typedef typename Base::Allocator Allocator;
-};
-
-} // end namespace hidden
-
+/** @ingroup Arrays
+  * @brief Generic expression where a product operator is applied to two expressions
+  *
+  * @tparam Lhs left-hand side type
+  * @tparam Rhs right-hand side type
+  *
+  * This class represents an expression where a product operator is applied to
+  * two expressions.
+  *
+  * It is the return type of product operator when the left hand side expression
+  * is an array and the right and side expression is a diagonal expression.
+  *
+  * Most of the time, this is the only way that it is used, so you typically
+  * don't have to name ArrayByDiagonalProduct types explicitly.
+  **/
 template<typename Lhs, typename Rhs>
 class ArrayByDiagonalProduct: public ExprBase< ArrayByDiagonalProduct<Lhs, Rhs> >
-                             , public TRef<1>
+                            , public TRef<1>
 {
   public:
     typedef ExprBase< ArrayByDiagonalProduct<Lhs, Rhs> > Base;
@@ -465,13 +375,15 @@ class ArrayByDiagonalProduct: public ExprBase< ArrayByDiagonalProduct<Lhs, Rhs> 
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return lhs_.rows();}
     /** @return the columns range */
-    inline ColRange const&colsImpl() const { return rhs_.cols();}
+    inline ColRange const& colsImpl() const { return rhs_.cols();}
 
+    /** @return the element (i,j) */
     inline ConstReturnType elt2Impl(int i, int j) const { return lhs_.elt(i,j)*rhs_.elt(j);}
-    /** access to the ith element */
+    /** @return ith element
+     *  @note make sense if lhs_ is a diagonal matrix, in this case this operator is also a
+     *  diagonal matrix.
+     **/
     inline ConstReturnType elt1Impl(int i) const { return lhs_.elt(i)*rhs_.elt(i);}
-    /** access to the element */
-    inline ConstReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
 
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_; }
@@ -483,9 +395,69 @@ class ArrayByDiagonalProduct: public ExprBase< ArrayByDiagonalProduct<Lhs, Rhs> 
     Rhs const& rhs_;
 };
 
+namespace hidden
+{
+/** @ingroup hidden
+ *  @brief Traits class for the VectorByPointProduct class
+ */
+template< typename Lhs, typename Rhs>
+struct Traits< VectorByPointProduct < Lhs, Rhs> >
+{
+  enum
+  {
+    structure_ = Arrays::array2D_,
+    sizeRows_  = Traits<Lhs>::sizeRows_,
+    sizeCols_  = Traits<Rhs>::sizeCols_,
+    orient_    = Arrays::by_col_,
+    storage_   = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
+                 ? int(Arrays::dense_) : int(Arrays::sparse_)
+  };
+  typedef typename Promote<typename Lhs::Type, typename Rhs::Type>::result_type Type;
+  typedef Type ConstReturnType;
+};
+
+} // namespace hidden
+
+namespace hidden
+{
+/** @ingroup hidden
+ *  @brief Traits class for the DiagonalByArrayProduct class
+ */
+template< typename Lhs, typename Rhs>
+struct Traits< DiagonalByArrayProduct < Lhs, Rhs> >
+{
+  enum
+  {
+    structure_ = Rhs::structure_,
+    sizeRows_  = Lhs::sizeRows_,
+    sizeCols_  = Rhs::sizeCols_,
+    orient_    = Rhs::orient_,
+    storage_   = Rhs::storage_
+  };
+  typedef typename Promote<typename Lhs::Type, typename Rhs::Type>::result_type Type;
+  typedef typename RemoveConst<Type>::Type ConstReturnType;  // not a reference as it is a temporary
+};
+
+} // namespace hidden
+
+/** @ingroup Arrays
+  * @brief Generic expression where a product operator is applied to two expressions
+  *
+  * @tparam Lhs left-hand side type
+  * @tparam Rhs right-hand side type
+  *
+  * This class represents an expression  where a product operator is applied to
+  * two expressions.
+  *
+  * It is the return type of product operator when the left hand side expression
+  * is a diagonal expression and the right and side expression is an array.
+  *
+  * Most of the time, this is the only way that it is used, so you typically
+  * don't have to name ArrayByDiagonalProduct types explicitly.
+  **/
 template<typename Lhs, typename Rhs>
 class DiagonalByArrayProduct: public ExprBase< DiagonalByArrayProduct<Lhs, Rhs> >
-                              , public TRef<1>
+                            , public TRef<1>
 {
   public:
     typedef ExprBase< DiagonalByArrayProduct<Lhs, Rhs> > Base;
@@ -506,7 +478,7 @@ class DiagonalByArrayProduct: public ExprBase< DiagonalByArrayProduct<Lhs, Rhs> 
     typedef TRange<sizeCols_> ColRange;
 
     inline DiagonalByArrayProduct( const Lhs& lhs, const Rhs& rhs)
-                                : Base(), lhs_(lhs), rhs_(rhs)
+                                 : Base(), lhs_(lhs), rhs_(rhs)
     {
       if (lhs.cols() != rhs.rows())
       { STKRUNTIME_ERROR_NO_ARG(DiagonalByArrayProduct, sizes mismatch);}
@@ -514,14 +486,15 @@ class DiagonalByArrayProduct: public ExprBase< DiagonalByArrayProduct<Lhs, Rhs> 
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return lhs_.rows();}
     /** @return the columns range */
-    inline ColRange const&colsImpl() const { return rhs_.cols();}
+    inline ColRange const& colsImpl() const { return rhs_.cols();}
 
-    /** access to the element (i,j) */
+    /** @return element (i,j) */
     inline ConstReturnType elt2Impl(int i, int j) const { return lhs_.elt(i)*rhs_.elt(i,j);}
-    /** access to the ith element */
+    /** @return ith element
+     *  @note make sense if rhs_ is a diagonal matrix, in this case this operator is also a
+     *  diagonal matrix.
+     **/
     inline ConstReturnType elt1Impl(int i) const { return lhs_.elt(i)*rhs_.elt(i);}
-    /** access to the element */
-    inline ConstReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
 
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_; }
@@ -533,9 +506,112 @@ class DiagonalByArrayProduct: public ExprBase< DiagonalByArrayProduct<Lhs, Rhs> 
     Rhs const& rhs_;
 };
 
+
+/** @ingroup Arrays
+  * @brief Generic expression where a product operator is applied to two expressions
+  *
+  * @tparam Lhs left-hand side type
+  * @tparam Rhs right-hand side type
+  *
+  * This class represents an expression  where a product operator is applied to
+  * two expressions.
+  *
+  * It is the return type of product operator when the left hand side expression
+  * is a (column) vector and the right and side expression is a point (a row vector).
+  *
+  * Most of the time, this is the only way that it is used, so you typically
+  * don't have to name VectorByPointProduct types explicitly.
+  **/
+template<typename Lhs, typename Rhs>
+class VectorByPointProduct: public ExprBase< VectorByPointProduct<Lhs, Rhs> >
+                          , public TRef<1>
+{
+  public:
+    typedef ExprBase< VectorByPointProduct<Lhs, Rhs> > Base;
+    typedef typename hidden::Traits<VectorByPointProduct>::Type Type;
+    typedef typename hidden::Traits<VectorByPointProduct>::ConstReturnType ConstReturnType;
+
+    enum
+    {
+      structure_ = hidden::Traits<VectorByPointProduct>::structure_,
+      orient_    = hidden::Traits<VectorByPointProduct>::orient_,
+      sizeRows_  = hidden::Traits<VectorByPointProduct>::sizeRows_,
+      sizeCols_  = hidden::Traits<VectorByPointProduct>::sizeCols_,
+      storage_   = hidden::Traits<VectorByPointProduct>::storage_
+    };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
+
+    /** constructor */
+    VectorByPointProduct( const Lhs& lhs, const Rhs& rhs): Base(), lhs_(lhs), rhs_(rhs){}
+    /**  @return the range of the rows */
+    inline RowRange const& rowsImpl() const { return lhs_.rows();}
+    /** @return the columns range */
+    inline ColRange const& colsImpl() const { return rhs_.cols();}
+
+    /** @return the element (i,j) */
+    inline ConstReturnType elt2Impl(int i, int j) const { return lhs_.elt(i)*rhs_.elt(j);}
+    /** @return the element */
+    inline ConstReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
+
+    /** @return the left hand side expression */
+    inline Lhs const& lhs() const { return lhs_; }
+    /** @return the right hand side expression */
+    inline Rhs const& rhs() const { return rhs_; }
+
+  protected:
+    Lhs const& lhs_;
+    Rhs const& rhs_;
+};
+
+
+
+namespace hidden
+{
+/** @ingroup hidden
+ *  @brief Traits class for the PointByArrayProduct
+ */
+template< typename Lhs, typename Rhs>
+struct Traits< PointByArrayProduct < Lhs, Rhs> >
+{
+  enum
+   {
+     structure_ = Arrays::point_,
+     sizeRows_  = 1,
+     sizeCols_  = Traits<Rhs>::sizeCols_,
+     orient_    = Arrays::by_row_,
+     storage_   = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
+                  ? int(Arrays::dense_) : int(Arrays::sparse_)
+   };
+
+  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+
+  typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
+};
+
+} // namespace hidden
+
+/** @ingroup Arrays
+  * @brief Generic expression where a product operator is applied to two expressions
+  *
+  * @tparam Lhs left-hand side type
+  * @tparam Rhs right-hand side type
+  *
+  * This class represents an expression  where a product operator is applied to
+  * two expressions.
+  *
+  * It is the return type of product operator when the left hand side expression
+  * is a point (a  row vector) and the right and side expression is an array.
+  *
+  * Most of the time, this is the only way that it is used, so you typically
+  * don't have to name PointByArrayProduct types explicitly.
+  **/
 template<typename Lhs, typename Rhs>
 class PointByArrayProduct: public ExprBase< PointByArrayProduct<Lhs, Rhs> >
-                           , public TRef<1>
+                         , public TRef<1>
 {
   public:
     typedef ExprBase< PointByArrayProduct<Lhs, Rhs> > Base;
@@ -558,7 +634,7 @@ class PointByArrayProduct: public ExprBase< PointByArrayProduct<Lhs, Rhs> >
 
     inline PointByArrayProduct( const Lhs& lhs, const Rhs& rhs)
                              : Base(), lhs_(lhs), rhs_(rhs)
-                              , result_(1, rhs.sizeCols(), Type(0))
+                             , result_(1, rhs.sizeCols(), Type(0))
     {
       if (lhs.range() != rhs.rows())
       { STKRUNTIME_ERROR_2ARG(PointByArrayProduct, lhs.range(), rhs.rows(), sizes mismatch);}
@@ -568,7 +644,7 @@ class PointByArrayProduct: public ExprBase< PointByArrayProduct<Lhs, Rhs> >
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return result_.rows();}
     /** @return the columns range */
-    inline ColRange const&colsImpl() const { return result_.cols();}
+    inline ColRange const& colsImpl() const { return result_.cols();}
 
     /** @return the element (i,j) */
     inline ConstReturnType elt2Impl(int i, int j) const { return result_.elt(i, j);}
@@ -582,7 +658,7 @@ class PointByArrayProduct: public ExprBase< PointByArrayProduct<Lhs, Rhs> >
     /** @return the right hand side nested expression */
     inline Rhs const& rhs() const { return rhs_; }
     /** @return the right hand side nested expression */
-    Rhs const& result() const { return result_; }
+    Allocator const& result() const { return result_; }
 
   protected:
     Lhs const& lhs_;
@@ -592,8 +668,48 @@ class PointByArrayProduct: public ExprBase< PointByArrayProduct<Lhs, Rhs> >
     Allocator result_;
 };
 
+namespace hidden
+{
+/** @ingroup hidden
+ *  @brief Traits class for the ArrayByVectorProduct class
+ */
+template< typename Lhs, typename Rhs>
+struct Traits< ArrayByVectorProduct < Lhs, Rhs> >
+{
+  enum
+   {
+     structure_ = Arrays::vector_,
+     orient_    = Arrays::by_col_,
+     sizeRows_  = Traits<Lhs>::sizeRows_,
+     sizeCols_  = 1,
+     storage_   = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
+                  ? int(Arrays::dense_) : int(Arrays::sparse_)
+   };
 
+  typedef ProductTraits<Lhs, Rhs, Lhs::structure_, Rhs::structure_> Base;
+  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
+  typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
+};
+
+} // nmaespace hidden
+
+/** @ingroup Arrays
+  * @brief Generic expression where a product operator is applied to two expressions
+  *
+  * @tparam Lhs left-hand side type
+  * @tparam Rhs right-hand side type
+  *
+  * This class represents an expression  where a product operator is applied to
+  * two expressions.
+  *
+  * It is the return type of product operator when the left hand side expression
+  * is an array and the right and side expression is a (column) vector.
+  *
+  * Most of the time, this is the only way that it is used, so you typically
+  * don't have to name ArrayByVectorProduct types explicitly.
+  **/
 template<typename Lhs, typename Rhs>
 class ArrayByVectorProduct: public ExprBase< ArrayByVectorProduct<Lhs, Rhs> >
                            , public TRef<1>
@@ -617,8 +733,8 @@ class ArrayByVectorProduct: public ExprBase< ArrayByVectorProduct<Lhs, Rhs> >
     typedef TRange<sizeCols_> ColRange;
 
     ArrayByVectorProduct( const Lhs& lhs, const Rhs& rhs)
-                             : Base(), lhs_(lhs), rhs_(rhs)
-                              , result_(lhs.sizeRows(), 1, Type(0))
+                        : Base(), lhs_(lhs), rhs_(rhs)
+                        , result_(lhs.sizeRows(), 1, Type(0)) // create result
     {
       if (lhs.cols() != rhs.range())
       { STKRUNTIME_ERROR_NO_ARG(ArrayByVectorProduct, sizes mismatch);}
@@ -628,7 +744,7 @@ class ArrayByVectorProduct: public ExprBase< ArrayByVectorProduct<Lhs, Rhs> >
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return result_.rows();}
     /** @return the columns range */
-    inline ColRange const&colsImpl() const { return result_.cols();}
+    inline ColRange const& colsImpl() const { return result_.cols();}
 
     /** @return the element (i,j) */
     inline ConstReturnType elt2Impl(int i, int j) const { return result_.elt(i, j);}
@@ -652,53 +768,57 @@ class ArrayByVectorProduct: public ExprBase< ArrayByVectorProduct<Lhs, Rhs> >
     Allocator result_;
 };
 
-template<typename Lhs, typename Rhs>
-class VectorByPointProduct: public ExprBase< VectorByPointProduct<Lhs, Rhs> >
-                           , public TRef<1>
+namespace hidden
 {
-  public:
-    typedef ExprBase< VectorByPointProduct<Lhs, Rhs> > Base;
-    typedef typename hidden::Traits<VectorByPointProduct>::Type Type;
-    typedef typename hidden::Traits<VectorByPointProduct>::ConstReturnType ConstReturnType;
+/** @ingroup hidden
+ *  @brief Traits class for the ArrayByArrayProduct class
+ */
+template< typename Lhs, typename Rhs>
+struct Traits< ArrayByArrayProduct<Lhs, Rhs> >
+{
+  typedef ProductTraits<Lhs, Rhs, Traits<Lhs>::structure_, Traits<Rhs>::structure_> Base;
 
-    enum
-    {
-      structure_ = hidden::Traits<VectorByPointProduct>::structure_,
-      orient_    = hidden::Traits<VectorByPointProduct>::orient_,
-      sizeRows_  = hidden::Traits<VectorByPointProduct>::sizeRows_,
-      sizeCols_  = hidden::Traits<VectorByPointProduct>::sizeCols_,
-      storage_   = hidden::Traits<VectorByPointProduct>::storage_
-    };
-    /** Type of the Range for the rows */
-    typedef TRange<sizeRows_> RowRange;
-    /** Type of the Range for the columns */
-    typedef TRange<sizeCols_> ColRange;
+  enum
+  {
+    structure_ = Base::structure_,
+    sizeRows_ = Traits<Lhs>::sizeRows_,
+    sizeCols_ = Traits<Rhs>::sizeCols_,
+    // if there is more block on the left side, we use bp --> result is by_col_
+    orient_   =  ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
+                 ? Traits<Rhs>::orient_
+                 : (Traits<Lhs>::sizeRows_)/blockSize_ < (Traits<Rhs>::sizeCols_)/blockSize_
+                   ? int(Arrays::by_row_) : int(Arrays::by_col_),
+    storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
+                  ? int(Arrays::dense_) : int(Arrays::sparse_)
+  };
+  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
-    VectorByPointProduct( const Lhs& lhs, const Rhs& rhs)
-                              : Base(), lhs_(lhs), rhs_(rhs)
-    {}
-    /**  @return the range of the rows */
-    inline RowRange const& rowsImpl() const { return lhs_.rows();}
-    /** @return the columns range */
-    inline ColRange const&colsImpl() const { return rhs_.cols();}
-
-    /** @return the element (i,j) */
-    inline ConstReturnType elt2Impl(int i, int j) const { return lhs_.elt(i)*rhs_.elt(j);}
-    /** @return the element */
-    inline ConstReturnType elt0Impl() const { return lhs_.elt()*rhs_.elt();}
-
-    /** @return the left hand side expression */
-    inline Lhs const& lhs() const { return lhs_; }
-    /** @return the right hand side expression */
-    inline Rhs const& rhs() const { return rhs_; }
-
-  protected:
-    Lhs const& lhs_;
-    Rhs const& rhs_;
+  typedef typename Base::Allocator Allocator;
 };
+
+} // namespace hidden
+
+
+
 // forward declaration
 template< typename Lhs, typename Rhs> class ArrayByArrayProductBase;
 
+/** @ingroup Arrays
+  * @brief Generic expression where a product operator is applied to two expressions
+  *
+  * @tparam Lhs left-hand side type
+  * @tparam Rhs right-hand side type
+  *
+  * This class represents an expression  where a product operator is applied to
+  * two expressions.
+  *
+  * It is the return type of product operator when the left hand side expression
+  * is an array and the right and side expression is an array.
+  *
+  * Most of the time, this is the only way that it is used, so you typically
+  * don't have to name ArrayByArrayProduct types explicitly.
+  **/
 template<typename Lhs, typename Rhs>
 class ArrayByArrayProduct: public ArrayByArrayProductBase< Lhs, Rhs >, public TRef<1>
 {
@@ -732,7 +852,7 @@ class ArrayByArrayProduct: public ArrayByArrayProductBase< Lhs, Rhs >, public TR
     typedef TRange<sizeCols_> ColRange;
 
     inline ArrayByArrayProduct( const Lhs& lhs, const Rhs& rhs)
-                             : Base(), lhs_(lhs), rhs_(rhs)
+                              : Base(), lhs_(lhs), rhs_(rhs)
                               , result_(lhs.sizeRows(), rhs.sizeCols(), Type(0))
     {
       STK_STATIC_ASSERT_PRODUCT_OPERATOR_MISMATCH( isValid_ );
@@ -745,7 +865,7 @@ class ArrayByArrayProduct: public ArrayByArrayProductBase< Lhs, Rhs >, public TR
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return lhs_.rows();}
     /** @return the columns range */
-    inline ColRange const&colsImpl() const { return rhs_.cols();}
+    inline ColRange const& colsImpl() const { return rhs_.cols();}
 
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_; }
@@ -777,15 +897,12 @@ class ArrayByArrayProductBase: public ExprBase< ArrayByArrayProduct<Lhs, Rhs> >
 
     /** constructor. */
     inline ArrayByArrayProductBase(): Base() {}
-    /** access to the element (i,j) */
-    inline Type const& elt2Impl(int i, int j) const
-    { return this->asDerived().result().elt(i,j);}
-    /** access to the element i */
-    inline Type const& elt1Impl(int i) const
-    { return this->asDerived().result().elt(i);}
-    /** access to the element */
-    inline Type const& elt0Impl() const
-    { return this->asDerived().result().elt();}
+    /** access to element (i,j) */
+    inline Type const& elt2Impl(int i, int j) const { return this->asDerived().result().elt(i,j);}
+    /** access to ith element */
+    inline Type const& elt1Impl(int i) const  { return this->asDerived().result().elt(i);}
+    /** access to number */
+    inline Type const& elt0Impl() const { return this->asDerived().result().elt();}
 };
 
 }  // namespace STK

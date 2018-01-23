@@ -175,8 +175,9 @@ inline Real Hamming<Array>::diag(int i) const { return diagElt_;}
 template<class Array>
 Real Hamming<Array>::comp(int i, int j) const
 {
-  typedef typename Array::Row RowVector;
+  typedef typename hidden::Traits<Array>::Row RowVector;
   if (hasRun_) return gram_(i,j);
+  // create references on row i and j
   RowVector ind1(p_data_->row(i), true), ind2(p_data_->row(j), true);
   Real value = 1.;
   for(int j=factors_.nbLevels().begin(); j < factors_.nbLevels().end(); ++j)

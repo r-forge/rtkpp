@@ -42,19 +42,17 @@
 
 #include "STK_IArrayBase.h"
 
-#include "STK_ExprBaseVisitor.h"
-#include "STK_ExprBaseDot.h"
-#include "STK_ExprBaseProduct.h"
 #include "STK_ArrayBaseApplier.h"
 #include "STK_ArrayBaseAssign.h"
 #include "STK_ArrayBaseInitializer.h"
 
 namespace STK
 {
+template< typename Type, int SizeRows_ = UnknownSize, int SizeCols_ = UnknownSize, bool Orient_ = Arrays::by_col_> class CArray;
+template< typename Type, int SizeCols_, bool Orient_> class CArrayPoint;
+template< typename Type, int SizeRows_, bool Orient_> class CArrayVector;
+template< typename Type, bool Orient_> class CArrayNumber;
 
-namespace hidden
-{
-}
 /** @class ICArray
   * @ingroup Arrays
   *
@@ -182,17 +180,21 @@ class ICArray: public IArrayBase<Derived>
     /** implement the col operator using a reference on the column of the allocator */
     inline Col colImpl(int j) const { return  Col( allocator_.col(j));}
     /** implement the col operator using a reference on the column of the allocator */
-    inline SubCol colImpl(Range const& I, int j) const { return SubCol( allocator_.col( I, j));}
-
-    /** implement the row operator using a reference on the rows of the allocator */
-    inline SubArray rowImpl(Range const& I) const { return SubArray( allocator_.sub(I, this->cols()));}
-    /** implement the col operator using a reference on the columns of the allocator */
-    inline SubArray colImpl(Range const& J) const { return SubArray( allocator_.sub( this->rows(), J));}
-    /** implement the sub operator for 2D arrays using a reference on the column of the allocator */
-    inline SubArray subImpl(Range const& I, Range const& J) const { return SubArray(allocator_.sub(I, J));}
+    inline SubCol colImpl(Range const& I, int j) const { return SubCol( allocator_.template col<UnknownSize>( I, j));}
 
     /** implement the sub operator for 1D arrays using a reference on the raw/column of the allocator */
-    inline SubVector subImpl( Range const& J) const { return SubVector( allocator_.sub(J));}
+    inline SubVector subImpl( Range const& J) const
+    { return SubVector( allocator_.template sub<UnknownSize>(J));}
+
+    /** implement the row operator using a reference on the rows of the allocator */
+    inline CArray<Type, UnknownSize, sizeCols_, orient_> rowImpl(Range const& I) const
+    { return CArray<Type, UnknownSize, sizeCols_, orient_>( allocator_.template sub<UnknownSize, sizeCols_>(I, this->cols()));}
+    /** implement the col operator using a reference on the columns of the allocator */
+    inline CArray<Type, sizeRows_, UnknownSize, orient_> colImpl(Range const& J) const
+    { return CArray<Type, sizeRows_, UnknownSize, orient_>( allocator_.template sub<sizeRows_, UnknownSize>( this->rows(), J));}
+    /** implement the sub operator for 2D arrays using a reference on the column of the allocator */
+    inline CArray<Type, UnknownSize, UnknownSize, orient_> subImpl(Range const& I, Range const& J) const
+    { return CArray<Type, UnknownSize, UnknownSize, orient_>(allocator_.template sub<UnknownSize, UnknownSize>(I, J));}
 
     /** swap two elements: only for vectors an points. */
     void swap(int i, int  j) { std::swap(this->elt(i), this->elt(j)); }

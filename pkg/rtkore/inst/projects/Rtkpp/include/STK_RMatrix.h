@@ -62,13 +62,13 @@ struct Traits< RMatrix<Type_> >
   private:
     class Void {};
   public:
-//    typedef RowOperator< RMatrix<Type_> > Row;
-//    typedef RowOperator< RMatrix<Type_> > SubRow;
-//    typedef ColOperator< RMatrix<Type_> > Col;
-//    typedef ColOperator< RMatrix<Type_> > SubCol;
-//    typedef Void SubVector;
-//    typedef Void SubArray;
-//    typedef Void Number;
+    typedef RowOperator< RMatrix<Type_> > Row;
+    typedef RowOperator< RMatrix<Type_> > SubRow;
+    typedef ColOperator< RMatrix<Type_> > Col;
+    typedef ColOperator< RMatrix<Type_> > SubCol;
+    typedef Void SubVector;
+    typedef SubOperator< RMatrix<Type_>, UnknownSize, UnknownSize > SubArray;
+    typedef Void Number;
 
     typedef Type_ Type;
     typedef Type const& ReturnType;
@@ -90,10 +90,6 @@ template <typename Type_>
 class RMatrix: public ArrayBase< RMatrix<Type_> >, public TRef<1>
 {
   public:
-    typedef typename hidden::Traits<RMatrix<Type_> >::Row Row;
-    typedef typename hidden::Traits<RMatrix<Type_> >::Col Col;
-    typedef typename hidden::Traits<RMatrix<Type_> >::SubRow SubRow;
-    typedef typename hidden::Traits<RMatrix<Type_> >::SubCol SubCol;
 
     typedef typename hidden::Traits<RMatrix<Type_> >::Type Type;
     typedef typename hidden::Traits<RMatrix<Type_> >::ReturnType ReturnType;
@@ -161,10 +157,6 @@ class RMatrix: public ArrayBase< RMatrix<Type_> >, public TRef<1>
     /** @return the number of columns */
     inline int sizeCols() const { return matrix_.cols();}
 
-//    /** @return the j-th column of this. */
-//    inline Col colImpl(int j) const { return Col(this->asDerived(), j);}
-//    /** @return the i-th row of this. */
-//    inline Row rowImpl(int i) const { return Row(this->asDerived(), i);}
    /** @return a constant reference on element (i,j)
      *  @param i, j indexes of the row and of the column
      **/

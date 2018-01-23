@@ -37,12 +37,10 @@
 #define RTKPP_H
 
 
-#include <Rcpp.h>
-
+#include <Rtkpp/include/STK_RcppTraits.h>
 #include "RTKppForward.h"
 #include <Rtkpp/include/Rcpp_as.h>
 #include <Rtkpp/include/Rcpp_wrap.h>
-#include <Rtkpp/include/STK_RcppTraits.h>
 #include <Rtkpp/include/STK_RMatrix.h>
 #include <Rtkpp/include/STK_RVector.h>
 #include <Rtkpp/include/STK_wrap.h>

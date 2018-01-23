@@ -37,6 +37,11 @@
 #ifndef RCPPTRAITS_H
 #define RCPPTRAITS_H
 
+#include <Rcpp.h>
+
+#include <complex>
+#include <string>
+
 #ifndef R_INTERNALS_H_
 
 namespace STK
@@ -148,7 +153,7 @@ template<int RType> struct RTKppTraits;
 template<> struct RTKppTraits<INTSXP> { typedef int Type; };
 template<> struct RTKppTraits<REALSXP>{ typedef double Type; };
 template<> struct RTKppTraits<LGLSXP> { typedef bool Type; };
-template<> struct RTKppTraits<STRSXP> { typedef String Type; };
+template<> struct RTKppTraits<STRSXP> { typedef std::string Type; };
 template<> struct RTKppTraits<CPLXSXP>{ typedef std::complex<double> Type; };
 template<> struct RTKppTraits<RAWSXP> { typedef unsigned char Type; };
 

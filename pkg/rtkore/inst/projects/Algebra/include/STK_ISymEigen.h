@@ -31,7 +31,7 @@
 /** @file STK_ISymEigen.h
  *  @brief In this file we define the ISymEigen class (for a symmetric matrix).
  **/
- 
+
 #ifndef STK_ISYMEIGEN_H
 #define STK_ISYMEIGEN_H
 
@@ -46,7 +46,7 @@ namespace STK
 /** @ingroup Algebra
  *  @brief The class ISymEigen is an interface class for the method
  *  computing the eigenvalue Decomposition of a symmetric ArrayXX.
- * 
+ *
  *  The decomposition of a symmetric matrix require
  *  - Input:  A symmetric matrix A of size (n,n)
  *  - Output:
@@ -74,7 +74,7 @@ class ISymEigen: public IRunnerBase, public IRecursiveTemplate<Derived>
       orient_    = hidden::Traits< SquareArray >::orient_,
       sizeRows_  = hidden::Traits< SquareArray >::sizeRows_,
       sizeCols_  = hidden::Traits< SquareArray >::sizeCols_,
-      size_      = hidden::Traits< SquareArray >::size_,
+      size_      = hidden::Traits< SquareArray >::size_
     };
     /** @brief Default constructor */
     ISymEigen();

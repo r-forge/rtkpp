@@ -37,6 +37,7 @@
 #define STK_LAW_ILAWBASE_H
 
 #include <STKernel/include/STK_String.h>
+#include "STK_Law_Util.h"
 
 namespace STK
 {

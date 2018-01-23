@@ -42,6 +42,8 @@
 #ifdef __cplusplus
 extern "C"
 {
+#endif
+
 SEXP stk_version(SEXP robj);
 SEXP fastBetaRand( SEXP n, SEXP alpha, SEXP beta);
 SEXP fastBinomialRand( SEXP n, SEXP nb, SEXP prob);
@@ -62,28 +64,10 @@ SEXP fastStudentRand( SEXP n, SEXP df);
 SEXP fastUniformRand( SEXP n, SEXP a, SEXP b);
 SEXP fastUniformDiscreteRand( SEXP n, SEXP a, SEXP b);
 SEXP fastWeibullRand( SEXP n, SEXP k, SEXP lambda);
+
+#ifdef __cplusplus
+extern "C"
 }
-#else
-SEXP stk_version(SEXP robj);
-SEXP fastBetaRand( SEXP n, SEXP alpha, SEXP beta);
-SEXP fastBinomialRand( SEXP n, SEXP nb, SEXP prob);
-SEXP fastCategoricalRand( SEXP n, SEXP pr);
-SEXP fastCauchyRand( SEXP n, SEXP mu, SEXP scale);
-SEXP fastChiSquaredRand( SEXP n, SEXP df);
-SEXP fastExponentialRand( SEXP n, SEXP lambda);
-SEXP fastFisherSnedecorRand( SEXP n, SEXP df1, SEXP df2);
-SEXP fastGammaRand( SEXP n, SEXP shape, SEXP scale);
-SEXP fastGeometricRand( SEXP n, SEXP prob);
-SEXP fastHyperGeometricRand( SEXP n,  SEXP nbSuccesses, SEXP nbFailures, SEXP nbDraws);
-SEXP fastLogisticRand( SEXP n, SEXP mu, SEXP scale);
-SEXP fastLogNormalRand( SEXP n, SEXP mu, SEXP sigma);
-SEXP fastNegativeBinomialRand( SEXP n, SEXP size, SEXP prob);
-SEXP fastNormalRand( SEXP n, SEXP mu, SEXP sigma);
-SEXP fastPoissonRand( SEXP n, SEXP lambda);
-SEXP fastStudentRand( SEXP n, SEXP df);
-SEXP fastUniformRand( SEXP n, SEXP a, SEXP b);
-SEXP fastUniformDiscreteRand( SEXP n, SEXP a, SEXP b);
-SEXP fastWeibullRand( SEXP n, SEXP k, SEXP lambda);
 #endif /*__cplusplus */
 
 #endif /* RTKORE_H*/

@@ -134,14 +134,14 @@ struct ProductSelector<Lhs, Rhs, Arrays::diagonal_, Arrays::diagonal_>
 template<typename Lhs, typename Rhs, int RStructure_>
 struct ProductSelector<Lhs, Rhs, Arrays::number_, RStructure_>
 { typedef typename Rhs::Type Type;
-  typedef UnaryOperator<MultipleOp<Type>, Rhs> ProductType;
+  typedef UnaryOperator<ProductWithOp<Type>, Rhs> ProductType;
 };
 
 // FIXME: will not work as UnaryOperator constructor take only Lhs
 template<typename Lhs, typename Rhs, int LStructure_>
 struct ProductSelector<Lhs, Rhs, LStructure_, Arrays::number_>
 { typedef typename Lhs::Type Type;
-  typedef UnaryOperator<MultipleOp<Type>, Lhs> ProductType;
+  typedef UnaryOperator<ProductWithOp<Type>, Lhs> ProductType;
 };
 
 } // namespace hidden

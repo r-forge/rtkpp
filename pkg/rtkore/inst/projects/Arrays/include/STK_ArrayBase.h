@@ -85,6 +85,54 @@ class ArrayBase: public ExprBase<Derived>
     ~ArrayBase() {}
 
   public:
+    /** @return safely a constant value of the element (i,j) of the 2D container.
+      *  @param i,j row and column indexes
+      **/
+     inline ConstReturnType operator()(int i, int j) const
+     {
+ #ifdef STK_BOUNDS_CHECK
+       if (this->beginRows() > i) { STKOUT_OF_RANGE_2ARG(ITContainerBase::elt, i, j, beginRows() > i);}
+       if (this->endRows() <= i)  { STKOUT_OF_RANGE_2ARG(ITContainerBase::elt, i, j, endRows() <= i);}
+       if (this->beginCols() > j) { STKOUT_OF_RANGE_2ARG(ITContainerBase::elt, i, j, beginCols() > j);}
+       if (this->endCols() <= j)  { STKOUT_OF_RANGE_2ARG(ITContainerBase::elt, i, j, endCols() <= j);}
+ #endif
+       return this->elt(i,j);
+     }
+     /** @return reference on the ith element
+      *  @param i index of the ith element
+      **/
+     inline ConstReturnType operator[](int i) const
+     {
+       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+       return this->elt(i);
+     }
+     /** @return reference on the number */
+     inline ConstReturnType operator()() const { return this->elt();}
+     /** @return value of the element (i,j) of the 2D container.
+      *  @param i,j row and column indexes
+      **/
+     inline Type& operator()(int i, int j)
+     {
+ #ifdef STK_BOUNDS_CHECK
+       if (this->beginRows() > i) { STKOUT_OF_RANGE_2ARG(ITContainer::elt, i, j, beginRows() > i);}
+       if (this->endRows() <= i)  { STKOUT_OF_RANGE_2ARG(ITContainer::elt, i, j, endRows() <= i);}
+       if (this->beginCols() > j) { STKOUT_OF_RANGE_2ARG(ITContainer::elt, i, j, beginCols() > j);}
+       if (this->endCols() <= j)  { STKOUT_OF_RANGE_2ARG(ITContainer::elt, i, j, endCols() <= j);}
+ #endif
+       return this->asDerived().elt2Impl(i,j);
+     }
+     /** @return reference on the ith element
+      *  @param i index of the ith element
+      **/
+     inline Type& operator[](int i)
+     {
+       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+       return this->elt(i);
+     }
+     /** @return reference on the number */
+     inline Type& operator()() { return this->elt();}
+
+
     /** Apply the Visitor @c visitor to the whole coefficients of the array.
       * The template parameter @c Visitor is the type of the visitor and provides
       * the following interface:
@@ -127,7 +175,7 @@ class ArrayBase: public ExprBase<Derived>
      *  method will call the resize method on this.
      *
      *  @note If @c this is a reference, it cannot be resized and thus an
-     *  exception will be thrown.
+     *  exception will be thrown if range is not the same.
      **/
     template<class Rhs> Derived& assign(ExprBase<Rhs> const& rhs);
 
@@ -138,7 +186,8 @@ class ArrayBase: public ExprBase<Derived>
     /** @return the matrix or vector obtained by evaluating this expression */
     template<typename Rhs>
     Derived& operator=( ExprBase<Rhs> const& rhs);
-    /** Adding a Rhs to this. */
+
+    /** Add Rhs to this. */
     template<typename Rhs>
     Derived& operator+=( ExprBase<Rhs> const& other);
     /** subtract a Rhs to this. */
@@ -147,17 +196,23 @@ class ArrayBase: public ExprBase<Derived>
     /** divide this by Rhs. */
     template<typename Rhs>
     Derived& operator/=( ExprBase<Rhs> const& other);
+    /** Take modulo of this by Rhs. */
+    template<typename Rhs>
+    Derived& operator%=( ExprBase<Rhs> const& other);
     /** multiply this by Rhs. */
     template<typename Rhs>
     Derived& operator*=( ExprBase<Rhs> const& other);
+
     /** Adding a constant to this. */
     Derived& operator+=( Type const& other);
-    /** Substract a constant to this. */
+    /** Subtract a constant to this. */
     Derived& operator-=( Type const& other);
     /** product of this by a constant. */
     Derived& operator*=( Type const& other);
     /** dividing this by a constant. */
     Derived& operator/=( Type const& other);
+    /** take modulo of this by a constant. */
+    Derived& operator%=( Type const& other);
 
     /** overwrite @c this with @c src.
      *  @note this method does not take care of the possibility of overlapping

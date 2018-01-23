@@ -213,7 +213,7 @@ class ExportToCsv
       p_data_->push_back(Variable<String>(A.range(), prefix));
       // add strings to the String variable
       for(int i = A.begin(); i< A.end(); i++)
-      { p_data_->back()[i] = typeToString(A[i]);}
+      { p_data_->back()[i] = typeToString(A.elt(i));}
     }
     /** Append a point (as a column vector).
      *  @param A the container to export
@@ -226,7 +226,7 @@ class ExportToCsv
       p_data_->push_back(Variable<String>(A.range(), prefix));
       // add strings to the String variable
       for(int i = A.begin(); i< A.end(); i++)
-      { p_data_->back()[i] = typeToString(A[i]);}
+      { p_data_->back()[i] = typeToString(A.elt(i));}
     }
     /** Append a 2D container.
      *  @param A the container to export
@@ -241,7 +241,7 @@ class ExportToCsv
         // add an empty string variable (an empty column)
         p_data_->push_back(Variable<String>(A.rows(), prefix+typeToString(iNum)));
         for (int iRow=A.beginRows(); iRow<A.endRows(); iRow++)
-        { p_data_->back()[iRow] = typeToString(A(iRow,iVar));}
+        { p_data_->back()[iRow] = typeToString(A.elt(iRow,iVar));}
       }
     }
     /** Append a 2D container.
@@ -257,7 +257,7 @@ class ExportToCsv
         // add an empty string variable (an empty column)
         p_data_->push_back(Variable<String>(A.rows(), prefix+typeToString(iNum)));
         for (int iRow=A.beginRows(); iRow<A.endRows(); iRow++)
-        { p_data_->back()[iRow] = typeToString(A(iRow,iVar));}
+        { p_data_->back()[iRow] = typeToString(A.elt(iRow,iVar));}
       }
     }
     /** Append a value.

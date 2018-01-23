@@ -108,9 +108,9 @@ class JointBernoulliModel: public IMultiStatModel<Array, WColVector, JointBernou
     /** Type of the data contained in the container */
     typedef typename Array::Type Type;
     /** Type of the row vector of the container */
-    typedef typename Array::Row RowVector;
+    typedef typename hidden::Traits<Array>::Row RowVector;
     /** Type of the column vector of the container */
-    typedef typename Array::Col ColVector;
+    typedef typename hidden::Traits<Array>::Col ColVector;
     /** Base class */
     typedef IMultiStatModel<Array, WColVector, JointBernoulliParameters > Base;
     using Base::p_data;

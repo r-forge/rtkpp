@@ -61,7 +61,7 @@ typedef int Integer ;
  *  Type for representing NA (not available) discrete numbers.
  */
 template<>
-struct Arithmetic<Integer>  : public std::numeric_limits<Integer>
+struct Arithmetic<Integer>: public std::numeric_limits<Integer>
 {
 #ifdef IS_RTKPP_LIB
   enum

@@ -48,7 +48,25 @@ namespace Regress
 {
 
 /** @ingroup Regress
- * Regression method we will use. */
+ *  functional basis coefficients to use  */
+enum TypeCoefficients
+{
+  /** unknown coefficients */
+  unknown_coefficients_ = -1
+  /** BSpline coefficients */
+  , bspline_
+  /** Sines coefficients */
+  , sines_
+  /** cosines coefficients */
+  , cosines_
+  /** trigonometric coefficients (sines and cosines) */
+  , trigonometric_
+  /**Chebyshev coefficients */
+  , chebyshev
+};
+
+/** @ingroup Regress
+ * Regression method to use. */
 enum TypeRegression
 {
   /** unknown regression */
@@ -100,6 +118,8 @@ String knotsPositionToString( KnotsPosition const& type);
 
 } // namespace Regress
 
+//
+// implementation
 namespace Regress
 {
 /* convert a String to a TypeReduction.

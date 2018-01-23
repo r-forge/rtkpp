@@ -39,15 +39,14 @@ classes for statistics, clustering, linear algebra (using native methods or
 Lapack\cite{Lapack}), arrays (with an Eigen-like API \cite{JSS:RcppEigen}),
 regression, dimension reduction, etc. Some functionalities provided by the
 library are available in the \texttt{R} environment as \texttt{R} functions or
-distributed as R packages (\texttt{MixAll} \cite{MixAll} and \texttt{HDPenReg}
-\cite{HDPenReg} among others).
+distributed as R packages (\texttt{MixAll} \cite{MixAll}, \texttt{blockcluster}
+\cite{blockcluster} and \texttt{HDPenReg} \cite{HDPenReg} among others).
 
 The \rtkore{} package provides a subset of the \stkpp{}
 library and is only composed of templated classes and inlined functions.
-The \rtkpp{} package is also available and provides the header files composing
-the whole \stkpp{} library. Theses packages furnish implementations of
-\texttt{Rcpp::as} and \texttt{Rcpp::wrap} for the \texttt{C++} classes defined
-in \stkpp{}. In this sense it is similar to the \texttt{RcppEigen}
+This package furnishes implementations of \texttt{Rcpp::as} and
+\texttt{Rcpp::wrap} for the \texttt{C++} classes defined in \stkpp{}.
+In this sense it is similar to the \texttt{RcppEigen}
 \cite{CRAN:RcppEigen,JSS:RcppEigen} and \texttt{RcppArmadillo}
 \cite{CRAN:RcppArmadillo} packages.
 
@@ -96,8 +95,8 @@ allows to wrap \texttt{Rcpp::Vector} class.
 through  \texttt{Rcpp::wrap}. This function is extended by \rtkore{} for \stkpp{}
 arrays and vectors.
 
-The following example is taken from the \texttt{STK::ClusterLauncher} class  (MixAll
-package)
+The following example is taken from the \texttt{STK::ClusterLauncher} class 
+(in MixAll package)
 \begin{lstlisting}[style=customcpp]
   Array2D<Real> mean(K, nbVariable), sigma(K, nbVariable);
   // get estimated parameters
@@ -157,6 +156,7 @@ PKG_LIBS     = `$(R_HOME)/bin/Rscript -e "rtkore:::LdFlags()"` \
                 $(SHLIB_OPENMP_CFLAGS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
 \end{verbatim}
 
+\section{Building a huge package using \rtkore{}}
 If you are building a package with a lot of cpp files, you may find
 convenient to locate your sources in a separate directory. Hereafter we give an
 example of a Makevars you can modify at your convenience in order to handle
@@ -206,7 +206,7 @@ pkglib:
 \section{An example}
 
 The package countMissings can be downloaded at the
-\url{http://sourceforge.net/projects/stkpp/files/R%20packages/countMissings_1.0.tar.gz/download}
+\url{https://sourceforge.net/projects/stkpp/files/R%20packages/countMissings_1.0.tar.gz/download}
 url. It is basically composed of one R-script file (countNA.R) and one C++ file
 (countNA.cpp).
 

@@ -93,6 +93,42 @@ enum Structure
 };
 
 /** @ingroup Arrays
+ *  @brief Kind of operators leading to a BinaryOperator or UnaryOperator.
+ *
+ *  This enum list the operators leading to binary or unary operators.
+ *  If both the left-hand side and the right-hand side are expressions
+ *  then we get a BinaryOperator while if the left-hand side is an expression
+ *  and right hand side is a number then we get an UnaryOperator.
+ *  For example, the return type of matrix1+matrix2 is a
+ *  BinaryOperator. The return type of number+number is an UnaryOperator.
+ **/
+enum BinaryOperatorType
+{
+  equalOp_,              ///< operator==
+  notEqualOp_,           ///< operator!=
+  greaterThanOp_,        ///< operator>
+  lessThanOp_,           ///< operator<
+  greaterThanOrEqualOp_, ///< operator>=
+  lessThanOrEqualOp_,    ///< operator<=
+
+  sumOp_,                ///< operator+
+  differenceOp_,         ///< operator-
+  productOp_,            ///< operator*
+  divisionOp_,           ///< operator/
+  moduloOp_,             ///< operator%
+
+  minOp_,                ///< min operator
+  maxOp_,                ///< max operator
+
+  logicalAndOp_,         ///< operator&&
+  logicalOrOp_,          ///< operator||
+
+  bitwiseAndOp_,         ///< operator&
+  bitwiseOrOp_,          ///< operator|
+  bitwiseXorOp_          ///< operator^
+};
+
+/** @ingroup Arrays
  *  Kind of operands in a BinaryOperator.
  **/
 enum BinaryOpKind

@@ -36,6 +36,7 @@
 #ifndef STK_RANGE_H
 #define STK_RANGE_H
 
+#include <Sdk/include/STK_IRecursiveTemplate.h>
 #include "STK_String.h"
 #include <map>
 
@@ -57,6 +58,85 @@ template<int Size_>
 ostream& operator<< (ostream& s, TRange<Size_> const& I);
 
 /** @ingroup STKernel
+ *  @brief Base class for TRange class
+ **/
+template<class Derived>
+class RangeBase: public IRecursiveTemplate<Derived>
+{
+  public:
+    /** Default constructor*/
+    inline RangeBase(): begin_(baseIdx) {}
+    /** constructor.
+     * @param begin beginning of range
+     **/
+    inline RangeBase( int begin): begin_(begin) {}
+    /** constructor.
+     * @param range range to copy
+     **/
+    inline RangeBase( RangeBase const& range): begin_(range.begin_) {}
+    /** destructor. */
+    inline ~RangeBase() {}
+
+    /** get the first index of the TRange.
+     *  @return the first index of the range
+     **/
+    inline int begin()  const { return begin_;};
+    // backward compatibility
+    /** get the first index of the TRange.
+     *  @return the first index of the range
+     **/
+    inline int firstIdx()  const { return begin_;};
+
+    /** shift range a:b becomes (a+i):(b+i)
+     *  @param i shift to apply
+     *  @return @c true if the range are equals, @c false otherwise
+     **/
+    inline Derived& operator+=(int i) { return this->asDerived().inc(i);}
+    /** shift range a:b becomes (a+i):(b+i)
+     *  @param i shift to apply
+     *  @return @c true if the range are equals, @c false otherwise
+     **/
+    inline Derived& operator-=(int i) { return this->asDerived().dec(i);}
+
+    /** check if this TRange in include in an other TRange
+     *  @param I the index to compare
+     *  @return @c true if this is include in @c I, @c false otherwise
+     **/
+    template<int OtherSize_>
+    inline bool isIn(TRange<OtherSize_> const& I) const
+    { return ((this->asDerived().begin() >= I.begin()) && (this->asDerived().end() <= I.end()));}
+    /** check if the TRange I is include in the this TRange
+     *  @param I the range to compare
+     *  @return @c true if this contain I, @c false otherwise
+     **/
+    template<int OtherSize_>
+    inline bool isContaining(TRange<OtherSize_> const& I) const
+    { return ((begin_<= I.begin())&&(this->asDerived().end()>=I.end()));}
+    /** Return true if i is in this TRange
+     *  @param i the integer to compare
+     *  @return @c true if i is in this, @c false otherwise
+     **/
+    inline bool isContaining(int i) const { return ((begin_<=i)&&(i<this->asDerived().end()));}
+    /** compare this range with range @c I
+     *  @param I the Index to compare
+     *  @return @c true if the range are equals, @c false otherwise
+     **/
+    template<int OtherSize_>
+    inline bool operator==(TRange<OtherSize_> const& I) const
+    { return ((begin_ == I.begin()) && (this->asDerived().end() == I.end()));}
+    /** compare this range with range @c I
+     *  @param I the Index to compare
+     *  @return @c true if the range are different, @c false otherwise
+     **/
+    template<int OtherSize_>
+    inline bool operator!=(TRange<OtherSize_> const& I) const
+    { return ((begin_ != I.begin()) || (this->asDerived().end() != I.end()));}
+
+ protected:
+    int begin_; ///< First index
+};
+
+/** @ingroup STKernel
  *  @brief Index sub-vector region with fixed size.
  *
  *  A TRange is an ordered pair [first,end) denoting a sub-vector
@@ -71,119 +151,92 @@ ostream& operator<< (ostream& s, TRange<Size_> const& I);
  *  There is no stride argument, only contiguous regions are allowed.
  **/
 template<int Size_>
-class TRange
+class TRange: public RangeBase<TRange<Size_> >
 {
   public:
+    typedef RangeBase<TRange<Size_> > Base;
+    using Base::begin_;
     /** Default constructor. Null range.*/
-    inline TRange(): begin_(baseIdx) {}
+    inline TRange(): Base(baseIdx) {}
     /** constructor. The first index is defined by the baseIdx macro.
      **/
-    inline TRange( int): begin_(baseIdx) {}
+    inline TRange( int): Base(baseIdx) {}
     /** Complete constructor. Give the beginning and the size of the sub-region.
      *  @param first is the beginning of the sub-region
      **/
-    inline TRange( int first, int): begin_(first) {}
+    inline TRange( int first, int): Base(first) {}
     /** Complete constructor. Give the beginning and the end of the sub-region.
-     * @param first is the beginning of the sub-region
+     *  @param first is the beginning of the sub-region
+     *  @param junk allow to use the constructor (begin,last) rather than (begin,size)
      **/
-    inline TRange( int first, int, bool junk): begin_(first) {}
-    /** Create a copy of an existing TRange.
+    inline TRange( int first, int, bool junk): Base(first) {}
+    /** copy constructor
      *  @param I The index to copy
      **/
     template<int OtherSize_>
-    inline TRange(TRange<OtherSize_> const& I): begin_(I.begin()) {}
+    inline TRange(TRange<OtherSize_> const& I): Base(I.begin()) {}
     /** destructor. */
     inline ~TRange() {}
-    /** get the first index of the TRange.
-     *  @return the first index of the range
-     **/
-    inline int begin()  const { return begin_;};
     /** get the ending index of the TRange.
      *  @return the first index of the range
      **/
-    inline int end()  const { return begin_ + Size_;};
+    inline int end() const { return begin_ + Size_;};
     /** get the size of the TRange (the number of elements).
      *  @return the size of the range
      **/
-    inline int size()   const { return Size_;};
-    // backward compatibility
-    /** get the first index of the TRange.
-     *  @return the first index of the range
-     **/
-    inline int firstIdx()  const { return begin_;};
-    /** get the last index of the TRange.
-     *  @return the last index of the range
-     **/
-    inline int lastIdx() const { return begin_ + Size_ -1;};
+    inline int size() const { return Size_;};
     /** check if the range is empty or not.
      *  @return @c true if size <=0, @c false otherwise
      */
     inline bool empty() const { return Size_<=0;};
 
+    // backward compatibility
+    /** get the last index of the TRange.
+     *  @return the last index of the range
+     **/
+    inline int lastIdx() const { return begin_ + Size_ -1;};
+
     /** Shift the TRange giving the first element.
-     *  @param first new value of the first element. */
-    inline TRange& shift(int first) { return inc(first - begin_);}
+     *  @param begin new value of the first element. */
+    inline TRange& shift(int begin) { begin_= begin; return *this;}
     /** create the TRange [begin_+inc, end_+inc_].
      *  @param inc the increment to apply
      **/
     inline TRange& inc(int inc =1) { begin_ +=inc; return *this;}
-    /** create the TRange [begin_+inc, end_].
-     *  @param inc the increment to apply
-     **/
-    inline TRange& incFirst(int inc=1) { begin_ +=inc; return *this;}
-    /** create the TRange [begin_, end_+inc]
-     * @param inc the increment to apply
-     **/
-    inline TRange& incLast(int inc=1) { begin_ +=inc; return *this;}
     /** create the TRange [begin_-dec, end_-dec]
      *  @param dec the decrement to apply
      **/
     inline TRange& dec(int dec=1) { begin_ -=dec; return *this;}
+
+    /** create the TRange [begin_+inc, end_].
+     *  @param inc the increment to apply
+     **/
+    inline TRange& incFirst(int inc=1) { begin_ +=inc; return *this;}
     /** @brief create the TRange [begin_-dec, end_]
      * @param dec the decrement to apply
      **/
     inline TRange& decFirst(int dec=1) { begin_ -=dec;  return *this;}
-    /** create the TRange [begin_, end_-dec]
-     * @param dec the decrement to apply
-     **/
-    inline TRange& decLast(int dec=1){ begin_ -=dec; return *this;}
 
-    /** check if this TRange in include in an other TRange
-     *  @param I the index to compare
-     *  @return @c true if this is include in @c I, @c false otherwise
+    /** create the TRange [begin_, end_+inc)
+     *  @param inc the increment to apply
      **/
-    template<int OtherSize_>
-    inline bool isIn(TRange<OtherSize_> const& I) const
-    { return ((begin_>= I.begin())&&(end()<=I.end()));}
-    /** check if the TRange I is include in the this TRange
-     *  @param I the range to compare
-     *  @return @c true if this contain I, @c false otherwise
+    inline TRange& incEnd(int inc =1) { return *this;}
+    /** create the TRange [begin_, end_-dec)
+     *  @param dec the decrement to apply
      **/
-    template<int OtherSize_>
-    inline bool isContaining(TRange<OtherSize_> const& I) const
-    { return ((begin_<= I.begin())&&(end()>=I.end()));}
-    /** Return true if i is in this TRange
-     *  @param i the integer to compare
-     *  @return @c true if i is in this, @c false otherwise
-     **/
-    inline bool isContaining(int i) const { return ((begin_<=i)&&(i<end()));}
-    /** compare this range with range @c I
-     *  @param I the Index to compare
-     *  @return @c true if the range are equals, @c false otherwise
-     **/
-    template<int OtherSize_>
-    inline bool operator==(TRange<OtherSize_> const& I) const
-    { return ((begin_ == I.begin()) && (end() == I.end()));}
-    /** compare this range with range @c I
-     *  @param I the Index to compare
-     *  @return @c true if the range are different, @c false otherwise
-     **/
-    template<int OtherSize_>
-    inline bool operator!=(TRange<OtherSize_> const& I) const
-    { return ((begin_ != I.begin()) || (end() != I.end()));}
+    inline TRange& decEnd(int dec =1){ return *this;}
 
-  private:
-    int begin_;    ///< First index
+    // backward compatibility
+    /** create the TRange [begin_, end_+inc)
+     *  @param inc the increment to apply
+     **/
+    inline TRange& incLast(int inc =1) { return *this;}
+    /** create the TRange [begin_, end_-dec)
+     *  @param dec the decrement to apply
+     **/
+    inline TRange& decLast(int dec =1){ return *this;}
+
+
 };
 
 /** @ingroup Arithmetic
@@ -238,37 +291,36 @@ struct IdTypeImpl< TRange<Size_> >
  *  There is no stride argument, only contiguous regions are allowed.
  **/
 template<>
-class TRange<UnknownSize>
+class TRange<UnknownSize>: public RangeBase<TRange<UnknownSize> >
 {
   public:
+    typedef RangeBase<TRange<UnknownSize> > Base;
+    using Base::begin_;
     /** Default constructor. Null range.*/
-    inline TRange(): begin_(baseIdx), end_(baseIdx), size_(0) {}
+    inline TRange(): Base(baseIdx), end_(baseIdx), size_(0) {}
     /** constructor. The first index is defined by the baseIdx macro.
      *  @param size the size of the range
      **/
-    inline TRange( int size): begin_(baseIdx), end_(size+baseIdx), size_(size) {}
+    inline TRange( int size): Base(baseIdx), end_(size+baseIdx), size_(size) {}
     /** Complete constructor. Give the beginning and the size of the sub-region.
      *  @param first is the beginning of the sub-region
      *  @param size is the size of the sub-region.
      **/
-    inline TRange( int first, int size): begin_(first), end_(size+first), size_(size) {}
+    inline TRange( int first, int size): Base(first), end_(size+first), size_(size) {}
     /**  Complete constructor. Give the first and last index of the sub-region.
      *  @param first beginning of the sub-region
-     *  @param last last index of the sub-region.
+     *  @param last last index of the sub-region
+     *  @param junk allow to use the constructor (begin,last) rather than (begin,size)
      **/
-    inline TRange( int first, int last, bool junk): begin_(first), end_(last+1), size_(end_-first) {}
+    inline TRange( int first, int last, bool junk): Base(first), end_(last+1), size_(end_-first) {}
     /** @brief Copy constructor.
      *  Create a copy of an existing TRange.
      *  @param I The index to copy
      **/
     template<int OtherSize_>
-    inline TRange(TRange<OtherSize_> const& I): begin_(I.begin()), end_(I.end()), size_(I.size()) {}
+    inline TRange(TRange<OtherSize_> const& I): Base(I.begin()), end_(I.end()), size_(I.size()) {}
     /** destructor. */
     inline ~TRange() {}
-    /** get the first index of the TRange.
-     *  @return the first index of the range
-     **/
-    inline int begin()  const { return begin_;};
     /** get the ending index of the TRange.
      *  @return the first index of the range
      **/
@@ -277,19 +329,17 @@ class TRange<UnknownSize>
      *  @return the size of the range
      **/
     inline int size()   const { return size_;};
-    // backward compatibility
-    /** get the first index of the TRange.
-     *  @return the first index of the range
-     **/
-    inline int firstIdx()  const { return begin_;};
-    /** get the last index of the TRange.
-     *  @return the last index of the range
-     **/
-    inline int lastIdx() const { return(end_-1);};
     /** check if the range is empty or not.
      *  @return @c true if size <=0, @c false otherwise
      */
     inline bool empty() const { return size_<=0;};
+
+    // backward compatibility
+    /** get the last index of the TRange.
+     *  @return the last index of the range
+     **/
+    inline int lastIdx() const { return(end_-1);};
+
     /** Shift the TRange giving the first element: the size is not modified.
      *  @param first new value of the first element. */
     inline TRange& shift(int first) { return inc(first - begin_);}
@@ -304,27 +354,32 @@ class TRange<UnknownSize>
     /** create the TRange [begin_-dec, end_-dec)
      *  @param inc the increment to apply to begin_
      **/
+
     inline TRange& incFirst(int inc =1) { begin_ +=inc; size_ -=inc; return *this;}
-    /** create the TRange [begin_, end_+inc)
-     *  @param inc the increment to apply
-     **/
-    inline TRange& incLast(int inc =1) { end_ +=inc; size_ +=inc; return *this;}
-    /** create the TRange [begin_, end_+inc)
-     *  @param inc the increment to apply
-     **/
-    inline TRange& incEnd(int inc =1) { end_ +=inc; size_ +=inc; return *this;}
     /** @brief create the TRange [begin_-dec, end_)
      * @param dec the decrement to apply
      **/
     inline TRange& decFirst(int dec =1) { begin_ -=dec; size_  +=dec; return *this;}
-    /** create the TRange [begin_, end_-dec)
-     *  @param dec the decrement to apply
+
+    /** create the TRange [begin_, end_+inc)
+     *  @param inc the increment to apply
      **/
-    inline TRange& decLast(int dec =1){ end_ -= dec; size_ -=dec; return *this;}
+    inline TRange& incEnd(int inc =1) { end_ +=inc; size_ +=inc; return *this;}
     /** create the TRange [begin_, end_-dec)
      *  @param dec the decrement to apply
      **/
     inline TRange& decEnd(int dec =1){ end_ -= dec; size_ -=dec; return *this;}
+
+    // backward compatibility
+    /** create the TRange [begin_, end_+inc)
+     *  @param inc the increment to apply
+     **/
+    inline TRange& incLast(int inc =1) { end_ +=inc; size_ +=inc; return *this;}
+    /** create the TRange [begin_, end_-dec)
+     *  @param dec the decrement to apply
+     **/
+    inline TRange& decLast(int dec =1){ end_ -= dec; size_ -=dec; return *this;}
+
     /** Take the lowest value of begin_ and I.begin_ for begin_
      *  and the largest value of end_ and I.end_ for end_.
      *  @param I the index to apply
@@ -347,56 +402,6 @@ class TRange<UnknownSize>
       size_  = end_ - begin_;
       return *this;
     }
-    /** check if this TRange in include in an other TRange
-     *  @param I the index to compare
-     *  @return @c true if this is include in @c I, @c false otherwise
-     **/
-    template<int OtherSize_>
-    inline bool isIn(TRange<OtherSize_> const& I) const
-    { return ((begin_>= I.begin())&&(end_<=I.end()));}
-    /** check if the TRange I is include in the this TRange
-     *  @param I the range to compare
-     *  @return @c true if this contain I, @c false otherwise
-     **/
-    template<int OtherSize_>
-    inline bool isContaining(TRange<OtherSize_> const& I) const
-    { return ((begin_<= I.begin())&&(I.end()<=end_));}
-    /** Return true if i is in this TRange
-     *  @param i the integer to compare
-     *  @return @c true if i is in this, @c false otherwise
-     **/
-    inline bool isContaining(int i) const { return ((begin_<=i)&&(i<end_));}
-    /** compare this range with range @c I
-     *  @param I the Index to compare
-     *  @return @c true if the range are equals, @c false otherwise
-     **/
-    template<int OtherSize_>
-    inline bool operator==(TRange<OtherSize_> const& I) const
-    { return ((begin_ == I.begin()) && (end_ == I.end()));}
-    /** compare this range with range @c I
-     *  @param I the Index to compare
-     *  @return @c true if the range are different, @c false otherwise
-     **/
-    template<int OtherSize_>
-    inline bool operator!=(TRange<OtherSize_> const& I) const
-    { return ((begin_ != I.begin()) || (end_ != I.end()));}
-
-    /** @brief compute sup(I,J).
-     *  Take the lowest value of I.begin_ and J.begin_ for begin_
-     *  and the largest value of I.end_ and J.end_ for end_.
-     *  @param I,J the first and second Range
-    */
-    template<int SizeI_, int SizeJ_>
-    static inline Range sup(TRange<SizeI_> const& I, TRange<SizeJ_> const& J)
-    { return Range(std::min(I.begin(), J.begin()), std::max(I.end(), J.end())-1, 0);}
-    /** @brief compute inf(I,J).
-     *  Take the largest value of I.begin_ and J.begin_ for begin_
-     *  and the lowest value of I.end_ and J.end_ for end_.
-     *  @param I,J the first and second Range
-     */
-    template<int SizeI_, int SizeJ_>
-    static inline Range inf(TRange<SizeI_> const& I, TRange<SizeJ_> const& J)
-    { return Range(std::max(I.begin(), J.begin()), std::min(I.end(), J.end())-1, 0);}
 
     /** @brief Read a Range in the form first:last (MATLAB-like form) from
      *  an input stream. The input stream can also be a number (say n).
@@ -435,13 +440,32 @@ class TRange<UnknownSize>
     }
 
   private:
-    int begin_;    ///< starting index
     int end_;      ///< ending index
     int size_;     ///< theoretic Dimension size_ = end_- begin_
 
 };
 
-/** @brief Write a TRange in the form first:last (MATLAB-like form) in an
+/** @ingroup STKernel
+ *  @brief compute sup(I,J).
+ *  Take the lowest value of I.begin() and J.begin() for begin
+ *  and the largest value of I.end() and J.end() for end.
+ *  @param I,J the first and second Range
+*/
+template<int SizeI_, int SizeJ_>
+Range sup(TRange<SizeI_> const& I, TRange<SizeJ_> const& J)
+{ return Range(std::min(I.begin(), J.begin()), std::max(I.end(), J.end())-1, 0);}
+/** @ingroup STKernel
+ *  @brief compute inf(I,J).
+ *  Take the largest value of I.begin() and J.begin() for begin
+ *  and the lowest value of I.end() and J.end() for end.
+ *  @param I,J the first and second Range
+ */
+template<int SizeI_, int SizeJ_>
+Range inf(TRange<SizeI_> const& I, TRange<SizeJ_> const& J)
+{ return Range(std::max(I.begin(), J.begin()), std::min(I.end(), J.end())-1, 0);}
+
+/** @ingroup Base
+ *  @brief Write a TRange in the form first:last (MATLAB-like form) in an
  *  output stream.
  *  @param os output stream
  *  @param I the Range to write
@@ -493,7 +517,7 @@ String rangeToString( TRange<Size_> const& value, std::ios_base& (*f)(std::ios_b
 }
 
 /** @ingroup Base
- *  Convert an Range to a String.
+ *  Convert a Range to a String.
  *  @param value the Range we want to convert
  *  @param mapping the mapping between Range and String
  *  @return the String associated to this value.

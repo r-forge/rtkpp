@@ -37,16 +37,22 @@
 #ifndef STK_STATICASSERT_H
 #define STK_STATICASSERT_H
 
+#include "STK_MetaTemplate.h"
+
+#define STK_SINGLE_ARG2(A,B) A,B
+#define STK_SINGLE_ARG3(A,B,C) A,B,C
+#define STK_SINGLE_ARG4(A,B,C,D) A,B,C,D
+#define STK_SINGLE_ARG5(A,B,C,D,E) A,B,C,D,E
 
 #if(__cplusplus < 201103L) // use old way
 
 namespace STK
 {
 
-template<bool condition> struct StaticAssert;
+template<int condition> struct StaticAssert;
 // if the condition is false the compiler will complain it does not find the message
-template<> struct StaticAssert<false> {};
-template<> struct StaticAssert<true>
+template<> struct StaticAssert<0> {};
+template<> struct StaticAssert<1>
 {
   enum
   {
@@ -83,7 +89,7 @@ template<> struct StaticAssert<true>
 };
 
 } // namespace STK
-
+#pragma GCC diagnostic ignored "-Wint-in-bool-context"
 #define STK_STATIC_ASSERT(COND,MSG) \
 if (STK::StaticAssert<bool(COND)>::MSG) {}
 
@@ -93,7 +99,7 @@ if (STK::StaticAssert<bool(COND)>::MSG) {}
 #include <type_traits>
 #define STK_STATIC_ASSERT(COND,MSG) static_assert(bool(COND),#MSG);
 
-#endif // not C++11
+#endif // C++11
 
 #define STK_STATIC_ASSERT_SAME_ORIENTATION(COND) \
     STK_STATIC_ASSERT(COND,YOU_TRIED_TO_CONSTRUCT_A_REFERENCE_WITH_A_DIFFERENT_ORIENTATION)
@@ -129,42 +135,43 @@ if (STK::StaticAssert<bool(COND)>::MSG) {}
     STK_STATIC_ASSERT(COND,YOU_TRIED_TO_APPLY_A_PRODUCT_OPERATOR_BETWEEN_NOT_COMPATIBLE_ARRAYS)
 
 #define STK_STATIC_ASSERT_TWO_DIMENSIONS_ONLY(EXPR) \
-STK_STATIC_ASSERT( (hidden::Traits<EXPR>::structure_==(int)Arrays::array2D_) \
-                 ||(hidden::Traits<EXPR>::structure_==(int)Arrays::square_) \
-                 ||(hidden::Traits<EXPR>::structure_==(int)Arrays::diagonal_) \
-                 ||(hidden::Traits<EXPR>::structure_==(int)Arrays::number_) \
-                 ||(hidden::Traits<EXPR>::structure_==(int)Arrays::lower_triangular_) \
-                 ||(hidden::Traits<EXPR>::structure_==(int)Arrays::upper_triangular_) \
-                 ||(hidden::Traits<EXPR>::structure_==(int)Arrays::symmetric_) \
-                 ||(hidden::Traits<EXPR>::structure_==(int)Arrays::lower_symmetric_) \
-                 ||(hidden::Traits<EXPR>::structure_==(int)Arrays::upper_symmetric_) \
+STK_STATIC_ASSERT( (int(hidden::Traits<EXPR>::structure_)==(int)Arrays::array2D_) \
+                 ||(int(hidden::Traits<EXPR>::structure_)==(int)Arrays::square_) \
+                 ||(int(hidden::Traits<EXPR>::structure_)==(int)Arrays::diagonal_) \
+                 ||(int(hidden::Traits<EXPR>::structure_)==(int)Arrays::number_) \
+                 ||(int(hidden::Traits<EXPR>::structure_)==(int)Arrays::lower_triangular_) \
+                 ||(int(hidden::Traits<EXPR>::structure_)==(int)Arrays::upper_triangular_) \
+                 ||(int(hidden::Traits<EXPR>::structure_)==(int)Arrays::symmetric_) \
+                 ||(int(hidden::Traits<EXPR>::structure_)==(int)Arrays::lower_symmetric_) \
+                 ||(int(hidden::Traits<EXPR>::structure_)==(int)Arrays::upper_symmetric_) \
                  ,YOU_TRIED_CALLING_A_MATRIX_METHOD_ON_A_VECTOR)
 
 #define STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(EXPR) \
-STK_STATIC_ASSERT( (hidden::Traits<EXPR>::structure_==(int)Arrays::vector_) \
-                 ||(hidden::Traits<EXPR>::structure_==(int)Arrays::point_) \
-                 ||(hidden::Traits<EXPR>::structure_==(int)Arrays::diagonal_) \
-                 ,YOU_CANNOT_USED_AN_UNIDIMENSIONAL_METHOD_ON_THIS_OBJECT)
+STK_STATIC_ASSERT(  STK_SINGLE_ARG2(hidden::IsEqual< int(hidden::Traits<EXPR>::structure_), int(Arrays::vector_)>::value_) \
+                  ||STK_SINGLE_ARG2(hidden::IsEqual< int(hidden::Traits<EXPR>::structure_), int(Arrays::point_)>::value_) \
+                  ||STK_SINGLE_ARG2(hidden::IsEqual< int(hidden::Traits<EXPR>::structure_), int(Arrays::diagonal_)>::value_) \
+                  ||STK_SINGLE_ARG2(hidden::IsEqual< int(hidden::Traits<EXPR>::structure_), int(Arrays::number_)>::value_) \
+                  ,YOU_CANNOT_USED_AN_UNIDIMENSIONAL_METHOD_ON_THIS_OBJECT)
 
 #define STK_STATIC_ASSERT_SAME_ORIENT(LHS, RHS) \
 STK_STATIC_ASSERT( hidden::Traits<LHS>::structure_== hidden::Traits<RHS>::structure_ \
                  ,YOU_HAVE_TO_USE_TWO_ARRAYS_WITH_THE_SAME_ORIENTATION)
 
 #define STK_STATIC_ASSERT_POINT_ONLY(EXPR) \
-STK_STATIC_ASSERT( (hidden::Traits<EXPR>::structure_==(int)Arrays::point_) \
+STK_STATIC_ASSERT(int(hidden::Traits<EXPR>::structure_) == int(Arrays::point_) \
                  ,YOU_TRIED_CALLING_A_POINT_METHOD_ON_SOMETHING_ELSE)
 
 #define STK_STATIC_ASSERT_VECTOR_ONLY(EXPR) \
-STK_STATIC_ASSERT( (hidden::Traits<EXPR>::structure_==(int)Arrays::vector_) \
+STK_STATIC_ASSERT(STK_SINGLE_ARG2(hidden::IsEqual< int(hidden::Traits<EXPR>::structure_), int(Arrays::vector_)>::value_) \
                  ,YOU_TRIED_CALLING_A_VECTOR_METHOD_ON_SOMETHING_ELSE)
 
 #define STK_STATIC_ASSERT_POINT_OR_VECTOR_ONLY(EXPR) \
-STK_STATIC_ASSERT( (hidden::Traits<EXPR>::structure_==(int)Arrays::vector_) \
-                 ||(hidden::Traits<EXPR>::structure_==(int)Arrays::point_) \
-                 ,YOU_TRIED_CALLING_A_VECTOR_METHOD_ON_SOMETHING_ELSE)
+STK_STATIC_ASSERT(  STK_SINGLE_ARG2(hidden::IsEqual< int(hidden::Traits<EXPR>::structure_), int(Arrays::vector_)>::value_) \
+                  ||STK_SINGLE_ARG2(hidden::IsEqual< int(hidden::Traits<EXPR>::structure_), int(Arrays::point_)>::value_) \
+                  ,YOU_TRIED_CALLING_A_VECTOR_METHOD_ON_SOMETHING_ELSE)
 
 #define STK_STATIC_ASSERT_ZERO_DIMENSION_ONLY(EXPR) \
-STK_STATIC_ASSERT( (hidden::Traits<EXPR>::structure_==(int)Arrays::number_) \
-                  ,YOU_CANNOT_USED_A_ZERODIMENSIONAL_METHOD_ON_THIS_OBJECT)
+STK_STATIC_ASSERT(STK_SINGLE_ARG2(hidden::IsEqual< int(hidden::Traits<EXPR>::structure_), int(Arrays::number_)>::value_) \
+                 ,YOU_CANNOT_USED_A_ZERODIMENSIONAL_METHOD_ON_THIS_OBJECT)
 
 #endif /* STK_STATICASSERT_H */

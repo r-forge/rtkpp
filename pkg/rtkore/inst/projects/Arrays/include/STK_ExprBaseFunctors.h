@@ -124,9 +124,9 @@ struct FunctorTraits
 } // namespace hidden
 
 /** @ingroup Arrays
- *  @brief  class allowing to apply the Functor Funct on each columns of an expression.
+ *  @brief  class allowing to apply the Functor Functor on each columns of an expression.
  **/
-template<typename Derived, typename Funct>
+template<typename Derived, typename Functor>
 struct ApplyFunctorByCol
 {
   typedef typename Derived::Type Type;
@@ -146,14 +146,14 @@ struct ApplyFunctorByCol
   Row operator()()
   {
     for (int j= lhs_.beginCols(); j < lhs_.endCols(); ++j)
-    { res_[j] = Funct(lhs_.col(j))();}
+    { res_[j] = Functor(lhs_.col(j))();}
     return res_;
   }
   /** @return the applied functor by column */
   Row operator()(bool option)
   {
     for (int j= lhs_.beginCols(); j < lhs_.endCols(); ++j)
-    { res_[j] = Funct(lhs_.col(j))( option);}
+    { res_[j] = Functor(lhs_.col(j))( option);}
     return res_;
   }
   /** @return the applied functor by column */
@@ -165,7 +165,7 @@ struct ApplyFunctorByCol
     STKRUNTIME_ERROR_NO_ARG(ApplyFunctorByCol::operator(value,option),lhs_.cols()!=value.range());
 #endif
     for (int j= lhs_.beginCols(); j < lhs_.endCols(); ++j)
-    { res_[j] = Funct(lhs_.col(j))(value[j], option);}
+    { res_[j] = Functor(lhs_.col(j))(value[j], option);}
     return res_;
   }
   protected:
@@ -174,10 +174,10 @@ struct ApplyFunctorByCol
 };
 
 /** @ingroup Arrays
- *  @brief  class allowing to apply the weighted Functor @c Funct on each
+ *  @brief  class allowing to apply the weighted Functor @c Functor on each
  *  columns of an expression.
  **/
-template<typename Derived, typename Funct>
+template<typename Derived, typename Functor>
 struct ApplyWeightedFunctorByCol
 {
   typedef typename Derived::Type Type;
@@ -197,21 +197,21 @@ struct ApplyWeightedFunctorByCol
   Row operator()(ExprBase<Weights> const& w)
   {
     for (int j= lhs_.beginCols(); j < lhs_.endCols(); ++j)
-    { res_[j] = Funct(lhs_.col(j))(w);}
+    { res_[j] = Functor(lhs_.col(j))(w);}
     return res_;
   }
   template<class Weights>
   Row operator()(ExprBase<Weights> const& w, bool option)
   {
     for (int j= lhs_.beginCols(); j < lhs_.endCols(); ++j)
-    { res_[j] = Funct(lhs_.col(j))(w, option);}
+    { res_[j] = Functor(lhs_.col(j))(w, option);}
     return res_;
   }
   template<class Weights>
   Row operator()(ExprBase<Weights> const& w, Type const& value)
   {
     for (int j= lhs_.beginCols(); j < lhs_.endCols(); ++j)
-    { res_[j] = Funct(lhs_.col(j))(w, value);}
+    { res_[j] = Functor(lhs_.col(j))(w, value);}
     return res_;
   }
   template< class Weights, typename OtherRow>
@@ -222,7 +222,7 @@ struct ApplyWeightedFunctorByCol
     STKRUNTIME_ERROR_NO_ARG(ApplyWeightedFunctorByCol::operator(w,value,option),lhs_.cols()!=value.range());
 #endif
     for (int j= lhs_.beginCols(); j < lhs_.endCols(); ++j)
-    { res_[j] = Funct(lhs_.col(j))(w, value[j], option);}
+    { res_[j] = Functor(lhs_.col(j))(w, value[j], option);}
     return res_;
   }
   protected:
@@ -231,9 +231,9 @@ struct ApplyWeightedFunctorByCol
 };
 
 /** @ingroup Arrays
- *  @brief class allowing to apply the Functor Funct on each rows of an expression.
+ *  @brief class allowing to apply the Functor Functor on each rows of an expression.
  **/
-template<typename Derived, typename Funct>
+template<typename Derived, typename Functor>
 struct ApplyFunctorByRow
 {
   typedef typename Derived::Type Type;
@@ -252,13 +252,13 @@ struct ApplyFunctorByRow
   Col operator()()
   {
     for (int i= lhs_.beginRows(); i < lhs_.endRows(); ++i)
-    { res_[i] = Funct(lhs_.row(i))();}
+    { res_[i] = Functor(lhs_.row(i))();}
     return res_;
   }
   Col operator()(bool option)
   {
     for (int j= lhs_.beginRows(); j < lhs_.endRows(); ++j)
-    { res_[j] = Funct(lhs_.row(j))( option);}
+    { res_[j] = Functor(lhs_.row(j))( option);}
     return res_;
   }
   template<class OtherCol>
@@ -268,7 +268,7 @@ struct ApplyFunctorByRow
   if (lhs_.rows() != value.range()) STKRUNTIME_ERROR_NO_ARG(ApplyFunctorByRow::operator(value,option),lhs_.rows()!=value.rows());
 #endif
     for (int j= lhs_.beginRows(); j < lhs_.endRows(); ++j)
-    { res_[j] = Funct(lhs_.row(j))(value[j], option);}
+    { res_[j] = Functor(lhs_.row(j))(value[j], option);}
     return res_;
   }
   protected:
@@ -277,9 +277,9 @@ struct ApplyFunctorByRow
 };
 
 /** @ingroup Arrays
- *  @brief class allowing to apply the Functor Funct on each rows of an expression.
+ *  @brief class allowing to apply the Functor Functor on each rows of an expression.
  **/
-template<typename Derived, typename Funct>
+template<typename Derived, typename Functor>
 struct ApplyWeightedFunctorByRow
 {
   typedef typename Derived::Type Type;
@@ -299,26 +299,16 @@ struct ApplyWeightedFunctorByRow
   Col operator()( ExprBase<Weights> const& w)
   {
     for (int i= lhs_.beginRows(); i < lhs_.endRows(); ++i)
-    { res_[i] = Funct(lhs_.row(i))(w);}
+    { res_[i] = Functor(lhs_.row(i))(w);}
     return res_;
   }
   template<typename Weights>
   Col operator()(ExprBase<Weights> const& w, bool option)
   {
     for (int j= lhs_.beginRows(); j < lhs_.endRows(); ++j)
-    { res_[j] = Funct(lhs_.row(j))(w, option);}
+    { res_[j] = Functor(lhs_.row(j))(w, option);}
     return res_;
   }
-//  template<typename Weights>
-//  Col operator()(ExprBase<Weights> const& w, Type const& value, bool option)
-//  {
-//#ifdef STK_BOUNDS_CHECK
-//  if (lhs_.rows() != value.rows()) STKRUNTIME_ERROR_NO_ARG(ApplyFunctorByRow::operator(w,value,option),lhs_.rows()!=value.rows());
-//#endif
-//    for (int j= lhs_.beginRows(); j < lhs_.endRows(); ++j)
-//    { res_[j] = Funct(lhs_.row(j))(w, value, option);}
-//    return res_;
-//  }
   template<typename Weights, typename OtherCol>
   Col operator()(ExprBase<Weights> const& w, ExprBase<OtherCol> const& value, bool option)
   {
@@ -326,7 +316,7 @@ struct ApplyWeightedFunctorByRow
   if (lhs_.rows() != value.range()) STKRUNTIME_ERROR_NO_ARG(ApplyFunctorByRow::operator(w,value,option),lhs_.rows()!=value.rows());
 #endif
     for (int j= lhs_.beginRows(); j < lhs_.endRows(); ++j)
-    { res_[j] = Funct(lhs_.row(j))(w, value[j], option);}
+    { res_[j] = Functor(lhs_.row(j))(w, value[j], option);}
     return res_;
   }
   protected:
@@ -335,52 +325,52 @@ struct ApplyWeightedFunctorByRow
 };
 
 /** @ingroup Arrays
- *  @brief class allowing applying the functor @c Funct on a vector or row-vector
+ *  @brief class allowing applying the functor @c Functor on a vector or row-vector
  **/
-template<typename Derived, typename Funct>
+template<typename Derived, typename Functor>
 struct ApplyFunctor
 {
-    typedef typename Derived::Type Type;
-    typedef Type Col;
-    typedef Type Row;
-    /// constructor
-    inline ApplyFunctor( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived())
-    { STK_STATIC_ASSERT_POINT_OR_VECTOR_ONLY(Derived);}
-    /** apply without argument*/
-    inline Type operator()() { return Funct(lhs_)();}
-    /** apply with an option argument*/
-    inline Type operator()(bool option) { return Funct(lhs_)(option);}
-    /** apply with a value and an option argument*/
-    inline Type operator()(Type const& value, bool option)
-    { return Funct(lhs_)(value, option);}
+  typedef typename Derived::Type Type;
+  typedef Type Col;
+  typedef Type Row;
+  /// constructor
+  inline ApplyFunctor( ExprBase<Derived> const& lhs) : lhs_(lhs.asDerived())
+  { STK_STATIC_ASSERT_POINT_OR_VECTOR_ONLY(Derived);}
+  /** apply without argument*/
+  inline Type operator()() { return Functor(lhs_)();}
+  /** apply with an option argument*/
+  inline Type operator()(bool option) { return Functor(lhs_)(option);}
+  /** apply with a value and an option argument*/
+  inline Type operator()(Type const& value, bool option)
+  { return Functor(lhs_)(value, option);}
 
   protected:
     Derived const& lhs_;
 };
 
 /** @ingroup Arrays
- *  @brief class allowing applying the weighted functor @c Funct on a vector or row-vector
+ *  @brief class allowing applying the weighted functor @c Functor on a vector or row-vector
  **/
-template<typename Derived, typename Funct>
+template<typename Derived, typename Functor>
 struct ApplyWeightedFunctor
 {
-    typedef typename Derived::Type Type;
-    typedef Type Col;
-    typedef Type Row;
-    /// constructor
-    inline ApplyWeightedFunctor( ExprBase<Derived> const& lhs): lhs_(lhs.asDerived())
-    { STK_STATIC_ASSERT_POINT_OR_VECTOR_ONLY(Derived);}
-    /** apply with weights*/
-    template<typename Weights>
-    inline Type operator()(ExprBase<Weights> const& w) { return Funct(lhs_)(w);}
-    /** apply with weight and an option argument*/
-    template<typename Weights>
-    inline Type operator()(ExprBase<Weights> const& w, bool option)
-    { return Funct(lhs_)(w, option);}
-    /** apply with weight, a value and an option argument*/
-    template<typename Weights>
-    inline Type operator()(ExprBase<Weights> const& w, Type const& value, bool option)
-    { return Funct(lhs_)(w, value, option);}
+  typedef typename Derived::Type Type;
+  typedef Type Col;
+  typedef Type Row;
+  /// constructor
+  inline ApplyWeightedFunctor( ExprBase<Derived> const& lhs): lhs_(lhs.asDerived())
+  { STK_STATIC_ASSERT_POINT_OR_VECTOR_ONLY(Derived);}
+  /** apply with weights*/
+  template<typename Weights>
+  inline Type operator()(ExprBase<Weights> const& w) { return Functor(lhs_)(w);}
+  /** apply with weight and an option argument*/
+  template<typename Weights>
+  inline Type operator()(ExprBase<Weights> const& w, bool option)
+  { return Functor(lhs_)(w, option);}
+  /** apply with weight, a value and an option argument*/
+  template<typename Weights>
+  inline Type operator()(ExprBase<Weights> const& w, Type const& value, bool option)
+  { return Functor(lhs_)(w, value, option);}
 
   protected:
     Derived const& lhs_;

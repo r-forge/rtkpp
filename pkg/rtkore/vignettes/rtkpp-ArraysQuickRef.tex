@@ -253,12 +253,11 @@ and are automatically unrolled if the array is of fixed (small) size.
   m.count();
   m.any();
   m.all();
+  m.nbAvailableValues(); // Get number of values which are not NA
   m.minElt(i,j);     // can be v.minElt(i) or m.minElt()
   m.maxElt(i,j);     // can be v.maxElt(i) or m.maxElt()
   m.minEltSafe(i,j); // can be v.minEltSafe(i) or m.minEltSafe()
   m.maxEltSafe(i,j); // can be v.maxEltSafe(i) or m.maxEltSafe()
-  m.sum(); m.sumSafe();
-  m.mean(); m.meanSafe();
 \end{lstlisting}
 
 \begin{lstlisting}[style=customcpp,caption=Appliers]
@@ -273,6 +272,8 @@ and are automatically unrolled if the array is of fixed (small) size.
 
 The next methods use visitors in order to compute the result, eventually safely
 \begin{lstlisting}[style=customcpp]
+ m.sum(); m.sumSafe();
+ m.mean(); m.meanSafe();
  m.norm();  m.normSafe();
  m.norm2(); m.norm2Safe();
  m.normInf();
@@ -306,7 +307,7 @@ Stat::min(a); Stat::minSafe(a); Stat::min(a, w); Stat::minSafe(a, w);
 Stat::max(a); Stat::maxSafe(a); Stat::max(a, w); Stat::maxSafe(a, w);
 Stat::sum(a); Stat::sumSafe(a); Stat::sum(a, w); Stat::sumSafe(a, w);
 Stat::mean(a); Stat::meanSafe(a); Stat::mean(a, w); Stat::meanSafe(a, w);
-// could also be (safe versions)
+// Note that ByCol is ommited and previous functor can also be written
 Stat::minByCol(a); Stat::minSafeByCol(a); Stat::minByCol(a, w); Stat::minSafeByCol(a, w);
 // .. etc
 // unbiased variance (division by n-1) when unbiased is true, false is the default
@@ -341,21 +342,25 @@ Stat::varianceWithFixedMeanSafeByRow(a, w, mean, false);
 
 Available operations on arrays/vectors and expressions are summarized in the next table.
 Many operations are similar to the operations
-furnished by the Eigen library \href{http://eigen.tuxfamily.org/}.
+furnished by the Eigen library \url{http://eigen.tuxfamily.org/}.
 
 \begin{lstlisting}[style=customcpp,caption=add\, subtract\, divide\, multiply arrays element by element"]
    m= m1+m2; m+= m1;
    m= m1-m2; m-= m1;
    m= m1/m2; m/= m1;
-   m= m1.prod(m2); // don't use m1*m2 if you want a product element by element
+   m= m1.prod(m2);   // don't use m1*m2 if you want a product element by element
+   m= m1%m2; m%= m1; // work only with integer values
 \end{lstlisting}
 
-\begin{lstlisting}[style=customcpp,caption=add\, subtract\, divide\, multiply a number]
-   Real s;
-   m= m1+s; m= s+m1; m+= s;
+\begin{lstlisting}[style=customcpp,caption=add\, subtract\, divide\, multiply,
+etc. a number]
+   Real s; m= m1+s; m= s+m1; m+= s;
    m= m1-s; m= s-m1; m-= s;
    m= m1/s; m= s/m1; m/= s;
    m= m1*s; m= s*m1; m*= s;
+   m= m1%s; m= s%m1; m%= s; // modulo work only with integer
+   m= m1&&s; m= m1||s;      // logical operations
+   m= m1&s; m=m1|s; m=m1^s; // bitwise operations, work only with integers
 \end{lstlisting}
 
 \begin{lstlisting}[style=customcpp,caption=matrix by matrix/vector products]
@@ -369,11 +374,13 @@ furnished by the Eigen library \href{http://eigen.tuxfamily.org/}.
 \end{lstlisting}
 
 \begin{lstlisting}[style=customcpp,caption=Comparisons operators]
-Real s;
-// count for each columns the number of true comparisons
-count(m1 < m2);  count(m1 > m2);  count(m1 < s);  count(m1 > s);
-count(m1 <= m2); count(m1 >= m2); count(m1 <= s); count(m1 >= s);
-count(m1 == m2); count(m1 != m2); count(m1 == s); count(m1 != s);
+  Real s;
+  // count for each columns the number of true comparisons
+  count(m1 < m2);  count(m1 > m2);  count(m1 < s);  count(m1 > s);
+  count(m1 <= m2); count(m1 >= m2); count(m1 <= s); count(m1 >= s);
+  count(m1 == m2); count(m1 != m2); count(m1 == s); count(m1 != s);
+  m.min(m2); m.min(v); // compute minimal value term by term
+  m.max(m2); m.max(v); // compute maximal value term by term
 \end{lstlisting}
 
 \begin{lstlisting}[style=customcpp,caption=Miscellaneous functions]

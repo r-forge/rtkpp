@@ -59,8 +59,8 @@ struct Traits< UnaryOperator <UnaryOp, Lhs> >
       sizeCols_  = Traits<Lhs>::sizeCols_,
       storage_   = Traits<Lhs>::storage_
   };
-//  typedef RowOperator<UnaryOperator <UnaryOp, Lhs> > Row;
-//  typedef ColOperator<UnaryOperator <UnaryOp, Lhs> > Col;
+  typedef RowOperator<UnaryOperator <UnaryOp, Lhs> > Row;
+  typedef ColOperator<UnaryOperator <UnaryOp, Lhs> > Col;
 
   typedef typename UnaryOp::result_type Type;
   typedef typename UnaryOp::result_type ConstReturnType;
@@ -98,9 +98,6 @@ class UnaryOperator: public ExprBase< UnaryOperator<UnaryOp, Lhs> >, public TRef
     typedef typename hidden::Traits< UnaryOperator<UnaryOp, Lhs> >::Type Type;
     typedef typename hidden::Traits< UnaryOperator<UnaryOp, Lhs> >::ConstReturnType ConstReturnType;
 
-//    typedef typename hidden::Traits< UnaryOperator<UnaryOp, Lhs> >::Row Row;
-//    typedef typename hidden::Traits< UnaryOperator<UnaryOp, Lhs> >::Col Col;
-
     enum
     {
         structure_ = hidden::Traits< UnaryOperator >::structure_,
@@ -115,7 +112,7 @@ class UnaryOperator: public ExprBase< UnaryOperator<UnaryOp, Lhs> >, public TRef
     typedef TRange<sizeCols_> ColRange;
 
     inline UnaryOperator( Lhs const& lhs, UnaryOp const& functor = UnaryOp())
-                       : Base(), lhs_(lhs), functor_(functor)
+                        : Base(), lhs_(lhs), functor_(functor)
     {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return lhs_.rows();}

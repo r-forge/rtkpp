@@ -40,7 +40,7 @@
 namespace STK
 {
 // forward declarations
-template< typename Type, int SizeRows_ = UnknownSize, int SizeCols_ = UnknownSize, bool Orient_ = Arrays::by_col_> class CArray;
+template< typename Type, int SizeRows_, int SizeCols_, bool Orient_> class CArray;
 template< typename Type, int SizeCols_, bool Orient_> class CArrayPoint;
 template< typename Type, int SizeRows_, bool Orient_> class CArrayVector;
 template< typename Type, bool Orient_> class CArrayNumber;

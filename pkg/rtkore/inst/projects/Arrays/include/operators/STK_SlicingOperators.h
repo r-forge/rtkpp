@@ -41,14 +41,14 @@ namespace STK
 // forward declaration
 template< typename Array> class RowOperator;
 template< typename Array> class ColOperator;
-// only for vectors/points/Diagonal expressions
+// only for vectors/points/diagonal expressions
 template< typename Array, int Size_> class SubVectorOperator;
 // only for array expressions
 template< typename Array, int SizeRows_, int SizeCols_> class SubOperator;
 
 template< typename Array> class RowAccessor;
 template< typename Array> class ColAccessor;
-// only for vectors/points/Diagonal expressions
+// only for vectors/points/diagonal expressions
 template< typename Array, int Size_> class SubVectorAccessor;
 // only for array expressions
 template< typename Array, int SizeRows_, int SizeCols_> class SubAccessor;
@@ -131,8 +131,11 @@ class RowOperator: public ExprBase< RowOperator< Lhs> >, public TRef<1>
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange; // will not be used
 
-    /** Constructor */
+    /** constructor */
     inline RowOperator( Lhs const& lhs, int i): Base(), lhs_(lhs), i_(i), rows_(i_, 1), cols_(lhs_.rangeColsInRow(i_)) {}
+    /** Copy constructor */
+    inline RowOperator( RowOperator const& row, bool ref = true)
+                      : Base(), lhs_(row.lhs_), i_(row.i_), rows_(row.rows_), cols_(row.cols_) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the range of the Columns */
@@ -197,8 +200,11 @@ class RowAccessor: public ExprBase< RowAccessor< Lhs> >, public TRef<1>
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange; // will not be used
 
-    /** Constructor */
+    /** constructor */
     inline RowAccessor( Lhs& lhs, int i): Base(), lhs_(lhs), i_(i), rows_(i_, 1), cols_(lhs_.rangeColsInRow(i_)) {}
+    /** Copy constructor */
+    inline RowAccessor( RowAccessor& row, bool ref = true)
+                      : Base(), lhs_(row.lhs_), i_(row.i_), rows_(row.rows_), cols_(row.cols_) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the range of the Columns */
@@ -326,9 +332,12 @@ class ColOperator: public ExprBase< ColOperator< Lhs> >, public TRef<1>
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
 
-    /** Constructor */
+    /** constructor */
     inline ColOperator( Lhs const& lhs, int j)
                       : Base(), lhs_(lhs), j_(j), rows_(lhs_.rangeRowsInCol(j_)), cols_(j_,1) {}
+    /** Copy constructor */
+    inline ColOperator( ColOperator const& col, bool ref = true)
+                      : Base(), lhs_(col.lhs_), j_(col.j_), rows_(col.rows_), cols_(col.cols_) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the columns range */
@@ -352,24 +361,6 @@ class ColOperator: public ExprBase< ColOperator< Lhs> >, public TRef<1>
     inline ConstReturnType elt1Impl(int i) const { return (lhs_.elt(i, j_));}
     /** access to the element */
     inline ConstReturnType elt0Impl() const { return (lhs_.elt(j_));}
-
-  protected:
-    /** @return the ith element of the column
-     *  @param i,j indexes of the element
-     **/
-    inline Type& elt2Impl(int i, int j)
-    {
-#ifdef STK_BOUNDS_CHECK
-      if (j != j_) { STKRUNTIME_ERROR_2ARG(ColOperatorBase::elt2Impl,i,j,column index is not valid);}
-#endif
-      return (lhs_.elt(i, j_));
-    }
-    /** @return the element ith element
-     *  @param i index of the ith element
-     **/
-    inline Type& elt1Impl(int i) { return (lhs_.elt(i, j_));}
-    /** access to the element */
-    inline Type& elt0Impl() { return (lhs_.elt(j_));}
 
   protected:
     Lhs const& lhs_;
@@ -412,9 +403,12 @@ class ColAccessor: public ExprBase< ColAccessor< Lhs> >, public TRef<1>
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
 
-    /** Constructor */
+    /** constructor */
     inline ColAccessor( Lhs& lhs, int j)
                       : Base(), lhs_(lhs), j_(j), rows_(lhs_.rangeRowsInCol(j_)), cols_(j_,1) {}
+    /** Copy constructor */
+    inline ColAccessor( ColAccessor& col, bool ref = true)
+                      : Base(), lhs_(col.lhs_), j_(col.j_), rows_(col.rows_), cols_(col.cols_) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the columns range */
@@ -553,9 +547,11 @@ class SubVectorOperator: public SubVectorOperatorBase< Lhs, Size_
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
 
-    /** Constructor */
+    /** constructor */
     inline SubVectorOperator( Lhs const& lhs, TRange<Size_> const& I): Base(I), lhs_(lhs) {}
-
+    /** Copy constructor */
+    inline SubVectorOperator( SubVectorOperator const& vec, bool ref = true)
+                            : Base(vec), lhs_(vec.lhs_) {}
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_;}
     /** @return element (i,j)
@@ -599,14 +595,16 @@ class SubVectorOperatorBase<Lhs, Size_, Arrays::point_ >: public ExprBase< SubVe
     enum
     {
       sizeRows_  = hidden::Traits< Derived >::sizeRows_,
-      sizeCols_  = hidden::Traits< Derived >::sizeCols_,
+      sizeCols_  = hidden::Traits< Derived >::sizeCols_
     };
     /** Type of the Range for the rows */
     typedef TRange<sizeRows_> RowRange;
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
-    /** Constructor */
+    /** constructor */
     inline SubVectorOperatorBase( ColRange const& J): Base(), cols_(J) {}
+    /** copy constructor */
+    inline SubVectorOperatorBase( SubVectorOperatorBase const& vec): Base(), cols_(vec.cols_) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return this->asDerived().lhs().rows();}
     /** @return the range of the Columns */
@@ -629,14 +627,16 @@ class SubVectorOperatorBase<Lhs, Size_, Arrays::vector_ >: public ExprBase< SubV
     enum
     {
       sizeRows_  = hidden::Traits< Derived >::sizeRows_,
-      sizeCols_  = hidden::Traits< Derived >::sizeCols_,
+      sizeCols_  = hidden::Traits< Derived >::sizeCols_
     };
     /** Type of the Range for the rows */
     typedef TRange<sizeRows_> RowRange;
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
-    /** Constructor */
+    /** constructor */
     inline SubVectorOperatorBase( RowRange const& I): Base(), rows_(I) {}
+    /** copy constructor */
+    inline SubVectorOperatorBase( SubVectorOperatorBase const& vec): Base(), rows_(vec.rows_) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the range of the Columns */
@@ -659,14 +659,16 @@ class SubVectorOperatorBase<Lhs, Size_, Arrays::diagonal_ >: public ExprBase< Su
       enum
       {
         sizeRows_  = hidden::Traits< Derived >::sizeRows_,
-        sizeCols_  = hidden::Traits< Derived >::sizeCols_,
+        sizeCols_  = hidden::Traits< Derived >::sizeCols_
       };
       /** Type of the Range for the rows */
       typedef TRange<sizeRows_> RowRange;
       /** Type of the Range for the columns */
       typedef TRange<sizeCols_> ColRange;
-      /** Constructor */
+      /** constructor */
       inline SubVectorOperatorBase( RowRange const& I): Base(), range_(I) {}
+      /** copy constructor */
+      inline SubVectorOperatorBase( SubVectorOperatorBase const& vec): Base(), range_(vec.range_) {}
       /**  @return the range of the rows */
       inline RowRange const& rowsImpl() const { return range_;}
       /** @return the range of the Columns */
@@ -715,8 +717,11 @@ class SubVectorAccessor: public SubVectorAccessorBase< Lhs, Size_
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
 
-    /** Constructor */
+    /** constructor */
     inline SubVectorAccessor( Lhs& lhs, TRange<Size_> const& I): Base(I), lhs_(lhs) {}
+    /** Copy constructor */
+    inline SubVectorAccessor( SubVectorAccessor& vec, bool ref = true)
+                            : Base(vec), lhs_(vec.lhs_) {}
 
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_;}
@@ -760,14 +765,16 @@ class SubVectorAccessorBase<Lhs, Size_, Arrays::point_>: public ExprBase< SubVec
     enum
     {
       sizeRows_  = hidden::Traits< Derived >::sizeRows_,
-      sizeCols_  = hidden::Traits< Derived >::sizeCols_,
+      sizeCols_  = hidden::Traits< Derived >::sizeCols_
     };
     /** Type of the Range for the rows */
     typedef TRange<sizeRows_> RowRange;
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
-    /** Constructor */
+    /** constructor */
     inline SubVectorAccessorBase( ColRange const& J): Base(), cols_(J) {}
+    /** copy constructor */
+    inline SubVectorAccessorBase( SubVectorAccessorBase const& vec): Base(), cols_(vec.cols_) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return this->asDerived().lhs().rows();}
     /** @return the range of the Columns */
@@ -790,14 +797,16 @@ class SubVectorAccessorBase<Lhs, Size_, Arrays::vector_ >: public ExprBase< SubV
     enum
     {
       sizeRows_  = hidden::Traits< Derived >::sizeRows_,
-      sizeCols_  = hidden::Traits< Derived >::sizeCols_,
+      sizeCols_  = hidden::Traits< Derived >::sizeCols_
     };
     /** Type of the Range for the rows */
     typedef TRange<sizeRows_> RowRange;
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
-    /** Constructor */
+    /** constructor */
     inline SubVectorAccessorBase( RowRange const& I): Base(), rows_(I) {}
+    /** copy constructor */
+    inline SubVectorAccessorBase( SubVectorAccessorBase const& vec): Base(), rows_(vec.rows_) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the range of the Columns */
@@ -820,14 +829,16 @@ class SubVectorAccessorBase<Lhs, Size_, Arrays::diagonal_ >: public ExprBase< Su
       enum
       {
         sizeRows_  = hidden::Traits< Derived >::sizeRows_,
-        sizeCols_  = hidden::Traits< Derived >::sizeCols_,
+        sizeCols_  = hidden::Traits< Derived >::sizeCols_
       };
       /** Type of the Range for the rows */
       typedef TRange<sizeRows_> RowRange;
       /** Type of the Range for the columns */
       typedef TRange<sizeCols_> ColRange;
-      /** Constructor */
+      /** constructor */
       inline SubVectorAccessorBase( RowRange const& I): Base(), range_(I) {}
+      /** copy constructor */
+      inline SubVectorAccessorBase( SubVectorAccessorBase const& vec): Base(), range_(vec.range_) {}
       /**  @return the range of the rows */
       inline RowRange const& rowsImpl() const { return range_;}
       /** @return the range of the Columns */
@@ -914,11 +925,20 @@ class SubOperator: public ExprBase< SubOperator<Lhs, SizeRows_, SizeCols_> >
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
 
-    /** Constructor */
-    inline SubOperator( Lhs const& lhs, RowRange const& I): Base(), lhs_(lhs) {}
+    /** constructor */
+    inline SubOperator( Lhs const& lhs, RowRange const& I, ColRange const& J)
+                      : Base(), lhs_(lhs), rows_(I), cols_(J) {}
+    /** copy constructor */
+    inline SubOperator( SubOperator const& sub, bool ref = true)
+                      : Base(), lhs_(sub.lhs_), rows_(sub.rows_), cols_(sub.cols_) {}
 
-    /** @return the left hand side expression */
+    /**  @return the range of the rows */
+    inline RowRange const& rowsImpl() const { return rows_;}
+    /** @return the range of the Columns */
+    inline ColRange const& colsImpl() const { return cols_;}
+   /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_;}
+
     /** @return element (i,j)
      *  @param i,j row and column indexes
      **/
@@ -931,19 +951,9 @@ class SubOperator: public ExprBase< SubOperator<Lhs, SizeRows_, SizeCols_> >
     inline ConstReturnType elt0Impl() const { return (lhs_.elt());}
 
   protected:
-    /** @return element (i,j)
-     *  @param i,j row and column indexes
-     **/
-    inline Type& elt2Impl(int i, int j) { return (lhs_.elt2Impl(i, j));}
-    /** @return i-th element
-     *  @param i element index
-     **/
-    inline Type& elt1Impl(int i) { return (lhs_.elt1Impl(i));}
-    /** accesses to the element */
-    inline Type& elt0Impl() { return (lhs_.elt());}
-
-  protected:
     Lhs const& lhs_;
+    RowRange rows_;
+    ColRange cols_;
 };
 
 /** @ingroup Arrays
@@ -964,53 +974,64 @@ template< typename Lhs, int SizeRows_, int SizeCols_>
 class SubAccessor: public ExprBase< SubAccessor<Lhs, SizeRows_, SizeCols_> >
                , public TRef<1>
 {
-public:
-  typedef typename hidden::Traits< SubAccessor<Lhs, SizeRows_, SizeCols_> >::Type Type;
-  typedef typename hidden::Traits< SubAccessor<Lhs, SizeRows_, SizeCols_> >::ConstReturnType ConstReturnType;
-  enum
-  {
-    structure_ = hidden::Traits< SubAccessor<Lhs, SizeRows_, SizeCols_> >::structure_,
-    orient_    = hidden::Traits< SubAccessor<Lhs, SizeRows_, SizeCols_> >::orient_,
-    sizeRows_  = hidden::Traits< SubAccessor<Lhs, SizeRows_, SizeCols_> >::sizeRows_,
-    sizeCols_  = hidden::Traits< SubAccessor<Lhs, SizeRows_, SizeCols_> >::sizeCols_,
-    storage_   = hidden::Traits< SubAccessor<Lhs, SizeRows_, SizeCols_> >::storage_
-  };
-  typedef ExprBase< SubAccessor<Lhs, SizeRows_, SizeCols_> > Base;
+  public:
+    typedef typename hidden::Traits< SubAccessor<Lhs, SizeRows_, SizeCols_> >::Type Type;
+    typedef typename hidden::Traits< SubAccessor<Lhs, SizeRows_, SizeCols_> >::ConstReturnType ConstReturnType;
+    enum
+    {
+      structure_ = hidden::Traits< SubAccessor<Lhs, SizeRows_, SizeCols_> >::structure_,
+      orient_    = hidden::Traits< SubAccessor<Lhs, SizeRows_, SizeCols_> >::orient_,
+      sizeRows_  = hidden::Traits< SubAccessor<Lhs, SizeRows_, SizeCols_> >::sizeRows_,
+      sizeCols_  = hidden::Traits< SubAccessor<Lhs, SizeRows_, SizeCols_> >::sizeCols_,
+      storage_   = hidden::Traits< SubAccessor<Lhs, SizeRows_, SizeCols_> >::storage_
+    };
+    typedef ExprBase< SubAccessor<Lhs, SizeRows_, SizeCols_> > Base;
 
-  /** Type of the Range for the rows */
-  typedef TRange<sizeRows_> RowRange;
-  /** Type of the Range for the columns */
-  typedef TRange<sizeCols_> ColRange;
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
 
-  /** Constructor */
-  inline SubAccessor( Lhs& lhs, RowRange const& I): Base(), lhs_(lhs) {}
+    /** constructor */
+    inline SubAccessor( Lhs& lhs, RowRange const& I, ColRange const& J)
+                      : Base(), lhs_(lhs), rows_(I), cols_(J) {}
+    /** copy constructor */
+    inline SubAccessor( SubAccessor& sub, bool ref = true)
+                      : Base(), lhs_(sub.lhs_), rows_(sub.rows_), cols_(sub.cols_) {}
 
-  /** @return the left hand side expression */
-  inline Lhs const& lhs() const { return lhs_;}
-  /** @return element (i,j)
-   *  @param i,j row and column indexes
-   **/
-  inline ConstReturnType elt2Impl(int i, int j) const { return (lhs_.elt2Impl(i, j));}
-  /** @return i-th element
-   *  @param i element index
-   **/
-  inline ConstReturnType elt1Impl(int i) const { return (lhs_.elt1Impl(i));}
-  /** accesses to the element */
-  inline ConstReturnType elt0Impl() const { return (lhs_.elt());}
+    /**  @return the range of the rows */
+    inline RowRange const& rowsImpl() const { return rows_;}
+    /** @return the range of the Columns */
+    inline ColRange const& colsImpl() const { return cols_;}
+    /** @return the left hand side expression */
+    inline Lhs const& lhs() const { return lhs_;}
 
-  /** @return element (i,j)
-   *  @param i,j row and column indexes
-   **/
-  inline Type& elt2Impl(int i, int j) { return (lhs_.elt2Impl(i, j));}
-  /** @return i-th element
-   *  @param i element index
-   **/
-  inline Type& elt1Impl(int i) { return (lhs_.elt1Impl(i));}
-  /** accesses to the element */
-  inline Type& elt0Impl() { return (lhs_.elt());}
+    /** @return element (i,j)
+     *  @param i,j row and column indexes
+     **/
+    inline ConstReturnType elt2Impl(int i, int j) const { return (lhs_.elt2Impl(i, j));}
+    /** @return i-th element
+     *  @param i element index
+     **/
+    inline ConstReturnType elt1Impl(int i) const { return (lhs_.elt1Impl(i));}
+    /** accesses to the element */
+    inline ConstReturnType elt0Impl() const { return (lhs_.elt());}
 
-protected:
-  Lhs& lhs_;
+    /** @return element (i,j)
+     *  @param i,j row and column indexes
+     **/
+    inline Type& elt2Impl(int i, int j) { return (lhs_.elt2Impl(i, j));}
+    /** @return i-th element
+     *  @param i element index
+     **/
+    inline Type& elt1Impl(int i) { return (lhs_.elt1Impl(i));}
+    /** accesses to the element */
+    inline Type& elt0Impl() { return (lhs_.elt());}
+
+  protected:
+    Lhs& lhs_;
+    RowRange rows_;
+    ColRange cols_;
 };
 
 

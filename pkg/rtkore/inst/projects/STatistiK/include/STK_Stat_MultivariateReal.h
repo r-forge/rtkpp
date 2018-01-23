@@ -59,14 +59,14 @@ namespace Stat
 template <class Array>
 class Multivariate<Array, Real>: public IRunnerUnsupervised< Array, typename Array::Col>
 {
-  typedef typename Array::Row RowVector;
-  typedef typename Array::Col ColVector;
+  typedef typename hidden::Traits<Array>::Row RowVector;
+  typedef typename hidden::Traits<Array>::Col ColVector;
   /** type of runner */
   typedef IRunnerUnsupervised< Array, ColVector> Runner;
   typedef typename Array::Type Type_;
   enum
   {
-    value_ = hidden::isSame<Type_, Real>::value
+    value_ = hidden::isSame<Type_, Real>::value_
   };
 
   public:

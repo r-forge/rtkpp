@@ -57,8 +57,8 @@ class GaussianModel: public IGaussianModel<Array>
     using Base::nbVariable;
     using Base::mean_;
 
-    typedef typename Array::Col ColVector;
-    typedef typename Array::Row RowVector;
+    typedef typename hidden::Traits<Array>::Col ColVector;
+    typedef typename hidden::Traits<Array>::Row RowVector;
     /** constructor.
      * @param p_data pointer on the data set
      */

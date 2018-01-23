@@ -86,6 +86,11 @@
 #include <Regress/include/STK_MultidimRegression.h>
 
 #include <Regress/include/STK_BSplineCoefficients.h>
+#include <Regress/include/STK_CosinesCoefficients.h>
+#include <Regress/include/STK_SinesCoefficients.h>
+#include <Regress/include/STK_TrigonometricCoefficients.h>
+#include <Regress/include/STK_ChebyshevCoefficients.h>
+
 #include <Regress/include/STK_BSplineRegression.h>
 
 #include <Regress/include/STK_AdditiveBSplineCoefficients.h>

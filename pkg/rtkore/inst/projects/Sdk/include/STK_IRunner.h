@@ -88,6 +88,11 @@ class IRunnerBase
     virtual bool run() =0;
 
   protected:
+    /** update the runner.
+     *  This virtual method will be called when the state of the runner will
+     *  change, i.e. when a new data set or a parameter is set. By default do nothing.
+     **/
+    inline virtual void update() {}
     /** String with the last error message. */
     String msg_error_;
     /** @c true if run has been used, @c false otherwise */
@@ -166,11 +171,6 @@ class IRunnerWithData: public IRunnerBase
   protected:
     /** A pointer on the original data set. */
     Array const* p_data_;
-    /** update the runner.
-     *  This virtual method will be called when the state of the runner will
-     *  change, i.e. when a new data set is set. By default do nothing.
-     **/
-    inline virtual void update() {}
 };
 
 /** @ingroup Sdk
@@ -249,11 +249,6 @@ class IRunnerUnsupervised: public IRunnerBase
   protected:
     /** A pointer on the original data set. */
     Array const* p_data_;
-    /** update the runner.
-     *  This virtual method will be called when the state of the runner will
-     *  change, i.e. when a new data set is set. By default do nothing.
-     **/
-    inline virtual void update() {}
 };
 
 /** @ingroup Sdk

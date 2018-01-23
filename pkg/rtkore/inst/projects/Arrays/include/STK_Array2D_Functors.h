@@ -230,24 +230,24 @@ struct SumOp
 
   SumOp( ExprBase<Lhs> const& lhs, ExprBase<Rhs> const& rhs )
             : lhs_(lhs.asDerived()), rhs_(rhs.asDerived())
-            , rows_(Range::inf(lhs_.rows(), rhs_.rows()))
-            , cols_(Range::inf(lhs_.cols(), rhs_.cols()))
+            , rows_(inf(lhs_.rows(), rhs_.rows()))
+            , cols_(inf(lhs_.cols(), rhs_.cols()))
             , res_()
   {}
   result_type operator()()
   {
     res_.resize(rows_, cols_); res_ = Type();
-    Range cols = Range::inf(cols_, lhs_.cols());
+    Range cols = inf(cols_, lhs_.cols());
     for (int j= cols.begin(); j <= cols.lastIdx(); ++j)
     {
-      Range rows = Range::inf(rows_, lhs_.rangeRowsInCol(j));
+      Range rows = inf(rows_, lhs_.rangeRowsInCol(j));
       for (int i= rows.begin(); i< rows.end(); ++i)
       { res_(i,j) += lhs_(i,j);}
     }
-    cols = Range::inf(cols_, rhs_.cols());
+    cols = inf(cols_, rhs_.cols());
     for (int j= cols.begin(); j <= cols.lastIdx(); ++j)
     {
-      Range rows = Range::inf(rows_, rhs_.rangeRowsInCol(j));
+      Range rows = inf(rows_, rhs_.rangeRowsInCol(j));
       for (int i= rows.begin(); i< rows.end(); ++i)
       { res_(i,j) += rhs_(i,j);}
     }
@@ -277,24 +277,24 @@ struct DifferenceOp
 
   DifferenceOp( ExprBase<Lhs> const& lhs, ExprBase<Rhs> const& rhs )
                   : lhs_(lhs.asDerived()), rhs_(rhs.asDerived())
-                  , rows_(Range::inf(lhs_.rows(), rhs_.rows()))
-                  , cols_(Range::inf(lhs_.cols(), rhs_.cols()))
+                  , rows_(inf(lhs_.rows(), rhs_.rows()))
+                  , cols_(inf(lhs_.cols(), rhs_.cols()))
                   , res_()
   {}
   result_type operator()()
   {
     res_.resize(rows_, cols_); res_ = Type();
-    Range cols = Range::inf(cols_, lhs_.cols());
+    Range cols = inf(cols_, lhs_.cols());
     for (int j= cols.begin(); j <= cols.lastIdx(); ++j)
     {
-      Range rows = Range::inf(rows_, lhs_.rangeRowsInCol(j));
+      Range rows = inf(rows_, lhs_.rangeRowsInCol(j));
       for (int i= rows.begin(); i< rows.end(); ++i)
       { res_(i,j) += lhs_(i,j);}
     }
-    cols = Range::inf(cols_, rhs_.cols());
+    cols = inf(cols_, rhs_.cols());
     for (int j= cols.begin(); j <= cols.lastIdx(); ++j)
     {
-      Range rows = Range::inf(rows_, rhs_.rangeRowsInCol(j));
+      Range rows = inf(rows_, rhs_.rangeRowsInCol(j));
       for (int i= rows.begin(); i< rows.end(); ++i)
       { res_(i,j) -= rhs_(i,j);}
     }
@@ -324,8 +324,8 @@ struct Product
 
   Product( ExprBase<Lhs> const& lhs, ExprBase<Rhs> const& rhs )
                 : lhs_(lhs.asDerived()), rhs_(rhs.asDerived())
-                , rows_(Range::inf(lhs_.rows(), rhs_.rows()))
-                , cols_(Range::inf(lhs_.cols(), rhs_.cols()))
+                , rows_(inf(lhs_.rows(), rhs_.rows()))
+                , cols_(inf(lhs_.cols(), rhs_.cols()))
                 , res_()
   {}
   result_type operator()()
@@ -333,7 +333,7 @@ struct Product
     res_.resize(rows_, cols_); res_ = Type();
     for (int j= cols_.begin(); j< cols_.end(); ++j)
     {
-      Range rows = Range::inf(lhs_.rangeRowsInCol(j), rhs_.rangeRowsInCol(j));
+      Range rows = inf(lhs_.rangeRowsInCol(j), rhs_.rangeRowsInCol(j));
       for (int i= rows.begin(); i< rows.end(); ++i)
       { res_(i,j) = lhs_(i,j) * rhs_(i,j);}
     }
@@ -364,8 +364,8 @@ struct DivOp
 
   DivOp( ExprBase<Lhs> const& lhs, ExprBase<Rhs> const& rhs )
             : lhs_(lhs.asDerived()), rhs_(rhs.asDerived())
-            , rows_(Range::inf(lhs_.rows(), rhs_.rows()))
-            , cols_(Range::inf(lhs_.cols(), rhs_.cols()))
+            , rows_(inf(lhs_.rows(), rhs_.rows()))
+            , cols_(inf(lhs_.cols(), rhs_.cols()))
             , res_()
   {}
   result_type operator()()
@@ -373,7 +373,7 @@ struct DivOp
     res_.resize(rows_, cols_); res_ = Type();
     for (int j= cols_.begin(); j< cols_.end(); ++j)
     {
-      Range rows = Range::inf(lhs_.rangeRowsInCol(j), rhs_.rangeRowsInCol(j));
+      Range rows = inf(lhs_.rangeRowsInCol(j), rhs_.rangeRowsInCol(j));
       for (int i= rows.begin(); i< rows.end(); ++i)
       { res_(i,j) = lhs_(i,j) / rhs_(i,j);}
     }

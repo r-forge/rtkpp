@@ -114,8 +114,8 @@ class Svd: public ISvd<Svd<Array> >
 {
   public :
     typedef ISvd< Svd<Array> > Base;
-    typedef typename Array::Col ColVector;
-    typedef typename Array::Row RowVector;
+    typedef typename hidden::Traits<Array>::Col ColVector;
+    typedef typename hidden::Traits<Array>::Row RowVector;
     using Base::U_;
     using Base::D_;
     using Base::V_;
@@ -266,8 +266,8 @@ bool Svd<Array>::computeSvd()
 template<class Array>
 Real bidiag(const Array& M, ArrayDiagonalX& D, VectorX& F)
 {
-  typedef typename Array::Col ColVector;
-  typedef typename Array::Row RowVector;
+  typedef typename hidden::Traits<Array>::Col ColVector;
+  typedef typename hidden::Traits<Array>::Row RowVector;
   // norm of the matrix M
   Real norm  = 0.0;
   // compute the number of iteration

@@ -58,42 +58,42 @@ struct If <false, Then, Else> { typedef Else Result; };
 
 /* C/C++ fundamental Types */
 template<typename T>
-struct isArithmetic { enum { yes = false, no = true}; };
+struct IsArithmetic { enum { yes = false, no = true}; };
 
 /* specializations */
-template<> struct isArithmetic<float>         { enum { yes = true, no = false }; };
-template<> struct isArithmetic<double>        { enum { yes = true, no = false }; };
-template<> struct isArithmetic<long double>   { enum { yes = true, no = false }; };
+template<> struct IsArithmetic<float>         { enum { yes = true, no = false }; };
+template<> struct IsArithmetic<double>        { enum { yes = true, no = false }; };
+template<> struct IsArithmetic<long double>   { enum { yes = true, no = false }; };
 
-template<> struct isArithmetic<bool>          { enum { yes = true, no = false }; };
-template<> struct isArithmetic<char>          { enum { yes = true, no = false }; };
-template<> struct isArithmetic<signed char>   { enum { yes = true, no = false }; };
-template<> struct isArithmetic<unsigned char> { enum { yes = true, no = false }; };
-template<> struct isArithmetic<signed short>  { enum { yes = true, no = false }; };
-template<> struct isArithmetic<unsigned short>{ enum { yes = true, no = false }; };
-template<> struct isArithmetic<signed int>    { enum { yes = true, no = false }; };
-template<> struct isArithmetic<unsigned int>  { enum { yes = true, no = false }; };
-template<> struct isArithmetic<signed long>   { enum { yes = true, no = false }; };
-template<> struct isArithmetic<unsigned long> { enum { yes = true, no = false }; };
-//template<> struct isArithmetic<signed long long>   { enum { yes = true, no = false }; };
-//template<> struct isArithmetic<unsigned long long> { enum { yes = true, no = false }; };
+template<> struct IsArithmetic<bool>          { enum { yes = true, no = false }; };
+template<> struct IsArithmetic<char>          { enum { yes = true, no = false }; };
+template<> struct IsArithmetic<signed char>   { enum { yes = true, no = false }; };
+template<> struct IsArithmetic<unsigned char> { enum { yes = true, no = false }; };
+template<> struct IsArithmetic<signed short>  { enum { yes = true, no = false }; };
+template<> struct IsArithmetic<unsigned short>{ enum { yes = true, no = false }; };
+template<> struct IsArithmetic<signed int>    { enum { yes = true, no = false }; };
+template<> struct IsArithmetic<unsigned int>  { enum { yes = true, no = false }; };
+template<> struct IsArithmetic<signed long>   { enum { yes = true, no = false }; };
+template<> struct IsArithmetic<unsigned long> { enum { yes = true, no = false }; };
+//template<> struct IsArithmetic<signed long long>   { enum { yes = true, no = false }; };
+//template<> struct IsArithmetic<unsigned long long> { enum { yes = true, no = false }; };
 
 /* C/C++ fundamental Types */
 template<typename Type>
-struct isInt { enum { yes = false, no = true}; };
+struct IsInt { enum { yes = false, no = true}; };
 
-template<> struct isInt<bool>          { enum { yes = true, no = false }; };
-template<> struct isInt<char>          { enum { yes = true, no = false }; };
-template<> struct isInt<signed char>   { enum { yes = true, no = false }; };
-template<> struct isInt<unsigned char> { enum { yes = true, no = false }; };
-template<> struct isInt<signed short>  { enum { yes = true, no = false }; };
-template<> struct isInt<unsigned short>{ enum { yes = true, no = false }; };
-template<> struct isInt<signed int>    { enum { yes = true, no = false }; };
-template<> struct isInt<unsigned int>  { enum { yes = true, no = false }; };
-template<> struct isInt<signed long>   { enum { yes = true, no = false }; };
-template<> struct isInt<unsigned long> { enum { yes = true, no = false }; };
-//template<> struct isInt<signed long long>   { enum { yes = true, no = false }; };
-//template<> struct isInt<unsigned long long> { enum { yes = true, no = false }; };
+template<> struct IsInt<bool>          { enum { yes = true, no = false }; };
+template<> struct IsInt<char>          { enum { yes = true, no = false }; };
+template<> struct IsInt<signed char>   { enum { yes = true, no = false }; };
+template<> struct IsInt<unsigned char> { enum { yes = true, no = false }; };
+template<> struct IsInt<signed short>  { enum { yes = true, no = false }; };
+template<> struct IsInt<unsigned short>{ enum { yes = true, no = false }; };
+template<> struct IsInt<signed int>    { enum { yes = true, no = false }; };
+template<> struct IsInt<unsigned int>  { enum { yes = true, no = false }; };
+template<> struct IsInt<signed long>   { enum { yes = true, no = false }; };
+template<> struct IsInt<unsigned long> { enum { yes = true, no = false }; };
+//template<> struct IsInt<signed long long>   { enum { yes = true, no = false }; };
+//template<> struct IsInt<unsigned long long> { enum { yes = true, no = false }; };
 
 
 // remove const and const& to typename
@@ -104,8 +104,11 @@ template<typename Type_> struct RemoveConst<Type_ const&>  { typedef typename Re
 
 
 /** check if T and U are of the same type. */
-template<typename T, typename U> struct isSame { enum { value = 0 }; };
-template<typename T> struct isSame<T,T> { enum { value = 1 }; };
+template<typename T, typename U> struct isSame { enum { value_ = 0 }; };
+template<typename T> struct isSame<T,T> { enum { value_ = 1 }; };
+
+/** check if T and U are equal */
+template<int M, int N> struct IsEqual { enum { value_ = (M==N) }; };
 
 /** @ingroup hidden
   * Convenient struct to Promote the result Type of some binary functors.

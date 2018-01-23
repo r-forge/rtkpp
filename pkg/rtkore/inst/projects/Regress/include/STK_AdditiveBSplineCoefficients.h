@@ -56,8 +56,8 @@ template<class Array>
 class AdditiveBSplineCoefficients: public IRunnerBase
 {
   public:
-    typedef typename Array::Row RowVector;
-    typedef typename Array::Col ColVector;
+    typedef typename hidden::Traits<Array>::Row RowVector;
+    typedef typename hidden::Traits<Array>::Col ColVector;
     /** Constructor : initialize the data members. The number of knots is given
      *  by the formula nbKnots = nbControlPoints + degree +1.
      *  @param p_data a pointer on the input data values

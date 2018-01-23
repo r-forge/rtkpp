@@ -97,7 +97,7 @@ template<class Type> struct memChooser<0, Type>
  *  class manages the main pointer on the data. It derives from the IContainerRef
  *  class as an array stored in memory can always be wrapped in some way or be
  *  a wrapper of some data stored in memory.
- * 
+ *
  *  This class can also be used as a concrete class.
  *  @tparam Type can be any type of data that can be stored in memory.
  *  @tparam Size size of the data if it is known at compile time
@@ -105,7 +105,7 @@ template<class Type> struct memChooser<0, Type>
 template<typename Type, int Size>
 struct AllocatorBase: public IContainerRef
 {
-    enum { isNumeric_ = hidden::isArithmetic<Type>::yes};
+    enum { isNumeric_ = hidden::IsArithmetic<Type>::yes};
 
     typedef TRange<Size> AllocatorRange;
     using IContainerRef::isRef;
@@ -191,7 +191,7 @@ struct AllocatorBase: public IContainerRef
     inline int capacity() const { return rangeData_.size();}
 
     /** Get the const element number pos.
-     *  @param pos the position of the element we get 
+     *  @param pos the position of the element we get
      **/
     inline Type const& data( int pos) const
     {
@@ -204,7 +204,7 @@ struct AllocatorBase: public IContainerRef
       return p_data_[pos];
     }
     /** Get the element number pos.
-     *  @param pos the position of the element we get 
+     *  @param pos the position of the element we get
      **/
     inline Type& data(int pos)
     {
@@ -449,7 +449,7 @@ void AllocatorBase<Type,Size>::realloc( Range const& I)
     Type* p  = new Type[I.size()];
      p -= I.begin();
     // copy data
-    Range rangeData = Range::inf(rangeData_, I);
+    Range rangeData = inf(rangeData_, I);
     for (int i = rangeData.begin(); i<rangeData.end(); ++i) { p[i] = p_data_[i];}
     // liberate old memory
     free();

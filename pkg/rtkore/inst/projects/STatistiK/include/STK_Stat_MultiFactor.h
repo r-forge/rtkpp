@@ -58,8 +58,6 @@ class MultiFactor: public IRunnerWithData<Array>
 {
   public:
     typedef IRunnerWithData<Array> Base;
-    typedef typename Array::Row RowVector;
-    typedef typename Array::Col ColVector;
     typedef typename Array::Type Type;
 
     typedef std::map<Type, int> EncodingMap;

@@ -89,7 +89,10 @@ template<> struct StaticAssert<1>
 };
 
 } // namespace STK
+
+#ifndef IS_RTKPP_LIB
 #pragma GCC diagnostic ignored "-Wint-in-bool-context"
+#endif
 #define STK_STATIC_ASSERT(COND,MSG) \
 if (STK::StaticAssert<bool(COND)>::MSG) {}
 

@@ -3,7 +3,7 @@
 
 \section{Changes in rtkore version 1.5.0 (2018-01-23)}{
   \itemize{
-    \item Accelerating template expression core
+    \item Accelerating template expression evaluation
     \item Adding support for binary operators expr + expr_number
     \item Adding support for functional basis in Regress project
     \item Updating documentation 

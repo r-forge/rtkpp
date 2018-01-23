@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{STK++ Utilities, Reference Guide}
+%\VignetteIndexEntry{STK++ Tools, Reference Guide}
 
 \documentclass[a4paper,10pt]{article}
 

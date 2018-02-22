@@ -118,7 +118,7 @@ class RVector: public ArrayBase< RVector<Type_> >, public TRef<1>
     inline RVector( SEXP robj)
                   : vector_(robj), rows_(0, vector_.size()), cols_(0,1) {}
     /** Copy constructor */
-    inline RVector( RVector robj, bool ref)
+    inline RVector( RVector const& robj, bool ref)
                   : vector_(robj), rows_(0, robj.size()), cols_(0,1) {}
 
     /** @return the underlying Rcpp matrix */
@@ -132,21 +132,8 @@ class RVector: public ArrayBase< RVector<Type_> >, public TRef<1>
 
     /** @return the Vertical range */
     inline RowRange const& rowsImpl() const { return rows_;}
-    /** @return the index of the first row */
-    inline int beginRowsImpl() const { return 0;}
-    /** @return the ending index of the rows */
-    inline int endRowsImpl() const { return vector_.size();}
-    /** @return the number of rows */
-    inline int sizeRowsImpl() const { return vector_.size();}
-
     /**@return the Horizontal range */
     inline ColRange const& colsImpl() const { return cols_;}
-    /** @return the index of the first column */
-    inline int beginColsImpl() const { return 0;}
-    /**  @return the ending index of the columns */
-    inline int endColsImpl() const { return 1;}
-    /** @return the number of columns */
-    inline int sizeCols() const { return 1;}
 
     /** @return a constant reference on ith element
      *  @param i index of the ith element

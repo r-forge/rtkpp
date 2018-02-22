@@ -248,6 +248,8 @@ BSplineCoefficients<Data>::BSplineCoefficients( BSplineCoefficients const& coefs
                                               , knots_(coefs.knots_)
 {}
 
+
+
 /*  run the computations for the given value.
  *  @param p_data the input data values
  **/
@@ -421,6 +423,7 @@ bool BSplineCoefficients<Data>::computeKnots()
       computeDensityKnots(true);
       break;
     default:
+
       msg_error_ = STKERROR_NO_ARG(BSplineCoefficients::computeKnots,invalid position);
       return false;
       break;

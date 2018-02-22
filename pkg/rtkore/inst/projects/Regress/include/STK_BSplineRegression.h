@@ -173,6 +173,7 @@ bool BSplineRegression<YArray, XVector, Weights>::regressionStep(Weights const& 
   GInvertSymMatrix inv;
   inv(prod);
   // compute (X'X)^{-1}X'Y
+
   controlPoints_ = prod * coefs_.coefficients().transpose() * weights.diagonalize() * p_y_->asDerived();
   return true;
 }

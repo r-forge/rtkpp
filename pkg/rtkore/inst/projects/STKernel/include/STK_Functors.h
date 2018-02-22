@@ -540,6 +540,23 @@ struct DifferenceWithOp
     param1_type const value_;
 };
 /** @ingroup Functors
+  * @brief Template functor to subtract a number to a fixed value
+  */
+template<typename Type>
+struct SubstractToOp
+{
+  enum { NbParam_ = 1 };
+  typedef Type result_type;
+  typedef typename hidden::RemoveConst<Type>::Type param1_type ;
+
+  inline SubstractToOp(SubstractToOp const& value): value_(value.value_) {}
+  inline SubstractToOp(Type value): value_(value) {}
+
+  inline result_type operator() (param1_type const& a) const { return value_ - a;}
+  private:
+    param1_type const value_;
+};
+/** @ingroup Functors
   * @brief Template functor computing the product of a number by a fixed value
   */
 template<typename Type>

@@ -118,6 +118,7 @@ String knotsPositionToString( KnotsPosition const& type);
 
 } // namespace Regress
 
+
 //
 // implementation
 namespace Regress

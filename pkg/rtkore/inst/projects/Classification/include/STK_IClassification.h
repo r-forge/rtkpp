@@ -139,6 +139,7 @@ class IClassification: public IRunnerSupervised<YArray_, XArray_, Weights_>
       if (!initializeStep()) { flag = false;}
       // compute the classification
       if (!estimationStep()) { flag = false;}
+
       // perform any post-operation needed after the classification step
       if (!finalizeStep()) { flag = false;}
       // Compute the number of parameter of the classification function.
@@ -154,6 +155,7 @@ class IClassification: public IRunnerSupervised<YArray_, XArray_, Weights_>
      **/
     virtual bool run( Weights_ const& weights)
     {
+
       if (!p_x_ || !p_y_)
       { this->msg_error_ = STKERROR_NO_ARG(IClassification::run,missing data sets);
         return false;
@@ -163,12 +165,14 @@ class IClassification: public IRunnerSupervised<YArray_, XArray_, Weights_>
       if (!initializeStep()) { flag = false;}
       // compute weighted classification
       if (!estimationStep(weights)) { flag = false;}
+
       // perform any post-operation needed after the classification step
       if (!finalizeStep()) { flag = false;}
       // Compute the number of parameter of the classification function.
       nbFreeParameter_ = computeNbFreeParameter();
       // create array of the predicted value and compute prediction
       if (!predictionStep()) { flag = false;}
+
       // return the result of the computations
       this->hasRun_ = true;
       return flag;

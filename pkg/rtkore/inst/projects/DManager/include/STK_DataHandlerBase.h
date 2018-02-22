@@ -29,7 +29,7 @@
  **/
 
 /** @file STK_DataHandler.h
- *  @brief In this file we define the interface class DataHandlerBase.
+ *  @brief In this file we define the interface base class DataHandlerBase.
  **/
 
 
@@ -49,7 +49,7 @@ namespace hidden
 /** @ingroup hidden
  *  The DataHandlerTraits will give the type of container furnished by the
  *  concrete implementations of the DataHandlerBase class.
- *  @note In incoming version of STK++ DataHandlerBase could be renamed as
+ *  @note In incoming version of STK++, DataHandlerBase could be renamed as
  *  IDataHandler
  **/
 template<class DataHandler, typename Type> struct DataHandlerTraits;
@@ -102,7 +102,7 @@ class DataHandlerBase: public IRecursiveTemplate<Derived>
      *  otherwise.
      **/
     bool getIdModelName(std::string const& idData, std::string& idModel) const;
-    /** write the info on os */
+    /** write infoMap on os */
     void writeInfo(ostream& os) const;
 
   protected:
@@ -114,14 +114,18 @@ class DataHandlerBase: public IRecursiveTemplate<Derived>
 };
 
 
-template<class Derived>
-void DataHandlerBase<Derived>::writeInfo(ostream& os) const
-{
-  // show content
-  for (InfoMap::const_iterator it=info_.begin(); it!=info_.end(); ++it)
-  os << _T("IdData: ") << it->first << _T(", IdModel: ") << it->second << _T('\n');
-}
-
+/* @brief Add an info descriptor to the data handler.
+ *  An info descriptor is a pair that allow to say that all columns of
+ *  the data set(s) handled by the data handler and having the name "idData"
+ *  are modeled by the model with model "idModel".
+ *  @param idData can be any string given by the user for identifying data.
+ *  @param idModel represent the idModel of a given model (can be defined
+ *  inside or outside STK++).
+ *
+ *  @note If the pair (idData, idModel) already exists then addInfo will do nothing.
+ *  @return @c false if there exists already an idData matched with an other
+ *  idModel, @c true otherwise.
+ **/
 template<class Derived>
 bool DataHandlerBase<Derived>::addInfo(std::string const& idData, std::string const& idModel)
 {
@@ -158,6 +162,15 @@ bool DataHandlerBase<Derived>::getIdModelName(std::string const& idData, std::st
   InfoMap::const_iterator it = info_.find(idData);
   if (it != info_.end()) { idModel = it->second; res = true;}
   return res;
+}
+
+/* write  info on os */
+template<class Derived>
+void DataHandlerBase<Derived>::writeInfo(ostream& os) const
+{
+  // show content
+  for (InfoMap::const_iterator it=info_.begin(); it!=info_.end(); ++it)
+  os << _T("IdData: ") << it->first << _T(", IdModel: ") << it->second << _T('\n');
 }
 
 

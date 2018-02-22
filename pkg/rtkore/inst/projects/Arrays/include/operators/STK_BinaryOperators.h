@@ -1375,6 +1375,7 @@ struct Traits< BinaryOperator<FunctorOp, Lhs, Rhs> >
   * Most of the time, this is the only way that it is used, so you typically
   * don't have to name BinaryOperator types explicitly.
   **/
+
 template<typename FunctorOp, typename Lhs, typename Rhs>
 class BinaryOperator: public ExprBase< BinaryOperator<FunctorOp, Lhs, Rhs> >
                     , public TRef<1>
@@ -1411,6 +1412,7 @@ class BinaryOperator: public ExprBase< BinaryOperator<FunctorOp, Lhs, Rhs> >
     typedef TRange<sizeCols_> ColRange;
 
     /** default constructor */
+
     inline BinaryOperator( Lhs const& lhs, Rhs const& rhs, FunctorOp const& func = FunctorOp())
                          : lhs_(lhs), rhs_(rhs), functor_(func)
     {

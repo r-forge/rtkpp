@@ -67,6 +67,7 @@ template< typename Type, bool Orient_> class CArrayNumber;
   * @tparam Derived is the derived type, e.g., a matrix type.
   */
 template<class Derived>
+
 class ICArray: public IArrayBase<Derived>
 {
   public:
@@ -124,14 +125,14 @@ class ICArray: public IArrayBase<Derived>
      **/
     template<class OtherAllocator>
     inline ICArray( ITContainer2D<OtherAllocator> const& allocator, Range const& I, Range const& J)
-                  : Base(), allocator_(allocator.asDerived(), I, J)
+                 : Base(), allocator_(allocator.asDerived(), I, J)
     {}
     /** constructor by reference, ref_=1.
      *  @param allocator with the data
      **/
     template< class OtherAllocator>
     inline ICArray( ITContainer2D<OtherAllocator> const& allocator)
-                  : Base(), allocator_(allocator.asDerived(), true)
+                 : Base(), allocator_(allocator.asDerived(), true)
     {}
     /**  destructor */
     ~ICArray() {}

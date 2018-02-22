@@ -461,9 +461,9 @@ class ExprBase: public ITContainer<Derived, hidden::Traits<Derived>::structure_>
     operator+(Type const& value, ExprBase<Derived> const& other)
     { return other.asDerived() + value;}
     /** @return an expression of value - this */
-    inline friend UnaryOperator<SumWithOp<Type>, Derived > const
+    inline friend UnaryOperator<SubstractToOp<Type>, Derived > const
     operator-(Type const value, ExprBase<Derived> const& other)
-    { return UnaryOperator<SumWithOp<Type>, Derived>(other.asDerived(), SumWithOp<Type>(-value));}
+    { return UnaryOperator<SubstractToOp<Type>, Derived>(other.asDerived(), SubstractToOp<Type>(value));}
     /** @return an expression of value * this */
     inline friend UnaryOperator< ProductWithOp<Type>, Derived> const
     operator*(Type const value, ExprBase<Derived> const& other)
@@ -555,7 +555,7 @@ class ExprBase: public ITContainer<Derived, hidden::Traits<Derived>::structure_>
 
 } // namespace STK
 
-//#undef MAKE_BINARY_OPERATOR
+#undef DEFINE_BINARY_OPERATOR
 #undef MAKE_UNARY_OPERATOR_NOARG
 #undef MAKE_UNARY_OPERATOR_1ARG
 #undef MAKE_RESHAPE_OPERATOR

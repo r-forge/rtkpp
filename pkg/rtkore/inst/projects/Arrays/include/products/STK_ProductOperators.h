@@ -478,7 +478,7 @@ class DiagonalByArrayProduct: public ExprBase< DiagonalByArrayProduct<Lhs, Rhs> 
     typedef TRange<sizeCols_> ColRange;
 
     inline DiagonalByArrayProduct( const Lhs& lhs, const Rhs& rhs)
-                                 : Base(), lhs_(lhs), rhs_(rhs)
+                                : Base(), lhs_(lhs), rhs_(rhs)
     {
       if (lhs.cols() != rhs.rows())
       { STKRUNTIME_ERROR_NO_ARG(DiagonalByArrayProduct, sizes mismatch);}
@@ -523,6 +523,7 @@ class DiagonalByArrayProduct: public ExprBase< DiagonalByArrayProduct<Lhs, Rhs> 
   * don't have to name VectorByPointProduct types explicitly.
   **/
 template<typename Lhs, typename Rhs>
+
 class VectorByPointProduct: public ExprBase< VectorByPointProduct<Lhs, Rhs> >
                           , public TRef<1>
 {
@@ -768,6 +769,7 @@ class ArrayByVectorProduct: public ExprBase< ArrayByVectorProduct<Lhs, Rhs> >
     Allocator result_;
 };
 
+
 namespace hidden
 {
 /** @ingroup hidden
@@ -793,6 +795,7 @@ struct Traits< ArrayByArrayProduct<Lhs, Rhs> >
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
   typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+
 
   typedef typename Base::Allocator Allocator;
 };
@@ -852,7 +855,7 @@ class ArrayByArrayProduct: public ArrayByArrayProductBase< Lhs, Rhs >, public TR
     typedef TRange<sizeCols_> ColRange;
 
     inline ArrayByArrayProduct( const Lhs& lhs, const Rhs& rhs)
-                              : Base(), lhs_(lhs), rhs_(rhs)
+                             : Base(), lhs_(lhs), rhs_(rhs)
                               , result_(lhs.sizeRows(), rhs.sizeCols(), Type(0))
     {
       STK_STATIC_ASSERT_PRODUCT_OPERATOR_MISMATCH( isValid_ );
@@ -897,6 +900,7 @@ class ArrayByArrayProductBase: public ExprBase< ArrayByArrayProduct<Lhs, Rhs> >
 
     /** constructor. */
     inline ArrayByArrayProductBase(): Base() {}
+
     /** access to element (i,j) */
     inline Type const& elt2Impl(int i, int j) const { return this->asDerived().result().elt(i,j);}
     /** access to ith element */

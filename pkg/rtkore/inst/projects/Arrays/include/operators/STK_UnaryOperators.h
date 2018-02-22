@@ -112,7 +112,7 @@ class UnaryOperator: public ExprBase< UnaryOperator<UnaryOp, Lhs> >, public TRef
     typedef TRange<sizeCols_> ColRange;
 
     inline UnaryOperator( Lhs const& lhs, UnaryOp const& functor = UnaryOp())
-                        : Base(), lhs_(lhs), functor_(functor)
+                       : Base(), lhs_(lhs), functor_(functor)
     {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return lhs_.rows();}

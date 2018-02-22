@@ -198,7 +198,7 @@ class OrientedCAllocator<Derived, Arrays::by_col_>: public CAllocatorBase<Derive
     {}
     /** copy constructor */
     OrientedCAllocator( OrientedCAllocator const& A, bool ref)
-                      : Base(A), ldx_(A.ldx()), allocator_(A.allocator_, ref)
+                     : Base(A), ldx_(A.ldx()), allocator_(A.allocator_, ref)
     { if (!ref) allocator_.assign(A.allocator_);}
     /** Reference constructor */
     template<class OtherDerived>
@@ -207,7 +207,7 @@ class OrientedCAllocator<Derived, Arrays::by_col_>: public CAllocatorBase<Derive
                              : Base(I, J), ldx_(A.ldx()), allocator_(A.allocator(), true)  {}
     /** wrapper constructor for 0 based C-Array*/
     OrientedCAllocator( Type* const& q, int nbRow, int nbCol)
-                      : Base(Range(0,nbRow), Range(0,nbCol)), ldx_(nbRow)
+                     : Base(Range(0,nbRow), Range(0,nbCol)), ldx_(nbRow)
                       , allocator_(q, nbRow * nbCol, true)
     {}
     /** destructor */
@@ -518,7 +518,6 @@ class StructuredCAllocator<Derived, 1, SizeCols_>
     {}
     /** wrapper constructor for 0 based C-Array*/
     StructuredCAllocator( Type* const& q, int , int nbCol): Base(q, 1, nbCol), row_(0) {}
-
   public:
     /** exchange T with this.
      *  @param T the container to exchange
@@ -612,6 +611,7 @@ class StructuredCAllocator<Derived, SizeRows_, 1>
 
   protected:
     /** Default constructor */
+
     StructuredCAllocator( RowRange const& I, ColRange const& J): Base(I, J), col_(J.begin()) {}
     /** copy constructor */
     StructuredCAllocator( StructuredCAllocator const& A, bool ref)
@@ -626,7 +626,6 @@ class StructuredCAllocator<Derived, SizeRows_, 1>
     {}
     /** wrapper constructor for 0 based C-Array*/
     StructuredCAllocator( Type* const& q, int nbRow, int): Base(q, nbRow, 1), col_(0) {}
-
   public:
     /** exchange T with this.
      *  @param T the container to exchange
@@ -783,13 +782,11 @@ class StructuredCAllocator<Derived, 1, 1>
       row_ = begin; col_ = begin;
     }
     /** resize the allocator (for square and diagonal matrices). */
-    Derived& resize1Impl(int)
-    { return this->asDerived().resize2Impl(1, 1);}
+    Derived& resize1Impl(int) { return this->asDerived().resize2Impl(1, 1);}
     /** move T to this.
      *  @param T the container to move
      **/
-    void moveImpl(StructuredCAllocator const& T)
-    { row_ = T.row_; col_ = T.col_;}
+    void moveImpl(StructuredCAllocator const& T) { row_ = T.row_; col_ = T.col_;}
 
   private:
     int row_;
@@ -983,6 +980,7 @@ class CAllocator<Type_, SizeRows_, UnknownSize, Orient_>
 
     using Base::allocator_;
 
+
     CAllocator(): Base(sizeRows_, 0) {}
     CAllocator( int, int sizeCols): Base(sizeRows_, sizeCols) {}
     CAllocator( int, int sizeCols, Type const& v): Base(sizeRows_, sizeCols) { Base::Base::setValue(v);}
@@ -1070,6 +1068,7 @@ class CAllocator<Type_, UnknownSize, SizeCols_, Orient_>
 
     CAllocator(): Base(0, SizeCols_) {}
     CAllocator( int sizeRows, int): Base(sizeRows, SizeCols_) {}
+
     CAllocator( int sizeRows, int, Type const& v): Base(sizeRows, SizeCols_){ this->asDerived().setValue(v);}
     CAllocator( CAllocator const& A, bool ref = true): Base(A, ref)
     { if (!ref) { allocator_.assign(A.allocator_);} }

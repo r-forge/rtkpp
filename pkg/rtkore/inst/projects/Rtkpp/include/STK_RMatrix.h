@@ -141,21 +141,9 @@ class RMatrix: public ArrayBase< RMatrix<Type_> >, public TRef<1>
 
     /** @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
-    /** @return the index of the first row */
-    inline int beginRowsImpl() const { return 0;}
-    /** @return the ending index of the rows */
-    inline int endRowsImpl() const { return matrix_.rows();}
-    /** @return the number of rows */
-    inline int sizeRowsImpl() const { return matrix_.rows();}
 
     /**@return the range of the columns */
     inline ColRange const& colsImpl() const { return cols_;}
-    /** @return the index of the first column */
-    inline int beginColsImpl() const { return 0;}
-    /**  @return the ending index of the columns */
-    inline int endColsImpl() const { return matrix_.cols();}
-    /** @return the number of columns */
-    inline int sizeCols() const { return matrix_.cols();}
 
    /** @return a constant reference on element (i,j)
      *  @param i, j indexes of the row and of the column

@@ -133,9 +133,9 @@ class RowOperator: public ExprBase< RowOperator< Lhs> >, public TRef<1>
 
     /** constructor */
     inline RowOperator( Lhs const& lhs, int i): Base(), lhs_(lhs), i_(i), rows_(i_, 1), cols_(lhs_.rangeColsInRow(i_)) {}
-    /** Copy constructor */
-    inline RowOperator( RowOperator const& row, bool ref = true)
-                      : Base(), lhs_(row.lhs_), i_(row.i_), rows_(row.rows_), cols_(row.cols_) {}
+//    /** Copy constructor */
+//    inline RowOperator( RowOperator const& row, bool ref = true)
+//                      : Base(), lhs_(row.lhs_), i_(row.i_), rows_(row.rows_), cols_(row.cols_) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the range of the Columns */
@@ -202,9 +202,9 @@ class RowAccessor: public ExprBase< RowAccessor< Lhs> >, public TRef<1>
 
     /** constructor */
     inline RowAccessor( Lhs& lhs, int i): Base(), lhs_(lhs), i_(i), rows_(i_, 1), cols_(lhs_.rangeColsInRow(i_)) {}
-    /** Copy constructor */
-    inline RowAccessor( RowAccessor& row, bool ref = true)
-                      : Base(), lhs_(row.lhs_), i_(row.i_), rows_(row.rows_), cols_(row.cols_) {}
+//    /** Copy constructor */
+//    inline RowAccessor( RowAccessor& row, bool ref = true)
+//                      : Base(), lhs_(row.lhs_), i_(row.i_), rows_(row.rows_), cols_(row.cols_) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the range of the Columns */
@@ -335,9 +335,9 @@ class ColOperator: public ExprBase< ColOperator< Lhs> >, public TRef<1>
     /** constructor */
     inline ColOperator( Lhs const& lhs, int j)
                       : Base(), lhs_(lhs), j_(j), rows_(lhs_.rangeRowsInCol(j_)), cols_(j_,1) {}
-    /** Copy constructor */
-    inline ColOperator( ColOperator const& col, bool ref = true)
-                      : Base(), lhs_(col.lhs_), j_(col.j_), rows_(col.rows_), cols_(col.cols_) {}
+//    /** Copy constructor */
+//    inline ColOperator( ColOperator const& col, bool ref = true)
+//                      : Base(), lhs_(col.lhs_), j_(col.j_), rows_(col.rows_), cols_(col.cols_) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the columns range */
@@ -406,9 +406,9 @@ class ColAccessor: public ExprBase< ColAccessor< Lhs> >, public TRef<1>
     /** constructor */
     inline ColAccessor( Lhs& lhs, int j)
                       : Base(), lhs_(lhs), j_(j), rows_(lhs_.rangeRowsInCol(j_)), cols_(j_,1) {}
-    /** Copy constructor */
-    inline ColAccessor( ColAccessor& col, bool ref = true)
-                      : Base(), lhs_(col.lhs_), j_(col.j_), rows_(col.rows_), cols_(col.cols_) {}
+//    /** Copy constructor */
+//    inline ColAccessor( ColAccessor& col, bool ref = true)
+//                      : Base(), lhs_(col.lhs_), j_(col.j_), rows_(col.rows_), cols_(col.cols_) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the columns range */
@@ -549,9 +549,6 @@ class SubVectorOperator: public SubVectorOperatorBase< Lhs, Size_
 
     /** constructor */
     inline SubVectorOperator( Lhs const& lhs, TRange<Size_> const& I): Base(I), lhs_(lhs) {}
-    /** Copy constructor */
-    inline SubVectorOperator( SubVectorOperator const& vec, bool ref = true)
-                            : Base(vec), lhs_(vec.lhs_) {}
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_;}
     /** @return element (i,j)
@@ -603,8 +600,6 @@ class SubVectorOperatorBase<Lhs, Size_, Arrays::point_ >: public ExprBase< SubVe
     typedef TRange<sizeCols_> ColRange;
     /** constructor */
     inline SubVectorOperatorBase( ColRange const& J): Base(), cols_(J) {}
-    /** copy constructor */
-    inline SubVectorOperatorBase( SubVectorOperatorBase const& vec): Base(), cols_(vec.cols_) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return this->asDerived().lhs().rows();}
     /** @return the range of the Columns */
@@ -635,8 +630,6 @@ class SubVectorOperatorBase<Lhs, Size_, Arrays::vector_ >: public ExprBase< SubV
     typedef TRange<sizeCols_> ColRange;
     /** constructor */
     inline SubVectorOperatorBase( RowRange const& I): Base(), rows_(I) {}
-    /** copy constructor */
-    inline SubVectorOperatorBase( SubVectorOperatorBase const& vec): Base(), rows_(vec.rows_) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the range of the Columns */
@@ -667,8 +660,6 @@ class SubVectorOperatorBase<Lhs, Size_, Arrays::diagonal_ >: public ExprBase< Su
       typedef TRange<sizeCols_> ColRange;
       /** constructor */
       inline SubVectorOperatorBase( RowRange const& I): Base(), range_(I) {}
-      /** copy constructor */
-      inline SubVectorOperatorBase( SubVectorOperatorBase const& vec): Base(), range_(vec.range_) {}
       /**  @return the range of the rows */
       inline RowRange const& rowsImpl() const { return range_;}
       /** @return the range of the Columns */
@@ -719,10 +710,6 @@ class SubVectorAccessor: public SubVectorAccessorBase< Lhs, Size_
 
     /** constructor */
     inline SubVectorAccessor( Lhs& lhs, TRange<Size_> const& I): Base(I), lhs_(lhs) {}
-    /** Copy constructor */
-    inline SubVectorAccessor( SubVectorAccessor& vec, bool ref = true)
-                            : Base(vec), lhs_(vec.lhs_) {}
-
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_;}
     /** @return element (i,j)
@@ -773,8 +760,6 @@ class SubVectorAccessorBase<Lhs, Size_, Arrays::point_>: public ExprBase< SubVec
     typedef TRange<sizeCols_> ColRange;
     /** constructor */
     inline SubVectorAccessorBase( ColRange const& J): Base(), cols_(J) {}
-    /** copy constructor */
-    inline SubVectorAccessorBase( SubVectorAccessorBase const& vec): Base(), cols_(vec.cols_) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return this->asDerived().lhs().rows();}
     /** @return the range of the Columns */
@@ -805,8 +790,6 @@ class SubVectorAccessorBase<Lhs, Size_, Arrays::vector_ >: public ExprBase< SubV
     typedef TRange<sizeCols_> ColRange;
     /** constructor */
     inline SubVectorAccessorBase( RowRange const& I): Base(), rows_(I) {}
-    /** copy constructor */
-    inline SubVectorAccessorBase( SubVectorAccessorBase const& vec): Base(), rows_(vec.rows_) {}
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the range of the Columns */
@@ -837,8 +820,6 @@ class SubVectorAccessorBase<Lhs, Size_, Arrays::diagonal_ >: public ExprBase< Su
       typedef TRange<sizeCols_> ColRange;
       /** constructor */
       inline SubVectorAccessorBase( RowRange const& I): Base(), range_(I) {}
-      /** copy constructor */
-      inline SubVectorAccessorBase( SubVectorAccessorBase const& vec): Base(), range_(vec.range_) {}
       /**  @return the range of the rows */
       inline RowRange const& rowsImpl() const { return range_;}
       /** @return the range of the Columns */
@@ -928,10 +909,6 @@ class SubOperator: public ExprBase< SubOperator<Lhs, SizeRows_, SizeCols_> >
     /** constructor */
     inline SubOperator( Lhs const& lhs, RowRange const& I, ColRange const& J)
                       : Base(), lhs_(lhs), rows_(I), cols_(J) {}
-    /** copy constructor */
-    inline SubOperator( SubOperator const& sub, bool ref = true)
-                      : Base(), lhs_(sub.lhs_), rows_(sub.rows_), cols_(sub.cols_) {}
-
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the range of the Columns */
@@ -995,10 +972,6 @@ class SubAccessor: public ExprBase< SubAccessor<Lhs, SizeRows_, SizeCols_> >
     /** constructor */
     inline SubAccessor( Lhs& lhs, RowRange const& I, ColRange const& J)
                       : Base(), lhs_(lhs), rows_(I), cols_(J) {}
-    /** copy constructor */
-    inline SubAccessor( SubAccessor& sub, bool ref = true)
-                      : Base(), lhs_(sub.lhs_), rows_(sub.rows_), cols_(sub.cols_) {}
-
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return rows_;}
     /** @return the range of the Columns */

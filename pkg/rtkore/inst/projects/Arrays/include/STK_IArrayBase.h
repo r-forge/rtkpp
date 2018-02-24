@@ -146,30 +146,74 @@ class IArrayBase: public ArrayBase<Derived>
     }
 
     // overloaded operators
-    /** @return a reference on the ith element
-     *  @param i index of the ith element
-     **/
-    inline Type& operator[](int i) { return this->elt(i);}
-    /** @return the ith element
-     *  @param i index of the ith element
-     **/
-    inline Type const& operator[](int i) const { return this->elt(i);}
-    /** @return the ith element
-     *  @param I range to get
-     **/
-    inline SubVector operator[](Range const& I) const { return this->sub(I);}
-    /** @return a reference on the element (i,j) of the 2D container.
-     *  @param i, j indexes of the row and of the column
-     **/
-    inline Type& operator()(int i, int j) { return this->elt(i,j);}
     /** @return a constant reference on the element (i,j) of the 2D container.
      *  @param i,j row and column indexes
      **/
-    inline Type const& operator()(int i, int j) const { return this->elt(i,j);}
+    inline ConstReturnType operator()(int i, int j) const
+    {
+#ifdef STK_BOUNDS_CHECK
+       if (this->beginRows() > i) { STKOUT_OF_RANGE_2ARG(IArrayBase::elt, i, j, beginRows() > i);}
+       if (this->endRows() <= i)  { STKOUT_OF_RANGE_2ARG(IArrayBase::elt, i, j, endRows() <= i);}
+       if (this->beginCols() > j) { STKOUT_OF_RANGE_2ARG(IArrayBase::elt, i, j, beginCols() > j);}
+       if (this->endCols() <= j)  { STKOUT_OF_RANGE_2ARG(IArrayBase::elt, i, j, endCols() <= j);}
+#endif
+      return this->elt(i,j);}
+    /** @return a reference on the element (i,j) of the 2D container.
+     *  @param i, j indexes of the row and of the column
+     **/
+    inline Type& operator()(int i, int j)
+    {
+#ifdef STK_BOUNDS_CHECK
+       if (this->beginRows() > i) { STKOUT_OF_RANGE_2ARG(IArrayBase::elt, i, j, beginRows() > i);}
+       if (this->endRows() <= i)  { STKOUT_OF_RANGE_2ARG(IArrayBase::elt, i, j, endRows() <= i);}
+       if (this->beginCols() > j) { STKOUT_OF_RANGE_2ARG(IArrayBase::elt, i, j, beginCols() > j);}
+       if (this->endCols() <= j)  { STKOUT_OF_RANGE_2ARG(IArrayBase::elt, i, j, endCols() <= j);}
+#endif
+      return this->elt(i,j);
+    }
+    /** @return the ith element
+     *  @param i index of the ith element
+     **/
+    inline ConstReturnType operator[](int i) const
+    {
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+#ifdef STK_BOUNDS_CHECK
+      if (this->asDerived().begin() > i) { STKOUT_OF_RANGE_1ARG(IArrayBase::elt, i, begin() > i);}
+      if (this->asDerived().end() <= i)  { STKOUT_OF_RANGE_1ARG(IArrayBase::elt, i, end() <= i);}
+#endif
+      return this->elt(i);
+    }
+    /** @return a reference on the ith element
+     *  @param i index of the ith element
+     **/
+    inline Type& operator[](int i)
+    {
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+#ifdef STK_BOUNDS_CHECK
+      if (this->asDerived().begin() > i) { STKOUT_OF_RANGE_1ARG(IArrayBase::elt, i, begin() > i);}
+      if (this->asDerived().end() <= i)  { STKOUT_OF_RANGE_1ARG(IArrayBase::elt, i, end() <= i);}
+#endif
+      return this->elt(i);
+    }
     /** @return a constant reference on the number */
-    inline Type const& operator()() const { return this->elt();}
+    inline ConstReturnType operator()() const
+    {
+      return this->elt();
+    }
     /** @return the number */
-    inline Type& operator()() { return this->elt();}
+    inline Type& operator()()
+    {
+      return this->elt();
+    }
+    // overloaded operators for sub-arrays/vectors
+    /** @return the sub-vector in given range
+     *  @param I range to get
+     **/
+    inline SubVector operator[](Range const& I) const
+    {
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+      return this->sub(I);
+    }
     /** @param I range of the index of the rows
      *  @param j index of the column
      *  @return a Vertical container containing the column @c j of this

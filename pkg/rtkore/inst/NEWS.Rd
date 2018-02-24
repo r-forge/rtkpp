@@ -1,12 +1,19 @@
 \name{NEWS}
 \title{News for Package 'rtkore}
 
+\section{Changes in rtkore version 1.5.1 (2018-02-24)}{
+  \itemize
+    \item Adding more functionalities for sub-arrays
+    \item Testing package under solaris 11
+  }
+}
+
 \section{Changes in rtkore version 1.5.0 (2018-01-23)}{
   \itemize{
     \item Accelerating template expression evaluation
     \item Adding support for binary operators expr + expr_number
     \item Adding support for functional basis in Regress project
-    \item Updating documentation 
+    \item Updating documentation
   }
 }
 
@@ -15,7 +22,7 @@
     \item Vignettes are renamed
     \item Fixing small bugs in expression evaluation
     \item Adding iterators for Array1D and List1D containers
-    \item Adding extended Cholesky decomposition method 
+    \item Adding extended Cholesky decomposition method
   }
 }
 \section{Changes in rtkore version 1.2.1 (2017-03-07)}{

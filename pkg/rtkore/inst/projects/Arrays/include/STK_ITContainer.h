@@ -271,6 +271,69 @@ return this->asDerived().elt1Impl(i);
       if (this->asDerived().end() <= i)  { STKOUT_OF_RANGE_1ARG(ITContainerBase::at, i, end() <= i);}
       return this->asDerived().elt1Impl(i);
     }
+   // overloaded operators
+    /** @return safely a constant value of the element (i,j) of the 2D container.
+      *  @param i,j row and column indexes
+      **/
+     inline ConstReturnType operator()(int i, int j) const
+     {
+#ifdef STK_BOUNDS_CHECK
+       if (this->beginRows() > i) { STKOUT_OF_RANGE_2ARG(ITContainerBase::elt, i, j, beginRows() > i);}
+       if (this->endRows() <= i)  { STKOUT_OF_RANGE_2ARG(ITContainerBase::elt, i, j, endRows() <= i);}
+       if (this->beginCols() > j) { STKOUT_OF_RANGE_2ARG(ITContainerBase::elt, i, j, beginCols() > j);}
+       if (this->endCols() <= j)  { STKOUT_OF_RANGE_2ARG(ITContainerBase::elt, i, j, endCols() <= j);}
+#endif
+       return this->elt(i,j);
+     }
+     /** @return value of the element (i,j) of the 2D container.
+      *  @param i,j row and column indexes
+      **/
+     inline Type& operator()(int i, int j)
+     {
+ #ifdef STK_BOUNDS_CHECK
+       if (this->beginRows() > i) { STKOUT_OF_RANGE_2ARG(ITContainer::operator(), i, j, beginRows() > i);}
+       if (this->endRows() <= i)  { STKOUT_OF_RANGE_2ARG(ITContainer::operator(), i, j, endRows() <= i);}
+       if (this->beginCols() > j) { STKOUT_OF_RANGE_2ARG(ITContainer::operator(), i, j, beginCols() > j);}
+       if (this->endCols() <= j)  { STKOUT_OF_RANGE_2ARG(ITContainer::eoperator()lt, i, j, endCols() <= j);}
+ #endif
+       return this->asDerived().elt2Impl(i,j);
+     }
+     /** @return reference on the ith element
+      *  @param i index of the ith element
+      **/
+     inline ConstReturnType operator[](int i) const
+     {
+       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+#ifdef STK_BOUNDS_CHECK
+      if (this->asDerived().begin() > i) { STKOUT_OF_RANGE_1ARG(ITContainer::operator[], i, begin() > i);}
+      if (this->asDerived().end() <= i)  { STKOUT_OF_RANGE_1ARG(ITContainer::operator[], i, end() <= i);}
+#endif
+       return this->elt(i);
+     }
+     /** @return reference on the ith element
+      *  @param i index of the ith element
+      **/
+     inline Type& operator[](int i)
+     {
+       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+#ifdef STK_BOUNDS_CHECK
+      if (this->asDerived().begin() > i) { STKOUT_OF_RANGE_1ARG(ITContainer::operator[], i, begin() > i);}
+      if (this->asDerived().end() <= i)  { STKOUT_OF_RANGE_1ARG(ITContainer::operator[], i, end() <= i);}
+#endif
+       return this->elt(i);
+     }
+     /** @return reference on the number */
+     inline ConstReturnType operator()() const
+     {
+       STK_STATIC_ASSERT_ZERO_DIMENSION_ONLY(Derived);
+       return this->elt();
+     }
+     /** @return reference on the number */
+     inline Type& operator()()
+     {
+       STK_STATIC_ASSERT_ZERO_DIMENSION_ONLY(Derived);
+       return this->elt();
+     }
 };
 
 /** @ingroup Arrays

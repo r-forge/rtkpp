@@ -2,8 +2,8 @@
 \title{News for Package 'rtkore}
 
 \section{Changes in rtkore version 1.5.1 (2018-02-24)}{
-  \itemize
-    \item Adding more functionalities for sub-arrays
+  \itemize{
+    \item Adding slicing operators for RVector and RMatrix classes
     \item Testing package under solaris 11
   }
 }

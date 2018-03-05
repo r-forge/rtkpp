@@ -75,8 +75,7 @@ struct Traits< RMatrix<Type_> >
     typedef Void Number;
 
     typedef Type_ Type;
-    typedef Type const& ReturnType;
-    typedef Type const& ConstReturnType;
+    typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
    enum
     {
@@ -110,7 +109,7 @@ struct Traits< RowRMatrix<Type_> >
 
    enum
     {
-      structure_ = Arrays::array2D_,
+      structure_ = Arrays::point_,
       orient_    = Arrays::by_col_,
       sizeRows_  = 1,
       sizeCols_  = UnknownSize,
@@ -140,7 +139,7 @@ struct Traits< ColRMatrix<Type_> >
 
    enum
     {
-      structure_ = Arrays::array2D_,
+      structure_ = Arrays::vector_,
       orient_    = Arrays::by_col_,
       sizeRows_  = UnknownSize,
       sizeCols_  = 1,
@@ -266,7 +265,7 @@ class RowRMatrix: public ArrayBase< RowRMatrix<Type_> >, public TRef<1>
 {
   public:
     typedef typename hidden::Traits<RowRMatrix<Type_> >::Type Type;
-    typedef typename hidden::Traits<RowRMatrix<Type_> >::ReturnType ReturnType;
+    typedef typename hidden::Traits<RowRMatrix<Type_> >::ConstReturnType ConstReturnType;
     enum
     {
       structure_ = hidden::Traits<RowRMatrix<Type_> >::structure_,
@@ -290,6 +289,28 @@ class RowRMatrix: public ArrayBase< RowRMatrix<Type_> >, public TRef<1>
     inline RowRMatrix( RowRMatrix<Type> const& rowmat, bool ref =true)
                      : matrix_(rowmat.matrix_), rows_(rowmat.rows()), cols_(rowmat.cols())
     {}
+    /** @return the range of the rows */
+    inline RowRange const& rowsImpl() const { return rows_;}
+    /** @return the range of the columns */
+    inline ColRange const& colsImpl() const { return cols_;}
+    /** @return a constant reference on element (i,j)
+      *  @param i, j indexes of the row and of the column
+     **/
+     inline ConstReturnType elt2Impl(int i, int j) const
+     { return static_cast<ConstReturnType>(matrix_(i,j));}
+     /** @return a reference on the element (i,j)
+      *  @param i, j indexes of the row and of the column
+      **/
+     inline Type& elt2Impl(int i, int j) { return (matrix_(i,j));}
+     /** @return a constant reference on the jth element
+      *  @param j index of the column
+      **/
+      inline ConstReturnType elt1Impl(int j) const
+      { return static_cast<ConstReturnType>(matrix_(rows_.begin(),j));}
+      /** @return a reference on the jth element
+       *  @param j index of the column
+       **/
+      inline Type& elt1Impl( int j) { return (matrix_(rows_.begin(),j));}
   private:
     Rcpp::Matrix<Rtype_> matrix_;
     RowRange rows_;
@@ -301,7 +322,7 @@ class ColRMatrix: public ArrayBase< ColRMatrix<Type_> >, public TRef<1>
 {
   public:
     typedef typename hidden::Traits<ColRMatrix<Type_> >::Type Type;
-    typedef typename hidden::Traits<ColRMatrix<Type_> >::ReturnType ReturnType;
+    typedef typename hidden::Traits<ColRMatrix<Type_> >::ConstReturnType ConstReturnType;
     enum
     {
       structure_ = hidden::Traits<ColRMatrix<Type_> >::structure_,
@@ -325,6 +346,28 @@ class ColRMatrix: public ArrayBase< ColRMatrix<Type_> >, public TRef<1>
     inline ColRMatrix( ColRMatrix<Type> const& colmat, bool ref =true)
                      : matrix_(colmat.matrix_), rows_(colmat.rows()), cols_(colmat.cols())
     {}
+    /** @return the range of the rows */
+    inline RowRange const& rowsImpl() const { return rows_;}
+    /**@return the range of the columns */
+    inline ColRange const& colsImpl() const { return cols_;}
+    /** @return a constant reference on element (i,j)
+      *  @param i, j indexes of the row and of the column
+      **/
+     inline ConstReturnType elt2Impl(int i, int j) const
+     { return static_cast<ConstReturnType>(matrix_(i,j));}
+     /** @return a reference on the element (i,j)
+      *  @param i, j indexes of the row and of the column
+      **/
+     inline Type& elt2Impl(int i, int j) { return (matrix_(i,j));}
+     /** @return a constant reference on the ith element
+      *  @param i index of the row
+      **/
+      inline ConstReturnType elt1Impl(int i) const
+      { return static_cast<ConstReturnType>(matrix_(i,cols_.begin()));}
+      /** @return a reference on the ith element
+       *  @param i index of the row
+       **/
+      inline Type& elt1Impl(int i) { return (matrix_(i,cols_.begin()));}
   private:
     Rcpp::Matrix<Rtype_> matrix_;
     RowRange rows_;

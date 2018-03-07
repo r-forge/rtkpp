@@ -58,14 +58,16 @@ IMixture::~IMixture(){}
 /* set the mixture composer to the mixture */
 void IMixture::setMixtureModel( IMixtureStatModel const* p_composer) { p_composer_ = p_composer;}
 
-/* @return the class labels of the composer */
-int const* IMixture::classLabels() const { return p_composer_->zi().p_data();}
-/* @return the proportions of the composer */
-Real const* IMixture::proportions() const { return p_composer_->pk().p_data();}
-/* @return the number of sample */
+/* This function can be used in derived classes to get number of samples.
+ *  @return Number of samples.
+ *  @note STK_IMixtureStatModel.h is include only here
+ */
 int IMixture::nbSample() const { return p_composer_->nbSample();}
-/* @return the number of sample */
+/* This function can be used in derived classes to get number of classes.
+ *  @return Number of classes.
+ */
 int IMixture::nbCluster() const { return p_composer_->nbCluster();}
+
 /* This function can be used in derived classes to get proportions from the framework.
  * @return Pointer to proportions.
  */

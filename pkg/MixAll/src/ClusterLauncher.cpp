@@ -26,7 +26,6 @@
  * Project:  MixAll
  * created on: 4 sept. 2013
  * Author:   iovleff, serge.iovleff@stkpp.org
- * Originally created by Parmeet Bhatia <b..._DOT_p..._AT_gmail_Dot_com>
  **/
 
 /** @file STK_ClusterLauncher.cpp
@@ -46,30 +45,27 @@ namespace STK
  * The ClusterLauncher allow to create the strategy for estimating a mixture model
  * with less effort
  **/
-ClusterLauncher::ClusterLauncher( SEXP model, SEXP nbCluster, SEXP models, SEXP strategy, SEXP critName )
+ClusterLauncher::ClusterLauncher( Rcpp::S4 model, Rcpp::IntegerVector nbCluster, Rcpp::CharacterVector models)
                                 : ILauncher(model, models)
-                                , s4_model_(model)
-                                , s4_strategy_(strategy)
+                                , s4_strategy_(s4_model_.slot("strategy"))
                                 , v_nbCluster_(nbCluster)
-                                , v_models_(models)
-                                , criterion_(Rcpp::as<std::string>(critName))
+                                , criterion_(Rcpp::as<std::string>(s4_model_.slot("criterionName")))
                                 , p_composer_(0)
 {}
 /* facade design pattern.
  * The ClusterLauncher allow to create the strategy for estimating a mixture model
  * with less effort
  **/
-ClusterLauncher::ClusterLauncher( SEXP model, SEXP nbCluster, SEXP strategy, SEXP critName )
+ClusterLauncher::ClusterLauncher( Rcpp::S4 model, Rcpp::IntegerVector nbCluster)
                                 : ILauncher(model)
-                                , s4_model_(model)
-                                , s4_strategy_(strategy)
+                                , s4_strategy_(s4_model_.slot("strategy"))
                                 , v_nbCluster_(nbCluster)
-                                , v_models_()
-                                , criterion_(Rcpp::as<std::string>(critName))
-, p_composer_(0)
+                                , criterion_(Rcpp::as<std::string>(s4_model_.slot("criterionName")))
+                                , p_composer_(0)
 {}
 /* destructor. */
-ClusterLauncher::~ClusterLauncher() {}
+ClusterLauncher::~ClusterLauncher()
+{ if (p_composer_) delete p_composer_; p_composer_ = 0;}
 
 /* run the estimation */
 bool ClusterLauncher::run()
@@ -77,7 +73,7 @@ bool ClusterLauncher::run()
   // compute the best model
   Real initCriter = s4_model_.slot("criterion");
   Real criter = (isMixedData_) ? selectBestMixedModel()
-                                    : selectBestSingleModel();
+                               : selectBestSingleModel();
 
   // get result common part of the estimated model
   s4_model_.slot("criterion")      = criter;
@@ -101,26 +97,24 @@ bool ClusterLauncher::run()
 /* get the parameters */
 Real ClusterLauncher::selectBestSingleModel()
 {
-  std::string idDataBestModel;
   // component
   Rcpp::S4 s4_component = s4_model_.slot("component");
-
-  // wrap data matrix with Rcpp and wrap Rcpp matrix with STK++ matrix
-  double critValue = s4_model_.slot("criterion");
-  int nbSample     = s4_model_.slot("nbSample");
-  IMixtureComposer*  p_current =0;
+  double critValue      = s4_model_.slot("criterion");
+  int nbSample          = s4_model_.slot("nbSample");
+  std::string idDataBestModel;
+  IMixtureComposer*  p_current   =0;
   IMixtureCriterion* p_criterion =0;
 
-  // loop over all the models and
+  // loop over all the models
   for (int l=0; l <v_models_.size(); ++l)
   {
     // create idData
     std::string idData = "model" + typeToString<int>(l);
-    std::string idModel(as<std::string>(v_models_[l]));
+    std::string idModel(Rcpp::as<std::string>(v_models_[l]));
     // transform R model names to STK++ model names
     // check have been done on the R side so.... Let's go
     bool freeProp;
-    Clust::Mixture model = Clust::stringToMixture(idModel, freeProp);
+    Clust::Mixture model           = Clust::stringToMixture(idModel, freeProp);
     Clust::MixtureClass classModel = Clust::mixtureToMixtureClass(model);
     // add Data set with the new model name, m_data is just a pointer on a SEXP
     // structure thus there is no difficulties in doing so
@@ -145,7 +139,7 @@ Real ClusterLauncher::selectBestSingleModel()
     for (int l=0; l <v_models_.size(); ++l)
     {
       std::string idData = "model" + typeToString<int>(l);
-      std::string idModel(as<std::string>(v_models_[l]));
+      std::string idModel(Rcpp::as<std::string>(v_models_[l]));
       bool freeProp;
       Clust::Mixture model = Clust::stringToMixture(idModel, freeProp);
       // for the current model,
@@ -159,7 +153,6 @@ Real ClusterLauncher::selectBestSingleModel()
         // create current mixture and register it
         std::string idData = "model" + typeToString<int>(l);
         createMixtures(static_cast<MixtureComposer*>(p_current));
-        updateMixtures(static_cast<MixtureComposer*>(p_current));
 
         // run estimation and get results if possible
         if (!facade.run()) { msg_error_ += facade.error();}
@@ -186,8 +179,8 @@ Real ClusterLauncher::selectBestSingleModel()
   }
   catch (Exception const& e)
   {
-    if (p_current) delete p_current;
-    if (p_criterion) delete p_criterion;
+    if (p_current)   { delete p_current; p_current = 0;}
+    if (p_criterion) { delete p_criterion; p_criterion = 0;}
     ::Rf_error(e.error().c_str()) ;
   }
   // failed
@@ -234,6 +227,7 @@ Real ClusterLauncher::selectBestMixedModel()
     if (criterion_ == "BIC") { p_criterion = new BICMixtureCriterion();}
     if (criterion_ == "AIC") { p_criterion = new AICMixtureCriterion();}
     if (criterion_ == "ICL") { p_criterion = new ICLMixtureCriterion();}
+    if (criterion_ == "ML")  { p_criterion = new MLMixtureCriterion();}
 
     for (int k=0; k <v_nbCluster_.length(); ++k)
     {
@@ -243,7 +237,6 @@ Real ClusterLauncher::selectBestMixedModel()
       else           { p_current = new MixtureComposerFixedProp(nbSample, K);}
       // create all mixtures
       createMixtures(static_cast<MixtureComposer*>(p_current));
-      updateMixtures(static_cast<MixtureComposer*>(p_current));
       // run estimation and get results if possible
       if (!facade.run()) { msg_error_ += facade.error();}
       // compute criterion and update model if necessary
@@ -281,28 +274,6 @@ Real ClusterLauncher::selectBestMixedModel()
   // failed
   return Arithmetic<Real>::max();
 }
-
-/* create the kernel mixtures in the given composer */
-void ClusterLauncher::updateMixtures(MixtureComposer* p_composer)
-{
-  typedef MixtureComposer::ConstMixtIterator ConstMixtIterator;
-  // loop over
-  for (ConstMixtIterator it =  p_composer->v_mixtures().begin(); it != p_composer->v_mixtures().end(); it++)
-  {
-    std::string idData = (*it)->idData();
-    std::string idModel;
-    handler_.getIdModelName(idData, idModel);
-    Clust::Mixture typeModel = Clust::stringToMixture(idModel);
-    if (Clust::mixtureToMixtureClass(typeModel) == Clust::Kernel_)
-    {
-      Rcpp::S4 s4_component = s4_model_.slot("component");
-      RVector<double> dim((SEXP)s4_component.slot("dim"));
-      double kdim = (dim.size()>0) ? dim[0] : 10;
-      kernelManager_.setDim(p_composer->getMixture(idData), kdim);
-    }
-  }
-}
-
 
 } // namespace STK
 

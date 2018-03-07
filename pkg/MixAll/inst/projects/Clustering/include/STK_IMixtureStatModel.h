@@ -52,7 +52,7 @@ namespace STK
 // forward declaration
 class IMixture;
 /** @ingroup StatModels
- *  @brief Base class for Mixture (composed) model.
+ *  @brief Interface base class for Mixture (composed) model.
  *
  * In statistics, a mixture model is a probabilistic model for representing
  * the presence of sub-populations within an overall population, without
@@ -72,18 +72,15 @@ class IMixture;
  * unsupervised learning or clustering procedures. However not all inference
  * procedures involve such steps.
  *
- * The pure virtual function to implement in derived class are
+ * Pure virtual functions to implement in derived class are
  * @code
  *   virtual IMixtureComposer* create() const = 0;
  *   virtual IMixtureComposer* clone() const = 0;
- *   virtual void registerMixture(IMixture* p_mixture) = 0;
- *   virtual void releaseMixture(String const& idData) = 0;
  *   virtual bool randomInit() =0;
  *   virtual Real lnComponentProbability(int i, int k) const = 0;
- *   virtual int computeNbFreeParameters() const = 0;
  * @endcode
  *
- * The virtual function that can be re-implemented in derived class for a
+ * Virtual functions that can be re-implemented in derived class for a
  * specific behavior are:
  * @code
  *   virtual void imputationStep();
@@ -94,10 +91,24 @@ class IMixture;
  *   virtual void writeParameters(std::ostream& os) const;
  * @endcode
  *
- * @sa IMixtureComposer, IMixtureLearner
+ * Template functions allowing to interact with the composer are
+ * @code
+ *   template<class DataHandler>
+ *   void createMixture(IMixtureManager<DataHandler>& manager);
+ *   template<class DataHandler>
+ *   IMixture* createMixture(IMixtureManager<DataHandler>& manager, String const& idData);
+ *   template<class DataHandler>
+ *   void removeMixture(IMixtureManager<DataHandler>& manager, String const& idData);
+ *   template<class DataHandler, class Parameters>
+ *   void getParameters(IMixtureManager<DataHandler> const& manager, String const& idData, Parameters& param) const;
+ *   template<class DataHandler, class Parameters>
+ *   void setParameters(IMixtureManager<DataHandler> const& manager, String const& idData, Parameters const& param);
+ * @endcode
+ *
+ * @sa IMixtureComposer, IMixtureLearner, IMixtureManager
  *
  * @note the virtual method @c IMixtureStatModel::initializeStep is called in all
- * the initialization method.  Don't forget to called it in the randomInit
+ * the initialization method. Don't forget to called it in the randomInit
  * implementation.
  */
 class IMixtureStatModel: public IStatModelBase
@@ -183,7 +194,7 @@ class IMixtureStatModel: public IStatModelBase
     virtual IMixtureStatModel* clone() const = 0;
     /** initialize randomly the parameters of the components of the model */
     virtual void randomInit() = 0;
-    /** @return the value of the probability of the i-th sample in the k-th class.
+    /** @return the value of the probability of the ith sample in the kth class.
      *  @param i,k indexes of the sample and of the class
      **/
     virtual Real lnComponentProbability(int i, int k) const = 0;
@@ -294,7 +305,8 @@ template<class DataHandler>
 void IMixtureStatModel::createMixture(IMixtureManager<DataHandler>& manager)
 {
   typedef typename DataHandlerBase<DataHandler>::InfoMap InfoMap;
-  for ( typename InfoMap::const_iterator it=manager.p_handler()->info().begin(); it!=manager.p_handler()->info().end(); ++it)
+  typedef typename InfoMap::const_iterator citerator;
+  for ( citerator it=manager.p_handler()->info().begin(); it!=manager.p_handler()->info().end(); ++it)
   {
     IMixture* p_mixture = manager.createMixture(it->first, nbCluster());
 #ifdef STK_MIXTURE_DEBUG

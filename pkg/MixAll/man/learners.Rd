@@ -5,7 +5,6 @@
 \alias{learnPoisson}
 \alias{learnGamma}
 \alias{learnCategorical}
-\alias{learnKernel}
 \title{Create an instance of a learn mixture model}
 \usage{
 learnDiagGaussian(data, labels, prop = NULL,
@@ -23,11 +22,6 @@ learnGamma(data, labels, prop = NULL, models = clusterGammaNames(prop =
 learnCategorical(data, labels, prop = NULL,
   models = clusterCategoricalNames(prop = "equal"), algo = "simul",
   nbIter = 100, epsilon = 1e-08, criterion = "ICL", nbCore = 1)
-
-learnKernel(data, labels, prop = NULL, models = clusterKernelNames(prop =
-  "equal"), algo = "impute", nbIter = 100, epsilon = 1e-08, dim = 10,
-  kernelName = "gaussian", kernelParameters = 1, criterion = "ICL",
-  nbCore = 1)
 }
 \arguments{
 \item{data}{frame or matrix containing the data. Rows correspond to observations
@@ -53,17 +47,9 @@ iterations. Not used if algo is "simul". Default value is 1e-08.}
 
 \item{criterion}{character defining the criterion to select the best model.
 The best model is the one with the lowest criterion value.
-Possible values: "BIC", "AIC", "ICL" (default).}
+Possible values: "BIC", "AIC", "ML". Default is "ICL".}
 
 \item{nbCore}{integer defining the number of processors to use (default is 1, 0 for all).}
-
-\item{dim}{integer giving the dimension of the Gaussian density. Default is 10.}
-
-\item{kernelName}{string with a kernel name. Possible values:
-"gaussian", "polynomial", "exponential", "linear", "hamming". Default is "gaussian".}
-
-\item{kernelParameters}{[\code{\link{vector}}] with the parameters of
-the chosen kernel. Default is 1.}
 }
 \value{
 An instance of a learned mixture model class.

@@ -18,6 +18,7 @@
 library(MixAll)
 MixAll.version <- packageDescription("MixAll")$Version
 MixAll.date <- packageDescription("MixAll")$Date
+set.seed(2)
 @
 
 \usepackage[utf8]{inputenc}
@@ -135,7 +136,7 @@ Learning analysis can be performed with the functions
 \item \code{learnCategorical} for Categorical mixture models,
 \item \code{learnPoisson} for Poisson mixture models,
 \item \code{learnGamma} for gamma mixture models,
-\item \code{learnKernel} for kernel mixture models,
+%\item \code{learnKernel} for kernel mixture models,
 \item \code{learnMixedData} for MixedData mixture models.
 \end{enumerate}
 
@@ -291,24 +292,24 @@ missingValues(model)
 plot(model)
 @
 
-\subsection{Learning Kernel Mixture Models}
-\label{subsec:learnKernel}
+%\subsection{Learning Kernel Mixture Models}
+%\label{subsec:learnKernel}
 
-Data can be clustered using the \code{learnKernel} function.
+%Data can be clustered using the \code{learnKernel} function.
 
-We illustrate this function with the bullsEye data set.
-<<fig=TRUE>>=
-data(bullsEye)
-x <- bullsEye[,1:2]; x = as.matrix(x); n <- nrow(x); p <- ncol(x);
-z <- bullsEye[,3];
-model <- learnKernel( data=x, labels=z
-                    , models = clusterKernelNames(prop = "equal")
-                    , dim = 50, kernelName = "gaussian", kernelParameters = 1.
-                    , algo="impute", nbIter = 1, epsilon =  1e-08
-                    )
-summary(model)
-plot(model)
-@
+%We illustrate this function with the bullsEye data set.
+%<<fig=TRUE>>=
+%data(bullsEye)
+%x <- bullsEye[,1:2]; x = as.matrix(x); n <- nrow(x); p <- ncol(x);
+%z <- bullsEye[,3];
+%model <- learnKernel( data=x, labels=z
+%                    , models = clusterKernelNames(prop = "equal")
+%                    , dim = 50, kernelName = "gaussian", kernelParameters = 1.
+%                    , algo="impute", nbIter = 1, epsilon =  1e-08
+%                    )
+%summary(model)
+%plot(model)
+%@
 
 \subsection{Learning Mixed data sets}
 \label{subsec:learnMixedData}

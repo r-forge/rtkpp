@@ -44,12 +44,10 @@ namespace STK
  * The LearnLauncher allow to create the strategy for estimating a mixture model
  * with less effort
  **/
-LearnLauncher::LearnLauncher( SEXP model, SEXP models, SEXP algo, SEXP critName )
+LearnLauncher::LearnLauncher( Rcpp::S4 model, Rcpp::CharacterVector models, Rcpp::S4 algo )
                             : ILauncher(model, models)
-                            , s4_model_(model)
                             , s4_algo_(algo)
-                            , v_models_(models)
-                            , criterion_(Rcpp::as<std::string>(critName))
+                            , criterion_(Rcpp::as<std::string>(s4_model_.slot("criterionName")))
                             , p_algo_(0)
                             , p_criterion_(0)
                             , p_learner_(0)
@@ -58,12 +56,10 @@ LearnLauncher::LearnLauncher( SEXP model, SEXP models, SEXP algo, SEXP critName 
  * The LearnLauncher allow to create the strategy for estimating a mixture model
  * with less effort
  **/
-LearnLauncher::LearnLauncher( SEXP model, SEXP algo, SEXP critName )
+LearnLauncher::LearnLauncher( Rcpp::S4 model, Rcpp::S4 algo )
                             : ILauncher(model)
-                            , s4_model_(model)
                             , s4_algo_(algo)
-                            , v_models_()
-                            , criterion_(Rcpp::as<std::string>(critName))
+                            , criterion_(Rcpp::as<std::string>(s4_model_.slot("criterionName")))
                             , p_algo_(0)
                             , p_criterion_(0)
                             , p_learner_(0)
@@ -83,7 +79,8 @@ bool LearnLauncher::run()
   if (criterion_ == "BIC") { p_criterion_ = new BICMixtureCriterion();}
   else if (criterion_ == "AIC") { p_criterion_ = new AICMixtureCriterion();}
     else if (criterion_ == "ICL") { p_criterion_ = new ICLMixtureCriterion();}
-      else
+      else if (criterion_ == "ML") { p_criterion_ = new MLMixtureCriterion();}
+        else
       { msg_error_ = STKERROR_1ARG(LearnLauncher::run,criterion_,Wrong criterion name);
         return false;
       }
@@ -172,7 +169,6 @@ Real LearnLauncher::selectBestSingleModel()
       p_current = new MixtureLearner(nbSample, K);
       p_current->setMixtureParameters(tik, pk);
       createMixtures(static_cast<MixtureLearner*>(p_current));
-      updateMixtures(static_cast<MixtureLearner*>(p_current));
       // start algo
       p_algo_->setModel(p_current);
       if (p_algo_->run())
@@ -248,7 +244,6 @@ Real LearnLauncher::selectBestMixedModel()
     p_current->setMixtureParameters(tik, pk);
     // create all mixtures
     createMixtures(static_cast<MixtureLearner*>(p_current));
-    updateMixtures(static_cast<MixtureLearner*>(p_current));
     // start algo
     p_algo_->setModel(p_current);
     if (p_algo_->run())
@@ -283,27 +278,6 @@ Real LearnLauncher::selectBestMixedModel()
   }
   // failed
   return Arithmetic<Real>::max();
-}
-
-/* create the kernel mixtures in the given learner */
-void LearnLauncher::updateMixtures(MixtureLearner* p_learner)
-{
-  typedef MixtureLearner::ConstMixtIterator ConstMixtIterator;
-  // loop over
-  for (ConstMixtIterator it =  p_learner->v_mixtures().begin(); it != p_learner->v_mixtures().end(); it++)
-  {
-    std::string idData = (*it)->idData();
-    std::string idModel;
-    handler_.getIdModelName(idData, idModel);
-    Clust::Mixture typeModel = Clust::stringToMixture(idModel);
-    if (Clust::mixtureToMixtureClass(typeModel) == Clust::Kernel_)
-    {
-      Rcpp::S4 s4_component = s4_model_.slot("component");
-      RVector<double> dim((SEXP)s4_component.slot("dim"));
-      double kdim = (dim.size()>0) ? dim[0] : 10;
-      kernelManager_.setDim(p_learner->getMixture(idData), kdim);
-    }
-  }
 }
 
 

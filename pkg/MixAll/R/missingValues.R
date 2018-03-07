@@ -130,19 +130,19 @@ setMethod(
 )
 
 #' @rdname missingValues-methods
-#' @aliases missingValues,ClusterKernelComponent-method
+#' @aliases missingValues,KmmComponent-method
 setMethod(
     "missingValues",
-    c("ClusterKernelComponent"),
+    c("KmmComponent"),
     function(x)
     {
       return(NULL)
     }
 )
 #' @rdname missingValues-methods
-#' @aliases missingValues,ClusterKernel-method
+#' @aliases missingValues,KernelMixtureModel-method
 setMethod(
     "missingValues",
-    c("ClusterKernel"),
+    c("KernelMixtureModel"),
     function(x) { return(NULL);}
 )

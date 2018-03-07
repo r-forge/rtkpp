@@ -1,18 +1,22 @@
 Package: MixAll
-Version: 1.2.1
-Date: 2018-01-11
+Version: 1.4.0
+Date: 2018-03-04
 Title: Clustering using Mixture Models
-Authors@R: c(person("Serge", "Iovleff", role = c("aut","cre"), email = "Serge.Iovleff@stkpp.org"))
+Authors@R: c(person("Serge", "Iovleff", role = c("aut","cre"), email = "Serge.Iovleff@stkpp.org")
+            ,person("Parmeet", "Bathia", role = c("ctb"), email = "Bathia.Parmeet@gmail.com")
+            )
 Copyright: inria, University Lille 1
 Depends:
     R (>= 3.0.2),
-    rtkore (>= 1.1.0)
+    rtkore (>= 1.5.0)
 Imports:
     methods
-Description: Algorithms and methods for estimating parametric mixture models for mixed data
-    and with missing data.
+Description: Algorithms and methods for estimating parametric mixture models for
+  Gaussian, gamma, Poisson, categorical or mixed data with possibly missing data.
+  This package can be used as an independant alternative of the (not free)
+  mixtcomp software available at <https://massiccc.lille.inria.fr/>.
 License: GPL (>= 2)
-LinkingTo: Rcpp
+LinkingTo: Rcpp (>= 0.11.0), rtkore (>= 1.5.0)
 Roxygen: list(wrap = FALSE)
 SystemRequirements: GNU make
 Collate: 
@@ -25,12 +29,13 @@ Collate:
     'ClusterCategorical.R'
     'ClusterDiagGaussian.R'
     'ClusterGamma.R'
-    'ClusterKernel.R'
     'ClusterMixedData.R'
     'ClusterPlot.R'
     'ClusterPoisson.R'
     'LearnAlgo.R'
     'Learners.R'
     'MixAll.R'
+    'kmmNames.R'
+    'kmm.R'
     'missingValues.R'
 RoxygenNote: 6.0.1

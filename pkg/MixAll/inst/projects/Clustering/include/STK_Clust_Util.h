@@ -49,6 +49,39 @@ class IMixtureLearnAlgo;
 class IMixtureInit;
 class IMixtureStrategy;
 class IMixtureComposer;
+class IMixtureCriterion;
+
+/** @ingroup Clustering
+ *  @brief struct storing the parameters of the mixture.
+ *  Parameters of a mixture model have an unique Id defined
+ *  in STK::Clust::Mixture enumeration.
+ **/
+template <int Id> struct ModelParameters;
+/** @ingroup Clustering
+ *  @brief struct handling the parameters for Monte-Carlo estimation.
+ *  Parameters handlers of a mixture model have an
+ *  unique Id defined in STK::Clust::Mixture enumeration.
+ **/
+template <int Id> struct ParametersHandler;
+
+
+namespace hidden
+{
+/** @ingroup hidden
+ *  MixtureBridgeTraits struct for bridged mixtures
+ *  The traits struct MixtureBridgeTraits must be specialized for any
+ *  Mixture deriving from the Interface IMixtureBridge.
+ **/
+template<class Derived> struct MixtureBridgeTraits;
+/**  @ingroup hidden
+ *  Main class for the mixtures traits policy.
+ *  The traits struct MixtureTraits must be specialized for any
+ *  Mixture deriving from the Interface IMixtureDensity.
+ **/
+template <class Mixture> struct MixtureTraits;
+
+} // namespace hidden
+
 
 namespace Clust
 {
@@ -156,6 +189,33 @@ enum strategyType
 };
 
 /** @ingroup Clustering
+ *  type of criterion to use in order to select the mixture model
+ **/
+enum criterionType
+{
+  aic_  = 0,
+  bic_  = 1,
+  icl_  = 2,
+  ml_   = 3
+};
+
+/** @ingroup Clustering
+ *  Convert a String to an criterionType. The recognized strings are
+ * <table>
+ * <tr> <th> Criterion </th></tr>
+ * <tr> <td> "AIC"     </td></tr>
+ * <tr> <td> "BIC"     </td></tr>
+ * <tr> <td> "ICL      </td></tr>
+ * <tr> <td> "ML"      </td></tr>
+ * </table>
+ *  @param type the type of criterion wanted
+ *  @return the criterionType corresponding
+ *  @note The capitalized letters have no effect and if the string is not found
+ *  in the list above,the type Clust::bic_ is returned.
+ **/
+criterionType stringToCriterion( std::string const& type);
+
+/** @ingroup Clustering
  *  Specific exceptions allowing to handle the erroros that can occur in the
  *  estimation process.
  **/
@@ -194,24 +254,11 @@ enum modelState
 };
 
 /** @ingroup Clustering
- *  list of the class of mixture implemented in stkpp
- **/
-enum MixtureClass
-{
- Gamma_,
-  Gaussian_,
-  Categorical_,
-  Poisson_,
-  Kernel_,
-  unknown_mixture_class_
-};
-
-/** @ingroup Clustering
  * list of the mixtures that can be used by the composer
  **/
 enum Mixture
 {
-  Gamma_ajk_bjk_,
+  Gamma_ajk_bjk_ =0,
   Gamma_ajk_bk_,
   Gamma_ajk_bj_,
   Gamma_ajk_b_,
@@ -222,27 +269,49 @@ enum Mixture
   Gamma_aj_bjk_,
   Gamma_aj_bk_,
   Gamma_a_bjk_,
-  Gamma_a_bk_,
-  Gaussian_sjk_,
+  Gamma_a_bk_, // = 11
+  Gaussian_sjk_ =20,
   Gaussian_sk_,
   Gaussian_sj_,
   Gaussian_s_,
-  Categorical_pjk_,
+  Gaussian_sjsk_, // = 24
+  HDGaussian_ajk_bk_qk_dk_ =120,
+  HDGaussian_ajk_bk_qk_d_,
+  HDGaussian_ajk_bk_q_dk_,
+  HDGaussian_ajk_bk_q_d_,
+  HDGaussian_ajk_b_qk_dk_,
+  HDGaussian_ajk_b_qk_d_,
+  HDGaussian_ajk_b_q_dk_,
+  HDGaussian_ajk_b_q_d_,
+  HDGaussian_ak_bk_qk_dk_,
+  HDGaussian_ak_bk_qk_d_,
+  HDGaussian_ak_bk_q_dk_,
+  HDGaussian_ak_bk_q_d_,
+  HDGaussian_ak_b_qk_dk_,
+  HDGaussian_ak_b_qk_d_,
+  HDGaussian_ak_b_q_dk_,
+  HDGaussian_ak_b_q_d_,
+  HDGaussian_aj_bk_qk_dk_,
+  HDGaussian_aj_bk_qk_d_,
+  HDGaussian_aj_bk_q_dk_,
+  HDGaussian_aj_bk_q_d_,
+  HDGaussian_aj_b_qk_dk_,
+  HDGaussian_aj_b_qk_d_,
+  HDGaussian_a_bk_qk_dk_,
+  HDGaussian_a_bk_qk_d_,
+  HDGaussian_a_bk_q_dk_,
+  HDGaussian_a_bk_q_d_,
+  HDGaussian_a_b_qk_dk_,
+  HDGaussian_a_b_qk_d_, // =147
+  Categorical_pjk_ =40,
   Categorical_pk_,
-  Poisson_ljk_,
+  Poisson_ljk_ = 60,
   Poisson_lk_,
   Poisson_ljlk_,
-  KernelGaussian_sk_,
+  KernelGaussian_sk_ = 80,
   KernelGaussian_s_,
-  unknown_mixture_
+  unknown_mixture_ = -1
 };
-
-/** @ingroup Clustering
- *  convert a Mixture to a MixtureClass.
- *  @param type the type of Mixture
- *  @return the MixtureClass associated to this Mixture.
- **/
-MixtureClass mixtureToMixtureClass( Mixture const& type);
 
 /** @ingroup Clustering
  *  Convert a String to a Mixture. The recognized strings are
@@ -264,13 +333,42 @@ MixtureClass mixtureToMixtureClass( Mixture const& type);
  * <tr> <td> "Gaussian_sk"     </td></tr>
  * <tr> <td> "Gaussian_sj"     </td></tr>
  * <tr> <td> "Gaussian_s"      </td></tr>
- * <tr> <td> "Categorical_pjk" </td></tr>
- * <tr> <td> "MixtureCategorical_pk"  </td></tr>
- * <tr> <td> "Poisson_ljk"     </td></tr>
- * <tr> <td> "Poisson_lk"      </td></tr>
- * <tr> <td> "Poisson_ljlk"    </td></tr>
- * <tr> <td> "MixtureKernelGaussian_sk" </td></tr>
- * <tr> <td> "MixtureKernelGaussian_s"  </td></tr>
+ * <tr> <td> "Gaussian_sjsk"   </td></tr>
+ * <tr> <td> "HDGaussian_ajk_bk_qk_dk" </td></tr>
+ * <tr> <td> "HDGaussian_ajk_bk_qk_d"  </td></tr>
+ * <tr> <td> "HDGaussian_ajk_bk_q_dk"  </td></tr>
+ * <tr> <td> "HDGaussian_ajk_bk_q_d"   </td></tr>
+ * <tr> <td> "HDGaussian_ajk_b_qk_dk"  </td></tr>
+ * <tr> <td> "HDGaussian_ajk_b_qk_d"   </td></tr>
+ * <tr> <td> "HDGaussian_ajk_b_q_dk"   </td></tr>
+ * <tr> <td> "HDGaussian_ajk_b_q_d"    </td></tr>
+ * <tr> <td> "HDGaussian_ak_bk_qk_dk"  </td></tr>
+ * <tr> <td> "HDGaussian_ak_bk_qk_d"   </td></tr>
+ * <tr> <td> "HDGaussian_ak_bk_q_dk"   </td></tr>
+ * <tr> <td> "HDGaussian_ak_bk_q_d"    </td></tr>
+ * <tr> <td> "HDGaussian_ak_b_qk_dk"   </td></tr>
+ * <tr> <td> "HDGaussian_ak_b_qk_d"    </td></tr>
+ * <tr> <td> "HDGaussian_ak_b_q_dk"    </td></tr>
+ * <tr> <td> "HDGaussian_ak_b_q_d"     </td></tr>
+ * <tr> <td> "HDGaussian_aj_bk_qk_dk"  </td></tr>
+ * <tr> <td> "HDGaussian_aj_bk_qk_d"   </td></tr>
+ * <tr> <td> "HDGaussian_aj_bk_q_dk"   </td></tr>
+ * <tr> <td> "HDGaussian_aj_bk_q_d"    </td></tr>
+ * <tr> <td> "HDGaussian_aj_b_qk_dk"   </td></tr>
+ * <tr> <td> "HDGaussian_aj_b_qk_d"   </td></tr>
+ * <tr> <td> "HDGaussian_a_bk_qk_dk"  </td></tr>
+ * <tr> <td> "HDGaussian_a_bk_qk_d" </td></tr>
+ * <tr> <td> "HDGaussian_a_bk_q_dk" </td></tr>
+ * <tr> <td> "HDGaussian_a_bk_q_d," </td></tr>
+ * <tr> <td> "HDGaussian_a_b_qk_dk" </td></tr>
+ * <tr> <td> "HDGaussian_a_b_qk_d"  </td></tr>
+ * <tr> <td> "Categorical_pjk"      </td></tr>
+ * <tr> <td> "Categorical_pk"       </td></tr>
+ * <tr> <td> "Poisson_ljk"          </td></tr>
+ * <tr> <td> "Poisson_lk"           </td></tr>
+ * <tr> <td> "Poisson_ljlk"         </td></tr>
+ * <tr> <td> "KernelGaussian_sk"    </td></tr>
+ * <tr> <td> "KernelGaussian_s"     </td></tr>
  * </table>
  *  @param type the String we want to convert
  *  @return the Mixture represented by the String @c type. if the string
@@ -299,13 +397,42 @@ Mixture stringToMixture( std::string const& type);
  * <tr> <td> "Gaussian_pk_sk"     </td><td> "Gaussian_p_sk"     </td> </tr>
  * <tr> <td> "Gaussian_pk_sj"     </td><td> "Gaussian_p_sj"     </td> </tr>
  * <tr> <td> "Gaussian_pk_s"      </td><td> "Gaussian_p_s"      </td> </tr>
+ * <tr> <td> "Gaussian_pk_sjsk"   </td><td> "Gaussian_p_sjsk"   </td> </tr>
+ * <tr> <td> "HDGaussian_pk_ajk_bk_qk_dk" </td><td> "HDGaussian_p_ajk_bk_qk_dk" </td></tr>
+ * <tr> <td> "HDGaussian_pk_ajk_bk_qk_d"  </td><td> "HDGaussian_p_ajk_bk_qk_d"  </td>/tr>
+ * <tr> <td> "HDGaussian_pk_ajk_bk_q_dk"  </td><td> "HDGaussian_p_ajk_bk_q_dk"  </td></tr>
+ * <tr> <td> "HDGaussian_pk_ajk_bk_q_d"   </td><td> "HDGaussian_p_ajk_bk_q_d"   </td></tr>
+ * <tr> <td> "HDGaussian_pk_ajk_b_qk_dk"  </td><td> "HDGaussian_p_ajk_b_qk_dk"  </td></tr>
+ * <tr> <td> "HDGaussian_pk_ajk_b_qk_d"   </td><td> "HDGaussian_p_ajk_b_qk_d"   </td></tr>
+ * <tr> <td> "HDGaussian_pk_ajk_b_q_dk"   </td><td> "HDGaussian_p_ajk_b_q_dk"   </td></tr>
+ * <tr> <td> "HDGaussian_pk_ajk_b_q_d"    </td><td> "HDGaussian_p_ajk_b_q_d"    </td></tr>
+ * <tr> <td> "HDGaussian_pk_ak_bk_qk_dk"  </td><td> "HDGaussian_p_ak_bk_qk_dk"  </td></tr>
+ * <tr> <td> "HDGaussian_pk_ak_bk_qk_d"   </td><td> "HDGaussian_p_ak_bk_qk_d"   </td></tr>
+ * <tr> <td> "HDGaussian_pk_ak_bk_q_dk"   </td><td> "HDGaussian_p_ak_bk_q_dk"   </td></tr>
+ * <tr> <td> "HDGaussian_pk_ak_bk_q_d"    </td><td> "HDGaussian_p_ak_bk_q_d"    </td></tr>
+ * <tr> <td> "HDGaussian_pk_ak_b_qk_dk"   </td><td> "HDGaussian_p_ak_b_qk_dk"   </td></tr>
+ * <tr> <td> "HDGaussian_pk_ak_b_qk_d"    </td><td> "HDGaussian_p_ak_b_qk_d"    </td></tr>
+ * <tr> <td> "HDGaussian_pk_ak_b_q_dk"    </td><td> "HDGaussian_p_ak_b_q_dk"    </td></tr>
+ * <tr> <td> "HDGaussian_pk_ak_b_q_d"     </td><td> "HDGaussian_p_ak_b_q_d"     </td></tr>
+ * <tr> <td> "HDGaussian_pk_aj_bk_qk_dk"  </td><td> "HDGaussian_p_aj_bk_qk_dk"  </td></tr>
+ * <tr> <td> "HDGaussian_pk_aj_bk_qk_d"   </td><td> "HDGaussian_p_aj_bk_qk_d"   </td></tr>
+ * <tr> <td> "HDGaussian_pk_aj_bk_q_dk"   </td><td> "HDGaussian_p_aj_bk_q_dk"   </td></tr>
+ * <tr> <td> "HDGaussian_pk_aj_bk_q_d"    </td><td> "HDGaussian_p_aj_bk_q_d"    </td></tr>
+ * <tr> <td> "HDGaussian_pk_aj_b_qk_dk"   </td><td> "HDGaussian_p_aj_b_qk_dk"   </td></tr>
+ * <tr> <td> "HDGaussian_pk_aj_b_qk_d"    </td><td> "HDGaussian_p_aj_b_qk_d"    </td></tr>
+ * <tr> <td> "HDGaussian_pk_a_bk_qk_dk"   </td><td> "HDGaussian_p_a_bk_qk_dk"   </td></tr>
+ * <tr> <td> "HDGaussian_pk_a_bk_qk_d"    </td><td> "HDGaussian_p_a_bk_qk_d"    </td></tr>
+ * <tr> <td> "HDGaussian_pk_a_bk_q_dk"    </td><td> "HDGaussian_p_a_bk_q_dk"    </td></tr>
+ * <tr> <td> "HDGaussian_pk_a_bk_q_d,"    </td><td> "HDGaussian_p_a_bk_q_d,"    </td></tr>
+ * <tr> <td> "HDGaussian_pk_a_b_qk_dk"    </td><td> "HDGaussian_p_a_b_qk_dk"    </td></tr>
+ * <tr> <td> "HDGaussian_pk_a_b_qk_d"     </td><td> "HDGaussian_p_a_b_qk_d"     </td></tr>
  * <tr> <td> "Categorical_pk_pjk" </td><td> "Categorical_p_pjk" </td> </tr>
  * <tr> <td> "Categorical_pk_pk"  </td><td> "Categorical_p_pk"  </td> </tr>
  * <tr> <td> "Poisson_pk_ljk"     </td><td> "Poisson_p_ljk"     </td> </tr>
  * <tr> <td> "Poisson_pk_lk"      </td><td> "Poisson_p_lk"      </td> </tr>
  * <tr> <td> "Poisson_pk_ljlk"    </td><td> "Poisson_p_ljlk"    </td> </tr>
- * <tr> <td> "MixtureKernelGaussian_pk_sk" </td><td> "MixtureKernelGaussian_p_sk"    </td> </tr>
- * <tr> <td> "MixtureKernelGaussian_pk_s" </td><td> "MixtureKernelGaussian_p_s"    </td> </tr>
+ * <tr> <td> "KernelGaussian_pk_sk" </td><td> "KernelGaussian_p_sk"    </td> </tr>
+ * <tr> <td> "KernelGaussian_pk_s" </td><td> "KernelGaussian_p_s"    </td> </tr>
  * </table>
  *  @param type the String we want to convert
  *  @param[out] freeProp @c true if the model have free proportions, @c false otherwise.
@@ -330,6 +457,27 @@ std::string mixtureToString( Mixture const& type);
  *  @return the string represented by the Mixture @c type.
  **/
 std::string mixtureToString(Mixture type, bool freeProp);
+
+/** @ingroup Clustering
+ *  list of the class of mixture implemented in stkpp
+ **/
+enum MixtureClass
+{
+  Gamma_,
+  DiagGaussian_,
+  HDGaussian_,
+  Categorical_,
+  Poisson_,
+  Kernel_,
+  unknown_mixture_class_ = -1
+};
+
+/** @ingroup Clustering
+ *  convert a Mixture to a MixtureClass.
+ *  @param type the type of Mixture
+ *  @return the MixtureClass associated to this Mixture.
+ **/
+MixtureClass mixtureToMixtureClass( Mixture const& type);
 
 /** @ingroup Clustering
  * Default number of try in an estimation strategy */
@@ -370,6 +518,12 @@ const int defaultMaxIterLongRun = 1000;
 /**  @ingroup Clustering
  * Default epsilon in the long run (used in strategy) */
 const Real defaultEpsilonLongRun = 1e-08;
+
+/** @ingroup Clustering
+ *  @param criterion selection criterion to use
+ *  @return a pointer on the class computing the criterion
+ **/
+IMixtureCriterion* createCriterion( Clust::criterionType criterion);
 
 /** @ingroup Clustering
  *  utility function for creating an estimation algorithm.

@@ -43,10 +43,12 @@ NULL
 #' @slot pk        Vector of size K with the proportions of each mixture.
 #' @slot tik       Matrix of size \eqn{n \times K} with the posterior probability of
 #' the ith individual to belong to kth cluster.
-#' @slot lnFi        Vector of size n with the log-likelihood of the ith individuals.
+#' @slot lnFi      Vector of size n with the log-likelihood of the ith individuals.
 #' @slot zi        Vector of integer of size n  with the attributed class label of the individuals.
 #' @slot lnLikelihood Real given the ln-liklihood of the Cluster model.
-#' @slot criterion Real given the value of the AIC, BIC or ICL criterion.
+#' @slot criterion    Real given the value of the AIC, BIC, ICL or ML criterion.
+#' @slot criterionName string with the name of the criterion. Possible values
+#' are "BIC", "AIC", "ICL" or "ML". Default is "ICL".
 #' @slot nbFreeParameter Integer given the number of free parameters of the model.
 #' @slot strategy  the instance of the [\code{\linkS4class{ClusterStrategy}}] used in the
 #' estimation process of the mixture. Default is clusterStrategy().
@@ -69,6 +71,7 @@ setClass(
                 , lnFi = "numeric"
                 , zi = "integer"
                 , lnLikelihood = "numeric"
+                , criterionName = "character"
                 , criterion = "numeric"
                 , nbFreeParameter = "numeric"
                 , strategy = "ClusterStrategy"
@@ -111,6 +114,9 @@ setClass(
     {stop("zi must have nbSample size.")}
     return(TRUE)
 
+    # check criterion
+    if(sum(criterionName %in% c("BIC","AIC", "ICL", "ML")) != 1)
+    { stop("criterionName is not valid. See ?IClusterModel for the list of valid criterion\n")}
     # check nbFreeParameter
     if (round(object@nbFreeParameter)!=object@nbFreeParameter)
     {stop("nbFreeParameter must be an integer.")}
@@ -149,6 +155,7 @@ setMethod(
     .Object@zi   <- as.integer(rep(1, nbSample))
     # set default values
     .Object@lnLikelihood = -Inf
+    .Object@criterionName=  "ICL"
     .Object@criterion    =  Inf
     .Object@nbFreeParameter = 0
     # set strategy
@@ -171,7 +178,8 @@ setMethod(
     cat("* nbCluster      = ", x@nbCluster, "\n")
     cat("* lnLikelihood   = ", x@lnLikelihood,"\n")
     cat("* nbFreeParameter= ", x@nbFreeParameter,"\n")
-    cat("* criterion      = ", x@criterion, "\n")
+    cat("* criterion name = ", x@criterionName, "\n")
+    cat("* criterion value= ", x@criterion, "\n")
     cat("* zi             =\n")
     print( format(x@zi), quote=FALSE)
   }
@@ -188,7 +196,8 @@ setMethod(
     cat("* nbCluster      = ", object@nbCluster, "\n")
     cat("* lnLikelihood   = ", object@lnLikelihood,"\n")
     cat("* nbFreeParameter= ", object@nbFreeParameter,"\n")
-    cat("* criterion      = ", object@criterion, "\n")
+    cat("* criterion name = ", object@criterionName, "\n")
+    cat("* criterion value= ", object@criterion, "\n")
   }
 )
 
@@ -203,7 +212,8 @@ setMethod(
     cat("* nbCluster      = ", object@nbCluster, "\n")
     cat("* lnLikelihood   = ", object@lnLikelihood,"\n")
     cat("* nbFreeParameter= ", object@nbFreeParameter, "\n")
-    cat("* criterion      = ", object@criterion, "\n")
+    cat("* criterion name = ", object@criterionName, "\n")
+    cat("* criterion value= ", object@criterion, "\n")
   }
 )
 
@@ -228,8 +238,8 @@ setMethod(
 #'
 setClass(
   Class="IClusterComponent",
-  representation( data = "matrix"
-                , missing = "matrix"
+  representation( data      = "matrix"
+                , missing   = "matrix"
                 , modelName = "character"
                 , "VIRTUAL"),
   validity=function(object)

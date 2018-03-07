@@ -46,7 +46,7 @@ NULL
 #' the strategy to run. Default is clusterStrategy().
 #' @param criterion character defining the criterion to select the best model.
 #' The best model is the one with the lowest criterion value.
-#' Possible values: "BIC", "AIC", "ICL". Default is "ICL".
+#' Possible values: "BIC", "AIC", "ICL", "ML". Default is "ICL".
 #' @param nbCore integer defining the number of processors to use (default is 1, 0 for all).
 #'
 #' @examples
@@ -76,7 +76,7 @@ NULL
 #' @export
 #'
 clusterMixedData <- function( data, models, nbCluster=2
-                            , strategy=clusterFastStrategy()
+                            , strategy=clusterStrategy()
                             , criterion="ICL"
                             , nbCore = 1)
 {
@@ -86,7 +86,7 @@ clusterMixedData <- function( data, models, nbCluster=2
   nbClusterMax   = max(nbCluster);
   if (nbClusterMin < 1) { stop("The number of clusters must be greater or equal to 1")}
   # check criterion
-  if(sum(criterion %in% c("BIC","AIC", "ICL")) != 1)
+  if(sum(criterion %in% c("BIC","AIC", "ICL", "ML")) != 1)
   { stop("criterion is not valid. See ?clusterMixedData for the list of valid criterion")}
   # check strategy
   if(class(strategy)[1] != "ClusterStrategy")
@@ -124,50 +124,18 @@ clusterMixedData <- function( data, models, nbCluster=2
       { # check if it is a diagonal Gaussian model
         if( clusterValidDiagGaussianNames(modelName) )
         { ldata[[i]] <- new("ClusterDiagGaussianComponent", data[[i]], nbClusterMin, modelName);}
-        else
-        { # check if it a kernel model
-          if( clusterValidKernelNames(modelName) )
-          {
-            if (is.list(param)) # get kernel parameters and check values
-            {
-              kernelName = param$kernelName;
-              if(is.null(kernelName)) { kernelName = "gaussian";}
-              kernelParameters = param$kernelParameters;
-              if(is.null(kernelParameters)) { kernelParameters = c();}
-              dim = param$dim;
-              if(is.null(dim)) { dim = 10;}
-            }
-            else # set default values
-            {
-              kernelName <- "gaussian"
-              kernelParameters <- c()
-              dim <- 10
-            }
-            # check kernel name
-            if(sum(kernelName %in% c("gaussian","polynomial", "exponential","linear","hamming")) != 1)
-            { stop("kernelName is not valid. See ?clusterKernel for the list of valid kernel name")}
-            # check dim
-            if (dim < 1) { stop("The dimension must be greater or equal to 1")}
-            # create component
-            component <- new("ClusterKernelComponent", data[[i]], dim= dim, nbCluster= nbClusterMin, modelName= modelName);
-            # compute gram matrix
-            resFlag  <- .Call("clusterKernelCompute", component, kernelName, kernelParameters, PACKAGE="MixAll");
-            if (!resFlag) { stop("error in gram matrix computation");}
-            # restore original data set and update ldata list
-            component@rawData <- data[[i]];
-            ldata[[i]] <- component;
-          }
           else
           {
             stop("invalid model name");
           }
-        } # else diag Gaussian
       } # else gamma
     } # else categorical
   } # for i
   # Create model
   model = new("ClusterMixedData", ldata)
   model@strategy = strategy;
+  model@criterionName = criterion
+  
   # start estimation of the models
   resFlag  <- FALSE;
   if (length(nbCluster) >0)

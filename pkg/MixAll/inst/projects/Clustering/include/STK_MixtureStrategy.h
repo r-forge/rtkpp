@@ -50,7 +50,7 @@ class IMixtureInit;
 
 /** @ingroup Clustering
  *  Interface base class for all the strategies */
-class IMixtureStrategy : public IRunnerBase
+class IMixtureStrategy: public IRunnerBase
 {
   public:
     /** default constructor.
@@ -101,7 +101,7 @@ struct SimpleStrategyParam
 /** @ingroup Clustering
  *  A SimpleStrategy is just nbTry long run.
  **/
-class SimpleStrategy : public IMixtureStrategy
+class SimpleStrategy: public IMixtureStrategy
 {
   public:
     /** default constructor.

@@ -44,7 +44,7 @@ NULL
 #' the strategy to run. [\code{\link{clusterStrategy}}]() method by default.
 #' @param criterion character defining the criterion to select the best model.
 #' The best model is the one with the lowest criterion value.
-#' Possible values: "BIC", "AIC", "ICL". Default is "ICL".
+#' Possible values: "BIC", "AIC", "ICL", "ML". Default is "ICL".
 #' @param nbCore integer defining the number of processor to use (default is 1, 0 for all).
 #'
 #' @examples
@@ -76,7 +76,7 @@ NULL
 #'
 clusterPoisson <- function( data, nbCluster=2
                           , models= clusterPoissonNames()
-                          , strategy=clusterFastStrategy()
+                          , strategy=clusterStrategy()
                           , criterion="ICL"
                           , nbCore = 1)
 {
@@ -108,9 +108,10 @@ clusterPoisson <- function( data, nbCluster=2
   # Create model
   model = new("ClusterPoisson", data)
   model@strategy = strategy;
-
+  model@criterionName = criterion
+  
   # start estimation of the models
-  resFlag = .Call("clusterMixture", model, nbCluster, models, strategy, criterion, nbCore, PACKAGE="MixAll")
+  resFlag = .Call("clusterMixture", model, nbCluster, models, nbCore, PACKAGE="MixAll")
 
   # set names
   if (resFlag != 1) {cat("WARNING: An error occur during the clustering process")}

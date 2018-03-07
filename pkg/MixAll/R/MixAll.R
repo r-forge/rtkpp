@@ -44,8 +44,8 @@
 #' multivariate quantitative positive data sets using gamma multidimensional models (24 models).
 #'    \item the \link{clusterPoisson} method allowing to discover group structures in
 #' multivariate counting data sets using Poisson multidimensional models (8 models).
-#'    \item the \link{clusterKernel} method allowing to discover group structures in
-#' any data sets using kernel trick (4 models).
+#    \item the \link{clusterKernel} method allowing to discover group structures in
+# any data sets using kernel trick (4 models).
 #'    \item the \link{clusterMixedData} method allowing to discover group structures in
 #' mixed data sets.
 #'  }

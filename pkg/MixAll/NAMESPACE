@@ -9,24 +9,25 @@ export(clusterAlgo
       ,clusterGammaNames
       ,clusterCategoricalNames
       ,clusterPoissonNames
-      ,clusterKernelNames
       ,clusterValidGammaNames
       ,clusterValidCategoricalNames
       ,clusterValidPoissonNames
       ,clusterValidDiagGaussianNames
-      ,clusterValidKernelNames
       ,clusterDiagGaussian
       ,clusterGamma
       ,clusterCategorical
       ,clusterPoisson
       ,clusterMixedData
-      ,clusterKernel
+      ,kmmNames
+      ,kmmValidModelNames
+      ,kmmValidKernelNames
+      ,kmmStrategy
+      ,kmm
       ,learnDiagGaussian
       ,learnGamma
       ,learnPoisson
       ,learnCategorical
       ,learnMixedData
-      ,learnKernel
       )
 
 exportClasses(ClusterAlgo
@@ -44,8 +45,8 @@ exportClasses(ClusterAlgo
              ,ClusterPoissonComponent
              ,ClusterPoisson
              ,ClusterMixedData
-             ,ClusterKernelComponent
-             ,ClusterKernel
+             ,KmmComponent
+             ,KernelMixtureModel
              )
 
 exportMethods(print)

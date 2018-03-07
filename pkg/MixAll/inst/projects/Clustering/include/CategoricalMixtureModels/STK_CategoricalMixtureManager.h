@@ -59,7 +59,7 @@ namespace STK
  *  @tparam DataHandler is any concrete class from the interface DataHandlerBase
  */
 template<class DataHandler>
-class CategoricalMixtureManager : public IMixtureManager<DataHandler>
+class CategoricalMixtureManager: public IMixtureManager<DataHandler>
 {
   public:
     typedef IMixtureManager<DataHandler> Base;
@@ -80,7 +80,7 @@ class CategoricalMixtureManager : public IMixtureManager<DataHandler>
     typedef CategoricalBridge<Clust::Categorical_pk_,  DataInt> MixtureBridge_pk;
 
     /** Default constructor, need an instance of a DataHandler.  */
-    CategoricalMixtureManager(DataHandler const& handler) : Base(&handler) {}
+    CategoricalMixtureManager(DataHandler const& handler): Base(&handler) {}
     /** destructor */
     virtual ~CategoricalMixtureManager() {}
     /** get the parameters from an IMixture.
@@ -130,12 +130,12 @@ class CategoricalMixtureManager : public IMixtureManager<DataHandler>
 
   protected:
     /** create a concrete mixture and initialize it.
-     *  @param idModelName, idData Id names of the model and of the data
+     *  @param modelName, idData Id names of the model and of the data
      *  @param nbCluster number of cluster of the model
      **/
-    virtual IMixture* createMixtureImpl(String const&  idModelName, String const& idData, int nbCluster)
+    virtual IMixture* createMixtureImpl(String const&  modelName, String const& idData, int nbCluster)
     {
-      Clust::Mixture idModel = Clust::stringToMixture(idModelName);
+      Clust::Mixture idModel = Clust::stringToMixture(modelName);
       return createMixtureImpl(idModel, idData, nbCluster);
     }
   private:

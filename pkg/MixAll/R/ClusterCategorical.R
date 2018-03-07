@@ -43,16 +43,16 @@ NULL
 #' the strategy to run. [\code{\link{clusterStrategy}}]() method by default.
 #' @param criterion character defining the criterion to select the best model.
 #' The best model is the one with the lowest criterion value.
-#' Possible values: "BIC", "AIC", "ICL". Default is "ICL".
+#' Possible values: "BIC", "AIC", "ICL", "ML". Default is "ICL".
 #' @param nbCore integer defining the number of processors to use (default is 1, 0 for all).
 #'
 #' @examples
 #' ## A quantitative example with the birds data set
 #' data(birds)
 #' ## add 10 missing values
-#' x = as.matrix(birds); n <- nrow(x); p <- ncol(x);
-#' indexes <- matrix(c(round(runif(5,1,n)), round(runif(5,1,p))), ncol=2);
-#' x[indexes] <- NA;
+#' x = as.matrix(birds); n <- nrow(x); p <- ncol(x)
+#' indexes <- matrix(c(round(runif(5,1,n)), round(runif(5,1,p))), ncol=2)
+#' x[indexes] <- NA
 #' ## estimate model (using fast strategy, results may be misleading)
 #' model <- clusterCategorical( data=x, nbCluster=2:3
 #'                            , models=c( "categorical_pk_pjk", "categorical_p_pjk")
@@ -78,8 +78,8 @@ NULL
 #' @export
 #'
 clusterCategorical <- function( data, nbCluster=2
-                              , models=c( "categorical_pk_pjk")
-                              , strategy=clusterFastStrategy()
+                              , models=clusterCategoricalNames(probabilities="free")
+                              , strategy=clusterStrategy()
                               , criterion="ICL"
                               , nbCore = 1)
 {
@@ -90,7 +90,7 @@ clusterCategorical <- function( data, nbCluster=2
   if (nbClusterMin < 2) { stop("The number of clusters must be greater or equal to 2\n")}
 
   # check criterion
-  if(sum(criterion %in% c("BIC","AIC", "ICL")) != 1)
+  if(sum(criterion %in% c("BIC","AIC", "ICL", "ML")) != 1)
   { stop("criterion is not valid. See ?clusterCategorical for the list of valid criterion\n")}
 
   # get data
@@ -109,10 +109,11 @@ clusterCategorical <- function( data, nbCluster=2
 
   # Create model
   model = new("ClusterCategorical", data)
-  model@strategy = strategy;
-
+  model@strategy = strategy
+  model@criterionName = criterion
+  
   # start estimation of the models
-  resFlag = .Call("clusterMixture", model, nbCluster, models, strategy, criterion, nbCore, PACKAGE="MixAll")
+  resFlag = .Call("clusterMixture", model, nbCluster, models, nbCore, PACKAGE="MixAll")
   # set names
   # dimnames(model@plkj) <- list(NULL, colnames(model@component@data), NULL) # not working
   # should be done on the C++ side
@@ -509,7 +510,7 @@ setMethod(
        mean  <- matrix(0, nrow = nbCluster, ncol =ndim)
        sigma <- matrix(1, nrow = nbCluster, ncol =ndim)
        for (k in 1:nbCluster)
-       {
+       { 
          wcov = cov.wt(as.matrix(Y), x@tik[,k], method = "ML");
          mean[k,]  = wcov$center;
          sigma[k,] = sqrt(diag(wcov$cov))

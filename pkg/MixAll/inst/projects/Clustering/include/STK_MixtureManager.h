@@ -57,6 +57,7 @@ namespace STK
  *  @class MixtureManager
  *  @brief [DEPRECATED] A mixture manager is a factory class for injection dependency in the
  *  STK++ derived class of the MixtureComposer class.
+ *  @note This Manager will be replaced by specialized managers for each kind of data.
  *
  *  It allows to handle all the creation and initialization stuff needed by the
  *  (bridged) mixture models of the stkpp library.
@@ -64,7 +65,7 @@ namespace STK
  *  @tparam DataHandler is any concrete class from the interface DataHandlerBase
  */
 template<class DataHandler>
-class MixtureManager : public IMixtureManager<DataHandler>
+class MixtureManager: public IMixtureManager<DataHandler>
 {
   public:
     typedef IMixtureManager<DataHandler> Base;
@@ -108,10 +109,10 @@ class MixtureManager : public IMixtureManager<DataHandler>
     typedef PoissonBridge<Clust::Poisson_lk_,  DataInt> MixtureBridge_lk;
     typedef PoissonBridge<Clust::Poisson_ljlk_, DataInt> MixtureBridge_ljlk;
     // All Kernel bridges
-    typedef KernelGaussianBridge<Clust::KernelGaussian_sk_,  DataReal> MixtureKernelGaussianBridge;
+    typedef KernelGaussianBridge<Clust::KernelGaussian_sk_,  DataReal> KernelBridge;
 
     /** Default constructor, need an instance of a DataHandler.  */
-    MixtureManager(DataHandler const& handler) : Base(&handler) {}
+    MixtureManager(DataHandler const& handler): Base(&handler) {}
     /** destructor */
     virtual ~MixtureManager() {}
     /** Utility function allowing to create and register all the STK++ mixtures
@@ -199,7 +200,7 @@ class MixtureManager : public IMixtureManager<DataHandler>
         break;
         // Kernel models
         case Clust::KernelGaussian_sk_:
-        { static_cast<MixtureKernelGaussianBridge*>(p_mixture)->getParameters(param);}
+        { static_cast<KernelBridge*>(p_mixture)->getParameters(param);}
         break;
         default: // idModel is not implemented
         break;
@@ -285,7 +286,7 @@ class MixtureManager : public IMixtureManager<DataHandler>
         break;
         // Kernel models
         case Clust::KernelGaussian_sk_:
-        { static_cast<MixtureKernelGaussianBridge*>(p_mixture)->setParameters(param);}
+        { static_cast<KernelBridge*>(p_mixture)->setParameters(param);}
         break;
         default: // idModel is not implemented
         break;
@@ -294,12 +295,12 @@ class MixtureManager : public IMixtureManager<DataHandler>
 
   protected:
     /** create a concrete mixture and initialize it.
-     *  @param idModelName, idData Id names of the model and of the data
+     *  @param modelName, idData Id names of the model and of the data
      *  @param nbCluster number of cluster of the model
      **/
-    virtual IMixture* createMixtureImpl(String const&  idModelName, String const& idData, int nbCluster)
+    virtual IMixture* createMixtureImpl(String const&  modelName, String const& idData, int nbCluster)
     {
-      Clust::Mixture idModel = Clust::stringToMixture(idModelName);
+      Clust::Mixture idModel = Clust::stringToMixture(modelName);
       return createMixtureImpl(idModel, idData, nbCluster);
     }
   private:
@@ -381,7 +382,7 @@ class MixtureManager : public IMixtureManager<DataHandler>
         break;
         // Kernel models
         case Clust::KernelGaussian_sk_:
-        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureKernelGaussianBridge)}
+        { STK_CREATE_MIXTURE(DataBridgeReal, KernelBridge)}
         break;
         default:
           return 0; // 0 if idModel is not implemented

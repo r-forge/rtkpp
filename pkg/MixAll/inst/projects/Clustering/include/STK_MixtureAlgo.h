@@ -53,7 +53,7 @@ class IMixtureLearner;
  * All algorithms start with an paramUpdateStep(), so user have to provide an instance of
  * the model with initial parameters values.
  **/
-class IMixtureAlgo : public IRunnerBase
+class IMixtureAlgo: public IRunnerBase
 {
   protected:
     /** default constructor */

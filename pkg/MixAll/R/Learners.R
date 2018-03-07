@@ -47,7 +47,7 @@ NULL
 #' iterations. Not used if algo is "simul". Default value is 1e-08.
 #' @param criterion character defining the criterion to select the best model.
 #' The best model is the one with the lowest criterion value.
-#' Possible values: "BIC", "AIC", "ICL" (default).
+#' Possible values: "BIC", "AIC", "ML". Default is "ICL".
 #' @param nbCore integer defining the number of processors to use (default is 1, 0 for all).
 #'
 #' @examples
@@ -104,18 +104,19 @@ learnDiagGaussian <- function( data, labels, prop = NULL
   # check nbIter
   if( nbIter < 1) { stop("nbIter must be greater or equal to 1")}
   # check criterion
-  if(sum(criterion %in% c("BIC","AIC", "ICL")) != 1)
+  if(sum(criterion %in% c("BIC","AIC", "ICL", "ML")) != 1)
   { stop("criterion is not valid. See ?learnDiagGaussian for the list of valid criterion")}
   
   # check models
   if (!clusterValidDiagGaussianNames(models))
   { stop("models is not valid. See ?clusterDiagGaussianNames for the list of valid model names")}
   # Create model
-  model = .createMixtureModel("ClusterDiagGaussian", data, labels, prop);
+  model = .createMixtureModel("ClusterDiagGaussian", data, labels, prop)
+  model@criterionName = criterion
   # Create algorithm
   algo = learnAlgo( algo, nbIter, epsilon)
   # start estimation of the models
-  resFlag = .Call("learnMixture", model, models, algo, criterion, nbCore, PACKAGE="MixAll");
+  resFlag = .Call("learnMixture", model, models, algo, nbCore, PACKAGE="MixAll");
   # set names
   if (resFlag != TRUE ) {cat("WARNING: An error occur during the learning process");}
   colnames(model@component@mean)  <- colnames(model@component@data);
@@ -140,14 +141,15 @@ learnPoisson <- function( data, labels, prop = NULL
   if( nbIter < 1) { stop("nbIter must be greater or equal to 1")}
   
   # check criterion
-  if(sum(criterion %in% c("BIC","AIC", "ICL")) != 1)
+  if(sum(criterion %in% c("BIC","AIC", "ICL", "ML")) != 1)
   { stop("criterion is not valid. See ?learnPoisson for the list of valid criterion")}
   
   # check models
   if (!clusterValidPoissonNames(models))
   { stop("models is not valid. See ?clusterPoissonNames for the list of valid model names")}
   # Create model
-  model = .createMixtureModel("ClusterPoisson", data, labels, prop);
+  model = .createMixtureModel("ClusterPoisson", data, labels, prop)
+  model@criterionName = criterion
   # Create algorithm
   algo = learnAlgo( algo, nbIter, epsilon)
   # start estimation of the models
@@ -174,14 +176,15 @@ learnGamma <- function( data, labels, prop = NULL
   if( nbIter < 1) { stop("nbIter must be greater or equal to 1")}
   
   # check criterion
-  if(sum(criterion %in% c("BIC","AIC", "ICL")) != 1)
+  if(sum(criterion %in% c("BIC","AIC", "ICL", "ML")) != 1)
   { stop("criterion is not valid. See ?learnGamma for the list of valid criterion")}
   
   # check models
   if (!clusterValidGammaNames(models))
   { stop("models is not valid. See ?clusterGammaNames for the list of valid model names")}
   # Create model
-  model = .createMixtureModel("ClusterGamma", data, labels, prop);
+  model = .createMixtureModel("ClusterGamma", data, labels, prop)
+  model@criterionName = criterion
   # Create algorithm
   algo = learnAlgo( algo, nbIter, epsilon)
   # start estimation of the models
@@ -209,75 +212,22 @@ learnCategorical <- function( data, labels, prop = NULL
   if( nbIter < 1) { stop("nbIter must be greater or equal to 1")}
   
   # check criterion
-  if(sum(criterion %in% c("BIC","AIC", "ICL")) != 1)
+  if(sum(criterion %in% c("BIC","AIC", "ICL", "ML")) != 1)
   { stop("criterion is not valid. See ?learnGamma for the list of valid criterion")}
   
   # check models
   if (!clusterValidCategoricalNames(models))
   { stop("models is not valid. See ?clusterCategoricalNames for the list of valid model names")}
   # Create model
-  model = .createMixtureModel("ClusterCategorical", data, labels, prop);
+  model = .createMixtureModel("ClusterCategorical", data, labels, prop)
+  model@criterionName = criterion
   # Create algorithm
   algo = learnAlgo( algo, nbIter, epsilon)
   # start estimation of the models
-  resFlag = .Call("learnMixture", model, models, algo, criterion, nbCore, PACKAGE="MixAll");
+  resFlag = .Call("learnMixture", model, models, algo, nbCore, PACKAGE="MixAll");
   # set names
   if (resFlag != TRUE ) {cat("WARNING: An error occur during the learning process");}
   dim(model@component@plkj) <- c(model@component@nbModalities, model@nbCluster, ncol(data));
-  model
-}
-
-#' @param dim integer giving the dimension of the Gaussian density. Default is 10.
-#' @param kernelName string with a kernel name. Possible values:
-#' "gaussian", "polynomial", "exponential", "linear", "hamming". Default is "gaussian".
-#' @param kernelParameters [\code{\link{vector}}] with the parameters of
-#' the chosen kernel. Default is 1.
-#' 
-#' @rdname learners
-
-learnKernel <- function( data, labels, prop = NULL
-                       , models=clusterKernelNames(prop = "equal")
-                       , algo="impute", nbIter = 100, epsilon = 1e-08
-                       , dim = 10, kernelName = "gaussian", kernelParameters = 1.
-                       , criterion="ICL"
-                       , nbCore = 1)
-{
-  # check data
-  labels = .checkDataInLearner(data, labels)
-  # check proportions
-  prop <- .checkPropInLearner(labels, prop)
-  
-  # check nbIter
-  if( nbIter < 1) { stop("nbIter must be greater or equal to 1")}
-  
-  # check criterion
-  if(sum(criterion %in% c("BIC","AIC", "ICL")) != 1)
-  { stop("criterion is not valid. See ?learnGamma for the list of valid criterion")}
- 
-  # check models
-  if (!clusterValidKernelNames(models))
-  { stop("models is not valid. See ?clusterKernelNames for the list of valid model names")}
-  
-  # check kernelName
-  if(sum(kernelName %in% c("gaussian","polynomial", "exponential","linear","hamming")) != 1)
-  { stop("kernelName is not valid. See ?clusterKernelNames for the list of valid kernel name")}
-  if (is.null(kernelParameters)) { kernelParameters = c(1)}
-  
-  # Create model
-  model = new("ClusterKernel", data, dim, kernelName, kernelParameters)
-  # update fields
-  tik <- matrix(0, nrow=length(labels), ncol=length(levels(labels)))
-  for (i in 1:length(labels))
-  { tik[i, as.numeric(labels[i])] <- 1}
-  model@zi       = as.integer(labels) -1L; # base 0 for the labels class
-  model@tik      = tik;
-  model@pk       = prop
-  # Create algorithm
-  algo = learnAlgo( algo, nbIter, epsilon)
-  # start estimation of the models
-  resFlag = .Call("learnKernelMixture", model, models, algo, criterion, nbCore, PACKAGE="MixAll");
-  # set names
-  if (resFlag != TRUE ) {cat("WARNING: An error occur during the learning process");}
   model
 }
 
@@ -305,7 +255,7 @@ learnKernel <- function( data, labels, prop = NULL
 #' iterations. Not used if algo is "simul". Default value is 1e-08.
 #' @param criterion character defining the criterion to select the best model.
 #' The best model is the one with the lowest criterion value.
-#' Possible values: "BIC", "AIC", "ICL" (default).
+#' Possible values: "BIC", "AIC", "ICL", "ML". Default is "ICL".
 #' @param nbCore integer defining the number of processors to use (default is 1, 0 for all).
 #'
 #' @examples
@@ -373,57 +323,24 @@ learnMixedData <- function( data, models, labels, prop = NULL
       else
       { # check if it is a diagonal Gaussian model
         if( clusterValidDiagGaussianNames(modelName) )
-        { ldata[[i]] <- new("ClusterDiagGaussianComponent", data[[i]], nbCluster, modelName);}
+        { ldata[[i]] <- new("ClusterDiagGaussianComponent", data[[i]], nbCluster, modelName)}
         else
-        { # check if it a kernel model
-          if( clusterValidKernelNames(modelName) )
-          {
-            if (is.list(param)) # get kernel parameters and check values
-            {
-              kernelName = param$kernelName;
-              if(is.null(kernelName)) { kernelName = "gaussian";}
-              kernelParameters = param$kernelParameters;
-              if(is.null(kernelParameters)) { kernelParameters = c();}
-              dim = param$dim;
-              if(is.null(dim)) { dim = 10;}
-            }
-            else # set default values
-            {
-              kernelName <- "gaussian"
-              kernelParameters <- c()
-              dim <- 10
-            }
-            # check kernel name
-            if(sum(kernelName %in% c("gaussian","polynomial", "exponential","linear","hamming")) != 1)
-            { stop("kernelName is not valid. See ?clusterKernel for the list of valid kernel name")}
-            # check dim
-            if (dim < 1) { stop("The dimension must be greater or equal to 1")}
-            # create component
-            component <- new("ClusterKernelComponent", data[[i]], dim= dim, nbCluster= nbCluster, modelName= modelName);
-            # compute gram matrix
-            resFlag  <- .Call("clusterKernelCompute", component, kernelName, kernelParameters, PACKAGE="MixAll");
-            if (!resFlag) { stop("error in gram matrix computation");}
-            # restore original data set and update ldata list
-            component@rawData <- data[[i]];
-            ldata[[i]] <- component;
-          }
-          else
-          {
-            stop("invalid model name");
-          }
+        {
+          stop("invalid model name");
         } # else diag Gaussian
       } # else gamma
     } # else categorical
   } # for i
   # create model
-  model = .createMixtureModel("ClusterMixedData", ldata, labels, prop);
+  model = .createMixtureModel("ClusterMixedData", ldata, labels, prop)
+  model@criterionName = criterion
   # Create algorithm
   algo = learnAlgo( algo, nbIter, epsilon)
   # start estimation of the models
   resFlag  <- FALSE;
   if (length(nbCluster) >0)
   {
-    resFlag = .Call("learnMixedData", model, algo, criterion, nbCore, PACKAGE="MixAll");
+    resFlag = .Call("learnMixedData", model, algo, nbCore, PACKAGE="MixAll");
   }
   # set names
   if (resFlag != TRUE) {cat("WARNING: An error occurs during the clustering process");}

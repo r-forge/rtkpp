@@ -26,7 +26,6 @@
  * Project:  MixAll
  * created on: 4 sept. 2013
  * Author:   iovleff, serge.iovleff@stkpp.org
- * Originally created by Parmeet Bhatia <b..._DOT_p..._AT_gmail_Dot_com>
  **/
 
 /** @file ClusterLauncher.h
@@ -51,14 +50,15 @@ class ClusterLauncher: public ILauncher
   public:
     /** constructor.
      * @param model a reference on the current model
-     * @param strategy the strategy defined in R
+     *  @param nbCluster a vector with the number of clusters to test
+     *  @param models a vector of string with the model names to test
      **/
-    ClusterLauncher( SEXP model, SEXP nbCluster, SEXP models, SEXP strategy, SEXP critName );
+    ClusterLauncher( Rcpp::S4 model, Rcpp::IntegerVector nbCluster, Rcpp::CharacterVector models );
     /** constructor with a list of component.
-     * @param model a reference on the current model
-     * @param strategy the strategy defined in R
+     *  @param model a reference on the current model
+     *  @param nbCluster a vector with the number of clusters to test
      **/
-    ClusterLauncher( SEXP model, SEXP nbCluster, SEXP strategy, SEXP critName );
+    ClusterLauncher( Rcpp::S4 model, Rcpp::IntegerVector nbCluster);
     /** destructor. */
     virtual ~ClusterLauncher();
     /** run the estimation */
@@ -68,13 +68,9 @@ class ClusterLauncher: public ILauncher
 
   protected:
     /** strategy from the R side */
-    Rcpp::S4              s4_model_;
-    /** strategy from the R side */
     Rcpp::S4              s4_strategy_;
     /** vector with the number of cluster to try */
     Rcpp::IntegerVector   v_nbCluster_;
-    /** vector with the model names to try */
-    Rcpp::CharacterVector v_models_;
     /** character string with the model selection criterion name */
     std::string           criterion_;
 
@@ -87,11 +83,6 @@ class ClusterLauncher: public ILauncher
      *  @return the value of the best criteria.
      **/
     Real selectBestMixedModel();
-    /** create the kernel mixtures in the given composer. We have to
-     * use a workaround for this kind of model as they need an extra parameter
-     * (the dimension) to be given
-     **/
-    void updateMixtures(MixtureComposer* p_composer);
     /** pointer on the main composer */
     IMixtureComposer* p_composer_;
 };

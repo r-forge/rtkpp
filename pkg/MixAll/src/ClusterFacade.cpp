@@ -32,7 +32,7 @@
  *  @brief In this file we implement the ClusterFacade class.
  **/
 
-#include "../inst/projects/MixAll/ClusterFacade.h"
+#include <MixAll/ClusterFacade.h>
 
 namespace STK
 {

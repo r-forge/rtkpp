@@ -4,8 +4,9 @@
 \alias{clusterCategorical}
 \title{Create an instance of the [\code{\linkS4class{ClusterCategorical}}] class}
 \usage{
-clusterCategorical(data, nbCluster = 2, models = c("categorical_pk_pjk"),
-  strategy = clusterFastStrategy(), criterion = "ICL", nbCore = 1)
+clusterCategorical(data, nbCluster = 2,
+  models = clusterCategoricalNames(probabilities = "free"),
+  strategy = clusterStrategy(), criterion = "ICL", nbCore = 1)
 }
 \arguments{
 \item{data}{frame or matrix containing the data. Rows correspond to observations
@@ -22,7 +23,7 @@ the strategy to run. [\code{\link{clusterStrategy}}]() method by default.}
 
 \item{criterion}{character defining the criterion to select the best model.
 The best model is the one with the lowest criterion value.
-Possible values: "BIC", "AIC", "ICL". Default is "ICL".}
+Possible values: "BIC", "AIC", "ICL", "ML". Default is "ICL".}
 
 \item{nbCore}{integer defining the number of processors to use (default is 1, 0 for all).}
 }
@@ -39,9 +40,9 @@ specified in \code{strategy}.
 ## A quantitative example with the birds data set
 data(birds)
 ## add 10 missing values
-x = as.matrix(birds); n <- nrow(x); p <- ncol(x);
-indexes <- matrix(c(round(runif(5,1,n)), round(runif(5,1,p))), ncol=2);
-x[indexes] <- NA;
+x = as.matrix(birds); n <- nrow(x); p <- ncol(x)
+indexes <- matrix(c(round(runif(5,1,n)), round(runif(5,1,p))), ncol=2)
+x[indexes] <- NA
 ## estimate model (using fast strategy, results may be misleading)
 model <- clusterCategorical( data=x, nbCluster=2:3
                            , models=c( "categorical_pk_pjk", "categorical_p_pjk")

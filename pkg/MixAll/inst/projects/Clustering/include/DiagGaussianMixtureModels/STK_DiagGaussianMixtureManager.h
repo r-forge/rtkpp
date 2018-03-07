@@ -58,7 +58,7 @@ namespace STK
  *  @tparam DataHandler is any concrete class from the interface DataHandlerBase
  */
 template<class DataHandler>
-class DiagGaussianMixtureManager : public IMixtureManager<DataHandler>
+class DiagGaussianMixtureManager: public IMixtureManager<DataHandler>
 {
   public:
     typedef IMixtureManager<DataHandler> Base;
@@ -81,7 +81,7 @@ class DiagGaussianMixtureManager : public IMixtureManager<DataHandler>
     typedef DiagGaussianBridge<Clust::Gaussian_s_,   DataReal> MixtureBridge_s;
 
     /** Default constructor, need an instance of a DataHandler.  */
-    DiagGaussianMixtureManager(DataHandler const& handler) : Base(&handler) {}
+    DiagGaussianMixtureManager(DataHandler const& handler): Base(&handler) {}
     /** destructor */
     virtual ~DiagGaussianMixtureManager() {}
     /** get the parameters from an IMixture.
@@ -143,12 +143,12 @@ class DiagGaussianMixtureManager : public IMixtureManager<DataHandler>
 
   protected:
     /** create a concrete mixture and initialize it.
-     *  @param idModelName, idData Id names of the model and of the data
+     *  @param modelName, idData Id names of the model and of the data
      *  @param nbCluster number of cluster of the model
      **/
-    virtual IMixture* createMixtureImpl(String const&  idModelName, String const& idData, int nbCluster)
+    virtual IMixture* createMixtureImpl(String const&  modelName, String const& idData, int nbCluster)
     {
-      Clust::Mixture idModel = Clust::stringToMixture(idModelName);
+      Clust::Mixture idModel = Clust::stringToMixture(modelName);
       return createMixtureImpl(idModel, idData, nbCluster);
     }
 

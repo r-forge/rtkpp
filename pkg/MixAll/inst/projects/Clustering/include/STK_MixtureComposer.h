@@ -140,7 +140,7 @@ class MixtureComposer: public IMixtureComposer
 
 /** @brief specialization of the composer for the fixed proportion case.
  **/
-class MixtureComposerFixedProp : public MixtureComposer
+class MixtureComposerFixedProp: public MixtureComposer
 {
   public:
     /** Constructor.

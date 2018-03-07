@@ -4,8 +4,8 @@
 \alias{clusterMixedData}
 \title{Create an instance of the [\code{\linkS4class{ClusterMixedData}}] class}
 \usage{
-clusterMixedData(data, models, nbCluster = 2,
-  strategy = clusterFastStrategy(), criterion = "ICL", nbCore = 1)
+clusterMixedData(data, models, nbCluster = 2, strategy = clusterStrategy(),
+  criterion = "ICL", nbCore = 1)
 }
 \arguments{
 \item{data}{[\code{list}] containing the data sets (matrices and/or data.frames).
@@ -26,7 +26,7 @@ the strategy to run. Default is clusterStrategy().}
 
 \item{criterion}{character defining the criterion to select the best model.
 The best model is the one with the lowest criterion value.
-Possible values: "BIC", "AIC", "ICL". Default is "ICL".}
+Possible values: "BIC", "AIC", "ICL", "ML". Default is "ICL".}
 
 \item{nbCore}{integer defining the number of processors to use (default is 1, 0 for all).}
 }

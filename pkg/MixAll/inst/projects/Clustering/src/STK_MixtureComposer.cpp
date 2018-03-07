@@ -47,7 +47,7 @@ MixtureComposer::MixtureComposer( int nbSample, int nbCluster)
                                 , meanlnLikelihood_(0.)
 { setNbFreeParameter(nbCluster-1);}
 
-/* copy constructor.³
+/* copy constructor.
  *  @param composer the composer to copy
  */
 MixtureComposer::MixtureComposer( MixtureComposer const& composer)

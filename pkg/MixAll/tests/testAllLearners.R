@@ -52,13 +52,13 @@ missingValues(model)
 print(model)
 
 ## get data and target from bulls eye data set
-data(bullsEye)
-x <- bullsEye[,1:2]; x = as.matrix(x); z <- bullsEye[,3];n <- nrow(x); p <- ncol(x);
-model <- learnKernel( data=x, labels=z
-                    , models = clusterKernelNames(prop = "equal")
-                    , algo="impute", nbIter = 1, epsilon =  1e-08
-                    )
-print(model)
+#data(bullsEye)
+#x <- bullsEye[,1:2]; x = as.matrix(x); z <- bullsEye[,3];n <- nrow(x); p <- ncol(x);
+#model <- learnKernel( data=x, labels=z
+#                    , models = clusterKernelNames(prop = "equal")
+#                    , algo="impute", nbIter = 1, epsilon =  1e-08
+#                    )
+#print(model)
 
 ## A quantitative example with the heart disease data set
 data(HeartDisease.cat)

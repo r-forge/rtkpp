@@ -43,12 +43,13 @@
 
 namespace STK
 {
+
 /** @ingroup Clustering
  * @brief Interface base class for the selection model criterion. The pure
  * virtual function @c run will be implemented in derived class and compute
  * the value_ member.
   */
-class IMixtureCriterion : public IRunnerBase
+class IMixtureCriterion: public IRunnerBase
 {
   protected:
     /** Default Constructor. */
@@ -90,7 +91,7 @@ class IMixtureCriterion : public IRunnerBase
  *  where \f$ L \f$ represents the likelihood of the observations and \f$ D \f$
  *  the number of free parameter of the model.
  **/
-class AICMixtureCriterion : public IMixtureCriterion
+class AICMixtureCriterion: public IMixtureCriterion
 {
   public:
     /** Default Constructor. */
@@ -124,7 +125,7 @@ class AICMixtureCriterion : public IMixtureCriterion
  *  where \f$ L \f$ represents the likelihood of the observations, \f$ D \f$ the
  *  number of free parameter of the model and \f$ n \f$ the number of sample.
  **/
-class BICMixtureCriterion : public IMixtureCriterion
+class BICMixtureCriterion: public IMixtureCriterion
 {
   public:
     /** Default Constructor. */
@@ -156,7 +157,7 @@ class BICMixtureCriterion : public IMixtureCriterion
  *  where \f$ L \f$ represents the likelihood of the observations and \f$ D \f$
  *  the number of free parameters of the model.
  **/
-class ICLMixtureCriterion : public IMixtureCriterion
+class ICLMixtureCriterion: public IMixtureCriterion
 {
   public:
     /** Default Constructor. */
@@ -177,6 +178,38 @@ class ICLMixtureCriterion : public IMixtureCriterion
     inline ICLMixtureCriterion* clone() const { return new ICLMixtureCriterion(*this);}
     /** implementation of the virtual method run */
     virtual bool run();
+};
+
+/** @ingroup Clustering
+ *  @brief Derived class of Criterion for computing the Maximum Likelihood Criterion
+ *  This criterion does not penalize the model and return minux two times the
+ *  log likelihood of the model.
+ *  \f[
+ *    -2 \ln{L}
+ *  \f]
+ *
+ **/
+class MLMixtureCriterion: public IMixtureCriterion
+{
+  public:
+    /** Default Constructor. */
+    inline MLMixtureCriterion() : IMixtureCriterion() {}
+    /** Constructor.
+     *  @param p_composer apointer on the current model
+     **/
+    inline MLMixtureCriterion( IMixtureStatModel* const p_composer)
+                              : IMixtureCriterion(p_composer) {}
+    /** copy Constructor.
+     *  @param criterion the criterion to copy
+     **/
+    inline MLMixtureCriterion( MLMixtureCriterion const& criterion)
+                              : IMixtureCriterion(criterion) {}
+    /** virtual destructor. */
+    inline virtual ~MLMixtureCriterion() {}
+    /** clone pattern */
+    inline MLMixtureCriterion* clone() const { return new MLMixtureCriterion(*this);}
+    /** implementation of the virtual method run */
+   virtual bool run();
 };
 
 

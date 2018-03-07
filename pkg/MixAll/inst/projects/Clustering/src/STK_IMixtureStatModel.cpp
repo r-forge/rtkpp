@@ -78,8 +78,12 @@ Real IMixtureStatModel::computeLnLikelihood(int i) const
 {
   // get maximal value
   CPointX lnComp(pk_.size());
+//  std::cout << "lnComp= ";
   for (int k = pk_.begin(); k< pk_.end(); ++k)
   { lnComp[k] = std::log(pk_[k]) + lnComponentProbability(i, k);}
+//  for (int k = pk_.begin(); k< pk_.end(); ++k)
+//  { std::cout << lnComp[k] << " ";}
+//  std::cout << "\n";
   // compute result
   Real lnCompMax = lnComp.maxElt();
   return std::log((lnComp-lnCompMax).exp().sum())+lnCompMax;
@@ -183,6 +187,9 @@ int IMixtureStatModel::computeNbVariables() const
  **/
 void IMixtureStatModel::initializeStep()
 {
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("Entering IMixtureStatModel::initializeStep\n");
+#endif
   if (v_mixtures_.size() == 0)
     STKRUNTIME_ERROR_NO_ARG(IMixtureStatModel::initializeStep,no mixture registered);
   setLnLikelihood(-Arithmetic<Real>::infinity());

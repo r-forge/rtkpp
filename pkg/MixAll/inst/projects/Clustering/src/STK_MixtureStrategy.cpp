@@ -332,8 +332,10 @@ bool FullStrategy::run()
       stk_cout << _T("In FullStrategy::run(), iTry =") << iTry << _T(" failed\n");
 #endif
       // release memory before next try
-      if (p_bestModel)      delete p_bestModel; p_bestModel = 0;
-      if (p_bestShortModel) delete p_bestShortModel; p_bestShortModel = 0;
+      if (p_bestModel)      delete p_bestModel;
+      p_bestModel = 0;
+      if (p_bestShortModel) delete p_bestShortModel;
+      p_bestShortModel = 0;
     } // end iTry
   }
   catch (Exception const& e)

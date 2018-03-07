@@ -7,5 +7,5 @@ FILE( GLOB Clustering_files
 include_directories("..")
 
 # Add Clustering files to STKClustering library
-add_library(STKClustering OBJECT ${Clustering_files})
+add_library(STK_Clustering OBJECT ${Clustering_files})
 

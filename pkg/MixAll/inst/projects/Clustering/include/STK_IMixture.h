@@ -47,31 +47,45 @@ namespace STK
 
 class IMixtureStatModel;
 
+/** @ingroup Clustering
+ *  @brief Interface base class for all the mixture models that will be
+ *  processed by the composer.
+ *
+ *  Any mixture that can be used and add to a mixed model have to implement
+ *  the pure virtual methods defined in this interface. With each mixture is
+ *  associated a data set identified by an idData string.
+ *
+ *  Using an idData is not mandatory but is useful in case data set is stored
+ *  in a DataHandler.
+ *
+ *  @sa STK::IDataHandler
+ */
 class IMixture
 {
   public:
     /**Constructor with identification character
      * @param idData Identification string of the data associated to this mixture.
-     * The Id is provided by the framework.
+     * @note The Id is provided by the framework if the associated data set is in
+     * a STK::IDataHandler struct.
      */
-    IMixture( std::string const& idData);
+    IMixture( std::string const& idData = std::string());
     /**copy constructor.
-     * @note The pointer on the composer is not copied and is set to 0: it have
+     * @warning The pointer on the composer is not copied and is set to 0: it has
      * to be set again.
      * @param mixture the mixture to copy */
     IMixture( IMixture const& mixture);
     /** Virtual destructor. */
     virtual ~IMixture();
 
-    /** @return the Idname of the mixture [DEPRECATED] */
-    inline std::string const& idName() const { return idData_;}
     /** @return the Id data of the mixture */
     inline std::string const& idData() const { return idData_;}
     /** @return A constant pointer on the composer. */
     inline IMixtureStatModel const* const p_composer() const { return p_composer_;}
 
-    /** set the mixture composer to the mixture */
-    void setMixtureModel( IMixtureStatModel const* p_model);
+    /** set the mixture composer to the mixture
+     *  @param p_composer the composer to set
+     **/
+    void setMixtureModel( IMixtureStatModel const* p_composer);
 
     /**This is a standard clone function in usual sense. It must be defined to
      * provide new object of your class with values of various parameters equal
@@ -169,19 +183,6 @@ class IMixture
      *  @return Number of classes.
      */
     int nbCluster() const;
-    /** This function can be used in derived classes to get class labels from the framework.
-     * @return Pointer to class labels.
-     */
-    int const* classLabels() const;
-    /** This function can be used in derived classes to get proportions from the framework.
-     *  @return Pointer to proportions.
-     */
-    Real const* proportions() const;
-    /** This function can be used in derived classes to get the posterior probabilities
-     *  from the framework.
-     *  @return Pointer to tik.
-     */
-    Real const** posteriorProbabilities() const;
     /** This function can be used in derived classes to get estimated number
      *  of individuals from the framework.
      *  @return Pointer to the number of individuals.

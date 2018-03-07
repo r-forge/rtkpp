@@ -51,11 +51,11 @@ class ILauncher: public IRunnerBase
      * @param model a reference on the current model
      * @param models a list of model name
      **/
-    ILauncher( SEXP model, SEXP models);
+    ILauncher( Rcpp::S4 model, Rcpp::CharacterVector models);
     /** constructor with a list of component.
      *  @param model a reference on the current model
      **/
-    ILauncher( SEXP model);
+    ILauncher( Rcpp::S4 model);
     /** destructor. */
     virtual ~ILauncher();
     /** @return the model */
@@ -72,25 +72,16 @@ class ILauncher: public IRunnerBase
     void createMixtures(IMixtureStatModel* p_model);
 
     /** get the parameters */
-    void getParameters(IMixtureStatModel* p_model, std::string const& idData, Rcpp::S4& s4_component);
+    void getParameters(IMixtureStatModel* p_model, std::string const& idData, Rcpp::S4 s4_component);
     /** get the diagonal Gaussian parameters */
-    void getDiagGaussianParameters(IMixtureStatModel* p_model, std::string const& idData, Rcpp::S4& s4_component);
+    void getDiagGaussianParameters(IMixtureStatModel* p_model, std::string const& idData, Rcpp::S4 s4_component);
     /** get the Poisson parameters */
-    void getPoissonParameters(IMixtureStatModel* p_model, std::string const& idData, Rcpp::S4& s4_component);
+    void getPoissonParameters(IMixtureStatModel* p_model, std::string const& idData, Rcpp::S4 s4_component);
     /** get the gamma parameters */
-    void getGammaParameters(IMixtureStatModel* p_model, std::string const& idData, Rcpp::S4& s4_component);
+    void getGammaParameters(IMixtureStatModel* p_model, std::string const& idData, Rcpp::S4 s4_component);
     /** get the gamma parameters */
-    void getCategoricalParameters(IMixtureStatModel* p_model, std::string const& idData, Rcpp::S4& s4_component);
-    /** get the kernel parameters */
-    void getKernelParameters(IMixtureStatModel* p_model, std::string const& idData, Rcpp::S4& s4_component);
+    void getCategoricalParameters(IMixtureStatModel* p_model, std::string const& idData, Rcpp::S4 s4_component);
 
-    /** model from the R side */
-    Rcpp::S4 s4_model_;
-    /** vector with the model names to try */
-    Rcpp::CharacterVector v_models_;
-
-    /** data handler */
-    RDataHandler handler_;
     /** diagonal Gaussian mixture models manager */
     DiagGaussianMixtureManager<RDataHandler> diagGaussianManager_;
     /** Poisson mixture models manager */
@@ -99,9 +90,13 @@ class ILauncher: public IRunnerBase
     GammaMixtureManager<RDataHandler> gammaManager_;
     /** categorical mixture models manager */
     CategoricalMixtureManager<RDataHandler> categoricalManager_;
-    /** kernel mixture models manager */
-    KernelMixtureManager<RDataHandler> kernelManager_;
 
+    /** data handler */
+    RDataHandler handler_;
+    /** model from the R side */
+    Rcpp::S4              s4_model_;
+    /** vector with the model names to try */
+    Rcpp::CharacterVector v_models_;
     /** Is the model with mixed data ? */
     bool isMixedData_;
 };

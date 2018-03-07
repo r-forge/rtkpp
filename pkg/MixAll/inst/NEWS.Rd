@@ -1,6 +1,13 @@
 \name{NEWS}
 \title{News for Package 'MixAll}
 
+
+\section{Changes in MixAll version 1.4.0 (2018-03-04)}{
+  \itemize{
+  \item Bugs fixed
+  }
+}
+
 \section{Changes in MixAll version 1.2.0 (2015-10-14)}{
   \itemize{
     \item Learning method are now implemented.

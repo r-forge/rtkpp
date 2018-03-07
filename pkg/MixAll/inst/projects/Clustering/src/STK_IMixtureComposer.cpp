@@ -35,7 +35,7 @@
 
 #include <cmath>
 
-#ifdef STK_MIXTURE_DEBUG
+#if STK_MIXTURE_DEBUG | STK_MIXTURE_VERBOSE | STK_MIXTURE_VERY_VERBOSE
 #include <Arrays/include/STK_Display.h>
 #endif
 
@@ -291,8 +291,12 @@ void IMixtureComposer::finalizeStep()
 /* Create the parameters of the  mixture model. */
 void IMixtureComposer::initializeMixtureParameters()
 {
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("Entering IMixtureComposer::initializeMixtureParameters\n");
+#endif
   pk_  = 1./nbCluster_;
   tik_ = 1./nbCluster_;
+  nk_  = sumByCol(tik_);
 }
 
 /* generate random tik_ */

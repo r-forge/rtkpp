@@ -44,7 +44,7 @@ NULL
 #' the strategy to run. [\code{\link{clusterStrategy}}]() method by default.
 #' @param criterion character defining the criterion to select the best model.
 #' The best model is the one with the lowest criterion value.
-#' Possible values: "BIC", "AIC", "ICL". Default is "ICL".
+#' Possible values: "BIC", "AIC", "ICL", "ML". Default is "ICL".
 #' @param nbCore integer defining the number of processors to use (default is 1, 0 for all).
 #'
 #' @examples
@@ -80,7 +80,7 @@ NULL
 #'
 clusterDiagGaussian <- function( data, nbCluster=2
                                , models=clusterDiagGaussianNames()
-                               , strategy=clusterFastStrategy()
+                               , strategy=clusterStrategy()
                                , criterion="ICL"
                                , nbCore = 1)
 {
@@ -91,7 +91,7 @@ clusterDiagGaussian <- function( data, nbCluster=2
   if (nbClusterMin < 1) { stop("The number of clusters must be greater or equal to 1")}
 
   # check criterion
-  if(sum(criterion %in% c("BIC","AIC", "ICL")) != 1)
+  if(sum(criterion %in% c("BIC","AIC", "ICL", "ML")) != 1)
   { stop("criterion is not valid. See ?clusterDiagGaussian for the list of valid criterion")}
 
   # check data
@@ -111,8 +111,10 @@ clusterDiagGaussian <- function( data, nbCluster=2
   # Create model
   model = new("ClusterDiagGaussian", data)
   model@strategy = strategy;
+  model@criterionName = criterion
+
   # start estimation of the models
-  resFlag = .Call("clusterMixture", model, nbCluster, models, strategy, criterion, nbCore, PACKAGE="MixAll");
+  resFlag = .Call("clusterMixture", model, nbCluster, models, PACKAGE="MixAll");
   # set names
   if (resFlag != TRUE ) {cat("WARNING: An error occur during the clustering process");}
   colnames(model@component@mean)  <- colnames(model@component@data);

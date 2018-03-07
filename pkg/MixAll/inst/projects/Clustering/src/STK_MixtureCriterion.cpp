@@ -70,6 +70,18 @@ bool ICLMixtureCriterion::run()
   return true;
 }
 
+/* implementation of the virtual method run */
+bool MLMixtureCriterion::run()
+{
+  if (!p_composer_)
+  { msg_error_ = STKERROR_NO_ARG(MLMixtureCriterion::run,p_composer_ is not set);
+    return false;
+  }
+  value_  = -2 * p_composer_->lnLikelihood();
+  return true;
+}
+
+
 } // namespace STK
 
 

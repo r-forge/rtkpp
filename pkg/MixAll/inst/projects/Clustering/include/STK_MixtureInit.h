@@ -52,7 +52,7 @@ class IMixtureAlgo;
  *  run method. An initialization determine in some way values for the parameters
  *  of the mixture and perform a given number of iterations of the SEM algorithm.
  **/
-class IMixtureInit : public IRunnerBase
+class IMixtureInit: public IRunnerBase
 {
   protected:
     /** default constructor */

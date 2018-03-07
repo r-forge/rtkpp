@@ -54,13 +54,20 @@ namespace STK
  *  parameters and imputed missing values from specific mixtures. It allows also
  *  to set the parameters to a specific mixture.
  *
- *  @tparam DataHandler any concrete class from the interface IDataHandler
+ *  The pure virtual method to implement in derived classes are
+ *  @code
+ *  virtual void getParameters(IMixture* p_mixture, ArrayXX& data) const =0;
+ *  virtual void setParameters(IMixture* p_mixture, ArrayXX const& data) const =0;
+    virtual IMixture* createMixtureImpl(String const& modelName, String const& idData, int nbCluster) =0;
+ *  @endcode
+ *
+ *  @tparam DataHandler any concrete class from the interface STK::DataHandlerBase
  */
 template<class DataHandler>
 class IMixtureManager
 {
   public:
-    /** Default constructor, need an instance of a DataHandler.  */
+    /** Default constructor, need an instance of a DataHandler. */
     IMixtureManager(DataHandler const* const p_handler);
     /** destructor */
     virtual ~IMixtureManager();
@@ -78,39 +85,27 @@ class IMixtureManager
      **/
     String getIdModelName( String const& idData) const;
     /** @brief create a mixture and initialize it.
-     *  This method get the idModelName from the DataHandler and then delegate
+     *  This method get the modelName from the DataHandler and then delegate
      *  the concrete creation to derived class using the pure virtual method
      *   @c createMixtureImpl.
      *  @param idData name of the model
      *  @param nbCluster number of cluster of the model
      *  @return 0 if the idData is not find, the result of
-     *  @c createMixture( idModelName, idData, nbCluster) otherwise.
+     *  @c createMixture( modelName, idData, nbCluster) otherwise.
      **/
     IMixture* createMixture(String const& idData, int nbCluster);
-    /** @brief register a data manager to the IMixtureManager.
+    /** @brief register a data bridge to the IMixtureManager.
      *  For each mixture created and registered, a data manager is created
      *  and registered so that it will be deleted when the mixture itself is
      *  deleted.
      *  @param p_data a pointer on the data manager
      **/
     void registerDataBridge(IDataBridge* p_data);
-    /** release a data manager from v_data_.
+    /** release a data bridge from v_data_.
      *  @param idData name of the data set to release
      **/
     void releaseDataBridge(String const& idData);
-    // templated methods
-    /** get the missing values of a data set.
-     *  @param idData Id name of the data set attached to the mixture
-     *  @param data the array to return with the missing values
-     **/
-    template<typename Type>
-    void getMissingValues( String const& idData, std::vector< std::pair< std::pair<int,int>, Type > >& data) const;
-    /** get the wrapper for any kind of data set using its Id
-     *  @param idData Id name of the data set attached to the mixture
-     *  @return a constant reference on the array with the data set
-     **/
-    template<typename Type>
-    typename hidden::DataHandlerTraits<DataHandler, Type>::Data const& getData( String const& idData) const;
+
     // pure virtual methods
     /** get the parameters from an IMixture.
      *  @param p_mixture pointer on the mixture
@@ -123,6 +118,20 @@ class IMixtureManager
      **/
     virtual void setParameters(IMixture* p_mixture, ArrayXX const& data) const =0;
 
+    // template methods
+    /** get the missing values of a data set.
+     *  @param idData Id name of the data set attached to the mixture
+     *  @param data the array to return with the missing values
+     **/
+    template<typename Type>
+    void getMissingValues( String const& idData, std::vector< std::pair< std::pair<int,int>, Type > >& data) const;
+    /** get the wrapper for any kind of data set using its Id
+     *  @param idData Id name of the data set attached to the mixture
+     *  @return a constant reference on the array with the data set
+     **/
+    template<typename Type>
+    typename hidden::DataHandlerTraits<DataHandler, Type>::Data const& getData( String const& idData) const;
+
   protected:
     /** Utility lookup function allowing to find a DataBridge from its idData
      *  @param idData the id name of the mixture we want to get
@@ -132,10 +141,10 @@ class IMixtureManager
 
   private:
     /** create a concrete mixture and initialize it.
-     *  @param idModelName, idData strings with the Id name of the model and of the data
+     *  @param modelName, idData strings with the Id name of the model and of the data
      *  @param nbCluster number of cluster of the model
      **/
-    virtual IMixture* createMixtureImpl(String const& idModelName, String const& idData, int nbCluster) =0;
+    virtual IMixture* createMixtureImpl(String const& modelName, String const& idData, int nbCluster) =0;
     /** A pointer on the concrete instance of the data handler */
     DataHandler const* const p_handler_;
     /** vector of pointers to the data components */
@@ -149,8 +158,8 @@ class IMixtureManager
 template<class DataHandler>
 Clust::Mixture IMixtureManager<DataHandler>::getIdModel( String const& idData) const
 {
-  std::string idModelName;
-  if (!p_handler()->getIdModelName( idData, idModelName))
+  std::string modelName;
+  if (!p_handler()->getIdModelName( idData, modelName))
   {
 #ifdef STK_MIXTURE_VERY_VERBOSE
     stk_cout << _T("In IMixtureManager::getIdModel, fail to get idData = ") << idData << _T("\n");
@@ -159,9 +168,9 @@ Clust::Mixture IMixtureManager<DataHandler>::getIdModel( String const& idData) c
   }
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("In IMixtureManager::getIdModel, success to get idData = ") << idData << _T("\n");
-  stk_cout << _T("In IMixtureManager::getIdModel, idModelName = ") << idModelName << _T("\n");
+  stk_cout << _T("In IMixtureManager::getIdModel, modelName = ") << modelName << _T("\n");
 #endif
-  return Clust::stringToMixture(idModelName);
+  return Clust::stringToMixture(modelName);
 }
 
 /* Default constructor, need an instance of a DataHandler.  */
@@ -184,8 +193,8 @@ IMixtureManager<DataHandler>::~IMixtureManager()
 template<class DataHandler>
 String IMixtureManager<DataHandler>::getIdModelName( String const& idData) const
 {
-  std::string idModelName;
-  if (!p_handler_->getIdModelName( idData, idModelName))
+  std::string modelName;
+  if (!p_handler_->getIdModelName( idData, modelName))
   {
 #ifdef STK_MIXTURE_VERY_VERBOSE
     stk_cout << _T("In IMixtureManager::getIdModelName, fail to get idData = ") << idData << _T("\n");
@@ -193,9 +202,9 @@ String IMixtureManager<DataHandler>::getIdModelName( String const& idData) const
   }
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("In IMixtureManager::getIdModeName, success to get idData = ") << idData << _T("\n");
-  stk_cout << _T("In IMixtureManager::getIdModel, idModelName = ") << idModelName << _T("\n");
+  stk_cout << _T("In IMixtureManager::getIdModel, modelName = ") << modelName << _T("\n");
 #endif
-  return idModelName;
+  return modelName;
 }
 /* create a mixture and initialize it.
  *  @param idData name of the model
@@ -206,9 +215,9 @@ String IMixtureManager<DataHandler>::getIdModelName( String const& idData) const
 template<class DataHandler>
 IMixture* IMixtureManager<DataHandler>::createMixture(String const& idData, int nbCluster)
 {
-  std::string idModelName;
-  if (!p_handler_->getIdModelName( idData, idModelName)) { return 0;};
-  return createMixtureImpl( idModelName, idData, nbCluster);
+  std::string modelName;
+  if (!p_handler_->getIdModelName( idData, modelName)) { return 0;};
+  return createMixtureImpl( modelName, idData, nbCluster);
 }
 /* @brief register a data manager to the IMixtureManager.
  *  For each mixture created and registered, a data manager is created

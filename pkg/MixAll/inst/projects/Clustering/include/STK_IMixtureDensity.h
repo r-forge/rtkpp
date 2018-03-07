@@ -48,21 +48,6 @@
 
 namespace STK
 {
-namespace hidden
-{
-/** Main class for the mixtures traits policy.
- *  The traits struct MixtureTraits must be specialized for any
- *  Mixture deriving from the Interface IMixtureDensity.
- **/
-template <class Mixture> struct MixtureTraits;
-
-} // namespace hidden
-
-/** Parameters class. All statistical models has an unique Id defined
- *  in STK::Clust::Mixture enumeration.
- **/
-template <int Id> struct ModelParameters;
-
 /**@ingroup Clustering
  *  @brief Base class for all Mixture densities.
  *
@@ -77,17 +62,18 @@ template <int Id> struct ModelParameters;
  *  denotes a distribution parameterized by \f$\lambda_k\f$ and \f$\alpha\f$, it
  *  is said that we observe a mixture model.
  *
- *  This interface class is the base class for all distributions part of a mixture
- *  model.
+ *  This interface class is the base class for all distributions part of a
+ *  mixture model.
  *
- *  @sa IMixture, IMixtureDensity, MixtureComposer
+ *  @sa IMixture, IMixtureBridge, MixtureComposer
  *
  * At this level the Parameters struct is created. The call to @e setData
  * trigger the call to @e initializeModel which itself trigger a call to
- * @e initializeModelImpl eventually implemented in the derived class.
+ * @c initializeModelImpl eventually re-implemented in derived class.
+ * Default behavior of @c initializeModelImpl is "do nothing".
  *
- * The pseudo virtual methods (needed by IMixtureBridge) to implement in derived
- * classes are
+ * The pseudo virtual methods (needed by IMixtureBridge) to implement in concrete
+ * derived classes are
  * @code
  *   template<class Weights>
  *   Type impute(int i, int j, Weights const& pk) const;
@@ -98,15 +84,13 @@ template <int Id> struct ModelParameters;
  *   int computeNbFreeParameters() const;
  * @endcode
  *
- * The pseudo virtual methods to implement if needed in derived classes are
+ * The pseudo virtual methods to re-implement if needed in derived classes are
  * @code
- *   // default implementation (do nothing) provided to all these methods
+ *   // default implementation "do nothing" provided to all these methods
  *   void initializeModelImpl();
  *   bool initializeStepImpl(); // return true by default
  *   void finalizeStepImpl();
  * @endcode
- *
- * @sa IMixtureDensityBase, IRecursiveTemplate
  **/
 template<class Derived>
 class IMixtureDensity: public IRecursiveTemplate<Derived>
@@ -131,22 +115,23 @@ class IMixtureDensity: public IRecursiveTemplate<Derived>
 
   public:
     /** destructor */
-    inline ~IMixtureDensity() {}
+    ~IMixtureDensity() {}
     /** create pattern.  */
-    inline IMixtureDensity* create() const { return new Derived(this->nbCluster());}
+    IMixtureDensity* create() const { return new Derived(this->nbCluster());}
 
     /** @return the number of cluster */
     inline int nbCluster() const { return nbCluster_;}
     /** @return the total available observations */
     inline int nbSample() const { return nbSample_;}
+    /** @return the total available variables */
+    inline int nbVariable() const { return nbVariable_;}
     /** @return the Log of the total available observations */
     inline Real lnNbSample() const
     { return (nbSample_ <= 0) ? -Arithmetic<Real>::infinity() : std::log((Real)nbSample_);}
-    /** @return the total available variables */
-    inline int nbVariable() const { return nbVariable_;}
     /** @return a pointer on the current data set */
     inline Array const* p_data() const { return p_dataij_;}
-
+    /** @return a constant reference on the current parameter struct */
+    inline Parameters const& param() const {return param_;}
     /** @brief Set the data set.
      *  Setting a (new) data set will trigger the initializeModel() method.
      *  @param data the data set to set
@@ -154,8 +139,8 @@ class IMixtureDensity: public IRecursiveTemplate<Derived>
     void setData(Array const& data);
     /** @brief This function will be called at the beginning of the estimation
      *  process once the model is created and data is set.
-     *  @note a stk++ mixture create and initialize all the containers when the data
-     *  is set. Thus the default behavior is @c return true.
+     *  @note a stk++ mixture create and initialize all the containers when the
+     *  data is set. Thus the default behavior is @c return true.
      */
     inline bool initializeStep() { return this->asDerived().initializeStepImpl();}
     /** set the parameters obtained with the intermediate results and release
@@ -168,14 +153,6 @@ class IMixtureDensity: public IRecursiveTemplate<Derived>
     /** @brief This function will be called once the model is estimated.
      *  perform specific model finalization stuff */
     inline void finalizeStep() { this->asDerived().finalizeStepImpl();}
-
-    // default implementation of the pseudo-virtual methods
-    /** default implementation of initializeModelImpl (do nothing) */
-    inline void initializeModelImpl() {}
-    /** default implementation of initializeStepImpl (return true) */
-    inline bool initializeStepImpl() { return true;}
-    /** default implementation of finalizeStepImpl (do nothing) */
-    inline void finalizeStepImpl() {}
 
     /** @return a simulated value for the jth variable of the ith sample
      *  @param i,j indexes of the data to impute
@@ -198,6 +175,14 @@ class IMixtureDensity: public IRecursiveTemplate<Derived>
      **/
     void initializeModel();
 
+    // default implementation of the pseudo-virtual methods
+    /** default implementation of initializeModelImpl (do nothing) */
+    inline void initializeModelImpl() {/* do nothing*/}
+    /** default implementation of initializeStepImpl (do nothing and return true) */
+    inline bool initializeStepImpl() { return true;/* do nothing*/}
+    /** default implementation of finalizeStepImpl (do nothing) */
+    inline void finalizeStepImpl() {/* do nothing*/}
+
     /** Set the number of sample of the model
      *  @param nbSample number of sample of the model
      * */
@@ -207,7 +192,10 @@ class IMixtureDensity: public IRecursiveTemplate<Derived>
      * */
     inline void setNbVariable( int nbVariable) { nbVariable_ = nbVariable;}
 
-    /** parameters of the derived mixture model */
+    /** parameters of the derived mixture model. Should be an instance
+     *  of the STK::ModelParameters struct.
+     *  @sa STK::ModelParameters
+     **/
     Parameters param_;
 
   private:
@@ -227,11 +215,11 @@ class IMixtureDensity: public IRecursiveTemplate<Derived>
  **/
 template<class Derived>
 IMixtureDensity<Derived>::IMixtureDensity( int nbCluster)
-                                                : param_(nbCluster)
-                                                , nbCluster_(nbCluster)
-                                                , nbSample_(0)
-                                                , nbVariable_(0)
-                                                , p_dataij_(0)
+                                         : param_(nbCluster)
+                                         , nbCluster_(nbCluster)
+                                         , nbSample_(0)
+                                         , nbVariable_(0)
+                                         , p_dataij_(0)
 {}
 /* copy constructor.
  *  - The Parameter class is copied using the copy constructor.
@@ -241,11 +229,11 @@ IMixtureDensity<Derived>::IMixtureDensity( int nbCluster)
  **/
 template<class Derived>
 IMixtureDensity<Derived>::IMixtureDensity( IMixtureDensity const& model)
-             : param_(model.param_)
-             , nbCluster_(model.nbCluster_)
-             , nbSample_(model.nbSample_)
-             , nbVariable_(model.nbVariable_)
-             , p_dataij_(model.p_dataij_)
+                                         : param_(model.param_)
+                                         , nbCluster_(model.nbCluster_)
+                                         , nbSample_(model.nbSample_)
+                                         , nbVariable_(model.nbVariable_)
+                                         , p_dataij_(model.p_dataij_)
 {}
 
 /* @brief Set the data set.

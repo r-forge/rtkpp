@@ -145,7 +145,7 @@ void MixtureSemiLearner::setLabels( ExprBase<RowVector> const& zi)
 
 /** @brief specialization of the composer for the fixed proportion case.
  **/
-class MixtureSemiLearnerFixedProp : public MixtureSemiLearner
+class MixtureSemiLearnerFixedProp: public MixtureSemiLearner
 {
   public:
     /** Constructor.

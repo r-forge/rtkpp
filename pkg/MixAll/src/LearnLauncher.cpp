@@ -148,9 +148,9 @@ Real LearnLauncher::selectBestSingleModel()
     // add Data set with the new model name, m_data is just a pointer on a SEXP
     // structure thus there is no difficulties in doing so
     if ((classModel == Clust::Categorical_)||(classModel == Clust::Poisson_))
-    { createDiscreteDataSets(idData, idModel, s4_component, model);}
+    { createDiscreteDataSets(idData, s4_component, model);}
     else
-    { createContinuousDataSets(idData, idModel, s4_component, model);}
+    { createContinuousDataSets(idData, s4_component, model);}
   }
 
   // start computation
@@ -235,9 +235,17 @@ Real LearnLauncher::selectBestMixedModel()
       // add Data set with the new model name, m_data is just a pointer on a SEXP
       // structure thus there is no difficulties in doing so
       if ((classModel == Clust::Categorical_)||(classModel == Clust::Poisson_))
-      { createDiscreteDataSets(idData, idModel, s4_component, model);}
+      {
+        NumericMatrix m_data = s4_component.slot("data");
+        createDataSets(m_data, idData, model);
+//        createDiscreteDataSets(idData, s4_component, model);
+      }
       else
-      { createContinuousDataSets(idData, idModel, s4_component, model);}
+      {
+        IntegerMatrix m_data = s4_component.slot("data");
+        createDataSets(m_data, idData, model);
+//        createContinuousDataSets(idData, s4_component, model);
+      }
     }
     // create learner
     p_current = new MixtureLearner(nbSample, K);

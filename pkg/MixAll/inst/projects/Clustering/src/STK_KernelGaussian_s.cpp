@@ -64,31 +64,31 @@ Real KernelGaussian_s::lnComponentProbability(int i, int k) const
 }
 
 /* Initialize randomly the parameters of the Gaussian mixture. */
-void KernelGaussian_s::randomInit( CArrayXX const*  p_tik, CPointX const* p_nk)
+void KernelGaussian_s::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)
 {
 #if STK_Kernel_DEBUG | STK_MIXTURE_VERBOSE
-  stk_cout << _T("Entering KernelGaussian_s::randomInit( CArrayXX const*  p_tik, CPointX const* p_nk)\n");
+  stk_cout << _T("Entering KernelGaussian_s::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)\n");
 #endif
   // compute the standard deviation
-  compute_dik(p_tik, p_nk);
+  compute_dik(p_tik, p_tk);
   param_.sigma2_ = dik_.prod(*p_tik).sum()/(this->nbSample() * param_.dim_.sum())
                  + std::abs(Law::generator.randGauss(0, 0.05));
 #ifdef STK_MIXTURE_VERBOSE
-  stk_cout << _T("KernelGaussian_s::randomInit( CArrayXX const*  p_tik, CPointX const* p_nk)  done\n");
+  stk_cout << _T("KernelGaussian_s::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)  done\n");
   stk_cout << param_.sigma2_ << "\n";
 #endif
 }
 
 /* Compute the weighted means and the weighted standard deviations. */
-bool KernelGaussian_s::run( CArrayXX const*  p_tik, CPointX const* p_nk)
+bool KernelGaussian_s::run( CArrayXX const*  p_tik, CPointX const* p_tk)
 {
 #if STK_Kernel_DEBUG | STK_MIXTURE_VERBOSE
-  stk_cout << _T("Entering KernelGaussian_s::run( CArrayXX const*  p_tik, CPointX const* p_nk)\n");
+  stk_cout << _T("Entering KernelGaussian_s::run( CArrayXX const*  p_tik, CPointX const* p_tk)\n");
 #endif
-  compute_dik(p_tik, p_nk);
+  compute_dik(p_tik, p_tk);
   param_.sigma2_ =  dik_.prod( *p_tik ).sum()/(this->nbSample() * param_.dim_.sum());
 #ifdef STK_MIXTURE_VERBOSE
-  stk_cout << _T("KernelGaussian_s::run( CArrayXX const*  p_tik, CPointX const* p_nk) done\n");
+  stk_cout << _T("KernelGaussian_s::run( CArrayXX const*  p_tik, CPointX const* p_tk) done\n");
   stk_cout << param_.sigma2_ << "\n";
 #endif
   if (param_.sigma2_ <= 0.)  return false;

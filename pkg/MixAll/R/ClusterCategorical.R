@@ -233,8 +233,21 @@ setMethod(
     signature=c("ClusterCategoricalComponent"),
     function(x,k,...)
     {
-      cat("* probabilities = \n");
-      print(format(x@plkj[,k,]), quote=FALSE);
+      if(missing(k))
+      {
+        callNextMethod()
+        cat("****************************************\n")
+        cat("* nbModalities   = ", format(x@nbModalities), "\n")
+        cat("****************************************\n")
+        cat("* levels = \n");
+        print(format(x@levels));
+        cat("****************************************\n")
+      }
+      else
+      { 
+        cat("* probabilities = \n");
+        print(format(x@plkj[,k,]), quote=FALSE);
+      }
     }
 )
 
@@ -245,8 +258,13 @@ setMethod(
     signature=c("ClusterCategoricalComponent"),
     function(object)
     {
-      cat("* probabilities = \n");
-      print(format(object@plkj), quote=FALSE);
+      callNextMethod()
+      cat("****************************************\n")
+      cat("* nbModalities   = ", format(object@nbModalities), "\n")
+      cat("****************************************\n")
+      cat("* levels = \n");
+      print(format(object@levels));
+      cat("****************************************\n")
     }
 )
 
@@ -257,8 +275,13 @@ setMethod(
     signature=c("ClusterCategoricalComponent"),
     function(object)
     {
-      cat("* levels of the variables = \n");
+      callNextMethod()
+      cat("****************************************\n")
+      cat("* nbModalities   = ", format(object@nbModalities), "\n")
+      cat("****************************************\n")
+      cat("* levels = \n");
       print(format(object@levels));
+      cat("****************************************\n")
     }
 )
 
@@ -344,16 +367,14 @@ setMethod(
   function(x,...)
   {
     cat("****************************************\n")
+    print(x@component)
     callNextMethod();
     cat("****************************************\n")
-    cat("* levels = \n");
-    cat("****************************************\n")
-    print(format(x@component@levels));
     for(k in 1:length(x@pk))
     {
       cat("*** Cluster: ",k,"\n")
-      cat("* Proportion = ", format(x@pk[k]), "\n");
-      print(x@component,k);
+      cat("* Proportion = ", format(x@pk[k]), "\n")
+      print(x@component,k)
       cat("* probabilities = \n"); print(format(x@component@plkj[,k,]), quote=FALSE)
       cat("****************************************\n")
     }
@@ -368,10 +389,9 @@ setMethod(
   function(object)
   {
     cat("****************************************\n")
+#    cat("* model name     =",object@component@modelName,"\n")
+    show(object@component)
     callNextMethod();
-    cat("****************************************\n")
-    cat("* levels of the variables = \n");
-    cat("****************************************\n")
     for(k in 1:length(object@pk))
     {
       cat("*** Cluster: ",k,"\n")
@@ -389,12 +409,10 @@ setMethod(
   signature=c("ClusterCategorical"),
   function(object, ...)
   {
-    cat("**************************************************************\n")
+    cat("****************************************\n")
+    summary(object@component)
     callNextMethod()
-    cat("**************************************************************\n")
-    summary(object@component);
-    cat("* nbModalities   = ", format(object@component@nbModalities), "\n")
-    cat("**************************************************************\n")
+    cat("****************************************\n")
   }
 )
 

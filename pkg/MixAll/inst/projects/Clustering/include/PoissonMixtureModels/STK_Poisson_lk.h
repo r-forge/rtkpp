@@ -87,16 +87,16 @@ class Poisson_lk: public PoissonBase<Poisson_lk<Array> >
     /** @return the value of lambda of the kth cluster and jth variable */
     inline Real lambda(int k, int j) const { return param_.lambda_[k];}
     /** Initialize randomly the parameters of the Poisson mixture. */
-    void randomInit( CArrayXX const*  p_tik, CPointX const* p_nk) ;
+    void randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) ;
     /** Compute the weighted probabilities. */
-    bool run( CArrayXX const*  p_tik, CPointX const* p_nk) ;
+    bool run( CArrayXX const*  p_tik, CPointX const* p_tk) ;
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const { return this->nbCluster();}
 };
 
 /* Initialize randomly the parameters of the Poisson mixture. */
 template<class Array>
-void Poisson_lk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_nk) 
+void Poisson_lk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)
 {
   Real m = p_data()->template cast<Real>().mean();
   for (int k= p_tik->beginCols(); k < p_tik->endCols(); ++k)
@@ -106,12 +106,17 @@ void Poisson_lk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_nk)
 
 /* Compute the modalities probabilities */
 template<class Array>
-bool Poisson_lk<Array>::run( CArrayXX const*  p_tik, CPointX const* p_nk) 
+bool Poisson_lk<Array>::run( CArrayXX const*  p_tik, CPointX const* p_tk)
 {
   for (int k= p_tik->beginCols(); k < p_tik->endCols(); ++k)
   {
-    param_.lambda_[k]= (p_data()->transpose() * p_tik->col(k)).sum()
-                      /(nbVariable()*p_nk->elt(k));
+    param_.lambda_[k]= 0.;
+    for (int j=p_data()->beginCols(); j< p_data()->endCols(); ++j)
+    {
+      for (int i=p_tik->beginRows(); i < p_tik->endRows(); ++i)
+      { param_.lambda_[k] += p_data()->elt(i,j) * p_tik->elt(i,k);}
+    }
+    param_.lambda_[k] /= nbVariable()*p_tk->elt(k);
   }
   return true;
 }

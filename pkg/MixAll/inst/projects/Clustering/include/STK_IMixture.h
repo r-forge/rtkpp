@@ -191,7 +191,7 @@ class IMixture
     /** This function can be used in derived classes to get proportions from the framework.
      *  @return Pointer to proportions.
      */
-    CPointX const* p_nk() const;
+    CPointX const* p_tk() const;
     /** This function can be used in derived classes to get posterior probabilities from the framework.
      *  @return Pointer to tik.
      */

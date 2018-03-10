@@ -105,6 +105,11 @@ Real ClusterLauncher::selectBestSingleModel()
   IMixtureComposer*  p_current   =0;
   IMixtureCriterion* p_criterion =0;
 
+  Rcpp::IntegerMatrix m_data_int=s4_component.slot("data");
+  Rcpp::NumericMatrix m_data_num=s4_component.slot("data");
+
+  bool freeProp;
+
   // loop over all the models
   for (int l=0; l <v_models_.size(); ++l)
   {
@@ -113,15 +118,22 @@ Real ClusterLauncher::selectBestSingleModel()
     std::string idModel(Rcpp::as<std::string>(v_models_[l]));
     // transform R model names to STK++ model names
     // check have been done on the R side so.... Let's go
-    bool freeProp;
     Clust::Mixture model           = Clust::stringToMixture(idModel, freeProp);
     Clust::MixtureClass classModel = Clust::mixtureToMixtureClass(model);
-    // add Data set with the new model name, m_data is just a pointer on a SEXP
+    // add Data set with the new model name, m_data_* is just a pointer on a SEXP
     // structure thus there is no difficulties in doing so
     if ((classModel == Clust::Categorical_)||(classModel == Clust::Poisson_))
-    { createDiscreteDataSets(idData, idModel, s4_component, model);}
+    {
+      createDataSets(m_data_int, idData, model);
+    }
     else
-    { createContinuousDataSets(idData, idModel, s4_component, model);}
+    {
+      createDataSets(m_data_num, idData, model);
+    }
+//    if ((classModel == Clust::Categorical_)||(classModel == Clust::Poisson_))
+//    { createDiscreteDataSets(idData, s4_component, model);}
+//    else
+//    { createContinuousDataSets(idData, s4_component, model);}
   }
   // start computation
   try
@@ -192,8 +204,8 @@ Real ClusterLauncher::selectBestMixedModel()
 {
   // list of the component
   Rcpp::List s4_list =s4_model_.slot("ldata");
-  Real criter =s4_model_.slot("criterion");
-  int nbSample =s4_model_.slot("nbSample");
+  Real criter        =s4_model_.slot("criterion");
+  int nbSample       =s4_model_.slot("nbSample");
   // main pointer
   IMixtureComposer* p_current =0;
   IMixtureCriterion* p_criterion =0;
@@ -203,7 +215,7 @@ Real ClusterLauncher::selectBestMixedModel()
     ClusterFacade facade(p_current);
     facade.createFullStrategy(s4_strategy_);
     bool sameProp = true;
-    // loop over the list of component and fil handler_
+    // loop over the list of component and fill handler_
     for (int l=0; l <s4_list.size(); ++l)
     {
       // component
@@ -216,12 +228,17 @@ Real ClusterLauncher::selectBestMixedModel()
       Clust::MixtureClass classModel = Clust::mixtureToMixtureClass(model);
       // if one of the model is free proportion, then we use free proportion
       sameProp &= (!freeMixture);
-      // add Data set with the new model name, m_data is just a pointer on a SEXP
-      // structure thus there is no difficulties in doing so
+      // add Data set with the new model name
       if ((classModel == Clust::Categorical_)||(classModel == Clust::Poisson_))
-      { createDiscreteDataSets(idData, idModel, s4_component, model);}
+      {
+        Rcpp::IntegerMatrix m_data = s4_component.slot("data");
+        createDataSets(m_data, idData, model);
+      }
       else
-      { createContinuousDataSets(idData, idModel, s4_component, model);}
+      {
+        Rcpp::NumericMatrix m_data = s4_component.slot("data");
+        createDataSets(m_data, idData, model);
+      }
     }
     // create criterion
     if (criterion_ == "BIC") { p_criterion = new BICMixtureCriterion();}

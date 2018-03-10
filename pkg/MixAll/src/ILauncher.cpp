@@ -78,24 +78,21 @@ ILauncher::~ILauncher()
 
 /* create the managers for models with real data */
 void ILauncher::createContinuousDataSets( std::string const& idData
-                                        , std::string const& idModel
                                         , Rcpp::S4 s4_component
                                         , Clust::Mixture model
                                         )
 {
   NumericMatrix m_data = s4_component.slot("data");
-  RMatrix<double> data(m_data);
   handler_.addData(m_data, idData, Clust::mixtureToString(model));
 }
+
 /* create the managers for models with real data */
 void ILauncher::createDiscreteDataSets( std::string const& idData
-                                      , std::string const& idModel
                                       , Rcpp::S4 s4_component
                                       , Clust::Mixture model
                                       )
 {
   IntegerMatrix m_data = s4_component.slot("data");
-  RMatrix<int> data(m_data);
   handler_.addData(m_data, idData, Clust::mixtureToString(model));
 }
 

@@ -222,8 +222,15 @@ setMethod(
   signature=c("ClusterGammaComponent"),
   function(x,k,...)
   {
-    cat("* Shapes     = ", format(x@shape[k,]), "\n")
-    cat("* Scales     = ", format(x@scale[k,]), "\n")
+    if(missing(k))
+    {
+      callNextMethod()
+    }
+    else
+    {
+      cat("* Shapes     = ", format(x@shape[k,]), "\n")
+      cat("* Scales     = ", format(x@scale[k,]), "\n")
+    }
   }
 )
 
@@ -234,8 +241,7 @@ setMethod(
   signature=c("ClusterGammaComponent"),
   function(object)
   {
-    cat("* Shapes     = ", format(object@shape), "\n")
-    cat("* Scales     = ", format(object@scale), "\n")
+    callNextMethod()
   }
 )
 
@@ -320,6 +326,7 @@ setMethod(
   signature=c("ClusterGamma"),
   function(x,...){
     cat("****************************************\n")
+    print(x@component)
     callNextMethod();
     cat("****************************************\n")
     for(k in 1:length(x@pk))
@@ -340,8 +347,8 @@ setMethod(
   function(object)
   {
     cat("****************************************\n")
+    show(object@component)
     callNextMethod();
-    show(object@component);
     cat("****************************************\n")
     for(k in 1:length(object@pk))
     {
@@ -361,10 +368,10 @@ setMethod(
   signature=c("ClusterGamma"),
   function(object, ...)
   {
-    cat("**************************************************************\n")
+    cat("****************************************\n")
+    cat("* model name     =",object@component@modelName,"\n")
     callNextMethod()
-    summary(object@component);
-    cat("**************************************************************\n")
+    cat("****************************************\n")
   }
 )
 

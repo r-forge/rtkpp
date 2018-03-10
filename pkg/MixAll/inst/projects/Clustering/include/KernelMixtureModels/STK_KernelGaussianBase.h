@@ -147,7 +147,7 @@ class KernelGaussianBase: public IMixtureDensity<Derived>
      *  \f[ d_{ik} = \|\phi(x_i)-m_k\| \f]
      *  using the kernel trick.
      **/
-    void compute_dik(CArrayXX const* p_tik, CPointX const* p_nk);
+    void compute_dik(CArrayXX const* p_tik, CPointX const* p_tk);
 
   private:
     /** @brief Set the data set.
@@ -162,7 +162,7 @@ class KernelGaussianBase: public IMixtureDensity<Derived>
  *  using the kernel trick.
  **/
 template<class Derived>
-void KernelGaussianBase<Derived>::compute_dik(CArrayXX const* p_tik, CPointX const* p_nk)
+void KernelGaussianBase<Derived>::compute_dik(CArrayXX const* p_tik, CPointX const* p_tk)
 {
 #ifdef STK_KernelS_DEBUG
   stk_cout << _T("Entering KernelGaussianBase::compute_dik\n");
@@ -177,10 +177,10 @@ void KernelGaussianBase<Derived>::compute_dik(CArrayXX const* p_tik, CPointX con
     {
       wi[i] = 0.;
       for (int j= wi.begin(); j < wi.end(); ++j)
-      { wi[i] += p_kernel_->comp(i, j) * p_tik->elt(j,k)/p_nk->elt(k);}
+      { wi[i] += p_kernel_->comp(i, j) * p_tik->elt(j,k)/p_tk->elt(k);}
     }
     // compute dik_ = k(i,i) - 2 * wik + \sum_{i=1}^n t_{ik} w_{ik}/t_{.k}
-    Real scal =p_tik->col(k).dot(wi)/p_nk->elt(k);
+    Real scal =p_tik->col(k).dot(wi)/p_tk->elt(k);
     for (int i= wi.begin(); i<wi.end(); ++i)
     { dik_(i,k) = p_kernel_->diag(i) - 2. * wi[i] + scal  ;}
   }

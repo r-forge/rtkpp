@@ -75,7 +75,7 @@ CPointX const* IMixture::p_pk() const { return &(p_composer_->pk());}
 /* This function can be used in derived classes to get proportions from the framework.
  * @return Pointer to proportions.
  */
-CPointX const* IMixture::p_nk() const { return &(p_composer_->nk());}
+CPointX const* IMixture::p_tk() const { return &(p_composer_->tk());}
 /* This function can be used in derived classes to get proportions from the framework.
  * @return Pointer to proportions.
  */

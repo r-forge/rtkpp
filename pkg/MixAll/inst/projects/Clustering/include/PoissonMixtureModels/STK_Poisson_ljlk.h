@@ -85,9 +85,9 @@ class Poisson_ljlk: public PoissonBase<Poisson_ljlk<Array> >
     /** destructor */
     ~Poisson_ljlk() {}
     /** Initialize randomly the parameters of the Poisson mixture. */
-    void randomInit( CArrayXX const*  p_tik, CPointX const* p_nk) ;
+    void randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) ;
     /** Compute the weighted probabilities. */
-    bool run( CArrayXX const*  p_tik, CPointX const* p_nk) ;
+    bool run( CArrayXX const*  p_tik, CPointX const* p_tk) ;
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()+this->nbVariable();}
@@ -95,7 +95,7 @@ class Poisson_ljlk: public PoissonBase<Poisson_ljlk<Array> >
 
 /* Initialize randomly the parameters of the Poisson mixture. */
 template<class Array>
-void Poisson_ljlk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_nk) 
+void Poisson_ljlk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) 
 {
   for (int j=p_data()->beginCols(); j< p_data()->endCols(); ++j)
   {
@@ -110,11 +110,11 @@ void Poisson_ljlk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_n
 
 /* Compute the lambdas */
 template<class Array>
-bool Poisson_ljlk<Array>::run( CArrayXX const*  p_tik, CPointX const* p_nk) 
+bool Poisson_ljlk<Array>::run( CArrayXX const*  p_tik, CPointX const* p_tk) 
 {
   param_.lambdaj_ =   (Stat::sumByRow(*p_tik).transpose() * (*p_data()))
                      /(Stat::sumByRow(*p_tik) * Stat::sumByRow(*p_data())).sum();
-  param_.lambdak_ = Stat::sumByRow(*p_data()).transpose() * (*p_tik)/(*p_nk);
+  param_.lambdak_ = Stat::sumByRow(*p_data()).transpose() * (*p_tik)/(*p_tk);
   return true;
 }
 

@@ -87,8 +87,8 @@ int MixtureSemiLearner::cStep()
   for (it=unknownLabels_.begin(); it != unknownLabels_.end(); it++)
   { MixtureComposer::cStep(*it);}
   // count the number of individuals in each class
-  nk_= Stat::sum(tik_);
-  return nk_.minElt();
+  tk_= Stat::sum(tik_);
+  return tk_.minElt();
 }
 
 /* simulate zi  */
@@ -107,7 +107,7 @@ Real MixtureSemiLearner::eStep()
 #ifdef STK_MIXTURE_DEBUG
   stk_cout << _T("Entering MixtureSemiLearner::eStep()\n");
 #endif
-  Real sum = 0.; nk_ =0.;
+  Real sum = 0.; tk_ =0.;
 //#ifdef _OPENMP
 //#pragma omp parallel for reduction (+:sum)
 //#endif
@@ -119,12 +119,12 @@ Real MixtureSemiLearner::eStep()
   // update log-likelihood
   setLnLikelihood(sum);
   // compute proportions
-  nk_ = Stat::sumByCol(tik_);
+  tk_ = Stat::sumByCol(tik_);
 #ifdef STK_MIXTURE_DEBUG
   stk_cout << _T("MixtureSemiLearner::eStep() done\n");
   stk_cout << _T("lnLikelihood =") << sum << _T("\n");
 #endif
-  return nk_.minElt();
+  return tk_.minElt();
 }
 
 /* Compute Zi using the Map estimate, default implementation. */
@@ -149,7 +149,7 @@ void MixtureSemiLearner::initializeMixtureParameters()
 /* generate random tik_ */
 int MixtureSemiLearner::randomTik()
 {
-  nk_ = 0.;
+  tk_ = 0.;
   std::vector<int>::const_iterator it;
   for (it = unknownLabels_.begin(); it != unknownLabels_.end(); ++it)
   {
@@ -158,9 +158,9 @@ int MixtureSemiLearner::randomTik()
     tikRowi.randUnif();
     tikRowi = tikRowi * pk_;
     tikRowi /= tikRowi.sum();
-    nk_ += tikRowi;
+    tk_ += tikRowi;
   }
-  return nk_.minElt();
+  return tk_.minElt();
 }
 
 /* generate random zi */

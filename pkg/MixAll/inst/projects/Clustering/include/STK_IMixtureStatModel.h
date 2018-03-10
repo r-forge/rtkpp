@@ -136,7 +136,7 @@ class IMixtureStatModel: public IStatModelBase
     /** @return the tik probabilities */
     inline CArrayXX const& tik() const { return tik_;};
     /** @return the proportions of individuals */
-    inline CPointX const& nk() const { return nk_;};
+    inline CPointX const& tk() const { return tk_;};
     /** @return the zi class label */
     inline CVectorXi const& zi() const { return zi_;};
     /** @return a constant reference on the vector of mixture */
@@ -288,7 +288,7 @@ class IMixtureStatModel: public IStatModelBase
     /** The tik probabilities */
     CArrayXX tik_;
     /** The sum of the columns of tik_ */
-    CPointX nk_;
+    CPointX tk_;
     /** The zi class label */
     CVectorXi zi_;
 

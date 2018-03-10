@@ -95,9 +95,9 @@ class KernelGaussian_sk: public KernelGaussianBase<KernelGaussian_sk >
      **/
     Real lnComponentProbability(int i, int k) const;
     /** Initialize randomly the variances of the Gaussian kernel mixture. */
-    void randomInit( CArrayXX const*  p_tik, CPointX const* p_nk);
+    void randomInit( CArrayXX const*  p_tik, CPointX const* p_tk);
     /** update the variances. */
-    bool run( CArrayXX const*  p_tik, CPointX const* p_nk) ;
+    bool run( CArrayXX const*  p_tik, CPointX const* p_tk) ;
 };
 
 } // namespace STK

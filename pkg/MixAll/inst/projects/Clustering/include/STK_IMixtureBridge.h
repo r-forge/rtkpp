@@ -145,11 +145,11 @@ class IMixtureBridge: public IMixture, public IRecursiveTemplate<Derived>
      *  parameters.
      **/
     inline virtual void paramUpdateStep()
-    { if (!mixture_.run( p_tik(), p_nk())) throw Clust::mStepFail_;}
+    { if (!mixture_.run( p_tik(), p_tk())) throw Clust::mStepFail_;}
     /** @brief This function should be used in order to initialize randomly the
      *  parameters of the mixture.
      **/
-    inline virtual void randomInit() { mixture_.randomInit( p_tik(), p_nk());};
+    inline virtual void randomInit() { mixture_.randomInit( p_tik(), p_tk());};
     /** This function must return the number of free parameters.
      *  @return Number of free parameters
      **/

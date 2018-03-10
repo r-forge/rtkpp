@@ -246,11 +246,11 @@ setMethod(
     {
       for (l in 1:nbData)
       {
+        cat("* model name = ", x@ldata[[l]]@modelName, "\n");
         for(k in 1:length(x@pk))
         {
           cat("*** Cluster: ",k,"\n")
           cat("* Proportion = ", format(x@pk[k]), "\n")
-          cat("* model name = ", x@ldata[[l]]@modelName, "\n");
           print(x@ldata[[l]],k);
         }
       }
@@ -287,12 +287,11 @@ setMethod(
       {
         for (l in 1:nbData)
         {
+          cat("* model name = ", object@ldata[[l]]@modelName, "\n");
           for(k in 1:length(object@pk))
           {
             cat("*** Cluster: ",k,"\n")
             cat("* Proportion = ", format(object@pk[k]),"\n")
-            cat("*\n")
-            cat("* model name = ", object@ldata[[l]]@modelName, "\n");
             print(object@ldata[[l]], k);
           }
         }
@@ -309,6 +308,14 @@ setMethod(
     function(object, ...)
     {
       cat("**************************************************************\n")
+      nbData <- length(object@ldata)
+      if(nbData>0)
+      {
+        for (l in 1:nbData)
+        {
+          cat("* model name = ", object@ldata[[l]]@modelName, "\n")
+        }
+      }
       callNextMethod()
       cat("**************************************************************\n")
     }

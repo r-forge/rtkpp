@@ -91,16 +91,16 @@ class Gamma_a_bjk: public GammaBase< Gamma_a_bjk<Array> >
      *  and the scale will be selected randomly using an exponential of parameter
      *  variance/mean.
      */
-    void randomInit( CArrayXX const*  p_tik, CPointX const* p_nk) ;
-    /** Compute the run( CArrayXX const*  p_tik, CPointX const* p_nk) . */
-    bool run( CArrayXX const*  p_tik, CPointX const* p_nk) ;
+    void randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) ;
+    /** Compute the run( CArrayXX const*  p_tik, CPointX const* p_tk) . */
+    bool run( CArrayXX const*  p_tik, CPointX const* p_tk) ;
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable() + 1;}
 };
 
 template<class Array>
-void Gamma_a_bjk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_nk) 
+void Gamma_a_bjk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) 
 {
   // compute moments
   this->moments(p_tik);
@@ -112,18 +112,18 @@ void Gamma_a_bjk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_nk
     {
       Real mean = meanjk(j,k), variance = variancejk(j,k);
       param_.scale_[k][j] = Law::Exponential::rand((variance/mean));
-      value += p_nk->elt(k) * (mean*mean/variance);
+      value += p_tk->elt(k) * (mean*mean/variance);
     }
   }
   param_.shape_ = Law::Exponential::rand(value/(this->nbSample()*this->nbVariable()));
 #ifdef STK_MIXTURE_VERY_VERBOSE
-  stk_cout << _T(" Gamma_a_bjk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_nk)  done\n");
+  stk_cout << _T(" Gamma_a_bjk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)  done\n");
 #endif
 }
 
 /* Compute the weighted mean and the common variance. */
 template<class Array>
-bool Gamma_a_bjk<Array>::run( CArrayXX const* p_tik, CPointX const* p_nk)
+bool Gamma_a_bjk<Array>::run( CArrayXX const* p_tik, CPointX const* p_tk)
 {
   if (!this->moments(p_tik)) { return false;}
   // estimate a
@@ -133,8 +133,8 @@ bool Gamma_a_bjk<Array>::run( CArrayXX const* p_tik, CPointX const* p_nk)
     for (int k= p_tik->beginCols(); k < p_tik->endCols(); ++k)
     {
       Real mean = meanjk(j,k);
-      y  += p_nk->elt(k) * (param_.meanLog_[k][j]-std::log(mean));
-      x0 += p_nk->elt(k) * (mean*mean/variancejk(j,k));
+      y  += p_tk->elt(k) * (param_.meanLog_[k][j]-std::log(mean));
+      x0 += p_tk->elt(k) * (mean*mean/variancejk(j,k));
     }
   }
   y  /= (this->nbSample()*this->nbVariable());
@@ -148,7 +148,7 @@ bool Gamma_a_bjk<Array>::run( CArrayXX const* p_tik, CPointX const* p_nk)
   if (!Arithmetic<Real>::isFinite(a))
   {
 #ifdef STK_MIXTURE_DEBUG
-    stk_cout << "ML estimation failed in Gamma_a_bjk::run( CArrayXX const*  p_tik, CPointX const* p_nk) \n";
+    stk_cout << "ML estimation failed in Gamma_a_bjk::run( CArrayXX const*  p_tik, CPointX const* p_tk) \n";
     stk_cout << "x0 =" << x0 << _T("\n";);
     stk_cout << "f(x0) =" << f(x0) << _T("\n";);
     stk_cout << "x1 =" << x1 << _T("\n";);

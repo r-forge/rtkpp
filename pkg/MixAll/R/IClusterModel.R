@@ -25,6 +25,103 @@
 #' @include ClusterStrategy.R
 NULL
 
+#-----------------------------------------------------------------------
+#' Definition of the [\code{\linkS4class{IClusterComponent}}] class
+#'
+#' This class defines a component of a mixture Model
+#'
+#' @slot data  Matrix with the data set
+#' @slot missing  Matrix with the indexes of the missing values
+#' @slot modelName model name associated with the data set
+#'
+#' @examples
+#' getSlots("IClusterComponent")
+#'
+#' @author Serge Iovleff
+#'
+#' @name IClusterComponent
+#' @rdname IClusterComponent-class
+#' @aliases IClusterComponent-class
+#' @exportClass IClusterComponent
+#'
+setClass(
+  Class="IClusterComponent",
+  representation( data      = "matrix"
+    , missing   = "matrix"
+    , modelName = "character"
+    , "VIRTUAL"),
+  validity=function(object)
+  {
+# called too soon when Component is part of an other S4 class
+#    if (!is.matrix(data)) { stop("data must be a matrix in IClusterComponent");}
+#    if (!is.matrix(missing)) { stop("missing must be a matrix in IClusterComponent");}
+#    if (!is.character(modelName)) { stop("modelName must be a character in IClusterComponent");}
+    return(TRUE);
+  }
+)
+#' Initialize an instance of a MixAll S4 class.
+#'
+#' Initialization method of the [\code{\linkS4class{IClusterComponent}}] class.
+#' Used internally in the 'MixAll' package.
+#'
+#' @rdname initialize-methods
+#' @keywords internal
+setMethod(
+  f="initialize",
+  signature=c("IClusterComponent"),
+  definition=function(.Object, data, modelName)
+  {
+    # fill data missing and modelName
+    .Object@data      <- as.matrix(data);
+    .Object@missing   <- which(is.na(.Object@data), arr.ind=TRUE);
+    .Object@modelName <- modelName;
+    return(.Object)
+  }
+)
+#' @rdname print-methods
+#' @aliases print print,IClusterComponent-method
+#'
+setMethod(
+  f="print",
+  signature=c("IClusterComponent"),
+  function(x,...)
+  {
+    cat("* model name    =",x@modelName,"\n");
+    cat("* data          =\n");
+    print(format(x@data),quote=FALSE) 
+    cat("* missing       =\n");
+    print(format(x@missing),quote=FALSE)
+  }
+)
+
+#' @rdname show-methods
+#' @aliases show-IClusterComponent,IClusterComponent,IClusterComponent-method
+setMethod(
+  f="show",
+  signature=c("IClusterComponent"),
+  function(object)
+  {
+    cat("* model name     =",object@modelName,"\n");
+    if(length(object@data)!=0)
+    {
+      nrowShow <- min(10,nrow(object@data));
+      ncolShow <- min(10,ncol(object@data));
+      cat("* data (limited to 10 samples and 10 variables) =\n")
+      print(format(object@data[1:nrowShow,1:ncolShow]),quote=FALSE)
+    }
+    cat("* ... ...\n")
+  }
+)
+
+#' @rdname summary-methods
+#' @aliases summary summary,IClusterComponent-method
+setMethod(
+  f="summary",
+  signature=c("IClusterComponent"),
+  function(object, ...)
+  { cat("* model name     =",object@modelName,"\n");}
+)
+
 #' Interface base Class [\code{\linkS4class{IClusterModel}}] for Cluster models.
 #'
 #' This class encapsulate the common parameters of all the Cluster models.
@@ -217,103 +314,6 @@ setMethod(
   }
 )
 
-#-----------------------------------------------------------------------
-#' Definition of the [\code{\linkS4class{IClusterComponent}}] class
-#'
-#' This class defines a component of a mixture Model
-#'
-#' @slot data  Matrix with the data set
-#' @slot missing  Matrix with the indexes of the missing values
-#' @slot modelName model name associated with the data set
-#'
-#' @examples
-#' getSlots("IClusterComponent")
-#'
-#' @author Serge Iovleff
-#'
-#' @name IClusterComponent
-#' @rdname IClusterComponent-class
-#' @aliases IClusterComponent-class
-#' @exportClass IClusterComponent
-#'
-setClass(
-  Class="IClusterComponent",
-  representation( data      = "matrix"
-                , missing   = "matrix"
-                , modelName = "character"
-                , "VIRTUAL"),
-  validity=function(object)
-  {
-# called too soon when Component is part of an other S4 class
-#    if (!is.matrix(data)) { stop("data must be a matrix in IClusterComponent");}
-#    if (!is.matrix(missing)) { stop("missing must be a matrix in IClusterComponent");}
-#    if (!is.character(modelName)) { stop("modelName must be a character in IClusterComponent");}
-    return(TRUE);
-  }
-)
-#' Initialize an instance of a MixAll S4 class.
-#'
-#' Initialization method of the [\code{\linkS4class{IClusterComponent}}] class.
-#' Used internally in the 'MixAll' package.
-#'
-#' @rdname initialize-methods
-#' @keywords internal
-setMethod(
-  f="initialize",
-  signature=c("IClusterComponent"),
-  definition=function(.Object, data, modelName)
-  {
-    # fill data missing and modelName
-    .Object@data      <- as.matrix(data);
-    .Object@missing   <- which(is.na(.Object@data), arr.ind=TRUE);
-    .Object@modelName <- modelName;
-    return(.Object)
-  }
-)
-#' @rdname print-methods
-#' @aliases print print,IClusterComponent-method
-#'
-setMethod(
-  f="print",
-  signature=c("IClusterComponent"),
-  function(x,...)
-  {
-    cat("* model name   =",x@modelName,"\n");
-    cat("* data         =\n");
-    print(format(x@data),quote=FALSE)
-    cat("* missing     =\n");
-    print(format(x@missing),quote=FALSE)
-  }
-)
-
-#' @rdname show-methods
-#' @aliases show-IClusterComponent,IClusterComponent,IClusterComponent-method
-setMethod(
-  f="show",
-  signature=c("IClusterComponent"),
-  function(object)
-  {
-    cat("* model name   =",object@modelName,"\n");
-    cat("*\n");
-    if(length(object@data)!=0)
-    {
-      nrowShow <- min(10,nrow(object@data));
-      ncolShow <- min(10,ncol(object@data));
-      cat("* data (limited to 10 samples and 10 variables) =\n")
-      print(format(object@data[1:nrowShow,1:ncolShow]),quote=FALSE)
-    }
-    cat("* ... ...\n")
-  }
-)
-
-#' @rdname summary-methods
-#' @aliases summary summary,IClusterComponent-method
-setMethod(
-  f="summary",
-  signature=c("IClusterComponent"),
-  function(object, ...)
-  { cat("* model name     =",object@modelName,"\n");}
-)
 ## 
 ## #-----------------------------------------------------------------------
 ## #' Interface base Class [\code{\linkS4class{IClusterPredict}}] for predictors

@@ -151,7 +151,7 @@ class GammaBase: public IMixtureDensity<Derived >
 
   protected:
     /** compute the Q(theta) value. */
-    Real qValue(CArrayXX const* p_tik, CPointX const* p_nk) const;
+    Real qValue(CArrayXX const* p_tik, CPointX const* p_tk) const;
     /** compute the weighted moments of a gamma mixture. */
     bool moments(CArrayXX const* p_tik);
     /** get the weighted mean of the jth variable of the kth cluster. */
@@ -220,7 +220,7 @@ bool GammaBase<Derived>::moments(CArrayXX const* p_tik)
 
 /* compute the intermediate value needed by Newton algorithm*/
 template<class Derived>
-Real GammaBase<Derived>::qValue(CArrayXX const* p_tik, CPointX const* p_nk) const
+Real GammaBase<Derived>::qValue(CArrayXX const* p_tik, CPointX const* p_tk) const
 {
   Real value = 0.;
   for (int k= p_tik->beginCols(); k < p_tik->endCols(); ++k)
@@ -232,7 +232,7 @@ Real GammaBase<Derived>::qValue(CArrayXX const* p_tik, CPointX const* p_nk) cons
       sumjk += a * (param_.meanLog_[k][j]-std::log(b))
              - param_.mean_[k][j]/b - STK::Funct::lgamma(a);
     }
-    value += p_nk->elt(k) * sumjk;
+    value += p_tk->elt(k) * sumjk;
   }
   return value;
 }

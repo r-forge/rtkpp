@@ -222,8 +222,15 @@ setMethod(
   f="print",
   function(x,k,...)
   {
-    cat("* Means     = ", format(x@mean[k,]), "\n")
-    cat("* S.D.      = ", format(x@sigma[k,]), "\n")
+    if(missing(k))
+    {
+      callNextMethod()
+    }
+    else
+    {
+      cat("* Means      = ", format(x@mean[k,]), "\n")
+      cat("* S.D.       = ", format(x@sigma[k,]), "\n")
+    }
   }
 )
 
@@ -234,8 +241,7 @@ setMethod(
   signature=c("ClusterDiagGaussianComponent"),
   function(object)
   {
-    cat("* Means     = ", format(object@mean), "\n")
-    cat("* S.D.      = ", format(object@sigma), "\n")
+    callNextMethod()
   }
 )
 
@@ -321,6 +327,7 @@ setMethod(
   signature=c("ClusterDiagGaussian"),
   function(x,...){
     cat("****************************************\n")
+    print(x@component)
     callNextMethod();
     cat("****************************************\n")
     for(k in 1:length(x@pk))
@@ -341,8 +348,8 @@ setMethod(
   function(object)
   {
     cat("****************************************\n")
+    show(object@component)
     callNextMethod();
-    show(object@component);
     cat("****************************************\n")
     for(k in 1:length(object@pk))
     {
@@ -362,10 +369,10 @@ setMethod(
   signature=c("ClusterDiagGaussian"),
   function(object, ...)
   {
-    cat("**************************************************************\n")
+    cat("****************************************\n")
+    summary(object@component)
     callNextMethod()
-    summary(object@component);
-    cat("**************************************************************\n")
+    cat("****************************************\n")
   }
 )
 

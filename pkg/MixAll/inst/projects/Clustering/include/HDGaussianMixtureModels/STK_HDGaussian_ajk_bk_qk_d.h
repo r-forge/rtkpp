@@ -137,9 +137,9 @@ class MixtureHDGaussian_ajk_bk_qk_d: public HDGaussianBase<MixtureHDGaussian_ajk
      *  will be selected randomly among the data set and the standard-deviation
      *  will be set to 1.
      */
-    void randomInit( CArrayXX const*  p_tik, CPointX const* p_nk) ;
+    void randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) ;
     /** Compute the weighted mean and the common standard deviation. */
-    bool run( CArrayXX const*  p_tik, CPointX const* p_nk) ;
+    bool run( CArrayXX const*  p_tik, CPointX const* p_tk) ;
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return 2*this->nbCluster()*this->nbVariable();}
@@ -150,7 +150,7 @@ class MixtureHDGaussian_ajk_bk_qk_d: public HDGaussianBase<MixtureHDGaussian_ajk
  *  will be set to 1.
  */
 template<class Array>
-void MixtureHDGaussian_ajk_bk_qk_d<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_nk)
+void MixtureHDGaussian_ajk_bk_qk_d<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)
 {
   this->randomMean(p_tik);
   // compute the standard deviation
@@ -159,13 +159,13 @@ void MixtureHDGaussian_ajk_bk_qk_d<Array>::randomInit( CArrayXX const*  p_tik, C
     param_.sigma_[k] = Stat::varianceWithFixedMean(*p_data(), p_tik->col(k), param_.mean_[k], false).sqrt();
   }
 #ifdef STK_MIXTURE_VERY_VERBOSE
-  stk_cout << _T("MixtureHDGaussian_ajk_bk_qk_d<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_nk)  done\n");
+  stk_cout << _T("MixtureHDGaussian_ajk_bk_qk_d<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)  done\n");
 #endif
 }
 
 /* Compute the weighted means and the weighted standard deviations. */
 template<class Array>
-bool MixtureHDGaussian_ajk_bk_qk_d<Array>::run( CArrayXX const*  p_tik, CPointX const* p_nk)
+bool MixtureHDGaussian_ajk_bk_qk_d<Array>::run( CArrayXX const*  p_tik, CPointX const* p_tk)
 {
   // compute the means
   if (!this->updateMean(p_tik)) return false;

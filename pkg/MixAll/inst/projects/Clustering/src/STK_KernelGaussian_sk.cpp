@@ -68,33 +68,33 @@ Real KernelGaussian_sk::lnComponentProbability(int i, int k) const
 }
 
 /* Initialize randomly the parameters of the Gaussian mixture. */
-void KernelGaussian_sk::randomInit( CArrayXX const*  p_tik, CPointX const* p_nk)
+void KernelGaussian_sk::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)
 {
 #if STK_Kernel_DEBUG | STK_MIXTURE_VERBOSE
-  stk_cout << _T("Entering KernelGaussian_sk::randomInit( CArrayXX const*  p_tik, CPointX const* p_nk)\n");
+  stk_cout << _T("Entering KernelGaussian_sk::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)\n");
 #endif
-  compute_dik(p_tik, p_nk);
-  param_.sigma2_ = sum( dik_.prod(*p_tik) )/ (*p_nk * param_.dim_)
+  compute_dik(p_tik, p_tk);
+  param_.sigma2_ = sum( dik_.prod(*p_tik) )/ (*p_tk * param_.dim_)
                  + CPointX(p_tik->cols()).rand(Law::Normal(0, 0.05)).abs();
 #ifdef STK_MIXTURE_VERY_VERBOSE
-  stk_cout << _T("KernelGaussian_sk::randomInit( CArrayXX const*  p_tik, CPointX const* p_nk) done\n");
+  stk_cout << _T("KernelGaussian_sk::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) done\n");
   stk_cout << param_.sigma2_ << "\n";
 #endif
 }
 
 /* Compute the weighted means and the weighted standard deviations. */
-bool KernelGaussian_sk::run( CArrayXX const*  p_tik, CPointX const* p_nk)
+bool KernelGaussian_sk::run( CArrayXX const*  p_tik, CPointX const* p_tk)
 {
 #if STK_Kernel_DEBUG | STK_MIXTURE_VERBOSE
-  stk_cout << _T("Entering KernelGaussian_sk::run( CArrayXX const*  p_tik, CPointX const* p_nk)\n");
+  stk_cout << _T("Entering KernelGaussian_sk::run( CArrayXX const*  p_tik, CPointX const* p_tk)\n");
 #endif
-  compute_dik(p_tik, p_nk);
+  compute_dik(p_tik, p_tk);
 #ifdef STK_Kernel_DEBUG
   stk_cout<< _T("Stat::sumByCol( dik_.prod(*p_tik) ) =\n")  << Stat::sumByCol( dik_.prod(*p_tik) ) << "\n";
 #endif
-  param_.sigma2_ =  Stat::sumByCol( dik_.prod(*p_tik) )/ (*p_nk * param_.dim_);
+  param_.sigma2_ =  Stat::sumByCol( dik_.prod(*p_tik) )/ (*p_tk * param_.dim_);
 #ifdef STK_MIXTURE_VERBOSE
-  stk_cout << _T("KernelGaussian_sk::run( CArrayXX const*  p_tik, CPointX const* p_nk) done\n");
+  stk_cout << _T("KernelGaussian_sk::run( CArrayXX const*  p_tik, CPointX const* p_tk) done\n");
   stk_cout << _T("sigma2 = ") << param_.sigma2_ << "\n";
 #endif
   return true;

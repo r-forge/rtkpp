@@ -77,7 +77,7 @@ class IMixturePredictor
     /** @return a pointer on the proportions of each mixtures */
     inline CPointX const* p_pk() const { return p_pk_;};
     /** @return a pointer on the sum of the columns of tik = estimated number of individuals */
-    inline CPointX const* p_nk() const { return p_nk_;};
+    inline CPointX const* p_tk() const { return p_tk_;};
     /** @return a pointer on the the tik probabilities */
     inline CArrayXX const* p_tik() const { return p_tik_;};
     /** @return a pointer on the zi class labels */
@@ -89,7 +89,7 @@ class IMixturePredictor
     /** The tik probabilities */
     CArrayXX* p_tik_;
     /** The sum of the columns of tik_ */
-    CPointX* p_nk_;
+    CPointX* p_tk_;
     /** The zi class label */
     CVectorXi* p_zi_;
 };

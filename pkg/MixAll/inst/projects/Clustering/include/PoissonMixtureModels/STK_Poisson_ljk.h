@@ -86,9 +86,10 @@ class Poisson_ljk: public PoissonBase<Poisson_ljk<Array> >
     /** destructor */
     ~Poisson_ljk() {}
     /** Initialize randomly the parameters of the Poisson mixture. */
-    void randomInit( CArrayXX const*  p_tik, CPointX const* p_nk) ;
-    /** Compute the weighted probabilities. */
-    bool run( CArrayXX const*  p_tik, CPointX const* p_nk) ;
+    void randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) ;
+    /** Compute the MStep for the lambda_jk
+     *  \lambda_jk =\sum_i X_{ij} * t_{ik} */
+    bool run( CArrayXX const*  p_tik, CPointX const* p_tk) ;
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable();}
@@ -96,7 +97,7 @@ class Poisson_ljk: public PoissonBase<Poisson_ljk<Array> >
 
 /* Initialize randomly the parameters of the Poisson mixture. */
 template<class Array>
-void Poisson_ljk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_nk) 
+void Poisson_ljk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)
 {
   for (int j=p_data()->beginCols(); j< p_data()->endCols(); ++j)
   {
@@ -107,14 +108,19 @@ void Poisson_ljk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_nk
 }
 
 
-/* Compute the modalities probabilities */
+/* Compute the lambda_jk  */
 template<class Array>
-bool Poisson_ljk<Array>::run( CArrayXX const*  p_tik, CPointX const* p_nk) 
+bool Poisson_ljk<Array>::run( CArrayXX const*  p_tik, CPointX const* p_tk)
 {
   for (int j=p_data()->beginCols(); j< p_data()->endCols(); ++j)
   {
     for (int k= p_tik->beginCols(); k < p_tik->endCols(); ++k)
-    { param_.lambda_[k][j] =p_data()->col(j).template cast<Real>().wmean(p_tik->col(k));}
+    {
+      param_.lambda_[k][j] = 0.;
+      for (int i= p_tik->beginRows(); i < p_tik->endRows(); ++i)
+      { param_.lambda_[k][j] += p_data()->elt(i,j) * p_tik->elt(i,k);}
+      param_.lambda_[k][j] /= p_tk->elt(k);
+    }
   }
   return true;
 }

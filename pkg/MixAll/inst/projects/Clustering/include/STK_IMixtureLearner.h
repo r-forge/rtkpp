@@ -119,8 +119,8 @@ void IMixtureLearner::setMixtureParameters(Array const& tik)
   setNbSample(tik_.sizeRows());
   setNbCluster(tik_.sizeCols());
   tik_ = tik;
-  nk_ = Stat::sumByCol(tik_);
-  pk_ = nk_ / nbSample();
+  tk_ = Stat::sumByCol(tik_);
+  pk_ = tk_ / nbSample();
   for (int i = tik_.beginCols(); i< tik_.endCols(); ++i)
   {
     int k;
@@ -142,7 +142,7 @@ void IMixtureLearner::setMixtureParameters(Array const& tik, RowVector const& pk
   setNbCluster(tik_.sizeCols());
   tik_ = tik;
   pk_  = pk;
-  nk_  = Stat::sumByCol(tik_);
+  tk_  = Stat::sumByCol(tik_);
   for (int i = tik_.beginCols(); i< tik_.endCols(); ++i)
   {
     int k;
@@ -163,8 +163,8 @@ void IMixtureLearner::setClassLabels( ColVector const& zi)
   for (int i=tik_.beginRows(); i < tik_.endRows(); i++)
   { tik_(i, zi_[i]) = 1.;}
   // count the number of individuals in each class
-  nk_ = Stat::sumByCol(tik_);
-  pk_ = nk_/nbSample();
+  tk_ = Stat::sumByCol(tik_);
+  pk_ = tk_/nbSample();
 }
 
 
@@ -180,7 +180,7 @@ void IMixtureLearner::setClassLabels( ColVector const& zi, RowVector const& pk)
   for (int i=tik_.beginRows(); i < tik_.endRows(); i++)
   { tik_(i, zi_[i]) = 1.;}
   // count the number of individuals in each class
-  nk_ = Stat::sumByCol(tik_);
+  tk_ = Stat::sumByCol(tik_);
 }
 
 } // namespace STK

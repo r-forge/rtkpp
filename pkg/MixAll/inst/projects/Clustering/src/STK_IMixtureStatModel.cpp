@@ -46,7 +46,7 @@ IMixtureStatModel::IMixtureStatModel( int nbSample, int nbCluster)
                                     : IStatModelBase(nbSample)
                                     , nbCluster_(nbCluster)
                                     , pk_(nbCluster, 1./nbCluster), tik_(nbSample, nbCluster, 1./nbCluster)
-                                    , nk_(nbCluster, nbSample/nbCluster), zi_(nbSample, baseIdx)
+                                    , tk_(nbCluster, nbSample/nbCluster), zi_(nbSample, baseIdx)
                                     , v_mixtures_()
 {}
 
@@ -55,7 +55,7 @@ IMixtureStatModel::IMixtureStatModel( IMixtureStatModel const& model)
                                    : IStatModelBase(model)
                                    , nbCluster_(model.nbCluster_)
                                    , pk_(model.pk_), tik_(model.tik_)
-                                   , nk_(model.nk_), zi_(model.zi_)
+                                   , tk_(model.tk_), zi_(model.zi_)
                                    , v_mixtures_(model.v_mixtures_)
 {
   // clone mixtures
@@ -81,9 +81,6 @@ Real IMixtureStatModel::computeLnLikelihood(int i) const
 //  std::cout << "lnComp= ";
   for (int k = pk_.begin(); k< pk_.end(); ++k)
   { lnComp[k] = std::log(pk_[k]) + lnComponentProbability(i, k);}
-//  for (int k = pk_.begin(); k< pk_.end(); ++k)
-//  { std::cout << lnComp[k] << " ";}
-//  std::cout << "\n";
   // compute result
   Real lnCompMax = lnComp.maxElt();
   return std::log((lnComp-lnCompMax).exp().sum())+lnCompMax;

@@ -142,7 +142,7 @@ class IMixtureComposer: public IMixtureStatModel
     virtual void pStep();
     /** @brief Initialize the model before its first use.
      *  Initialize the values of the mixture parameters @c pk_ and @© tik_ using
-     *  virtual method @c initializeMixtureParameters() and compute @c nk_ and
+     *  virtual method @c initializeMixtureParameters() and compute @c tk_ and
      *  @c zk_ using the virtual methods @c mapStep() and @c pStep().
      **/
     virtual void initializeStep();

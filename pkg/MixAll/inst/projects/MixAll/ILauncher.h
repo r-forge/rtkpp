@@ -62,12 +62,16 @@ class ILauncher: public IRunnerBase
     inline Rcpp::S4 const& s4_model() const { return s4_model_;}
 
   protected:
+    /** create data sets */
+    template<int Rtype>
+    void createDataSets(Rcpp::Matrix<Rtype> const& data, std::string const& idData, Clust::Mixture model)
+    { handler_.addData(data, idData, Clust::mixtureToString(model));}
+
     /** create the data sets with real data */
-    void createContinuousDataSets(std::string const& idData, std::string const& idModel,
-                                  Rcpp::S4 s4_component, Clust::Mixture model);
+    void createContinuousDataSets(std::string const& idData, Rcpp::S4 s4_component, Clust::Mixture model);
     /** create the data sets with integer data */
-    void createDiscreteDataSets(std::string const& idData, std::string const& idModel,
-                                Rcpp::S4 s4_component, Clust::Mixture model);
+    void createDiscreteDataSets(std::string const& idData, Rcpp::S4 s4_component, Clust::Mixture model);
+
     /** create the mixtures in the given model */
     void createMixtures(IMixtureStatModel* p_model);
 
@@ -94,7 +98,7 @@ class ILauncher: public IRunnerBase
     /** data handler */
     RDataHandler handler_;
     /** model from the R side */
-    Rcpp::S4              s4_model_;
+    Rcpp::S4 s4_model_;
     /** vector with the model names to try */
     Rcpp::CharacterVector v_models_;
     /** Is the model with mixed data ? */

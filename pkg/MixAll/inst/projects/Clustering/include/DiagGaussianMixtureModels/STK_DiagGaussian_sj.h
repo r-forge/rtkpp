@@ -89,9 +89,9 @@ class DiagGaussian_sj: public DiagGaussianBase<DiagGaussian_sj<Array> >
      *  will be selected randomly among the data set and the standard-deviation
      *  will be set to 1.
      */
-    void randomInit( CArrayXX const*  p_tik, CPointX const* p_nk) ;
+    void randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) ;
     /** Compute the weighted mean and the common standard deviation. */
-    bool run( CArrayXX const*  p_tik, CPointX const* p_nk) ;
+    bool run( CArrayXX const*  p_tik, CPointX const* p_tk) ;
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable()+this->nbVariable();}
@@ -102,7 +102,7 @@ class DiagGaussian_sj: public DiagGaussianBase<DiagGaussian_sj<Array> >
  *  will be set to 1.
  */
 template<class Array>
-void DiagGaussian_sj<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_nk) 
+void DiagGaussian_sj<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) 
 {
   // compute the initial mean
   this->randomMean(p_tik);
@@ -118,13 +118,13 @@ void DiagGaussian_sj<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* 
   // store the standard deviation
   param_.sigma_ = (variance /= this->nbSample()).sqrt();
 #ifdef STK_MIXTURE_VERY_VERBOSE
-  stk_cout << _T("DiagGaussian_sj<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_nk)  done\n");
+  stk_cout << _T("DiagGaussian_sj<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)  done\n");
 #endif
 }
 
 /* Compute the weighted mean and the common standard deviation. */
 template<class Array>
-bool DiagGaussian_sj<Array>::run( CArrayXX const*  p_tik, CPointX const* p_nk) 
+bool DiagGaussian_sj<Array>::run( CArrayXX const*  p_tik, CPointX const* p_tk) 
 {
   // compute the means
   if (!this->updateMean(p_tik)) return false;

@@ -124,7 +124,7 @@ class KernelGaussianBridge: public IMixtureBridge< KernelGaussianBridge<Id,Data>
     using Base::mixture_;
     using Base::paramHandler_;
     using Base::p_tik;
-    using Base::p_nk;
+    using Base::p_tk;
 
     /** default constructor. Remove the missing values from the data set and
      *  initialize the mixture by setting the data set.

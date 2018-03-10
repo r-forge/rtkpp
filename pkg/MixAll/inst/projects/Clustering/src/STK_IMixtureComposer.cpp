@@ -79,7 +79,7 @@ void IMixtureComposer::initializeStep()
   // (re)initialize the mixture parameters tik and pk. (virtual method)
   initializeMixtureParameters();
   // compute nk
-  nk_  = Stat::sumByCol(tik_);
+  tk_  = Stat::sumByCol(tik_);
   // (re) initialize mixtures
   IMixtureStatModel::initializeStep();
   // compute zi (virtual method)
@@ -156,12 +156,12 @@ int IMixtureComposer::cStep()
   for (int i=tik_.beginRows(); i < tik_.endRows(); i++)
   { cStep(i);}
   // count the number of individuals in each class
-  nk_= Stat::sum(tik_);
+  tk_= Stat::sum(tik_);
 #ifdef STK_MIXTURE_VERBOSE
-  stk_cout << _T("IMixtureComposer::cStep() nk_ = ") << nk_;
+  stk_cout << _T("IMixtureComposer::cStep() tk_ = ") << tk_;
   stk_cout << _T("IMixtureComposer::cStep() done\n");
 #endif
-  return nk_.minElt();
+  return tk_.minElt();
 }
 
 /* simulate zi  */
@@ -193,14 +193,14 @@ Real IMixtureComposer::eStep()
   // update ln-likelihood
   setLnLikelihood(sum);
   // compute proportions
-  nk_ = Stat::sum(tik_);
+  tk_ = Stat::sumByCol(tik_);
 #ifdef STK_MIXTURE_VERBOSE
   stk_cout << _T("IMixtureComposer::eStep() lnLikelihood =") << sum << _T("\n");
   stk_cout << _T("IMixtureComposer::eStep() done\n");
   if (!isFinite(sum))
   { stk_cout << _T("tik_ =\n") << tik_.transpose();}
 #endif
-  return nk_.minElt();
+  return tk_.minElt();
 }
 
 /* Compute Zi using the Map estimate, default implementation. */
@@ -235,7 +235,7 @@ Real IMixtureComposer::eStep(int i)
 #ifdef STK_MIXTURE_VERBOSE
     stk_cout << _T("IMixtureComposer::eStep(") << i << _T(")\n");
     stk_cout << _T("pk_ =") << pk_;
-    stk_cout << _T("nk_ =") << nk_;
+    stk_cout << _T("tk_ =") << tk_;
     stk_cout << _T("lnComp_ =") << lnComp_;
     for (int k=tik_.beginCols(); k< tik_.endCols(); k++)
     {
@@ -296,13 +296,13 @@ void IMixtureComposer::initializeMixtureParameters()
 #endif
   pk_  = 1./nbCluster_;
   tik_ = 1./nbCluster_;
-  nk_  = sumByCol(tik_);
+  tk_  = sumByCol(tik_);
 }
 
 /* generate random tik_ */
 int IMixtureComposer::randomTik()
 {
-  nk_ = 0.;
+  tk_ = 0.;
   tik_.randUnif();
   for (int i = tik_.beginRows(); i < tik_.endRows(); ++i)
   {
@@ -310,9 +310,9 @@ int IMixtureComposer::randomTik()
     CPointX tikRowi(tik_.row(i), true);
     tikRowi = tikRowi * pk_;
     tikRowi /= tikRowi.sum();
-    nk_ += tikRowi;
+    tk_ += tikRowi;
   }
-  return nk_.minElt();
+  return tk_.minElt();
 }
 
 /* generate random tik_ */

@@ -92,9 +92,9 @@ class Gamma_ajk_b: public GammaBase<Gamma_ajk_b<Array> >
     /** destructor */
     ~Gamma_ajk_b() {}
     /** Initialize randomly the parameters of the Gamma mixture. */
-    void randomInit( CArrayXX const*  p_tik, CPointX const* p_nk) ;
+    void randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) ;
     /** Compute the weighted mean and the common variance. */
-    bool run( CArrayXX const*  p_tik, CPointX const* p_nk) ;
+    bool run( CArrayXX const*  p_tik, CPointX const* p_tk) ;
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*this->nbVariable() + 1;}
@@ -105,7 +105,7 @@ class Gamma_ajk_b: public GammaBase<Gamma_ajk_b<Array> >
  *  will be set to 1.
  */
 template<class Array>
-void Gamma_ajk_b<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_nk) 
+void Gamma_ajk_b<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) 
 {
   // compute moments
   this->moments(p_tik);
@@ -117,7 +117,7 @@ void Gamma_ajk_b<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_nk
     {
       Real mean = meanjk(j,k), variance = variancejk(j,k);
       param_.shape_[k][j] = Law::Exponential::rand((mean*mean/variance));
-      value += p_nk->elt(k) * variance/mean;
+      value += p_tk->elt(k) * variance/mean;
     }
   }
   param_.scale_ = Law::Exponential::rand(value/(this->nbVariable()*this->nbSample()));
@@ -128,11 +128,11 @@ void Gamma_ajk_b<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_nk
 
 /* Compute the weighted mean and the common variance. */
 template<class Array>
-bool Gamma_ajk_b<Array>::run( CArrayXX const*  p_tik, CPointX const* p_nk) 
+bool Gamma_ajk_b<Array>::run( CArrayXX const*  p_tik, CPointX const* p_tk) 
 {
   if (!this->moments(p_tik)) { return false;}
   // start estimations of the ajk and bj
-  Real qvalue = this->qValue(p_tik, p_nk);
+  Real qvalue = this->qValue(p_tik, p_tk);
   int iter;
   for(iter=0; iter<MAXITER; ++iter)
   {
@@ -153,7 +153,7 @@ bool Gamma_ajk_b<Array>::run( CArrayXX const*  p_tik, CPointX const* p_nk)
         {
           param_.shape_[k][j] = x0; // use moment estimate
 #ifdef STK_MIXTURE_DEBUG
-          stk_cout << _T("ML estimation failed in Gamma_ajk_bj::run( CArrayXX const*  p_tik, CPointX const* p_nk) \n");
+          stk_cout << _T("ML estimation failed in Gamma_ajk_bj::run( CArrayXX const*  p_tik, CPointX const* p_tk) \n");
           stk_cout << "x0 =" << x0 << _T("\n";);
           stk_cout << "f(x0) =" << f(x0) << _T("\n";);
           stk_cout << "x1 =" << x1 << _T("\n";);
@@ -166,8 +166,8 @@ bool Gamma_ajk_b<Array>::run( CArrayXX const*  p_tik, CPointX const* p_nk)
     Real num=0., den = 0.;
     for (int k= p_tik->beginCols(); k < p_tik->endCols(); ++k)
     {
-      num += param_.mean_[k].sum()  * p_nk->elt(k);
-      den +=  param_.shape_[k].sum() * p_nk->elt(k);
+      num += param_.mean_[k].sum()  * p_tk->elt(k);
+      den +=  param_.shape_[k].sum() * p_tk->elt(k);
     }
     // compute b
     Real b = num/den;
@@ -175,11 +175,11 @@ bool Gamma_ajk_b<Array>::run( CArrayXX const*  p_tik, CPointX const* p_nk)
     if (!Arithmetic<Real>::isFinite(b)) { return false;}
     param_.scale_ = b;
     // check convergence
-    Real value = this->qValue(p_tik, p_nk);
+    Real value = this->qValue(p_tik, p_tk);
 #ifdef STK_MIXTURE_DEBUG
     if (value < qvalue)
     {
-      stk_cout << _T("In Gamma_ajk_b::run( CArrayXX const*  p_tik, CPointX const* p_nk) : run( CArrayXX const*  p_tik, CPointX const* p_nk)  diverge\n");
+      stk_cout << _T("In Gamma_ajk_b::run( CArrayXX const*  p_tik, CPointX const* p_tk) : run( CArrayXX const*  p_tik, CPointX const* p_tk)  diverge\n");
       stk_cout << _T("New value =") << value << _T(", qvalue =") << qvalue << _T("\n");
     }
 #endif
@@ -189,7 +189,7 @@ bool Gamma_ajk_b<Array>::run( CArrayXX const*  p_tik, CPointX const* p_nk)
 #ifdef STK_MIXTURE_DEBUG
   if (iter == MAXITER)
   {
-    stk_cout << _T("In Gamma_ajk_b::run( CArrayXX const*  p_tik, CPointX const* p_nk) : run( CArrayXX const*  p_tik, CPointX const* p_nk)  did not converge\n");
+    stk_cout << _T("In Gamma_ajk_b::run( CArrayXX const*  p_tik, CPointX const* p_tk) : run( CArrayXX const*  p_tik, CPointX const* p_tk)  did not converge\n");
     stk_cout << _T("qvalue =") << qvalue << _T("\n");
   }
 #endif

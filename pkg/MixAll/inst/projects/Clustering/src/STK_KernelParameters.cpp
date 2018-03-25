@@ -34,7 +34,7 @@
  **/
 
 
-#include "../include/KernelMixtureModels/STK_KernelParameters.h"
+#include <Clustering/include/KernelModels/STK_KernelParameters.h>
 
 namespace STK
 {

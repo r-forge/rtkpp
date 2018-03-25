@@ -51,6 +51,7 @@ ClusterLauncher::ClusterLauncher( Rcpp::S4 model, Rcpp::IntegerVector nbCluster,
                                 , v_nbCluster_(nbCluster)
                                 , criterion_(Rcpp::as<std::string>(s4_model_.slot("criterionName")))
                                 , p_composer_(0)
+                                , isMixedData_(false)
 {}
 /* facade design pattern.
  * The ClusterLauncher allow to create the strategy for estimating a mixture model
@@ -62,6 +63,8 @@ ClusterLauncher::ClusterLauncher( Rcpp::S4 model, Rcpp::IntegerVector nbCluster)
                                 , v_nbCluster_(nbCluster)
                                 , criterion_(Rcpp::as<std::string>(s4_model_.slot("criterionName")))
                                 , p_composer_(0)
+                                , isMixedData_(true)
+
 {}
 /* destructor. */
 ClusterLauncher::~ClusterLauncher()
@@ -105,17 +108,14 @@ Real ClusterLauncher::selectBestSingleModel()
   IMixtureComposer*  p_current   =0;
   IMixtureCriterion* p_criterion =0;
 
-  Rcpp::IntegerMatrix m_data_int=s4_component.slot("data");
-  Rcpp::NumericMatrix m_data_num=s4_component.slot("data");
-
   bool freeProp;
 
   // loop over all the models
   for (int l=0; l <v_models_.size(); ++l)
   {
     // create idData
-    std::string idData = "model" + typeToString<int>(l);
-    std::string idModel(Rcpp::as<std::string>(v_models_[l]));
+    std::string idData  = "model" + typeToString<int>(l);
+    std::string idModel = Rcpp::as<std::string>(v_models_[l]);
     // transform R model names to STK++ model names
     // check have been done on the R side so.... Let's go
     Clust::Mixture model           = Clust::stringToMixture(idModel, freeProp);
@@ -124,24 +124,20 @@ Real ClusterLauncher::selectBestSingleModel()
     // structure thus there is no difficulties in doing so
     if ((classModel == Clust::Categorical_)||(classModel == Clust::Poisson_))
     {
+      Rcpp::IntegerMatrix m_data_int=s4_component.slot("data");
       createDataSets(m_data_int, idData, model);
     }
     else
     {
+      Rcpp::NumericMatrix m_data_num=s4_component.slot("data");
       createDataSets(m_data_num, idData, model);
     }
-//    if ((classModel == Clust::Categorical_)||(classModel == Clust::Poisson_))
-//    { createDiscreteDataSets(idData, s4_component, model);}
-//    else
-//    { createContinuousDataSets(idData, s4_component, model);}
   }
   // start computation
   try
   {
     // create criterion
-    if (criterion_ == "BIC") { p_criterion = new BICMixtureCriterion();}
-    if (criterion_ == "AIC") { p_criterion = new AICMixtureCriterion();}
-    if (criterion_ == "ICL") { p_criterion = new ICLMixtureCriterion();}
+    p_criterion = Clust::createCriterion(criterion_);
 
     // start the estimation process, should end with the best model according to
     // the criteria
@@ -150,8 +146,8 @@ Real ClusterLauncher::selectBestSingleModel()
     // loop over all the models
     for (int l=0; l <v_models_.size(); ++l)
     {
-      std::string idData = "model" + typeToString<int>(l);
-      std::string idModel(Rcpp::as<std::string>(v_models_[l]));
+      std::string idData  = "model" + typeToString<int>(l);
+      std::string idModel = Rcpp::as<std::string>(v_models_[l]);
       bool freeProp;
       Clust::Mixture model = Clust::stringToMixture(idModel, freeProp);
       // for the current model,
@@ -184,7 +180,7 @@ Real ClusterLauncher::selectBestSingleModel()
       }
     }
     // release
-    delete p_criterion;
+    if (p_criterion) delete p_criterion; p_criterion = 0;
     // get specific parameters
     getParameters(p_composer_, idDataBestModel, s4_component);
     return critValue;
@@ -206,7 +202,7 @@ Real ClusterLauncher::selectBestMixedModel()
   Rcpp::List s4_list =s4_model_.slot("ldata");
   Real criter        =s4_model_.slot("criterion");
   int nbSample       =s4_model_.slot("nbSample");
-  // main pointer
+  // main pointers
   IMixtureComposer* p_current =0;
   IMixtureCriterion* p_criterion =0;
   try
@@ -241,10 +237,7 @@ Real ClusterLauncher::selectBestMixedModel()
       }
     }
     // create criterion
-    if (criterion_ == "BIC") { p_criterion = new BICMixtureCriterion();}
-    if (criterion_ == "AIC") { p_criterion = new AICMixtureCriterion();}
-    if (criterion_ == "ICL") { p_criterion = new ICLMixtureCriterion();}
-    if (criterion_ == "ML")  { p_criterion = new MLMixtureCriterion();}
+    p_criterion = Clust::createCriterion(criterion_);
 
     for (int k=0; k <v_nbCluster_.length(); ++k)
     {
@@ -261,9 +254,9 @@ Real ClusterLauncher::selectBestMixedModel()
       p_criterion->run();
       if (criter > p_criterion->value())
       {
+        criter = p_criterion->value();
         if (p_composer_) { std::swap(p_current, p_composer_);}
         else             { p_composer_ = p_current; p_current = 0;}
-        criter = p_criterion->value();
       }
       // release current composer
       if (p_current) { delete p_current; p_current = 0;}

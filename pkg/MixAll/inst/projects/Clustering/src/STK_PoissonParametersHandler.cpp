@@ -34,7 +34,7 @@
  *  mixture models
  **/
 
-#include "../include/PoissonMixtureModels/STK_PoissonParametersHandler.h"
+#include "../include/PoissonModels/STK_PoissonParametersHandler.h"
 
 namespace STK
 {

@@ -45,7 +45,8 @@ namespace STK
 
 // forward declaration
 class IMixtureAlgo;
-class IMixtureLearnAlgo;
+class IMixtureAlgoPredict;
+class IMixtureAlgoLearn;
 class IMixtureInit;
 class IMixtureStrategy;
 class IMixtureComposer;
@@ -88,18 +89,20 @@ namespace Clust
 
 /** @ingroup Clustering
  *  @brief initialization type.
- *  There is trheee ways to initialize the mixture model:
+ *  There is four ways to initialize the mixture model:
  *  - using random values for the parameters
  *  - using random class for the sampling
  *  - using random probabilities class for the sampling
+ *  - using parameters values
  **/
 enum initType
 {
   noInit_ = -1,         ///< no initialization
-  randomInit_ = -2,      ///< DEPRECATED
+  randomInit_ = -2,     ///< DEPRECATED
   randomParamInit_ = 0, ///< initialize randomly the parameters
   randomClassInit_ = 1, ///< initialize randomly the class labels
-  randomFuzzyInit_ = 2  ///< initialize randomly the partnership class probabilities
+  randomFuzzyInit_ = 2, ///< initialize randomly the partnership class probabilities
+  valuePramaInit_ = 3   ///< initialize parameters using given values
 };
 
 /** @ingroup Clustering
@@ -132,14 +135,6 @@ enum algoType
   semiSemAlgo_ = 3
 };
 
-/** @ingroup Clustering
- *  Learning estimation algorithms
- **/
-enum algoLearnType
-{
-  imputeAlgo_,
-  simulAlgo_
-};
 
 /** @ingroup Clustering
  *  Convert a String to an algoType. The recognized strings are
@@ -157,9 +152,41 @@ enum algoLearnType
  *  @param type the type of algorithm wanted
  *  @return the algoType corresponding (default is emAlgo)
  *  @note The capitalized letters have no effect and if the string is not found
- *  in the list above,the type Clust::emAlgo_ is returned.
+ *  in the list above, the type Clust::emAlgo_ is returned.
  **/
 algoType stringToAlgo( std::string const& type);
+
+/** @ingroup Clustering
+ *  Learning estimation algorithms
+ **/
+enum algoPredictType
+{
+  emPredictAlgo_,
+  semiSEMPredictAlgo_
+};
+
+/** @ingroup Clustering
+ *  Convert a String to an algoPredictType. The recognized strings are
+ * <table>
+ * <tr> <th> Algorithm     </th></tr>
+ * <tr> <td> "em"          </td></tr>
+ * <tr> <td> "semiSem"         </td></tr>
+ * </table>
+ *  @param type the type of algorithm wanted
+ *  @return the algoPredictType corresponding (default is em)
+ *  @note The capitalized letters have no effect and if the string is not found
+ *  in the list above, the type Clust::emPredictAlgo_ is returned.
+ **/
+algoPredictType stringToPredictAlgo( std::string const& type);
+
+/** @ingroup Clustering
+ *  Learning estimation algorithms
+ **/
+enum algoLearnType
+{
+  imputeAlgo_,
+  simulAlgo_
+};
 
 /** @ingroup Clustering
  *  Convert a String to an algoLearnType. The recognized strings are
@@ -525,6 +552,11 @@ const Real defaultEpsilonLongRun = 1e-08;
  **/
 IMixtureCriterion* createCriterion( Clust::criterionType criterion);
 
+/** @return a pointer on the class computing the criterion
+ *  @param criterion string with the criterion name
+ **/
+STK::IMixtureCriterion* createCriterion( std::string const& criterion);
+
 /** @ingroup Clustering
  *  utility function for creating an estimation algorithm.
  *  @param algo the algorithm to create
@@ -537,7 +569,15 @@ IMixtureAlgo* createAlgo( Clust::algoType algo, int nbIterMax, Real epsilon);
  *  @param algo the algorithm to create
  *  @param nbIterMax,epsilon the maximal number of iteration and the tolerance of the algorithm
  **/
-IMixtureLearnAlgo* createLearnAlgo(Clust::algoLearnType algo, int nbIterMax, Real epsilon);
+IMixtureAlgoLearn* createLearnAlgo(Clust::algoLearnType algo, int nbIterMax, Real epsilon);
+
+/** @ingroup Clustering
+ *  utility function for creating a predicting algorithm.
+ *  @param algo the algorithm to create
+ *  @param nbIterBurn,nbIterLong,epsilon number of iteration of the burning and estimation steps
+ *  and tolerance of the algorithm
+ **/
+IMixtureAlgoPredict* createPredictAlgo(Clust::algoPredictType algo, int nbIterBurn, int nbIterLong, Real epsilon);
 
 /** @ingroup Clustering
  *  Utility function for creating a model initializer.

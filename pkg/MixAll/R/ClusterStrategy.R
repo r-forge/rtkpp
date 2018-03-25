@@ -22,12 +22,9 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
-#' @include ClusterInit.R
+#' @include ClusterAlgo.R ClusterInit.R
 NULL
 
-#-----------------------------------------------------------------------
-#' Create an instance of [\code{\linkS4class{ClusterStrategy}}] class
-#'
 #' A strategy is a multistage empirical process for finding a
 #' good estimate in the clustering estimation process.
 #'
@@ -86,7 +83,7 @@ NULL
 #'
 #' @return a [\code{\linkS4class{ClusterStrategy}}] object
 #' @author Serge Iovleff
-#' @export
+#'
 clusterStrategy <- function( nbTry =1
                            , nbInit= 5, initMethod="class", initAlgo= "EM", nbInitIteration=20, initEpsilon=0.01
                            , nbShortRun= 5, shortRunAlgo= "EM", nbShortIteration=100, shortEpsilon=1e-04
@@ -110,7 +107,7 @@ clusterStrategy <- function( nbTry =1
 #'    clusterSemiSEMStrategy()
 #'
 #' @rdname clusterStrategy
-#' @export
+#'
 clusterSemiSEMStrategy <- function()
 {
   # create init
@@ -130,7 +127,7 @@ clusterSemiSEMStrategy <- function()
 #'    clusterSEMStrategy()
 #'
 #' @rdname clusterStrategy
-#' @export
+#'
 clusterSEMStrategy <- function()
 {
   # create init
@@ -149,7 +146,7 @@ clusterSEMStrategy <- function()
 #'    clusterFastStrategy()
 #'
 #' @rdname clusterStrategy
-#' @export
+#'
 clusterFastStrategy <- function()
 {
   # create init
@@ -192,6 +189,7 @@ clusterFastStrategy <- function()
 #' @rdname ClusterStrategy-class
 #' @aliases ClusterStrategy-class
 #' @exportClass ClusterStrategy
+#' @export ClusterStrategy
 setClass(
     Class="ClusterStrategy",
     slots=c( nbTry = "numeric", nbShortRun = "numeric", initMethod = "ClusterInit", shortAlgo="ClusterAlgo", longAlgo="ClusterAlgo" ),

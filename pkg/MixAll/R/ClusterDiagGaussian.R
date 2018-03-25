@@ -22,7 +22,7 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
-#' @include ClusterModelNames.R IClusterModel.R
+#' @include global.R ClusterModelNames.R IClusterModel.R
 NULL
 
 #-----------------------------------------------------------------------
@@ -76,7 +76,7 @@ NULL
 #'
 #' @return An instance of the [\code{\linkS4class{ClusterDiagGaussian}}] class.
 #' @author Serge Iovleff
-#' @export
+#'
 #'
 clusterDiagGaussian <- function( data, nbCluster=2
                                , models=clusterDiagGaussianNames()
@@ -390,7 +390,7 @@ setMethod(
 #' @aliases plot-ClusterDiagGaussian
 #' @docType methods
 #' @rdname plot-ClusterDiagGaussian-method
-#' @export
+#'
 #'
 #' @seealso \code{\link{plot}}
 #' @examples

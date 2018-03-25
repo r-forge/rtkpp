@@ -56,7 +56,7 @@
 #'
 #' @return a [\code{\linkS4class{ClusterAlgo}}] object
 #' @author Serge Iovleff
-#' @export
+#'
 #'
 clusterAlgo <- function( algo="EM", nbIteration=200, epsilon=1e-07)
 {
@@ -106,7 +106,9 @@ clusterAlgo <- function( algo="EM", nbIteration=200, epsilon=1e-07)
 #' @name ClusterAlgo
 #' @rdname ClusterAlgo-class
 #' @aliases ClusterAlgo-class
+#' @export ClusterAlgo
 #' @exportClass ClusterAlgo
+
 setClass (
   Class= "ClusterAlgo",
   representation(algo="character", nbIteration = "numeric", epsilon = "numeric"),

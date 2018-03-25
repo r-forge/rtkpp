@@ -22,6 +22,9 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
+#' @include ClusterAlgo.R
+NULL
+
 #' Create an instance of [\code{\linkS4class{ClusterInit}}] class
 #'
 #' The initialization step is a two stages process: the proper initialization step
@@ -58,7 +61,7 @@
 #'
 #' @return a [\code{\linkS4class{ClusterInit}}] object
 #' @author Serge Iovleff
-#' @export
+#'
 clusterInit <- function( method="class", nbInit=5,  algo = "EM", nbIteration=20, epsilon=0.01)
 {
   # check criterion
@@ -115,11 +118,12 @@ clusterInit <- function( method="class", nbInit=5,  algo = "EM", nbIteration=20,
 #' @rdname ClusterInit-class
 #' @aliases ClusterInit-class
 #' @exportClass ClusterInit
+#' @export ClusterInit
 #'
 setClass(
   Class="ClusterInit",
   slots=c(method="character", nbInit = "numeric", algo = "ClusterAlgo"),
-  prototype=list(method="class", nbInit = 5, algo = clusterAlgo("EM", 20, 0.01)),
+  prototype=list(method="class", nbInit = 5, algo = clusterAlgo(algo="EM", nbIteration=20, epsilon=0.01)),
   # validity function
   validity=function(object)
   {

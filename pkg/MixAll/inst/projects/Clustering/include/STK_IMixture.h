@@ -129,6 +129,10 @@ class IMixture
      *  @return Number of free parameters
      */
     virtual int nbFreeParameter() const = 0;
+    /** This function must return the number of missing value in data set identified by idData_.
+     *  @return Number of missing values
+     */
+    virtual int nbMissingValues() const = 0;
     /** This function must return the number of variables (columns).
      *  @return Number of variables
      */

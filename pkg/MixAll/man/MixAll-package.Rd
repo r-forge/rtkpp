@@ -32,11 +32,11 @@ mixed data sets.
  }
 
 \tabular{ll}{
-  Package: \tab rtkpp\cr
+  Package: \tab MixAll\cr
   Type: \tab Package\cr
   Version: \tab 0.8.1\cr
-  Date: \tab 2014-07-05\cr
-  License: \tab GPL for the MixAll and rtkpp side, LGPL for the stkpp side  + file LICENSE\cr
+  Date: \tab 2018-03-19\cr
+  License: \tab GPL for the MixAll and rtkore side, LGPL for the stkpp side  + file LICENSE\cr
   LazyLoad: \tab yes\cr
 }
 }

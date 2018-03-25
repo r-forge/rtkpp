@@ -49,16 +49,17 @@ namespace STK
  *  @brief Interface base class for mixture managers.
  *
  *  A mixture manager is a factory class for injection dependency in the
- *  STK++ derived class of the IMixtureComposer. It handles all the creation
- *  and initialization stuff needed by the mixture models. It allows to get the
- *  parameters and imputed missing values from specific mixtures. It allows also
- *  to set the parameters to a specific mixture.
+ *  STK++ derived class of the IMixtureComposer:
+ *  - It handles all the creation and initialization stuff needed by mixture models,
+ *  - It allows to get parameters and imputed missing values from specific mixtures,
+ *  - It allows also to set parameters to a specific mixture,
+ *  - all data set are enclosed in a DataBridge structure and stored in vector v_data_
  *
  *  The pure virtual method to implement in derived classes are
  *  @code
- *  virtual void getParameters(IMixture* p_mixture, ArrayXX& data) const =0;
- *  virtual void setParameters(IMixture* p_mixture, ArrayXX const& data) const =0;
-    virtual IMixture* createMixtureImpl(String const& modelName, String const& idData, int nbCluster) =0;
+ *    virtual void getParameters(IMixture* p_mixture, ArrayXX& data) const =0;
+ *    virtual void setParameters(IMixture* p_mixture, ArrayXX const& data) const =0;
+ *    virtual IMixture* createMixtureImpl(String const& modelName, String const& idData, int nbCluster) =0;
  *  @endcode
  *
  *  @tparam DataHandler any concrete class from the interface STK::DataHandlerBase
@@ -118,13 +119,6 @@ class IMixtureManager
      **/
     virtual void setParameters(IMixture* p_mixture, ArrayXX const& data) const =0;
 
-    // template methods
-    /** get the missing values of a data set.
-     *  @param idData Id name of the data set attached to the mixture
-     *  @param data the array to return with the missing values
-     **/
-    template<typename Type>
-    void getMissingValues( String const& idData, std::vector< std::pair< std::pair<int,int>, Type > >& data) const;
     /** get the wrapper for any kind of data set using its Id
      *  @param idData Id name of the data set attached to the mixture
      *  @return a constant reference on the array with the data set
@@ -252,22 +246,6 @@ IDataBridge* IMixtureManager<DataHandler>::getDataBridge( String const& idData) 
   return 0;
 }
 
-/* get the missing values of a data set.
- *  @param idData Id name of the data set attached to the mixture
- *  @param data the array to return with the missing values
- **/
-template<class DataHandler>
-template<typename Type>
-void IMixtureManager<DataHandler>::getMissingValues( String const& idData, std::vector< std::pair< std::pair<int,int>, Type > >& data) const
-{
-  typedef typename hidden::DataHandlerTraits<DataHandler, Type>::Data DataType;
-  typedef DataBridge<DataType> DataBridgeType;
-
-  IDataBridge* p_data = getDataBridge(idData);
-  // up-cast... (Yes it's bad....;)...)
-  if (p_data)
-  { static_cast<DataBridgeType const*>(p_data)->getMissingValues(data);}
-}
 /* get the wrapper for any kind of data set using its Id
  *  @param idData Id name of the data set attached to the mixture
  *  @return a constant reference on the array with the data set

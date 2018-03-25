@@ -137,6 +137,5 @@ NULL
 #' @rdname summary-methods
 #' @exportMethod summary
 #'
-# @seealso \code{\link{base::summary}}
 #'
 NULL

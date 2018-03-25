@@ -32,10 +32,10 @@
  *  @brief In this file we implement the initialization methods.
  **/
 
-#include "STKernel/include/STK_Exceptions.h"
+#include <STKernel/include/STK_Exceptions.h>
 
-#include "../include/STK_MixtureInit.h"
-#include "../include/STK_MixtureAlgo.h"
+#include "../include/MixtureInit/STK_MixtureInit.h"
+#include "../include/MixtureAlgo/STK_MixtureAlgo.h"
 #include "../include/STK_IMixtureComposer.h"
 
 #include "Arrays/include/STK_Display.h"
@@ -55,7 +55,7 @@ bool IMixtureInit::runInitAlgo()
     p_initAlgo_->setModel(p_model_);
     return (p_initAlgo_->run());
   }
-  msg_error_ = _T("p_initAlgo is not initialized.");
+  msg_error_ = STKERROR_NO_ARG(ClassInit::run,p_initAlgo is not initialized\n);
   return false;
 }
 
@@ -85,11 +85,21 @@ bool RandomInit::run()
     }
     catch (Clust::exceptions const& error)
     {
-#ifdef STK_MIXTURE_VERBOSE
-      stk_cout << _T("In RandomInit::run(), try number") << iTry << " generate an exception.\n";
-#endif
       String msg = Clust::exceptionToString(error);
       msg_error_ = STKERROR_NO_ARG(ClassInit::run,msg\n);
+#ifdef STK_MIXTURE_VERBOSE
+      stk_cout << _T("In RandomInit::run(), try number") << iTry << " generate an exception.\n";
+      stk_cout << _T("In RandomInit::run(), error") << msg_error_ << _T("\n");
+#endif
+    }
+    catch (Exception const& error)
+    {
+      String msg = error.error();
+      msg_error_ = STKERROR_NO_ARG(ClassInit::run,msg\n);
+#ifdef STK_MIXTURE_VERBOSE
+      stk_cout << _T("In RandomInit::run(), try number") << iTry << " generate an exception.\n";
+      stk_cout << _T("In RandomInit::run(), error") << msg_error_ << _T("\n");
+#endif
     }
   } // iTry
 #ifdef STK_MIXTURE_VERY_VERBOSE
@@ -126,11 +136,21 @@ bool ClassInit::run()
     }
     catch (Clust::exceptions const& error)
     {
-#ifdef STK_MIXTURE_VERBOSE
-      stk_cout << _T("In ClassInit::run(), try number: ") << iTry << _T(" generate exception.\n");
-#endif
       String msg = Clust::exceptionToString(error);
       msg_error_ = STKERROR_NO_ARG(ClassInit::run,msg\n);
+#ifdef STK_MIXTURE_VERBOSE
+      stk_cout << _T("In ClassInit::run(), try number") << iTry << " generate an exception.\n";
+      stk_cout << _T("In ClassInit::run(), error") << msg_error_ << _T("\n");
+#endif
+    }
+    catch (Exception const& error)
+    {
+      String msg = error.error();
+      msg_error_ = STKERROR_NO_ARG(ClassInit::run,msg\n);
+#ifdef STK_MIXTURE_VERBOSE
+      stk_cout << _T("In ClassInit::run(), try number") << iTry << " generate an exception.\n";
+      stk_cout << _T("In ClassInit::run(), error") << msg_error_ << _T("\n");
+#endif
     }
   }
 #ifdef STK_MIXTURE_VERY_VERBOSE
@@ -169,8 +189,17 @@ bool FuzzyInit::run()
       String msg = Clust::exceptionToString(error);
       msg_error_ = STKERROR_NO_ARG(ClassInit::run,msg\n);
 #ifdef STK_MIXTURE_VERBOSE
-  stk_cout << _T("In FuzzyInit::run(), try number") << iTry << _T(" generate an exception.\n");
-  stk_cout << _T("In FuzzyInit::run(), error") << msg_error_ << _T("\n");
+      stk_cout << _T("In FuzzyInit::run(), try number") << iTry << _T(" generate an exception.\n");
+      stk_cout << _T("In FuzzyInit::run(), error") << msg_error_ << _T("\n");
+#endif
+    }
+    catch (Exception const& error)
+    {
+      String msg = error.error();
+      msg_error_ = STKERROR_NO_ARG(ClassInit::run,msg\n);
+#ifdef STK_MIXTURE_VERBOSE
+      stk_cout << _T("In FuzzyInit::run(), try number") << iTry << " generate an exception.\n";
+      stk_cout << _T("In FuzzyInit::run(), error") << msg_error_ << _T("\n");
 #endif
     }
   } // iTry

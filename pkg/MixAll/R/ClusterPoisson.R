@@ -22,7 +22,7 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
-#' @include ClusterModelNames.R IClusterModel.R
+#' @include global.R ClusterModelNames.R IClusterModel.R
 NULL
 
 #-----------------------------------------------------------------------
@@ -72,7 +72,7 @@ NULL
 #'
 #' @return An instance of the [\code{\linkS4class{ClusterPoisson}}] class.
 #' @author Serge Iovleff
-#' @export
+#'
 #'
 clusterPoisson <- function( data, nbCluster=2
                           , models= clusterPoissonNames()
@@ -436,7 +436,7 @@ setMethod(
 #' @aliases plot-ClusterPoisson, ClusterPoisson-method
 #' @docType methods
 #' @rdname plot-ClusterPoisson-method
-#' @export
+#'
 #'
 #' @seealso \code{\link{plot}}
 #' @examples

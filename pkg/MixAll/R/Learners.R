@@ -88,7 +88,7 @@ NULL
 #' @rdname learners
 #' @aliases learnDiagGaussian
 #' @author Serge Iovleff
-#' @export
+#'
 #'
 learnDiagGaussian <- function( data, labels, prop = NULL
                              , models=clusterDiagGaussianNames(prop = "equal")
@@ -282,7 +282,7 @@ learnCategorical <- function( data, labels, prop = NULL
 #'
 #' @return An instance of the [\code{\linkS4class{ClusterMixedData}}] class.
 #' @author Serge Iovleff
-#' @export
+#'
 #'
 learnMixedData <- function( data, models, labels, prop = NULL
                           , algo="impute", nbIter = 100, epsilon = 1e-08

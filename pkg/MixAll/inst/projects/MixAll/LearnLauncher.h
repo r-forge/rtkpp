@@ -62,8 +62,6 @@ class LearnLauncher: public ILauncher
     virtual ~LearnLauncher();
     /** run the estimation */
     bool run();
-    /** @return the model */
-    inline Rcpp::S4 const& s4_model() const { return s4_model_;}
 
   protected:
     /** strategy from the R side */
@@ -71,7 +69,7 @@ class LearnLauncher: public ILauncher
     /** character string with the model selection criterion name */
     std::string criterion_;
     /** learning algorithm to run */
-    IMixtureLearnAlgo* p_algo_;
+    IMixtureAlgoLearn* p_algo_;
     /** criterion to run */
     IMixtureCriterion* p_criterion_;
 
@@ -87,6 +85,8 @@ class LearnLauncher: public ILauncher
 
     /** pointer on the main learner */
     IMixtureLearner* p_learner_;
+    /** Is the model with mixed data ? */
+    bool isMixedData_;
 };
 
 } // namespace STK

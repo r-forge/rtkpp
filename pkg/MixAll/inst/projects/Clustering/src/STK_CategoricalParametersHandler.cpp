@@ -34,7 +34,7 @@
  *  mixture models
  **/
 
-#include "../include/CategoricalMixtureModels/STK_CategoricalParametersHandler.h"
+#include "../include/CategoricalModels/STK_CategoricalParametersHandler.h"
 
 namespace STK
 {

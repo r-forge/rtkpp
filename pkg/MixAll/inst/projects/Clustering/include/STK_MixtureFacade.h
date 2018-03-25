@@ -118,7 +118,7 @@ class LearnFacade: public IRunnerBase
     /** the mixture model to learn */
    IMixtureLearner* p_model_;
    /** the algorithm to use for learning */
-   IMixtureLearnAlgo* p_algo_;
+   IMixtureAlgoLearn* p_algo_;
 };
 
 }  // namespace STK

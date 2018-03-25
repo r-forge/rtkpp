@@ -21,6 +21,7 @@
 #
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
+NULL
 
 #-----------------------------------------------------------------------
 #' Create a vector of diagonal Gaussian mixture model names.
@@ -58,7 +59,7 @@
 #' clusterDiagGaussianNames(prop="all", sdInCluster="equal", sdBetweenCluster= "free")
 #'
 #' @rdname clusterDiagGaussianNames
-#' @export
+#'
 clusterDiagGaussianNames <- function(prop = "all", sdInCluster="all", sdBetweenCluster = "all")
 {
   if(sum(prop %in% c("equal","free","all")) != 1)
@@ -145,7 +146,7 @@ clusterValidDiagGaussianNames <- function(names)
 #' clusterGammaNames("all", "equal", "free", "free", "equal")
 #'
 #' @rdname clusterGammaNames
-#' @export
+#'
 clusterGammaNames <- function( prop = "all", shapeInCluster="all", shapeBetweenCluster="all"
                              , scaleInCluster= "all", scaleBetweenCluster="all")
 {
@@ -288,7 +289,7 @@ clusterValidGammaNames <- function(names)
 #' clusterCategoricalNames("all", "equal") # same as c( "categorical_pk_pk", "categorical_p_pk")
 #'
 #' @rdname clusterCategoricalNames
-#' @export
+#'
 clusterCategoricalNames <- function(prop = "all", probabilities="all")
 {
   if(sum(prop %in% c("equal","free","all")) != 1)
@@ -354,7 +355,7 @@ clusterValidCategoricalNames <- function(names)
 #' clusterPoissonNames("all", "proportional") # same as c( "poisson_pk_ljlk", "poisson_p_ljlk")
 #'
 #' @rdname clusterPoissonNames
-#' @export
+#'
 clusterPoissonNames <- function(prop = "all", mean="all")
 {
   if(sum(prop %in% c("equal","free","all")) != 1)

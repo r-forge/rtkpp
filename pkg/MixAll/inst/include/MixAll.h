@@ -52,6 +52,12 @@ SEXP clusterMixture( SEXP model, SEXP nbCluster, SEXP models, SEXP nbCore);
  */
 SEXP clusterMixedData( SEXP model, SEXP nbCluster, SEXP nbCore);
 
+/** @param model  any model derived from IClusterModel S4 class
+ *  @param result an instance of ClusterPredict S4 class
+ *  @param nbCore number of core to use
+ */
+SEXP clusterPredict( SEXP model, SEXP result, SEXP nbCore );
+
 // kmm methods
 /** estimate the kernel mixture model
  *  @param model a Kmm S4 class

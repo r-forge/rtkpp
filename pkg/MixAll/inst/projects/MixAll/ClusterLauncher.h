@@ -85,6 +85,8 @@ class ClusterLauncher: public ILauncher
     Real selectBestMixedModel();
     /** pointer on the main composer */
     IMixtureComposer* p_composer_;
+    /** Is the model with mixed data ? */
+    bool isMixedData_;
 };
 
 } // namespace STK

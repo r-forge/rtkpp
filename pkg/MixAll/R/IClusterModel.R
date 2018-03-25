@@ -28,7 +28,7 @@ NULL
 #-----------------------------------------------------------------------
 #' Definition of the [\code{\linkS4class{IClusterComponent}}] class
 #'
-#' This class defines a component of a mixture Model
+#' Interface base class defining a component of a mixture Model
 #'
 #' @slot data  Matrix with the data set
 #' @slot missing  Matrix with the indexes of the missing values
@@ -43,13 +43,13 @@ NULL
 #' @rdname IClusterComponent-class
 #' @aliases IClusterComponent-class
 #' @exportClass IClusterComponent
-#'
+#' @export IClusterComponent
 setClass(
-  Class="IClusterComponent",
+  Class = "IClusterComponent",
   representation( data      = "matrix"
-    , missing   = "matrix"
-    , modelName = "character"
-    , "VIRTUAL"),
+                , missing   = "matrix"
+                , modelName = "character"
+                , "VIRTUAL"),
   validity=function(object)
   {
 # called too soon when Component is part of an other S4 class
@@ -159,19 +159,20 @@ setMethod(
 #' @rdname ClusterModels-class
 #' @aliases IClusterModel-class
 #' @exportClass IClusterModel
+#' @export IClusterModel
 setClass(
   Class="IClusterModel",
-  representation( nbSample = "numeric"
-                , nbCluster = "numeric"
-                , pk = "numeric"
-                , tik = "matrix"
-                , lnFi = "numeric"
-                , zi = "integer"
-                , lnLikelihood = "numeric"
-                , criterionName = "character"
-                , criterion = "numeric"
+  representation( nbSample        = "numeric"
+                , nbCluster       = "numeric"
+                , pk              = "numeric"
+                , tik             = "matrix"
+                , lnFi            = "numeric"
+                , zi              = "integer"
+                , lnLikelihood    = "numeric"
+                , criterionName   = "character"
+                , criterion       = "numeric"
                 , nbFreeParameter = "numeric"
-                , strategy = "ClusterStrategy"
+                , strategy        = "ClusterStrategy"
                 , "VIRTUAL"
                 ),
   # validity function

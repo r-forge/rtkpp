@@ -34,7 +34,7 @@
  *  mixture models
  **/
 
-#include "../include/GammaMixtureModels/STK_GammaParametersHandler.h"
+#include "../include/GammaModels/STK_GammaParametersHandler.h"
 
 namespace STK
 {

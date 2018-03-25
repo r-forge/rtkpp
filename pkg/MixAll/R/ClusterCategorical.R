@@ -75,7 +75,7 @@ NULL
 #'
 #' @return An instance of the [\code{\linkS4class{ClusterCategorical}}] class.
 #' @author Serge Iovleff
-#' @export
+#'
 #'
 clusterCategorical <- function( data, nbCluster=2
                               , models=clusterCategoricalNames(probabilities="free")
@@ -142,7 +142,7 @@ clusterCategorical <- function( data, nbCluster=2
 #' @name ClusterCategoricalComponent
 #' @rdname ClusterCategoricalComponent-class
 #' @aliases ClusterCategoricalComponent-class
-#' @exportClass ClusterCategoricalComponent
+#' @export
 #'
 setClass(
   Class="ClusterCategoricalComponent",
@@ -494,7 +494,7 @@ setMethod(
 #' @aliases plot-ClusterCategorical
 #' @docType methods
 #' @rdname plot-ClusterCategorical-method
-#' @export
+#'
 #'
 #' @seealso \code{\link{plot}}
 #' @examples

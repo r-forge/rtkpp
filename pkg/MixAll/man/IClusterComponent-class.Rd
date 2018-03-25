@@ -8,7 +8,7 @@
 \alias{ClusterPoissonComponent-class}
 \title{Definition of the [\code{\linkS4class{IClusterComponent}}] class}
 \description{
-This class defines a component of a mixture Model
+Interface base class defining a component of a mixture Model
 
 This class defines a poisson component of a mixture Model. It inherits
 from [\code{\linkS4class{IClusterComponent}}].

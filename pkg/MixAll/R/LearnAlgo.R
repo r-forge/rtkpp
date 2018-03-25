@@ -56,7 +56,7 @@
 #'
 #' @return a [\code{\linkS4class{LearnAlgo}}] object
 #' @author Serge Iovleff
-#' @export
+#'
 #'
 learnAlgo <- function( algo="Simul", nbIteration=200, epsilon=1e-07)
 {

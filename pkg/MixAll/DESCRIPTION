@@ -5,6 +5,8 @@ Title: Clustering using Mixture Models
 Authors@R: c(person("Serge", "Iovleff", role = c("aut","cre"), email = "Serge.Iovleff@stkpp.org")
             ,person("Parmeet", "Bathia", role = c("ctb"), email = "Bathia.Parmeet@gmail.com")
             )
+Author: Serge Iovleff [aut, cre], Parmeet Bathia [ctb]
+Maintainer: Serge Iovleff <Serge.Iovleff@stkpp.org>
 Copyright: inria, University Lille 1
 Depends:
     R (>= 3.0.2),
@@ -21,6 +23,7 @@ Roxygen: list(wrap = FALSE)
 SystemRequirements: GNU make
 Collate: 
     'ClusterAlgo.R'
+    'ClusterAlgoPredict.R'
     'ClusterInit.R'
     'ClusterStrategy.R'
     'IClusterModel.R'
@@ -32,6 +35,7 @@ Collate:
     'ClusterMixedData.R'
     'ClusterPlot.R'
     'ClusterPoisson.R'
+    'ClusterPredict.R'
     'LearnAlgo.R'
     'Learners.R'
     'MixAll.R'

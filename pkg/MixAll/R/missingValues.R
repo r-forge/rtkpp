@@ -26,7 +26,7 @@
 #' @rdname missingValues-methods
 #' @aliases missingValues,ClusterDiagGaussian-method
 setMethod(
-  "missingValues",
+  f="missingValues",
   c("ClusterMixedData"),
   function(x)
   {
@@ -47,7 +47,7 @@ setMethod(
 #' @rdname missingValues-methods
 #' @aliases missingValues,ClusterDiagGaussianComponent-method
 setMethod(
-  "missingValues",
+  f="missingValues",
   c("ClusterDiagGaussianComponent"),
   function(x)
   { res = cbind(x@missing, x@data[x@missing]);
@@ -60,7 +60,7 @@ setMethod(
 #' @rdname missingValues-methods
 #' @aliases missingValues,ClusterDiagGaussian-method
 setMethod(
-  "missingValues",
+  f="missingValues",
   c("ClusterDiagGaussian"),
   function(x) { return(missingValues(x@component));}
 )
@@ -68,7 +68,7 @@ setMethod(
 #' @rdname missingValues-methods
 #' @aliases missingValues,ClusterGammaComponent-method
 setMethod(
-    "missingValues",
+    f="missingValues",
     c("ClusterGammaComponent"),
     function(x)
     { res = cbind(x@missing, x@data[x@missing]);
@@ -81,7 +81,7 @@ setMethod(
 #' @rdname missingValues-methods
 #' @aliases missingValues,ClusterGamma-method
 setMethod(
-  "missingValues",
+  f="missingValues",
   c("ClusterGamma"),
   function(x) { return(missingValues(x@component));}
 )
@@ -111,7 +111,7 @@ setMethod(
 #' @rdname missingValues-methods
 #' @aliases missingValues,ClusterPoissonComponent-method
 setMethod(
-  "missingValues",
+  f="missingValues",
   c("ClusterPoissonComponent"),
   function(x)
   { res = cbind(x@missing, x@data[x@missing]);
@@ -121,18 +121,32 @@ setMethod(
     return(res)
   }
 )
+
 #' @rdname missingValues-methods
 #' @aliases missingValues,ClusterPoisson-method
 setMethod(
-  "missingValues",
+  f="missingValues",
   c("ClusterPoisson"),
   function(x) { return(missingValues(x@component));}
 )
 
 #' @rdname missingValues-methods
+#' @aliases missingValues,ClusterPredict-method
+setMethod(
+  f="missingValues",
+  signature=c("ClusterPredict"),
+  function(x)
+  { res = cbind(x@missing, x@data[x@missing]);
+    colnames(res)[3] <- "value";
+    nmiss <- nrow(x@missing)
+    if (nmiss > 0) { rownames(res) <- 1:nmiss}
+    return(res)
+  }
+)
+#' @rdname missingValues-methods
 #' @aliases missingValues,KmmComponent-method
 setMethod(
-    "missingValues",
+    f="missingValues",
     c("KmmComponent"),
     function(x)
     {
@@ -142,7 +156,7 @@ setMethod(
 #' @rdname missingValues-methods
 #' @aliases missingValues,KernelMixtureModel-method
 setMethod(
-    "missingValues",
+    f="missingValues",
     c("KernelMixtureModel"),
     function(x) { return(NULL);}
 )

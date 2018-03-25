@@ -51,6 +51,8 @@ LearnLauncher::LearnLauncher( Rcpp::S4 model, Rcpp::CharacterVector models, Rcpp
                             , p_algo_(0)
                             , p_criterion_(0)
                             , p_learner_(0)
+                            , isMixedData_(false)
+
 {}
 /* facade design pattern.
  * The LearnLauncher allow to create the strategy for estimating a mixture model
@@ -63,6 +65,8 @@ LearnLauncher::LearnLauncher( Rcpp::S4 model, Rcpp::S4 algo )
                             , p_algo_(0)
                             , p_criterion_(0)
                             , p_learner_(0)
+                            , isMixedData_(true)
+
 {}
 /* destructor. */
 LearnLauncher::~LearnLauncher()
@@ -75,15 +79,11 @@ LearnLauncher::~LearnLauncher()
 /* run the estimation */
 bool LearnLauncher::run()
 {
-  // create criterion runner
-  if (criterion_ == "BIC") { p_criterion_ = new BICMixtureCriterion();}
-  else if (criterion_ == "AIC") { p_criterion_ = new AICMixtureCriterion();}
-    else if (criterion_ == "ICL") { p_criterion_ = new ICLMixtureCriterion();}
-      else if (criterion_ == "ML") { p_criterion_ = new MLMixtureCriterion();}
-        else
-      { msg_error_ = STKERROR_1ARG(LearnLauncher::run,criterion_,Wrong criterion name);
-        return false;
-      }
+  p_criterion_ = Clust::createCriterion(criterion_);
+  if (!p_criterion_)
+  { msg_error_ = STKERROR_1ARG(LearnLauncher::run,criterion_,Wrong criterion name);
+    return false;
+  }
   // create algo runner
   std::string algoName = s4_algo_.slot("algo");
   STK::Real epsilon    = s4_algo_.slot("epsilon");

@@ -31,11 +31,13 @@
 /** @file STK_Clust_Util.cpp
  *  @brief In this file we implement the utilities functions of the Clustering project.
  **/
+#include <Clustering/include/MixtureCriterion/STK_MixtureCriterion.h>
+#include <Clustering/include/MixtureInit/STK_MixtureInit.h>
+#include <Clustering/include/MixtureStrategy/STK_MixtureStrategy.h>
 #include "../include/STK_IMixtureComposer.h"
-#include "../include/STK_MixtureAlgo.h"
-#include "../include/STK_MixtureInit.h"
-#include "../include/STK_MixtureStrategy.h"
-#include "../include/STK_MixtureCriterion.h"
+#include "../include/MixtureAlgo/STK_MixtureAlgo.h"
+#include "../include/MixtureAlgo/STK_MixtureAlgoLearn.h"
+#include "../include/MixtureAlgo/STK_MixtureAlgoPredict.h"
 
 namespace STK
 {
@@ -99,6 +101,25 @@ algoType stringToAlgo( std::string const& type)
   if (toUpperString(type) == toUpperString(_T("sem"))) return semAlgo_;
   if (toUpperString(type) == toUpperString(_T("semiSem"))) return semiSemAlgo_;
   return emAlgo_;
+}
+
+/* @ingroup Clustering
+ *  Convert a String to an algoPredictType. The recognized strings are
+ * <table>
+ * <tr> <th> Algorithm     </th></tr>
+ * <tr> <td> "em"          </td></tr>
+ * <tr> <td> "semiSem"         </td></tr>
+ * </table>
+ *  @param type the type of algorithm wanted
+ *  @return the algoPredictType corresponding (default is em)
+ *  @note The capitalized letters have no effect and if the string is not found
+ *  in the list above, the type Clust::emPredictAlgo_ is returned.
+ **/
+algoPredictType stringToPredictAlgo( std::string const& type)
+{
+  if (toUpperString(type) == toUpperString(_T("em"))) return emPredictAlgo_;
+  if (toUpperString(type) == toUpperString(_T("semiSem"))) return semiSEMPredictAlgo_;
+  return emPredictAlgo_;
 }
 
 /* @ingroup Clustering
@@ -194,33 +215,33 @@ MixtureClass mixtureToMixtureClass( Mixture const& type)
   if (type == Gaussian_s_)        return DiagGaussian_;
   if (type == Gaussian_sjsk_)     return DiagGaussian_;
   if (type == HDGaussian_ajk_bk_qk_dk_) return HDGaussian_;
-  if (type == HDGaussian_ajk_bk_qk_d_) return HDGaussian_;
-  if (type == HDGaussian_ajk_bk_q_dk_) return HDGaussian_;
-  if (type == HDGaussian_ajk_bk_q_d_) return HDGaussian_;
-  if (type == HDGaussian_ajk_b_qk_dk_) return HDGaussian_;
-  if (type == HDGaussian_ajk_b_qk_d_) return HDGaussian_;
-  if (type == HDGaussian_ajk_b_q_dk_) return HDGaussian_;
-  if (type == HDGaussian_ajk_b_q_d_) return HDGaussian_;
-  if (type == HDGaussian_ak_bk_qk_dk_) return HDGaussian_;
-  if (type == HDGaussian_ak_bk_qk_d_) return HDGaussian_;
-  if (type == HDGaussian_ak_bk_q_dk_) return HDGaussian_;
-  if (type == HDGaussian_ak_bk_q_d_) return HDGaussian_;
-  if (type == HDGaussian_ak_b_qk_dk_) return HDGaussian_;
-  if (type == HDGaussian_ak_b_qk_d_) return HDGaussian_;
-  if (type == HDGaussian_ak_b_q_dk_) return HDGaussian_;
-  if (type == HDGaussian_ak_b_q_d_) return HDGaussian_;
-  if (type == HDGaussian_aj_bk_qk_dk_) return HDGaussian_;
-  if (type == HDGaussian_aj_bk_qk_d_) return HDGaussian_;
-  if (type == HDGaussian_aj_bk_q_dk_) return HDGaussian_;
-  if (type == HDGaussian_aj_bk_q_d_) return HDGaussian_;
-  if (type == HDGaussian_aj_b_qk_dk_) return HDGaussian_;
-  if (type == HDGaussian_aj_b_qk_d_) return HDGaussian_;
-  if (type == HDGaussian_a_bk_qk_dk_) return HDGaussian_;
-  if (type == HDGaussian_a_bk_qk_d_) return HDGaussian_;
-  if (type == HDGaussian_a_bk_q_dk_) return HDGaussian_;
-  if (type == HDGaussian_a_bk_q_d_) return HDGaussian_;
-  if (type == HDGaussian_a_b_qk_dk_) return HDGaussian_;
-  if (type == HDGaussian_a_b_qk_d_) return HDGaussian_;
+  if (type == HDGaussian_ajk_bk_qk_d_)  return HDGaussian_;
+  if (type == HDGaussian_ajk_bk_q_dk_)  return HDGaussian_;
+  if (type == HDGaussian_ajk_bk_q_d_)   return HDGaussian_;
+  if (type == HDGaussian_ajk_b_qk_dk_)  return HDGaussian_;
+  if (type == HDGaussian_ajk_b_qk_d_)   return HDGaussian_;
+  if (type == HDGaussian_ajk_b_q_dk_)   return HDGaussian_;
+  if (type == HDGaussian_ajk_b_q_d_)    return HDGaussian_;
+  if (type == HDGaussian_ak_bk_qk_dk_)  return HDGaussian_;
+  if (type == HDGaussian_ak_bk_qk_d_)   return HDGaussian_;
+  if (type == HDGaussian_ak_bk_q_dk_)   return HDGaussian_;
+  if (type == HDGaussian_ak_bk_q_d_)    return HDGaussian_;
+  if (type == HDGaussian_ak_b_qk_dk_)   return HDGaussian_;
+  if (type == HDGaussian_ak_b_qk_d_)    return HDGaussian_;
+  if (type == HDGaussian_ak_b_q_dk_)    return HDGaussian_;
+  if (type == HDGaussian_ak_b_q_d_)     return HDGaussian_;
+  if (type == HDGaussian_aj_bk_qk_dk_)  return HDGaussian_;
+  if (type == HDGaussian_aj_bk_qk_d_)   return HDGaussian_;
+  if (type == HDGaussian_aj_bk_q_dk_)   return HDGaussian_;
+  if (type == HDGaussian_aj_bk_q_d_)    return HDGaussian_;
+  if (type == HDGaussian_aj_b_qk_dk_)   return HDGaussian_;
+  if (type == HDGaussian_aj_b_qk_d_)    return HDGaussian_;
+  if (type == HDGaussian_a_bk_qk_dk_)   return HDGaussian_;
+  if (type == HDGaussian_a_bk_qk_d_)    return HDGaussian_;
+  if (type == HDGaussian_a_bk_q_dk_)    return HDGaussian_;
+  if (type == HDGaussian_a_bk_q_d_)     return HDGaussian_;
+  if (type == HDGaussian_a_b_qk_dk_)    return HDGaussian_;
+  if (type == HDGaussian_a_b_qk_d_)     return HDGaussian_;
   if (type == Categorical_pjk_)   return Categorical_;
   if (type == Categorical_pk_)    return Categorical_;
   if (type == Poisson_ljk_)       return Poisson_;
@@ -228,7 +249,8 @@ MixtureClass mixtureToMixtureClass( Mixture const& type)
   if (type == Poisson_ljlk_)      return Poisson_;
   if (type == KernelGaussian_sk_) return Kernel_;
   if (type == KernelGaussian_s_)  return Kernel_;
-  return unknown_mixture_class_;
+  if (type == unknown_mixture_)   return unknown_mixture_class_;
+  return unknown_mixture_class_; // avoid compiler warning
 }
 
 /* @ingroup Clustering
@@ -239,62 +261,64 @@ MixtureClass mixtureToMixtureClass( Mixture const& type)
  **/
 Mixture stringToMixture( std::string const& type)
 {
-  if (toUpperString(type) == toUpperString(_T("Gamma_ajk_bjk"))) return Gamma_ajk_bjk_;
-  if (toUpperString(type) == toUpperString(_T("Gamma_ajk_bk"))) return Gamma_ajk_bk_;
-  if (toUpperString(type) == toUpperString(_T("Gamma_ajk_bj"))) return Gamma_ajk_bj_;
-  if (toUpperString(type) == toUpperString(_T("Gamma_ajk_b"))) return Gamma_ajk_b_;
-  if (toUpperString(type) == toUpperString(_T("Gamma_ak_bjk"))) return Gamma_ak_bjk_;
-  if (toUpperString(type) == toUpperString(_T("Gamma_ak_bk"))) return Gamma_ak_bk_;
-  if (toUpperString(type) == toUpperString(_T("Gamma_ak_bj"))) return Gamma_ak_bj_;
-  if (toUpperString(type) == toUpperString(_T("Gamma_ak_b"))) return Gamma_ak_b_;
-  if (toUpperString(type) == toUpperString(_T("Gamma_aj_bjk"))) return Gamma_aj_bjk_;
-  if (toUpperString(type) == toUpperString(_T("Gamma_aj_bk"))) return Gamma_aj_bk_;
-  if (toUpperString(type) == toUpperString(_T("Gamma_a_bjk"))) return Gamma_a_bjk_;
-  if (toUpperString(type) == toUpperString(_T("Gamma_a_bk"))) return Gamma_a_bk_;
-  if (toUpperString(type) == toUpperString(_T("Gaussian_sjk")))  return Gaussian_sjk_;
-  if (toUpperString(type) == toUpperString(_T("Gaussian_sk")))   return Gaussian_sk_;
-  if (toUpperString(type) == toUpperString(_T("Gaussian_sj")))   return Gaussian_sj_;
-  if (toUpperString(type) == toUpperString(_T("Gaussian_s")))    return Gaussian_s_;
-  if (toUpperString(type) == toUpperString(_T("Gaussian_sjsk"))) return Gaussian_sjsk_;
-  if (toUpperString(type) == toUpperString(_T("Categorical_pjk"))) return Categorical_pjk_;
-  if (toUpperString(type) == toUpperString(_T("Categorical_pk")))  return Categorical_pk_;
-  if (toUpperString(type) == toUpperString(_T("Poisson_ljk"))) return Poisson_ljk_;
-  if (toUpperString(type) == toUpperString(_T("Poisson_lk")))  return Poisson_lk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_ajk_bjk")))    return Gamma_ajk_bjk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_ajk_bk")))     return Gamma_ajk_bk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_ajk_bj")))     return Gamma_ajk_bj_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_ajk_b")))      return Gamma_ajk_b_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_ak_bjk")))     return Gamma_ak_bjk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_ak_bk")))      return Gamma_ak_bk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_ak_bj")))      return Gamma_ak_bj_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_ak_b")))       return Gamma_ak_b_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_aj_bjk")))     return Gamma_aj_bjk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_aj_bk")))      return Gamma_aj_bk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_a_bjk")))      return Gamma_a_bjk_;
+  if (toUpperString(type) == toUpperString(_T("Gamma_a_bk")))       return Gamma_a_bk_;
+  if (toUpperString(type) == toUpperString(_T("Gaussian_sjk")))     return Gaussian_sjk_;
+  if (toUpperString(type) == toUpperString(_T("Gaussian_sk")))      return Gaussian_sk_;
+  if (toUpperString(type) == toUpperString(_T("Gaussian_sj")))      return Gaussian_sj_;
+  if (toUpperString(type) == toUpperString(_T("Gaussian_s")))       return Gaussian_s_;
+  if (toUpperString(type) == toUpperString(_T("Gaussian_sjsk")))    return Gaussian_sjsk_;
+  if (toUpperString(type) == toUpperString(_T("Categorical_pjk")))  return Categorical_pjk_;
+  if (toUpperString(type) == toUpperString(_T("Categorical_pk")))   return Categorical_pk_;
+  if (toUpperString(type) == toUpperString(_T("Poisson_ljk")))      return Poisson_ljk_;
+  if (toUpperString(type) == toUpperString(_T("Poisson_lk")))       return Poisson_lk_;
   if (toUpperString(type) == toUpperString(_T("Poisson_ljlk")))     return Poisson_ljlk_;
   if (toUpperString(type) == toUpperString(_T("KernelGaussian_sk")))return KernelGaussian_sk_;
   if (toUpperString(type) == toUpperString(_T("KernelGaussian_s"))) return KernelGaussian_s_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_ajk_bk_qk_dk"))) return HDGaussian_ajk_bk_qk_dk_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_ajk_bk_qk_dk")))return HDGaussian_ajk_bk_qk_dk_;
   if (toUpperString(type) == toUpperString(_T("HDGaussian_ajk_bk_qk_d"))) return HDGaussian_ajk_bk_qk_d_;
   if (toUpperString(type) == toUpperString(_T("HDGaussian_ajk_bk_q_dk"))) return HDGaussian_ajk_bk_q_dk_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_ajk_bk_q_d"))) return HDGaussian_ajk_bk_q_d_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_ajk_bk_q_d")))  return HDGaussian_ajk_bk_q_d_;
   if (toUpperString(type) == toUpperString(_T("HDGaussian_ajk_b_qk_dk"))) return HDGaussian_ajk_b_qk_dk_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_ajk_b_qk_d"))) return HDGaussian_ajk_b_qk_d_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_ajk_b_q_dk"))) return HDGaussian_ajk_b_q_dk_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_ajk_b_q_d"))) return HDGaussian_ajk_b_q_d_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_ajk_b_qk_d")))  return HDGaussian_ajk_b_qk_d_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_ajk_b_q_dk")))  return HDGaussian_ajk_b_q_dk_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_ajk_b_q_d")))   return HDGaussian_ajk_b_q_d_;
   if (toUpperString(type) == toUpperString(_T("HDGaussian_ak_bk_qk_dk"))) return HDGaussian_ak_bk_qk_dk_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_ak_bk_qk_d"))) return HDGaussian_ak_bk_qk_d_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_ak_bk_q_dk"))) return HDGaussian_ak_bk_q_dk_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_ak_bk_q_d"))) return HDGaussian_ak_bk_q_d_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_ak_b_qk_dk"))) return HDGaussian_ak_b_qk_dk_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_ak_b_qk_d"))) return HDGaussian_ak_b_qk_d_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_ak_b_q_dk"))) return HDGaussian_ak_b_q_dk_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_ak_b_q_d"))) return HDGaussian_ak_b_q_d_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_ak_bk_qk_d")))  return HDGaussian_ak_bk_qk_d_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_ak_bk_q_dk")))  return HDGaussian_ak_bk_q_dk_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_ak_bk_q_d")))   return HDGaussian_ak_bk_q_d_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_ak_b_qk_dk")))  return HDGaussian_ak_b_qk_dk_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_ak_b_qk_d")))   return HDGaussian_ak_b_qk_d_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_ak_b_q_dk")))   return HDGaussian_ak_b_q_dk_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_ak_b_q_d")))    return HDGaussian_ak_b_q_d_;
   if (toUpperString(type) == toUpperString(_T("HDGaussian_aj_bk_qk_dk"))) return HDGaussian_aj_bk_qk_dk_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_aj_bk_qk_d"))) return HDGaussian_aj_bk_qk_d_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_aj_bk_q_dk"))) return HDGaussian_aj_bk_q_dk_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_aj_bk_q_d"))) return HDGaussian_aj_bk_q_d_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_aj_b_qk_dk"))) return HDGaussian_aj_b_qk_dk_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_aj_b_qk_d"))) return HDGaussian_aj_b_qk_d_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_a_bk_qk_dk"))) return HDGaussian_a_bk_qk_dk_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_a_bk_qk_d"))) return HDGaussian_a_bk_qk_d_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_a_bk_q_dk"))) return HDGaussian_a_bk_q_dk_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_a_bk_q_d"))) return HDGaussian_a_bk_q_d_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_a_b_qk_dk"))) return HDGaussian_a_b_qk_dk_;
-  if (toUpperString(type) == toUpperString(_T("HDGaussian_a_b_qk_d"))) return HDGaussian_a_b_qk_d_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_aj_bk_qk_d")))  return HDGaussian_aj_bk_qk_d_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_aj_bk_q_dk")))  return HDGaussian_aj_bk_q_dk_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_aj_bk_q_d")))   return HDGaussian_aj_bk_q_d_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_aj_b_qk_dk")))  return HDGaussian_aj_b_qk_dk_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_aj_b_qk_d")))   return HDGaussian_aj_b_qk_d_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_a_bk_qk_dk")))  return HDGaussian_a_bk_qk_dk_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_a_bk_qk_d")))   return HDGaussian_a_bk_qk_d_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_a_bk_q_dk")))   return HDGaussian_a_bk_q_dk_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_a_bk_q_d")))    return HDGaussian_a_bk_q_d_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_a_b_qk_dk")))   return HDGaussian_a_b_qk_dk_;
+  if (toUpperString(type) == toUpperString(_T("HDGaussian_a_b_qk_d")))    return HDGaussian_a_b_qk_d_;
 #ifdef STK_MIXTURE_DEBUG
   stk_cout << _T("In stringToMixture, mixture ") << type << _T(" not found.\n");
 #endif
-  return unknown_mixture_;
+  // try second naming sheme
+  bool freeProp;
+  return stringToMixture(type, freeProp);
 }
 /* @ingroup Clustering
  *  convert a String to an Mixture.
@@ -622,6 +646,13 @@ IMixtureCriterion* createCriterion( Clust::criterionType type)
   return p_criter;
 }
 
+/* @return a pointer on the class computing the criterion */
+STK::IMixtureCriterion* createCriterion( std::string const& criterion)
+{
+  criterionType type = STK::Clust::stringToCriterion(criterion);
+  return createCriterion(type);
+}
+
 /* utility function for creating an estimation algorithm
  *  @param algo the algorithm to create
  *  @param nbIterMax the maximal number of iteration of the algorithm
@@ -660,9 +691,9 @@ IMixtureAlgo* createAlgo(Clust::algoType algo, int nbIterMax, Real epsilon)
  *  @param nbIterMax the maximal number of iteration of the algorithm
  *  @param epsilon the tolerance of the algorithm
  **/
-IMixtureLearnAlgo* createLearnAlgo(Clust::algoLearnType algo, int nbIterMax, Real epsilon)
+IMixtureAlgoLearn* createLearnAlgo(Clust::algoLearnType algo, int nbIterMax, Real epsilon)
 {
-  IMixtureLearnAlgo* p_algo = 0;
+  IMixtureAlgoLearn* p_algo = 0;
   switch (algo)
   {
   case imputeAlgo_:
@@ -677,6 +708,34 @@ IMixtureLearnAlgo* createLearnAlgo(Clust::algoLearnType algo, int nbIterMax, Rea
   if (p_algo)
   {
     p_algo->setNbIterMax(nbIterMax);
+    p_algo->setEpsilon(epsilon);
+  }
+  return p_algo;
+}
+
+/* utility function for creating an estimation algorithm
+ *  @param algo the algorithm to create
+ *  @param nbIterMax the maximal number of iteration of the algorithm
+ *  @param epsilon the tolerance of the algorithm
+ **/
+IMixtureAlgoPredict* createPredictAlgo(Clust::algoPredictType algo, int nbIterBurn, int nbIterLong, Real epsilon)
+{
+  IMixtureAlgoPredict* p_algo = 0;
+  switch (algo)
+  {
+    case emPredictAlgo_:
+      p_algo = new EMPredict();
+      break;
+    case semiSEMPredictAlgo_:
+      p_algo = new SemiSEMPredict();
+      break;
+    default:
+      break;
+  }
+  if (p_algo)
+  {
+    p_algo->setNbIterBurn(nbIterBurn);
+    p_algo->setNbIterLong(nbIterLong);
     p_algo->setEpsilon(epsilon);
   }
   return p_algo;

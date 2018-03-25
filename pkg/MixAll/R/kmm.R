@@ -87,7 +87,7 @@ NULL
 #'
 #' @return a [\code{\linkS4class{ClusterStrategy}}] object
 #' @author Serge Iovleff
-#' @export
+#'
 kmmStrategy <- function( nbTry =1
                        , nbInit= 5, initMethod="class", initAlgo= "EM", nbInitIteration=20, initEpsilon=0.01
                        , nbShortRun= 5, shortRunAlgo= "EM", nbShortIteration=100, shortEpsilon=1e-04
@@ -170,7 +170,7 @@ kmmStrategy <- function( nbTry =1
 #'
 #' @return An instance of the [\code{\linkS4class{KernelMixtureModel}}] class.
 #' @author Serge Iovleff
-#' @export
+#'
 #'
 kmm <- function( data, nbCluster=2
                , dim = 10, models = "kmm_s", prop = "free"
@@ -437,7 +437,9 @@ setMethod(
     signature=c("KernelMixtureModel"),
     definition=function(.Object, data, nbCluster=2
                        , modelName = "kmm_s", dim= 10
-                       , kernelName = "Gaussian", kernelParameters = c(1), kernelComputation=TRUE
+                       , kernelName = "Gaussian"
+                       , kernelParameters = c(1)
+                       , kernelComputation=TRUE
                        )
     {
       # for data
@@ -526,7 +528,7 @@ setMethod(
 #' @aliases plot-KernelMixtureModel
 #' @docType methods
 #' @rdname plot-KernelMixtureModel-method
-#' @export
+#'
 #'
 #' @seealso \code{\link{plot}}
 #' @examples

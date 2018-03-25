@@ -74,14 +74,11 @@ class RDataHandler: public DataHandlerBase<RDataHandler>
     typedef DataHandlerBase<RDataHandler> Base;
     typedef Base::InfoMap InfoMap;
     typedef std::map<std::string, int> InfoType;
+
     /** default constructor */
-    inline RDataHandler(): Base(), nbSample_(0), nbVariable_(0) {}
+    inline RDataHandler(): Base() {}
     /** destructor */
     inline ~RDataHandler() {}
-    /** @return the number of sample (the number of rows of the data) */
-    inline int nbSample() const { return nbSample_;}
-    /** @return the number of variables (the number of columns of the data) */
-    inline int nbVariable() const { return nbVariable_;}
 
     /** Add a Matrix to the existing data sets
      *  @param idData Id of the data set
@@ -91,13 +88,12 @@ class RDataHandler: public DataHandlerBase<RDataHandler>
      *  in the next release of Rcpp).
      **/
     template<int Rtype>
-    inline void addData( Rcpp::Matrix<Rtype> const& data, std::string idData, std::string const& idModel )
+    void addData( Rcpp::Matrix<Rtype> const& data, std::string idData, std::string const& idModel )
     {
       if (addInfo(idData, idModel))
       {
         data_.push_back(data, idData);
         addType(idData, Rtype);
-        nbVariable_ += data.cols();
       }
     }
     /** return in an CArray the copied data with the given idData */
@@ -112,6 +108,18 @@ class RDataHandler: public DataHandlerBase<RDataHandler>
       RMatrix<Type> aux(Rdata);
       data = aux;
       nbVariable = data.sizeCols();
+    }
+    /** return in an CArray the copied data with the given idData */
+    template<typename Type>
+    void getData(std::string const& idData, CArray<Type>& data) const
+    {
+      enum
+      {
+        Rtype_ = hidden::RcppTraits<Type>::Rtype_
+      };
+      Rcpp::Matrix<Rtype_> Rdata = data_[idData];
+      RMatrix<Type> aux(Rdata);
+      data = aux;
     }
 
   private:
@@ -130,10 +138,6 @@ class RDataHandler: public DataHandlerBase<RDataHandler>
      * - Rtype: an integer (defined in Rinternal.h) giving the type of the data
      **/
     InfoType infoType_;
-    /** Number of sample */
-    int nbSample_;
-    /** Number of variable */
-    int nbVariable_;
 };
 
 } // namespace STK

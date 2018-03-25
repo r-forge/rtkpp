@@ -46,7 +46,7 @@
 #' kmmNames( sdBetweenCluster= "free")
 #'
 #' @rdname kmmNames
-#' @export
+#'
 kmmNames <- function( sdBetweenCluster = "all")
 {
   if(sum(sdBetweenCluster %in% c("equal","free","all")) != 1)

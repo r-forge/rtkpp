@@ -36,7 +36,7 @@
 #ifndef STK_ILAUNCHER_H
 #define STK_ILAUNCHER_H
 
-#include "RDataHandler.h"
+#include "ILauncherBase.h"
 
 namespace STK
 {
@@ -44,7 +44,7 @@ namespace STK
 /** The ILauncher allow to create the composer or learner for estimate or
  *  learn a  mixture model with less effort.
  **/
-class ILauncher: public IRunnerBase
+class ILauncher: public ILauncherBase
 {
   public:
     /** constructor.
@@ -71,21 +71,15 @@ class ILauncher: public IRunnerBase
     void createContinuousDataSets(std::string const& idData, Rcpp::S4 s4_component, Clust::Mixture model);
     /** create the data sets with integer data */
     void createDiscreteDataSets(std::string const& idData, Rcpp::S4 s4_component, Clust::Mixture model);
-
     /** create the mixtures in the given model */
     void createMixtures(IMixtureStatModel* p_model);
-
     /** get the parameters */
     void getParameters(IMixtureStatModel* p_model, std::string const& idData, Rcpp::S4 s4_component);
-    /** get the diagonal Gaussian parameters */
-    void getDiagGaussianParameters(IMixtureStatModel* p_model, std::string const& idData, Rcpp::S4 s4_component);
-    /** get the Poisson parameters */
-    void getPoissonParameters(IMixtureStatModel* p_model, std::string const& idData, Rcpp::S4 s4_component);
-    /** get the gamma parameters */
-    void getGammaParameters(IMixtureStatModel* p_model, std::string const& idData, Rcpp::S4 s4_component);
-    /** get the gamma parameters */
-    void getCategoricalParameters(IMixtureStatModel* p_model, std::string const& idData, Rcpp::S4 s4_component);
 
+    /** vector with the model names to try */
+    Rcpp::CharacterVector v_models_;
+    /** data handler */
+    RDataHandler handler_;
     /** diagonal Gaussian mixture models manager */
     DiagGaussianMixtureManager<RDataHandler> diagGaussianManager_;
     /** Poisson mixture models manager */
@@ -94,15 +88,6 @@ class ILauncher: public IRunnerBase
     GammaMixtureManager<RDataHandler> gammaManager_;
     /** categorical mixture models manager */
     CategoricalMixtureManager<RDataHandler> categoricalManager_;
-
-    /** data handler */
-    RDataHandler handler_;
-    /** model from the R side */
-    Rcpp::S4 s4_model_;
-    /** vector with the model names to try */
-    Rcpp::CharacterVector v_models_;
-    /** Is the model with mixed data ? */
-    bool isMixedData_;
 };
 
 } // namespace STK

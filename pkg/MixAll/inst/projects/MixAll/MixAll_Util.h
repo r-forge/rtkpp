@@ -66,8 +66,5 @@ STK::Kernel::IKernel* createKernel( Rcpp::S4 s4_component
                                   , bool computeGramMatrix
                                   );
 
-/** @return a pointer on the class computing the criterion */
-STK::IMixtureCriterion* createCriterion( std::string const& criterion);
-
 
 #endif /* MIXALL_UTIL_H_ */

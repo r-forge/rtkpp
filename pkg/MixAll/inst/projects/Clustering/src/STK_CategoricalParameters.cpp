@@ -33,7 +33,7 @@
  *  mixture models
  **/
 
-#include "../include/CategoricalMixtureModels/STK_CategoricalParameters.h"
+#include "../include/CategoricalModels/STK_CategoricalParameters.h"
 
 namespace STK
 {

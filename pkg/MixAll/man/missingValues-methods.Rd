@@ -13,6 +13,7 @@
 \alias{missingValues,ClusterCategorical-method}
 \alias{missingValues,ClusterPoissonComponent-method}
 \alias{missingValues,ClusterPoisson-method}
+\alias{missingValues,ClusterPredict-method}
 \alias{missingValues,KmmComponent-method}
 \alias{missingValues,KernelMixtureModel-method}
 \title{Return the missing values of a component or a cluster class.}
@@ -36,6 +37,8 @@ missingValues(x)
 \S4method{missingValues}{ClusterPoissonComponent}(x)
 
 \S4method{missingValues}{ClusterPoisson}(x)
+
+\S4method{missingValues}{ClusterPredict}(x)
 
 \S4method{missingValues}{KmmComponent}(x)
 

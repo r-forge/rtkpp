@@ -5,7 +5,7 @@
 \title{Create an instance of the [\code{\linkS4class{ClusterGamma}}] class}
 \usage{
 clusterGamma(data, nbCluster = 2, models = "gamma_pk_ajk_bjk",
-  strategy = clusterFastStrategy(), criterion = "ICL", nbCore = 1)
+  strategy = clusterStrategy(), criterion = "ICL", nbCore = 1)
 }
 \arguments{
 \item{data}{frame or matrix containing the data. Rows correspond to observations

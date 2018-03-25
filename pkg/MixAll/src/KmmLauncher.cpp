@@ -163,7 +163,7 @@ Real KmmLauncher::selectBestSingleModel()
   try
   {
     // create criterion
-    p_criterion = createCriterion(criterion_);
+    p_criterion = Clust::createCriterion(criterion_);
     // start the estimation process, should end with the best model according to
     // the criterion
     ClusterFacade facade(p_current);
@@ -251,7 +251,11 @@ Real KmmLauncher::selectBestMixedModel()
       sameProp &= (!freeMixture);
     }
     // create criterion
-    p_criterion = createCriterion(criterion_);
+    p_criterion = Clust::createCriterion(criterion_);
+    if (!p_criterion)
+    { msg_error_ = STKERROR_1ARG(LearnLauncher::run,criterion_,Wrong criterion name);
+      return false;
+    }
     // loop over the models
     for (int k=0; k <v_nbCluster_.length(); ++k)
     {

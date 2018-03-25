@@ -33,7 +33,7 @@
  **/
 
 
-#include "../include/KernelMixtureModels/STK_KernelHandler.h"
+#include <Clustering/include/KernelModels/STK_KernelHandler.h>
 
 namespace STK
 {

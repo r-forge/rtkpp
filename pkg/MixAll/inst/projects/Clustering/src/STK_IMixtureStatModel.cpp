@@ -78,7 +78,6 @@ Real IMixtureStatModel::computeLnLikelihood(int i) const
 {
   // get maximal value
   CPointX lnComp(pk_.size());
-//  std::cout << "lnComp= ";
   for (int k = pk_.begin(); k< pk_.end(); ++k)
   { lnComp[k] = std::log(pk_[k]) + lnComponentProbability(i, k);}
   // compute result
@@ -155,6 +154,7 @@ void IMixtureStatModel::releaseMixture( String const& idData)
     }
   }
 }
+
 // implement computeNbFreeParameters
 int IMixtureStatModel::computeNbFreeParameters() const
 {
@@ -163,6 +163,19 @@ int IMixtureStatModel::computeNbFreeParameters() const
   { sum+= (*it)->nbFreeParameter();}
   return sum;
 }
+
+/** @brief compute the missing values of the model.
+ *  lookup on the mixtures and sum the nbMissingValues.
+ *  @return the number of missing values
+ **/
+int IMixtureStatModel::computeNbMissingValues() const
+{
+  int sum = nbCluster_-1; // proportions
+  for (ConstMixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
+  { sum+= (*it)->nbMissingValues();}
+  return sum;
+}
+
 
 /* @brief compute the number of variables of the model.
  *  lookup on the mixtures and sum the nbFreeParameter.

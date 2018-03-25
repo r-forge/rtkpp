@@ -5,7 +5,8 @@
 \alias{clusterSemiSEMStrategy}
 \alias{clusterSEMStrategy}
 \alias{clusterFastStrategy}
-\title{Create an instance of [\code{\linkS4class{ClusterStrategy}}] class}
+\title{A strategy is a multistage empirical process for finding a
+good estimate in the clustering estimation process.}
 \usage{
 clusterStrategy(nbTry = 1, nbInit = 5, initMethod = "class",
   initAlgo = "EM", nbInitIteration = 20, initEpsilon = 0.01,
@@ -64,18 +65,6 @@ epsilon is not used by the \code{SEM} algorithm. Default value: 1e-07.}
 a [\code{\linkS4class{ClusterStrategy}}] object
 }
 \description{
-A strategy is a multistage empirical process for finding a
-good estimate in the clustering estimation process.
-
-\code{clusterSemiSEMStrategy()} create an instance of [\code{\linkS4class{ClusterStrategy}}]
-for users with many missing values uning a semiSem algorithm.
-
-\code{clusterSEMStrategy()} create an instance of [\code{\linkS4class{ClusterStrategy}}]
-for users with many missing values using a SEM algorithm.
-
-\code{clusterFastStrategy()} create an instance of [\code{\linkS4class{ClusterStrategy}}] for impatient user.
-}
-\details{
 A strategy is a way to find a good estimate of the parameters of a mixture model
 when using an EM algorithm or its variants. A ``try'' is composed of three stages
 \itemize{
@@ -90,6 +79,15 @@ be 5 packets of 5 models initialized. In each packet, the best model will be
 ameliorated using a short run. Among the 5 models ameliorated one will be
 estimated until convergence using a long run. In total there were 25 initializations.
 
+\code{clusterSemiSEMStrategy()} create an instance of [\code{\linkS4class{ClusterStrategy}}]
+for users with many missing values uning a semiSem algorithm.
+
+\code{clusterSEMStrategy()} create an instance of [\code{\linkS4class{ClusterStrategy}}]
+for users with many missing values using a SEM algorithm.
+
+\code{clusterFastStrategy()} create an instance of [\code{\linkS4class{ClusterStrategy}}] for impatient user.
+}
+\details{
 The whole process can be repeated at least \code{nbTry} times. If a try
 success, the estimated model is returned, otherwise an empty model is returned.
 }

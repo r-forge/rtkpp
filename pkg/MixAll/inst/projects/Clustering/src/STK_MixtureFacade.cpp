@@ -32,10 +32,11 @@
  *  @brief In this file we implement the StrategyFacade class.
  **/
 
+#include <Clustering/include/MixtureInit/STK_MixtureInit.h>
+#include <Clustering/include/MixtureStrategy/STK_MixtureStrategy.h>
 #include "../include/STK_MixtureFacade.h"
-#include "../include/STK_MixtureStrategy.h"
-#include "../include/STK_MixtureInit.h"
-#include "../include/STK_MixtureAlgo.h"
+#include "../include/MixtureAlgo/STK_MixtureAlgo.h"
+#include "../include/MixtureAlgo/STK_MixtureAlgoLearn.h"
 #include "../include/STK_IMixtureComposer.h"
 #include "../include/STK_IMixtureLearner.h"
 

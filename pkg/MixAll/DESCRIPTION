@@ -35,6 +35,7 @@ Collate:
     'ClusterMixedData.R'
     'ClusterPlot.R'
     'ClusterPoisson.R'
+    'IClusterPredict.R'
     'ClusterPredict.R'
     'LearnAlgo.R'
     'Learners.R'

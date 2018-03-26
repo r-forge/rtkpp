@@ -42,8 +42,7 @@ NULL
 #' @name IClusterComponent
 #' @rdname IClusterComponent-class
 #' @aliases IClusterComponent-class
-#' @exportClass IClusterComponent
-#' @export IClusterComponent
+#' 
 setClass(
   Class = "IClusterComponent",
   representation( data      = "matrix"
@@ -52,10 +51,6 @@ setClass(
                 , "VIRTUAL"),
   validity=function(object)
   {
-# called too soon when Component is part of an other S4 class
-#    if (!is.matrix(data)) { stop("data must be a matrix in IClusterComponent");}
-#    if (!is.matrix(missing)) { stop("missing must be a matrix in IClusterComponent");}
-#    if (!is.character(modelName)) { stop("modelName must be a character in IClusterComponent");}
     return(TRUE);
   }
 )
@@ -158,8 +153,7 @@ setMethod(
 #' @name IClusterModel
 #' @rdname ClusterModels-class
 #' @aliases IClusterModel-class
-#' @exportClass IClusterModel
-#' @export IClusterModel
+#' 
 setClass(
   Class="IClusterModel",
   representation( nbSample        = "numeric"
@@ -315,74 +309,3 @@ setMethod(
   }
 )
 
-## 
-## #-----------------------------------------------------------------------
-## #' Interface base Class [\code{\linkS4class{IClusterPredict}}] for predictors
-## #' using cluster models.
-## #'
-## #' This class encapsulate the common parameters of all the predictors using a
-## #' cluster model.
-## #'
-## #'
-## #' @slot tik  Matrix of size \eqn{n \times K} with the predicted posterior
-## #' probabilities of the ith individual to belong to kth cluster.
-## #' @slot lnFi Vector of size n with the predicted log-likelihood of the ith
-## #' individuals.
-## #' @slot zi   Vector of integer of size n with the predicted class label of
-## #' the individuals.
-## #'
-## #' @examples
-## #'   getSlots("IClusterPredict")
-## #'
-## #' @author Serge Iovleff
-## #'
-## #' @name IClusterPredict
-## #' @rdname IClusterPredict-class
-## #' @aliases IClusterPredict-class
-## #' @exportClass IClusterPredict
-## #'
-## setClass(
-##     Class="IClusterPredict",
-##     representation( nbSample = "numeric"
-##                   , nbCluster = "numeric"
-##                   , tik = "matrix"
-##                   , lnFi = "numeric"
-##                   , zi = "integer"
-##                   , "VIRTUAL"
-##                   ),
-##     validity=function(object)
-##     {
-##       return(TRUE)
-##     }
-## )
-## 
-## #' Initialize an instance of a MixAll S4 class.
-## #'
-## #' Initialization method of the [\code{\linkS4class{IClusterPredict}}] class.
-## #' Used internally in the 'MixAll' package.
-## #'
-## #' @rdname initialize-methods
-## #' @keywords internal
-## #'
-## setMethod(
-##     f="initialize",
-##     signature=c("IClusterPredict"),
-##     definition=function(.Object, nbSample, nbCluster)
-##     {
-##       # for nbSample
-##       if(missing(nbSample)) { stop("nbSample is mandatory in IClusterPredict.")}
-##       .Object@nbSample <- nbSample;
-##       # for nbCluster
-##       if(missing(nbCluster)) { stop("nbCluster is mandatory in IClusterPredict.")}
-##       .Object@nbCluster<-nbCluster
-##       # resize
-##       .Object@pk   <- rep(1/nbCluster, nbCluster)
-##       .Object@tik  <- matrix(1/nbCluster, nbSample, nbCluster)
-##       .Object@lnFi <- rep(0, nbSample)
-##       .Object@zi   <- as.integer(rep(1, nbSample))
-##       # validObject(.Object) will be called at the end of the initialization process
-##       # in the derived classes
-##       return(.Object)
-##     }
-## )
-## 

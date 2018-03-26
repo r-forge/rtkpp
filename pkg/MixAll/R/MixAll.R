@@ -64,12 +64,10 @@
 #' @aliases MixAll
 #' @docType package
 #' @keywords STK++, stkpp
-#' @import Rcpp, rtkore
 #'
 #' @author
 #' Author: Serge Iovleff \email{contact@@stkpp.org}
 #'
-#' @useDynLib rtkore
 NULL
 
 #' Counting Data: DebTrivedi

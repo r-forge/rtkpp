@@ -178,7 +178,6 @@ clusterMixedData <- function( data, models, nbCluster=2
 #' @name ClusterMixedData
 #' @rdname ClusterMixedData-class
 #' @aliases ClusterMixedData-class
-#' @exportClass ClusterMixedData
 #'
 setClass(
     Class="ClusterMixedData",
@@ -330,7 +329,6 @@ setMethod(
 #' @param y a number between 1 and K-1.
 #' @param ... further arguments passed to or from other methods
 #'
-#' @importFrom graphics plot
 #' @aliases plot-ClusterMixedData
 #' @docType methods
 #' @rdname plot-ClusterMixedData-method

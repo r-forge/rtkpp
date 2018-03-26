@@ -2,8 +2,8 @@
 % Please edit documentation in R/ClusterAlgo.R, R/ClusterAlgoPredict.R,
 %   R/ClusterInit.R, R/ClusterStrategy.R, R/IClusterModel.R, R/global.R,
 %   R/ClusterCategorical.R, R/ClusterDiagGaussian.R, R/ClusterGamma.R,
-%   R/ClusterMixedData.R, R/ClusterPoisson.R, R/ClusterPredict.R, R/LearnAlgo.R,
-%   R/kmm.R
+%   R/ClusterMixedData.R, R/ClusterPoisson.R, R/IClusterPredict.R,
+%   R/ClusterPredict.R, R/LearnAlgo.R, R/kmm.R
 \docType{methods}
 \name{show,ClusterAlgo-method}
 \alias{show,ClusterAlgo-method}
@@ -40,6 +40,8 @@
 \alias{show-ClusterPoissonComponent,ClusterPoissonComponent,ClusterPoissonComponent-method}
 \alias{show,ClusterPoisson-method}
 \alias{show-ClusterPoisson,ClusterPoisson,ClusterPoisson-method}
+\alias{show,IClusterPredict-method}
+\alias{show}
 \alias{show,ClusterPredict-method}
 \alias{show}
 \alias{show,LearnAlgo-method}
@@ -81,6 +83,8 @@
 
 \S4method{show}{ClusterPoisson}(object)
 
+\S4method{show}{IClusterPredict}(object)
+
 \S4method{show}{ClusterPredict}(object)
 
 \S4method{show}{LearnAlgo}(object)
@@ -109,6 +113,7 @@ Show description of a MixAll S4 class to standard output.
   ## for cluster algo
   algo <- clusterAlgo()
   show(algo)
+
 }
 \seealso{
 \code{\link{show}}

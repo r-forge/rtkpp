@@ -22,6 +22,7 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
+
 #' Return the missing values of a component or a cluster class.
 #'
 #' The missing methods allow the user to get the imputed mssing
@@ -34,7 +35,6 @@
 #' @name missingValues
 #' @docType methods
 #' @rdname missingValues-methods
-#' @exportMethod missingValues
 #'
 #' @examples
 #' \dontrun{
@@ -47,6 +47,7 @@
 #' model <- clusterDiagGaussian(data=x, nbCluster=2:3, strategy = clusterFastStrategy())
 #' missingValues(model)
 #' }
+#' 
 setGeneric(
     name = "missingValues",
     function(x)
@@ -81,7 +82,6 @@ NULL
 #' @name print
 #' @rdname print-methods
 #' @docType methods
-#' @exportMethod print
 #'
 #' @seealso \code{\link{print}}
 #' @examples
@@ -104,11 +104,9 @@ NULL
 #'
 #' @return NULL. Prints to standard out.
 #'
-#' @importFrom methods show
 #' @name show
 #' @docType methods
 #' @rdname show-methods
-#' @exportMethod show
 #'
 #' @seealso \code{\link{show}}
 #' @examples
@@ -121,6 +119,7 @@ NULL
 #'   ## for cluster algo
 #'   algo <- clusterAlgo()
 #'   show(algo)
+#' 
 NULL
 
 
@@ -135,7 +134,5 @@ NULL
 #' @name summary
 #' @docType methods
 #' @rdname summary-methods
-#' @exportMethod summary
-#'
 #'
 NULL

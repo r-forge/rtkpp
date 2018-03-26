@@ -65,4 +65,5 @@ x[indexes] <- NA;
 model <- clusterDiagGaussian(data=x, nbCluster=2:3, strategy = clusterFastStrategy())
 missingValues(model)
 }
+
 }

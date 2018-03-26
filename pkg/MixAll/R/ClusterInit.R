@@ -117,8 +117,6 @@ clusterInit <- function( method="class", nbInit=5,  algo = "EM", nbIteration=20,
 #' @name ClusterInit
 #' @rdname ClusterInit-class
 #' @aliases ClusterInit-class
-#' @exportClass ClusterInit
-#' @export ClusterInit
 #'
 setClass(
   Class="ClusterInit",

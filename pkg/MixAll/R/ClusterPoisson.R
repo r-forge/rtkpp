@@ -136,7 +136,6 @@ clusterPoisson <- function( data, nbCluster=2
 #' @name ClusterPoissonComponent
 #' @rdname IClusterComponent-class
 #' @aliases ClusterPoissonComponent-class
-#' @exportClass ClusterPoissonComponent
 #'
 setClass(
     Class="ClusterPoissonComponent",
@@ -260,7 +259,6 @@ setMethod(
 #' @name ClusterPoisson
 #' @rdname ClusterPoisson-class
 #' @aliases ClusterPoisson-class
-#' @exportClass ClusterPoisson
 #'
 setClass(
     Class="ClusterPoisson",
@@ -358,70 +356,6 @@ setMethod(
   }
 )
 
-## #-----------------------------------------------------------------------
-## #' Definition of the [\code{\linkS4class{PredictPoisson}}] class
-## #'
-## #' This class defines a predictor for diagonal Gaussian mixture Model.
-## #'
-## #' @slot model  A valid [\code{\linkS4class{ClusterDiagGaussian}}] class.
-## #' @slot data   A matrix with the data to predict.
-## #' @seealso [\code{\linkS4class{IClusterModel}}] class
-## #'
-## #' @examples
-## #' getSlots("PredictPoisson")
-## #'
-## #' @author Serge Iovleff
-## #'
-## #' @name PredictPoisson
-## #' @rdname PredictPoisson-class
-## #' @aliases PredictPoisson-class
-## #' @exportClass PredictPoisson
-## #'
-## setClass(
-##     Class="PredictPoisson",
-##     representation( model = "ClusterPoisson", data = "matrix"),
-##     contains=c("IClusterPredict"),
-##     validity=function(object)
-##     {
-##       # check model
-##       if(class(object@model)[1] != "ClusterPoisson")
-##       { stop("model must be an instance of ClusterPoisson.")}
-##       if (!validObject(object@model)) {stop("model is not valid.")}
-##       # check data
-##       if (ncol(object@model@component@data)!= ncol(object@data))
-##       {stop("data must have the same number of column.")}
-##       return(TRUE)
-##     }
-## )
-## 
-## #' Initialize an instance of a MixAll S4 class.
-## #'
-## #' Initialization method of the [\code{\linkS4class{PredictPoisson}}] class.
-## #' Used internally in the 'MixAll' package.
-## #'
-## #' @rdname initialize-methods
-## #' @keywords internal
-## setMethod(
-##     f="initialize",
-##     signature=c("PredictPoisson"),
-##     definition=function(.Object, model, data)
-##     {
-##       # check model
-##       if(missing(model)) {stop("model is mandatory in PredictPoisson.")}
-##       if(class(model)[1] != "ClusterDiagGaussian")
-##       { stop("model must be an instance of ClusterPoisson.")}
-##       # for data
-##       if(missing(data)) {stop("data is mandatory in PredictPoisson.")}
-##       # create slots
-##       .Object@model <- model
-##       .Object@data <- as.matrix(data, ncol= ncol(model@component@data))
-##       # validate
-##       .Object <- callNextMethod(.Object, nrow(.Object@data), .Object@model@nbCluster);
-##       validObject(.Object)
-##       return(.Object)
-##     }
-## )
-
 #' Plotting of a class [\code{\linkS4class{ClusterPoisson}}]
 #'
 #' Plotting data from a [\code{\linkS4class{ClusterPoisson}}] object
@@ -432,7 +366,6 @@ setMethod(
 #' If missingValues all the variables are represented.
 #' @param ... further arguments passed to or from other methods
 #'
-#' @importFrom graphics plot
 #' @aliases plot-ClusterPoisson, ClusterPoisson-method
 #' @docType methods
 #' @rdname plot-ClusterPoisson-method

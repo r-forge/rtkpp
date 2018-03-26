@@ -108,8 +108,7 @@ clusterAlgoPredict <- function( algo="EM", nbIterBurn = 50, nbIterLong = 100, ep
 #' @name ClusterAlgoPredict
 #' @rdname ClusterAlgoPredict-class
 #' @aliases ClusterAlgoPredict-class
-#' @export ClusterAlgoPredict
-#' @exportClass ClusterAlgoPredict
+#' 
 setClass (
   Class= "ClusterAlgoPredict",
   representation(algo="character"

@@ -14,26 +14,14 @@ This class encapsulate the parameters for predicted data.
 \item{\code{data}}{Matrix with the data set}
 
 \item{\code{missing}}{Matrix with the indexes of the missing values}
-
-\item{\code{nbSample}}{Integer with the number of samples}
-
-\item{\code{nbCluster}}{Integer with the number of cluster}
-
-\item{\code{pk}}{Vector of size K with the proportions of each mixture.}
-
-\item{\code{tik}}{Matrix of size \eqn{n \times K} with the posterior probability of
-the ith individual to belong to kth cluster.}
-
-\item{\code{lnFi}}{Vector of size n with the log-likelihood of the ith individuals.}
-
-\item{\code{zi}}{Vector of integer of size n  with the attributed class label of the individuals}
-
-\item{\code{algo}}{an instance of [\code{\linkS4class{ClusterAlgoPredict}}]}
 }}
 
 \examples{
   getSlots("ClusterPredict")
 
+}
+\seealso{
+[\code{\linkS4class{IClusterPredict}}] class
 }
 \author{
 Serge Iovleff

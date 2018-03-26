@@ -22,6 +22,7 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
+#' @include IClusterPredict.R
 NULL
 
 #-----------------------------------------------------------------------
@@ -98,16 +99,9 @@ clusterPredict <- function( data, model, algo = clusterAlgoPredict(), nbCore = 1
 #'
 #' @slot data  Matrix with the data set
 #' @slot missing   Matrix with the indexes of the missing values
-#' @slot nbSample  Integer with the number of samples 
-#' @slot nbCluster Integer with the number of cluster
-#' @slot pk        Vector of size K with the proportions of each mixture.
-#' @slot tik       Matrix of size \eqn{n \times K} with the posterior probability of
-#' the ith individual to belong to kth cluster.
-#' @slot lnFi      Vector of size n with the log-likelihood of the ith individuals.
-#' @slot zi        Vector of integer of size n  with the attributed class label of the individuals
-#' @slot algo      an instance of [\code{\linkS4class{ClusterAlgoPredict}}] 
 #'
-#'
+#' @seealso [\code{\linkS4class{IClusterPredict}}] class
+#' 
 #' @examples
 #'   getSlots("ClusterPredict")
 #'
@@ -116,61 +110,23 @@ clusterPredict <- function( data, model, algo = clusterAlgoPredict(), nbCore = 1
 #' @name ClusterPredict
 #' @rdname ClusterPredict-class
 #' @aliases ClusterPredict-class
-#' @exportClass ClusterPredict
+#' 
 setClass(
   Class="ClusterPredict",
   # members
-  representation( data = "matrix"
-                , missing   = "matrix"
-                , nbSample  = "numeric"
-                , nbCluster = "numeric"
-                , pk        = "numeric"
-                , tik       = "matrix"
-                , lnFi      = "numeric"
-                , zi        = "integer"
-                , algo      = "ClusterAlgoPredict"
-              ),
+  representation( data    = "matrix"
+                , missing = "matrix"
+                ),
+  contains=c("IClusterPredict"),
   # validity function
   validity=function(object)
   {
     nbSample  <- object@nbSample
     nbCluster <- object@nbCluster
     
-    # check nbSample
-    if (round(nbSample) != nbSample)
-    {stop("Error in ClusterPredict validity. nbSample must be an integer.")}
-    
-    # check nbCluster
-    if (round(nbCluster)!= nbCluster)
-    {stop("Error in ClusterPredict validity. nbCluster must be an integer.")}
-    if( nbCluster < 1 )
-    { stop("Error in ClusterPredict validity. nbCluster must be greater than 0.")}
-    
     # check data
     if (nrow(object@data) != nbSample)
     {stop("Error in ClusterPredict validity. data must have nbSample rows.")}
-    
-    # check pk
-    if (length(object@pk) != nbCluster)
-    { stop("Error in ClusterPredict validity. pk must have length nbCluster.")}
-    
-    # check tik
-    if (ncol(object@tik) != nbCluster)
-    { stop("Error in ClusterPredict validity. tik must have nbCluster columns.")}
-    if (nrow(object@tik) != nbSample)
-    { stop("Error in ClusterPredict validity. tik must have nbSample rows.")}
-    
-    # check lnFi
-    if (length(object@lnFi) != nbSample)
-    { stop("Error in ClusterPredict validity. lnFi must have nbSample size.")}
-    
-    # check zi
-    if (length(object@zi) != nbSample)
-    { stop("Error in ClusterPredict validity. zi must have nbSample size.")}
-    
-    # check algo
-    if (class(object@algo)[1] != "ClusterAlgoPredict")
-    { stop("Error in ClusterPredict validity. algo must be an instance of ClusterPredictAlgo.")}
     return(TRUE)
   }
 )
@@ -191,19 +147,12 @@ setMethod(
     # for data
     if(missing(data)) { stop("data is mandatory in ClusterPredict.")}
     .Object@data <- data
-    .Object@nbSample <- nrow(data)
     .Object@missing  <- which(is.na(.Object@data), arr.ind=TRUE);
-
     # for nbCluster
     if(missing(nbCluster)) { stop("nbCluster is mandatory in ClusterPredict.")}
     .Object@nbCluster<-nbCluster
-    
-    # create arrays
-    .Object@pk   <- rep(1/nbCluster, nbCluster)
-    .Object@tik  <- matrix(1/nbCluster, .Object@nbSample, nbCluster)
-    .Object@lnFi <- rep(0, .Object@nbSample)
-    .Object@zi   <- as.integer(rep(1, .Object@nbSample))
-    .Object@algo <- algo
+    # creata base class
+    .Object <- callNextMethod(.Object, nrow(data), nbCluster, algo)
     
     # valid object
     validObject(.Object)
@@ -222,10 +171,15 @@ setMethod(
   function(x,...)
   {
     cat("****************************************\n")
-    cat("* nbSample       = ", x@nbSample, "\n")
-    cat("* nbCluster      = ", x@nbCluster, "\n")
-    cat("* zi             =\n")
-    print( format(x@zi), quote=FALSE)
+    if(length(object@data)!=0)
+    {
+      nrowShow <- min(10,nrow(object@data));
+      ncolShow <- min(10,ncol(object@data));
+      cat("* data (limited to 10 samples and 10 variables) =\n")
+      print(format(x@data[1:nrowShow,1:ncolShow]),quote=FALSE)
+    }
+    callNextMethod()
+    cat("****************************************\n")
   }
 )
 
@@ -237,10 +191,7 @@ setMethod(
   function(object)
   {
     cat("****************************************\n")
-    cat("* nbSample       = ", object@nbSample, "\n")
-    cat("* nbCluster      = ", object@nbCluster, "\n")
-    cat("* zi             =\n")
-    print( format(object@zi), quote=FALSE)
+    callNextMethod()
     cat("****************************************\n")
   }
 )
@@ -253,8 +204,7 @@ setMethod(
   function(object,...)
   {
     cat("****************************************\n")
-    cat("* nbSample       = ", object@nbSample, "\n")
-    cat("* nbCluster      = ", object@nbCluster, "\n")
+    callNextMethod()
     cat("****************************************\n")
   }
 )

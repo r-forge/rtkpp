@@ -141,7 +141,6 @@ clusterGamma <- function( data, nbCluster=2
 #' @name ClusterGammaComponent
 #' @rdname ClusterGammaComponent-class
 #' @aliases ClusterGammaComponent-class
-#' @exportClass ClusterGammaComponent
 #'
 setClass(
     Class="ClusterGammaComponent",
@@ -272,7 +271,6 @@ setMethod(
 #' @name ClusterGamma
 #' @rdname ClusterGamma-class
 #' @aliases ClusterGamma-class
-#' @exportClass ClusterGamma
 #'
 setClass(
     Class="ClusterGamma",
@@ -374,71 +372,6 @@ setMethod(
     cat("****************************************\n")
   }
 )
-
-## #-----------------------------------------------------------------------
-## #' Definition of the [\code{\linkS4class{PredictGamma}}] class
-## #'
-## #' This class defines a predictor for diagonal Gaussian mixture Model.
-## #'
-## #' @slot model  A valid [\code{\linkS4class{ClusterDiagGaussian}}] class.
-## #' @slot data   A matrix with the data to predict.
-## #' @seealso [\code{\linkS4class{IClusterModel}}] class
-## #'
-## #' @examples
-## #' getSlots("PredictGamma")
-## #'
-## #' @author Serge Iovleff
-## #'
-## #' @name PredictGamma
-## #' @rdname PredictGamma-class
-## #' @aliases PredictGamma-class
-## #' @exportClass PredictGamma
-## #'
-## setClass(
-##     Class="PredictGamma",
-##     representation( model = "ClusterGamma", data = "matrix"),
-##     contains=c("IClusterPredict"),
-##     validity=function(object)
-##     {
-##       # check model
-##       if(class(object@model)[1] != "ClusterGamma")
-##       { stop("model must be an instance of ClusterGamma.")}
-##       if (!validObject(object@model)) {stop("model is not valid.")}
-##       # check data
-##       if (ncol(object@model@component@data)!= ncol(object@data))
-##       {stop("data must have the same number of column.")}
-##       return(TRUE)
-##     }
-## )
-## 
-## #' Initialize an instance of a MixAll S4 class.
-## #'
-## #' Initialization method of the [\code{\linkS4class{PredictGamma}}] class.
-## #' Used internally in the 'MixAll' package.
-## #'
-## #' @rdname initialize-methods
-## #' @keywords internal
-## setMethod(
-##     f="initialize",
-##     signature=c("PredictGamma"),
-##     definition=function(.Object, model, data)
-##     {
-##       # check model
-##       if(missing(model)) {stop("model is mandatory in PredictGamma.")}
-##       if(class(model)[1] != "ClusterDiagGaussian")
-##       { stop("model must be an instance of ClusterGamma.")}
-##       # for data
-##       if(missing(data)) {stop("data is mandatory in PredictGamma.")}
-##       # create slots
-##       .Object@model <- model
-##       .Object@data <- as.matrix(data, ncol= ncol(model@component@data))
-##       # validate
-##       .Object <- callNextMethod(.Object, nrow(.Object@data), .Object@model@nbCluster);
-##       validObject(.Object)
-##       return(.Object)
-##     }
-## )
-
 #' Plotting of a class [\code{\linkS4class{ClusterGamma}}]
 #'
 #' Plotting data from a [\code{\linkS4class{ClusterGamma}}] object
@@ -449,7 +382,6 @@ setMethod(
 #' If missingValues all the variables are represented.
 #' @param ... further arguments passed to or from other methods
 #'
-#' @importFrom graphics plot
 #' @aliases plot-ClusterGamma, ClusterGamma-method
 #' @docType methods
 #' @rdname plot-ClusterGamma-method

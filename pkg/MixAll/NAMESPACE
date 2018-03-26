@@ -48,6 +48,7 @@ exportClasses(ClusterAlgo
              ,ClusterPoissonComponent
              ,ClusterPoisson
              ,ClusterMixedData
+             ,IClusterPredict
              ,ClusterPredict
              ,KmmComponent
              ,KernelMixtureModel

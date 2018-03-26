@@ -105,7 +105,7 @@ learnAlgo <- function( algo="Simul", nbIteration=200, epsilon=1e-07)
 #' @name LearnAlgo
 #' @rdname LearnAlgo-class
 #' @aliases LearnAlgo-class
-#' @exportClass LearnAlgo
+#'
 setClass (
   Class= "LearnAlgo",
   representation(algo="character", nbIteration = "numeric", epsilon = "numeric"),

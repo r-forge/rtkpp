@@ -142,7 +142,6 @@ clusterCategorical <- function( data, nbCluster=2
 #' @name ClusterCategoricalComponent
 #' @rdname ClusterCategoricalComponent-class
 #' @aliases ClusterCategoricalComponent-class
-#' @export
 #'
 setClass(
   Class="ClusterCategoricalComponent",
@@ -313,7 +312,7 @@ setMethod(
 #' @name ClusterCategorical-class
 #' @rdname ClusterCategorical-class
 #' @aliases ClusterCategorical-class
-#' @exportClass ClusterCategorical
+#' 
 setClass(
   Class="ClusterCategorical",
   representation( component = "ClusterCategoricalComponent"),
@@ -416,71 +415,6 @@ setMethod(
   }
 )
 
-## #-----------------------------------------------------------------------
-## #' Definition of the [\code{\linkS4class{PredictCategorical}}] class
-## #'
-## #' This class defines a predictor for Categorical mixture Model.
-## #'
-## #' @slot model  A valid [\code{\linkS4class{ClusterCategorical}}] class.
-## #' @slot data   A matrix with the data to predict.
-## #' @seealso [\code{\linkS4class{IClusterModel}}] class
-## #'
-## #' @examples
-## #' getSlots("PredictCategorical")
-## #'
-## #' @author Serge Iovleff
-## #'
-## #' @name PredictCategorical
-## #' @rdname PredictCategorical-class
-## #' @aliases PredictCategorical-class
-## #' @exportClass PredictCategorical
-## #'
-## setClass(
-##     Class="PredictCategorical",
-##     representation( model = "ClusterCategorical", data = "matrix"),
-##     contains=c("IClusterPredict"),
-##     validity=function(object)
-##     {
-##       # check model
-##       if(class(object@model)[1] != "ClusterCategorical")
-##       { stop("model must be an instance of ClusterCategorical.")}
-##       if (!validObject(object@model)) {stop("model is not valid.")}
-##       # check data
-##       if (ncol(object@model@component@data)!= ncol(object@data))
-##       {stop("data must have the same number of column.")}
-##       return(TRUE)
-##     }
-## )
-## 
-## #' Initialize an instance of a MixAll S4 class.
-## #'
-## #' Initialization method of the [\code{\linkS4class{PredictCategorical}}] class.
-## #' Used internally in the 'MixAll' package.
-## #'
-## #' @rdname initialize-methods
-## #' @keywords internal
-## setMethod(
-##     f="initialize",
-##     signature=c("PredictCategorical"),
-##     definition=function(.Object, model, data)
-##     {
-##       # check model
-##       if(missing(model)) {stop("model is mandatory in PredictCategorical.")}
-##       if(class(model)[1] != "ClusterDiagGaussian")
-##       { stop("model must be an instance of ClusterDiagGaussian.")}
-##       # for data
-##       if(missing(data)) {stop("data is mandatory in PredictCategorical.")}
-##       # create slots
-##       .Object@model <- model
-##       .Object@data <- as.matrix(data, ncol= ncol(model@component@data))
-##       # validate
-##       .Object <- callNextMethod(.Object, nrow(.Object@data), .Object@model@nbCluster);
-##       validObject(.Object)
-##       return(.Object)
-##     }
-## )
-## 
-## 
 #' Plotting of a class [\code{\linkS4class{ClusterCategorical}}]
 #'
 #' Plotting data from a [\code{\linkS4class{ClusterCategorical}}] object
@@ -490,7 +424,6 @@ setMethod(
 #' @param y a number between 1 and K-1.
 #' @param ... further arguments passed to or from other methods
 #'
-#' @importFrom graphics plot
 #' @aliases plot-ClusterCategorical
 #' @docType methods
 #' @rdname plot-ClusterCategorical-method

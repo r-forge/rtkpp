@@ -263,7 +263,6 @@ kmm <- function( data, nbCluster=2
 #' @name KmmComponent
 #' @rdname KmmComponent-class
 #' @aliases KmmComponent-class
-#' @exportClass KmmComponent
 #'
 setClass(
   Class="KmmComponent",
@@ -398,7 +397,6 @@ setMethod(
 #' @name KernelMixtureModel
 #' @rdname KernelMixtureModel-class
 #' @aliases KernelMixtureModel-class
-#' @exportClass KernelMixtureModel
 #'
 setClass(
   Class="KernelMixtureModel",
@@ -524,7 +522,6 @@ setMethod(
 #' If missing all the variables are represented.
 #' @param ... further arguments passed to or from other methods
 #'
-#' @importFrom graphics plot
 #' @aliases plot-KernelMixtureModel
 #' @docType methods
 #' @rdname plot-KernelMixtureModel-method

@@ -2,8 +2,8 @@
 % Please edit documentation in R/ClusterAlgo.R, R/ClusterAlgoPredict.R,
 %   R/ClusterInit.R, R/ClusterStrategy.R, R/IClusterModel.R, R/global.R,
 %   R/ClusterCategorical.R, R/ClusterDiagGaussian.R, R/ClusterGamma.R,
-%   R/ClusterMixedData.R, R/ClusterPoisson.R, R/ClusterPredict.R, R/LearnAlgo.R,
-%   R/kmm.R
+%   R/ClusterMixedData.R, R/ClusterPoisson.R, R/IClusterPredict.R,
+%   R/ClusterPredict.R, R/LearnAlgo.R, R/kmm.R
 \docType{methods}
 \name{print,ClusterAlgo-method}
 \alias{print,ClusterAlgo-method}
@@ -39,6 +39,8 @@
 \alias{print,ClusterPoissonComponent-method}
 \alias{print}
 \alias{print,ClusterPoisson-method}
+\alias{print}
+\alias{print,IClusterPredict-method}
 \alias{print}
 \alias{print,ClusterPredict-method}
 \alias{print}
@@ -80,6 +82,8 @@
 \S4method{print}{ClusterPoissonComponent}(x, k, ...)
 
 \S4method{print}{ClusterPoisson}(x, ...)
+
+\S4method{print}{IClusterPredict}(x, ...)
 
 \S4method{print}{ClusterPredict}(x, ...)
 

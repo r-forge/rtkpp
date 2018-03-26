@@ -188,8 +188,7 @@ clusterFastStrategy <- function()
 #' @name ClusterStrategy
 #' @rdname ClusterStrategy-class
 #' @aliases ClusterStrategy-class
-#' @exportClass ClusterStrategy
-#' @export ClusterStrategy
+#' 
 setClass(
     Class="ClusterStrategy",
     slots=c( nbTry = "numeric", nbShortRun = "numeric", initMethod = "ClusterInit", shortAlgo="ClusterAlgo", longAlgo="ClusterAlgo" ),

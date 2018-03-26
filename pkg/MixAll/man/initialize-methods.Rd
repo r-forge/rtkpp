@@ -2,8 +2,8 @@
 % Please edit documentation in R/ClusterAlgo.R, R/ClusterAlgoPredict.R,
 %   R/ClusterInit.R, R/ClusterStrategy.R, R/IClusterModel.R,
 %   R/ClusterCategorical.R, R/ClusterDiagGaussian.R, R/ClusterGamma.R,
-%   R/ClusterMixedData.R, R/ClusterPoisson.R, R/ClusterPredict.R, R/LearnAlgo.R,
-%   R/kmm.R
+%   R/ClusterMixedData.R, R/ClusterPoisson.R, R/IClusterPredict.R,
+%   R/ClusterPredict.R, R/LearnAlgo.R, R/kmm.R
 \docType{methods}
 \name{initialize,ClusterAlgo-method}
 \alias{initialize,ClusterAlgo-method}
@@ -21,6 +21,7 @@
 \alias{initialize,ClusterMixedData-method}
 \alias{initialize,ClusterPoissonComponent-method}
 \alias{initialize,ClusterPoisson-method}
+\alias{initialize,IClusterPredict-method}
 \alias{initialize,ClusterPredict-method}
 \alias{initialize,LearnAlgo-method}
 \alias{initialize,KmmComponent-method}
@@ -69,6 +70,8 @@
 
 \S4method{initialize}{ClusterPoisson}(.Object, data = matrix(nrow = 0, ncol =
   0), nbCluster = 2, modelName = "poisson_pk_ljk")
+
+\S4method{initialize}{IClusterPredict}(.Object, nbSample, nbCluster, algo)
 
 \S4method{initialize}{ClusterPredict}(.Object, data, nbCluster,
   algo = clusterAlgoPredict())
@@ -126,6 +129,9 @@ Initialization method of the [\code{\linkS4class{ClusterPoissonComponent}}] clas
 Used internally in the 'MixAll' package.
 
 Initialization method of the [\code{\linkS4class{ClusterPoisson}}] class.
+Used internally in the 'MixAll' package.
+
+Initialization method of the [\code{\linkS4class{IClusterPredict}}] class.
 Used internally in the 'MixAll' package.
 
 Initialization method of the [\code{\linkS4class{ClusterPredict}}] class.

@@ -30,14 +30,16 @@ NULL
 #'
 #' This function predicts the best cluster each sample in data belongs to. 
 #'
-#' @param data frame or matrix containing the data. Rows correspond to observations
+#' @param data dataframe or matrix containing the data. Rows correspond to observations
 #' and columns correspond to variables. If the data set contains NA values, they
 #' will be estimated during the predicting process.
 #' @param model (estimated) clustering model to use, i.e. an instance of
-#' \code{\linkS4class{ClusterCategorical}}, \code{\linkS4class{ClusterDiagGaussian}}, etc. class
-#' produced by \code{\link{clusterCategorical}}, \code{\link{clusterDiagGaussian}}, etc.
-#' functions
-#' @param algo an instance of \code{\linkS4class{ClusterAlgoPredict}} S4 class
+#' \code{\linkS4class{ClusterCategorical}}, \code{\linkS4class{ClusterDiagGaussian}},..
+#' produced by \code{\link{clusterCategorical}}, \code{\link{clusterDiagGaussian}},...
+#' \code{\link{learnCategorical}}, \code{\link{learnDiagGaussian}}, etc.
+#' functions.
+#' @param algo an instance of \code{\linkS4class{ClusterAlgoPredict}} S4 class. Will not
+#' be used if there is no missing values.
 #' @param nbCore integer defining the number of processors to use (default is 1, 0 for all).
 #'
 #' @examples

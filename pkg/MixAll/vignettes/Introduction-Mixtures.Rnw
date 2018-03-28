@@ -955,6 +955,26 @@ plot(model)
 MixedData mixture models are plotted using the \emph{logistic latent
 representation}.
 
+\section{Prediction with MixAll}
+
+It is possible to predict cluster observations and to estimate
+missing values based on a mixture model estimated by \pkg{MixAll}
+using the \code{clusterPredict} function. If there is no missing data
+the predicted cluster are computed using Maximum A Posteriori (MAP) estimator.
+
+Given a new observation $\bx$ the Bayes classifier is the function
+$$
+\hat{z} = \arg\max_k \frac{ \hat{p}_k h(\bx|{\hat{\blambda}_k},\hat{\balpha})}
+{\sum_{l=1}^K  \hat{p}p_l h(\bx_i|\hat{\blambda}_l,\hat{\balpha})}.
+$$
+
+The following example use the famous iris data set (\cite{FISHER36})
+
+
+
+
+
+
 
 \bibliography{MixAll}
 

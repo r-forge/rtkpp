@@ -190,7 +190,7 @@ clusterFastStrategy <- function()
 #' @aliases ClusterStrategy-class
 #' 
 setClass(
-    Class="ClusterStrategy",
+    Class = "ClusterStrategy",
     slots=c( nbTry = "numeric", nbShortRun = "numeric", initMethod = "ClusterInit", shortAlgo="ClusterAlgo", longAlgo="ClusterAlgo" ),
     prototype=list(  nbTry = 1, nbShortRun=5, initMethod = clusterInit(), shortAlgo=clusterAlgo("EM",100,1e-04), longAlgo=clusterAlgo("EM",1000,1e-07)),
     # validity function

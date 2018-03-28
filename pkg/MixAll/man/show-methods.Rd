@@ -44,13 +44,15 @@
 \alias{show}
 \alias{show,ClusterPredict-method}
 \alias{show}
+\alias{show,ClusterPredictMixedData-method}
+\alias{show}
 \alias{show,LearnAlgo-method}
 \alias{show}
 \alias{show-algo,LearnAlgo-method}
 \alias{show,KmmComponent-method}
 \alias{show-KmmComponent,KmmComponent,KmmComponent-method}
-\alias{show,KernelMixtureModel-method}
-\alias{show-KernelMixtureModel,KernelMixtureModel,KernelMixtureModel-method}
+\alias{show,KmmModel-method}
+\alias{show-KmmModel,KmmModel,KmmModel-method}
 \title{Show description of a MixAll S4 class to standard output.}
 \usage{
 \S4method{show}{ClusterAlgo}(object)
@@ -87,11 +89,13 @@
 
 \S4method{show}{ClusterPredict}(object)
 
+\S4method{show}{ClusterPredictMixedData}(object)
+
 \S4method{show}{LearnAlgo}(object)
 
 \S4method{show}{KmmComponent}(object)
 
-\S4method{show}{KernelMixtureModel}(object)
+\S4method{show}{KmmModel}(object)
 }
 \arguments{
 \item{object}{a MixAll object: a \code{\linkS4class{ClusterStrategy}},

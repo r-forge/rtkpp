@@ -23,9 +23,10 @@
 \alias{initialize,ClusterPoisson-method}
 \alias{initialize,IClusterPredict-method}
 \alias{initialize,ClusterPredict-method}
+\alias{initialize,ClusterPredictMixedData-method}
 \alias{initialize,LearnAlgo-method}
 \alias{initialize,KmmComponent-method}
-\alias{initialize,KernelMixtureModel-method}
+\alias{initialize,KmmModel-method}
 \title{Initialize an instance of a MixAll S4 class.}
 \usage{
 \S4method{initialize}{ClusterAlgo}(.Object, algo, nbIteration, epsilon)
@@ -62,8 +63,7 @@
 \S4method{initialize}{ClusterGamma}(.Object, data = matrix(nrow = 0, ncol =
   0), nbCluster = 2, modelName = "gamma_pk_ajk_bjk")
 
-\S4method{initialize}{ClusterMixedData}(.Object, ldata = list(),
-  nbCluster = 2)
+\S4method{initialize}{ClusterMixedData}(.Object, lcomponent, nbCluster = 2)
 
 \S4method{initialize}{ClusterPoissonComponent}(.Object, data = matrix(nrow =
   0, ncol = 0), nbCluster = 2, modelName = "poisson_pk_ljk")
@@ -76,12 +76,15 @@
 \S4method{initialize}{ClusterPredict}(.Object, data, nbCluster,
   algo = clusterAlgoPredict())
 
+\S4method{initialize}{ClusterPredictMixedData}(.Object, ldata, nbCluster,
+  algo = clusterAlgoPredict())
+
 \S4method{initialize}{LearnAlgo}(.Object, algo, nbIteration, epsilon)
 
 \S4method{initialize}{KmmComponent}(.Object, rawData, dim = 10,
   nbCluster = 2, modelName = "kmm_s")
 
-\S4method{initialize}{KernelMixtureModel}(.Object, data, nbCluster = 2,
+\S4method{initialize}{KmmModel}(.Object, data, nbCluster = 2,
   modelName = "kmm_s", dim = 10, kernelName = "Gaussian",
   kernelParameters = c(1), kernelComputation = TRUE)
 }
@@ -137,13 +140,16 @@ Used internally in the 'MixAll' package.
 Initialization method of the [\code{\linkS4class{ClusterPredict}}] class.
 Used internally in the 'MixAll' package.
 
+Initialization method of the [\code{\linkS4class{ClusterPredictMixedData}}] class.
+Used internally in the 'MixAll' package.
+
 Initialization method of the [\code{\linkS4class{LearnAlgo}}] class.
 Used internally in the `MixAll' package.
 
 Initialization method of the [\code{\linkS4class{KmmComponent}}] class.
 Used internally in the 'MixAll' package.
 
-Initialization method of the [\code{\linkS4class{KernelMixtureModel}}] class.
+Initialization method of the [\code{\linkS4class{KmmModel}}] class.
 Used internally in the 'MixAll' package.
 }
 \keyword{internal}

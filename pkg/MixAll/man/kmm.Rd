@@ -2,7 +2,7 @@
 % Please edit documentation in R/kmm.R
 \name{kmm}
 \alias{kmm}
-\title{Create an instance of the [\code{\linkS4class{KernelMixtureModel}}] class}
+\title{Create an instance of the [\code{\linkS4class{KmmModel}}] class}
 \usage{
 kmm(data, nbCluster = 2, dim = 10, models = "kmm_s", prop = "free",
   kernelName = "Gaussian", kernelParameters = c(1),
@@ -46,7 +46,7 @@ Possible values: "BIC", "AIC", "ICL", "ML". Default is "ICL".}
 \item{nbCore}{integer defining the number of processor to use (default is 1, 0 for all).}
 }
 \value{
-An instance of the [\code{\linkS4class{KernelMixtureModel}}] class.
+An instance of the [\code{\linkS4class{KmmModel}}] class.
 }
 \description{
 This function computes the optimal kernel mixture model (KMM) according
@@ -54,7 +54,7 @@ to the [\code{criterion}] among the number of clusters given in
 [\code{nbCluster}], using the strategy specified in [\code{strategy}].
 }
 \note{
-in the KernelMixtureModel instance returned by the function, data is the Gram matrix.
+in the KmmModel instance returned by the function, data is the Gram matrix.
 }
 \examples{
 ## A quantitative example with the famous bulls eye model

@@ -65,10 +65,10 @@ data(HeartDisease.cat)
 data(HeartDisease.cont)
 data(HeartDisease.target)
 ## with default values
-ldata = list(HeartDisease.cat, HeartDisease.cont);
+lcomponent = list(HeartDisease.cat, HeartDisease.cont);
 models = c("categorical_pk_pjk","gaussian_pk_sjk")
 z<-HeartDisease.target[[1]];
-model <- learnMixedData(ldata, models, z, algo="simul", nbIter=2)
+model <- learnMixedData(lcomponent, models, z, algo="simul", nbIter=2)
 missingValues(model)
 print(model)
 

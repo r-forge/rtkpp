@@ -75,7 +75,7 @@ SEXP kmm( SEXP model, SEXP nbCluster, SEXP models, SEXP prop, SEXP nbCore );
  */
 SEXP kmmMixedData( SEXP model, SEXP nbCluster, SEXP nbCore  );
 /** Compute the Gram matrix and overwrite data slot in S4 component with the result
- *  @param component a KernelMixtureModelComponent S4 class
+ *  @param component a KmmModelComponent S4 class
  *  @param kernelName a string with the name of the kernel to use
  *  @param kernelParameters a vector with the optional parameters
  */

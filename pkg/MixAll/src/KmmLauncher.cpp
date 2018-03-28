@@ -35,7 +35,6 @@
 
 
 #include "../inst/projects/MixAll/KmmLauncher.h"
-#include "../inst/projects/MixAll/MixAll_Util.h"
 #include "../inst/projects/MixAll/ClusterFacade.h"
 
 using namespace Rcpp;
@@ -47,19 +46,16 @@ namespace STK
  * with less effort
  **/
 KmmLauncher::KmmLauncher( Rcpp::S4 s4_model
-                        , STK::KernelHandler const& handler
                         , Rcpp::IntegerVector const& nbCluster
-                        , Rcpp::CharacterVector const& models)
-                        : IRunnerBase()
-                        , kernelHandler_(handler)
-                        , kernelManager_(kernelHandler_)
-                        , s4_model_(s4_model)
+                        , Rcpp::CharacterVector const& models
+                        )
+                        : ILauncherBase(s4_model)
                         , s4_strategy_(s4_model_.slot("strategy"))
                         , v_models_(models)
                         , v_nbCluster_(nbCluster)
                         , criterion_(Rcpp::as<std::string>(s4_model_.slot("criterionName")))
+                        , facade_()
                         , isMixedData_(false)
-                        , p_composer_(0)
 {}
 ///* facade design pattern.
 // * The KmmLauncher allow to create the strategy for estimating a mixture model
@@ -81,12 +77,6 @@ KmmLauncher::~KmmLauncher()
 {}
 
 
-/* create the mixtures in the given learner */
-void KmmLauncher::createMixtures(IMixtureStatModel* p_model)
-{
-  p_model->createMixture(kernelManager_);
-}
-
 /* create the kernel mixtures in the given composer */
 void KmmLauncher::updateMixtures(MixtureComposer* p_composer)
 {
@@ -100,24 +90,11 @@ void KmmLauncher::updateMixtures(MixtureComposer* p_composer)
     Clust::Mixture typeModel = Clust::stringToMixture(idModel);
     RVector<double> dim((SEXP)s4_component.slot("dim"));
     double kdim = (dim.size()>0) ? dim[0] : 10;
-    kernelManager_.setDim(p_composer->getMixture(idData), kdim);
+    facade_.kmmManager().setDim(p_composer->getMixture(idData), kdim);
   }
 }
 
 
-
-/* get the kernel parameters */
-void KmmLauncher::getParameters(IMixtureStatModel* p_model, std::string const& idData, Rcpp::S4 s4_component)
-{
-  // get parameters
-  ArrayXX param;
-  p_model->getParameters(kernelManager_,idData, param);
-  // save results in s4_model
-   s4_component.slot("sigma") = Rcpp::wrap(param.col(0));
-  s4_component.slot("dim")   = Rcpp::wrap(param.col(1));
-  // get data -- not necessary for kernels--
-  //s4_component.slot("data") = kernelManager_.getData<double>(idData).matrix();
-}
 
 /* run the estimation */
 bool KmmLauncher::run()
@@ -130,17 +107,17 @@ bool KmmLauncher::run()
 
   // get result common part of the estimated model
   s4_model_.slot("criterion")      = criter;
-  s4_model_.slot("nbCluster")      = p_composer_->nbCluster();
-  s4_model_.slot("lnLikelihood")   = p_composer_->lnLikelihood();
-  s4_model_.slot("nbFreeParameter")= p_composer_->nbFreeParameter();
-  s4_model_.slot("pk")             = Rcpp::wrap(p_composer_->pk());
-  s4_model_.slot("tik")            = Rcpp::wrap(p_composer_->tik());
-  s4_model_.slot("zi")             = Rcpp::wrap(p_composer_->zi());
+  s4_model_.slot("nbCluster")      = facade_.p_composer_->nbCluster();
+  s4_model_.slot("lnLikelihood")   = facade_.p_composer_->lnLikelihood();
+  s4_model_.slot("nbFreeParameter")= facade_.p_composer_->nbFreeParameter();
+  s4_model_.slot("pk")             = Rcpp::wrap(facade_.p_composer_->pk());
+  s4_model_.slot("tik")            = Rcpp::wrap(facade_.p_composer_->tik());
+  s4_model_.slot("zi")             = Rcpp::wrap(facade_.p_composer_->zi());
   NumericVector fi = s4_model_.slot("lnFi");
   NumericVector zi = s4_model_.slot("zi");
   for (int i=0; i< fi.length(); ++i)
   {
-    fi[i] = p_composer_->computeLnLikelihood(i);
+    fi[i] = facade_.p_composer_->computeLnLikelihood(i);
     zi[i] += (1 - baseIdx);  // set base 1 for the class labels
   }
   if (criter == initCriter || !Arithmetic<Real>::isFinite(criter)) return false;
@@ -185,7 +162,7 @@ Real KmmLauncher::selectBestSingleModel()
 
         // create current mixture and register it
         std::string idData = "model" + typeToString<int>(l);
-        createMixtures(static_cast<MixtureComposer*>(p_current));
+        //createMixtures(static_cast<MixtureComposer*>(p_current));
 
         // run estimation and get results if possible
         if (!facade.run()) { msg_error_ += facade.error();}
@@ -194,8 +171,10 @@ Real KmmLauncher::selectBestSingleModel()
         p_criterion->run();
         if (bestCritValue > p_criterion->value())
         {
-          if (p_composer_) { std::swap(p_current, p_composer_);}
-          else             { p_composer_ = p_current; p_current = 0;}
+          if (facade_.p_composer_)
+          { std::swap(p_current, facade_.p_composer_);}
+          else
+          { facade_.p_composer_ = p_current; p_current = 0;}
           s4_component.slot("modelName") = idModel;
           idDataBestModel = idData;
           bestCritValue = p_criterion->value();
@@ -207,7 +186,10 @@ Real KmmLauncher::selectBestSingleModel()
     // release
     delete p_criterion;
     // get specific parameters
-    getParameters(p_composer_, idDataBestModel, s4_component);
+    setKernelParametersToComponent( facade_.p_composer_
+                                  , facade_.kerHandler_
+                                  , idDataBestModel
+                                  , s4_component);
     return bestCritValue;
   }
   catch (Exception const& e)
@@ -224,7 +206,7 @@ Real KmmLauncher::selectBestSingleModel()
 Real KmmLauncher::selectBestMixedModel()
 {
   // list of the component
-  Rcpp::List s4_list =s4_model_.slot("ldata");
+  Rcpp::List s4_list =s4_model_.slot("lcomponent");
   Real criter =s4_model_.slot("criterion");
   int nbSample =s4_model_.slot("nbSample");
   // main pointer
@@ -264,7 +246,7 @@ Real KmmLauncher::selectBestMixedModel()
       if (!sameProp) { p_current = new MixtureComposer(nbSample, K);}
       else           { p_current = new MixtureComposerFixedProp(nbSample, K);}
       // create all mixtures
-      createMixtures(static_cast<MixtureComposer*>(p_current));
+      //createMixtures(static_cast<MixtureComposer*>(p_current));
       // run estimation and get results if possible
       if (!facade.run()) { msg_error_ += facade.error();}
       // compute criterion and update model if necessary
@@ -272,8 +254,10 @@ Real KmmLauncher::selectBestMixedModel()
       p_criterion->run();
       if (criter > p_criterion->value())
       {
-        if (p_composer_) { std::swap(p_current, p_composer_);}
-        else             { p_composer_ = p_current; p_current = 0;}
+        if (facade_.p_composer_)
+        { std::swap(p_current, facade_.p_composer_);}
+        else
+        { facade_.p_composer_ = p_current; p_current = 0;}
         criter = p_criterion->value();
       }
       // release current composer
@@ -288,7 +272,11 @@ Real KmmLauncher::selectBestMixedModel()
       Rcpp::S4 s4_component = s4_list[l];
       // id of the data set and of the model
       std::string idData  = "model" + typeToString<int>(l);
-      getParameters(p_composer_, idData, s4_component);
+      // get specific parameters
+      setKernelParametersToComponent( facade_.p_composer_
+                                    , facade_.kerHandler_
+                                    , idData
+                                    , s4_component);
     }
     //
     return criter;

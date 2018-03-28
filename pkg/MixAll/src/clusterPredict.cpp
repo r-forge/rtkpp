@@ -36,6 +36,7 @@
 #include "RTKpp.h"
 #include "MixAll.h"
 #include <MixAll/ClusterPredictor.h>
+#include <MixAll/ClusterPredictorMixedData.h>
 
 /*  @param nbCore number of core to use
  */
@@ -53,9 +54,18 @@ extern "C" SEXP clusterPredict( SEXP model, SEXP result, SEXP nbCore )
   Rcpp::S4 s4_result(result);
 
   // create a launcher
-  STK::ClusterPredictor predictor(s4_model, s4_result);
-  // return result
-  return Rcpp::wrap(predictor.run());
+  if (s4_model.is("ClusterMixedData"))
+  {
+    STK::ClusterPredictorMixedData predictor(s4_model, s4_result);
+    // return result
+    return Rcpp::wrap(predictor.run());
+  }
+  else
+  {
+    STK::ClusterPredictor predictor(s4_model, s4_result);
+    // return result
+    return Rcpp::wrap(predictor.run());
+  }
 
   END_RCPP
 }

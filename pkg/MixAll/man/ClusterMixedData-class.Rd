@@ -22,7 +22,7 @@ can be any implemented model (Gaussian, Poisson,...).
 \section{Slots}{
 
 \describe{
-\item{\code{ldata}}{a list of IClusterComponent.}
+\item{\code{lcomponent}}{a list of [\code{\linkS4class{IClusterComponent}}]}
 }}
 
 \examples{

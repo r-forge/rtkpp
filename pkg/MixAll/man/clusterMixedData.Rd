@@ -12,12 +12,9 @@ clusterMixedData(data, models, nbCluster = 2, strategy = clusterStrategy(),
 If data sets contain NA values, these missing values will be estimated during
 the estimation process.}
 
-\item{models}{either a [\code{vector}] of character or a [\code{list}] of
-same length than data. If \code{models} is a vector, it contains the model
-names to use in order to fit each data set. If \code{models} is a list, it
-must be of the form 
-\code{models = list( modelName, dim, kernelName, modelParameters) }
-Only modelName is required.}
+\item{models}{a [\code{vector}] of character or a [\code{list}] of
+same length than data. It contains the model names to use in order to fit
+each data set.}
 
 \item{nbCluster}{[\code{\link{vector}}] with the number of clusters to test.}
 

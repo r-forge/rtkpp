@@ -27,16 +27,16 @@
 #' @aliases missingValues,ClusterDiagGaussian-method
 setMethod(
   f="missingValues",
-  c("ClusterMixedData"),
+  signature=c("ClusterMixedData"),
   function(x)
   {
-    nbData <- length(x@ldata)
+    nbData <- length(x@lcomponent)
     res <- vector("list", nbData)
     if(nbData>0)
     {
       for (l in 1:nbData)
       {
-        res[[l]]  <- cbind(x@ldata[[l]]@missing, (x@ldata[[l]]@data)[x@ldata[[l]]@missing]);
+        res[[l]]  <- cbind(x@lcomponent[[l]]@missing, (x@lcomponent[[l]]@data)[x@lcomponent[[l]]@missing]);
         colnames(res[[l]])[3] <- "value";
       }
     }
@@ -48,7 +48,7 @@ setMethod(
 #' @aliases missingValues,ClusterDiagGaussianComponent-method
 setMethod(
   f="missingValues",
-  c("ClusterDiagGaussianComponent"),
+  signature=c("ClusterDiagGaussianComponent"),
   function(x)
   { res = cbind(x@missing, x@data[x@missing]);
     colnames(res)[3] <- "value";
@@ -61,7 +61,7 @@ setMethod(
 #' @aliases missingValues,ClusterDiagGaussian-method
 setMethod(
   f="missingValues",
-  c("ClusterDiagGaussian"),
+  signature=c("ClusterDiagGaussian"),
   function(x) { return(missingValues(x@component));}
 )
 
@@ -69,7 +69,7 @@ setMethod(
 #' @aliases missingValues,ClusterGammaComponent-method
 setMethod(
     f="missingValues",
-    c("ClusterGammaComponent"),
+    signature=c("ClusterGammaComponent"),
     function(x)
     { res = cbind(x@missing, x@data[x@missing]);
       colnames(res)[3] <- "value";
@@ -82,10 +82,9 @@ setMethod(
 #' @aliases missingValues,ClusterGamma-method
 setMethod(
   f="missingValues",
-  c("ClusterGamma"),
+  signature=c("ClusterGamma"),
   function(x) { return(missingValues(x@component));}
 )
-
 
 #' @rdname missingValues-methods
 #' @aliases missingValues,ClusterCategoricalComponent-method
@@ -112,7 +111,7 @@ setMethod(
 #' @aliases missingValues,ClusterPoissonComponent-method
 setMethod(
   f="missingValues",
-  c("ClusterPoissonComponent"),
+  signature=c("ClusterPoissonComponent"),
   function(x)
   { res = cbind(x@missing, x@data[x@missing]);
     colnames(res)[3] <- "value";
@@ -121,12 +120,11 @@ setMethod(
     return(res)
   }
 )
-
 #' @rdname missingValues-methods
 #' @aliases missingValues,ClusterPoisson-method
 setMethod(
   f="missingValues",
-  c("ClusterPoisson"),
+  signature=c("ClusterPoisson"),
   function(x) { return(missingValues(x@component));}
 )
 
@@ -136,27 +134,28 @@ setMethod(
   f="missingValues",
   signature=c("ClusterPredict"),
   function(x)
-  { res = cbind(x@missing, x@data[x@missing]);
-    colnames(res)[3] <- "value";
+  { res = cbind(x@missing, x@data[x@missing])
+    colnames(res)[3] <- "value"
     nmiss <- nrow(x@missing)
     if (nmiss > 0) { rownames(res) <- 1:nmiss}
     return(res)
   }
 )
+
 #' @rdname missingValues-methods
 #' @aliases missingValues,KmmComponent-method
 setMethod(
     f="missingValues",
-    c("KmmComponent"),
-    function(x)
-    {
-      return(NULL)
-    }
+    signature=c("KmmComponent"),
+    function(x) { return(NULL)}
 )
+
 #' @rdname missingValues-methods
-#' @aliases missingValues,KernelMixtureModel-method
+#' @aliases missingValues,KmmModel-method
 setMethod(
     f="missingValues",
-    c("KernelMixtureModel"),
-    function(x) { return(NULL);}
+    signature=c("KmmModel"),
+    function(x) { return(NULL)}
 )
+
+

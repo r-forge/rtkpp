@@ -108,16 +108,16 @@ void ILauncher::getParameters(IMixtureStatModel* p_model, std::string const& idD
   switch (Clust::mixtureToMixtureClass(Clust::stringToMixture(rModelName, freeProp)))
   {
     case Clust::DiagGaussian_:
-      getDiagGaussianParameters(p_model, diagGaussianManager_, idData, s4_component);
+      setDiagGaussianParametersToComponent(p_model, diagGaussianManager_, idData, s4_component);
       break;
     case Clust::Poisson_:
-      getPoissonParameters(p_model, poissonManager_, idData, s4_component);
+      setPoissonParametersToComponent(p_model, poissonManager_, idData, s4_component);
       break;
     case Clust::Gamma_:
-      getGammaParameters(p_model, gammaManager_, idData, s4_component);
+      setGammaParametersToComponent(p_model, gammaManager_, idData, s4_component);
       break;
     case Clust::Categorical_:
-      getCategoricalParameters(p_model, categoricalManager_, idData, s4_component);
+      setCategoricalParametersToComponent(p_model, categoricalManager_, idData, s4_component);
       break;
     case Clust::Kernel_:
       break;

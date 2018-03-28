@@ -143,7 +143,7 @@ clusterDiagGaussian <- function( data, nbCluster=2
 #' @aliases ClusterDiagGaussianComponent-class
 #'
 setClass(
-  Class="ClusterDiagGaussianComponent",
+  Class = "ClusterDiagGaussianComponent",
   representation( mean = "matrix", sigma = "matrix"),
   contains=c("IClusterComponent"),
   validity=function(object)
@@ -275,7 +275,7 @@ setMethod(
 #' @aliases ClusterDiagGaussian-class
 #'
 setClass(
-  Class="ClusterDiagGaussian",
+  Class = "ClusterDiagGaussian",
   representation( component = "ClusterDiagGaussianComponent"),
   contains=c("IClusterModel"),
   validity=function(object)

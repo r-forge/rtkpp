@@ -2,7 +2,7 @@
 % Please edit documentation in R/ClusterPredict.R
 \name{clusterPredict}
 \alias{clusterPredict}
-\title{Create an instance of a mixture model S4 class with predicted values}
+\title{Create an instance of [\code{\linkS4class{ClusterPredict}}] class}
 \usage{
 clusterPredict(data, model, algo = clusterAlgoPredict(), nbCore = 1)
 }
@@ -11,9 +11,12 @@ clusterPredict(data, model, algo = clusterAlgoPredict(), nbCore = 1)
 and columns correspond to variables. If the data set contains NA values, they
 will be estimated during the predicting process.}
 
-\item{model}{estimated clustering model}
+\item{model}{(estimated) clustering model to use, i.e. an instance of
+\code{\linkS4class{ClusterCategorical}}, \code{\linkS4class{ClusterDiagGaussian}}, etc. class
+produced by \code{\link{clusterCategorical}}, \code{\link{clusterDiagGaussian}}, etc.
+functions}
 
-\item{algo}{an instance of \code{\link{ClusterAlgoPredict}} S4 class}
+\item{algo}{an instance of \code{\linkS4class{ClusterAlgoPredict}} S4 class}
 
 \item{nbCore}{integer defining the number of processors to use (default is 1, 0 for all).}
 }
@@ -27,18 +30,15 @@ This function predicts the best cluster each sample in data belongs to.
 \examples{
 ## A quantitative example with the famous iris data set
 data(iris)
-## add 10 missing values as random
-x = as.matrix(iris[1:4]); n <- nrow(x); p <- ncol(x);
-indexes <- matrix(c(round(runif(5,1,n)), round(runif(5,1,p))), ncol=2);
-x[indexes] <- NA;
+## get quantitatives 
+x = as.matrix(iris[1:4])
 ## sample train and test data sets
 indexes <- sample(1:nrow(x), nrow(x)/2)
 train <- x[ indexes,]
 test  <- x[-indexes,]
 ## estimate model (using fast strategy, results may be misleading)
 model1 <- clusterDiagGaussian( data =train, nbCluster=2:3
-                             , models=c( "gaussian_pk_sjk")
-                             , strategy = clusterFastStrategy()
+                             , models=c( "gaussian_p_sjk")
                              )
 ## get summary
 summary(model1)

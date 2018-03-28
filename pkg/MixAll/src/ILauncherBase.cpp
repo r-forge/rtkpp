@@ -52,27 +52,27 @@ ILauncherBase::ILauncherBase( Rcpp::S4 model)
 ILauncherBase::~ILauncherBase() {}
 
 /* fill the s4_component with the parameters */
-void ILauncherBase::getParameters( IMixtureStatModel* p_model
-                                 , IManager const& manager
-                                 , std::string const& idData
-                                 , Rcpp::S4 s4_component
-                                 )
+void ILauncherBase::setParametersToComponent( IMixtureStatModel* p_model
+                                           , IManager const& manager
+                                           , std::string const& idData
+                                           , Rcpp::S4 s4_component
+                                           )
 {
   std::string rModelName = s4_component.slot("modelName");
   bool freeProp;
   switch (Clust::mixtureToMixtureClass(Clust::stringToMixture(rModelName, freeProp)))
   {
     case Clust::DiagGaussian_:
-      getDiagGaussianParameters(p_model, manager, idData, s4_component);
+      setDiagGaussianParametersToComponent(p_model, manager, idData, s4_component);
       break;
     case Clust::Poisson_:
-      getPoissonParameters(p_model, manager, idData, s4_component);
+      setPoissonParametersToComponent(p_model, manager, idData, s4_component);
       break;
     case Clust::Gamma_:
-      getGammaParameters(p_model, manager, idData, s4_component);
+      setGammaParametersToComponent(p_model, manager, idData, s4_component);
       break;
     case Clust::Categorical_:
-      getCategoricalParameters(p_model, manager, idData, s4_component);
+      setCategoricalParametersToComponent(p_model, manager, idData, s4_component);
       break;
     case Clust::Kernel_:
       break;
@@ -85,7 +85,7 @@ void ILauncherBase::getParameters( IMixtureStatModel* p_model
 
 
 /* get the diagonal Gaussian parameters */
-void ILauncherBase::getDiagGaussianParameters( IMixtureStatModel* p_model, IManager const& manager
+void ILauncherBase::setDiagGaussianParametersToComponent( IMixtureStatModel* p_model, IManager const& manager
                                              , std::string const& idData, Rcpp::S4 s4_component)
 {
   // get parameters
@@ -108,7 +108,7 @@ void ILauncherBase::getDiagGaussianParameters( IMixtureStatModel* p_model, IMana
 }
 
 /* get the diagonal Gaussian parameters */
-void ILauncherBase::getPoissonParameters( IMixtureStatModel* p_model, IManager const& manager
+void ILauncherBase::setPoissonParametersToComponent( IMixtureStatModel* p_model, IManager const& manager
                                         , std::string const& idData, Rcpp::S4 s4_component)
 {
   // get parameters
@@ -121,7 +121,7 @@ void ILauncherBase::getPoissonParameters( IMixtureStatModel* p_model, IManager c
 }
 
 /* get the gamma parameters */
-void ILauncherBase::getGammaParameters( IMixtureStatModel* p_model, IManager const& manager
+void ILauncherBase::setGammaParametersToComponent( IMixtureStatModel* p_model, IManager const& manager
                                       , std::string const& idData, Rcpp::S4 s4_component)
 {
   // get parameters
@@ -144,7 +144,7 @@ void ILauncherBase::getGammaParameters( IMixtureStatModel* p_model, IManager con
 }
 
 /* get the diagonal Categorical parameters */
-void ILauncherBase::getCategoricalParameters( IMixtureStatModel* p_model, IManager const& manager
+void ILauncherBase::setCategoricalParametersToComponent( IMixtureStatModel* p_model, IManager const& manager
                                             , std::string const& idData, Rcpp::S4 s4_component)
 {
   // get parameters
@@ -158,7 +158,7 @@ void ILauncherBase::getCategoricalParameters( IMixtureStatModel* p_model, IManag
 }
 
 /* get the kernel parameters */
-void ILauncherBase::getKernelParameters( IMixtureStatModel* p_model
+void ILauncherBase::setKernelParametersToComponent( IMixtureStatModel* p_model
                                        , KernelMixtureManager const& manager
                                        , std::string const& idData, Rcpp::S4 s4_component)
 {

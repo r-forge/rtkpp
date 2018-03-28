@@ -119,7 +119,7 @@ clusterInit <- function( method="class", nbInit=5,  algo = "EM", nbIteration=20,
 #' @aliases ClusterInit-class
 #'
 setClass(
-  Class="ClusterInit",
+  Class = "ClusterInit",
   slots=c(method="character", nbInit = "numeric", algo = "ClusterAlgo"),
   prototype=list(method="class", nbInit = 5, algo = clusterAlgo(algo="EM", nbIteration=20, epsilon=0.01)),
   # validity function

@@ -38,7 +38,7 @@
 #include <MixAll/MixAll_Util.h>
 
 /* Compute the Gram matrix and overwrite the data with the result.
- *  @param component a KernelMixtureModelComponent S4 class
+ *  @param component a KmmModelComponent S4 class
  *  @param kernelName a string with the name of the kernel to use
  *  @param kernelParameters a vector with the optional parameters
  */

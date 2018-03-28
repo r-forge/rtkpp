@@ -44,12 +44,14 @@
 \alias{print}
 \alias{print,ClusterPredict-method}
 \alias{print}
+\alias{print,ClusterPredictMixedData-method}
+\alias{print}
 \alias{print,LearnAlgo-method}
 \alias{print}
 \alias{print-algo,LearnAlgo-method}
 \alias{print,KmmComponent-method}
 \alias{print}
-\alias{print,KernelMixtureModel-method}
+\alias{print,KmmModel-method}
 \alias{print}
 \title{Print a MixAll S4 class to standard output.}
 \usage{
@@ -87,11 +89,13 @@
 
 \S4method{print}{ClusterPredict}(x, ...)
 
+\S4method{print}{ClusterPredictMixedData}(x, ...)
+
 \S4method{print}{LearnAlgo}(x, ...)
 
 \S4method{print}{KmmComponent}(x, k, ...)
 
-\S4method{print}{KernelMixtureModel}(x, ...)
+\S4method{print}{KmmModel}(x, ...)
 }
 \arguments{
 \item{x}{a MixAll object: a \code{\linkS4class{ClusterStrategy}},

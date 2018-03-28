@@ -15,7 +15,7 @@
 \alias{missingValues,ClusterPoisson-method}
 \alias{missingValues,ClusterPredict-method}
 \alias{missingValues,KmmComponent-method}
-\alias{missingValues,KernelMixtureModel-method}
+\alias{missingValues,KmmModel-method}
 \title{Return the missing values of a component or a cluster class.}
 \usage{
 missingValues(x)
@@ -42,7 +42,7 @@ missingValues(x)
 
 \S4method{missingValues}{KmmComponent}(x)
 
-\S4method{missingValues}{KernelMixtureModel}(x)
+\S4method{missingValues}{KmmModel}(x)
 }
 \arguments{
 \item{x}{an object that can return the imputed missing values}

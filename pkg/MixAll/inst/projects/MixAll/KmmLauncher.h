@@ -36,7 +36,7 @@
 #ifndef STK_KMMLAUNCHER_H
 #define STK_KMMLAUNCHER_H
 
-#include "RDataHandler.h"
+#include "ILauncherBase.h"
 
 namespace STK
 {
@@ -44,18 +44,17 @@ namespace STK
 /** KmmLauncher class is an interface class allowing to create composer or
  *  learner of mixture models with less efforts.
  **/
-class KmmLauncher: public IRunnerBase
+class KmmLauncher: public ILauncherBase
 {
   public:
     /** constructor for single data
-     *  @param s4_model KernelMixtureModel S4 class with the result in output
+     *  @param s4_model KmmModel S4 class with the result in output
      *  @param handler an instance of the KernelHandler class with the kernels to use
      *  @param nbCluster a vector with the number of clusters to test
      *  @param models a vector of string with the model names to try
      *  @param criteria selection model criteria (string)
      **/
   KmmLauncher( Rcpp::S4 s4_model
-             , KernelHandler const& handler
              , Rcpp::IntegerVector const& nbCluster
              , Rcpp::CharacterVector const& models
              );
@@ -71,29 +70,13 @@ class KmmLauncher: public IRunnerBase
     /** run the estimation */
     bool run();
 
-    /** @return the estimated model */
-    inline Rcpp::S4 const& s4_model() const { return s4_model_;}
-
   protected:
-    /** create the mixtures in the given composer */
-    void createMixtures(IMixtureStatModel* p_model);
-
-    /** get kernel parameters */
-    void getParameters(IMixtureStatModel* p_model, std::string const& idData, Rcpp::S4 s4_component);
-
     /** create the kernel mixtures in the given composer. We have to
      * use a workaround for this kind of model as they need an extra parameter
      * (the dimension) to be given
      **/
     void updateMixtures(MixtureComposer* p_composer);
 
-    /** kernel mixture models manager */
-    KernelHandler const& kernelHandler_;
-    /** kernel mixture models manager */
-    KernelMixtureManager kernelManager_;
-
-    /** model from the R side */
-    Rcpp::S4 s4_model_;
     /** vector with the model names to try */
     Rcpp::CharacterVector v_models_;
     /** strategy from the R side */
@@ -102,8 +85,6 @@ class KmmLauncher: public IRunnerBase
     Rcpp::IntegerVector   v_nbCluster_;
     /** character string with the model selection criterion name */
     std::string           criterion_;
-    /** Is model with mixed data ? */
-    bool isMixedData_;
 
   private:
     /** Select the best model among the models and nbCluster given.
@@ -114,8 +95,10 @@ class KmmLauncher: public IRunnerBase
      *  @return the value of the best criteria.
      **/
     Real selectBestMixedModel();
-    /** pointer on the main composer */
-    IMixtureComposer* p_composer_;
+    /** facade with the main composer */
+    MixtureComposerFacade<RDataHandler> facade_;
+    /** Is the model with mixed data ? */
+    bool isMixedData_;
 };
 
 } // namespace STK

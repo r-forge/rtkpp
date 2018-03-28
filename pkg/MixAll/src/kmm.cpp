@@ -57,38 +57,12 @@ extern "C" SEXP kmm( SEXP model, SEXP nbCluster, SEXP models, SEXP prop, SEXP nb
   Rcpp::S4 s4_model(model);
   Rcpp::IntegerVector r_nbCluster(nbCluster);
   Rcpp::CharacterVector r_models(models);
-  std::string proportion = Rcpp::as<std::string>(prop);
 
-  Rcpp::S4 s4_component = s4_model.slot("component");
-
-  // create kernel and eventually Gram matrix
-  std::string kernelName = Rcpp::as<std::string>(s4_model.slot("kernelName"));
-  Rcpp::DoubleVector r_kernelParameters  = s4_model.slot("kernelParameters");
-  bool kernelComputation = Rcpp::as<bool>(s4_model.slot("kernelComputation"));
-
-  try
-  {
-    STK::Kernel::IKernel* p_kernel = createKernel(s4_component, kernelName, r_kernelParameters, kernelComputation);
-    if (!p_kernel) { return Rcpp::wrap(false);}
-
-    // create kernel handler
-    STK::KernelHandler handler;
-    for (int i=0; i<r_models.length(); ++i)
-    {
-      std::string idData  = "idData" + STK::typeToString(i);
-      std::string idModel  = Rcpp::as<std::string>(r_models[i]);
-      handler.addKernel(p_kernel, idData, idModel);
-    }
-    // create launcher
-    STK::KmmLauncher launcher(s4_model, handler, r_nbCluster, r_models);
+  // create launcher
+  STK::KmmLauncher launcher(s4_model, r_nbCluster, r_models);
     // return result
     //return Rcpp::wrap(launcher.run());
     return Rcpp::wrap(true);
-  }
-  catch (STK::Exception const& e)
-  {
-    return Rcpp::wrap(false);
-  };
 
   END_RCPP
 }

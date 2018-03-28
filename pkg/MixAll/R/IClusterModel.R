@@ -48,7 +48,8 @@ setClass(
   representation( data      = "matrix"
                 , missing   = "matrix"
                 , modelName = "character"
-                , "VIRTUAL"),
+                , "VIRTUAL"
+                ),
   validity=function(object)
   {
     return(TRUE);
@@ -155,7 +156,7 @@ setMethod(
 #' @aliases IClusterModel-class
 #' 
 setClass(
-  Class="IClusterModel",
+  Class = "IClusterModel",
   representation( nbSample        = "numeric"
                 , nbCluster       = "numeric"
                 , pk              = "numeric"

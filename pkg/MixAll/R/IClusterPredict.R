@@ -47,17 +47,17 @@
 #' @aliases IClusterPredict-class
 #' 
 setClass(
-  Class="IClusterPredict",
+  Class = "IClusterPredict",
   # members
   representation( nbSample  = "numeric"
-                , nbCluster = "numeric"
-                , pk        = "numeric"
-                , tik       = "matrix"
-                , lnFi      = "numeric"
-                , zi        = "integer"
-                , algo      = "ClusterAlgoPredict"
-                , "VIRTUAL"
-              ),
+           , nbCluster = "numeric"
+           , pk        = "numeric"
+           , tik       = "matrix"
+           , lnFi      = "numeric"
+           , zi        = "integer"
+           , algo      = "ClusterAlgoPredict"
+           , "VIRTUAL"
+           ),
   # validity function
   validity=function(object)
   {

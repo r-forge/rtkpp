@@ -68,9 +68,9 @@ class KernelMixtureManager: public IMixtureManager<KernelHandler>
      * */
     void setKernel(IMixture* p_mixture, Kernel::IKernel const* p_kernel);
     /** set the dimension of the kernel mixture model */
-    void setDim(IMixture* p_mixture, Real const& dim);
+    void setDim(IMixture* p_mixture, Real const& dim) const;
     /** set the dimension of the kernel mixture model */
-    void setDim(IMixture* p_mixture, CPointX const& dim);
+    void setDim(IMixture* p_mixture, CPointX const& dim) const;
     /** get the parameters from an IMixture.
      *  @param p_mixture pointer on the mixture
      *  @param param the array to return with the parameters

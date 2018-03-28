@@ -37,14 +37,13 @@
 #ifndef STK_CLUSTERPREDICTOR_H
 #define STK_CLUSTERPREDICTOR_H
 
-#include "RDataHandler.h"
-#include "ILauncher.h"
+#include "IClusterPredictor.h"
 
 namespace STK
 {
 
 /** ClusterPredictor class allows **/
-class ClusterPredictor: public ILauncherBase
+class ClusterPredictor: public IClusterPredictor
 {
   public:
     /** constructor.
@@ -59,19 +58,6 @@ class ClusterPredictor: public ILauncherBase
   protected:
     /** component of the model from the R side */
     Rcpp::S4 s4_component_;
-    /** result from the R side */
-    Rcpp::S4 s4_clusterPredict_;
-    /** predict algorithm from the R side */
-    Rcpp::S4 s4_algo_;
-
-  private:
-    /** utility function creating STK algorithm from R algorithm */
-    IMixtureAlgoPredict* createAlgo();
-
-    /** facade for the data to predict */
-    MixtureComposerFacade<RDataHandler> facade_;
-    /** algorithm to use */
-    IMixtureAlgoPredict* p_algo_;
 };
 
 } // namespace STK

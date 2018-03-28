@@ -143,7 +143,7 @@ clusterGamma <- function( data, nbCluster=2
 #' @aliases ClusterGammaComponent-class
 #'
 setClass(
-    Class="ClusterGammaComponent",
+    Class = "ClusterGammaComponent",
     representation( shape = "matrix", scale = "matrix"),
     contains=c("IClusterComponent"),
     validity=function(object)
@@ -273,7 +273,7 @@ setMethod(
 #' @aliases ClusterGamma-class
 #'
 setClass(
-    Class="ClusterGamma",
+    Class = "ClusterGamma",
     representation( component = "ClusterGammaComponent"),
     contains=c("IClusterModel"),
     validity=function(object)

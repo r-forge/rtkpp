@@ -95,6 +95,7 @@ bool EMPredict::run()
 #endif
     result = false;
   }
+  p_model_->mapStep();
   p_model_->finalizeStep();
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Terminating EMPredict::run()\n");
@@ -154,6 +155,7 @@ bool SemiSEMPredict::run()
   }
   else
   { p_model_->releaseIntermediateResults();}
+  p_model_->mapStep();
   p_model_->finalizeStep();
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Terminating SemiSEMPredict::run()\n");

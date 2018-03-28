@@ -144,7 +144,7 @@ clusterCategorical <- function( data, nbCluster=2
 #' @aliases ClusterCategoricalComponent-class
 #'
 setClass(
-  Class="ClusterCategoricalComponent",
+  Class = "ClusterCategoricalComponent",
   representation( plkj = "array", nbModalities = "numeric", levels = "list"),
   contains=c("IClusterComponent"),
   validity=function(object)
@@ -314,7 +314,7 @@ setMethod(
 #' @aliases ClusterCategorical-class
 #' 
 setClass(
-  Class="ClusterCategorical",
+  Class = "ClusterCategorical",
   representation( component = "ClusterCategoricalComponent"),
   contains=c("IClusterModel"),
   validity=function(object)

@@ -298,7 +298,7 @@ learnMixedData <- function( data, models, labels, prop = NULL
   prop<- .checkPropInLearner(labels, prop)
   nbCluster <-length(prop)
   # create list of component
-  ldata <- vector("list", length(data));
+  lcomponent <- vector("list", length(data));
   for (i in 1:length(data))
   {
     # get the name of the model and the parameters for the kernel if it is a list
@@ -315,15 +315,15 @@ learnMixedData <- function( data, models, labels, prop = NULL
     }
     # check if it is a Categorical model 
     if( clusterValidCategoricalNames(modelName) )
-    { ldata[[i]] <- new("ClusterCategoricalComponent", data[[i]], nbCluster, modelName);}
+    { lcomponent[[i]] <- new("ClusterCategoricalComponent", data[[i]], nbCluster, modelName);}
     else 
     {  # check if it is a Gamma model
       if( clusterValidGammaNames(modelName) )
-      { ldata[[i]] <- new("ClusterGammaComponent", data[[i]], nbCluster, modelName);}
+      { lcomponent[[i]] <- new("ClusterGammaComponent", data[[i]], nbCluster, modelName);}
       else
       { # check if it is a diagonal Gaussian model
         if( clusterValidDiagGaussianNames(modelName) )
-        { ldata[[i]] <- new("ClusterDiagGaussianComponent", data[[i]], nbCluster, modelName)}
+        { lcomponent[[i]] <- new("ClusterDiagGaussianComponent", data[[i]], nbCluster, modelName)}
         else
         {
           stop("invalid model name");
@@ -332,7 +332,7 @@ learnMixedData <- function( data, models, labels, prop = NULL
     } # else categorical
   } # for i
   # create model
-  model = .createMixtureModel("ClusterMixedData", ldata, labels, prop)
+  model = .createMixtureModel("ClusterMixedData", lcomponent, labels, prop)
   model@criterionName = criterion
   # Create algorithm
   algo = learnAlgo( algo, nbIter, epsilon)
@@ -347,7 +347,7 @@ learnMixedData <- function( data, models, labels, prop = NULL
   for (i in 1:length(data))
   {
     if(clusterValidCategoricalNames(models[i]))
-    { dim(model@ldata[[i]]@plkj) <- c(model@ldata[[i]]@nbModalities, model@nbCluster, ncol(model@ldata[[i]]@data))}
+    { dim(model@lcomponent[[i]]@plkj) <- c(model@lcomponent[[i]]@nbModalities, model@nbCluster, ncol(model@lcomponent[[i]]@data))}
   }
   model
 }

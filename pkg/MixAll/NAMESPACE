@@ -50,8 +50,9 @@ exportClasses(ClusterAlgo
              ,ClusterMixedData
              ,IClusterPredict
              ,ClusterPredict
+             ,ClusterPredictMixedData
              ,KmmComponent
-             ,KernelMixtureModel
+             ,KmmModel
              )
 
 exportMethods(print)
@@ -63,7 +64,7 @@ exportMethods(missingValues)
 import(rtkore)
 
 importFrom("graphics", "close.screen", "hist", "lines", "par", "screen", "split.screen")
-importFrom("methods", "show", "callNextMethod", "new", "validObject", "is")
+importFrom("methods", "show", "callNextMethod", "new", "validObject", "is", ".hasSlot")
 importFrom("stats", "cov.wt", "dgamma", "dnorm", "dpois")
 
 useDynLib(MixAll)

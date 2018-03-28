@@ -66,7 +66,7 @@ void KernelMixtureManager::setKernel(IMixture* p_mixture, Kernel::IKernel const*
   }
 }
 /* set the dimension of the kernel mixture model */
-void KernelMixtureManager::setDim(IMixture* p_mixture, Real const& dim)
+void KernelMixtureManager::setDim(IMixture* p_mixture, Real const& dim) const
 {
   if (!p_mixture) return;
   Clust::Mixture idModel = getIdModel(p_mixture->idData());
@@ -86,7 +86,7 @@ void KernelMixtureManager::setDim(IMixture* p_mixture, Real const& dim)
 }
 
 /* set the dimension of the kernel mixture model */
-void KernelMixtureManager::setDim(IMixture* p_mixture, CPointX const& dim)
+void KernelMixtureManager::setDim(IMixture* p_mixture, CPointX const& dim) const
 {
   if (!p_mixture) return;
   Clust::Mixture idModel = getIdModel(p_mixture->idData());

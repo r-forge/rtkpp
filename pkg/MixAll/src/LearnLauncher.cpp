@@ -205,7 +205,7 @@ Real LearnLauncher::selectBestSingleModel()
 Real LearnLauncher::selectBestMixedModel()
 {
   // list of the component
-  Rcpp::List s4_list =s4_model_.slot("ldata");
+  Rcpp::List s4_list =s4_model_.slot("lcomponent");
   Real criter  = s4_model_.slot("criterion");
   int nbSample = s4_model_.slot("nbSample");
   int K        = s4_model_.slot("nbCluster");

@@ -75,6 +75,7 @@ bool IMixtureAlgoPredict::predictWithNoMissingValues()
   {
     p_model_->initializeStep();
     p_model_->eStep();
+    p_model_->mapStep();
     p_model_->finalizeStep();
   }
   catch (Exception const& error)

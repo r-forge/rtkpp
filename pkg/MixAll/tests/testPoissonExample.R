@@ -1,4 +1,3 @@
-require(methods)
 library(MixAll)
 
 data(DebTrivedi)

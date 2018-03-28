@@ -26,7 +26,9 @@
 \alias{summary}
 \alias{summary,ClusterPredict-method}
 \alias{summary}
-\alias{summary,KernelMixtureModel-method}
+\alias{summary,ClusterPredictMixedData-method}
+\alias{summary}
+\alias{summary,KmmModel-method}
 \alias{summary}
 \title{Produce summary of a MixAll S4 class.}
 \usage{
@@ -50,7 +52,9 @@
 
 \S4method{summary}{ClusterPredict}(object, ...)
 
-\S4method{summary}{KernelMixtureModel}(object, ...)
+\S4method{summary}{ClusterPredictMixedData}(object, ...)
+
+\S4method{summary}{KmmModel}(object, ...)
 }
 \arguments{
 \item{object}{any cluster model deriving from a \code{\linkS4class{IClusterModel}}

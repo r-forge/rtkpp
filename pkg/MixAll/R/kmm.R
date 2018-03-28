@@ -118,7 +118,7 @@ kmmStrategy <- function( nbTry =1
 
 
 #-----------------------------------------------------------------------
-#' Create an instance of the [\code{\linkS4class{KernelMixtureModel}}] class
+#' Create an instance of the [\code{\linkS4class{KmmModel}}] class
 #'
 #' This function computes the optimal kernel mixture model (KMM) according
 #' to the [\code{criterion}] among the number of clusters given in
@@ -149,7 +149,7 @@ kmmStrategy <- function( nbTry =1
 #' Possible values: "BIC", "AIC", "ICL", "ML". Default is "ICL".
 #' @param nbCore integer defining the number of processor to use (default is 1, 0 for all).
 #'
-#' @note in the KernelMixtureModel instance returned by the function, data is the Gram matrix.
+#' @note in the KmmModel instance returned by the function, data is the Gram matrix.
 #' @examples
 #' ## A quantitative example with the famous bulls eye model
 #' data(bullsEye)
@@ -168,7 +168,7 @@ kmmStrategy <- function( nbTry =1
 #' print(model)
 #' }
 #'
-#' @return An instance of the [\code{\linkS4class{KernelMixtureModel}}] class.
+#' @return An instance of the [\code{\linkS4class{KmmModel}}] class.
 #' @author Serge Iovleff
 #'
 #'
@@ -227,7 +227,7 @@ kmm <- function( data, nbCluster=2
   validObject(strategy);
 
   # Create model
-  model = new("KernelMixtureModel", data, nbCluster[1], models[1], dim, kernelName, kernelParameters, kernelComputation)
+  model = new("KmmModel", data, nbCluster[1], models[1], dim, kernelName, kernelParameters, kernelComputation)
   model@strategy = strategy;
   model@criterionName = criterion;
   
@@ -265,7 +265,7 @@ kmm <- function( data, nbCluster=2
 #' @aliases KmmComponent-class
 #'
 setClass(
-  Class="KmmComponent",
+  Class = "KmmComponent",
   representation( sigma2 = "vector", dim = "vector", gram = "matrix"),
   contains=c("IClusterComponent"),
   validity=function(object)
@@ -273,7 +273,7 @@ setClass(
     if ( length(object@sigma2) == 0) { stop("sigma2 must be a vector of length > 0.")}
     if ( length(object@dim)    == 0) { stop("dim must be a vector of length > 0")}
     if (!kmmValidModelNames(object@modelName))
-    {stop(paste("Invalid kernel mixture model name:", object@modelName,". See ?KernelMixtureModel for the list of valid kernel name",sep=""))}
+    {stop(paste("Invalid kernel mixture model name:", object@modelName,". See ?KmmModel for the list of valid kernel name",sep=""))}
     return(TRUE)
   }
 )
@@ -363,7 +363,7 @@ setMethod(
 )
 
 #-----------------------------------------------------------------------
-#' Definition of the [\code{\linkS4class{KernelMixtureModel}}] class
+#' Definition of the [\code{\linkS4class{KmmModel}}] class
 #'
 #' This class defines a Kernel mixture Model (KMM).
 #'
@@ -388,18 +388,18 @@ setMethod(
 #' @seealso [\code{\linkS4class{IClusterModel}}] class
 #'
 #' @examples
-#' getSlots("KernelMixtureModel")
+#' getSlots("KmmModel")
 #' data(bullsEye)
-#' new("KernelMixtureModel", data=bullsEye)
+#' new("KmmModel", data=bullsEye)
 #'
 #' @author Serge Iovleff
 #'
-#' @name KernelMixtureModel
-#' @rdname KernelMixtureModel-class
-#' @aliases KernelMixtureModel-class
+#' @name KmmModel
+#' @rdname KmmModel-class
+#' @aliases KmmModel-class
 #'
 setClass(
-  Class="KernelMixtureModel",
+  Class = "KmmModel",
   representation( component = "KmmComponent"
                 , kernelName = "character"
                 , kernelParameters = "vector"
@@ -413,26 +413,26 @@ setClass(
     if (length(object@component@sigma2)!=object@nbCluster)
     {stop("sigma2 must have nbCluster length.")}
     if (!kmmValidModelNames(object@component@modelName))
-    {stop(paste("Invalid kernel mixture model name:", object@component@modelName,". See ?KernelMixtureModel for the list of valid kernel name",sep=""))}
+    {stop(paste("Invalid kernel mixture model name:", object@component@modelName,". See ?KmmModel for the list of valid kernel name",sep=""))}
     # check kernelName
     if (length(object@kernelName) != 1)
-    { stop("kernelName must be of length 1. See ?KernelMixtureModel for the list of valid kernel name")}
+    { stop("kernelName must be of length 1. See ?KmmModel for the list of valid kernel name")}
     if (!kmmValidKernelNames(object@kernelName))
-    { stop(paste("kernelName is not valid",object@kernelName,". See ?KernelMixtureModel for the list of valid kernel name",sep=""))}
+    { stop(paste("kernelName is not valid",object@kernelName,". See ?KmmModel for the list of valid kernel name",sep=""))}
     return(TRUE)
   }
 )
 
 #' Initialize an instance of a MixAll S4 class.
 #'
-#' Initialization method of the [\code{\linkS4class{KernelMixtureModel}}] class.
+#' Initialization method of the [\code{\linkS4class{KmmModel}}] class.
 #' Used internally in the 'MixAll' package.
 #'
 #' @rdname initialize-methods
 #' @keywords internal
 setMethod(
     f="initialize",
-    signature=c("KernelMixtureModel"),
+    signature=c("KmmModel"),
     definition=function(.Object, data, nbCluster=2
                        , modelName = "kmm_s", dim= 10
                        , kernelName = "Gaussian"
@@ -441,7 +441,7 @@ setMethod(
                        )
     {
       # for data
-      if(missing(data)) {stop("data is mandatory in KernelMixtureModel.")}
+      if(missing(data)) {stop("data is mandatory in KmmModel.")}
       # initialize fields
       .Object@kernelName <- kernelName;
       if (is.null(kernelParameters)) {.Object@kernelParameters = c(1);}
@@ -457,11 +457,11 @@ setMethod(
 )
 
 #' @rdname print-methods
-#' @aliases print print,KernelMixtureModel-method
+#' @aliases print print,KmmModel-method
 #'
 setMethod(
   f="print",
-  signature=c("KernelMixtureModel"),
+  signature=c("KmmModel"),
   function(x,...){
     cat("****************************************\n")
     callNextMethod();
@@ -477,10 +477,10 @@ setMethod(
 )
 
 #' @rdname show-methods
-#' @aliases show-KernelMixtureModel,KernelMixtureModel,KernelMixtureModel-method
+#' @aliases show-KmmModel,KmmModel,KmmModel-method
 setMethod(
   f="show",
-  signature=c("KernelMixtureModel"),
+  signature=c("KmmModel"),
   function(object)
   {
     cat("****************************************\n")
@@ -498,11 +498,11 @@ setMethod(
 )
 
 #' @rdname summary-methods
-#' @aliases summary summary,KernelMixtureModel-method
+#' @aliases summary summary,KmmModel-method
 #'
 setMethod(
   f="summary",
-  signature=c("KernelMixtureModel"),
+  signature=c("KmmModel"),
   function(object, ...)
   {
     cat("**************************************************************\n")
@@ -512,19 +512,19 @@ setMethod(
   }
 )
 
-#' Plotting of a class [\code{\linkS4class{KernelMixtureModel}}]
+#' Plotting of a class [\code{\linkS4class{KmmModel}}]
 #'
-#' Plotting data from a [\code{\linkS4class{KernelMixtureModel}}] object
+#' Plotting data from a [\code{\linkS4class{KmmModel}}] object
 #' using the estimated parameters and partition.
 #'
-#' @param x an object of class [\code{\linkS4class{KernelMixtureModel}}]
+#' @param x an object of class [\code{\linkS4class{KmmModel}}]
 #' @param y a list of variables to plot (subset). Variables names or indices.
 #' If missing all the variables are represented.
 #' @param ... further arguments passed to or from other methods
 #'
-#' @aliases plot-KernelMixtureModel
+#' @aliases plot-KmmModel
 #' @docType methods
-#' @rdname plot-KernelMixtureModel-method
+#' @rdname plot-KmmModel-method
 #'
 #'
 #' @seealso \code{\link{plot}}
@@ -541,7 +541,7 @@ setMethod(
 #'
 setMethod(
     f="plot",
-    signature=c("KernelMixtureModel"),
+    signature=c("KmmModel"),
     function(x, y, ...)
     {
       # total number of variable in the data set

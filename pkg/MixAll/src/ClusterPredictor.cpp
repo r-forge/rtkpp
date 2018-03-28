@@ -37,15 +37,10 @@
 namespace STK
 {
 ClusterPredictor::ClusterPredictor( Rcpp::S4 s4_model,  Rcpp::S4 s4_clusterPredict)
-                                  : ILauncherBase(s4_model)
+                                  : IClusterPredictor(s4_model, s4_clusterPredict)
                                   , s4_component_(s4_model_.slot("component"))
-                                  , s4_clusterPredict_(s4_clusterPredict)
-                                  , s4_algo_(s4_clusterPredict_.slot("algo"))
-                                  , facade_()
-                                  , p_algo_(createAlgo())
 {}
-ClusterPredictor::~ClusterPredictor()
-{ if (p_algo_) delete p_algo_;}
+ClusterPredictor::~ClusterPredictor() {}
 
 /* run the estimation */
 bool ClusterPredictor::run()
@@ -87,18 +82,21 @@ bool ClusterPredictor::run()
 
   // run prediction algorithm
   p_algo_->setModel(facade_.p_composer_);
-  return p_algo_->run();
-}
+  bool flag = p_algo_->run();
+  // get results
+  s4_clusterPredict_.slot("pk")  = Rcpp::wrap(facade_.p_composer_->pk());
+  s4_clusterPredict_.slot("tik") = Rcpp::wrap(facade_.p_composer_->tik());
+  s4_clusterPredict_.slot("zi")  = Rcpp::wrap(facade_.p_composer_->zi());
 
-/* utility function creating STK algorithm from R algorithm */
-IMixtureAlgoPredict* ClusterPredictor::createAlgo()
-{
-   std::string algoName = s4_algo_.slot("algo");
-   int nbIterBurn = s4_algo_.slot("nbIterBurn");
-   int nbIterLong = s4_algo_.slot("nbIterLong");
-   double epsilon = s4_algo_.slot("epsilon");
-   Clust::algoPredictType algoType = Clust::stringToPredictAlgo(algoName);
-   return Clust::createPredictAlgo(algoType,nbIterBurn,nbIterLong,epsilon);
+  Rcpp::NumericVector fi = s4_clusterPredict_.slot("lnFi");
+  Rcpp::NumericVector zi = s4_clusterPredict_.slot("zi");
+  for (int i=0; i< fi.length(); ++i)
+  {
+    fi[i] = facade_.p_composer_->computeLnLikelihood(i);
+    zi[i] += (1 - baseIdx);  // set base 1 for the class labels
+  }
+  //
+  return flag;
 }
 
 

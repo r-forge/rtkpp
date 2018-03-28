@@ -138,7 +138,7 @@ clusterPoisson <- function( data, nbCluster=2
 #' @aliases ClusterPoissonComponent-class
 #'
 setClass(
-    Class="ClusterPoissonComponent",
+    Class = "ClusterPoissonComponent",
     representation( lambda = "matrix"),
     contains=c("IClusterComponent"),
     validity=function(object)
@@ -261,7 +261,7 @@ setMethod(
 #' @aliases ClusterPoisson-class
 #'
 setClass(
-    Class="ClusterPoisson",
+    Class = "ClusterPoisson",
     representation( component = "ClusterPoissonComponent"),
     contains=c("IClusterModel"),
     validity=function(object)

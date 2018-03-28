@@ -72,8 +72,24 @@ class MixtureComposerFacade
                          , kmmManager_(kerHandler_)
     {}
     /** destructor. */
-    ~MixtureComposerFacade()
-    { if (p_composer_) delete p_composer_;}
+    ~MixtureComposerFacade() { if (p_composer_) delete p_composer_;}
+
+    // getters
+    /** @return DiagGaussian mixtures  manager*/
+    DiagGaussianMixtureManager<DataHandler_> const& diagGaussianManager() const
+    { return diagGaussianManager_;}
+    /** @returnPoisson mixture models manager */
+    PoissonMixtureManager<DataHandler_> const& poissonManager() const
+    { return poissonManager_;}
+    /** gamma mixture models manager */
+    GammaMixtureManager<DataHandler_> const& gammaManager() const
+    { return gammaManager_;}
+    /** categorical mixture models manager */
+    CategoricalMixtureManager<DataHandler_> const& categoricalManager() const
+    { return categoricalManager_;}
+    /** Kernel Mixture Manager */
+    KernelMixtureManager const& kmmManager() const
+    { return kmmManager_;}
 
     /** set parameters of a component */
     bool setParameters( std::string const& idData, ArrayXX const& param);

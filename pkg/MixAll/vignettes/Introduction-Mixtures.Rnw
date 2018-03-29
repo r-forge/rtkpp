@@ -131,7 +131,7 @@ There is five kinds of generative models implemented:
   % \ref{subsec:Kernel} and \ref{subsec:clustKernel}.
 \end{enumerate}
 and a special model called "mixed data" allowing to cluster
-mixed data sets using conditional independance between the different
+mixed data sets using conditional independence between the different
 kinds of data, see sections \ref{subsec:MixedData} and
 \ref{subsec:clustMixedData}.
 
@@ -163,7 +163,7 @@ probability distribution with density (a mixture model)
 where the $p_k$'s are the mixing proportions ($0<p_k<1$ for all $k=1,...,K$ and
 $p_1+...+p_K=1$), $h(\cdot| \blambda_{k},\balpha)$ denotes a $d$-dimensional
 distribution parameterized by $\blambda_k$ and $\balpha$. The parameters
-$\balpha$ are not dependant from $k$ and are common to all the components of the
+$\balpha$ are not dependent from $k$ and are common to all the components of the
 mixture. The vector parameter to be estimated is
 $\theta=(p_1,\ldots,p_K,\blambda_1,\ldots,\blambda_K, \balpha)$ and is chosen
 to maximize the observed log-likelihood
@@ -171,7 +171,7 @@ to maximize the observed log-likelihood
   \label{eq:vraisemblance}
   L(\theta|\bx_1,\ldots,\bx_n)=\sum_{i=1}^n \ln \left(\sum_{k=1}^K p_k h(\bx_i|\blambda_k, \balpha)\right).
 \end{equation}
-In case there is missing data, that is some $\bx_i$ are splited in observed
+In case there is missing data, that is some $\bx_i$ are split in observed
 values $\bx_i^o$ and missing values $\bx^m_i$, the log-likelihood to maximize
 should be the integrated log-likelihood
 \begin{equation}
@@ -295,7 +295,7 @@ mixing weights as in the \code{EM} algorithm.
 If there is no missing values, SemiSEM algorithm is equivalent to EM
 algorithm. If there is missing values, SemiSEM does not converge point wise.
 It generates a Markov chain whose stationary distribution is more or less
-concentrated around the maximaum likelihood parameter estimator. A natural
+concentrated around the maximum likelihood parameter estimator. A natural
 parameter estimate from a \code{SemiSEM} sequence $(\theta^r)_{r=1, \ldots,R}$
 is the mean $\bar{\theta}=\sum_{r=1}^R \theta^r/R$ of the iterates values.
 
@@ -344,7 +344,7 @@ Section 2.21).
 
 All the algorithms (\code{EM}, \code{SEM}, \code{CEM} and \code{SemiSEM}) are
 encoded in a \code{S4} class and can be created using the utility function
-\code{clusterAlgo}. This function take as input three parameters:
+\code{clusterAlgo}. This function takes as input three parameters:
 \begin{itemize}
 \item \code{algo}: name of the algorithm (\code{"EM"},
 \code{"SEM"}, \code{"CEM"} or \code{"SemiSEM"}). Default value is \code{"EM"}.
@@ -371,7 +371,7 @@ large dimension setting because the domain parameter to be explored becomes
 very large or when the number of mixture components is large \cite{baudry2015}.
 
 The initialization step is encoded in a \code{S4} class and can be created
-using the utility function \code{clusterInit}. This function take as input
+using the utility function \code{clusterInit}. This function takes as input
 four parameters:
 \begin{itemize}
 \item \code{method}: name of the initialization to perform (\code{"random"},
@@ -502,7 +502,7 @@ clusterSemiSEMStrategy()
 \label{subsec:DiagGaussian}
 A Gaussian density on $\R$ is a density of the form:
 \begin{equation}\label{law::gaussian-density}
-f(x;\mu,\sigma) = \frac{1}{\sqrt{2\pi} \sigma} 
+f(x;\mu,\sigma) = \frac{1}{\sqrt{2\pi} \sigma}
 \exp\left\{- \frac{(x-\mu)^2}{2\sigma^2}\right\} \quad \sigma>0.
 \end{equation}
 
@@ -918,7 +918,7 @@ plot(model)
 \label{subsec:clustMixedData}
 
 Mixed data sets can be clustered using the \code{clusterMixedData}
-function. The original mixed data set has to be splited in multiple
+function. The original mixed data set has to be split in multiple
 homogeneous data sets and each one associated to a mixture model name.
 
 In Table~\ref{tab:clusterMixedData} the reader will find a summary of all
@@ -957,22 +957,67 @@ representation}.
 
 \section{Prediction with MixAll}
 
-It is possible to predict cluster observations and to estimate
-missing values based on a mixture model estimated by \pkg{MixAll}
-using the \code{clusterPredict} function. If there is no missing data
-the predicted cluster are computed using Maximum A Posteriori (MAP) estimator.
-
-Given a new observation $\bx$ the Bayes classifier is the function
+A classifier is a rule that assigns to an observation $\bx$ a guess or estimate
+of what the unobserved label $z$ actually was. It is possible to predict label
+observations (and to estimate missing values) of a data set using a mixture model
+estimated by \pkg{MixAll} with the \code{clusterPredict} function.
+If there is no missing data label of an observation $\bx$ is computed with the
+Bayes classifier
 $$
 \hat{z} = \arg\max_k \frac{ \hat{p}_k h(\bx|{\hat{\blambda}_k},\hat{\balpha})}
 {\sum_{l=1}^K  \hat{p}p_l h(\bx_i|\hat{\blambda}_l,\hat{\balpha})}.
 $$
 
+If there is missing data, this classifier cannot be used directly and
+\pkg{MixAll} use a Monte Carlo algorithm in order to estimate jointly the
+missing values and latent label. The Monte Carlo algorithm can be
+tuned using the utility function \code{clusterAlgoPredict}.
+This function takes as input three parameters:
+\begin{itemize}
+\item \code{algo}: name of the algorithm (\code{"EM"} or \code{"SemiSEM"}).
+Default value is \code{"EM"}. Note that this default value is faster but
+can produce a biased estimator.
+\item \code{nbIterBurn}: number of burning iterations to perform. Default value
+is 50.
+\item \code{nbIterLong}: number of iteration to perform. Default value
+is 100. The simulated values are averaged (in the continuous case) or majority
+chosen (in the discrete case) at the end of the iterations.
+\item \code{epsilon}:  threshold to use in order to stop the iterations
+(not used by \code{SemiSEM} algorithm). Default value is $1e-07$.
+\end{itemize}
+<< >>=
+clusterAlgoPredict()
+clusterAlgo(algo="SemiSEM",nbIteration=100)
+@
+
+The \code{EM} algorithm consists of repeating the following {\bf I} and {\bf E}
+steps using the estimated parameter value $\hat{\theta}$
+\begin{itemize}
+\item {\bf I step:} Missing values $\bx_i^m$ are imputed using MAP value.
+\item {\bf E step:} Current conditional probabilities that $z_{ik}=1$ for
+$i=1,\ldots,n$ and $k=1,\ldots,K$ are computed:
+\begin{equation}\label{eq:condipred}
+t^m_{ik}=\frac{ \hat{p}_k\, h(\bx_i|\hat{\blambda}_k,\hat{\balpha})}
+{\sum_{l=1}^K  \hat{p}_l\, h(\bx_i|\hat{\blambda}_l,\hat{\balpha})}.
+\end{equation}
+\end{itemize}
+The \code{EM} algorithm may converge to a local maximum of the observed data
+likelihood function, depending on starting values. The \code{SemiSEM} algorithm
+replaces the {\bf I} step by a simulation step ({\bf S} step) and is not detailed
+(see \ref{subsec:algorithms} section).
+
 The following example use the famous iris data set (\cite{FISHER36})
-
-
-
-
+<< >>=
+data(iris)
+x = as.matrix(iris[1:4])
+indexes <- sample(1:nrow(x), nrow(x)/2)
+train <- x[ indexes,]
+test  <- x[-indexes,]
+model1 <- clusterDiagGaussian( data =train, nbCluster=2:3, models=c( "gaussian_p_sjk"))
+## compute prediction for test and compare
+model2 <- clusterPredict(test, model1)
+table(model2@zi, as.integer(iris$Species[-indexes]))
+@
 
 
 
@@ -1242,7 +1287,7 @@ using moment estimators.
 \end{itemize}
 \end{itemize}
 
-This algorithm minimize alternatively the log-likelihood in $\ba_k$, $k=1,\ldots n$ and in
-$\bb$ and converge in few iterations.
+This algorithm minimizes alternatively the log-likelihood in $\ba_k$,
+$k=1,\ldots n$ and in $\bb$ and converge in few iterations.
 
 \end{document}

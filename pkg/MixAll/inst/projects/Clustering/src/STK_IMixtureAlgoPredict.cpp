@@ -63,11 +63,11 @@ void IMixtureAlgoPredict::setModel(IMixtureComposer* p_model)
 /* predict class labels when there is no missing values
  * @return @c true if no error occur, @c false otherwise
  */
-bool IMixtureAlgoPredict::predictWithNoMissingValues()
+bool IMixtureAlgoPredict::predictBayesClassifier()
 {
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("-------------------------------\n");
-  stk_cout << _T("Entering IMixtureAlgoPredict::predictWithNoMissingValues()\n");
+  stk_cout << _T("Entering IMixtureAlgoPredict::predictBayesClassifier()\n");
 #endif
 
 

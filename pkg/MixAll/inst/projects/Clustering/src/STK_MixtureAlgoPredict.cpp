@@ -42,18 +42,20 @@ namespace STK
 
 bool EMPredict::run()
 {
+  if (p_model_->computeNbMissingValues() == 0) { return predictBayesClassifier();}
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("-------------------------------\n");
   stk_cout << _T("Entering EMPredict::run() with:\n")
            << _T("nbIterMax_ = ") << nbIterMax_ << _T("\n")
            << _T("epsilon_ = ") << epsilon_ << _T("\n");
 #endif
-  if (p_model_->computeNbMissingValues() == 0) return predictWithNoMissingValues();
-  bool result = true;
   try
   {
+    p_model_->initializeStep();
     if (!burnStep())
     {
+      p_model_->mapStep();
+      p_model_->finalizeStep();
       return false;
     }
     Real currentLnLikelihood = p_model_->lnLikelihood();
@@ -85,7 +87,9 @@ bool EMPredict::run()
 #ifdef STK_MIXTURE_VERBOSE
     stk_cout << _T("An error occur in EMPredict::run():\n") << msg_error_ << _T("\n");
 #endif
-    result = false;
+    p_model_->mapStep();
+    p_model_->finalizeStep();
+    return false;
   }
   catch (Exception const& error)
   {
@@ -93,7 +97,9 @@ bool EMPredict::run()
 #ifdef STK_MIXTURE_VERBOSE
     stk_cout << _T("An error occur in EMPredict::run():\n") << msg_error_ << _T("\n");
 #endif
-    result = false;
+    p_model_->mapStep();
+    p_model_->finalizeStep();
+    return false;
   }
   p_model_->mapStep();
   p_model_->finalizeStep();
@@ -101,21 +107,29 @@ bool EMPredict::run()
   stk_cout << _T("Terminating EMPredict::run()\n");
   stk_cout << _T("----------------------------\n");
 #endif
-  return result;
+  return true;
 }
 
 bool SemiSEMPredict::run()
 {
+  if (p_model_->computeNbMissingValues() == 0)
+  { return predictBayesClassifier();}
+
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("------------------------------------\n");
   stk_cout << _T("Entering SemiSEMPredict::run() with:\n")
            << _T("nbIterMax_ = ") << nbIterMax_ << _T("\n")
            << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
 #endif
-  bool result = true;
   try
   {
-    if (!burnStep()) { return false;}
+    p_model_->initializeStep();
+    if (!burnStep())
+    {
+      p_model_->mapStep();
+      p_model_->finalizeStep();
+      return false;
+    }
     int iter;
     for (iter = 0; iter < nbIterLong_; ++iter)
     {
@@ -130,7 +144,10 @@ bool SemiSEMPredict::run()
 #ifdef STK_MIXTURE_VERBOSE
   stk_cout << _T("An exception occur in SemiSEMPredict::run(): ") << msg_error_ << _T("\n");
 #endif
-    result = false;
+    p_model_->setParametersStep();
+    p_model_->mapStep();
+    p_model_->finalizeStep();
+    return false;
   }
   catch (Exception const& error)
   {
@@ -138,30 +155,24 @@ bool SemiSEMPredict::run()
 #ifdef STK_MIXTURE_VERBOSE
     stk_cout << _T("An error occur in SemiSEMPredict::run():\n") << msg_error_ << _T("\n");
 #endif
-    result = false;
+    p_model_->setParametersStep();
+    p_model_->mapStep();
+    p_model_->finalizeStep();
+    return false;
   }
 #ifdef STK_MIXTURE_VERBOSE
     stk_cout << _T("In SemiSEMPredict::run() iterations terminated.\n")
              << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
 #endif
   // set averaged parameters
-  if (result)
-  {
-    p_model_->setParametersStep();
-#ifdef STK_MIXTURE_VERBOSE
-    stk_cout << _T("\nIn SemiSEMPredict::run(), setParameters done.\n")
-             << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
-#endif
-  }
-  else
-  { p_model_->releaseIntermediateResults();}
+  p_model_->setParametersStep();
   p_model_->mapStep();
   p_model_->finalizeStep();
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Terminating SemiSEMPredict::run()\n");
   stk_cout << _T("---------------------------------\n");
 #endif
-  return result;
+  return true;
 }
 
 

@@ -103,7 +103,7 @@ class IMixtureAlgoPredict: public IRunnerBase
      *   finalizeStep();
      * @endcode
      * @return @c true if no error occur, @c false otherwise */
-    bool predictWithNoMissingValues();
+    bool predictBayesClassifier();
     /** Perform burn step using SEM algorithm
      * @code
      *   initializeStep();

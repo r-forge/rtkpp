@@ -148,7 +148,7 @@ Real ClusterLauncher::selectBestSingleModel()
       std::string idData  = "model" + typeToString<int>(l);
       std::string idModel = Rcpp::as<std::string>(v_models_[l]);
       bool freeProp;
-      Clust::Mixture model = Clust::stringToMixture(idModel, freeProp);
+      Clust::stringToMixture(idModel, freeProp);
       // for the current model,
       for (int k=0; k <v_nbCluster_.length(); ++k)
       {

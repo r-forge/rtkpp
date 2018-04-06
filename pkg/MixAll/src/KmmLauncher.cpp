@@ -55,8 +55,8 @@ KmmLauncher::KmmLauncher( Rcpp::S4 s4_model
                         , v_nbCluster_(nbCluster)
                         , s4_strategy_(s4_model_.slot("strategy"))
                         , criterion_(Rcpp::as<std::string>(s4_model_.slot("criterionName")))
-                        , facade_()
                         , isMixedData_(false)
+                        , facade_()
 {}
 /* facade design pattern.
  * The KmmLauncher allow to create the strategy for estimating a mixture model
@@ -68,8 +68,8 @@ KmmLauncher::KmmLauncher( Rcpp::S4 s4_model, Rcpp::IntegerVector const& nbCluste
                         , v_nbCluster_(nbCluster)
                         , s4_strategy_(s4_model_.slot("strategy"))
                         , criterion_(Rcpp::as<std::string>(s4_model_.slot("criterionName")))
-                        , facade_()
                         , isMixedData_(true)
+                        , facade_()
 {}
 /* destructor. */
 KmmLauncher::~KmmLauncher()

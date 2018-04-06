@@ -66,11 +66,13 @@ class MixtureComposerFacade
      **/
     MixtureComposerFacade( IMixtureComposer* p_composer = 0)
                          : p_composer_(p_composer)
+                         , handler_()
+                         , kerHandler_()
+                         , kmmManager_(kerHandler_)
                          , diagGaussianManager_(handler_)
                          , poissonManager_(handler_)
                          , gammaManager_(handler_)
                          , categoricalManager_(handler_)
-                         , kmmManager_(kerHandler_)
     {}
     /** destructor. */
     ~MixtureComposerFacade() { if (p_composer_) delete p_composer_;}

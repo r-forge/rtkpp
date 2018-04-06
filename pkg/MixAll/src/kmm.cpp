@@ -44,7 +44,7 @@
  * @param nbCluster a vector with the number of clusters to test
  * @param models a vector of string with the model names to try
  */
-extern "C" SEXP kmm( SEXP model, SEXP nbCluster, SEXP models, SEXP prop, SEXP nbCore )
+extern "C" SEXP kmm( SEXP model, SEXP nbCluster, SEXP models, SEXP nbCore )
 {
   BEGIN_RCPP
 
@@ -60,9 +60,10 @@ extern "C" SEXP kmm( SEXP model, SEXP nbCluster, SEXP models, SEXP prop, SEXP nb
 
   // create launcher
   STK::KmmLauncher launcher(s4_model, r_nbCluster, r_models);
+
     // return result
-    //return Rcpp::wrap(launcher.run());
-    return Rcpp::wrap(true);
+    return Rcpp::wrap(launcher.run());
+//    return Rcpp::wrap(true);
 
   END_RCPP
 }

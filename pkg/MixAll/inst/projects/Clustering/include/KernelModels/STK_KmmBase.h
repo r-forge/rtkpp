@@ -28,12 +28,12 @@
  * Author:   Serge Iovleff
  **/
 
-/** @file STK_KernelGaussianBase.h
- *  @brief In this file we define the KernelGaussianBase base class
+/** @file STK_KmmBase.h
+ *  @brief In this file we define the KmmBase base class for Kernel Mixture
  **/
 
-#ifndef STK_KERNELGAUSSIANBASE_H
-#define STK_KERNELGAUSSIANBASE_H
+#ifndef STK_KMMBASE_H
+#define STK_KMMBASE_H
 
 #include "../STK_IMixtureDensity.h"
 
@@ -41,7 +41,7 @@
 #include <Arrays/include/STK_CArrayPoint.h>
 #include <Arrays/include/STK_CArrayVector.h>
 #include <STatistiK/include/STK_Kernel_IKernel.h>
-#include "../KernelModels/STK_KernelParameters.h"
+#include "STK_KernelParameters.h"
 
 namespace STK
 {
@@ -50,7 +50,7 @@ namespace STK
  *  Base class for the Gaussian Kernel Mixture Models.
  **/
 template<class Derived>
-class KernelGaussianBase: public IMixtureDensity<Derived>
+class KmmBase: public IMixtureDensity<Derived>
 {
   public:
     typedef IMixtureDensity<Derived > Base;
@@ -62,28 +62,28 @@ class KernelGaussianBase: public IMixtureDensity<Derived>
 
   protected:
     /** default constructor
-     * @param nbCluster number of cluster in the model
+     *  @param nbCluster number of cluster in the model
      **/
-    KernelGaussianBase( int nbCluster): Base(nbCluster), p_kernel_(0) {}
+    KmmBase( int nbCluster): Base(nbCluster), p_kernel_(0) {}
     /** copy constructor
      *  @param model Model to copy
      **/
-    KernelGaussianBase( KernelGaussianBase const& model)
-                            : Base(model)
-                             , p_kernel_(model.p_kernel_)
-                             , dik_(model.dik_)
+    KmmBase( KmmBase const& model)
+                      : Base(model)
+                      , p_kernel_(model.p_kernel_)
+                      , dik_(model.dik_)
     {}
     /** destructor */
-    ~KernelGaussianBase() {}
+    ~KmmBase() {}
 
   public:
-    // access
+    // getters
     /** @return the value of sigma2 in the kth cluster */
     inline Real sigma2(int k) const { return param_.sigma2(k);}
     /** @return the value of dim in the kth */
     inline Real dim(int k) const { return param_.dim(k);}
     /** @return the pointer on the kernel */
-    inline Kernel::IKernel const* p_kernel() const { return p_kernel_;}
+    inline Kernel::IKernel const* const p_kernel() const { return p_kernel_;}
     /** @return distance of the individual to the kth centroid */
     inline CArrayXX dik() const { return dik_;}
 
@@ -91,7 +91,12 @@ class KernelGaussianBase: public IMixtureDensity<Derived>
     /** set the dimensions of the kernel mixture model using an unique value */
     inline void setDim(Real const& dim)  { param_.dim_ = dim;}
     /** set the dimension of the kernel mixture model */
-    inline void setDim(CPointX const& dim)  { param_.dim_ = dim;}
+    template<class Vector>
+    inline void setDim(ExprBase<Vector> const& dim)
+    {
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Vector);
+      param_.dim_ = dim.asDerived();
+    }
 
     /** set the dimensions of the kernel mixture model using an unique value.
      *  call to this method will triger the call to @c initializeModelImpl
@@ -162,10 +167,10 @@ class KernelGaussianBase: public IMixtureDensity<Derived>
  *  using the kernel trick.
  **/
 template<class Derived>
-void KernelGaussianBase<Derived>::compute_dik(CArrayXX const* p_tik, CPointX const* p_tk)
+void KmmBase<Derived>::compute_dik(CArrayXX const* p_tik, CPointX const* p_tk)
 {
 #ifdef STK_KernelS_DEBUG
-  stk_cout << _T("Entering KernelGaussianBase::compute_dik\n");
+  stk_cout << _T("Entering KmmBase::compute_dik\n");
   stk_cout << _T("dik_.cols() =") << dik_.cols() << _T("\n");
   stk_cout << _T("dik_.rows() =") << dik_.rows() << _T("\n");
 #endif
@@ -185,7 +190,7 @@ void KernelGaussianBase<Derived>::compute_dik(CArrayXX const* p_tik, CPointX con
     { dik_(i,k) = p_kernel_->diag(i) - 2. * wi[i] + scal  ;}
   }
 #ifdef STK_KernelS_DEBUG
-  stk_cout << _T("KernelGaussianBase::compute_dik done\n");
+  stk_cout << _T("KmmBase::compute_dik done\n");
 #endif
 }
 
@@ -200,7 +205,7 @@ void KernelGaussianBase<Derived>::compute_dik(CArrayXX const* p_tik, CPointX con
  * for initialization of the specific model parameters if needed.
  **/
 template<class Derived>
-void KernelGaussianBase<Derived>::initializeModel()
+void KmmBase<Derived>::initializeModel()
 {
   // set dimensions
   this->setNbSample(p_kernel_->nbSample());
@@ -217,7 +222,7 @@ void KernelGaussianBase<Derived>::initializeModel()
  */
 template<class Derived>
 template<class ArrayParam>
-inline void KernelGaussianBase<Derived>::getParameters(ArrayParam& param) const
+inline void KmmBase<Derived>::getParameters(ArrayParam& param) const
 {
   param.resize(this->nbCluster(), 2);
   for (int k= param.beginRows(); k < param.endRows(); ++k)
@@ -231,7 +236,7 @@ inline void KernelGaussianBase<Derived>::getParameters(ArrayParam& param) const
  *  @param os Stream where you want to write the summary of parameters.
  */
 template<class Derived>
-inline void KernelGaussianBase<Derived>::writeParameters(CArrayXX const* p_tik, ostream& os) const
+inline void KmmBase<Derived>::writeParameters(CArrayXX const* p_tik, ostream& os) const
 {
   for (int k= p_tik->beginCols(); k < p_tik->endCols(); ++k)
   {
@@ -243,4 +248,4 @@ inline void KernelGaussianBase<Derived>::writeParameters(CArrayXX const* p_tik, 
 
 } // namespace STK
 
-#endif /* STK_KernelGAUSSIANBASE_H */
+#endif /* STK_KMMBASE_H */

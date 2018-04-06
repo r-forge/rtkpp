@@ -48,7 +48,6 @@ class ILauncherBase: public IRunnerBase
 {
   public:
     typedef IMixtureManager<RDataHandler> IManager;
-    typedef IMixtureManager<KernelHandler> KManager;
     /** constructor with a list of component.
      *  @param model a reference on the current model
      **/
@@ -68,7 +67,19 @@ class ILauncherBase: public IRunnerBase
     void setParametersToComponent( IMixtureStatModel* p_model
                                  , IManager const& manager
                                  , std::string const& idData
-                                 , Rcpp::S4 s4_component);
+                                 , Rcpp::S4 s4_component
+                                 );
+    /** get the parameters of a component given by its ID
+     *  @param p_model model with the parameters to get
+     *  @param manager mixture manager
+     *  @param idData ID of the data
+     *  @param s4_component component storing the parameters
+     **/
+    void setParametersToComponent( IMixtureStatModel* p_model
+                                 , KernelMixtureManager const& manager
+                                 , std::string const& idData
+                                 , Rcpp::S4 s4_component
+                                 );
     /** set diagonal Gaussian parameters and data to S4 component
      *  @param p_model model with the parameters to get
      *  @param manager mixture manager
@@ -78,7 +89,8 @@ class ILauncherBase: public IRunnerBase
     void setDiagGaussianParametersToComponent( IMixtureStatModel* p_model
                                              , IManager const& manager
                                              , std::string const& idData
-                                             , Rcpp::S4 s4_component);
+                                             , Rcpp::S4 s4_component
+                                             );
     /** get Poisson parameters
      *  @param p_model model with the parameters to get
      *  @param manager mixture manager
@@ -88,7 +100,8 @@ class ILauncherBase: public IRunnerBase
     void setPoissonParametersToComponent( IMixtureStatModel* p_model
                                         , IManager const& manager
                                         , std::string const& idData
-                                        , Rcpp::S4 s4_component);
+                                        , Rcpp::S4 s4_component
+                                        );
     /** get gamma parameters
      *  @param p_model model with the parameters to get
      *  @param manager mixture manager
@@ -96,10 +109,10 @@ class ILauncherBase: public IRunnerBase
      *  @param s4_component component storing the parameters
      *  */
     void setGammaParametersToComponent( IMixtureStatModel* p_model
-                           , IManager const& manager
-                           , std::string const& idData
-                           , Rcpp::S4 s4_component
-                           );
+                                      , IManager const& manager
+                                      , std::string const& idData
+                                      , Rcpp::S4 s4_component
+                                      );
     /** get categorical parameters
      *  @param p_model model with the parameters to get
      *  @param manager mixture manager
@@ -109,7 +122,8 @@ class ILauncherBase: public IRunnerBase
     void setCategoricalParametersToComponent( IMixtureStatModel* p_model
                                             , IManager const& manager
                                             , std::string const& idData
-                                            , Rcpp::S4 s4_component);
+                                            , Rcpp::S4 s4_component
+                                            );
     /** get kernel parameters
      *  @param p_model model with the parameters to get
      *  @param manager mixture manager
@@ -119,7 +133,8 @@ class ILauncherBase: public IRunnerBase
     void setKernelParametersToComponent( IMixtureStatModel* p_model
                                        , KernelMixtureManager const& manager
                                        , std::string const& idData
-                                       , Rcpp::S4 s4_component);
+                                       , Rcpp::S4 s4_component
+                                       );
 
     /** get parameters of a component given by its ID
      *  @param s4_component the component with the parameters to get
@@ -134,7 +149,7 @@ class ILauncherBase: public IRunnerBase
      * */
     ArrayXX getDiagGaussianParameters( Rcpp::S4 s4_component
                                      , std::string const& idData
-                                  );
+                                     );
     /** get Poisson parameters
      *  @param s4_component the component with the parameters to get
      *  @param idData ID of the data
@@ -163,7 +178,6 @@ class ILauncherBase: public IRunnerBase
     ArrayXX getKernelParameters( Rcpp::S4 s4_component
                                , std::string const& idData
                                );
-
 
     /** model from the R side */
     Rcpp::S4 s4_model_;

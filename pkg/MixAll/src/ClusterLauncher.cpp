@@ -75,8 +75,7 @@ bool ClusterLauncher::run()
 {
   // compute the best model
   Real initCriter = s4_model_.slot("criterion");
-  Real criter = (isMixedData_) ? selectBestMixedModel()
-                               : selectBestSingleModel();
+  Real criter = (isMixedData_) ? selectBestMixedModel() : selectBestSingleModel();
 
   // get result common part of the estimated model
   s4_model_.slot("criterion")      = criter;
@@ -87,7 +86,7 @@ bool ClusterLauncher::run()
   s4_model_.slot("tik")            = Rcpp::wrap(p_composer_->tik());
   s4_model_.slot("zi")             = Rcpp::wrap(p_composer_->zi());
   NumericVector fi = s4_model_.slot("lnFi");
-  NumericVector zi = s4_model_.slot("zi");
+  IntegerVector zi = s4_model_.slot("zi");
   for (int i=0; i< fi.length(); ++i)
   {
     fi[i] = p_composer_->computeLnLikelihood(i);
@@ -159,7 +158,6 @@ Real ClusterLauncher::selectBestSingleModel()
         else          { p_current = new MixtureComposerFixedProp(nbSample, K);}
 
         // create current mixture and register it
-        std::string idData = "model" + typeToString<int>(l);
         createMixtures(static_cast<MixtureComposer*>(p_current));
 
         // run estimation and get results if possible
@@ -172,7 +170,7 @@ Real ClusterLauncher::selectBestSingleModel()
           if (p_composer_) { std::swap(p_current, p_composer_);}
           else             { p_composer_ = p_current; p_current = 0;}
           s4_component.slot("modelName") = idModel;
-          idDataBestModel = idData;
+          idDataBestModel                = idData;
           critValue = p_criterion->value();
         }
         // release current composer

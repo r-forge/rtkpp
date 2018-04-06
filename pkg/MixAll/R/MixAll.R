@@ -95,14 +95,38 @@ NULL
 
 #' Quantitative Data: bullsEye 
 #'
-#' Generated  data  set  containing  two  clusters  with  untypical  ring
-#' shapes (circles)
+#' Generated data set containing two clusters with untypical ring shapes (circles)
 #' @name bullsEye
 #' @docType data
 #' @keywords datasets
 #'
 #' @examples
 #'   data(bullsEye)
+NULL
+
+
+#' label Data: bullsEye.target 
+#'
+#' Generated data set containing labels for the two clusters with untypical
+#' ring shapes (circles)
+#' @name bullsEye.target
+#' @docType data
+#' @keywords datasets
+#'
+#' @examples
+#'   data(bullsEye.target)
+NULL
+
+#' label Data: bullsEye.cat 
+#'
+#' Generated data set containing two categorical variables for the two clusters
+#' with untypical ring shapes (circles)
+#' @name bullsEye.cat
+#' @docType data
+#' @keywords datasets
+#'
+#' @examples
+#'   data(bullsEye.cat)
 NULL
 
 #' Quantitative data: Old Faithful Geyser

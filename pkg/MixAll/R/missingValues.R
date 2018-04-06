@@ -27,7 +27,7 @@
 #' @aliases missingValues,ClusterDiagGaussian-method
 setMethod(
   f="missingValues",
-  signature=c("ClusterMixedData"),
+  signature=c("ClusterMixedDataModel"),
   function(x)
   {
     nbData <- length(x@lcomponent)
@@ -138,6 +138,27 @@ setMethod(
     colnames(res)[3] <- "value"
     nmiss <- nrow(x@missing)
     if (nmiss > 0) { rownames(res) <- 1:nmiss}
+    return(res)
+  }
+)
+
+#' @rdname missingValues-methods
+#' @aliases missingValues,ClusterPredictMixedData-method
+setMethod(
+  f="missingValues",
+  signature=c("ClusterPredictMixedData"),
+  function(x)
+  {
+    nbData <- length(x@ldata)
+    res <- vector("list", nbData)
+    if(nbData>0)
+    {
+      for (l in 1:nbData)
+      {
+        res[[l]]  <- cbind(x@lmissing[[l]], (x@ldata[[l]])[x@lmissing[[l]]]);
+        colnames(res[[l]])[3] <- "value";
+      }
+    }
     return(res)
   }
 )

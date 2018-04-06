@@ -393,7 +393,7 @@ void IMixtureStatModel::removeMixture(IMixtureManager<DataHandler>& manager, Str
 template<class DataHandler, class Parameters>
 void IMixtureStatModel::getParameters(IMixtureManager<DataHandler> const& manager, String const& idData, Parameters& param) const
 {  IMixture* p_mixture= getMixture(idData);
-   if (p_mixture) manager.getParameters(getMixture(idData), param);
+   if (p_mixture) manager.getParameters(p_mixture, param);
 }
 /* Utility method allowing to set the parameters to a specific mixture.
  *  @param manager the manager with the responsibility of the parameters

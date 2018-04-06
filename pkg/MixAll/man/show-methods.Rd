@@ -3,7 +3,7 @@
 %   R/ClusterInit.R, R/ClusterStrategy.R, R/IClusterModel.R, R/global.R,
 %   R/ClusterCategorical.R, R/ClusterDiagGaussian.R, R/ClusterGamma.R,
 %   R/ClusterMixedData.R, R/ClusterPoisson.R, R/IClusterPredict.R,
-%   R/ClusterPredict.R, R/LearnAlgo.R, R/kmm.R
+%   R/ClusterPredict.R, R/LearnAlgo.R, R/kmm.R, R/kmmMixedData.R
 \docType{methods}
 \name{show,ClusterAlgo-method}
 \alias{show,ClusterAlgo-method}
@@ -34,8 +34,8 @@
 \alias{show-ClusterGammaComponent,ClusterGammaComponent,ClusterGammaComponent-method}
 \alias{show,ClusterGamma-method}
 \alias{show-ClusterGamma,ClusterGamma,ClusterGamma-method}
-\alias{show,ClusterMixedData-method}
-\alias{show-ClusterMixedData,ClusterMixedData,ClusterMixedData-method}
+\alias{show,ClusterMixedDataModel-method}
+\alias{show-ClusterMixedDataModel,ClusterMixedDataModel,ClusterMixedDataModel-method}
 \alias{show,ClusterPoissonComponent-method}
 \alias{show-ClusterPoissonComponent,ClusterPoissonComponent,ClusterPoissonComponent-method}
 \alias{show,ClusterPoisson-method}
@@ -53,6 +53,8 @@
 \alias{show-KmmComponent,KmmComponent,KmmComponent-method}
 \alias{show,KmmModel-method}
 \alias{show-KmmModel,KmmModel,KmmModel-method}
+\alias{show,KmmMixedDataModel-method}
+\alias{show-KmmMixedDataModel,KmmMixedDataModel,KmmMixedDataModel-method}
 \title{Show description of a MixAll S4 class to standard output.}
 \usage{
 \S4method{show}{ClusterAlgo}(object)
@@ -79,7 +81,7 @@
 
 \S4method{show}{ClusterGamma}(object)
 
-\S4method{show}{ClusterMixedData}(object)
+\S4method{show}{ClusterMixedDataModel}(object)
 
 \S4method{show}{ClusterPoissonComponent}(object)
 
@@ -96,6 +98,8 @@
 \S4method{show}{KmmComponent}(object)
 
 \S4method{show}{KmmModel}(object)
+
+\S4method{show}{KmmMixedDataModel}(object)
 }
 \arguments{
 \item{object}{a MixAll object: a \code{\linkS4class{ClusterStrategy}},

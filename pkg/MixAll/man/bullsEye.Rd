@@ -5,8 +5,7 @@
 \alias{bullsEye}
 \title{Quantitative Data: bullsEye}
 \description{
-Generated  data  set  containing  two  clusters  with  untypical  ring
-shapes (circles)
+Generated data set containing two clusters with untypical ring shapes (circles)
 }
 \examples{
   data(bullsEye)

@@ -36,7 +36,7 @@
 #ifndef STK_KERNELMIXTUREMANAGER_H
 #define STK_KERNELMIXTUREMANAGER_H
 
-#include "STK_KernelGaussianBridge.h"
+#include "STK_KmmBridge.h"
 #include "STK_KernelHandler.h"
 #include "../STK_IMixtureManager.h"
 
@@ -54,23 +54,19 @@ class KernelMixtureManager: public IMixtureManager<KernelHandler>
   public:
     typedef IMixtureManager<KernelHandler> Base;
 
-    typedef KernelGaussianBridge< Clust::KernelGaussian_sk_, CSquareX> KernelGaussianBridge_sk;
-    typedef KernelGaussianBridge< Clust::KernelGaussian_s_, CSquareX> KernelGaussianBridge_s;
+    typedef KmmBridge< Clust::Kmm_sk_, CSquareX> KmmBridge_sk;
+    typedef KmmBridge< Clust::Kmm_s_, CSquareX> KmmBridge_s;
 
     /** Default constructor, need an instance of a KernelHandler.  */
     KernelMixtureManager(KernelHandler const& handler);
     /** destructor */
     virtual ~KernelMixtureManager();
 
-    /** set the kernel of the mixture model
-     * @param p_mixture pointer on the mixture
-     * @param p_kernel pointer on the kernel
-     * */
-    void setKernel(IMixture* p_mixture, Kernel::IKernel const* p_kernel);
     /** set the dimension of the kernel mixture model */
     void setDim(IMixture* p_mixture, Real const& dim) const;
     /** set the dimension of the kernel mixture model */
-    void setDim(IMixture* p_mixture, CPointX const& dim) const;
+    template<class Vector>
+    void setDim(IMixture* p_mixture, ExprBase<Vector> const& dim) const;
     /** get the parameters from an IMixture.
      *  @param p_mixture pointer on the mixture
      *  @param param the array to return with the parameters
@@ -96,6 +92,29 @@ class KernelMixtureManager: public IMixtureManager<KernelHandler>
      **/
     IMixture* createMixtureImpl(Clust::Mixture idModel, String const& idData, int nbCluster);
 };
+
+/* set the dimension of the kernel mixture model */
+template<class Vector>
+void KernelMixtureManager::setDim(IMixture* p_mixture, ExprBase<Vector> const& dim) const
+{
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Vector);
+  if (!p_mixture) return;
+  Clust::Mixture idModel = getIdModel(p_mixture->idData());
+  // up-cast... (Yes it's bad....;)...)
+  switch (idModel)
+  {
+    // Kernel models
+    case Clust::Kmm_sk_:
+    { static_cast<KmmBridge_sk*>(p_mixture)->setDim(dim.asDerived());}
+    break;
+    case Clust::Kmm_s_:
+    { static_cast<KmmBridge_s*>(p_mixture)->setDim(dim.asDerived());}
+    break;
+    default: // idModel is not implemented
+    break;
+  }
+}
+
 
 } // namespace STK
 

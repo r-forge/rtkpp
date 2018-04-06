@@ -2,7 +2,7 @@
 % Please edit documentation in R/ClusterMixedData.R
 \name{clusterMixedData}
 \alias{clusterMixedData}
-\title{Create an instance of the [\code{\linkS4class{ClusterMixedData}}] class}
+\title{Create an instance of the [\code{\linkS4class{ClusterMixedDataModel}}] class}
 \usage{
 clusterMixedData(data, models, nbCluster = 2, strategy = clusterStrategy(),
   criterion = "ICL", nbCore = 1)
@@ -28,7 +28,7 @@ Possible values: "BIC", "AIC", "ICL", "ML". Default is "ICL".}
 \item{nbCore}{integer defining the number of processors to use (default is 1, 0 for all).}
 }
 \value{
-An instance of the [\code{\linkS4class{ClusterMixedData}}] class.
+An instance of the [\code{\linkS4class{ClusterMixedDataModel}}] class.
 }
 \description{
 This function computes the optimal mixture model for mixed data according

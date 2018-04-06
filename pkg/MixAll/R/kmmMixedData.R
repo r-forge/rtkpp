@@ -22,22 +22,20 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
-#' @include global.R ClusterModelNames.R IClusterModel.R
+#' @include global.R kmmNames.R IClusterModel.R
 NULL
 
 #-----------------------------------------------------------------------
-#' Create an instance of the [\code{\linkS4class{ClusterMixedDataModel}}] class
+#' Create an instance of the [\code{\linkS4class{KmmMixedDataModel}}] class
 #'
-#' This function computes the optimal mixture model for mixed data according
-#' to the \code{criterion} among the number of clusters given in
-#' \code{nbCluster} using the strategy specified in [\code{strategy}].
+#' This function computes the optimal mixture model for mixed data using kernel
+#' mixture models according to the \code{criterion} among the number of clusters
+#' given in \code{nbCluster} using the strategy specified in [\code{strategy}].
 #'
 #' @param data [\code{list}] containing the data sets (matrices and/or data.frames).
-#' If data sets contain NA values, these missing values will be estimated during
-#' the estimation process.
-#' @param models a [\code{vector}] of character or a [\code{list}] of
-#' same length than data. It contains the model names to use in order to fit
-#' each data set.
+#' @param lmodels a [\code{list}] of same length than data. It contains the model
+#' names, kernel names and kernel parameter names to use in order to fit each
+#' data set.
 #' @param nbCluster [\code{\link{vector}}] with the number of clusters to test.
 #' @param strategy a [\code{\linkS4class{ClusterStrategy}}] object containing
 #' the strategy to run. Default is clusterStrategy().
@@ -46,20 +44,24 @@ NULL
 #' Possible values: "BIC", "AIC", "ICL", "ML". Default is "ICL".
 #' @param nbCore integer defining the number of processors to use (default is 1, 0 for all).
 #'
+#' @details For each data set in data, we need to specify a list of parameters
+#' 
 #' @examples
-#' ## A quantitative example with the heart disease data set
-#' data(HeartDisease.cat)
-#' data(HeartDisease.cont)
+#'
+#' ## An example with the bullsEye data set
+#' data(bullsEye)
+#' data(bullsEye.cat)
 #' ## with default values
-#' ldata = list(HeartDisease.cat, HeartDisease.cont);
-#' models = c("categorical_pk_pjk","gaussian_pk_sjk")
-#' model <- clusterMixedData(ldata, models, nbCluster=2:5, strategy = clusterFastStrategy())
+#' ldata  = list(bullsEye, bullsEye.cat)
+#' modelcont <- list(modelName="kmm_pk_s", dim = 10, kernelName="Gaussian")
+#' modelcat  <- list(modelName="kmm_pk_s", dim = 20, kernelName="Hamming", kernelParameters = c(0.6))
+#' lmodels = list( modelcont, modelcat)
+#' 
+#' model <- kmmMixedData(ldata, lmodels, nbCluster=2:5, strategy = clusterFastStrategy())
 #'
 #' ## get summary
 #' summary(model)
 #'
-#' ## get estimated missing values
-#' missingValues(model)
 #'
 #' \dontrun{
 #' ## print model
@@ -68,62 +70,77 @@ NULL
 #' plot(model)
 #' }
 #'
-#' @return An instance of the [\code{\linkS4class{ClusterMixedDataModel}}] class.
+#' @return An instance of the [\code{\linkS4class{KmmMixedDataModel}}] class.
 #' @author Serge Iovleff
 #'
-clusterMixedData <- function( data, models, nbCluster=2
-                            , strategy=clusterStrategy()
-                            , criterion="ICL"
-                            , nbCore = 1)
+kmmMixedData <- function( data, lmodels, nbCluster=2
+                        , strategy=clusterStrategy()
+                        , criterion="ICL"
+                        , nbCore = 1)
 {
   # check nbCluster
   nbClusterModel = length(nbCluster);
   nbClusterMin   = min(nbCluster);
   nbClusterMax   = max(nbCluster);
   if (nbClusterMin < 1) { stop("The number of clusters must be greater or equal to 1")}
+  
   # check criterion
   if(sum(criterion %in% c("BIC","AIC", "ICL", "ML")) != 1)
-  { stop("criterion is not valid. See ?clusterMixedData for the list of valid criterion")}
+  { stop("criterion is not valid. See ?KmmMixedDataModel for the list of valid criterion")}
+  
   # check strategy
   if(class(strategy)[1] != "ClusterStrategy")
   {stop("strategy is not a Cluster Stategy class (must be an instance of the class ClusterStrategy).")}
   validObject(strategy);
-  # check data and models
-  if (!is.list(data))     { stop("data must be a list");}
-  if (!is.vector(models)) { stop("models must be a vector of character");}
-  if (length(data) != length(models)) { stop("data and models must be of equal lengths");}
   
-  # create list of component
+  # check data and models
+  if (!is.list(data))    { stop("data must be a list")}
+  if (!is.list(lmodels)) { stop("lmodels must be a list")}
+  if (length(data) != length(lmodels)) { stop("data and lmodels must be of equal lengths");}
+  
+  # create list of models
   lcomponent <- vector("list", length(data));
   for (i in 1:length(data))
   {
-    param <- models[i];
-    modelName <- models[i];
-    # check if it is a Categorical model
-    if( clusterValidCategoricalNames(modelName) )
-    { lcomponent[[i]] <- new("ClusterCategoricalComponent", data[[i]], nbClusterMin, modelName)}
+    # check data
+    data[[i]] <- as.matrix(data[[i]])
+    # check parameter
+    param <- lmodels[[i]];
+    if (is.list(param))
+    {
+      modelName         <- param$modelName
+      dim               <- param$dim
+      kernelName        <- param$kernelName
+      kernelParameters  <- param$kernelParameters
+      kernelComputation <- param$kernelComputation
+      # check and set default values
+      if (is.null(kernelName))        { kernelName <- "Gaussian"}
+      if (is.null(dim))               { dim <- 10}
+      if (is.null(kernelParameters))  { kernelParameters <- c(1)}
+      if (is.null(kernelComputation)) { kernelComputation <- TRUE}
+    }
     else
-    {  # check if it is a Gamma model
-      if( clusterValidGammaNames(modelName) )
-      { lcomponent[[i]] <- new("ClusterGammaComponent", data[[i]], nbClusterMin, modelName)}
-      else
-      { # check if it is a diagonal Gaussian model
-        if( clusterValidDiagGaussianNames(modelName) )
-        { lcomponent[[i]] <- new("ClusterDiagGaussianComponent", data[[i]], nbClusterMin, modelName);}
-        else
-        { # check if it is a Poisson model
-          if( clusterValidPoissonNames(modelName) )
-          { lcomponent[[i]] <- new("ClusterPoissonComponent", data[[i]], nbClusterMin, modelName);}
-          else
-          {
-            stop("in clusterMixedData: invalid model name");
-          }
-        }
-      } # else gamma
-    } # else categorical
+    { 
+      modelName  <- param
+      dim        <- 10
+      kernelName <- "Gaussian"
+      kernelParameters <- c(1)
+      kernelComputation <- TRUE
+    }
+    if (!kmmValidModelNames(modelName))
+    { stop("modelName is not valid. See ?kmmNames for the list of valid model names")}
+    if (!kmmValidKernelNames(kernelName))
+    { stop("kernelName is not valid. See ?kmm for the list of valid model names")}
+    
+    # create component
+    lcomponent[[i]] = new( "KmmComponent", data[[i]], dim
+                         , nbClusterMin
+                         , modelName
+                         , kernelName, kernelParameters, kernelComputation)
   } # for i
+  
   # Create model
-  model = new("ClusterMixedDataModel", lcomponent)
+  model = new("KmmMixedDataModel", lcomponent)
   model@strategy = strategy;
   model@criterionName = criterion
   
@@ -131,57 +148,51 @@ clusterMixedData <- function( data, models, nbCluster=2
   resFlag  <- FALSE;
   if (length(nbCluster) >0)
   {
-    resFlag = .Call("clusterMixedData", model, nbCluster, strategy, criterion, nbCore, PACKAGE="MixAll");
+    resFlag = .Call("kmmMixedData", model, nbCluster, strategy, criterion, nbCore, PACKAGE="MixAll");
   }
   # set names
   if (resFlag != TRUE) {cat("WARNING: An error occurs during the clustering process");}
-  for (i in 1:length(data))
-  {
-    if(clusterValidCategoricalNames(models[i]))
-    { dim(model@lcomponent[[i]]@plkj) <- c(model@lcomponent[[i]]@nbModalities, model@nbCluster, ncol(model@lcomponent[[i]]@data))}
-  }
   model
 }
 
 #-----------------------------------------------------------------------
-#' Definition of the [\code{\linkS4class{ClusterMixedDataModel}}] class
+#' Definition of the [\code{\linkS4class{KmmMixedDataModel}}] class
 #'
-#' This class defines a mixed data mixture Model.
+#' This class defines a mixed data kernel mixture Model (KMM).
 #'
 #' This class inherits from the [\code{\linkS4class{IClusterModel}}] class.
 #' A model for mixed data is a mixture model of the form:
 #' \deqn{
 #' f({{x}}_i=({{x}}_{1i}, {{x}}_{2i},\ldots {{x}}_{Li})|\theta)
-#' = \sum_{k=1}^K p_k \prod_{l=1}^L h({{x}}_{li}| \lambda_{lk},\alpha_l).
+#' = \sum_{k=1}^K p_k \prod_{l=1}^L h({{x}}_{li}).
 #' }
 #' The density functions (or probability distribution functions)
-#' \deqn{h(.|\lambda_{lk},\alpha_l)}
-#' can be any implemented model (Gaussian, Poisson,...).
+#' \deqn{h(.)} can be any implemented kmm model on a RKHS space.
 #'
-#' @slot lcomponent  a list of [\code{\linkS4class{IClusterComponent}}]
+#' @slot lcomponent  a list of [\code{\linkS4class{KmmComponent}}]
 #' @seealso [\code{\linkS4class{IClusterModel}}] class
 #'
 #' @examples
-#' getSlots("ClusterMixedDataModel")
+#' getSlots("KmmMixedDataModel")
 #'
 #' @author Serge Iovleff
 #'
-#' @name ClusterMixedDataModel
-#' @rdname ClusterMixedDataModel-class
-#' @aliases ClusterMixedDataModel-class
+#' @name KmmMixedDataModel
+#' @rdname KmmMixedDataModel-class
+#' @aliases KmmMixedDataModel-class
 #'
 setClass(
-  Class = "ClusterMixedDataModel",
+  Class = "KmmMixedDataModel",
   representation( lcomponent = "list"),
   contains=c("IClusterModel"),
   validity=function(object)
   {
-    nbData = length(object@lcomponent)
-    if (nbData == 0) {stop("At least on data set must be given.");}
+    nbData = length(object@lcomponent[1])
+    if (nbData == 0) { stop("At least on data set must be given.")}
     for (l in 1:nbData)
     {
       if (nrow(object@lcomponent[[1]]@data) != object@nbSample)
-      {stop("All data sets must have the same number of individuals (number of rows).");}
+      { stop("All data sets must have the same number of individuals (number of rows)")}
     }
     return(TRUE)
   }
@@ -189,21 +200,22 @@ setClass(
 
 #' Initialize an instance of a MixAll S4 class.
 #'
-#' Initialization method of the [\code{\linkS4class{ClusterMixedDataModel}}] class.
+#' Initialization method of the [\code{\linkS4class{KmmMixedDataModel}}] class.
 #' Used internally in the 'MixAll' package.
 #'
 #' @rdname initialize-methods
 #' @keywords internal
 setMethod(
   f="initialize",
-  signature=c("ClusterMixedDataModel"),
+  signature=c("KmmMixedDataModel"),
   definition=function(.Object, lcomponent, nbCluster=2)
   {
     # for data
-    if(missing(lcomponent)) {stop("lcomponent is mandatory in ClusterMixedDataModel.")}
+    if(missing(lcomponent)) {stop("lcomponent is mandatory in KmmMixedDataModel.")}
     nbData = length(lcomponent)
     if (nbData == 0) {stop("At least on data set must be given.")}
     .Object@lcomponent <- lcomponent;
+    
     # take first element of the list, this will give us the dimensions
     nbSample = nrow(.Object@lcomponent[[1]]@data);
     .Object <- callNextMethod(.Object, nbSample, nbCluster)
@@ -214,10 +226,10 @@ setMethod(
 )
 
 #' @rdname print-methods
-#' @aliases print print,ClusterMixedDataModel-method
+#' @aliases print print,KmmMixedDataModel-method
 setMethod(
   f="print",
-  signature=c("ClusterMixedDataModel"),
+  signature=c("KmmMixedDataModel"),
   function(x,...){
     cat("****************************************\n")
     callNextMethod()
@@ -249,10 +261,10 @@ setMethod(
 )
 
 #' @rdname show-methods
-#' @aliases show-ClusterMixedDataModel,ClusterMixedDataModel,ClusterMixedDataModel-method
+#' @aliases show-KmmMixedDataModel,KmmMixedDataModel,KmmMixedDataModel-method
 setMethod(
   f="show",
-  signature=c("ClusterMixedDataModel"),
+  signature=c("KmmMixedDataModel"),
   function(object)
   {
     cat("****************************************\n")
@@ -290,10 +302,10 @@ setMethod(
 )
 
 #' @rdname summary-methods
-#' @aliases summary summary,ClusterMixedDataModel-method
+#' @aliases summary summary,KmmMixedDataModel-method
 setMethod(
   f="summary",
-  signature=c("ClusterMixedDataModel"),
+  signature=c("KmmMixedDataModel"),
   function(object, ...)
   {
     cat("**************************************************************\n")
@@ -310,18 +322,18 @@ setMethod(
   }
 )
 
-#' Plotting of a class [\code{\linkS4class{ClusterMixedDataModel}}]
+#' Plotting of a class [\code{\linkS4class{KmmMixedDataModel}}]
 #'
-#' Plotting data from a [\code{\linkS4class{ClusterMixedDataModel}}] object
+#' Plotting data from a [\code{\linkS4class{KmmMixedDataModel}}] object
 #' using the estimated parameters and partition.
 #'
-#' @param x an object of class [\code{\linkS4class{ClusterMixedDataModel}}]
+#' @param x an object of class [\code{\linkS4class{KmmMixedDataModel}}]
 #' @param y a number between 1 and K-1.
 #' @param ... further arguments passed to or from other methods
 #'
-#' @aliases plot-ClusterMixedDataModel
+#' @aliases plot-KmmMixedDataModel
 #' @docType methods
-#' @rdname plot-ClusterMixedDataModel-method
+#' @rdname plot-KmmMixedDataModel-method
 #'
 #'
 #' @seealso \code{\link{plot}}
@@ -329,13 +341,13 @@ setMethod(
 #' \dontrun{
 #'   ## the car data set
 #'   data(car)
-#'   model <- clusterMixedData(car, 3, strategy = clusterFastStrategy())
+#'   model <- kmmMixedData(car, 3, strategy = clusterFastStrategy())
 #'   plot(model)
 #'   }
 #'
 setMethod(
   f="plot",
-  signature=c("ClusterMixedDataModel"),
+  signature=c("KmmMixedDataModel"),
   function(x, y, ...)
   {
     # total number of cluster in the data set

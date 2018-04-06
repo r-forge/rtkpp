@@ -38,17 +38,17 @@
 #define STK_KERNELPARAMETERSHANDLER_H
 
 #include <STatistiK/include/STK_Stat_Online.h>
-#include "../KernelModels/STK_KernelParameters.h"
+#include "STK_KernelParameters.h"
 
 namespace STK
 {
 /** @ingroup Clustering
- *  Specialization of the ParametersHandler struct for KernelGaussian_s model
+ *  Specialization of the ParametersHandler struct for Kmm_s model
  **/
 template <>
-struct ParametersHandler<Clust::KernelGaussian_s_>
+struct ParametersHandler<Clust::Kmm_s_>
 {
-    typedef ModelParameters<Clust::KernelGaussian_s_> Parameters;
+    typedef ModelParameters<Clust::Kmm_s_> Parameters;
     /** sigma2 statistics */
     Stat::Online<Real, Real> stat_sigma2_;
     /** Array of the dim statistics */
@@ -72,12 +72,12 @@ struct ParametersHandler<Clust::KernelGaussian_s_>
 };
 
 /** @ingroup Clustering
- *  Specialization of the ParametersHandler struct for KernelGaussian_sk model
+ *  Specialization of the ParametersHandler struct for Kmm_sk model
  **/
 template <>
-struct ParametersHandler<Clust::KernelGaussian_sk_>
+struct ParametersHandler<Clust::Kmm_sk_>
 {
-    typedef ModelParameters<Clust::KernelGaussian_sk_> Parameters;
+    typedef ModelParameters<Clust::Kmm_sk_> Parameters;
     /** Array of the sigma2 statistics */
     Array1D< Stat::Online<Real, Real> > stat_sigma2_;
     /** Array of the dim statistics */

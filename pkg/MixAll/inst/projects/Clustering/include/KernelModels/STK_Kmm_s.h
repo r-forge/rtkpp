@@ -28,38 +28,38 @@
  * Author:   Serge Iovleff
  **/
 
-/** @file STK_KernelGaussian_s.h
- *  @brief In this file we define the KernelGaussian_s class
+/** @file STK_Kmm_s.h
+ *  @brief In this file we define the Kmm_s class
  **/
 
-#ifndef STK_KERNELGAUSSIAN_S_H
-#define STK_KERNELGAUSSIAN_S_H
+#ifndef STK_KMM_S_H
+#define STK_KMM_S_H
 
-#include "../KernelModels/STK_KernelGaussianBase.h"
+#include "STK_KmmBase.h"
 
 namespace STK
 {
 
 //forward declaration, to allow for recursive template
-class KernelGaussian_s;
+class Kmm_s;
 
 namespace hidden
 {
 /** @ingroup Clustering
- *  Traits class for the KernelGaussian_sk traits policy. */
+ *  MixtureTraits class for the Kmm_s traits policy. */
 template<>
-struct MixtureTraits< KernelGaussian_s >
+struct MixtureTraits< Kmm_s >
 {
   typedef CArrayXX Array;
   typedef Array::Type       Type;
-  /** Type of the structure storing the parameters of a KernelGaussian_s model*/
-  typedef ModelParameters<Clust::KernelGaussian_s_> Parameters;
+  /** Type of the structure storing the parameters of a Kmm_s model*/
+  typedef ModelParameters<Clust::Kmm_s_> Parameters;
 };
 
 } // namespace Clust
 
 /** @ingroup Clustering
- *  The Gaussian mixture model @c KernelGaussian_s is an isotrope Gaussian
+ *  The Gaussian mixture model @c Kmm_s is an isotrope Gaussian
  *  mixture model on a kernel space. It has a density function of the form
  * \f[
  *  f(\mathbf{x}|\theta) = \sum_{k=1}^K p_k
@@ -68,23 +68,23 @@ struct MixtureTraits< KernelGaussian_s >
  * \f]
  * where \f$ \phi \f$ denote a feature mapping from the original space to an RKHS.
  *
- * In a KernelGaussian_s model, the data set refer to the Gram's matrix.
+ * In a Kmm_s model, the data set refer to the Gram's matrix.
  **/
-class KernelGaussian_s: public KernelGaussianBase<KernelGaussian_s >
+class Kmm_s: public KmmBase<Kmm_s >
 {
   public:
-    typedef KernelGaussianBase<KernelGaussian_s> Base;
+    typedef KmmBase<Kmm_s> Base;
 
     /** default constructor
      * @param nbCluster number of cluster in the model
      **/
-    KernelGaussian_s( int nbCluster);
+    Kmm_s( int nbCluster);
     /** copy constructor
      *  @param model The model to copy
      **/
-    KernelGaussian_s( KernelGaussian_s const& model);
+    Kmm_s( Kmm_s const& model);
     /** destructor */
-    ~KernelGaussian_s();
+    ~Kmm_s();
 
     /** @return the number of free parameters of the model */
     int computeNbFreeParameters() const;
@@ -102,4 +102,4 @@ class KernelGaussian_s: public KernelGaussianBase<KernelGaussian_s >
 
 } // namespace STK
 
-#endif /* STK_KernelGAUSSIAN_S_H */
+#endif /* STK_KMM_S_H */

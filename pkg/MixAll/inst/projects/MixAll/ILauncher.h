@@ -80,6 +80,8 @@ class ILauncher: public ILauncherBase
     Rcpp::CharacterVector v_models_;
     /** data handler */
     RDataHandler handler_;
+    /** kernel handler */
+    KernelHandler kerHandler_;
     /** diagonal Gaussian mixture models manager */
     DiagGaussianMixtureManager<RDataHandler> diagGaussianManager_;
     /** Poisson mixture models manager */
@@ -88,6 +90,8 @@ class ILauncher: public ILauncherBase
     GammaMixtureManager<RDataHandler> gammaManager_;
     /** categorical mixture models manager */
     CategoricalMixtureManager<RDataHandler> categoricalManager_;
+    /** categorical mixture models manager */
+    KernelMixtureManager kernelManager_;
 };
 
 } // namespace STK

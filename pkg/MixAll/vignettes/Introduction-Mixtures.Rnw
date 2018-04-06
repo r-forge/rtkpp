@@ -960,8 +960,8 @@ representation}.
 A classifier is a rule that assigns to an observation $\bx$ a guess or estimate
 of what the unobserved label $z$ actually was. It is possible to predict label
 observations (and to estimate missing values) of a data set using a mixture model
-estimated by \pkg{MixAll} with the \code{clusterPredict} function.
-If there is no missing data label of an observation $\bx$ is computed with the
+estimated by \pkg{MixAll} using the \code{clusterPredict} function.
+If there is no missing data, label of an observation $\bx$ is computed with the
 Bayes classifier
 $$
 \hat{z} = \arg\max_k \frac{ \hat{p}_k h(\bx|{\hat{\blambda}_k},\hat{\balpha})}
@@ -975,8 +975,8 @@ tuned using the utility function \code{clusterAlgoPredict}.
 This function takes as input three parameters:
 \begin{itemize}
 \item \code{algo}: name of the algorithm (\code{"EM"} or \code{"SemiSEM"}).
-Default value is \code{"EM"}. Note that this default value is faster but
-can produce a biased estimator.
+Default value is \code{"EM"}. Note that this default value give faster results
+but can produce biased estimators.
 \item \code{nbIterBurn}: number of burning iterations to perform. Default value
 is 50.
 \item \code{nbIterLong}: number of iteration to perform. Default value
@@ -1003,7 +1003,7 @@ t^m_{ik}=\frac{ \hat{p}_k\, h(\bx_i|\hat{\blambda}_k,\hat{\balpha})}
 \end{itemize}
 The \code{EM} algorithm may converge to a local maximum of the observed data
 likelihood function, depending on starting values. The \code{SemiSEM} algorithm
-replaces the {\bf I} step by a simulation step ({\bf S} step) and is not detailed
+replaces the {\bf I} step by a simulation step ({\bf S} step)
 (see \ref{subsec:algorithms} section).
 
 The following example use the famous iris data set (\cite{FISHER36})

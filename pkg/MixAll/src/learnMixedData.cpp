@@ -39,7 +39,7 @@
 
 
 /*
- *  @param model ClusterMixedData S4 class
+ *  @param model ClusterMixedDataModel S4 class
  *  @param critName name criteria string
  *  @param nbCore number of core to use
  */

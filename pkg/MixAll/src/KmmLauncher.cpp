@@ -48,51 +48,32 @@ namespace STK
 KmmLauncher::KmmLauncher( Rcpp::S4 s4_model
                         , Rcpp::IntegerVector const& nbCluster
                         , Rcpp::CharacterVector const& models
+
                         )
                         : ILauncherBase(s4_model)
-                        , s4_strategy_(s4_model_.slot("strategy"))
                         , v_models_(models)
                         , v_nbCluster_(nbCluster)
+                        , s4_strategy_(s4_model_.slot("strategy"))
                         , criterion_(Rcpp::as<std::string>(s4_model_.slot("criterionName")))
                         , facade_()
                         , isMixedData_(false)
 {}
-///* facade design pattern.
-// * The KmmLauncher allow to create the strategy for estimating a mixture model
-// * with less effort
-// **/
-//KmmLauncher::KmmLauncher( SEXP model, SEXP nbCluster, SEXP critName )
-//                        : IRunnerBase()
-//                        , handlerDouble_()
-//                        , handlerInt_()
-//                        , s4_model_(model)
-//                        , v_models_()
-//                        , s4_strategy_(s4_model_.slot("strategy"))
-//                        , handlerDouble_()
-//                        , handlerInt_()
-//                        , kernelManager_(kernelHandler_)
-//{}
+/* facade design pattern.
+ * The KmmLauncher allow to create the strategy for estimating a mixture model
+ * with less effort
+ **/
+KmmLauncher::KmmLauncher( Rcpp::S4 s4_model, Rcpp::IntegerVector const& nbCluster)
+                        : ILauncherBase(s4_model)
+                        , v_models_()
+                        , v_nbCluster_(nbCluster)
+                        , s4_strategy_(s4_model_.slot("strategy"))
+                        , criterion_(Rcpp::as<std::string>(s4_model_.slot("criterionName")))
+                        , facade_()
+                        , isMixedData_(true)
+{}
 /* destructor. */
 KmmLauncher::~KmmLauncher()
 {}
-
-
-/* create the kernel mixtures in the given composer */
-void KmmLauncher::updateMixtures(MixtureComposer* p_composer)
-{
-  typedef MixtureComposer::ConstMixtIterator ConstMixtIterator;
-  Rcpp::S4 s4_component = s4_model_.slot("component");
-  // loop over mixtures
-  for (ConstMixtIterator it =  p_composer->v_mixtures().begin(); it != p_composer->v_mixtures().end(); it++)
-  {
-    std::string idData = (*it)->idData();
-    std::string idModel;
-    Clust::Mixture typeModel = Clust::stringToMixture(idModel);
-    RVector<double> dim((SEXP)s4_component.slot("dim"));
-    double kdim = (dim.size()>0) ? dim[0] : 10;
-    facade_.kmmManager().setDim(p_composer->getMixture(idData), kdim);
-  }
-}
 
 
 
@@ -102,9 +83,8 @@ bool KmmLauncher::run()
 
   // compute the best model
   Real initCriter = s4_model_.slot("criterion");
-  Real criter = (isMixedData_) ? selectBestMixedModel()
-                               : selectBestSingleModel();
-
+  Real criter = (isMixedData_) ? selectBestMixedModel() : selectBestSingleModel();
+  if (!facade_.p_composer_) return false;
   // get result common part of the estimated model
   s4_model_.slot("criterion")      = criter;
   s4_model_.slot("nbCluster")      = facade_.p_composer_->nbCluster();
@@ -114,7 +94,7 @@ bool KmmLauncher::run()
   s4_model_.slot("tik")            = Rcpp::wrap(facade_.p_composer_->tik());
   s4_model_.slot("zi")             = Rcpp::wrap(facade_.p_composer_->zi());
   NumericVector fi = s4_model_.slot("lnFi");
-  NumericVector zi = s4_model_.slot("zi");
+  IntegerVector zi = s4_model_.slot("zi");
   for (int i=0; i< fi.length(); ++i)
   {
     fi[i] = facade_.p_composer_->computeLnLikelihood(i);
@@ -124,16 +104,117 @@ bool KmmLauncher::run()
   return true;
 }
 
+
+/* Create kernels and add them to KernelHandler from facade
+ **/
+Kernel::IKernel* KmmLauncher::createKernel(Rcpp::S4 s4_component, std::string const& idData, KernelMixtureManager& manager)
+{
+  // get kernel parameters from component
+  std::string         kernelName        = Rcpp::as<std::string>(s4_component.slot("kernelName"));
+  Rcpp::NumericVector kernelParameters  = s4_component.slot("kernelParameters");
+  bool                kernelComputation = Rcpp::as<bool>(s4_component.slot("kernelComputation"));
+
+  Kernel::IKernel* p_kernel = 0;
+  // build kernel
+  switch (Kernel::stringToKernelType(kernelName))
+  {
+    case Kernel::exponential_:
+    {
+      Real param1 = 1;
+      if (kernelParameters.length()>0) { param1 = kernelParameters[0];}
+      NumericMatrix r_data = s4_component.slot("data");
+      DataBridge< RMatrix<double> >* p_bridge = new DataBridge< RMatrix<double> >( idData, RMatrix<double>(r_data));
+      manager.registerDataBridge(p_bridge);
+      p_kernel = new Kernel::Exponential< RMatrix<double> >(p_bridge->dataij(), param1);
+      break;
+    }
+    case Kernel::gaussian_:
+    {
+      Real param1 = 1;
+      if (kernelParameters.length()>0) { param1 = kernelParameters[0];}
+      NumericMatrix r_data = s4_component.slot("data");
+      DataBridge< RMatrix<double> >* p_bridge = new DataBridge< RMatrix<double> >( idData, RMatrix<double>(r_data));
+      manager.registerDataBridge(p_bridge);
+      p_kernel = new Kernel::Gaussian< RMatrix<double> >(p_bridge->dataij(), param1);
+      break;
+    }
+    case Kernel::laplace_:
+    {
+      Real param1 = 1;
+      if (kernelParameters.length()>0) { param1 = kernelParameters[0];}
+      NumericMatrix r_data = s4_component.slot("data");
+      DataBridge< RMatrix<double> >* p_bridge = new DataBridge< RMatrix<double> >( idData, RMatrix<double>(r_data));
+      manager.registerDataBridge(p_bridge);
+      p_kernel = new Kernel::Laplace< RMatrix<double> >(p_bridge->dataij(), param1);
+      break;
+    }
+    case Kernel::linear_:
+    {
+      NumericMatrix r_data = s4_component.slot("data");
+      DataBridge< RMatrix<double> >* p_bridge = new DataBridge< RMatrix<double> >( idData, RMatrix<double>(r_data));
+      manager.registerDataBridge(p_bridge);
+      p_kernel = new Kernel::Linear< RMatrix<double> >(p_bridge->dataij());
+      break;
+    }
+    case Kernel::polynomial_:
+    {
+      Real param1 = 2, param2 =0;
+      if (kernelParameters.length()>0) { param1 = kernelParameters[0];}
+      if (kernelParameters.length()>2) { param2 = kernelParameters[1];}
+      NumericMatrix r_data = s4_component.slot("data");
+      DataBridge< RMatrix<double> >* p_bridge = new DataBridge< RMatrix<double> >( idData, RMatrix<double>(r_data));
+      manager.registerDataBridge(p_bridge);
+      p_kernel = new Kernel::Polynomial< RMatrix<double> >(p_bridge->dataij(), param1, param2);
+      break;
+    }
+    case Kernel::rationalQuadratic_:
+    {
+      Real param1 = 1;
+      if (kernelParameters.length()>0) { param1 = kernelParameters[0];}
+      NumericMatrix r_data = s4_component.slot("data");
+      DataBridge< RMatrix<double> >* p_bridge = new DataBridge< RMatrix<double> >( idData, RMatrix<double>(r_data));
+      manager.registerDataBridge(p_bridge);
+      p_kernel = new Kernel::RationalQuadratic< RMatrix<double> >(p_bridge->dataij(), param1);
+      break;
+    }
+    case Kernel::hamming_:
+    {
+      Real param1 = 2, param2 =0;
+      if (kernelParameters.length()>0) { param1 = kernelParameters[0];}
+      if (kernelParameters.length()>2) { param2 = kernelParameters[1];}
+      IntegerMatrix r_data = s4_component.slot("data");
+      DataBridge< RMatrix<int> >* p_bridge = new DataBridge< RMatrix<int> >( idData, RMatrix<int>(r_data));
+      manager.registerDataBridge(p_bridge);
+      p_kernel = new Kernel::Hamming< RMatrix<int> >(p_bridge->dataij(), param1);
+      break;
+    }
+    default:
+      return 0;
+      break;
+  }
+  // compute Gram matrix
+  if (kernelComputation)
+  {
+    p_kernel->run();
+    s4_component.slot("gram") = STK::wrap(p_kernel->gram());
+  }
+  return p_kernel;
+}
+
 /* get the parameters */
 Real KmmLauncher::selectBestSingleModel()
 {
-  std::string idDataBestModel;
   // component
   Rcpp::S4 s4_component = s4_model_.slot("component");
+  double critBestModel  = s4_model_.slot("criterion");
+  int nbSample          = s4_model_.slot("nbSample");
+  Rcpp::NumericVector r_dim = s4_component.slot("dim");
+  double dim = r_dim[0];
 
-  double bestCritValue = s4_model_.slot("criterion");
-  int nbSample     = s4_model_.slot("nbSample");
-  IMixtureComposer*  p_current =0;
+  //
+  std::string idBestModel;
+  bool freeProp;
+  IMixtureComposer*  p_bestModel =0;
   IMixtureCriterion* p_criterion =0;
 
   // start computation
@@ -141,60 +222,75 @@ Real KmmLauncher::selectBestSingleModel()
   {
     // create criterion
     p_criterion = Clust::createCriterion(criterion_);
-    // start the estimation process, should end with the best model according to
-    // the criterion
-    ClusterFacade facade(p_current);
-    facade.createFullStrategy(s4_strategy_);
-    // loop over all the models
-    for (int l=0; l <v_models_.size(); ++l)
+    if (!p_criterion)
     {
-      std::string idData = "model" + typeToString<int>(l);
-      std::string idModel(as<std::string>(v_models_[l]));
-      bool freeProp;
-      Clust::Mixture model = Clust::stringToMixture(idModel, freeProp);
-      // for the current model,
+      msg_error_ = STKERROR_1ARG(KmmLauncher::run,criterion_,Erro in criterion creation);
+      return Arithmetic<Real>::max();
+    }
+
+    // start the estimation process, should end with the best model according to the criterion
+    ClusterFacade facade(facade_.p_composer_);
+    facade.createFullStrategy(s4_strategy_);
+
+    // loop over all the models
+    for (int l=0; l <v_models_.length(); ++l)
+    {
+      std::string idData  = "model" + typeToString<int>(l);
+      std::string idModel = as<std::string>(v_models_[l]);
+
+      // create kernel and register it
+      Kernel::IKernel* p_kernel = createKernel(s4_component, idData, facade_.kmmManager_);
+      if (!facade_.kerHandler_.addKernel(p_kernel, idData, idModel))
+      { msg_error_ = STKERROR_1ARG(KmmLauncher::run,idData,Error in kernel creation);
+        return Arithmetic<Real>::max();
+      }
+
+      // get freeProp
+      Clust::stringToMixture(idModel, freeProp);
+
+      // loop over all number of cluster
       for (int k=0; k <v_nbCluster_.length(); ++k)
       {
-        int K = v_nbCluster_[k];
+        int nbCluster = v_nbCluster_[k];
         // create composer
-        if (freeProp) { p_current = new MixtureComposer(nbSample, K);}
-        else          { p_current = new MixtureComposerFixedProp(nbSample, K);}
-
-        // create current mixture and register it
-        std::string idData = "model" + typeToString<int>(l);
-        //createMixtures(static_cast<MixtureComposer*>(p_current));
+        facade_.p_composer_ = (freeProp) ? new MixtureComposer(nbSample, nbCluster)
+                                         : new MixtureComposerFixedProp(nbSample, nbCluster);
+        IMixture* p_mixture = facade_.kmmManager_.createMixture(idData, nbCluster);
+        facade_.kmmManager_.setDim(p_mixture, dim);
+        facade_.p_composer_->registerMixture(p_mixture);
 
         // run estimation and get results if possible
-        if (!facade.run()) { msg_error_ += facade.error();}
+        if (!facade.run())
+        { msg_error_ += facade.error();}
+
         // compute criterion and update model if necessary
-        p_criterion->setModel(p_current);
+        p_criterion->setModel(facade_.p_composer_);
         p_criterion->run();
-        if (bestCritValue > p_criterion->value())
+        if (critBestModel > p_criterion->value())
         {
-          if (facade_.p_composer_)
-          { std::swap(p_current, facade_.p_composer_);}
-          else
-          { facade_.p_composer_ = p_current; p_current = 0;}
+          idBestModel   = idData;
+          critBestModel = p_criterion->value();
+          std::swap(p_bestModel, facade_.p_composer_);
           s4_component.slot("modelName") = idModel;
-          idDataBestModel = idData;
-          bestCritValue = p_criterion->value();
         }
-        // release current composer
-        if (p_current) { delete p_current; p_current = 0;}
+        // release current composer as best model is pointed by p_bestModel
+        if (facade_.p_composer_)
+        { delete facade_.p_composer_; facade_.p_composer_ = 0;}
       }
     }
-    // release
-    delete p_criterion;
-    // get specific parameters
-    setKernelParametersToComponent( facade_.p_composer_
-                                  , facade_.kerHandler_
-                                  , idDataBestModel
-                                  , s4_component);
-    return bestCritValue;
+    // save best model
+    facade_.p_composer_ = p_bestModel;
+    if (facade_.p_composer_) // in case every thing fail
+    {
+      setKernelParametersToComponent( facade_.p_composer_, facade_.kmmManager(), idBestModel
+                                    , s4_component);
+    }
+    if (p_criterion) { delete p_criterion;}
+    return critBestModel;
   }
   catch (Exception const& e)
   {
-    if (p_current) delete p_current;
+    if (p_bestModel) delete p_bestModel;
     if (p_criterion) delete p_criterion;
     ::Rf_error(e.error().c_str()) ;
   }
@@ -206,84 +302,108 @@ Real KmmLauncher::selectBestSingleModel()
 Real KmmLauncher::selectBestMixedModel()
 {
   // list of the component
-  Rcpp::List s4_list =s4_model_.slot("lcomponent");
-  Real criter =s4_model_.slot("criterion");
-  int nbSample =s4_model_.slot("nbSample");
-  // main pointer
-  IMixtureComposer* p_current =0;
+  Rcpp::List list_component = s4_model_.slot("lcomponent");
+  double critBestModel      = s4_model_.slot("criterion");
+  int nbSample              = s4_model_.slot("nbSample");
+  // auxiliaries pointers
+  IMixtureComposer*  p_bestModel =0;
   IMixtureCriterion* p_criterion =0;
   try
   {
-    // create facade and strategy
-    ClusterFacade facade(p_current);
-    facade.createFullStrategy(s4_strategy_);
-    bool sameProp = true;
-    // loop over the list of component and fill handler_
-    for (int l=0; l <s4_list.size(); ++l)
-    {
-      // component
-      Rcpp::S4 s4_component = s4_list[l];
-      std::string idData  = "model" + typeToString<int>(l);
-      std::string idModel = s4_component.slot("modelName");
-      // register
-      bool freeMixture;
-      Clust::Mixture model = Clust::stringToMixture(idModel, freeMixture);
-      Clust::MixtureClass classModel = Clust::mixtureToMixtureClass(model);
-      // if one of the model is free proportion, then we use free proportion
-      sameProp &= (!freeMixture);
-    }
     // create criterion
     p_criterion = Clust::createCriterion(criterion_);
     if (!p_criterion)
-    { msg_error_ = STKERROR_1ARG(LearnLauncher::run,criterion_,Wrong criterion name);
-      return false;
+    {
+      msg_error_ = STKERROR_1ARG(KmmLauncher::run,criterion_,Error in criterion creation);
+      return Arithmetic<Real>::max();
     }
-    // loop over the models
+
+    // start the estimation process, should end with the best model according to the criterion
+    ClusterFacade facade(facade_.p_composer_);
+    facade.createFullStrategy(s4_strategy_);
+
+    // loop over the list of component and fill handler_
+    bool sameProp = true;
+    for (int l=0; l <list_component.size(); ++l)
+    {
+      // component
+      Rcpp::S4 s4_component = list_component[l];
+      std::string idData  = "model" + typeToString<int>(l);
+      std::string idModel = s4_component.slot("modelName");
+
+      // create kernel and register it
+      Kernel::IKernel* p_kernel = createKernel(s4_component, idData, facade_.kmmManager_);
+      if (!facade_.kerHandler_.addKernel(p_kernel, idData, idModel))
+      { msg_error_ = STKERROR_1ARG(KmmLauncher::run,idData,Error in kernel creation);
+        return Arithmetic<Real>::max();
+      }
+
+      // compute sameProp. If one of the model is free proportion, then we use free proportion
+      bool freeMixture;
+      Clust::Mixture model = Clust::stringToMixture(idModel, freeMixture);
+      sameProp &= (!freeMixture);
+    }
+
+    // loop over the number of clusters
     for (int k=0; k <v_nbCluster_.length(); ++k)
     {
-      int K = v_nbCluster_[k];
+      int nbCluster = v_nbCluster_[k];
       // create composer
-      if (!sameProp) { p_current = new MixtureComposer(nbSample, K);}
-      else           { p_current = new MixtureComposerFixedProp(nbSample, K);}
+      if (!sameProp) { facade_.p_composer_ = new MixtureComposer(nbSample, nbCluster);}
+      else           { facade_.p_composer_ = new MixtureComposerFixedProp(nbSample, nbCluster);}
+
       // create all mixtures
-      //createMixtures(static_cast<MixtureComposer*>(p_current));
+      for (int l=0; l <list_component.length(); ++l)
+      {
+        // get component and dimension to specific model
+        Rcpp::S4 s4_component = list_component[l];
+        Rcpp::NumericVector r_dim = s4_component.slot("dim");
+        double dim = r_dim[0];
+        std::string idData  = "model" + typeToString<int>(l);
+        IMixture* p_mixture = facade_.kmmManager_.createMixture(idData, nbCluster);
+        facade_.kmmManager_.setDim(p_mixture, dim);
+        facade_.p_composer_->registerMixture(p_mixture);
+      }
+
       // run estimation and get results if possible
       if (!facade.run()) { msg_error_ += facade.error();}
       // compute criterion and update model if necessary
-      p_criterion->setModel(p_current);
+      p_criterion->setModel(facade_.p_composer_);
       p_criterion->run();
-      if (criter > p_criterion->value())
+      if (critBestModel > p_criterion->value())
       {
-        if (facade_.p_composer_)
-        { std::swap(p_current, facade_.p_composer_);}
-        else
-        { facade_.p_composer_ = p_current; p_current = 0;}
-        criter = p_criterion->value();
+        critBestModel = p_criterion->value();
+        std::swap(p_bestModel, facade_.p_composer_);
       }
-      // release current composer
-      if (p_current) { delete p_current; p_current = 0;}
-    }
-    // release
-    delete p_criterion;
-    // get parameters
-    for (int l=0; l <s4_list.size(); ++l)
-    {
-      // component
-      Rcpp::S4 s4_component = s4_list[l];
-      // id of the data set and of the model
-      std::string idData  = "model" + typeToString<int>(l);
-      // get specific parameters
-      setKernelParametersToComponent( facade_.p_composer_
-                                    , facade_.kerHandler_
-                                    , idData
-                                    , s4_component);
+      // release current composer as best model is pointed by p_bestModel
+      if (facade_.p_composer_)
+      { delete facade_.p_composer_; facade_.p_composer_ = 0;}
     }
     //
-    return criter;
+    if (p_criterion) { delete p_criterion;}
+    //save best model
+    if (p_bestModel) // in case everything failed
+    {
+      facade_.p_composer_ = p_bestModel;
+      // get parameters
+      for (int l=0; l <list_component.length(); ++l)
+      {
+        // component
+        Rcpp::S4 s4_component = list_component[l];
+        // id of the data set and of the model
+        std::string idData  = "model" + typeToString<int>(l);
+        // get specific parameters
+        setKernelParametersToComponent( facade_.p_composer_
+                                      , facade_.kmmManager_
+                                      , idData
+                                      , s4_component);
+      }
+    }
+    return critBestModel;
   }
   catch (Exception const& e)
   {
-    if (p_current) delete p_current;
+    if (p_bestModel) delete p_bestModel;
     if (p_criterion) delete p_criterion;
     ::Rf_error(e.error().c_str()) ;
   }

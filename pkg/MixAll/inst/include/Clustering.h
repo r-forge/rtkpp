@@ -106,8 +106,8 @@
 #include <Clustering/include/GammaModels/STK_Gamma_ak_bjk.h>
 #include <Clustering/include/GammaModels/STK_Gamma_ak_bk.h>
 #include <Clustering/include/GammaModels/STK_GammaMixtureManager.h>
-#include <Clustering/include/KernelModels/STK_KernelGaussian_s.h>
-#include <Clustering/include/KernelModels/STK_KernelGaussian_sk.h>
+#include <Clustering/include/KernelModels/STK_Kmm_s.h>
+#include <Clustering/include/KernelModels/STK_Kmm_sk.h>
 #include <Clustering/include/KernelModels/STK_KernelMixtureManager.h>
 #include <Clustering/include/PoissonModels/STK_Poisson_ljk.h>
 #include <Clustering/include/PoissonModels/STK_Poisson_ljlk.h>

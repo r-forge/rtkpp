@@ -77,7 +77,7 @@ clusterPredict <- function( data, model, algo = clusterAlgoPredict(), nbCore = 1
   if(missing(data)) { stop("data is mandatory in clusterPredict.")}
   
   # cluster
-  if (is(model, "ClusterMixedData"))
+  if (is(model, "ClusterMixedDataModel"))
   {
     nbComponent <- length(model@lcomponent)
     if(length(data) != nbComponent)
@@ -119,7 +119,23 @@ clusterPredict <- function( data, model, algo = clusterAlgoPredict(), nbCore = 1
   
   # set plkj as array
   if ( is(model,"ClusterCategorical") )
-  { dim(model@component@plkj) <- modelDim } 
+  {
+    nbVariable <- dim(model@component@plkj)[2]
+    dim(model@component@plkj) <- c(model@component@nbModalities, model@nbCluster, nbVariable)
+  }
+  if (is(model, "ClusterMixedDataModel"))
+  {
+    nbComponent <- length(model@lcomponent)
+    for(i in 1:nbComponent)
+    {
+      if (.hasSlot(model@lcomponent[[i]],"plkj"))
+      {
+        nbVariable <- dim(model@lcomponent[[i]]@plkj)[2]
+        modelDim   <- c(model@component@nbModalities, model@nbCluster, nbVariable)
+        dim(model@lcomponent[[i]]@plkj) <- modelDim
+      }
+    }
+  }
   #
   result
 }

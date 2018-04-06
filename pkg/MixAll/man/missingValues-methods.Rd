@@ -3,7 +3,7 @@
 \docType{methods}
 \name{missingValues}
 \alias{missingValues}
-\alias{missingValues,ClusterMixedData-method}
+\alias{missingValues,ClusterMixedDataModel-method}
 \alias{missingValues,ClusterDiagGaussian-method}
 \alias{missingValues,ClusterDiagGaussianComponent-method}
 \alias{missingValues,ClusterDiagGaussian-method}
@@ -14,13 +14,14 @@
 \alias{missingValues,ClusterPoissonComponent-method}
 \alias{missingValues,ClusterPoisson-method}
 \alias{missingValues,ClusterPredict-method}
+\alias{missingValues,ClusterPredictMixedData-method}
 \alias{missingValues,KmmComponent-method}
 \alias{missingValues,KmmModel-method}
 \title{Return the missing values of a component or a cluster class.}
 \usage{
 missingValues(x)
 
-\S4method{missingValues}{ClusterMixedData}(x)
+\S4method{missingValues}{ClusterMixedDataModel}(x)
 
 \S4method{missingValues}{ClusterDiagGaussianComponent}(x)
 
@@ -39,6 +40,8 @@ missingValues(x)
 \S4method{missingValues}{ClusterPoisson}(x)
 
 \S4method{missingValues}{ClusterPredict}(x)
+
+\S4method{missingValues}{ClusterPredictMixedData}(x)
 
 \S4method{missingValues}{KmmComponent}(x)
 

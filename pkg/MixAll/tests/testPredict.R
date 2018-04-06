@@ -19,7 +19,7 @@ testPredict<-function(nbTrain , nbTest)
   )
   model <- clusterCategorical(train1,2,models = "categorical_p_pjk")
   pred  <- clusterPredict(test1,model)
-# more than 5 classification errors is abnormal
+  # more than 5 classification errors is abnormal
   if (abs(sum(pred@zi) - nbTest)>5) return(FALSE)
   
   ##------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ testPredict<-function(nbTrain , nbTest)
   )
   model <- clusterPoisson(train2,2,models = "poisson_p_lk")
   pred  <- clusterPredict(test2,model)
-# more than classification errors is abnormal
+  # more than 5 classification errors is abnormal
   if (abs(sum(pred@zi) - nbTest)>5) return(FALSE)
   
   ##------------------------------------------------------------------------------
@@ -49,7 +49,7 @@ testPredict<-function(nbTrain , nbTest)
   )
   model <- clusterDiagGaussian(train3,2,models = "gaussian_p_s")
   pred  <- clusterPredict(test3,model)
-# more than classification errors is abnormal
+  # more than 5 classification errors is abnormal
   if (abs(sum(pred@zi) - nbTest)>5) return(FALSE)
   
   ##------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ testPredict<-function(nbTrain , nbTest)
   )
   model <- clusterGamma(train4, 2, models = "gamma_p_ak_b")
   pred  <- clusterPredict(test4,model)
-# more than classification errors is abnormal
+  # more than 5 classification errors is abnormal
   if (abs(sum(pred@zi) - nbTest)>5) return(FALSE)
   
   ##------------------------------------------------------------------------------
@@ -72,15 +72,11 @@ testPredict<-function(nbTrain , nbTest)
   train <- list(train1, train2, train3, train4)
   test <- list(test1, test2, test3, test4)
   models <- c("categorical_p_pjk", "poisson_p_lk",  "gaussian_p_s","gamma_p_ak_b")
-  ## train <- list( train2, train3, train4)
-  ## test <- list( test2, test3, test4)
-  ## models <- c( "poisson_p_lk",  "gaussian_p_s","gamma_p_ak_b")
   
   model <- clusterMixedData(train, models, 2)
   pred  <- clusterPredict(test,model)
-# more than classification errors is abnormal
+  # more than 5 classification errors is abnormal
   if (abs(sum(pred@zi) - nbTest)>5) return(FALSE)
-  
   
   ##------------------------------------------------------------------------------
   return(TRUE)  

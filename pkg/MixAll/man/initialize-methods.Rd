@@ -3,7 +3,7 @@
 %   R/ClusterInit.R, R/ClusterStrategy.R, R/IClusterModel.R,
 %   R/ClusterCategorical.R, R/ClusterDiagGaussian.R, R/ClusterGamma.R,
 %   R/ClusterMixedData.R, R/ClusterPoisson.R, R/IClusterPredict.R,
-%   R/ClusterPredict.R, R/LearnAlgo.R, R/kmm.R
+%   R/ClusterPredict.R, R/LearnAlgo.R, R/kmm.R, R/kmmMixedData.R
 \docType{methods}
 \name{initialize,ClusterAlgo-method}
 \alias{initialize,ClusterAlgo-method}
@@ -18,7 +18,7 @@
 \alias{initialize,ClusterDiagGaussian-method}
 \alias{initialize,ClusterGammaComponent-method}
 \alias{initialize,ClusterGamma-method}
-\alias{initialize,ClusterMixedData-method}
+\alias{initialize,ClusterMixedDataModel-method}
 \alias{initialize,ClusterPoissonComponent-method}
 \alias{initialize,ClusterPoisson-method}
 \alias{initialize,IClusterPredict-method}
@@ -27,6 +27,7 @@
 \alias{initialize,LearnAlgo-method}
 \alias{initialize,KmmComponent-method}
 \alias{initialize,KmmModel-method}
+\alias{initialize,KmmMixedDataModel-method}
 \title{Initialize an instance of a MixAll S4 class.}
 \usage{
 \S4method{initialize}{ClusterAlgo}(.Object, algo, nbIteration, epsilon)
@@ -63,7 +64,8 @@
 \S4method{initialize}{ClusterGamma}(.Object, data = matrix(nrow = 0, ncol =
   0), nbCluster = 2, modelName = "gamma_pk_ajk_bjk")
 
-\S4method{initialize}{ClusterMixedData}(.Object, lcomponent, nbCluster = 2)
+\S4method{initialize}{ClusterMixedDataModel}(.Object, lcomponent,
+  nbCluster = 2)
 
 \S4method{initialize}{ClusterPoissonComponent}(.Object, data = matrix(nrow =
   0, ncol = 0), nbCluster = 2, modelName = "poisson_pk_ljk")
@@ -81,12 +83,15 @@
 
 \S4method{initialize}{LearnAlgo}(.Object, algo, nbIteration, epsilon)
 
-\S4method{initialize}{KmmComponent}(.Object, rawData, dim = 10,
-  nbCluster = 2, modelName = "kmm_s")
+\S4method{initialize}{KmmComponent}(.Object, data, dim = 10, nbCluster = 2,
+  modelName = "kmm_pk_s", kernelName = "Gaussian",
+  kernelParameters = c(1), kernelComputation = TRUE)
 
 \S4method{initialize}{KmmModel}(.Object, data, nbCluster = 2,
-  modelName = "kmm_s", dim = 10, kernelName = "Gaussian",
+  modelName = "kmm_pk_s", dim = 10, kernelName = "Gaussian",
   kernelParameters = c(1), kernelComputation = TRUE)
+
+\S4method{initialize}{KmmMixedDataModel}(.Object, lcomponent, nbCluster = 2)
 }
 \description{
 Initialization method of the [\code{\linkS4class{ClusterAlgo}}] class.
@@ -125,7 +130,7 @@ Used internally in the 'MixAll' package.
 Initialization method of the [\code{\linkS4class{ClusterGamma}}] class.
 Used internally in the 'MixAll' package.
 
-Initialization method of the [\code{\linkS4class{ClusterMixedData}}] class.
+Initialization method of the [\code{\linkS4class{ClusterMixedDataModel}}] class.
 Used internally in the 'MixAll' package.
 
 Initialization method of the [\code{\linkS4class{ClusterPoissonComponent}}] class.
@@ -150,6 +155,9 @@ Initialization method of the [\code{\linkS4class{KmmComponent}}] class.
 Used internally in the 'MixAll' package.
 
 Initialization method of the [\code{\linkS4class{KmmModel}}] class.
+Used internally in the 'MixAll' package.
+
+Initialization method of the [\code{\linkS4class{KmmMixedDataModel}}] class.
 Used internally in the 'MixAll' package.
 }
 \keyword{internal}

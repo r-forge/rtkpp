@@ -95,12 +95,14 @@ void MixtureComposer::paramUpdateStep()
 
 void MixtureComposer::writeParameters(std::ostream& os) const
 {
-  os << _T("Composer nbSample = ") << nbSample() << std::endl;
-  os << _T("Composer nbVariable = ") << nbVariable() << std::endl;
-  os << _T("Composer nbCluster = ") << nbCluster() << std::endl;
-  os << _T("Composer nbFreeParameter = ") << nbFreeParameter() << std::endl;
-  os << _T("Composer lnLikelihood = ") << lnLikelihood() << std::endl;
-  os << _T("Composer proportions = ") << pk();
+  os << _T("nbSample = ") << nbSample() << std::endl;
+  os << _T("nbVariable = ") << nbVariable() << std::endl;
+  os << _T("nbCluster = ") << nbCluster() << std::endl;
+  os << _T("nbFreeParameter = ") << nbFreeParameter() << std::endl;
+  os << _T("nbMissingValues = ") << computeNbMissingValues() << std::endl;
+  os << _T("lnLikelihood = ") << lnLikelihood() << std::endl;
+  os << _T("v_mixtures_.size() = ") << v_mixtures_.size() << std::endl;
+  os << _T("proportions = ") << pk();
 
   for (ConstMixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
   {

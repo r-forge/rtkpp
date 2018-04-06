@@ -41,32 +41,32 @@ namespace STK
 /* default constructor
  *  @param nbCluster the number of class of the mixture
  **/
-ModelParameters<Clust::KernelGaussian_s_>::ModelParameters(int nbCluster)
+ModelParameters<Clust::Kmm_s_>::ModelParameters(int nbCluster)
                              : sigma2_(1.), dim_(nbCluster, 10) {}
 /* copy constructor.
  *  @param param the parameters to copy.
  **/
-ModelParameters<Clust::KernelGaussian_s_>::ModelParameters( ModelParameters const& param)
+ModelParameters<Clust::Kmm_s_>::ModelParameters( ModelParameters const& param)
                : sigma2_(param.sigma2_), dim_(param.dim_)
 {}
 /* destructor */
-ModelParameters<Clust::KernelGaussian_s_>::~ModelParameters() {}
+ModelParameters<Clust::Kmm_s_>::~ModelParameters() {}
 
 
 
 /* default constructor
  *  @param nbCluster the number of class of the mixture
  **/
-ModelParameters<Clust::KernelGaussian_sk_>::ModelParameters(int nbCluster)
+ModelParameters<Clust::Kmm_sk_>::ModelParameters(int nbCluster)
                              : sigma2_(nbCluster, 1.), dim_(nbCluster, 10) {}
 /* copy constructor.
  *  @param param the parameters to copy.
  **/
-ModelParameters<Clust::KernelGaussian_sk_>::ModelParameters( ModelParameters const& param)
+ModelParameters<Clust::Kmm_sk_>::ModelParameters( ModelParameters const& param)
                : sigma2_(param.sigma2_), dim_(param.dim_)
 {}
 /* destructor */
-ModelParameters<Clust::KernelGaussian_sk_>::~ModelParameters() {}
+ModelParameters<Clust::Kmm_sk_>::~ModelParameters() {}
 
 
 } // namespace STK

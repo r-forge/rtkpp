@@ -39,36 +39,36 @@
 namespace STK
 {
 /* @ingroup Clustering
- *  Specialization of the ParametersHandler struct for KernelGaussian_s model
+ *  Specialization of the ParametersHandler struct for Kmm_s model
  **/
     /* default constructor. All lambdas are initialized to 1. */
-    ParametersHandler<Clust::KernelGaussian_s_>::ParametersHandler( int nbCluster)
+    ParametersHandler<Clust::Kmm_s_>::ParametersHandler( int nbCluster)
                             : stat_sigma2_(), stat_dim_(nbCluster)
     {}
     /* copy constructor.
      * @param param the parameters to copy.
      **/
-    ParametersHandler<Clust::KernelGaussian_s_>::ParametersHandler( ParametersHandler const& param)
+    ParametersHandler<Clust::Kmm_s_>::ParametersHandler( ParametersHandler const& param)
                             : stat_sigma2_(param.stat_sigma2_), stat_dim_(param.stat_dim_)
     {}
     /* destructor */
-    ParametersHandler<Clust::KernelGaussian_s_>::~ParametersHandler() {}
+    ParametersHandler<Clust::Kmm_s_>::~ParametersHandler() {}
     /* copy operator */
-    ParametersHandler<Clust::KernelGaussian_s_>& ParametersHandler<Clust::KernelGaussian_s_>::operator=( ParametersHandler const& other)
+    ParametersHandler<Clust::Kmm_s_>& ParametersHandler<Clust::Kmm_s_>::operator=( ParametersHandler const& other)
     {
       stat_sigma2_ = other.stat_sigma2_;
       stat_dim_ = other.stat_dim_;
       return *this;
     }
     /* update statistics of the parameters. */
-    void ParametersHandler<Clust::KernelGaussian_s_>::updateStatistics(Parameters const& param)
+    void ParametersHandler<Clust::Kmm_s_>::updateStatistics(Parameters const& param)
     {
       stat_sigma2_.update(param.sigma2_);
       for(int k=stat_dim_.begin(); k<stat_dim_.end(); ++k)
       { stat_dim_[k].update(param.dim_[k]);}
     }
     /* Set the computed statistics */
-    void ParametersHandler<Clust::KernelGaussian_s_>::setStatistics(Parameters& param)
+    void ParametersHandler<Clust::Kmm_s_>::setStatistics(Parameters& param)
     {
       param.sigma2_ = stat_sigma2_.mean();
       stat_sigma2_.release();
@@ -79,7 +79,7 @@ namespace STK
       }
     }
     /* Release the computed statistics */
-    void ParametersHandler<Clust::KernelGaussian_s_>::releaseStatistics()
+    void ParametersHandler<Clust::Kmm_s_>::releaseStatistics()
     {
       stat_sigma2_.release();
       for(int k=stat_dim_.begin(); k<stat_dim_.end(); ++k)
@@ -87,29 +87,29 @@ namespace STK
     }
 
 /* @ingroup Clustering
- *  Specialization of the ParametersHandler struct for KernelGaussian_sk model
+ *  Specialization of the ParametersHandler struct for Kmm_sk model
  **/
     /* default constructor. All lambdas are initialized to 1. */
-    ParametersHandler<Clust::KernelGaussian_sk_>::ParametersHandler( int nbCluster)
+    ParametersHandler<Clust::Kmm_sk_>::ParametersHandler( int nbCluster)
                             : stat_sigma2_(nbCluster), stat_dim_(nbCluster)
     {}
     /* copy constructor.
      * @param param the parameters to copy.
      **/
-    ParametersHandler<Clust::KernelGaussian_sk_>::ParametersHandler( ParametersHandler const& param)
+    ParametersHandler<Clust::Kmm_sk_>::ParametersHandler( ParametersHandler const& param)
                             : stat_sigma2_(param.stat_sigma2_), stat_dim_(param.stat_dim_)
     {}
     /* destructor */
-    ParametersHandler<Clust::KernelGaussian_sk_>::~ParametersHandler() {}
+    ParametersHandler<Clust::Kmm_sk_>::~ParametersHandler() {}
     /* copy operator */
-    ParametersHandler<Clust::KernelGaussian_sk_>& ParametersHandler<Clust::KernelGaussian_sk_>::operator=( ParametersHandler const& other)
+    ParametersHandler<Clust::Kmm_sk_>& ParametersHandler<Clust::Kmm_sk_>::operator=( ParametersHandler const& other)
     {
       stat_sigma2_ = other.stat_sigma2_;
       stat_dim_ = other.stat_dim_;
       return *this;
     }
     /* update statistics of the parameters. */
-    void ParametersHandler<Clust::KernelGaussian_sk_>::updateStatistics(Parameters const& param)
+    void ParametersHandler<Clust::Kmm_sk_>::updateStatistics(Parameters const& param)
     {
       for(int k=stat_sigma2_.begin(); k<stat_sigma2_.end(); ++k)
       { stat_sigma2_[k].update(param.sigma2_[k]);
@@ -117,7 +117,7 @@ namespace STK
       }
     }
     /* Set the computed statistics */
-    void ParametersHandler<Clust::KernelGaussian_sk_>::setStatistics(Parameters& param)
+    void ParametersHandler<Clust::Kmm_sk_>::setStatistics(Parameters& param)
     {
       for(int k=stat_sigma2_.begin(); k<stat_sigma2_.end(); ++k)
       {
@@ -128,7 +128,7 @@ namespace STK
       }
     }
     /* Release the computed statistics */
-    void ParametersHandler<Clust::KernelGaussian_sk_>::releaseStatistics()
+    void ParametersHandler<Clust::Kmm_sk_>::releaseStatistics()
     {
       for(int k=stat_sigma2_.begin(); k<stat_sigma2_.end(); ++k)
       {

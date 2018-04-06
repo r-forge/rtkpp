@@ -28,13 +28,13 @@
  * Author:   Serge Iovleff
  **/
 
-/** @file STK_KernelGaussian_sk.cpp
- *  @brief In this file we implement the KernelGaussian_sk class
+/** @file STK_Kmm_sk.cpp
+ *  @brief In this file we implement the Kmm_sk class
  **/
 
 
 #include <Analysis/include/STK_Const_Math.h>
-#include <Clustering/include/KernelModels/STK_KernelGaussian_sk.h>
+#include <Clustering/include/KernelModels/STK_Kmm_sk.h>
 #include <STatistiK/include/STK_Law_Normal.h>
 #include <STatistiK/include/STK_Stat_Functors.h>
 
@@ -47,46 +47,46 @@ namespace STK
 /* default constructor
  * @param nbCluster number of cluster in the model
  **/
-KernelGaussian_sk::KernelGaussian_sk( int nbCluster): Base(nbCluster) {}
+Kmm_sk::Kmm_sk( int nbCluster): Base(nbCluster) {}
 /* copy constructor
  *  @param model The model to copy
  **/
-KernelGaussian_sk::KernelGaussian_sk( KernelGaussian_sk const& model): Base(model) {}
+Kmm_sk::Kmm_sk( Kmm_sk const& model): Base(model) {}
 /* destructor */
-KernelGaussian_sk::~KernelGaussian_sk() {}
+Kmm_sk::~Kmm_sk() {}
 /* @return the number of free parameters of the model */
-int KernelGaussian_sk::computeNbFreeParameters() const
+int Kmm_sk::computeNbFreeParameters() const
 { return param_.dim_.sum() + this->nbCluster();}
 
 /* @return the value of the probability of the i-th sample in the k-th component.
  *  @param i,k indexes of the sample and of the component
  **/
-Real KernelGaussian_sk::lnComponentProbability(int i, int k) const
+Real Kmm_sk::lnComponentProbability(int i, int k) const
 {
   return(- dik_.elt(i,k)/(2.*param_.sigma2_[k])
          - (std::log(param_.sigma2_[k])+2.*Const::_LNSQRT2PI_)*param_.dim_[k]/2.);
 }
 
 /* Initialize randomly the parameters of the Gaussian mixture. */
-void KernelGaussian_sk::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)
+void Kmm_sk::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)
 {
 #if STK_Kernel_DEBUG | STK_MIXTURE_VERBOSE
-  stk_cout << _T("Entering KernelGaussian_sk::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)\n");
+  stk_cout << _T("Entering Kmm_sk::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)\n");
 #endif
   compute_dik(p_tik, p_tk);
   param_.sigma2_ = sum( dik_.prod(*p_tik) )/ (*p_tk * param_.dim_)
                  + CPointX(p_tik->cols()).rand(Law::Normal(0, 0.05)).abs();
 #ifdef STK_MIXTURE_VERY_VERBOSE
-  stk_cout << _T("KernelGaussian_sk::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) done\n");
+  stk_cout << _T("Kmm_sk::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) done\n");
   stk_cout << param_.sigma2_ << "\n";
 #endif
 }
 
 /* Compute the weighted means and the weighted standard deviations. */
-bool KernelGaussian_sk::run( CArrayXX const*  p_tik, CPointX const* p_tk)
+bool Kmm_sk::run( CArrayXX const*  p_tik, CPointX const* p_tk)
 {
 #if STK_Kernel_DEBUG | STK_MIXTURE_VERBOSE
-  stk_cout << _T("Entering KernelGaussian_sk::run( CArrayXX const*  p_tik, CPointX const* p_tk)\n");
+  stk_cout << _T("Entering Kmm_sk::run( CArrayXX const*  p_tik, CPointX const* p_tk)\n");
 #endif
   compute_dik(p_tik, p_tk);
 #ifdef STK_Kernel_DEBUG
@@ -94,7 +94,7 @@ bool KernelGaussian_sk::run( CArrayXX const*  p_tik, CPointX const* p_tk)
 #endif
   param_.sigma2_ =  Stat::sumByCol( dik_.prod(*p_tik) )/ (*p_tk * param_.dim_);
 #ifdef STK_MIXTURE_VERBOSE
-  stk_cout << _T("KernelGaussian_sk::run( CArrayXX const*  p_tik, CPointX const* p_tk) done\n");
+  stk_cout << _T("Kmm_sk::run( CArrayXX const*  p_tik, CPointX const* p_tk) done\n");
   stk_cout << _T("sigma2 = ") << param_.sigma2_ << "\n";
 #endif
   return true;

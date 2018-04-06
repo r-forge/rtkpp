@@ -41,7 +41,7 @@ Possible values: "BIC", "AIC", "ICL", "ML". Default is "ICL".}
 \item{nbCore}{integer defining the number of processors to use (default is 1, 0 for all).}
 }
 \value{
-An instance of the [\code{\linkS4class{ClusterMixedData}}] class.
+An instance of the [\code{\linkS4class{ClusterMixedDataModel}}] class.
 }
 \description{
 This function learn the optimal mixture model when the class labels are known

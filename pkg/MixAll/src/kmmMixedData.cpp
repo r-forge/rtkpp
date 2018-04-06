@@ -42,12 +42,11 @@
 
 
 /*
- *  @param model ClusterMixedData S4 class
+ *  @param model ClusterMixedDataModel S4 class
  *  @param nbCluster a vector with the number of clusters to test
  *  @param nbCore number of core to use
  */
-extern "C" SEXP kmmMixedData( SEXP model, SEXP nbCluster
-                            , SEXP nbCore  )
+extern "C" SEXP kmmMixedData( SEXP model, SEXP nbCluster, SEXP nbCore  )
 {
   BEGIN_RCPP
 
@@ -57,10 +56,9 @@ extern "C" SEXP kmmMixedData( SEXP model, SEXP nbCluster
   else { omp_set_num_threads(1);}
 #endif
   // create a launcher
-  //STK::ClusterLauncher launcher(model, nbCluster, strategy, critName);
+  STK::KmmLauncher launcher(model, nbCluster);
   // return result
-  //return Rcpp::wrap(launcher.run());
-  return Rcpp::wrap(true);
+  return Rcpp::wrap(launcher.run());
 
   END_RCPP
 }

@@ -28,8 +28,8 @@
  * Author:   iovleff, serge.iovleff@stkpp.org
  **/
 
-/** @file STK_MixtureStrategy.cpp
- *  @brief In this file we implement the strategies for estimating mixture model.
+/** @file STK_IMixtureStrategy.cpp
+ *  @brief In this file we implement the interface base class for estimation strategies
  **/
 
 #include <Clustering/include/MixtureInit/STK_MixtureInit.h>

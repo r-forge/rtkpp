@@ -114,19 +114,20 @@ class KernelHandler: public DataHandlerBase<KernelHandler>
     bool addKernel( std::string const& kernelName
                   , Array const& data
                   , ExprBase<Derived> const& param
-                  , std::string const& idData, std::string const& idModel);
+                  , std::string const& idData
+                  , std::string const& idModel);
     /** get an instance of a kernel from the handler
      * @param idData can be any string given by the user for identifying data.
      * @return @c 0 if the idData has not been found, a pointer to the kernel
      * otherwise
      */
-    Kernel::IKernel* getKernel( std::string const& idData);
+    Kernel::IKernel const* getKernel( std::string const& idData) const;
     /** remove an instance of a kernel to the handler
      *  @param idData can be any string given by the user for identifying data.
      */
     void removeKernel( std::string const& idData);
-    /** utility lookup function allowing to know if some pointer on, a kernl
-     *  is handled.
+    /** utility lookup function allowing to know if some pointer on a kernel
+     *  is handled by the KernelHandler.
      *  @return @c true if the pointed kernel is found, @c false otherwise
      **/
     bool isHandled(Kernel::IKernel* const p_kernel) const;
@@ -144,13 +145,13 @@ template<class Derived, class Array>
 bool KernelHandler::addKernel( std::string const& kernelName
                              , Array const& data
                              , ExprBase<Derived> const& param
-                             , std::string const& idData, std::string const& idModel)
+                             , std::string const& idData
+                             , std::string const& idModel)
 {
   // check if the idData already exists
   Array1D< TaggedKernel >::Iterator it;
   for (it = v_kernel_.beginIterator() ; it!=v_kernel_.endIterator(); ++it)
   { if (it->second == idData) { break;}}
-
   // if idData already exists return false
   if (it != v_kernel_.endIterator()) return false;
 
@@ -180,7 +181,9 @@ bool KernelHandler::addKernel( std::string const& kernelName
     default:
       break;
   }
-  if (!kt) return false;
+  // not an existing kernel
+  if (!p_kernel) return false;
+  // add kernel to
   v_kernel_.push_back(TaggedKernel(p_kernel, idData));
   nbSample_   = p_kernel->nbSample();
   nbVariable_ += p_kernel->nbVariable();

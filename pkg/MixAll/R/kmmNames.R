@@ -24,39 +24,49 @@
 
 #' Create a vector of Kernel mixture model (KMM) names.
 #'
-#' In a Kernel mixture model, we can assume that
+#' In a Kernel mixture model, sssumptions on the proportions
+#' and standard deviations give rise to 4 models:
 #' \enumerate{
-#'  \item {The standard deviations are equal or free for all the clusters.}
+#'  \item {Proportions can be equal or free.}
+#'  \item {Standard deviations are equal or free for all clusters.}
 #' }
-#' This give rise to two models.
-#'
+#' 
 #' The model names are summarized in the following array:
-#' \tabular{ll}{
-#'  Model Name  \tab standard deviation between clusters \cr
-#'  kmm_sk      \tab Free                                \cr
-#'  kmm_s       \tab Equal                               \cr
+#' \tabular{lll}{
+#'  Model Name  \tab Proportions   \tab s. d. between clusters \cr
+#'  kmm_p_sk    \tab equal         \tab Free                   \cr
+#'  kmm_p_s     \tab equal         \tab Equal                  \cr
+#'  kmm_pk_sk   \tab equal         \tab Free                   \cr
+#'  kmm_pk_s    \tab equal         \tab Equal                  \cr
 #' }
 #'
+#' @param prop A character string equal to "equal", "free" or "all". Default is "all".
 #' @param sdBetweenCluster A character string equal to "equal", "free" or "all". Default is "all".
 #'
 #' @return A vector of character with the model names.
 #' @examples
 #' kmmNames()
-#' ## same as c("kmm_sk")
-#' kmmNames( sdBetweenCluster= "free")
+#' ## same as c("kmm_p_sk")
+#' kmmNames( prop = "equal", sdBetweenCluster= "free")
 #'
 #' @rdname kmmNames
 #'
-kmmNames <- function( sdBetweenCluster = "all")
+kmmNames <- function( prop = "all", sdBetweenCluster = "all")
 {
+  if(sum(prop %in% c("equal","free","all")) != 1)
+  { stop("prop is not valid. See ?clusterDiagGaussianNames for the list of prop.")}
   if(sum(sdBetweenCluster %in% c("equal","free","all")) != 1)
   { stop("sdBetweenCluster is not valid. See ?kmmNames for the list of sdBetweenCluster.")}
 
-  all = c( "kmm_sk", "kmm_s")
-  sdFree   = c( "kmm_sk")
-  sdEqual  = c( "kmm_s")
-
+  all = c( "kmm_p_sk", "kmm_p_s",  "kmm_pk_sk", "kmm_pk_s")
+  propFree  = c( "kmm_pk_sk", "kmm_pk_s")
+  propEqual = c( "kmm_p_sk", "kmm_p_s")
+  sdFree    = c( "kmm_p_sk",  "kmm_pk_sk")
+  sdEqual   = c( "kmm_p_s",  "kmm_pk_s")
+  
   res = all;
+  if (prop == "free")  { res = intersect(res, propFree);}
+  if (prop == "equal") { res = intersect(res, propEqual);}
   if (sdBetweenCluster =="free")  { res = intersect(res, sdFree);}
   if (sdBetweenCluster =="equal") { res = intersect(res, sdEqual);}
 
@@ -74,7 +84,7 @@ kmmValidModelNames <- function(names)
 
   all = kmmNames()
   for (i in 1:nb)
-  { if ( sum(names[i] %in% all) != 1 ) { return(FALSE);}}
+  { if ( sum(names[i] %in% all) != 1 ) { return(FALSE)}}
   return(TRUE)
 }
 
@@ -83,7 +93,7 @@ kmmValidModelNames <- function(names)
 kmmValidKernelNames <- function(names)
 {
   nb = length(names)
-  if ( nb == 0 ) { return(FALSE);}
+  if ( nb == 0 ) { return(FALSE)}
     
   all = c("GAUSSIAN","POLYNOMIAL", "LAPLACE","LINEAR","RATIONALQUADRATIC","HAMMING")
   for (i in 1:nb)

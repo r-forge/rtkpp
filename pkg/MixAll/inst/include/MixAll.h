@@ -46,7 +46,7 @@ extern "C"
  *  @param nbCore number of core to use
  */
 SEXP clusterMixture( SEXP model, SEXP nbCluster, SEXP models, SEXP nbCore);
-/** @param model ClusterMixedData S4 class
+/** @param model ClusterMixedDataModel S4 class
  *  @param nbCluster a vector with the number of clusters to test
  *  @param nbCore number of core to use
  */
@@ -63,11 +63,10 @@ SEXP clusterPredict( SEXP model, SEXP result, SEXP nbCore );
  *  @param model a Kmm S4 class
  *  @param nbCluster a vector with the number of clusters to test
  *  @param models a vector of string with the model names to try
- *  @param prop estimate model with equal, free proportions, or both ?
  *  @param critName selection model criteria (string)
  *  @param nbCore number of core to use
  */
-SEXP kmm( SEXP model, SEXP nbCluster, SEXP models, SEXP prop, SEXP nbCore );
+SEXP kmm( SEXP model, SEXP nbCluster, SEXP models, SEXP nbCore );
 /** estimate the kernel mixture model for mixed data
  *  @param model a Kmm S4 class
  *  @param nbCluster a vector with the number of clusters to test
@@ -88,7 +87,7 @@ SEXP computeGramMatrix( SEXP component, SEXP kernelName, SEXP kernelParameters);
  *  @param nbCore number of core to use
  */
 SEXP learnMixture( SEXP model, SEXP models, SEXP algo, SEXP nbCore);
-/** @param model ClusterMixedData S4 class
+/** @param model ClusterMixedDataModel S4 class
  *  @param algo estimation strategy S4 class
  *  @param critName selection model criteria (string)
  *  @param nbCore number of core to use

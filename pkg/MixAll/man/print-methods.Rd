@@ -3,7 +3,7 @@
 %   R/ClusterInit.R, R/ClusterStrategy.R, R/IClusterModel.R, R/global.R,
 %   R/ClusterCategorical.R, R/ClusterDiagGaussian.R, R/ClusterGamma.R,
 %   R/ClusterMixedData.R, R/ClusterPoisson.R, R/IClusterPredict.R,
-%   R/ClusterPredict.R, R/LearnAlgo.R, R/kmm.R
+%   R/ClusterPredict.R, R/LearnAlgo.R, R/kmm.R, R/kmmMixedData.R
 \docType{methods}
 \name{print,ClusterAlgo-method}
 \alias{print,ClusterAlgo-method}
@@ -34,7 +34,7 @@
 \alias{print}
 \alias{print,ClusterGamma-method}
 \alias{print}
-\alias{print,ClusterMixedData-method}
+\alias{print,ClusterMixedDataModel-method}
 \alias{print}
 \alias{print,ClusterPoissonComponent-method}
 \alias{print}
@@ -52,6 +52,8 @@
 \alias{print,KmmComponent-method}
 \alias{print}
 \alias{print,KmmModel-method}
+\alias{print}
+\alias{print,KmmMixedDataModel-method}
 \alias{print}
 \title{Print a MixAll S4 class to standard output.}
 \usage{
@@ -79,7 +81,7 @@
 
 \S4method{print}{ClusterGamma}(x, ...)
 
-\S4method{print}{ClusterMixedData}(x, ...)
+\S4method{print}{ClusterMixedDataModel}(x, ...)
 
 \S4method{print}{ClusterPoissonComponent}(x, k, ...)
 
@@ -96,6 +98,8 @@
 \S4method{print}{KmmComponent}(x, k, ...)
 
 \S4method{print}{KmmModel}(x, ...)
+
+\S4method{print}{KmmMixedDataModel}(x, ...)
 }
 \arguments{
 \item{x}{a MixAll object: a \code{\linkS4class{ClusterStrategy}},

@@ -52,6 +52,7 @@ ILauncher::ILauncher( Rcpp::S4 model, Rcpp::CharacterVector models)
                     , poissonManager_(handler_)
                     , gammaManager_(handler_)
                     , categoricalManager_(handler_)
+                    , kernelManager_(kerHandler_)
 {}
 /* facade design pattern.
  * The ILauncher allow to create the strategy for estimating a mixture model
@@ -65,7 +66,9 @@ ILauncher::ILauncher( Rcpp::S4 model)
                     , poissonManager_(handler_)
                     , gammaManager_(handler_)
                     , categoricalManager_(handler_)
+                    , kernelManager_(kerHandler_)
 {}
+
 /* destructor. */
 ILauncher::~ILauncher()
 {}
@@ -119,7 +122,8 @@ void ILauncher::getParameters(IMixtureStatModel* p_model, std::string const& idD
     case Clust::Categorical_:
       setCategoricalParametersToComponent(p_model, categoricalManager_, idData, s4_component);
       break;
-    case Clust::Kernel_:
+    case Clust::Kmm_:
+      setKernelParametersToComponent(p_model, kernelManager_, idData, s4_component);
       break;
     case Clust::unknown_mixture_class_:
       break;

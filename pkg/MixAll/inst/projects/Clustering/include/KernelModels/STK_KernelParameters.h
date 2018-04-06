@@ -45,10 +45,10 @@
 namespace STK
 {
 /** @ingroup Clustering
- *  Structure encapsulating the parameters of a KernelGaussian_s model.
+ *  Structure encapsulating the parameters of a Kmm_s model.
  */
 template<>
-struct ModelParameters<Clust::KernelGaussian_s_>
+struct ModelParameters<Clust::Kmm_s_>
 {
     /** variance of the variables */
     Real sigma2_;
@@ -86,10 +86,10 @@ struct ModelParameters<Clust::KernelGaussian_s_>
 };
 
 /** @ingroup Clustering
- *  Structure encapsulating the parameters of a KernelGaussian_sk model.
+ *  Structure encapsulating the parameters of a Kmm_sk model.
  */
 template<>
-struct ModelParameters<Clust::KernelGaussian_sk_>
+struct ModelParameters<Clust::Kmm_sk_>
 {
     /** variance of the variables */
     CPointX sigma2_;

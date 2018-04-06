@@ -25,6 +25,7 @@ export(clusterAlgo
       ,kmmValidKernelNames
       ,kmmStrategy
       ,kmm
+      ,kmmMixedData
       ,learnDiagGaussian
       ,learnGamma
       ,learnPoisson
@@ -47,12 +48,13 @@ exportClasses(ClusterAlgo
              ,ClusterCategorical
              ,ClusterPoissonComponent
              ,ClusterPoisson
-             ,ClusterMixedData
+             ,ClusterMixedDataModel
              ,IClusterPredict
              ,ClusterPredict
              ,ClusterPredictMixedData
              ,KmmComponent
              ,KmmModel
+             ,KmmMixedDataModel
              )
 
 exportMethods(print)

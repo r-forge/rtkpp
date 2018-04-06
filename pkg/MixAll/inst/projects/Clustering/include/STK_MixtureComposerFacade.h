@@ -55,6 +55,7 @@ class MixtureComposerFacade
   public:
     /** pointer on the main p_composer */
     IMixtureComposer* p_composer_;
+
     /** data handler for model based mixture models */
     DataHandler_ handler_;
     /** handler for kernel mixture models */
@@ -78,7 +79,7 @@ class MixtureComposerFacade
     /** @return DiagGaussian mixtures  manager*/
     DiagGaussianMixtureManager<DataHandler_> const& diagGaussianManager() const
     { return diagGaussianManager_;}
-    /** @returnPoisson mixture models manager */
+    /** @return Poisson mixture models manager */
     PoissonMixtureManager<DataHandler_> const& poissonManager() const
     { return poissonManager_;}
     /** gamma mixture models manager */
@@ -142,6 +143,9 @@ class MixtureComposerFacade
     template<class RowVector>
     void setProportions( RowVector const& pk);
 
+    /** Kernel Mixture Manager */
+    KernelMixtureManager kmmManager_;
+
   protected:
     /** diagonal Gaussian mixture models manager */
     DiagGaussianMixtureManager<DataHandler_> diagGaussianManager_;
@@ -151,8 +155,6 @@ class MixtureComposerFacade
     GammaMixtureManager<DataHandler_> gammaManager_;
     /** categorical mixture models manager */
     CategoricalMixtureManager<DataHandler_> categoricalManager_;
-    /** Kernel Mixture Manager */
-    KernelMixtureManager kmmManager_;
 };
 
 /* create the mixtures in the given learner */
@@ -201,7 +203,7 @@ bool MixtureComposerFacade<DataHandler_>::getParameters( std::string const& idDa
       getCategoricalParameters( idData, param);
       return true;
       break;
-    case Clust::Kernel_:
+    case Clust::Kmm_:
       getKmmParameters( idData, param);
       return true;
       break;
@@ -249,7 +251,7 @@ bool MixtureComposerFacade<DataHandler_>::setParameters( std::string const& idDa
         setCategoricalParameters( idData, param);
         return true;
         break;
-      case Clust::Kernel_:
+      case Clust::Kmm_:
         setKmmParameters( idData, param);
         return true;
         break;

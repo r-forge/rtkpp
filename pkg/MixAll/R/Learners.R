@@ -280,7 +280,7 @@ learnCategorical <- function( data, labels, prop = NULL
 #' plot(model)
 #' }
 #'
-#' @return An instance of the [\code{\linkS4class{ClusterMixedData}}] class.
+#' @return An instance of the [\code{\linkS4class{ClusterMixedDataModel}}] class.
 #' @author Serge Iovleff
 #'
 #'
@@ -332,7 +332,7 @@ learnMixedData <- function( data, models, labels, prop = NULL
     } # else categorical
   } # for i
   # create model
-  model = .createMixtureModel("ClusterMixedData", lcomponent, labels, prop)
+  model = .createMixtureModel("ClusterMixedDataModel", lcomponent, labels, prop)
   model@criterionName = criterion
   # Create algorithm
   algo = learnAlgo( algo, nbIter, epsilon)

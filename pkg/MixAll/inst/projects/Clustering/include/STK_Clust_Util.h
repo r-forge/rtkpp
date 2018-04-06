@@ -335,8 +335,8 @@ enum Mixture
   Poisson_ljk_ = 60,
   Poisson_lk_,
   Poisson_ljlk_,
-  KernelGaussian_sk_ = 80,
-  KernelGaussian_s_,
+  Kmm_sk_ = 80,
+  Kmm_s_,
   unknown_mixture_ = -1
 };
 
@@ -382,8 +382,8 @@ enum Mixture
  * <tr> <td> "HDGaussian_aj_bk_q_dk"   </td></tr>
  * <tr> <td> "HDGaussian_aj_bk_q_d"    </td></tr>
  * <tr> <td> "HDGaussian_aj_b_qk_dk"   </td></tr>
- * <tr> <td> "HDGaussian_aj_b_qk_d"   </td></tr>
- * <tr> <td> "HDGaussian_a_bk_qk_dk"  </td></tr>
+ * <tr> <td> "HDGaussian_aj_b_qk_d"    </td></tr>
+ * <tr> <td> "HDGaussian_a_bk_qk_dk"   </td></tr>
  * <tr> <td> "HDGaussian_a_bk_qk_d" </td></tr>
  * <tr> <td> "HDGaussian_a_bk_q_dk" </td></tr>
  * <tr> <td> "HDGaussian_a_bk_q_d," </td></tr>
@@ -394,8 +394,8 @@ enum Mixture
  * <tr> <td> "Poisson_ljk"          </td></tr>
  * <tr> <td> "Poisson_lk"           </td></tr>
  * <tr> <td> "Poisson_ljlk"         </td></tr>
- * <tr> <td> "KernelGaussian_sk"    </td></tr>
- * <tr> <td> "KernelGaussian_s"     </td></tr>
+ * <tr> <td> "Kmm_sk"               </td></tr>
+ * <tr> <td> "Kmm_s"                </td></tr>
  * </table>
  *  @param type the String we want to convert
  *  @return the Mixture represented by the String @c type. if the string
@@ -453,13 +453,13 @@ Mixture stringToMixture( std::string const& type);
  * <tr> <td> "HDGaussian_pk_a_bk_q_d,"    </td><td> "HDGaussian_p_a_bk_q_d,"    </td></tr>
  * <tr> <td> "HDGaussian_pk_a_b_qk_dk"    </td><td> "HDGaussian_p_a_b_qk_dk"    </td></tr>
  * <tr> <td> "HDGaussian_pk_a_b_qk_d"     </td><td> "HDGaussian_p_a_b_qk_d"     </td></tr>
- * <tr> <td> "Categorical_pk_pjk" </td><td> "Categorical_p_pjk" </td> </tr>
- * <tr> <td> "Categorical_pk_pk"  </td><td> "Categorical_p_pk"  </td> </tr>
- * <tr> <td> "Poisson_pk_ljk"     </td><td> "Poisson_p_ljk"     </td> </tr>
- * <tr> <td> "Poisson_pk_lk"      </td><td> "Poisson_p_lk"      </td> </tr>
- * <tr> <td> "Poisson_pk_ljlk"    </td><td> "Poisson_p_ljlk"    </td> </tr>
- * <tr> <td> "KernelGaussian_pk_sk" </td><td> "KernelGaussian_p_sk"    </td> </tr>
- * <tr> <td> "KernelGaussian_pk_s" </td><td> "KernelGaussian_p_s"    </td> </tr>
+ * <tr> <td> "Categorical_pk_pjk"  </td><td> "Categorical_p_pjk" </td> </tr>
+ * <tr> <td> "Categorical_pk_pk"   </td><td> "Categorical_p_pk"  </td> </tr>
+ * <tr> <td> "Poisson_pk_ljk"      </td><td> "Poisson_p_ljk"     </td> </tr>
+ * <tr> <td> "Poisson_pk_lk"       </td><td> "Poisson_p_lk"      </td> </tr>
+ * <tr> <td> "Poisson_pk_ljlk"     </td><td> "Poisson_p_ljlk"    </td> </tr>
+ * <tr> <td> "Kmm_pk_sk"           </td><td> "Kmm_p_sk"    </td> </tr>
+ * <tr> <td> "Kmm_pk_s"            </td><td> "Kmm_p_s"    </td> </tr>
  * </table>
  *  @param type the String we want to convert
  *  @param[out] freeProp @c true if the model have free proportions, @c false otherwise.
@@ -495,7 +495,7 @@ enum MixtureClass
   HDGaussian_,
   Categorical_,
   Poisson_,
-  Kernel_,
+  Kmm_,
   unknown_mixture_class_ = -1
 };
 

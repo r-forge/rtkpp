@@ -89,7 +89,7 @@ bool ClusterPredictor::run()
   s4_clusterPredict_.slot("zi")  = Rcpp::wrap(facade_.p_composer_->zi());
 
   Rcpp::NumericVector fi = s4_clusterPredict_.slot("lnFi");
-  Rcpp::NumericVector zi = s4_clusterPredict_.slot("zi");
+  Rcpp::IntegerVector zi = s4_clusterPredict_.slot("zi");
   for (int i=0; i< fi.length(); ++i)
   {
     fi[i] = facade_.p_composer_->computeLnLikelihood(i);

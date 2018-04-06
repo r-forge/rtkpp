@@ -129,19 +129,17 @@ kmmStrategy <- function( nbTry =1
 #' @param dim integer giving the dimension of the Gaussian density. Default is 10.
 #' @param nbCluster  [\code{\link{vector}}] listing the number of clusters to test.
 #' @param models [\code{\link{vector}}] of model names to run. By default only
-#' "kmm_s" is estimated. All the model names are given by the method
+#' "kmm_pk_s" is estimated. All the model names are given by the method
 #' [\code{\link{kmmNames}}].
-#' @param prop character defining if the proportions of the mixture are equals or
-#' to be estimated. Possible values: "free", "equal", "all". Default is "free".
 #' @param kernelName string with a kernel name. Possible values:
 #' "Gaussian", "polynomial", "Laplace", "linear", "rationalQuadratic_", "Hamming".
 #' Default is "Gaussian".
 #' @param kernelParameters [\code{\link{vector}}] with the parameters of
-#' the chosen kernel. Default is 1.
-#' @param kernelComputation [\code{\link{logical}}] parameter. Should be \code{TRUE} if
-#' the Gram matrix is to be pre-computed (faster but can be memory consuming), \code{FALSE}
-#' otherwise (times consuming). Default is \code{TRUE}. The computed Gram matrix is a
-#' square matrix of size nbSample.
+#' the chosen kernel. Default is c(1).
+#' @param kernelComputation [\code{\link{logical}}] parameter. Should be \code{TRUE}
+#' if the Gram matrix is to be computed (faster but can be memory consuming), \code{FALSE}
+#' otherwise (times consuming). Default is \code{TRUE}. Recall that Gram matrix
+#' is a square matrix of size nbSample.
 #' @param strategy a [\code{\linkS4class{ClusterStrategy}}] object containing
 #' the strategy to run. [\code{\link{kmmStrategy}}]() method by default.
 #' @param criterion character defining the criterion to select the best model.
@@ -150,11 +148,12 @@ kmmStrategy <- function( nbTry =1
 #' @param nbCore integer defining the number of processor to use (default is 1, 0 for all).
 #'
 #' @note in the KmmModel instance returned by the function, data is the Gram matrix.
+#' 
 #' @examples
 #' ## A quantitative example with the famous bulls eye model
 #' data(bullsEye)
 #' ## estimate model
-#' model <- kmm( data=bullsEye[,1:2], nbCluster=2:3, models= "kmm_s")
+#' model <- kmm( data=bullsEye, nbCluster=2:3, models= "kmm_pk_s")
 #'
 #' ## use graphics functions
 #' \dontrun{
@@ -173,47 +172,39 @@ kmmStrategy <- function( nbTry =1
 #'
 #'
 kmm <- function( data, nbCluster=2
-               , dim = 10, models = "kmm_s", prop = "free"
+               , dim = 10, models = "kmm_pk_s"
                , kernelName = "Gaussian", kernelParameters = c(1), kernelComputation = TRUE
                , strategy=kmmStrategy()
                , criterion="ICL"
                , nbCore = 1)
 {
-  # check nbCluster
-  if (length(nbCluster) == 0)
-  { stop("You must give at least one number of clusters")}
-  nbClusterMin = min(nbCluster);
-  nbClusterMax = max(nbCluster);
-  if (nbClusterMin < 1)
-  { stop("The number of clusters must be greater or equal to 1")}
-  
   # check data
   if (missing(data)) { stop("data is mandatory in kmm")}
   data <- as.matrix(data)
   if (ncol(data) < 1) { stop("Error: empty data set")}
+  
+  # check nbCluster
+  if (length(nbCluster) == 0) { stop("You must give at least one number of clusters")}
+  nbClusterMin = min(nbCluster);
+  nbClusterMax = max(nbCluster);
+  if (nbClusterMin < 1) { stop("The number of clusters must be greater or equal to 1")}  
   if (nrow(data) <= 3*nbClusterMax)
   { stop("There is too much clusters or not enough individuals in the data set")}
   
   # check dim
-  if (dim < 1)
-  { stop("The dimension must be greater or equal to 1")}
+  if (dim < 1) { stop("dim must be greater or equal to 1")}
   
   # check criterion
   criterion = toupper(criterion)
   if(sum(criterion %in% c("BIC","AIC", "ICL", "ML")) != 1)
   { stop("criterion is not valid. See ?kmm for the list of valid criterion")}
   
-  # check proportions
-  if(sum(prop %in% c("free","equal", "all")) != 1)
-  { stop("prop is not valid. See ?kmm for the list of valid criterion")}
-  
   # check model names
   if (!kmmValidModelNames(models))
   { stop("models is not valid. See ?kmmNames for the list of valid model names")}
   
   # check kernelName
-  kernelName = toupper(kernelName)
-  if(sum(kernelName %in% c("GAUSSIAN","POLYNOMIAL", "LAPLACE","LINEAR","RATIONALQUADRATIC","HAMMING")) != 1)
+  if (!kmmValidKernelNames(kernelName))
   { stop("kernelName is not valid. See ?kmm for the list of valid kernel name")}
   if (is.null(kernelParameters)) { kernelParameters = c(1)}
  
@@ -227,13 +218,15 @@ kmm <- function( data, nbCluster=2
   validObject(strategy);
 
   # Create model
-  model = new("KmmModel", data, nbCluster[1], models[1], dim, kernelName, kernelParameters, kernelComputation)
+  model = new( "KmmModel", data
+             , dim=dim
+             , kernelName = kernelName, kernelParameters = kernelParameters, kernelComputation=kernelComputation)
   model@strategy = strategy;
   model@criterionName = criterion;
   
   # start estimation of the models
   resFlag <- FALSE
-  resFlag = .Call("kmm", model, nbCluster, models, prop, nbCore, PACKAGE="MixAll")
+  resFlag = .Call("kmm", model, nbCluster, models, nbCore, PACKAGE="MixAll")
   if (resFlag != TRUE )
   { 
     msg_error <- model@msg_error
@@ -251,7 +244,13 @@ kmm <- function( data, nbCluster=2
 #'
 #' @slot dim    Vector with the dimension of the kth cluster
 #' @slot sigma2 Vector with the standard deviation in the kth cluster.
-#' @slot gram   Matrix storing the gram matrix is its computation is needed.
+#' @slot gram   Matrix storing the gram matrix is its computation is needed
+#' @slot kernelName string with the name of the kernel to use. Possible values:
+#' "Gaussian", "polynomial", "Laplace", "linear","rationalQuadratic", "Hamming".
+#' Default is "Gaussian".
+#' @slot kernelParameters vector with the parameters of the kernel.
+#' @slot kernelComputation boolean value set as \code{TRUE} if Gram matrix is to be computed
+#' \code{FALSE} othewise. Default is \code{TRUE}.
 #'
 #' @seealso [\code{\linkS4class{IClusterComponent}}] class
 #'
@@ -266,14 +265,23 @@ kmm <- function( data, nbCluster=2
 #'
 setClass(
   Class = "KmmComponent",
-  representation( sigma2 = "vector", dim = "vector", gram = "matrix"),
+  representation( sigma2 = "vector"
+                , dim = "vector"
+                , kernelName = "character"
+                , kernelParameters = "vector"
+                , kernelComputation = "logical"
+                , gram = "matrix"),
   contains=c("IClusterComponent"),
   validity=function(object)
   {
     if ( length(object@sigma2) == 0) { stop("sigma2 must be a vector of length > 0.")}
     if ( length(object@dim)    == 0) { stop("dim must be a vector of length > 0")}
+    
     if (!kmmValidModelNames(object@modelName))
-    {stop(paste("Invalid kernel mixture model name:", object@modelName,". See ?KmmModel for the list of valid kernel name",sep=""))}
+    {stop(paste("Invalid model name: ", object@modelName,". See ?KmmModel for the list of valid model name",sep=""))}
+    if (!kmmValidKernelNames(object@kernelName))
+    { stop(paste("kernelName is not valid: ",object@kernelName,". See ?KmmModel for the list of valid kernel name",sep=""))}
+    
     return(TRUE)
   }
 )
@@ -287,22 +295,71 @@ setClass(
 setMethod(
     f="initialize",
     signature=c("KmmComponent"),
-    definition=function( .Object, rawData, dim =10, nbCluster=2, modelName="kmm_s")
+    definition=function( .Object, data, dim =10
+                       , nbCluster=2
+                       , modelName="kmm_pk_s"
+                       , kernelName = "Gaussian"
+                       , kernelParameters = c(1)
+                       , kernelComputation=TRUE
+                       )
     {
       # check data
-      if(missing(rawData)) { stop("rawData is mandatory in KmmComponent"); }
-      # check model name
-      if(is.null(modelName)) { modelName="kmm_s";}
+      if(missing(data)) { stop("data is mandatory in KmmComponent"); }
+      
+      # check dim
+      if(is.null(dim)) { dim = 10}
       else
-      { if(!kmmValidModelNames(modelName)) { stop("modelName is invalid");} }
-      # for dim
-      if(is.null(dim)) { dim = 10; }
-      # call base class initialize (use rawData as data)
-      .Object <- callNextMethod(.Object, rawData, modelName)
+      {
+        if (length(dim) != 1)
+        { stop("dim must be of length 1")}
+      }
+      .Object@dim = rep(dim, nbCluster)
+      
+      # check model name
+      if(is.null(modelName)) { modelName="kmm_pk_s"}
+      else
+      {
+        if (length(modelName) != 1)
+        { stop("modelName must be of length 1.")}
+        if(!kmmValidModelNames(modelName))
+        { stop("modelName is invalid. See ?kmmNames for the list of valid model name");}
+      }
+      
+      # check kernelName
+      if(is.null(kernelName)) { kernelName="Gaussian"}
+      else
+      {
+        if (length(kernelName) != 1)
+        { stop("kernelName must be of length 1.")}
+        if (!kmmValidKernelNames(kernelName))
+        { stop(paste("kernelName is not valid: ",kernelName,". See ?KmmNames for the list of valid kernel name",sep=""))}
+      }
+      .Object@kernelName <- kernelName
+      
+      # check kernelParameters
+      if (is.null(kernelParameters)) { kernelParameters = c(1);}
+      else
+      {
+        if (length(kernelParameters) < 1)
+        { stop("kernelParameters must be at least of length 1.")}
+      }
+      .Object@kernelParameters <- kernelParameters;
+      
+      # check kernelComputation
+      if(is.null(kernelComputation)) { kernelComputation=TRUE}
+      else
+      {
+        if (!is.logical(kernelComputation))
+        { stop("kernelComputation must be boolean");}
+      }
+      .Object@kernelComputation <- kernelComputation;
+      
       # create slots
       .Object@sigma2   = rep(1., nbCluster)
-      .Object@dim      = rep(dim, nbCluster)
       .Object@gram     = matrix(nrow=0, ncol=0)
+      
+      # call base class initialize (use data as data)
+      .Object <- callNextMethod(.Object, data, modelName)
       # validate
       validObject(.Object)
       return(.Object)
@@ -319,7 +376,7 @@ setMethod(
       if ( missing(j) )
       {
         switch(EXPR=i,
-            "sigma2"  = {return(x@sigma2)},
+            "sigma2" = {return(x@sigma2)},
             "dim"    = {return(x@dim)},
             stop("This attribute doesn't exist !")
         )
@@ -379,12 +436,6 @@ setMethod(
 #'
 #' @slot component  A [\code{\linkS4class{KmmComponent}}] with the
 #' dimension and standard deviation of the kernel mixture model.
-#' @slot kernelName string with the name of the kernel to use. Possible values:
-#' "Gaussian", "polynomial", "Laplace", "linear","rationalQuadratic", "Hamming".
-#' Default is "Gaussian".
-#' @slot kernelParameters vector with the parameters of the kernel.
-#' @slot kernelComputation boolean value set as \code{TRUE} if Gram matrix is to be computed
-#' \code{FALSE} othewise. Default is \code{TRUE}.
 #' @seealso [\code{\linkS4class{IClusterModel}}] class
 #'
 #' @examples
@@ -400,11 +451,7 @@ setMethod(
 #'
 setClass(
   Class = "KmmModel",
-  representation( component = "KmmComponent"
-                , kernelName = "character"
-                , kernelParameters = "vector"
-                , kernelComputation = "logical"
-                ),
+  representation( component = "KmmComponent"),
   contains=c("IClusterModel"),
   validity=function(object)
   {
@@ -412,13 +459,15 @@ setClass(
     {stop("dim must have nbCluster length.")}
     if (length(object@component@sigma2)!=object@nbCluster)
     {stop("sigma2 must have nbCluster length.")}
+    
     if (!kmmValidModelNames(object@component@modelName))
     {stop(paste("Invalid kernel mixture model name:", object@component@modelName,". See ?KmmModel for the list of valid kernel name",sep=""))}
+    
     # check kernelName
-    if (length(object@kernelName) != 1)
+    if (length(object@component@kernelName) != 1)
     { stop("kernelName must be of length 1. See ?KmmModel for the list of valid kernel name")}
-    if (!kmmValidKernelNames(object@kernelName))
-    { stop(paste("kernelName is not valid",object@kernelName,". See ?KmmModel for the list of valid kernel name",sep=""))}
+    if (!kmmValidKernelNames(object@component@kernelName))
+    { stop(paste("kernelName is not valid",object@component@kernelName,". See ?KmmModel for the list of valid kernel name",sep=""))}
     return(TRUE)
   }
 )
@@ -434,21 +483,24 @@ setMethod(
     f="initialize",
     signature=c("KmmModel"),
     definition=function(.Object, data, nbCluster=2
-                       , modelName = "kmm_s", dim= 10
+                       , modelName = "kmm_pk_s", dim= 10
                        , kernelName = "Gaussian"
                        , kernelParameters = c(1)
                        , kernelComputation=TRUE
                        )
     {
-      # for data
+      # check data
       if(missing(data)) {stop("data is mandatory in KmmModel.")}
-      # initialize fields
-      .Object@kernelName <- kernelName;
-      if (is.null(kernelParameters)) {.Object@kernelParameters = c(1);}
-      else                           {.Object@kernelParameters = kernelParameters;}
-      .Object@kernelComputation <- kernelComputation;
+      
+      # check model name
+      if(is.null(modelName)) { modelName="kmm_pk_s";}
+      else
+      { if(!kmmValidModelNames(modelName)) { stop("modelName is invalid");} }
+            
       # initialize component
-      .Object@component = new("KmmComponent", data, dim, nbCluster, modelName);
+      .Object@component = new( "KmmComponent", data, dim, nbCluster
+                             , modelName
+                             , kernelName, kernelParameters, kernelComputation);
       .Object <- callNextMethod(.Object, nrow(data), nbCluster);
       # validate
       validObject(.Object);
@@ -465,6 +517,8 @@ setMethod(
   function(x,...){
     cat("****************************************\n")
     callNextMethod();
+    cat("* KernelName = ", x@component@kernelName, "\n")
+    cat("* KernelParameters = ", format(x@component@kernelParameters), "\n")
     cat("****************************************\n")
     for(k in 1:length(x@pk))
     {
@@ -486,6 +540,8 @@ setMethod(
     cat("****************************************\n")
     callNextMethod();
     show(object@component);
+    cat("* KernelName = ", object@component@kernelName, "\n")
+    cat("* KernelParameters = ", format(object@component@kernelParameters), "\n")
     cat("****************************************\n")
     for(k in 1:length(object@pk))
     {
@@ -505,10 +561,11 @@ setMethod(
   signature=c("KmmModel"),
   function(object, ...)
   {
-    cat("**************************************************************\n")
+    cat("****************************************\n")
     callNextMethod()
+    cat("* KernelName     = ", object@component@kernelName, "\n")
     summary(object@component);
-    cat("**************************************************************\n")
+    cat("****************************************\n")
   }
 )
 
@@ -532,10 +589,7 @@ setMethod(
 #' \dontrun{
 #'  ## the bull eyes data set
 #'   data(bullsEye)
-#'   model <- kmm( bullsEye[,1:2]
-#'                         , 2
-#'                         , models= "kmm_s"
-#'                         )
+#'   model <- kmm( bullsEye, 2, models= "kmm_pk_s")
 #'   plot(model)
 #'   }
 #'
@@ -545,7 +599,8 @@ setMethod(
     function(x, y, ...)
     {
       # total number of variable in the data set
-      nbVariable = ncol(x@component@rawData);
+      data = x@component@data
+      nbVariable = ncol(data);
       # no y => display all variables
       if (missing(y)) { y=1:nbVariable; }
       else # perform some check
@@ -557,12 +612,12 @@ setMethod(
         }
         else # names of the variables to plot are given
         {
-          if ( sum(y %in% colnames(x@component@rawData)) != length(y) )
-          { stop(cat("In plot, unknown variables: ", paste(y[which(!(y %in% colnames(x@rawData)))]),"\n"))}
+          if ( sum(y %in% colnames(data)) != length(y) )
+          { stop(cat("In plot, unknown variables: ", paste(y[which(!(y %in% colnames(data)))]),"\n"))}
         }
       }
       # scatter plot
-      plot(x@rawData[,y], col = x@zi+2)
+      plot(as.data.frame(data[,y]), col = x@zi+2)
     }
 )
 

@@ -1,5 +1,5 @@
 Package: MixAll
-Version: 1.4.0
+Version: 1.4.1
 Date: 2018-03-04
 Title: Clustering using Mixture Models
 Authors@R: c(person("Serge", "Iovleff", role = c("aut","cre"), email = "Serge.Iovleff@stkpp.org")
@@ -42,5 +42,6 @@ Collate:
     'MixAll.R'
     'kmmNames.R'
     'kmm.R'
+    'kmmMixedData.R'
     'missingValues.R'
 RoxygenNote: 6.0.1

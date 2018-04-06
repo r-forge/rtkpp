@@ -47,23 +47,22 @@ namespace STK
 class KmmLauncher: public ILauncherBase
 {
   public:
+    typedef typename hidden::DataHandlerTraits< STK::RDataHandler, int>::Data DataInt;
     /** constructor for single data
-     *  @param s4_model KmmModel S4 class with the result in output
-     *  @param handler an instance of the KernelHandler class with the kernels to use
+     *  @param s4_model KmmModel S4 class
      *  @param nbCluster a vector with the number of clusters to test
      *  @param models a vector of string with the model names to try
-     *  @param criteria selection model criteria (string)
      **/
-  KmmLauncher( Rcpp::S4 s4_model
+    KmmLauncher( Rcpp::S4 s4_model
              , Rcpp::IntegerVector const& nbCluster
              , Rcpp::CharacterVector const& models
              );
-//    /** constructor for mixed data
-//     *  @param model ClusterMixedData S4 class
-//     *  @param nbCluster a vector with the number of clusters to test
-//     *  @param critName selection model criteria (string)
-//     **/
-//    KmmLauncher( SEXP model, SEXP nbCluster, SEXP critName );
+    /** constructor for mixed data
+     *  @param model ClusterMixedDataModel S4 class
+     *  @param nbCluster a vector with the number of clusters to test
+     **/
+    KmmLauncher( Rcpp::S4 s4_model, Rcpp::IntegerVector const& nbCluster);
+
     /** destructor. */
     virtual ~KmmLauncher();
 
@@ -71,22 +70,26 @@ class KmmLauncher: public ILauncherBase
     bool run();
 
   protected:
-    /** create the kernel mixtures in the given composer. We have to
-     * use a workaround for this kind of model as they need an extra parameter
-     * (the dimension) to be given
-     **/
-    void updateMixtures(MixtureComposer* p_composer);
 
     /** vector with the model names to try */
     Rcpp::CharacterVector v_models_;
-    /** strategy from the R side */
-    Rcpp::S4              s4_strategy_;
     /** vector with the number of cluster to try */
     Rcpp::IntegerVector   v_nbCluster_;
+    /** strategy from the R side */
+    Rcpp::S4              s4_strategy_;
     /** character string with the model selection criterion name */
     std::string           criterion_;
 
+    /** Is the model with mixed data ? */
+    bool isMixedData_;
+
   private:
+    /** Create kernels and add them to KernelHandler from facade
+     *  @param s4_component component with the creation parameters
+     *  @param idData  Id of the data set of the kernel
+     *  @param manager manager storing the KmmBridge
+     **/
+    Kernel::IKernel* createKernel(Rcpp::S4 s4_component, std::string const& idData, KernelMixtureManager& manager);
     /** Select the best model among the models and nbCluster given.
      *  @return the value of the best criteria.
      **/
@@ -97,8 +100,6 @@ class KmmLauncher: public ILauncherBase
     Real selectBestMixedModel();
     /** facade with the main composer */
     MixtureComposerFacade<RDataHandler> facade_;
-    /** Is the model with mixed data ? */
-    bool isMixedData_;
 };
 
 } // namespace STK

@@ -54,7 +54,7 @@ extern "C" SEXP clusterPredict( SEXP model, SEXP result, SEXP nbCore )
   Rcpp::S4 s4_result(result);
 
   // create a launcher
-  if (s4_model.is("ClusterMixedData"))
+  if (s4_model.is("ClusterMixedDataModel"))
   {
     STK::ClusterPredictorMixedData predictor(s4_model, s4_result);
     // return result

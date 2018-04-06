@@ -7,16 +7,18 @@
 clusterPredict(data, model, algo = clusterAlgoPredict(), nbCore = 1)
 }
 \arguments{
-\item{data}{frame or matrix containing the data. Rows correspond to observations
+\item{data}{dataframe or matrix containing the data. Rows correspond to observations
 and columns correspond to variables. If the data set contains NA values, they
 will be estimated during the predicting process.}
 
 \item{model}{(estimated) clustering model to use, i.e. an instance of
-\code{\linkS4class{ClusterCategorical}}, \code{\linkS4class{ClusterDiagGaussian}}, etc. class
-produced by \code{\link{clusterCategorical}}, \code{\link{clusterDiagGaussian}}, etc.
-functions}
+\code{\linkS4class{ClusterCategorical}}, \code{\linkS4class{ClusterDiagGaussian}},..
+produced by \code{\link{clusterCategorical}}, \code{\link{clusterDiagGaussian}},...
+\code{\link{learnCategorical}}, \code{\link{learnDiagGaussian}}, etc.
+functions.}
 
-\item{algo}{an instance of \code{\linkS4class{ClusterAlgoPredict}} S4 class}
+\item{algo}{an instance of \code{\linkS4class{ClusterAlgoPredict}} S4 class. Will not
+be used if there is no missing values.}
 
 \item{nbCore}{integer defining the number of processors to use (default is 1, 0 for all).}
 }

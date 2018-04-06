@@ -69,33 +69,36 @@ KernelHandler::~KernelHandler()
  */
 bool KernelHandler::addKernel(Kernel::IKernel* p_kernel, std::string const& idData, std::string const& idModel)
 {
-  // check if the idData already exists
-  Array1D< TaggedKernel >::Iterator it;
-  for (it = v_kernel_.beginIterator() ; it!=v_kernel_.endIterator(); ++it)
+  if (!p_kernel) return false;
+  if (!addInfo(idData, idModel)) return false; // there exists an idData with an other idModel
+
+  // check if idData already exists
+  Array1D< TaggedKernel >::ConstIterator it;
+  for (it = v_kernel_.beginConstIterator() ; it!=v_kernel_.endConstIterator(); ++it)
   { if (it->second == idData) { break;}}
-  // add kernel if it does not exist
-  if (it == v_kernel_.endIterator())
+
+  // add kernel if it does not exist otherwise do nothing
+  if (it == v_kernel_.endConstIterator())
   {
     v_kernel_.push_back(TaggedKernel(p_kernel, idData));
     nbSample_   = p_kernel->nbSample();
     nbVariable_ += p_kernel->nbVariable();
-    return addInfo(idData, idModel);
   }
-  return false;
+  return true;
 }
 /* get an instance of a kernel from the handler
  * @param idData can be any string given by the user for identifying data.
  * @return @c 0 if the idData has not been found, a pointer to the kernel
  * otherwise
  */
-Kernel::IKernel* KernelHandler::getKernel( std::string const& idData)
+Kernel::IKernel const* KernelHandler::getKernel( std::string const& idData) const
 {
   // check if the idData already exists
-  Array1D< TaggedKernel >::Iterator it;
-  for (it = v_kernel_.beginIterator() ; it!=v_kernel_.endIterator(); ++it)
+  Array1D< TaggedKernel >::ConstIterator it;
+  for (it = v_kernel_.beginConstIterator() ; it!=v_kernel_.endConstIterator(); ++it)
   {  if (it->second == idData) { break;}}
   // no data set found
-  if (it == v_kernel_.endIterator()) { return 0;}
+  if (it == v_kernel_.endConstIterator()) { return 0;}
   return it->first;
 }
 /* remove an instance of a kernel to the handler

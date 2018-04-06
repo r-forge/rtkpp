@@ -43,28 +43,6 @@ KernelMixtureManager::KernelMixtureManager(KernelHandler const& handler): Base(&
 /* destructor */
 KernelMixtureManager::~KernelMixtureManager() {}
 
-/* set the kernel of the mixture model
- * @param p_mixture pointer on the mixture
- * @param p_kernel pointer on the kernel
- * */
-void KernelMixtureManager::setKernel(IMixture* p_mixture, Kernel::IKernel const* p_kernel)
-{
-  if (!p_mixture) return;
-  Clust::Mixture idModel = getIdModel(p_mixture->idData());
-  // up-cast... (Yes it's bad....;)...)
-  switch (idModel)
-  {
-    // Kernel models
-    case Clust::KernelGaussian_sk_:
-    { static_cast<KernelGaussianBridge_sk*>(p_mixture)->setKernel(p_kernel);}
-    break;
-    case Clust::KernelGaussian_s_:
-    { static_cast<KernelGaussianBridge_s*>(p_mixture)->setKernel(p_kernel);}
-    break;
-    default: // idModel is not implemented
-    break;
-  }
-}
 /* set the dimension of the kernel mixture model */
 void KernelMixtureManager::setDim(IMixture* p_mixture, Real const& dim) const
 {
@@ -74,31 +52,11 @@ void KernelMixtureManager::setDim(IMixture* p_mixture, Real const& dim) const
   switch (idModel)
   {
     // Kernel models
-    case Clust::KernelGaussian_sk_:
-    { static_cast<KernelGaussianBridge_sk*>(p_mixture)->setDim(dim);}
+    case Clust::Kmm_sk_:
+    { static_cast<KmmBridge_sk*>(p_mixture)->setDim(dim);}
     break;
-    case Clust::KernelGaussian_s_:
-    { static_cast<KernelGaussianBridge_s*>(p_mixture)->setDim(dim);}
-    break;
-    default: // idModel is not implemented
-    break;
-  }
-}
-
-/* set the dimension of the kernel mixture model */
-void KernelMixtureManager::setDim(IMixture* p_mixture, CPointX const& dim) const
-{
-  if (!p_mixture) return;
-  Clust::Mixture idModel = getIdModel(p_mixture->idData());
-  // up-cast... (Yes it's bad....;)...)
-  switch (idModel)
-  {
-    // Kernel models
-    case Clust::KernelGaussian_sk_:
-    { static_cast<KernelGaussianBridge_sk*>(p_mixture)->setDim(dim);}
-    break;
-    case Clust::KernelGaussian_s_:
-    { static_cast<KernelGaussianBridge_s*>(p_mixture)->setDim(dim);}
+    case Clust::Kmm_s_:
+    { static_cast<KmmBridge_s*>(p_mixture)->setDim(dim);}
     break;
     default: // idModel is not implemented
     break;
@@ -117,11 +75,11 @@ void KernelMixtureManager::getParameters(IMixture* p_mixture, ArrayXX& param) co
   switch (idModel)
   {
     // Kernel models
-    case Clust::KernelGaussian_sk_:
-    { static_cast<KernelGaussianBridge_sk*>(p_mixture)->getParameters(param);}
+    case Clust::Kmm_sk_:
+    { static_cast<KmmBridge_sk*>(p_mixture)->getParameters(param);}
     break;
-    case Clust::KernelGaussian_s_:
-    { static_cast<KernelGaussianBridge_s*>(p_mixture)->getParameters(param);}
+    case Clust::Kmm_s_:
+    { static_cast<KmmBridge_s*>(p_mixture)->getParameters(param);}
     break;
     default: // idModel is not implemented
     break;
@@ -139,11 +97,11 @@ void KernelMixtureManager::setParameters(IMixture* p_mixture, ArrayXX const& par
   switch (idModel)
   {
     // Kernel models
-    case Clust::KernelGaussian_sk_:
-    { static_cast<KernelGaussianBridge_sk*>(p_mixture)->setParameters(param);}
+    case Clust::Kmm_sk_:
+    { static_cast<KmmBridge_sk*>(p_mixture)->setParameters(param);}
     break;
-    case Clust::KernelGaussian_s_:
-    { static_cast<KernelGaussianBridge_s*>(p_mixture)->setParameters(param);}
+    case Clust::Kmm_s_:
+    { static_cast<KmmBridge_s*>(p_mixture)->setParameters(param);}
     break;
     default: // idModel is not implemented
     break;
@@ -165,14 +123,23 @@ IMixture* KernelMixtureManager::createMixtureImpl(String const& modelName, Strin
  **/
 IMixture* KernelMixtureManager::createMixtureImpl(Clust::Mixture idModel, String const& idData, int nbCluster)
 {
+  Kernel::IKernel const* p_kernel = p_handler()->getKernel(idData);
   switch (idModel)
   {
-    case Clust::KernelGaussian_sk_:
-    { return new KernelGaussianBridge_sk( 0, idData, nbCluster);}
-    break;
-    case Clust::KernelGaussian_s_:
-    { return new KernelGaussianBridge_s( 0, idData, nbCluster);}
-    break;
+    case Clust::Kmm_sk_:
+    {
+      KmmBridge_sk* p_mixture = new KmmBridge_sk( 0, idData, nbCluster);
+      p_mixture->setKernel(p_kernel);
+      return p_mixture;
+      break;
+    }
+    case Clust::Kmm_s_:
+    {
+      KmmBridge_s* p_mixture = new KmmBridge_s( 0, idData, nbCluster);
+      p_mixture->setKernel(p_kernel);
+      return p_mixture;
+      break;
+    }
     default:
       return 0; // 0 if idModel does not exists
       break;

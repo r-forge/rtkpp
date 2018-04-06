@@ -6,13 +6,15 @@
 \alias{kmmValidKernelNames}
 \title{Create a vector of Kernel mixture model (KMM) names.}
 \usage{
-kmmNames(sdBetweenCluster = "all")
+kmmNames(prop = "all", sdBetweenCluster = "all")
 
 kmmValidModelNames(names)
 
 kmmValidKernelNames(names)
 }
 \arguments{
+\item{prop}{A character string equal to "equal", "free" or "all". Default is "all".}
+
 \item{sdBetweenCluster}{A character string equal to "equal", "free" or "all". Default is "all".}
 
 \item{names}{a vector of character with the names to check}
@@ -23,11 +25,12 @@ A vector of character with the model names.
 TRUE if the names in the vector names are valid, FALSE otherwise.
 }
 \description{
-In a Kernel mixture model, we can assume that
+In a Kernel mixture model, sssumptions on the proportions
+and standard deviations give rise to 4 models:
 \enumerate{
- \item {The standard deviations are equal or free for all the clusters.}
+ \item {Proportions can be equal or free.}
+ \item {Standard deviations are equal or free for all clusters.}
 }
-This give rise to two models.
 
 check if a vector of kernel mixture model (KMM) name is correct.
 
@@ -35,15 +38,17 @@ check if a vector of kernel name is correct.
 }
 \details{
 The model names are summarized in the following array:
-\tabular{ll}{
- Model Name  \tab standard deviation between clusters \cr
- kmm_sk      \tab Free                                \cr
- kmm_s       \tab Equal                               \cr
+\tabular{lll}{
+ Model Name  \tab Proportions   \tab s. d. between clusters \cr
+ kmm_p_sk    \tab equal         \tab Free                   \cr
+ kmm_p_s     \tab equal         \tab Equal                  \cr
+ kmm_pk_sk   \tab equal         \tab Free                   \cr
+ kmm_pk_s    \tab equal         \tab Equal                  \cr
 }
 }
 \examples{
 kmmNames()
-## same as c("kmm_sk")
-kmmNames( sdBetweenCluster= "free")
+## same as c("kmm_p_sk")
+kmmNames( prop = "equal", sdBetweenCluster= "free")
 
 }

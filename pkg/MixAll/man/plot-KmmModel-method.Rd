@@ -24,10 +24,7 @@ using the estimated parameters and partition.
 \dontrun{
  ## the bull eyes data set
   data(bullsEye)
-  model <- kmm( bullsEye[,1:2]
-                        , 2
-                        , models= "kmm_s"
-                        )
+  model <- kmm( bullsEye, 2, models= "kmm_pk_s")
   plot(model)
   }
 

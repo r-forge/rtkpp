@@ -4,7 +4,7 @@
 \alias{kmm}
 \title{Create an instance of the [\code{\linkS4class{KmmModel}}] class}
 \usage{
-kmm(data, nbCluster = 2, dim = 10, models = "kmm_s", prop = "free",
+kmm(data, nbCluster = 2, dim = 10, models = "kmm_pk_s",
   kernelName = "Gaussian", kernelParameters = c(1),
   kernelComputation = TRUE, strategy = kmmStrategy(), criterion = "ICL",
   nbCore = 1)
@@ -18,23 +18,20 @@ and columns correspond to variables.}
 \item{dim}{integer giving the dimension of the Gaussian density. Default is 10.}
 
 \item{models}{[\code{\link{vector}}] of model names to run. By default only
-"kmm_s" is estimated. All the model names are given by the method
+"kmm_pk_s" is estimated. All the model names are given by the method
 [\code{\link{kmmNames}}].}
-
-\item{prop}{character defining if the proportions of the mixture are equals or
-to be estimated. Possible values: "free", "equal", "all". Default is "free".}
 
 \item{kernelName}{string with a kernel name. Possible values:
 "Gaussian", "polynomial", "Laplace", "linear", "rationalQuadratic_", "Hamming".
 Default is "Gaussian".}
 
 \item{kernelParameters}{[\code{\link{vector}}] with the parameters of
-the chosen kernel. Default is 1.}
+the chosen kernel. Default is c(1).}
 
-\item{kernelComputation}{[\code{\link{logical}}] parameter. Should be \code{TRUE} if
-the Gram matrix is to be pre-computed (faster but can be memory consuming), \code{FALSE}
-otherwise (times consuming). Default is \code{TRUE}. The computed Gram matrix is a
-square matrix of size nbSample.}
+\item{kernelComputation}{[\code{\link{logical}}] parameter. Should be \code{TRUE}
+if the Gram matrix is to be computed (faster but can be memory consuming), \code{FALSE}
+otherwise (times consuming). Default is \code{TRUE}. Recall that Gram matrix
+is a square matrix of size nbSample.}
 
 \item{strategy}{a [\code{\linkS4class{ClusterStrategy}}] object containing
 the strategy to run. [\code{\link{kmmStrategy}}]() method by default.}
@@ -60,7 +57,7 @@ in the KmmModel instance returned by the function, data is the Gram matrix.
 ## A quantitative example with the famous bulls eye model
 data(bullsEye)
 ## estimate model
-model <- kmm( data=bullsEye[,1:2], nbCluster=2:3, models= "kmm_s")
+model <- kmm( data=bullsEye, nbCluster=2:3, models= "kmm_pk_s")
 
 ## use graphics functions
 \dontrun{

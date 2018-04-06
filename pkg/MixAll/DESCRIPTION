@@ -1,6 +1,6 @@
 Package: MixAll
 Version: 1.4.1
-Date: 2018-03-04
+Date: 2018-04-04
 Title: Clustering using Mixture Models
 Authors@R: c(person("Serge", "Iovleff", role = c("aut","cre"), email = "Serge.Iovleff@stkpp.org")
             ,person("Parmeet", "Bathia", role = c("ctb"), email = "Bathia.Parmeet@gmail.com")
@@ -13,9 +13,10 @@ Depends:
     rtkore (>= 1.5.0)
 Imports:
     methods
-Description: Algorithms and methods for estimating parametric mixture models for
-  Gaussian, gamma, Poisson, categorical or mixed data with possibly missing data.
-  This package can be used as an independant alternative of the (not free)
+Description: MixAll provides model-based supervised and unsupervised
+  classification for various types of data: Gaussian (with diagonal covariance
+  structure), gamma, categorical and Poisson. MixAll also supports missing values.
+  This package can be used as an independant alternative to the (not free)
   mixtcomp software available at <https://massiccc.lille.inria.fr/>.
 License: GPL (>= 2)
 LinkingTo: Rcpp (>= 0.11.0), rtkore (>= 1.5.0)

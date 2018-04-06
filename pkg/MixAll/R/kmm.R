@@ -147,7 +147,8 @@ kmmStrategy <- function( nbTry =1
 #' Possible values: "BIC", "AIC", "ICL", "ML". Default is "ICL".
 #' @param nbCore integer defining the number of processor to use (default is 1, 0 for all).
 #'
-#' @note in the KmmModel instance returned by the function, data is the Gram matrix.
+#' @note in KmmModel instance returned, the gram matrix is computed if and only
+#' if kernelComputation is \code{TRUE}.
 #' 
 #' @examples
 #' ## A quantitative example with the famous bulls eye model
@@ -155,16 +156,12 @@ kmmStrategy <- function( nbTry =1
 #' ## estimate model
 #' model <- kmm( data=bullsEye, nbCluster=2:3, models= "kmm_pk_s")
 #'
-#' ## use graphics functions
-#' \dontrun{
-#' plot(model)
-#' }
 #'
 #' ## get summary
 #' summary(model)
-#' ## print model
+#' ## use graphics functions
 #' \dontrun{
-#' print(model)
+#' plot(model)
 #' }
 #'
 #' @return An instance of the [\code{\linkS4class{KmmModel}}] class.
@@ -244,7 +241,7 @@ kmm <- function( data, nbCluster=2
 #'
 #' @slot dim    Vector with the dimension of the kth cluster
 #' @slot sigma2 Vector with the standard deviation in the kth cluster.
-#' @slot gram   Matrix storing the gram matrix is its computation is needed
+#' @slot gram   Matrix storing the gram matrix if its computation is needed
 #' @slot kernelName string with the name of the kernel to use. Possible values:
 #' "Gaussian", "polynomial", "Laplace", "linear","rationalQuadratic", "Hamming".
 #' Default is "Gaussian".
@@ -619,5 +616,43 @@ setMethod(
       # scatter plot
       plot(as.data.frame(data[,y]), col = x@zi+2)
     }
+)
+
+#' Plotting of a class [\code{\linkS4class{KmmComponent}}]
+#'
+#' Plotting data from a [\code{\linkS4class{KmmComponent}}] object
+#' using the estimated partition.
+#'
+#' @param x an object of class [\code{\linkS4class{KmmComponent}}]
+#' @param y a vector with partitions
+#' @param ... further arguments passed to or from other methods
+#'
+#' @aliases plot-KmmComponent
+#' @docType methods
+#' @rdname plot-KmmComponent-method
+#'
+#'
+#' @seealso \code{\link{plot}}
+#' @examples
+#' \dontrun{
+#'  ## the bull eyes data set
+#'   data(bullsEye)
+#'   model <- kmm( bullsEye, 2, models= "kmm_pk_s")
+#'   plot(model)
+#'   }
+#'
+setMethod(
+  f="plot",
+  signature=c("KmmComponent"),
+  function(x, y, ...)
+  {
+    # total number of variable in the data set
+    data = x@data
+    nbVariable = ncol(data);
+    # no y => no class
+    if (missing(y)) { y=rep(1,nrow(data)) }
+    # scatter plot using data frame plot
+    plot(as.data.frame(data), col = y+2)
+  }
 )
 

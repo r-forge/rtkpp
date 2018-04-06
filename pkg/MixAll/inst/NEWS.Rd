@@ -2,9 +2,11 @@
 \title{News for Package 'MixAll}
 
 
-\section{Changes in MixAll version 1.4.0 (2018-03-04)}{
+\section{Changes in MixAll version 1.4.1 (2018-04-04)}{
   \itemize{
   \item Bugs fixed
+  \item Kernel Mixture Models (KMM) for mixed data implemented
+  \item Adding clusterPredict method for class label prediction
   }
 }
 

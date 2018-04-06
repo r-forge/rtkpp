@@ -54,8 +54,6 @@ summary(model)
 
 
 \dontrun{
-## print model
-print(model)
 ## use graphics functions
 plot(model)
 }

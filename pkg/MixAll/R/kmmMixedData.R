@@ -64,8 +64,6 @@ NULL
 #'
 #'
 #' \dontrun{
-#' ## print model
-#' print(model)
 #' ## use graphics functions
 #' plot(model)
 #' }
@@ -328,7 +326,7 @@ setMethod(
 #' using the estimated parameters and partition.
 #'
 #' @param x an object of class [\code{\linkS4class{KmmMixedDataModel}}]
-#' @param y a number between 1 and K-1.
+#' @param y a vector listing the data sets you want to disply
 #' @param ... further arguments passed to or from other methods
 #'
 #' @aliases plot-KmmMixedDataModel
@@ -339,10 +337,17 @@ setMethod(
 #' @seealso \code{\link{plot}}
 #' @examples
 #' \dontrun{
-#'   ## the car data set
-#'   data(car)
-#'   model <- kmmMixedData(car, 3, strategy = clusterFastStrategy())
-#'   plot(model)
+#' data(bullsEye)
+#' data(bullsEye.cat)
+#' ## with default values
+#' ldata  = list(bullsEye, bullsEye.cat)
+#' modelcont <- list(modelName="kmm_pk_s", dim = 10, kernelName="Gaussian")
+#' modelcat  <- list(modelName="kmm_pk_s", dim = 20, kernelName="Hamming", kernelParameters = c(0.6))
+#' lmodels = list( modelcont, modelcat)
+#' 
+#' model <- kmmMixedData(ldata, lmodels, nbCluster=2:5, strategy = clusterFastStrategy())
+#' # plot only the first continuous data set
+#' plot(model, y=c(1))
 #'   }
 #'
 setMethod(
@@ -351,48 +356,22 @@ setMethod(
   function(x, y, ...)
   {
     # total number of cluster in the data set
-    nbCluster = ncol(x@tik);
+    nbCluster   <- ncol(x@tik);
+    nbComponent <- length(x@lcomponent)
+    #
     # check y, no y => display all dimensions
-    if (missing(y)) { y=1:(nbCluster-1); }
+    if (missing(y)) { y=1:nbComponent; }
     else
-    { if (round(y)!=y) {stop("y must be an integer.")}
-      if (y>nbCluster-1)
-        stop("y should not be greater than K-1")
-      y <- 1:y
-    }
-    # get representation
-    Y=.visut(x@tik, nbCluster);
-    if (nbCluster == 2) { ndim = 1;}
-    else { ndim = ncol(Y);}
-    # Compute gaussian statistics
-    mean  <- matrix(0, nrow = x@nbCluster, ncol =ndim)
-    sigma <- matrix(1, nrow = x@nbCluster, ncol =ndim)
-    for (k in 1:nbCluster)
     {
-      wcov = cov.wt(as.matrix(Y), x@tik[,k], method = "ML");
-      mean[k,]  = wcov$center;
-      sigma[k,] = sqrt(diag(wcov$cov))
+      if (max(y)>nbComponent)
+        stop("y should not be greater than the number of data set")
     }
-    # create gaussian model
-    gauss<-new("ClusterDiagGaussian", Y, nbCluster = x@nbCluster)
-    gauss@component@mean = mean
-    gauss@component@sigma= sigma
-    gauss@pk   = x@pk
-    gauss@tik  = x@tik
-    gauss@lnFi = x@lnFi
-    gauss@zi   = x@zi
-    #gauss@component@missing     = x@component@missing
-    gauss@lnLikelihood = x@lnLikelihood
-    gauss@criterion    = x@criterion
-    gauss@nbFreeParameter = x@nbFreeParameter
-    gauss@strategy        = x@strategy
-    .clusterPlot(gauss, y, .dGauss,...);
+    #
+    par(mfrow=c(1, length(y)), pty="s")
+    for (i in y)
+    {
+      plot(x@lcomponent[[i]], x@zi,...)
+    }
   }
 )
 
-# get logistic representation
-.visut <- function(t, gp)
-{ m <- min(t[,gp])
-  if (m==0) { t[,gp] = t[,gp] + 1e-30 }
-  return(scale(log(sweep(t,1,t[,gp],FUN="/")+ 1e-30), center=TRUE, scale=FALSE)[,-gp])
-}

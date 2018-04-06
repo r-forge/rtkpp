@@ -11,7 +11,7 @@
 \arguments{
 \item{x}{an object of class [\code{\linkS4class{KmmMixedDataModel}}]}
 
-\item{y}{a number between 1 and K-1.}
+\item{y}{a vector listing the data sets you want to disply}
 
 \item{...}{further arguments passed to or from other methods}
 }
@@ -21,10 +21,17 @@ using the estimated parameters and partition.
 }
 \examples{
 \dontrun{
-  ## the car data set
-  data(car)
-  model <- kmmMixedData(car, 3, strategy = clusterFastStrategy())
-  plot(model)
+data(bullsEye)
+data(bullsEye.cat)
+## with default values
+ldata  = list(bullsEye, bullsEye.cat)
+modelcont <- list(modelName="kmm_pk_s", dim = 10, kernelName="Gaussian")
+modelcat  <- list(modelName="kmm_pk_s", dim = 20, kernelName="Hamming", kernelParameters = c(0.6))
+lmodels = list( modelcont, modelcat)
+
+model <- kmmMixedData(ldata, lmodels, nbCluster=2:5, strategy = clusterFastStrategy())
+# plot only the first continuous data set
+plot(model, y=c(1))
   }
 
 }

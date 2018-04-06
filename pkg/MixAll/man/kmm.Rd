@@ -51,7 +51,8 @@ to the [\code{criterion}] among the number of clusters given in
 [\code{nbCluster}], using the strategy specified in [\code{strategy}].
 }
 \note{
-in the KmmModel instance returned by the function, data is the Gram matrix.
+in KmmModel instance returned, the gram matrix is computed if and only
+if kernelComputation is \code{TRUE}.
 }
 \examples{
 ## A quantitative example with the famous bulls eye model
@@ -59,16 +60,12 @@ data(bullsEye)
 ## estimate model
 model <- kmm( data=bullsEye, nbCluster=2:3, models= "kmm_pk_s")
 
-## use graphics functions
-\dontrun{
-plot(model)
-}
 
 ## get summary
 summary(model)
-## print model
+## use graphics functions
 \dontrun{
-print(model)
+plot(model)
 }
 
 }

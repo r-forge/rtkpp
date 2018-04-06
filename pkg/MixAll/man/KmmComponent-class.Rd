@@ -16,7 +16,7 @@ from [\code{\linkS4class{IClusterComponent}}].
 
 \item{\code{sigma2}}{Vector with the standard deviation in the kth cluster.}
 
-\item{\code{gram}}{Matrix storing the gram matrix is its computation is needed}
+\item{\code{gram}}{Matrix storing the gram matrix if its computation is needed}
 
 \item{\code{kernelName}}{string with the name of the kernel to use. Possible values:
 "Gaussian", "polynomial", "Laplace", "linear","rationalQuadratic", "Hamming".

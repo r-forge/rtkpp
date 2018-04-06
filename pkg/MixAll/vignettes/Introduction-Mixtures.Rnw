@@ -1018,7 +1018,7 @@ model1 <- clusterDiagGaussian( data =train, nbCluster=2:3, models=c( "gaussian_p
 model2 <- clusterPredict(test, model1)
 table(model2@zi, as.integer(iris$Species[-indexes]))
 @
-
+Remember that original labels are known up to a permutation.
 
 
 \bibliography{MixAll}

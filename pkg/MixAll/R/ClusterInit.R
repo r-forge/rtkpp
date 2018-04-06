@@ -180,16 +180,14 @@ setMethod(
   f="print",
   signature=c("ClusterInit"),
   function(x,...){
-    function(object){
       cat("****************************************\n")
       cat("*** MixAll ClusterInit:\n")
-      cat("* method               = ", object@method, "\n")
-      cat("* number of init       = ", object@nbInit, "\n")
-      cat("* algorithm            = ", object@algo@algo, "\n")
-      cat("* number of iterations = ", object@algo@nbIteration, "\n")
-      cat("* epsilon              = ", object@algo@epsilon, "\n")
+      cat("* method               = ", x@method, "\n")
+      cat("* number of init       = ", x@nbInit, "\n")
+      cat("* algorithm            = ", x@algo@algo, "\n")
+      cat("* number of iterations = ", x@algo@nbIteration, "\n")
+      cat("* epsilon              = ", x@algo@epsilon, "\n")
       cat("****************************************\n")
-    }
   }
 )
 

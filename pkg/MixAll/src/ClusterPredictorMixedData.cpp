@@ -84,9 +84,7 @@ bool ClusterPredictorMixedData::run()
     Rcpp::S4 s4_component = lcomponent_[l];
     std::string idModel = s4_component.slot("modelName");
     bool freeProp;
-    Clust::Mixture model           = Clust::stringToMixture(idModel, freeProp);
-    Clust::MixtureClass classModel = Clust::mixtureToMixtureClass(model);
-    std::string idData = Clust::mixtureToString(model);
+    std::string idData = Clust::mixtureToString(Clust::stringToMixture(idModel, freeProp));
 
     // get parameters from component and set them to facade_
     ArrayXX params;

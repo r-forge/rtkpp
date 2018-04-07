@@ -178,7 +178,7 @@ Real ClusterLauncher::selectBestSingleModel()
       }
     }
     // release
-    if (p_criterion) delete p_criterion; p_criterion = 0;
+    if (p_criterion) { delete p_criterion; p_criterion = 0;}
     // get specific parameters
     getParameters(p_composer_, idDataBestModel, s4_component);
     return critValue;

@@ -1,6 +1,6 @@
 Package: MixAll
-Version: 1.4.1
-Date: 2018-04-04
+Version: 1.4.3
+Date: 2018-04-06
 Title: Clustering and Classification using Model-Based Mixture Models
 Authors@R: c(person("Serge", "Iovleff", role = c("aut","cre"), email = "Serge.Iovleff@stkpp.org")
             ,person("Parmeet", "Bathia", role = c("ctb"), email = "Bathia.Parmeet@gmail.com")

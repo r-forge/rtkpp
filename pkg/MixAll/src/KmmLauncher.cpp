@@ -179,9 +179,8 @@ Kernel::IKernel* KmmLauncher::createKernel(Rcpp::S4 s4_component, std::string co
     }
     case Kernel::hamming_:
     {
-      Real param1 = 2, param2 =0;
+      Real param1 = 2;
       if (kernelParameters.length()>0) { param1 = kernelParameters[0];}
-      if (kernelParameters.length()>2) { param2 = kernelParameters[1];}
       IntegerMatrix r_data = s4_component.slot("data");
       DataBridge< RMatrix<int> >* p_bridge = new DataBridge< RMatrix<int> >( idData, RMatrix<int>(r_data));
       manager.registerDataBridge(p_bridge);
@@ -340,7 +339,7 @@ Real KmmLauncher::selectBestMixedModel()
 
       // compute sameProp. If one of the model is free proportion, then we use free proportion
       bool freeMixture;
-      Clust::Mixture model = Clust::stringToMixture(idModel, freeMixture);
+      Clust::stringToMixture(idModel, freeMixture);
       sameProp &= (!freeMixture);
     }
 

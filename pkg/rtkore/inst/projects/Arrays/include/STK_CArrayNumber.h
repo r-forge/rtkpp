@@ -63,14 +63,9 @@ namespace hidden
 template<typename Type_, bool Orient_>
 struct Traits< CArrayNumber<Type_, Orient_> >
 {
-    typedef CArrayNumber<Type_, Orient_> Number;
+    typedef CArrayNumber<Type_, Orient_> Row;
+    typedef CArrayNumber<Type_, Orient_> Col;
 
-    typedef Number Row;
-    typedef Number SubRow;
-    typedef Number Col;
-    typedef Number SubCol;
-    typedef Number SubVector;
-    typedef Number SubArray;
     // The CAllocator have to have the same structure than the CArrayNumber
     typedef CAllocator<Type_, 1, 1, Orient_> Allocator;
 
@@ -83,9 +78,11 @@ struct Traits< CArrayNumber<Type_, Orient_> >
       orient_    = Orient_,
       sizeRows_  = 1,
       sizeCols_  = 1,
+      size_      = 1,
       storage_   = Arrays::dense_
     };
 };
+
 
 } // namespace hidden
 
@@ -100,16 +97,19 @@ class CArrayNumber: public ICArray < CArrayNumber<Type_, Orient_> >
     typedef ICArray < CArrayNumber<Type_, Orient_> > Base;
     typedef ArrayBase < CArrayNumber<Type_, Orient_> > LowBase;
 
-    typedef typename hidden::Traits<CArrayNumber<Type_, Orient_> >::Type Type;
-    typedef typename hidden::Traits<CArrayNumber<Type_, Orient_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< CArrayNumber<Type_, Orient_> >::Row Row;
+    typedef typename hidden::Traits< CArrayNumber<Type_, Orient_> >::Col Col;
+    typedef typename hidden::Traits< CArrayNumber<Type_, Orient_> >::Type Type;
+    typedef typename hidden::Traits< CArrayNumber<Type_, Orient_> >::ConstReturnType ConstReturnType;
 
     enum
     {
-      structure_ = Arrays::number_,
-      orient_    = Orient_,
-      sizeRows_  = 1,
-      sizeCols_  = 1,
-      storage_   = Arrays::dense_
+      structure_ = hidden::Traits< CArrayNumber<Type_, Orient_> >::structure_,
+      orient_    = hidden::Traits< CArrayNumber<Type_, Orient_> >::orient_,
+      sizeRows_  = hidden::Traits< CArrayNumber<Type_, Orient_> >::sizeRows_,
+      sizeCols_  = hidden::Traits< CArrayNumber<Type_, Orient_> >::sizeCols_,
+      size_      = hidden::Traits< CArrayNumber<Type_, Orient_> >::size_,
+      storage_   = hidden::Traits< CArrayNumber<Type_, Orient_> >::storage_
     };
     /** Default constructor. */
     CArrayNumber(): Base() {}

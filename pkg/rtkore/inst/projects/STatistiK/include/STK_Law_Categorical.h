@@ -101,8 +101,7 @@ class Categorical: public IUnivLaw<int>
     /** @return a categorical random variate . */
     virtual int rand() const;
     /** @brief compute the cumulative distribution function
-     *  Give the probability that a Categorical random variate is less or equal
-     *  to t.
+     *  Give the probability that a Categorical random variate is less or equal to t.
      *  @param t a real value
      *  @return the value of the cdf
      **/

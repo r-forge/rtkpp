@@ -70,6 +70,28 @@ namespace lapack
  *    @class SymEigen
  *    @brief  SymEigen computes the eigenvalues and optionally the
  *    eigenvectors of a symmetric real matrix using the syevr Lapack routine.
+ *
+ *  The decomposition of a symmetric matrix require
+ *  - Input:  A symmetric matrix A of size (n,n)
+ *  - Output:
+ *     -# P Array of size (n,n).
+ *     -# D Vector of dimension n
+ *     -# \f$ A = PDP' \f$
+ *  The matrix A can be copied or overwritten by the class.
+ *
+ *  The 2-norm (operator norm) of the matrix is given. if the 2-norm is less
+ *  than the arithmetic precision of the type @c Real, the rank is not
+ *  full.
+ *  Thus the user can be faced with a deficient rank matrix and with a norm and
+ *  a determinant very small (but not exactly 0.0).
+ *
+ *  @note Default values for syevr lapack parameters are
+ *  @code
+ *  jobz_ = 'V'; RANGE_ = 'A'; UPLO_ = 'U';
+ *   VL_ = 0.0; VU_ = 0.0; IL_ = 0; IU_ = 0;
+ *  @endcode
+ *
+ *  @sa STK::ISymEigen, STK::SymEigen
  */
 template<class SquareArray>
 class SymEigen: public ISymEigen< SymEigen<SquareArray> >
@@ -107,6 +129,8 @@ class SymEigen: public ISymEigen< SymEigen<SquareArray> >
     SymEigen( SymEigen const& eigen);
     /** Destructor. */
     virtual ~SymEigen() {}
+
+    // setters
     /** @param jobz If jobz ='N': Compute eigenvalues only; If jobz = 'V': Compute
      * eigenvalues and eigenvectors.
      **/
@@ -134,6 +158,7 @@ class SymEigen: public ISymEigen< SymEigen<SquareArray> >
      *  referenced if RANGE_ = 'A' or 'V'.
     **/
     inline void setIlAndIu(int il, int iu) { IL_ = il; IU_ = iu;}
+
     /** @brief clone pattern */
     inline virtual SymEigen* clone() const { return new SymEigen(*this);}
     /** @brief Run eigenvalues decomposition

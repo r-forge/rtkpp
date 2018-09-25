@@ -64,11 +64,17 @@ namespace STK
 {
 template<class Derived> class ExprBase;
 template<class Derived> class ArrayBase;
-template<class Derived, class Rhs> struct  ProductProductType;
+//<class Derived, class Rhs> struct  ProductProductType;
 template<class Derived> class  ArrayInitializer;
+namespace hidden
+{
+template<typename Lhs, typename Rhs, int LStructure_, int RStructure_> struct ProductSelector;
+}
+
 } // namespace STK
 
-#include "STKernel/include/STK_Functors.h"
+#include <STKernel/include/STK_Functors.h>
+#include <STatistiK/include/STK_Law_Functors.h>
 
 #include "products/STK_ProductOperators.h"
 #include "products/STK_DotProduct.h"
@@ -215,6 +221,7 @@ class ExprBase: public ITContainer<Derived, hidden::Traits<Derived>::structure_>
     Type const sum() const;
     /** @return safely the sum of all the elements of this */
     Type const sumSafe() const;
+
     /** @return the norm of this*/
     Type const norm() const;
     /** @return the norm of this*/
@@ -445,11 +452,35 @@ class ExprBase: public ITContainer<Derived, hidden::Traits<Derived>::structure_>
     operator*(Type const value, ExprBase<Derived> const& other)
     { return other.asDerived()*value; }
 
-    // templates
     /** @return an expression of *this with the  Type type casted to  OtherType. */
     template<typename OtherType>
     inline UnaryOperator<CastOp<Type, OtherType>, Derived> const cast() const
     { return UnaryOperator<CastOp<Type, OtherType>, Derived>(this->asDerived());}
+
+    // pdf, lpdf, cdf, icdf
+    /** compute pdf values to this using distribution law given by user */
+    inline UnaryOperator<Law::PdfOp<Type>, Derived> pdf( Law::IUnivLaw<Type> const& law) const
+    { return UnaryOperator<Law::PdfOp<Type>, Derived>(this->asDerived(), Law::PdfOp<Type>(law));}
+    /** compute log-pdf values to this using distribution law given by user */
+    inline UnaryOperator<Law::LogPdfOp<Type>, Derived> lpdf( Law::IUnivLaw<Type> const& law) const
+    { return UnaryOperator<Law::LogPdfOp<Type>, Derived>(this->asDerived(), Law::LogPdfOp<Type>(law));}
+    /** compute cumulative distribution function of this using distribution law given by user */
+    inline UnaryOperator<Law::CdfOp<Type>, Derived> cdf( Law::IUnivLaw<Type> const& law) const
+    { return UnaryOperator<Law::CdfOp<Type>, Derived>(this->asDerived(), Law::CdfOp<Type>(law));}
+    /** compute log-cumulative distribution function of this using distribution law given by user */
+    inline UnaryOperator<Law::LogCdfOp<Type>, Derived> lcdf( Law::IUnivLaw<Type> const& law) const
+    { return UnaryOperator<Law::LogCdfOp<Type>, Derived>(this->asDerived(), Law::LogCdfOp<Type>(law));}
+    /** compute complementary cumulative distribution function of this using distribution law given by user */
+    inline UnaryOperator<Law::CdfcOp<Type>, Derived> cdfc( Law::IUnivLaw<Type> const& law) const
+    { return UnaryOperator<Law::CdfcOp<Type>, Derived>(this->asDerived(), Law::CdfcOp<Type>(law));}
+    /** compute complementary cumulative distribution function of this using distribution law given by user */
+    inline UnaryOperator<Law::LogCdfcOp<Type>, Derived> lcdfc( Law::IUnivLaw<Type> const& law) const
+    { return UnaryOperator<Law::LogCdfcOp<Type>, Derived>(this->asDerived(), Law::LogCdfcOp<Type>(law));}
+    /** compute inverse cumulative distribution function using distribution law given by user */
+    inline UnaryOperator<Law::IcdfOp<Type>, Derived> icdf( Law::IUnivLaw<Type> const& law) const
+    { return UnaryOperator<Law::IcdfOp<Type>, Derived>(this->asDerived(), Law::IcdfOp<Type>(law));}
+
+    // extension
     /** @return an expression of funct0 to this. */
     template< template<typename> class OtherOperator>
     inline UnaryOperator<OtherOperator<Type>, Derived> const funct0() const
@@ -525,7 +556,7 @@ class ExprBase: public ITContainer<Derived, hidden::Traits<Derived>::structure_>
 
     /** @return the matrix multiplication of this with other.*/
     template<typename Rhs>
-    typename ProductProductType<Derived, Rhs>::ProductType const
+    typename hidden::ProductSelector<Derived, Rhs, hidden::Traits<Derived>::structure_, hidden::Traits<Rhs>::structure_>::ProductType const
     operator*( ExprBase<Rhs> const& other) const;
 };
 

@@ -36,7 +36,7 @@
 
 /**
  * @defgroup Regress Regression
- * @brief The project Regress propose a set of classes for computing usual
+ * @brief The project Regress proposes a set of classes for computing usual
  * linear and non-linear regressions.
  *
  * In statistics, regression analysis includes any techniques for modeling and
@@ -71,9 +71,24 @@
  * infinite-dimensional.
  **/
 
+/**
+ * @defgroup Basis Basis
+ * @brief The project Basis proposes a set of classes for computing function basis.
+ *
+ */
+
 /** @ingroup Regress
- * @namespace STK::Regress
- * @brief This namespace encloses all variables and constant specific to the Regress project.
+ *  @namespace STK::Regress
+ *  @brief This namespace encloses all variables and constant specific to the Regress project.
+ *
+ *  @ingroup Regress
+ *  @namespace STK::Basis
+ *  @brief This namespace encloses all variables and constant specific to the function basis
+ *  project.
+ *  In mathematics, a basis function is an element of a particular basis for a
+ *  function space. Every continuous function in the function space can be represented
+ *  as a linear combination of basis functions, just as every vector in a vector space
+ *  can be represented as a linear combination of basis vectors.
  **/
 
 
@@ -81,6 +96,7 @@
 #ifndef REGRESS_H
 #define REGRESS_H
 
+#include <Regress/include/STK_Basis_Util.h>
 #include <Regress/include/STK_Regress_Util.h>
 
 #include <Regress/include/STK_MultidimRegression.h>

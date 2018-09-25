@@ -40,7 +40,8 @@
 namespace STK
 {
 // forward declarations
-template< typename Type, int SizeRows_, int SizeCols_, bool Orient_> class CArray;
+template< typename Type, int SizeRows_ = UnknownSize, int SizeCols_ = UnknownSize, bool Orient_ = Arrays::by_col_> class CArray;
+template< typename Type, int Size_, bool Orient_> class CArraySquare;
 template< typename Type, int SizeCols_, bool Orient_> class CArrayPoint;
 template< typename Type, int SizeRows_, bool Orient_> class CArrayVector;
 template< typename Type, bool Orient_> class CArrayNumber;
@@ -98,27 +99,8 @@ namespace hidden
 template<typename Type_, int SizeRows_, int SizeCols_, bool Orient_>
 struct Traits< CArray<Type_, SizeRows_, SizeCols_, Orient_> >
 {
-  private:
-    class Void { };
-
-  public:
-    typedef CArrayNumber<Type_, Orient_> Number;
-
-    typedef CArrayPoint<Type_, SizeCols_, Orient_> Row;
-    typedef CArrayVector<Type_, SizeRows_, Orient_>  Col;
-
-    typedef CArrayPoint<Type_, UnknownSize, Orient_>  SubRow;
-    typedef CArrayVector<Type_, UnknownSize, Orient_>  SubCol;
-
-    /** If one of the Size is 1, we have a Vector (a column) or a Point (a row)
-     *  (What to do if both are = 1 : Type or array (1,1) ?).
-     **/
-    typedef typename If< (SizeRows_ == 1)||(SizeCols_ == 1)   // one row or one column
-                       , typename If<(SizeCols_ == 1), SubCol, SubRow>::Result
-                       , Void
-                       >::Result SubVector;
-    // FIXME does not seem optimal if we want only to get a subset of rows (columns)
-    typedef CArray<Type_, UnknownSize, UnknownSize, Orient_> SubArray;
+    typedef CArrayPoint<Type_, SizeCols_, Orient_>  Row;
+    typedef CArrayVector<Type_, SizeRows_, Orient_> Col;
 
     // The CAllocator have to have the same structure than the CArray
     typedef CAllocator<Type_, SizeRows_, SizeCols_, Orient_> Allocator;
@@ -136,6 +118,7 @@ struct Traits< CArray<Type_, SizeRows_, SizeCols_, Orient_> >
     };
 };
 
+
 } // namespace hidden
 
 /** @ingroup Arrays
@@ -149,16 +132,18 @@ class CArray: public ICArray < CArray<Type_, SizeRows_, SizeCols_, Orient_> >
     typedef ICArray < CArray<Type_, SizeRows_, SizeCols_, Orient_> > Base;
     typedef ArrayBase < CArray<Type_, SizeRows_, SizeCols_, Orient_> > LowBase;
 
-    typedef typename hidden::Traits<CArray<Type_, SizeRows_, SizeCols_, Orient_> >::Type Type;
-    typedef typename hidden::Traits<CArray<Type_, SizeRows_, SizeCols_, Orient_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< CArray<Type_, SizeRows_, SizeCols_, Orient_> >::Row Row;
+    typedef typename hidden::Traits< CArray<Type_, SizeRows_, SizeCols_, Orient_> >::Col Col;
+    typedef typename hidden::Traits< CArray<Type_, SizeRows_, SizeCols_, Orient_> >::Type Type;
+    typedef typename hidden::Traits< CArray<Type_, SizeRows_, SizeCols_, Orient_> >::ConstReturnType ConstReturnType;
 
     enum
     {
-      structure_ = Arrays::array2D_,
-      orient_    = Orient_,
-      sizeRows_  = SizeRows_,
-      sizeCols_  = SizeCols_,
-      storage_   = Arrays::dense_
+      structure_ = hidden::Traits< CArray<Type_, SizeRows_, SizeCols_, Orient_> >::structure_,
+      orient_    = hidden::Traits< CArray<Type_, SizeRows_, SizeCols_, Orient_> >::orient_,
+      sizeRows_  = hidden::Traits< CArray<Type_, SizeRows_, SizeCols_, Orient_> >::sizeRows_,
+      sizeCols_  = hidden::Traits< CArray<Type_, SizeRows_, SizeCols_, Orient_> >::sizeCols_,
+      storage_   = hidden::Traits< CArray<Type_, SizeRows_, SizeCols_, Orient_> >::storage_
     };
 
     /** Default constructor. */
@@ -176,9 +161,7 @@ class CArray: public ICArray < CArray<Type_, SizeRows_, SizeCols_, Orient_> >
      *  @param sizeRows, sizeCols size of the rows and columns
      *  @param v initial value of the container
      **/
-    CArray( int sizeRows, int sizeCols, Type const& v)
-                : Base(sizeRows, sizeCols, v)
-    {}
+    CArray( int sizeRows, int sizeCols, Type const& v): Base(sizeRows, sizeCols, v) {}
     /** constructor with specified ranges, initialization with a constant.
      *  @param rows, cols range of the rows and columns
      *  @param v initial value of the container

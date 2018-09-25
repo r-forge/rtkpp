@@ -62,8 +62,8 @@ struct VisitorSelector
     sizeRows_  = hidden::Traits<Derived>::sizeRows_,
     sizeCols_  = hidden::Traits<Derived>::sizeCols_,
     storage_   = hidden::Traits<Derived>::storage_,
-    unrollRows_ = (sizeRows_ < MaxUnrollSquareRoot),
-    unrollCols_ = (sizeCols_ < MaxUnrollSquareRoot),
+    unrollRows_ = (sizeRows_ < MaxUnrollSlice),
+    unrollCols_ = (sizeCols_ < MaxUnrollSlice),
     is2D_       = (structure_ == (int)Arrays::array2D_ || structure_ == (int)Arrays::square_)
   };
 

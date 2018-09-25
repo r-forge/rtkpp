@@ -95,12 +95,12 @@ class IUnivStatModel: public IStatModelBase, public IRunnerUnsupervised<ColVecto
 
   protected:
     /** default constructor. */
-    IUnivStatModel() : IStatModelBase(), Runner() {}
+    IUnivStatModel(): IStatModelBase(), Runner() {}
     /** Constructor with data set. */
-    IUnivStatModel(ColVector const& data) : IStatModelBase(data.size(), 1), Runner(data)
+    IUnivStatModel(ColVector const& data): IStatModelBase(data.size(), 1), Runner(data)
     { this->initialize(data.size(), 1);}
     /** Constructor with a ptr on the data set. */
-    IUnivStatModel(ColVector const* p_data) : IStatModelBase(), Runner(p_data)
+    IUnivStatModel(ColVector const* p_data): IStatModelBase(), Runner(p_data)
     { if (p_data) this->initialize(p_data->size(), 1) ;}
     /** Copy constructor. */
     IUnivStatModel( IUnivStatModel const& model)

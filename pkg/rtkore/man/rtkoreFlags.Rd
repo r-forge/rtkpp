@@ -4,7 +4,7 @@
 \alias{CxxFlags}
 \alias{CppFlags}
 \alias{LdFlags}
-\title{CxxFlags defaults for rtkore}
+\title{CxxFlags defaults for rtkore package}
 \usage{
 CxxFlags(cpp11 = FALSE)
 
@@ -13,10 +13,10 @@ CppFlags()
 LdFlags()
 }
 \description{
-CxxFlags defaults for rtkore
+CxxFlags defaults for rtkore package
 
-CppFlags defaults for rtkore
+CppFlags defaults for rtkore package
 
-LdFlags defaults for the rtkore package
+LdFlags defaults for rtkore package
 }
 \keyword{internal}

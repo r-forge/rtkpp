@@ -32,7 +32,7 @@
 /** @file STK_Svd.h
  *  @brief In this file we define the Svd Class.
  **/
- 
+
 #ifndef STK_SVD_H
 #define STK_SVD_H
 
@@ -97,17 +97,20 @@ static void leftEliminate( ArrayDiagonalX& D
 /** @ingroup Algebra
  *  @brief The class Svd compute the Singular Value Decomposition
  *  of a Array with the Golub-Reinsch Algorithm.
- * 
+ *
  *  The method take as:
  *  - input: a matrix A(nrow,ncol)
  *  - output:
  *    -# U Array (nrow,ncol).
  *    -# D diagonal matrix (min(norw,ncol))
  *    -# V Array (ncol,ncol).
- *  and perform the decomposition: 
+ *  and perform the decomposition:
  *  - A = UDV' (transpose V).
  *  U can have more columns than A,
  *  and it is possible to compute some (all) vectors of Ker(A).
+ *
+ *  @sa SK::ISvd, STK::lapack::Svd
+ *
  **/
 template<class Array>
 class Svd: public ISvd<Svd<Array> >
@@ -134,7 +137,7 @@ class Svd: public ISvd<Svd<Array> >
      *  @param withV if true, we save the right housolder transforms in V_.
      **/
     inline Svd( Array const& A, bool ref= false, bool withU= true, bool withV= true)
-             : Base(A, ref, withU, withV)
+              : Base(A, ref, withU, withV)
     {}
     /** constructor with other kind of array/expression
      *  @param A the matrix/expression to decompose.
@@ -143,7 +146,7 @@ class Svd: public ISvd<Svd<Array> >
      */
     template<class OtherArray>
     inline Svd( ArrayBase<OtherArray> const& A, bool withU = true, bool withV = true)
-             : Base(A, withU, withV) {}
+              : Base(A, withU, withV) {}
     /** Copy Constructor
      *  @param S the Svd to copy
      **/
@@ -190,7 +193,7 @@ class Svd: public ISvd<Svd<Array> >
                               );
   private:
     /// Values of the Sub-diagonal
-    Vector F_;
+    VectorX F_;
     /// Svd main steps
     bool computeSvd();
     /// Compute U (if withU_ is true)
@@ -257,7 +260,7 @@ bool Svd<Array>::computeSvd()
   F_.resize(0,0);
   U_.shift(beginRow, beginCol);
   D_.shift(beginCol);
-  V_.shift(beginCol); // U_*D_.diagonalize()*VT_ will work
+  V_.shift(beginCol);
   return error;
 }
 
@@ -295,7 +298,7 @@ Real bidiag(const Array& M, ArrayDiagonalX& D, VectorX& F)
     // Left Householder
     D[iter] = house(X);
     // apply Householder to next cols
-    leftHouseholder(M.col(colRange1), X);
+    applyLeftHouseholderVector(M.col(colRange1), X);
     // check if there is a row
     if ((iter < last_iter)||(M.sizeCols()>M.sizeRows()))
     {
@@ -304,7 +307,7 @@ Real bidiag(const Array& M, ArrayDiagonalX& D, VectorX& F)
       // Right Householder
       F[iter] = house(P);
       // apply Householder to next rows
-      rightHouseholder(M.row(rowRange1), P);
+      applyRightHouseholderVector(M.row(rowRange1), P);
     }
     else
       F[iter] = 0.0;
@@ -327,7 +330,7 @@ void Svd<Array>::compV()
   // initialization of the remaining rows and cols of V_ to Identity
   for (int iter=niter+2; iter<=ncolV(); iter++)
   {
-    Vector W(V_, V_.cols(), iter);
+    VectorX W(V_, V_.cols(), iter);
     W       = 0.0;
     W[iter] = 1.0;
   }
@@ -343,11 +346,11 @@ void Svd<Array>::compV()
     if (beta)
     {
       // ref on the row iter1 of V_
-      Point  Vrow1(V_, range1, iter1);
+      PointX  Vrow1(V_, range1, iter1);
       // diagonal element
       Vrow1[iter1] = 1.0+beta;
       // ref on the column iter1
-      Vector Vcol1(V_, range2, iter1);
+      VectorX Vcol1(V_, range2, iter1);
       // get the Householder vector
       Vcol1 = RowVector(U_, range2, iter0);
       // Apply housholder to next cols
@@ -355,7 +358,7 @@ void Svd<Array>::compV()
       {
         Real aux;
         // ref on the column j
-        Vector Vcolj( V_, range2, j);
+        VectorX Vcolj( V_, range2, j);
         // update column j
         Vrow1[j] = (aux = dot(Vcol1, Vcolj) * beta);
         for (int i= iter2; i <= ncolV(); ++i)

@@ -81,10 +81,21 @@ namespace lapack
 /** @ingroup Algebra
  *  @brief The class MultiLeastSQquare solve the least square problem when
  *  the response @e b is multidimensional.
- *  computes the minimum-norm solution to a real linear least squares
+ *
+ *  The class MultiLeastSquare allows to solve the least-square problem
+ *  \f[
+ *  \min_{x} \|b - A*x\|^2.
+ *  \f]
+ *  - A is an m-by-n matrix which may be rank-deficient.
+ *  - B can be a vector or a Matrix.
+ *
+ *  It computes the minimum-norm solution to a real linear least squares
  *  problem: minimize 2-norm(| b - A*x |) using the singular value
  *  decomposition (SVD) of A.
  *  A is an M-by-N matrix which may be rank-deficient.
+ *
+ *  @sa STK::ILeastSquare, STK::MultiLeastSquare, STK::lapack::MultiLeastSquare
+ *
  **/
 template<class ArrayB, class ArrayA>
 class MultiLeastSquare: public ILeastSquare< MultiLeastSquare<ArrayB, ArrayA> >
@@ -100,14 +111,14 @@ class MultiLeastSquare: public ILeastSquare< MultiLeastSquare<ArrayB, ArrayA> >
      *  @param isBref,isAref are the left hand side and the right hand side references ?
      */
     MultiLeastSquare( ArrayB const& b, ArrayA const& a, bool isBref=false, bool isAref=false)
-                   : Base(b, a, isBref, isAref), rcond_(-1) {};
+                    : Base(b, a, isBref, isAref), rcond_(-1) {};
     /** @brief template constructor
      *  @param b,a the left hand side and the right hand side of the least square
      *  problem.
      */
     template<class ArrayB_, class ArrayA_>
     MultiLeastSquare( ExprBase<ArrayB_> const& b, ExprBase<ArrayA_> const& a)
-                   : Base(b, a), rcond_(-1) {}
+                    : Base(b, a), rcond_(-1) {}
     /** Destructor */
     virtual ~MultiLeastSquare() {};
     /** @return the condition number */

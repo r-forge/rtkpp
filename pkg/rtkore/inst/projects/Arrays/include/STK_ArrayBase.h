@@ -108,7 +108,8 @@ class ArrayBase: public ExprBase<Derived>
      *  @sa randUnif(), rand(Law::IUnivLaw<Type> const& law), apply()
      **/
     Derived& randGauss();
-    /** set random values to this using a law given by the user. @sa randGauss(), randUnif(), apply() */
+    /** set random values to this using a distribution law given by the user.
+     *  @sa randGauss(), randUnif(), apply() */
     Derived& rand( Law::IUnivLaw<Type> const& law);
     /** set one to this using a Visitor. @sa apply(), setValue(), setZeros() */
     Derived& setOnes();

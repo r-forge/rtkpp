@@ -37,9 +37,9 @@
  *  @brief The Algebra project provides structures, tools and methods of the
  *  usual algebra techniques.
  *
- * The Algebra project propose some set of template function for computing
+ * The Algebra project proposes some set of template function for computing
  * dot product,  weighted dot product, vector norm, weighted vector norm
- * and so on... It proposes linear algebra methods for the ArrayXX
+ * and so on... It implement also linear algebra methods for the ArrayXX
  * and the ArraySquareX classes:
  *    @li The Qr decomposition of an arbitrary matrix of Real, @sa Qr
  *    @li The svd decomposition of an arbitrary matrix of real, @sa Svd
@@ -47,13 +47,12 @@
  *    generalized inverse method for such matrices, @sa SymEigen.
 *    @li methods for solving the linear least square problem.
  *
- * It propose also some set of method for performing
- * @li Givens rotation on a matrix
- * @li GramScmidt orthogonalization of the column of a ArrayXX
- * @li Householder rotation of a ArrayXX.
+ * It proposes also some set of method for performing
+ * @li Givens rotations on a matrix
+ * @li GramSchmidt orthogonalization of the columns of a matrix/array
+ * @li Householder rotations of an array/matrix.
+ * @li Cholesky decomposition.
  *
- * @note these classes will be abandoned soon and replaced by lapack wrappers.
- * They can only be used (except @sa SymEigen) with 1-based arrays.
  **/
 
 /** @ingroup Algebra
@@ -66,6 +65,7 @@
 #define Algebra_H
 
 /* Utilities Algebra methods. */
+#include <Algebra/include/STK_transpose.h>
 #include <Algebra/include/STK_Givens.h>
 #include <Algebra/include/STK_GramSchmidt.h>
 #include <Algebra/include/STK_Householder.h>
@@ -73,14 +73,15 @@
 
 /* Algebra methods */
 #include <Algebra/include/STK_CG.h>
+#include <Algebra/include/STK_InvertMatrix.h>
 
+/* built-in */
 #include <Algebra/include/STK_Qr.h>
 #include <Algebra/include/STK_Svd.h>
 #include <Algebra/include/STK_SymEigen.h>
 #include <Algebra/include/STK_MultiLeastSquare.h>
-#include <Algebra/include/STK_InvertSymMatrix.h>
-#include <Algebra/include/STK_InvertFixedSizeMatrix.h>
-#include <Algebra/include/STK_InvertSymMatrix.h>
+
+/* lapack */
 #include <Algebra/include/STK_lapack_Qr.h>
 #include <Algebra/include/STK_lapack_Svd.h>
 #include <Algebra/include/STK_lapack_SymEigen.h>

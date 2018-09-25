@@ -151,34 +151,33 @@ class RangeBase: public IRecursiveTemplate<Derived>
  *  There is no stride argument, only contiguous regions are allowed.
  **/
 template<int Size_>
-class TRange: public RangeBase<TRange<Size_> >
+class TRange: public RangeBase< TRange<Size_> >
 {
   public:
     typedef RangeBase<TRange<Size_> > Base;
     using Base::begin_;
-    /** Default constructor. Null range.*/
-    inline TRange(): Base(baseIdx) {}
-    /** constructor. The first index is defined by the baseIdx macro.
+    /** Default constructor. Give the size of the sub-region.
+     *  @param size size of the sub-region
      **/
-    inline TRange( int): Base(baseIdx) {}
-    /** Complete constructor. Give the beginning and the size of the sub-region.
-     *  @param first is the beginning of the sub-region
+    inline TRange( int size = Size_): Base(baseIdx) {}
+    /** Full constructor. Give the beginning and the size of the sub-region.
+     *  @param first, size beginning and size of the sub-region
      **/
-    inline TRange( int first, int): Base(first) {}
+    inline TRange( int first, int size): Base(first) {}
     /** Complete constructor. Give the beginning and the end of the sub-region.
-     *  @param first is the beginning of the sub-region
+     *  @param first, last first and last indexes of the sub-region
      *  @param junk allow to use the constructor (begin,last) rather than (begin,size)
      **/
-    inline TRange( int first, int, bool junk): Base(first) {}
+    inline TRange( int first, int last, bool junk): Base(first) {}
     /** copy constructor
-     *  @param I The index to copy
+     *  @param I Range to copy
      **/
     template<int OtherSize_>
     inline TRange(TRange<OtherSize_> const& I): Base(I.begin()) {}
     /** destructor. */
     inline ~TRange() {}
     /** get the ending index of the TRange.
-     *  @return the first index of the range
+     *  @return the end index of the range
      **/
     inline int end() const { return begin_ + Size_;};
     /** get the size of the TRange (the number of elements).
@@ -291,31 +290,28 @@ struct IdTypeImpl< TRange<Size_> >
  *  There is no stride argument, only contiguous regions are allowed.
  **/
 template<>
-class TRange<UnknownSize>: public RangeBase<TRange<UnknownSize> >
+class TRange<UnknownSize>: public RangeBase< TRange<UnknownSize> >
 {
   public:
     typedef RangeBase<TRange<UnknownSize> > Base;
     using Base::begin_;
-    /** Default constructor. Null range.*/
-    inline TRange(): Base(baseIdx), end_(baseIdx), size_(0) {}
-    /** constructor. The first index is defined by the baseIdx macro.
-     *  @param size the size of the range
+
+    /** constructor. By default the first index is defined by the baseIdx macro.
+     *  @param size size of the sub-region
      **/
-    inline TRange( int size): Base(baseIdx), end_(size+baseIdx), size_(size) {}
+    inline TRange( int size =0): Base(baseIdx), end_(size+baseIdx), size_(size) {}
     /** Complete constructor. Give the beginning and the size of the sub-region.
-     *  @param first is the beginning of the sub-region
-     *  @param size is the size of the sub-region.
+     *  @param first, size beginning  and size of the sub-region
      **/
     inline TRange( int first, int size): Base(first), end_(size+first), size_(size) {}
-    /**  Complete constructor. Give the first and last index of the sub-region.
-     *  @param first beginning of the sub-region
-     *  @param last last index of the sub-region
+    /** Complete constructor. Give the first and last index of the sub-region.
+     *  @param first, last first and last indexes of the sub-region
      *  @param junk allow to use the constructor (begin,last) rather than (begin,size)
      **/
     inline TRange( int first, int last, bool junk): Base(first), end_(last+1), size_(end_-first) {}
     /** @brief Copy constructor.
      *  Create a copy of an existing TRange.
-     *  @param I The index to copy
+     *  @param I range to copy
      **/
     template<int OtherSize_>
     inline TRange(TRange<OtherSize_> const& I): Base(I.begin()), end_(I.end()), size_(I.size()) {}
@@ -465,16 +461,16 @@ Range inf(TRange<SizeI_> const& I, TRange<SizeJ_> const& J)
 { return Range(std::max(I.begin(), J.begin()), std::min(I.end(), J.end())-1, 0);}
 
 /** @ingroup Base
- *  @brief Write a TRange in the form first:last (MATLAB-like form) in an
- *  output stream.
+ *  @brief Write a TRange in the form first:last (MATLAB-like form) in an output stream.
  *  @param os output stream
- *  @param I the Range to write
+ *  @param I Range to write
+ *  @return output stream
  **/
 template<int Size_>
 ostream& operator<< (ostream& os, TRange<Size_> const& I)
 {
-  if (Arithmetic< TRange<Size_> >::isNA(I)) { os << stringNa;}
-  else { os << I.begin() << _T(":") << I.lastIdx();}
+  (Arithmetic< TRange<Size_> >::isNA(I)) ? os <<  stringNa
+                                         : os <<  I.begin() << _T(":") << I.lastIdx();
   return os;
 }
 

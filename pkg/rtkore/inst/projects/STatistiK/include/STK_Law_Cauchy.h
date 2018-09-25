@@ -46,7 +46,7 @@ namespace Law
 {
 /** @ingroup Laws
  *  @brief Cauchy distribution law.
- * 
+ *
  *  The <em>Cauchy distribution</em>, named after Augustin Cauchy, is a
  *  continuous probability distribution. The Cauchy distribution has the
  *  probability density function
@@ -122,7 +122,7 @@ class Cauchy: public IUnivLaw<Real>
      * \f[
      * F^{-1}(p; \mu,\gamma) = \mu + \gamma \tan(\pi (p-1/2)).
      * \f]
-     * 
+     *
      *  @param p a probability number
      *  @return the inverse cdf of the Cauchy distribution at p
      **/
@@ -169,6 +169,15 @@ class Cauchy: public IUnivLaw<Real>
      **/
     static Real icdf( Real const& p, Real const& mu, Real const& scale);
 
+#ifdef IS_RTKPP_LIB
+    /** @return log-cumulative distribution function */
+    virtual Real lcdf( Real const& t) const;
+    /** @return complement of cumulative distribution function */
+    virtual Real cdfc( Real const& t) const;
+    /** @return log-complement of cumulative distribution function */
+    virtual Real lcdfc( Real const& t) const;
+#endif
+
   protected:
     /** The mu parameter. */
     Real mu_;
@@ -190,6 +199,9 @@ GetRNGstate(); Real s = Rf_rcauchy(mu_, scale_); PutRNGstate(); return s;
 inline Real Cauchy::pdf( Real const& x) const { return Rf_dcauchy(x,mu_, scale_, false);}
 inline Real Cauchy::lpdf( Real const& x) const { return Rf_dcauchy(x,mu_, scale_, true);}
 inline Real Cauchy::cdf( Real const& t) const { return Rf_pcauchy(t, mu_, scale_, true, false);}
+inline Real Cauchy::lcdf( Real const& t) const { return Rf_pcauchy(t, mu_, scale_, true, true);}
+inline Real Cauchy::cdfc( Real const& t) const { return Rf_pcauchy(t, mu_, scale_, false, false);}
+inline Real Cauchy::lcdfc( Real const& t) const { return Rf_pcauchy(t, mu_, scale_, false, true);}
 inline Real Cauchy::icdf( Real const& p) const { return Rf_qcauchy(p , mu_, scale_, true, false);}
 
 // static

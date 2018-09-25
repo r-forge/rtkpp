@@ -40,7 +40,7 @@
 #define STK_IARRAY1D_H
 
 #include "STK_ExprBase.h"
-#include "allocators/STK_AllocatorBase.h"
+#include "allocators/STK_MemAllocator.h"
 #include "STK_ITContainer1D.h"
 
 namespace STK
@@ -48,28 +48,36 @@ namespace STK
 
 /** @ingroup Arrays
  *  @brief template one dimensional Array.
- * 
+ *
  * An IArray1D is a template one column container implementing the interface
  * base class ITContainer1D.
  **/
 template<class Derived >
 class IArray1D: public ITContainer1D<Derived>
-              , protected AllocatorBase< typename hidden::Traits<Derived>::Type
-                                       , hidden::Traits<Derived>::size_
-                                       >
 {
   public:
     enum
     {
-      size_ = hidden::Traits<Derived>::size_
+      size_ = hidden::Traits<Derived>::size_,
+      isFixedSize_ = (size_ != UnknownSize)
     };
     typedef typename hidden::Traits<Derived>::Type Type;
+    typedef typename hidden::Traits<Derived>::ConstReturnType ConstReturnType;
+
     typedef typename hidden::Traits<Derived>::RowRange RowRange;
     typedef typename hidden::Traits<Derived>::ColRange ColRange;
 
-  protected:
-    typedef AllocatorBase<Type, size_> Allocator;
+    typedef MemAllocator<Type, size_> Allocator;
     typedef ITContainer1D< Derived > Base;
+
+    using Base::range;
+    using Base::begin;
+    using Base::end;
+    using Base::size;
+    using Base::elt;
+    using Base::setRange;
+
+  protected:
 
     /** Default constructor. */
     IArray1D();
@@ -102,29 +110,32 @@ class IArray1D: public ITContainer1D<Derived>
     template<class OtherDerived>
     IArray1D( IArray1D<OtherDerived> const& T, Range const& I);
 
-    /** destructor: allocated memory is liberated by AllocatorBase base class.*/
+    /** destructor: allocated memory is liberated by MemAllocator base class.*/
     ~IArray1D() {}
 
   public:
     /** @return @c true if *this is reference container, @c false otherwise */
-    inline bool isRef() const { return Allocator::isRef();}
+    inline bool isRef() const { return allocator_.isRef();}
     /** Modify the state of the container: this become a reference (if ref is
-     * @c true) or the owner of the data (if ref is @c false).
-     * @note To use with care in order to avoid memory leak
+     *  @c true) or the owner of the data (if ref is @c false).
+     *  @note To use with care in order to avoid memory leak
      *  @param ref : has top be false if this own its own data
      **/
-    void setRef(bool ref) const { Allocator::setRef(ref);}
-    /** @return a pointer on the constant data set*/
-    inline Type* const& p_data() const { return Allocator::p_data_;}
+    inline void setRef(bool ref) const { allocator_.setRef(ref);}
+
+    /** @return a constant pointer on the data set*/
+    inline Type* const& p_data() const { return allocator_.p_data();}
+    /** @return a constant reference on the allocator */
+    Allocator const& allocator() const { return allocator_;}
 
     /**  @return the range of the rows of the container */
-    inline RowRange const& rows() const  { return this->range();}
+    inline RowRange const& rows() const  { return range();}
      /** @return the index of the first element */
-    inline int beginRows() const { return this->begin();}
+    inline int beginRows() const { return begin();}
     /**  @return the ending index of the elements */
-    inline int endRows() const { return this->end();}
+    inline int endRows() const { return end();}
     /**  @return the size of the container */
-    inline int sizeRows() const  { return this->size();}
+    inline int sizeRows() const  { return size();}
 
     /** @return the Horizontal range (1 column) */
     inline ColRange cols() const { return ColRange(1);}
@@ -141,16 +152,19 @@ class IArray1D: public ITContainer1D<Derived>
     inline int lastIdxCols() const  { return baseIdx;}
 
     /** @return the maximum possible number of elements without reallocation*/
-    int capacity() const { return isRef() ? 0 : this->sizeData();}
+    int capacity() const { return isRef() ? 0 : allocator_.size();}
 
-    /** access to one element.
+    /** access to an element
      *  @param pos index of the element
+     *  @return a reference on the element to modify
      **/
-    inline Type& elt1Impl(int pos) { return this->data(pos);}
-    /** access to one element const.
+    inline Type& elt1Impl(int pos) { return allocator_.data(pos);}
+    /** access to a constant element
      *  @param pos index of the const element
+     *  @return a constant reference on the element
      **/
-    inline Type const& elt1Impl(int pos) const { return this->data(pos);}
+    inline ConstReturnType elt1Impl(int pos) const { return allocator_.data(pos);}
+
     /** New beginning index for the object.
      *  @param beg the index of the first column to set
      **/
@@ -174,39 +188,42 @@ class IArray1D: public ITContainer1D<Derived>
      *  @note : T is not modified but just set as a reference of the data it was owner.
      *  @param T the container to move to this.
      **/
-     void move(Derived const& T);
-     /** Add n Elements to the end of the container.
-      *  @param n number of elements to add
-      **/
-     Derived& pushBack( int n=1);
+    void move(Derived const& T);
+    /** Add n Elements to the end of the container.
+     *  @param n number of elements to add
+     **/
+    Derived& pushBack( int n=1);
     /** Delete last elts of the container.
      *  @param n number of elts to delete
      **/
-     Derived& popBack(int n = 1);
+    Derived& popBack(int n = 1);
     /** Delete n elements at the pos index to the container.
      *  @param pos index where to delete elements
      *  @param n number of elements to delete (default 1)
-    **/
-     Derived& erase(int pos, int n=1);
-    /** Insert n elements at the position pos of the container. The bound
-     *  end_ should be modified at the very end of the insertion as pos
-     *  can be a reference to it.
+     **/
+    Derived& erase(int pos, int n=1);
+    /** Insert n elements at the position pos of the container.
      *  @param pos,n index where to insert the @c n elements (default is 1)
      **/
-     Derived& insertElt( int pos, int n =1);
+    Derived& insertElt( int pos, int n =1);
+    /** STL compatibility: Insert element @c v at position @c pos of the Array.
+     *  @param pos position to insert elements
+     *  @param v value to insert
+     **/
+    Derived& insert( int pos, Type const& v);
     /** STL compatibility: Insert element @c v in the range @c I of the Array.
      *  @param I range of the index where to insert elements
-     *  @param v the value to insert
+     *  @param v value to insert
      **/
-     Derived& insert( Range const& I, Type const& v);
+    Derived& insert( Range const& I, Type const& v);
     /** STL compatibility: push front an element.
      *  @param v value to append
      **/
-     Derived& push_front(Type const& v);
+    Derived& push_front(Type const& v);
     /** STL compatibility: append an element v.
      *  @param v value to append
      **/
-     Derived& push_back(Type const& v);
+    Derived& push_back(Type const& v);
     /** Swapping the pos1 elt and the pos2 elt.
      *  @param pos1,pos2 positions of the elements to swap
      **/
@@ -217,7 +234,7 @@ class IArray1D: public ITContainer1D<Derived>
     void exchange(IArray1D &T);
     /** overwrite @c this with @c src.
      *  @note If the size match, @c this is not resized, and in this case,
-     *  the method take care of the possibly of overlapping.
+     *  the method take care of the possibility of overlapping.
      *  @param src the container to assign
      **/
     Derived& assign( IArray1D const& src);
@@ -226,43 +243,40 @@ class IArray1D: public ITContainer1D<Derived>
      *  @param value the value to set
      **/
     Derived& setValue(Type const& value);
+
   protected:
-    /** @return a writable on the constant data set*/
-    inline Type* p_data() { return Allocator::p_data_;}
     /** function for memory allocation and initialization.
-     *  This method will free all allocated memory owned by this
-     *  container before initialization.
+     *  This method will free all allocated memory owned by this container before initialization.
      *  @param I range of the container
      **/
-    void initialize(Range const& I);
+    void initialize(RowRange const& I);
     /** function for memory allocation and initialization.
      *  The range is not set in this method. If a bad_alloc occur, we set the
      *  range of the container to default before throwing it.
      *  @param I range of the container
      **/
-    void allocate(Range const& I);
+    void allocate(RowRange const& I);
     /** Method for memory deallocation. Memory is liberated and the
      *  range of the Container is set to begin:begin-1.
      **/
     void freeMem();
+
+  private:
+    Allocator allocator_;
 };
 
 template<class Derived >
-IArray1D<Derived>::IArray1D(): Base()
-                             , Allocator(Arrays::evalSizeCapacity(0))
-{}
+IArray1D<Derived>::IArray1D(): Base(), allocator_(Arrays::evalRangeCapacity(range())) {}
 
 template<class Derived >
 IArray1D<Derived>::IArray1D( Range const& I)
-                          : Base(I)
-                           , Allocator(Arrays::evalRangeCapacity(I))
-{}
+                           : Base(I), allocator_(Arrays::evalRangeCapacity(range())) {}
 
 template<class Derived >
 IArray1D<Derived>::IArray1D( Range const& I, Type const& v)
-                          : Base(I)
-                           , Allocator(Arrays::evalRangeCapacity(I))
-{ for(int i=this->begin(); i<this->end(); i++) this->data(i) = v;}
+                           : Base(I)
+                           , allocator_(Arrays::evalRangeCapacity(range()))
+{ for(int i=begin(); i<end(); i++) allocator_.data(i) = v;}
 
 /* Copy constructor
  *  @param T the container to copy
@@ -270,12 +284,13 @@ IArray1D<Derived>::IArray1D( Range const& I, Type const& v)
  **/
 template<class Derived >
 IArray1D<Derived>::IArray1D( const IArray1D &T, bool ref)
-                          : Base(T)
-                           , Allocator(T, ref)
+                           : Base(T)
+                           , allocator_(T.allocator_, ref)
 {
-  if (!ref)
-  { allocate(T.range());
-    this->memcpy(this->begin(), T, this->range());
+  if (!ref) // copy data
+  {
+    allocate(T.range());
+    allocator_.memcpy(begin(), T.allocator_, range());
   }
 }
 
@@ -285,37 +300,37 @@ IArray1D<Derived>::IArray1D( const IArray1D &T, bool ref)
 template<class Derived >
 template<class OtherDerived>
 IArray1D<Derived>::IArray1D( ExprBase<OtherDerived> const& T)
-                          : Base(T.range())
-                           , Allocator(Arrays::evalRangeCapacity(T.range()))
+                           : Base(T.range())
+                           , allocator_(Arrays::evalRangeCapacity(T.range()))
 {
   STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(OtherDerived);
-  for (int i=this->begin(); i<this->end(); i++) this->elt(i)= T.elt(i);
+  for (int i=begin(); i<end(); i++) elt(i)= T.elt(i);
 }
 
 template<class Derived >
 IArray1D<Derived>::IArray1D( IArray1D const& T, Range const& I)
                           : Base(I)
-                           , Allocator(T, true)
+                          , allocator_(T.allocator_, true)
 {}
 /* constructor by reference, ref_=1.
  *  @param T,I the container and the range of data to wrap
  **/
 template<class Derived >
 template<class OtherDerived>
-IArray1D<Derived>::IArray1D( IArray1D<OtherDerived> const& T, Range const& I): Base(T, I) {}
+IArray1D<Derived>::IArray1D( IArray1D<OtherDerived> const& T, Range const& I)
+                           : Base(I), allocator_(T.allocator(), true) {}
 
 template<class Derived >
 void IArray1D<Derived>::shiftImpl(int beg)
 {
   // compute increment
-  int inc = beg - this->begin();
+  int inc = beg - begin();
   if (inc == 0) return;
-  // is this structure just a pointer?
-  if (this->isRef())
-  { STKRUNTIME_ERROR_1ARG(IArray1D::shift,beg,cannot operate on references);}
-  // translate cols_ and data
+  if (isRef())  // is this structure just a pointer ?
+  { STKRUNTIME_ERROR_1ARG(IArray1D::shiftImpl,beg,cannot operate on references);}
+  // translate range and data
   this->incRange(inc);
-  this->shiftData(beg);
+  allocator_.shift(beg);
 }
 
 template<class Derived >
@@ -323,15 +338,14 @@ Derived& IArray1D<Derived>::resizeImpl(Range const& I)
 {
   // check if there is something to do
   if ( this->range() == I) return this->asDerived();
-  if (this->isRef())
-  { STKRUNTIME_ERROR_1ARG(IArray1D::resize,I,cannot operate on references);}
+  if (isRef()) { STKRUNTIME_ERROR_1ARG(IArray1D::resizeImpl,I,cannot operate on references);}
   // translate
   shiftImpl(I.begin());
   // compute number of elements to delete or add
-  const int inc = I.end() - this->end();
+  const int inc = I.end() - end();
   // adjust size of the container
-  if (inc > 0) this->pushBack(inc);  // more elements
-  else         this->popBack(-inc);  // less elements
+  if (inc > 0) pushBack(inc);  // more elements
+  else         popBack(-inc);  // less elements
   return this->asDerived();
 }
 
@@ -339,28 +353,27 @@ template<class Derived >
 void IArray1D<Derived>::reserve(int size)
 {
   // nothing to do
-  if (size < this->capacity()) return;
+  if (size < this->capacity() || isFixedSize_) return;
   // is this structure a ptr ?
-  if (this->isRef())
-  { STKRUNTIME_ERROR_1ARG(IArray1D::reserve,size,cannot operate on references);}
-  Allocator::realloc(Range(this->begin(), size));
+  if (isRef()) { STKRUNTIME_ERROR_1ARG(IArray1D::reserve,size,cannot operate on references);}
+  allocator_.realloc(Range(begin(), size));
 }
 
 template<class Derived >
 void IArray1D<Derived>::clear()
 {
-  if (this->isRef()) return;   // Nothing to do for ref
-  this->freeMem();  // Free Mem
-  this->setRange(); // Set dimension to default
+  if (isRef()) return;   // Nothing to do for ref
+  freeMem();  // Free Mem
+  setRange(); // Set dimension to default
 }
 
 template<class Derived >
 void IArray1D<Derived>::move(Derived const& T)
 {
-  if (this->asPtrDerived() == &T) return; // avoid
-  if (!this->isRef()) { freeMem();}
-  Allocator::move(T);       // move Allocator part
-  this->setRange(T.range());// Set ITContainer1D part
+  if (this->asPtrDerived() == &T) return; // avoid move on itself
+  if (!isRef()) { freeMem();}
+  allocator_.move(T.allocator_);  // move Allocator part
+  setRange(T.range());            // Set ITContainer1D part
 }
 
 template<class Derived >
@@ -371,11 +384,11 @@ Derived& IArray1D<Derived>::pushBack( int n)
 #endif
   // checks
   if (n <= 0) return this->asDerived();
-  if (this->isRef())
-  { STKRUNTIME_ERROR_1ARG(IArray1D::pushBack,n,cannot operate on references);}
-  // If the container is empty : create it
-  if (this->empty()) { initialize(Range(this->begin(), n));}
-  else               { insertElt(this->end(), n);}
+  if (isRef()) { STKRUNTIME_ERROR_1ARG(IArray1D::pushBack,n,cannot operate on references);}
+  if (this->empty())  // If container is empty : create it
+  { initialize(RowRange(begin(), n));}
+  else // otherwise add element from end() position
+  { insertElt(end(), n);}
   return this->asDerived();
 }
 
@@ -383,16 +396,11 @@ template<class Derived >
 Derived& IArray1D<Derived>::popBack(int n)
 {
   // checks
-  if (n <= 0) return this->asDerived();
-  if (this->isRef())
+  if (n <= 0 || isFixedSize_) return this->asDerived();
+  if (isRef())
   { STKRUNTIME_ERROR_1ARG(IArray1D::popBack,n,cannot operate on reference);}
-#ifdef STK_BOUNDS_CHECK
-  if (this->size()<n)
-  { STKOUT_OF_RANGE_1ARG(IArray1D::popBack,n,size() < n);}
-#endif
-  // update range
   this->decLast(n);
-  if (this->size() == 0) this->freeMem(); // release mem if there's no more elts
+  if (this->size() <= 0) this->freeMem(); // release mem if there's no more elts
   return this->asDerived();
 }
 
@@ -401,23 +409,19 @@ Derived& IArray1D<Derived>::erase(int pos, int n)
 {
   // checks
   if (n<=0) return this->asDerived();
-  if (this->isRef())
-  { STKRUNTIME_ERROR_2ARG(IArray1D::erase,pos, n,cannot operate on reference);}
+  if (isRef()) { STKRUNTIME_ERROR_2ARG(IArray1D::erase,pos, n,cannot operate on reference);}
 #ifdef STK_BOUNDS_CHECK
-  if (this->begin() > pos)
+  if (begin() > pos)
   { STKOUT_OF_RANGE_2ARG(IArray1D::erase,pos, n,begin() > pos);}
-  if (this->lastIdx() < pos)
-  { STKOUT_OF_RANGE_2ARG(IArray1D::erase,pos, n,lastIdx() < pos);}
-  if (this->lastIdx() < pos+n-1)
-  { STKOUT_OF_RANGE_2ARG(IArray1D::erase,pos, n,lastIdx() < pos+n-1);}
+  if (end() <= pos)
+  { STKOUT_OF_RANGE_2ARG(IArray1D::erase,pos, n,end() <= pos);}
+  if (end() < pos+n)
+  { STKOUT_OF_RANGE_2ARG(IArray1D::erase,pos, n,end() < pos+n);}
 #endif
-  // translate remaining elts
-  this->memmove(pos, Range(pos+n, this->end() - pos -n));
-  //const int last = this->lastIdx()-n;
-  //for (int k=pos; k<=last; k++) this->data(k) = this->data(k+n);
-  // update dimensions
+  // translate remaining elements and update dimensions
+  allocator_.memmove(pos, _R(pos+n, end()-1));
   this->decLast(n);
-  if (this->size() <= 0) this->freeMem(); // if empty release mem
+  if (size() <= 0) this->freeMem(); // if empty release allocated memory
   return this->asDerived();
 }
 
@@ -425,67 +429,79 @@ template<class Derived >
 Derived& IArray1D<Derived>::insertElt( int pos, int n)
 {
   // checks
-  if (n <= 0) return this->asDerived();
-  if (this->isRef())
-  { STKRUNTIME_ERROR_2ARG(IArray1D::insertElt,pos,n,cannot operate on references);}
+  if (n <= 0 ) return this->asDerived();
+  if (isRef()) { STKRUNTIME_ERROR_2ARG(IArray1D::insertElt,pos,n,cannot operate on references);}
 #ifdef STK_BOUNDS_CHECK
-  if (this->begin() > pos)
+  if (begin() > pos)
   { STKOUT_OF_RANGE_2ARG(IArray1D::insertElt,pos, n,begin() > pos);}
-  if (this->end() < pos)
+  if (end() < pos)
   { STKOUT_OF_RANGE_2ARG(IArray1D::insertElt,pos, n,end() < pos);}
 #endif
-  // allocate, if necessary, the memory for the elements
-  if (this->capacity() < this->size()+n)
+
+  // allocate, if necessary, memory for the elements
+  if ( (capacity() < this->size()+n) && !isFixedSize_ )
   {
     // temporary container
     IArray1D Taux;
     exchange(Taux);
     // compute range of the container after insertion
-    Range range(Taux.range());
+    RowRange range(Taux.range());
     range.incLast(n);
-    // initialize
-    try
-    {
-      this->allocate(range);
-    }
-    catch (runtime_error const& error)   // if an error occur
+    // allocate
+    try { allocate(range);}
+    catch (Exception const& error)   // if an error occur
     {
       exchange(Taux); // restore this
       throw error;    // and send again the Exception
     }
     // set range
-    this->setRange(Taux.range());
+    setRange(Taux.range());
     // copy original elements
-    this->memcpy(Taux.begin(), Taux, Range(Taux.begin(), pos - this->begin()) );
-    this->memcpy(pos+n, Taux, Range(pos, this->end()-pos) );
+    allocator_.memcpy(Taux.begin(), Taux.allocator_, Range(Taux.begin(), pos - begin()) );
+    allocator_.memcpy(pos+n, Taux.allocator_, Range(pos, end()-pos) );
   }
   else // enough space -> shift the last elements
   {
-    this->memmove(pos+n, Range(pos, this->end() - pos));
+    if (!isFixedSize_)
+    { allocator_.memmove(pos+n, Range(pos, end() - pos));}
+    else
+    { allocator_.memmove(pos+n, Range(pos, end() - pos - n));}
   }
   this->incLast(n);
+  return this->asDerived();
+}
+
+/* STL compatibility: Insert element @c v at position @c pos of the Array.
+ *  @param pos position to insert elements
+ *  @param v value to insert
+ **/
+template<class Derived >
+Derived& IArray1D<Derived>::insert( int pos, Type const& v)
+{
+  insertElt(pos, 1);
+  elt(pos) = v;
   return this->asDerived();
 }
 
 template<class Derived >
 Derived&  IArray1D<Derived>::insert( Range const& I, Type const& v)
 {
-  this->insertElt(I.begin(), I.size());
-  for (int i=I.begin(); i<I.end(); i++) this->data(i) = v;
+  insertElt(I.begin(), I.size());
+  for (int i=I.begin(); i<I.end(); i++) elt(i) = v;
   return this->asDerived();
 }
 
 template<class Derived >
 Derived& IArray1D<Derived>::push_front(Type const& v)
 {
-  insert(Range(this->begin(), 1), v);
+  insert(Range(begin(), 1), v);
   return this->asDerived();
 }
 
 template<class Derived >
 Derived& IArray1D<Derived>::push_back(Type const& v)
 {
-  this->pushBack();
+  pushBack();
   this->back() = v;
   return this->asDerived();
 }
@@ -494,38 +510,28 @@ template<class Derived >
 void IArray1D<Derived>::swap(int pos1, int pos2)
 {
 #ifdef STK_BOUNDS_CHECK
-  if (this->begin() > pos1)
-  { STKOUT_OF_RANGE_2ARG(IArray1D::swap,pos1,pos2,begin()>pos1);}
-  if (this->lastIdx() < pos1)
-  { STKOUT_OF_RANGE_2ARG(IArray1D::swap,pos1,pos2,lastIdx()<pos1);}
-  if (this->begin() > pos2)
-  { STKOUT_OF_RANGE_2ARG(IArray1D::swap,pos1,pos2,begin()>pos2);}
-  if (this->lastIdx() < pos2)
-  { STKOUT_OF_RANGE_2ARG(IArray1D::swap,pos1,pos2,lastIdx()<pos2);}
+  if (begin() > pos1) { STKOUT_OF_RANGE_2ARG(IArray1D::swap,pos1,pos2,begin()>pos1);}
+  if (end() <= pos1)  { STKOUT_OF_RANGE_2ARG(IArray1D::swap,pos1,pos2,end()<=pos1);}
+  if (begin() > pos2) { STKOUT_OF_RANGE_2ARG(IArray1D::swap,pos1,pos2,begin()>pos2);}
+  if (end() <= pos2)  { STKOUT_OF_RANGE_2ARG(IArray1D::swap,pos1,pos2,end()<=pos2);}
 #endif
-  // swap
-  std::swap(this->data(pos1), this->data(pos2));
+  std::swap(elt(pos1), elt(pos2));
 }
 
 template<class Derived >
 void IArray1D<Derived>::exchange(IArray1D &T)
 {
-  Allocator::exchange(T);
+  allocator_.exchange(T.allocator_);
   Base::exchange(T);
 }
 
 template<class Derived >
 Derived& IArray1D<Derived>::assign( IArray1D const& src)
 {
-  if (p_data() == src.p_data())
-  {
-    if (this->range() != src.range())
-    { STKRUNTIME_ERROR_NO_ARG(IArray1D::assign,cannot copy a part of an array on itself);}
-    return this->asDerived();
-  }
+  if (p_data() == src.p_data()) { return this->asDerived();}
   // Resize if necessary.
-  if ( this->sizeRows() != src.sizeRows() ) { this->resize(src.rows());}
-  this->memcpy(this->begin(), src, src.range());
+  if ( size() != src.size() ) { this->resize(src.range());}
+  allocator_.memcpy(begin(), src.allocator_, src.range());
   return this->asDerived();
 }
 
@@ -535,32 +541,28 @@ Derived& IArray1D<Derived>::assign( IArray1D const& src)
 template<class Derived >
 Derived& IArray1D<Derived>::setValue(Type const& v)
 {
-  for(int i=this->begin(); i<this->end(); i++) this->data(i) = v;
+  for(int i=begin(); i<end(); i++) elt(i) = v;
   return this->asDerived();
 }
 
 template<class Derived >
-void IArray1D<Derived>::initialize(Range const& I)
+void IArray1D<Derived>::initialize(RowRange const& I)
 {
-  this->clear();
-  this->setRef(false);
-  this->allocate(I);
-  this->setRange(I);
+  allocate(I);
+  allocator_.setRef(false);
+  setRange(I);
 }
 
 template<class Derived >
-void IArray1D<Derived>::allocate(Range const& I)
+void IArray1D<Derived>::allocate(RowRange const& I)
 {
-  // compute the size necessary (can be 0)
-  int size = Arrays::evalSizeCapacity(I.size());
   try
   {
-    this->malloc(Range(I.begin(), size));
+    allocator_.malloc(Arrays::evalRangeCapacity(I));
   }
-  catch (runtime_error const& error)
+  catch (Exception const& error)
   {
-    // if an error occur set default range
-    this->setRange();
+    setRange(); // if an error occur set default range
     throw error;
   }
 }
@@ -568,10 +570,9 @@ void IArray1D<Derived>::allocate(Range const& I)
 template<class Derived >
 void IArray1D<Derived>::freeMem()
 {
-  // Nothing to do for ref
-  if (this->isRef()) return;
-  this->free();                 // free allocated memory (Allocator)
-  this->setRange(Range(this->begin(), -1)); // set range to default (Base)
+  if (isRef()) return;  // Nothing to do for ref
+  allocator_.free();
+  setRange(Range(begin(),0)); // set range to default (Base)
 }
 
 } // namespace STK

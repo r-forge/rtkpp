@@ -199,8 +199,8 @@ struct VisitorArrayUnrollImpl<Visitor, Derived, Arrays::by_row_, 1, 1>
 
 /** @ingroup hidden
  *  Specialization of VisitorArrayImpl when the number of rows is less than
- *  MaxUnrollSquareRoot and the number of column is unknown or greater
- *  than MaxUnrollSquareRoot
+ *  MaxUnrollSlice and the number of column is unknown or greater
+ *  than MaxUnrollSlice
  */
 template<typename Visitor, typename Derived, int SizeRows_>
 struct VisitorArrayImpl< Visitor, Derived, SizeRows_, UnknownSize>
@@ -221,7 +221,7 @@ struct VisitorArrayImpl< Visitor, Derived, SizeRows_, UnknownSize>
 
 /** @ingroup hidden
  *  @brief Specialization of VisitorArrayImpl when the number of rows is 1
- *  and the number of column is unknown or greater than MaxUnrollSquareRoot.
+ *  and the number of column is unknown or greater than MaxUnrollSlice.
  *  This class will stop the unrolling of on the rows.
  **/
 template<typename Visitor, typename Derived>
@@ -241,7 +241,7 @@ struct VisitorArrayImpl< Visitor, Derived, 1, UnknownSize>
 
 /** @ingroup hidden
  *  Specialization of VisitorArrayImpl when the number of columns is less than
- *  MaxUnrollSquareRoot and the number of rows is unknown
+ *  MaxUnrollSlice and the number of rows is unknown
  */
 template<typename Visitor, typename Derived, int SizeCols_>
 struct VisitorArrayImpl< Visitor, Derived, UnknownSize, SizeCols_>

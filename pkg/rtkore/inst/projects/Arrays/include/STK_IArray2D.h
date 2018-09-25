@@ -91,13 +91,9 @@ template < class  Derived  >
 class IArray2D: public IArray2DBase< typename hidden::Traits<Derived>::Type*, Derived>
 {
   public:
-     typedef typename hidden::Traits<Derived>::Type Type;
+    typedef typename hidden::Traits<Derived>::Type Type;
     typedef typename hidden::Traits<Derived>::Row  Row;
     typedef typename hidden::Traits<Derived>::Col  Col;
-    typedef typename hidden::Traits<Derived>::SubRow SubRow;
-    typedef typename hidden::Traits<Derived>::SubCol SubCol;
-    typedef typename hidden::Traits<Derived>::SubVector SubVector;
-    typedef typename hidden::Traits<Derived>::SubArray SubArray;
 
     enum
     {
@@ -928,12 +924,10 @@ class IArray2D: public IArray2DBase< typename hidden::Traits<Derived>::Type*, De
       this->rangeCols_[pos] = I;
     }
     /** vertical memory deallocation.
-     *  @param J the columns range to liberate.
+     *  @param J range of the columns to liberate.
      **/
     void freeCols(Range const& J)
-    {
-      for (int j=J.begin(); j<J.end(); j++) { this->freeCol(j);}
-    }
+    { for (int j=J.begin(); j<J.end(); j++) { freeCol(j);}}
     /** @brief Internal method for memory deallocation.
      *  @param col the number of the column to free
      **/

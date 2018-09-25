@@ -48,7 +48,6 @@ template<typename> class Array2DVector;
   * @brief final class for a Real horizontal container.
   * A Point is a row oriented 1D container of Real.
   */
-typedef Array2DPoint<Real>   Point;
 typedef Array2DPoint<Real>   PointX;
 typedef Array2DPoint<double> PointXd;
 typedef Array2DPoint<int>    PointXi;
@@ -77,6 +76,7 @@ struct Traits< Array2DPoint<Type_> >
     orient_    = Arrays::by_col_,
     sizeRows_  = 1,
     sizeCols_  = UnknownSize,
+    size_      = UnknownSize,
     storage_   = Arrays::dense_ // always dense
   };
 };
@@ -89,7 +89,7 @@ struct Traits< Array2DPoint<Type_> >
  * An Array2DPoint is an implementation of the interface IArray2D.
  * It's a one dimensional row-vector and is refered as a point.
  *
- *  By default the index of the first element is 1 but this can be
+ *  By default the index of the first element is 0 but this can be
  *  modified using the appropriate constructor or using the method @c shift.
  **/
 template<class Type_>
@@ -97,25 +97,26 @@ class Array2DPoint: public IArray2D< Array2DPoint<Type_> >
 {
   public:
     typedef IArray2D< Array2DPoint<Type_> > Base;
-    typedef ArrayBase < Array2DPoint<Type_> > LowBase;
+    typedef ArrayBase< Array2DPoint<Type_> > LowBase;
 
-    typedef typename hidden::Traits<Array2DPoint<Type_> >::Row Row;
-    typedef typename hidden::Traits<Array2DPoint<Type_> >::Col Col;
-    typedef typename hidden::Traits<Array2DPoint<Type_> >::SubRow SubRow;
-    typedef typename hidden::Traits<Array2DPoint<Type_> >::SubCol SubCol;
-    typedef typename hidden::Traits<Array2DPoint<Type_> >::SubVector SubVector;
-    typedef typename hidden::Traits<Array2DPoint<Type_> >::SubArray SubArray;
+    typedef typename hidden::Traits< Array2DPoint<Type_> >::Row Row;
+    typedef typename hidden::Traits< Array2DPoint<Type_> >::Col Col;
+    typedef typename hidden::Traits< Array2DPoint<Type_> >::SubRow SubRow;
+    typedef typename hidden::Traits< Array2DPoint<Type_> >::SubCol SubCol;
+    typedef typename hidden::Traits< Array2DPoint<Type_> >::SubVector SubVector;
+    typedef typename hidden::Traits< Array2DPoint<Type_> >::SubArray SubArray;
 
-    typedef typename hidden::Traits<Array2DPoint<Type_> >::Type Type;
-    typedef typename hidden::Traits<Array2DPoint<Type_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< Array2DPoint<Type_> >::Type Type;
+    typedef typename hidden::Traits< Array2DPoint<Type_> >::ConstReturnType ConstReturnType;
 
-   enum
+    enum
     {
-      structure_ = Arrays::point_,
-      orient_    = Arrays::by_col_,
-      sizeRows_  = 1,
-      sizeCols_  = UnknownSize,
-      storage_   = Arrays::dense_ // always dense
+      structure_ = hidden::Traits< Array2DPoint<Type_> >::structure_,
+      orient_    = hidden::Traits< Array2DPoint<Type_> >::orient_,
+      sizeCols_  = hidden::Traits< Array2DPoint<Type_> >::sizeCols_,
+      sizeRows_  = hidden::Traits< Array2DPoint<Type_> >::sizeRows_,
+      size_      = hidden::Traits< Array2DPoint<Type_> >::size_,
+      storage_   = hidden::Traits< Array2DPoint<Type_> >::storage_
     };
 
     /** Default constructor */

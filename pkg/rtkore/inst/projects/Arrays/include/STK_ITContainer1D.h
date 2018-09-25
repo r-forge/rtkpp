@@ -94,10 +94,7 @@ class ITContainer1D: public IRecursiveTemplate<Derived>
 
     typedef typename hidden::Traits<Derived>::Row Row;
     typedef typename hidden::Traits<Derived>::Col Col;
-    typedef typename hidden::Traits<Derived>::SubRow SubRow;
-    typedef typename hidden::Traits<Derived>::SubCol SubCol;
     typedef typename hidden::Traits<Derived>::SubVector SubVector;
-    typedef typename hidden::Traits<Derived>::SubArray SubArray;
 
     typedef typename hidden::Traits<Derived>::Iterator Iterator;
     typedef typename hidden::Traits<Derived>::ConstIterator ConstIterator;
@@ -159,48 +156,56 @@ class ITContainer1D: public IRecursiveTemplate<Derived>
     bool empty() const { return range_.empty();}
 
     /** @return the ith element for vector_, point_ and diagonal_ containers
-     *  @param i index of the ith element
+     *  @param i index of the element to get
      **/
     inline Type& elt(int i)
     {
 #ifdef STK_BOUNDS_CHECK
-      if (this->asDerived().begin() > i)
-      { STKOUT_OF_RANGE_1ARG(ITContainer1D::elt, i, begin() > i);}
-      if (this->asDerived().end() <= i)
-      { STKOUT_OF_RANGE_1ARG(ITContainer1D::elt, i, end() <= i);}
+      if (begin() > i) { STKOUT_OF_RANGE_1ARG(ITContainer1D::elt, i, begin() > i);}
+      if (end() <= i)  { STKOUT_OF_RANGE_1ARG(ITContainer1D::elt, i, end() <= i);}
 #endif
       return this->asDerived().elt1Impl(i);
     }
     /** @return a constant reference on the ith element for vector_, point_ and diagonal_ containers
-     *  @param i index of the ith element
+     *  @param i index of the element to get
      **/
     inline ConstReturnType elt(int i) const
     {
 #ifdef STK_BOUNDS_CHECK
-      if (this->asDerived().begin() > i)
-      { STKOUT_OF_RANGE_1ARG(ITContainer1D::elt, i, begin() > i);}
-      if (this->asDerived().end() <= i)
-      { STKOUT_OF_RANGE_1ARG(ITContainer1D::elt, i, end() <= i);}
+      if (begin() > i) { STKOUT_OF_RANGE_1ARG(ITContainer1D::elt, i, begin() > i);}
+      if (end() <= i)  { STKOUT_OF_RANGE_1ARG(ITContainer1D::elt, i, end() <= i);}
 #endif
       return this->asDerived().elt1Impl(i);
     }
     /** @return the element ith element
-     *  @param i index of the ith element
+     *  @param i index of the element to get
      **/
-    inline Type& operator[](int i) { return elt(i);}
+    inline Type& operator[](int i)
+    {
+#ifdef STK_BOUNDS_CHECK
+      if (begin() > i) { STKOUT_OF_RANGE_1ARG(ITContainer1D::operator[], i, begin() > i);}
+      if (end() <= i)  { STKOUT_OF_RANGE_1ARG(ITContainer1D::operator[], i, end() <= i);}
+#endif
+      return elt(i);
+    }
     /** @return a constant reference on the ith  element
-     *  @param i index of the ith element
+     *  @param i index of the element to get
      **/
-    inline ConstReturnType operator[](int i) const { return elt(i);}
+    inline ConstReturnType operator[](int i) const
+    {
+#ifdef STK_BOUNDS_CHECK
+      if (begin() > i) { STKOUT_OF_RANGE_1ARG(ITContainer1D::operator[], i, begin() > i);}
+      if (end() <= i)  { STKOUT_OF_RANGE_1ARG(ITContainer1D::operator[], i, end() <= i);}
+#endif
+      return elt(i);
+    }
     /** @return safely the jth element
      *  @param i index of the element
      **/
     inline Type& at(int i)
     {
-      if (begin() > i)
-      { STKOUT_OF_RANGE_1ARG(ITContainer1D::at, i, begin() > i);}
-      if (end() <= i)
-      { STKOUT_OF_RANGE_1ARG(ITContainer1D::at, i, end() <= i);}
+      if (begin() > i) { STKOUT_OF_RANGE_1ARG(ITContainer1D::at, i, begin() > i);}
+      if (end() <= i)  { STKOUT_OF_RANGE_1ARG(ITContainer1D::at, i, end() <= i);}
       return elt(i);
     }
     /** @return safely the constant jth element

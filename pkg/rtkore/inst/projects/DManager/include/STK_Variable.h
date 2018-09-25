@@ -110,9 +110,10 @@ class Variable: public IVariable
       sizeRows_  = hidden::Traits<Variable<Type> >::sizeRows_,
       storage_   = hidden::Traits<Variable<Type> >::storage_
     };
-    typedef AllocatorBase<Type*, UnknownSize> Allocator;
+    typedef MemAllocator<Type*, UnknownSize> Allocator;
     typedef IArray1D< Variable<Type> > Base;
 
+    using Base::elt;
     /** default constructor
      *  @param name name of the variable
      **/
@@ -179,14 +180,6 @@ class Variable: public IVariable
      **/
     virtual Variable* clone( bool ref = false) const
     { return new Variable(*this, ref);}
-    /** @return a constant reference on the ith element
-     *  @param i index of the element (const)
-     **/
-    inline Type const& elt1Impl(int i) const { return this->data(i);}
-    /** @return a reference on the ith element
-     *  @param i index of the element
-     **/
-    inline Type& elt1Impl(int i) { return this->data(i);}
     /** New first index for the object.
      *  @param rbeg the index of the first row to set
      **/

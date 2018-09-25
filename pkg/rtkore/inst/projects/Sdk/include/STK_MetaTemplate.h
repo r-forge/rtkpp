@@ -130,28 +130,37 @@ struct Promote<Type, Type>
 template<int Size1, int Size2> struct ProductSizeRowsBySizeCols;
 
 // easy part
-template<> struct ProductSizeRowsBySizeCols<1, 1>                        { enum { prod_ = 1};};
-template<> struct ProductSizeRowsBySizeCols<UnknownSize, 1>              { enum { prod_ = UnknownSize};};
-template<> struct ProductSizeRowsBySizeCols<1, UnknownSize>              { enum { prod_ = UnknownSize};};
-template<> struct ProductSizeRowsBySizeCols<UnknownSize, UnknownSize>    { enum { prod_ = UnknownSize};};
-template<int Size1> struct ProductSizeRowsBySizeCols<Size1, 1>           { enum { prod_ = Size1};};
-template<int Size2> struct ProductSizeRowsBySizeCols<1, Size2>           { enum { prod_ = Size2};};
-template<int Size1> struct ProductSizeRowsBySizeCols<Size1, UnknownSize> { enum { prod_ = UnknownSize};};
-template<int Size2> struct ProductSizeRowsBySizeCols<UnknownSize, Size2> { enum { prod_ = UnknownSize};};
+template<>
+struct ProductSizeRowsBySizeCols<1, 1>                    { enum { prod_ = 1};};
+template<>
+struct ProductSizeRowsBySizeCols<UnknownSize, 1>          { enum { prod_ = UnknownSize};};
+template<>
+struct ProductSizeRowsBySizeCols<1, UnknownSize>          { enum { prod_ = UnknownSize};};
+template<>
+struct ProductSizeRowsBySizeCols<UnknownSize, UnknownSize>{ enum { prod_ = UnknownSize};};
+template<int Size1>
+struct ProductSizeRowsBySizeCols<Size1, 1>                { enum { prod_ = Size1};};
+template<int Size2>
+struct ProductSizeRowsBySizeCols<1, Size2>                { enum { prod_ = Size2};};
+template<int Size1>
+struct ProductSizeRowsBySizeCols<Size1, UnknownSize>      { enum { prod_ = UnknownSize};};
+template<int Size2>
+struct ProductSizeRowsBySizeCols<UnknownSize, Size2>      { enum { prod_ = UnknownSize};};
+
+template<bool isSmallSize1, bool isSmallSize2, int Size1, int Size2>
+struct ProductSizesHelper { enum { prod_ =  UnknownSize};};
+template<int Size1, int Size2>
+struct ProductSizesHelper<false, false, Size1, Size2> { enum { prod_ =  Size1 * Size2};};
 
 /** @ingroup hidden
- *  trick as some compilers (g++) complain about overflow */
-template<bool isSmallSize1, bool isSmallSize2, int Size1, int Size2>
-struct ProductHelper { enum { prod_ =  UnknownSize};};
+ *  @brief Compute the product Size1*Size2
+ *  trick as some compilers (g++ 4 and 5 at least) complain about overflow otherwise
+ **/
 template<int Size1, int Size2>
-struct ProductHelper<false, false, Size1, Size2> { enum { prod_ =  Size1 * Size2};};
-
-// case Size1 and Size2 are known
-template<int Size1, int Size2>
-struct ProductSizeRowsBySizeCols { enum { prod_ = ProductHelper< Size1 >= SqrtUnknownSize
-                                                               , Size2 >= SqrtUnknownSize
-                                                               , Size1
-                                                               , Size2>::prod_};};
+struct ProductSizeRowsBySizeCols { enum { prod_ = ProductSizesHelper< Size1 >= SqrtUnknownSize
+                                                                    , Size2 >= SqrtUnknownSize
+                                                                    , Size1
+                                                                    , Size2>::prod_};};
 
 
 }// namespace hidden

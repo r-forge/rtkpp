@@ -118,7 +118,10 @@ class DataHandler: public DataHandlerBase<DataHandler>
      **/
     template<typename Array>
     bool readDataFromArray(ExprBase<Array> const& data, std::string const& idData, std::string const& idModel);
-    /** return in an Array2D<Type> the data with the given idData */
+    /** @return in an Array2D<Type> the data with the given idData */
+    template<typename Type>
+    void getData(std::string const& idData, Array2D<Type>& data) const;
+    /** @return in an Array2D<Type> the data with the given idData */
     template<typename Type>
     void getData(std::string const& idData, Array2D<Type>& data, int& nbVariable) const;
     /** remove the data with the given idData */
@@ -155,6 +158,27 @@ void DataHandler::getData(std::string const& idData, Array2D<Type>& data, int& n
   stk_cout << _T("\n");
 #endif
   nbVariable = indexes.size();
+  data.resize(nbSample(), nbVariable);
+  int j= data.beginCols();
+  for (std::vector<int>::const_iterator it = indexes.begin(); it != indexes.end(); ++it, ++j)
+  {
+    for (int i = data_.firstRow(*it); i <= data_.lastRow(*it); ++i)
+    { data(i, j) = stringToType<Type>(data_(i,*it));}
+  }
+}
+
+template<typename Type>
+void DataHandler::getData(std::string const& idData, Array2D<Type>& data) const
+{
+  std::vector<int> indexes = colIndex(idData);
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("In DataHandler::getData, idData = ") << idData << _T("\n");
+  stk_cout << _T("columns found = ");
+  for (std::vector<int>::const_iterator it = indexes.begin(); it != indexes.end(); ++it)
+  { stk_cout << (*it) << _T(" ");}
+  stk_cout << _T("\n");
+#endif
+  int nbVariable = indexes.size();
   data.resize(nbSample(), nbVariable);
   int j= data.beginCols();
   for (std::vector<int>::const_iterator it = indexes.begin(); it != indexes.end(); ++it, ++j)

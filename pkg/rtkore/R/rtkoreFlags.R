@@ -39,16 +39,16 @@
 # You should have received a copy of the GNU General Public License
 # along with Rcpp.  If not, see <http://www.gnu.org/licenses/>.
 #-----------------------------------------------------------------------
-#' CxxFlags defaults for rtkore
+#' CxxFlags defaults for rtkore package
 #' @rdname rtkoreFlags
 #' @keywords internal
 CxxFlags <- function(cpp11=FALSE) { cat(.rtkoreCxxFlags(cpp11=cpp11)) }
 #-----------------------------------------------------------------------
-#' CppFlags defaults for rtkore
+#' CppFlags defaults for rtkore package
 #' @rdname rtkoreFlags
 #' @keywords internal
 CppFlags <- function() { cat(.rtkoreCppFlags()) }
-#' LdFlags defaults for the rtkore package
+#' LdFlags defaults for rtkore package
 #' @rdname rtkoreFlags
 #' @keywords internal
 LdFlags <- function() { cat(.rtkoreLdFlags()) }

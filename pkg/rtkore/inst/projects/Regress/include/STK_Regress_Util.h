@@ -48,11 +48,13 @@ namespace Regress
 {
 
 /** @ingroup Regress
- *  functional basis coefficients to use  */
-enum TypeCoefficients
+ *  functional basis coefficients to use  for fonctional and non-linear
+ *  regression
+ **/
+enum TypeBasisFunction
 {
   /** unknown coefficients */
-  unknown_coefficients_ = -1
+  unknown_basis_ = -1
   /** BSpline coefficients */
   , bspline_
   /** Sines coefficients */
@@ -94,7 +96,9 @@ TypeRegression stringToTypeRegression( String const& type);
  **/
 String typeRegressionToString( TypeRegression const& type);
 
-/** Method to use for positioning the knots. */
+/** @ingroup Regress
+ *  Method to use for positioning the knots for BSpline basis
+ **/
 enum KnotsPosition
 {
   uniformKnotsPositions_  ///< uniform knots
@@ -110,19 +114,17 @@ enum KnotsPosition
  **/
 KnotsPosition stringToKnotsPosition( String const& type);
 
-/** convert a KnotsPosition to a String.
+/** @ingroup Regress
+ *  convert a KnotsPosition to a String.
  *  @param type the KnotsPosition we want to convert to a string
  *  @return the string associated to this KnotsPosition
  **/
 String knotsPositionToString( KnotsPosition const& type);
 
-} // namespace Regress
 
 
 //
 // implementation
-namespace Regress
-{
 /* convert a String to a TypeReduction.
  *  @param type the type of reduction we want to define
  *  @return the TypeReduction represented by the String @c type. if the string

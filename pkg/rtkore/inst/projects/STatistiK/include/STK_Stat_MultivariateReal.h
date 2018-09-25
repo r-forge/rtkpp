@@ -57,7 +57,7 @@ namespace Stat
  *  @c Array with n rows (the samples) and p columns (the variables).
  **/
 template <class Array>
-class Multivariate<Array, Real>: public IRunnerUnsupervised< Array, typename Array::Col>
+class Multivariate<Array, Real>: public IRunnerUnsupervised< Array, typename hidden::Traits<Array>::Col>
 {
   typedef typename hidden::Traits<Array>::Row RowVector;
   typedef typename hidden::Traits<Array>::Col ColVector;
@@ -110,13 +110,13 @@ class Multivariate<Array, Real>: public IRunnerUnsupervised< Array, typename Arr
     /** @return the number of samples in the p_data_ set (the number of rows) */
     inline int nbSamples() const {return nbSamples_;}
     /** @return the minimal values of the variables in a RowVector */
-    inline Point const& min() const { return min_;}
+    inline PointX const& min() const { return min_;}
     /** @return the maximal values of the variables in a RowVector  */
-    inline Point const& max() const { return max_;}
+    inline PointX const& max() const { return max_;}
     /** @return the mean of the variables in a RowVector */
-    inline Point const& mean() const { return mean_;}
+    inline PointX const& mean() const { return mean_;}
     /**@return the variance of the variables in a RowVector */
-    inline Point const& variance() const { return var_;}
+    inline PointX const& variance() const { return var_;}
     /** @return the covariance of the variables in a square matrix */
     inline ArraySquareX const& covariance() const { return cov_;}
 
@@ -204,13 +204,13 @@ class Multivariate<Array, Real>: public IRunnerUnsupervised< Array, typename Arr
     int nbVar_;
 
     /** Vector of the mean of the Variables */
-    Point min_;
+    PointX min_;
     /** Vector of the mean of the Variables */
-    Point max_;
+    PointX max_;
     /** Vector of the mean of the Variables */
-    Point mean_;
+    PointX mean_;
     /** Vector of the variance of the variables */
-    Point var_;
+    PointX var_;
     /** Array of the covariance of the variables */
     ArraySquareX cov_;
 

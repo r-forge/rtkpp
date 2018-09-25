@@ -79,6 +79,8 @@ struct TRef<-1>
   public:
     /** @return @c true if *this is reference container, @c false otherwise */
     inline bool isRef() const { return ref_;}
+    /** @return @c true if *this is reference container, @c false otherwise */
+    inline bool ref() const { return ref_;}
     /** swap this with the container T.
      *  @param T the container to swap with this
      **/

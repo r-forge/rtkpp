@@ -59,11 +59,11 @@ class STK_ISparseArray: public ArrayBase<Derived>
     typedef ArrayBase<Derived> Base;
 
     typedef typename hidden::Traits<Derived>::Type Type;
-    typedef typename hidden::Traits<Derived>::Row  Row;
+    //typedef typename hidden::Traits<Derived>::Row  Row;
     typedef typename hidden::Traits<Derived>::Col  Col;
-    typedef typename hidden::Traits<Derived>::SubRow SubRow;
-    typedef typename hidden::Traits<Derived>::SubCol SubCol;
-    typedef typename hidden::Traits<Derived>::SubVector SubVector;
+    //typedef typename hidden::Traits<Derived>::SubRow SubRow;
+    //typedef typename hidden::Traits<Derived>::SubCol SubCol;
+    //typedef typename hidden::Traits<Derived>::SubVector SubVector;
     typedef typename hidden::Traits<Derived>::SubArray SubArray;
 
     enum

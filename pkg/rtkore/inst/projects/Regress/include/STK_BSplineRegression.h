@@ -40,7 +40,7 @@
 #include "STK_BSplineCoefficients.h"
 #include "STK_IRegression.h"
 
-#include <Algebra/include/STK_InvertSymMatrix.h>
+#include <Algebra/include/STK_InvertMatrix.h>
 
 namespace STK
 {
@@ -48,7 +48,7 @@ namespace STK
 /** @brief Compute a BSpline, multi-valued, regression function using BSpline
  *  basis.
  */
-template <class YArray, class XVector, class Weights = Vector>
+template <class YArray, class XVector, class Weights = VectorX>
 class BSplineRegression: public IRegression<YArray, XVector, Weights>
 {
   public:
@@ -155,11 +155,11 @@ bool BSplineRegression<YArray, XVector, Weights>::regressionStep()
   // compute X'X
   ArraySquareX prod = coefs_.coefficients().transpose() * coefs_.coefficients();
   // compute (X'X)^{-1}
-  GInvertSymMatrix inv;
-  inv(prod);
+//  GInvertSymMatrix<ArraySquareX> inv;
+//  inv(prod);
 
   // compute (X'X)^{-1}X'Y
-  controlPoints_ = prod * (coefs_.coefficients().transpose() * p_y_->asDerived());
+  controlPoints_ = invert(prod.symmetrize()) * (coefs_.coefficients().transpose() * p_y_->asDerived());
   return true;
 }
 
@@ -170,11 +170,11 @@ bool BSplineRegression<YArray, XVector, Weights>::regressionStep(Weights const& 
   // compute X'X
   ArraySquareX prod = coefs_.coefficients().transpose() * weights.diagonalize() * coefs_.coefficients();
   // compute (X'X)^{-1}
-  GInvertSymMatrix inv;
-  inv(prod);
+  // GInvertSymMatrix<ArraySquareX> inv;
+  // inv(prod);
   // compute (X'X)^{-1}X'Y
-
-  controlPoints_ = prod * coefs_.coefficients().transpose() * weights.diagonalize() * p_y_->asDerived();
+  controlPoints_ = invert(prod.symmetrize()) * coefs_.coefficients().transpose() * weights.diagonalize() * p_y_->asDerived();
+  //controlPoints_ = prod * coefs_.coefficients().transpose() * weights.diagonalize() * p_y_->asDerived();
   return true;
 }
 

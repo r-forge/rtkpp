@@ -53,7 +53,7 @@ namespace Law
  * if @e Y has a log-normal distribution, then <em>X = exp(Y)</em> has a log-normal
  * distribution. A random variable which is log-normally distributed takes only
  * positive real values.
- * 
+ *
  *  A variable might be modeled as log-normal if it can be thought of as the
  *  multiplicative product of many independent random variables, each of which
  *  is positive.
@@ -155,6 +155,15 @@ class LogNormal: public IUnivLaw<Real>
      **/
     static Real icdf( Real const& p, Real const& mu, Real const& sigma);
 
+#ifdef IS_RTKPP_LIB
+    /** @return log-cumulative distribution function */
+    virtual Real lcdf( Real const& t) const;
+    /** @return complement of cumulative distribution function */
+    virtual Real cdfc( Real const& t) const;
+    /** @return log-complement of cumulative distribution function */
+    virtual Real lcdfc( Real const& t) const;
+#endif
+
   protected:
     /** The location parameter. **/
     Real mu_;
@@ -172,14 +181,13 @@ inline Real LogNormal::rand() const
 GetRNGstate(); Real s = Rf_rlnorm(mu_, sigma_); PutRNGstate(); return s;
 }
 
-inline Real LogNormal::pdf( Real const& x) const
-{ return Rf_dlnorm(x, mu_, sigma_, false);}
-inline Real LogNormal::lpdf( Real const& x) const
-{ return Rf_dlnorm(x, mu_, sigma_, true);}
-inline Real LogNormal::cdf( Real const& t) const
-{ return Rf_plnorm(t, mu_, sigma_, true, false);}
-inline Real LogNormal::icdf( Real const& p) const
-{ return Rf_qlnorm(p, mu_, sigma_, true, false);}
+inline Real LogNormal::pdf( Real const& x) const { return Rf_dlnorm(x, mu_, sigma_, false);}
+inline Real LogNormal::lpdf( Real const& x) const { return Rf_dlnorm(x, mu_, sigma_, true);}
+inline Real LogNormal::cdf( Real const& t) const { return Rf_plnorm(t, mu_, sigma_, true, false);}
+inline Real LogNormal::lcdf( Real const& t) const { return Rf_plnorm(t, mu_, sigma_, true, true);}
+inline Real LogNormal::cdfc( Real const& t) const { return Rf_plnorm(t, mu_, sigma_, false, false);}
+inline Real LogNormal::lcdfc( Real const& t) const { return Rf_plnorm(t, mu_, sigma_, false, true);}
+inline Real LogNormal::icdf( Real const& p) const { return Rf_qlnorm(p, mu_, sigma_, true, false);}
 
 inline Real LogNormal::rand( Real const& mu, Real const& sigma)
 {

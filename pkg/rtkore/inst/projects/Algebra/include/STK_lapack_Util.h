@@ -263,29 +263,29 @@ inline int geqrf(int m, int n, Real* a, int lda, Real* tau, Real *work, int lWor
 }
 
 /** @ingroup Algebra
- * @brief wrapper of the LAPACK DGESDD routine.
- * DGESDD computes the Svd decomposition of a matrix.
+ *  @brief wrapper of the LAPACK DGESDD routine.
+ *  DGESDD computes the Svd decomposition of a matrix.
  *
- * @verbatim
- * DGESDD computes the singular value decomposition (SVD) of a real
- * m-by-n matrix a, optionally computing the left and right singular
- * vectors.  If singular vectors are desired, it uses a
- * divide-and-conquer algorithm.
+ *  @verbatim
+ *   DGESDD computes the singular value decomposition (SVD) of a real
+ *   m-by-n matrix a, optionally computing the left and right singular
+ *   vectors.  If singular vectors are desired, it uses a
+ *   divide-and-conquer algorithm.
  *
- * The SVD is written
+ *   The SVD is written
  *
  *      a = u * SIGMA * transpose(v)
  *
- * where SIGMA is an m-by-n matrix which is zero except for its
- * min(m,n) diagonal elements, u is an m-by-m orthogonal matrix, and
- * v is an n-by-n orthogonal matrix. The diagonal elements of SIGMA
- * are the singular values of a; they are real and non-negative, and
- * are returned in descending order. The first min(m,n) columns of
- * u and v are the left and right singular vectors of a.
+ *   where SIGMA is an m-by-n matrix which is zero except for its
+ *   min(m,n) diagonal elements, u is an m-by-m orthogonal matrix, and
+ *   v is an n-by-n orthogonal matrix. The diagonal elements of SIGMA
+ *   are the singular values of a; they are real and non-negative, and
+ *   are returned in descending order. The first min(m,n) columns of
+ *   u and v are the left and right singular vectors of a.
+ *  @endverbatim
  *
- * Note that the routine returns vt = v**T, not v.
+ *  @note routine returns vt = v**T, not v.
  *
- * @endverbatim
  *
  *  Arguments:
  *  ==========

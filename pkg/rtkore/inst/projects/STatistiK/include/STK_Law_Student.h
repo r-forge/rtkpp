@@ -45,7 +45,7 @@ namespace Law
 {
 /** @ingroup Laws
  *  @brief Student distribution law.
- * 
+ *
  *  In probability and statistics, <em>Student's t-distribution</em> (or simply
  *  the <em>t-distribution</em>) is any member of a family of continuous
  *  probability distributions that arises when estimating the mean of a normally
@@ -132,6 +132,15 @@ class Student: public IUnivLaw<Real>
      **/
     static Real icdf(Real const& p, int df);
 
+#ifdef IS_RTKPP_LIB
+    /** @return log-cumulative distribution function */
+    virtual Real lcdf( Real const& t) const;
+    /** @return complement of cumulative distribution function */
+    virtual Real cdfc( Real const& t) const;
+    /** @return log-complement of cumulative distribution function */
+    virtual Real lcdfc( Real const& t) const;
+#endif
+
   protected:
     /** degree of freedom */
     int df_;
@@ -150,6 +159,9 @@ GetRNGstate(); Real s = Rf_rt(df_); PutRNGstate(); return s;
 inline Real Student::pdf(Real const& x) const  { return Rf_dt(x, df_, false);}
 inline Real Student::lpdf(Real const& x) const { return Rf_dt(x, df_, true);}
 inline Real Student::cdf(Real const& t) const  { return Rf_pt(t, df_, true, false);}
+inline Real Student::lcdf(Real const& t) const  { return Rf_pt(t, df_, true, true);}
+inline Real Student::cdfc(Real const& t) const  { return Rf_pt(t, df_, false, false);}
+inline Real Student::lcdfc(Real const& t) const  { return Rf_pt(t, df_, false, true);}
 inline Real Student::icdf(Real const& p) const { return Rf_qt(p, df_, true, false);}
 
 inline Real Student::rand( int df)

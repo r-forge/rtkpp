@@ -125,10 +125,6 @@ struct vb
 template<typename Lhs, typename Rhs, typename Result>
 struct MultPointArray
 {
-//  enum
-//  {
-//
-//  };
   typedef typename Result::Type Type;
    /** Compute the product res = l*r with l a point (a row-vector) and r a matrix
    *   using the standard formula \f$ \mathrm{res}_j = \sum_{i=1}^n l_i r_{ij} \f$

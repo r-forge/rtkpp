@@ -74,7 +74,7 @@ namespace STK
  * class Page2: public IPage
  * {
  *   public:
- *    Page2() : IPage("test2", 1, false)
+ *    Page2(): IPage("test2", 1, false)
  *    {
  *      options_.push_back(Option("opt1", real_, false));
  *      options_.push_back(Option("opt2", string_, false));

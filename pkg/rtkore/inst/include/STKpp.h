@@ -99,11 +99,11 @@
  *     </ul>
  *  <li> @b Other @b tutorials
  *     <ul>
+ *     <li> @subpage TutorialAlgebra
  *     <li> @subpage PageTutorialKernel
  *     <li> @subpage TutorialSTatisitK
  *     <li> @subpage TutorialClustering
  *     <li> @subpage TutorialApplication
- *     <li> @subpage TutorialStatModel
  *     </ul>
  *  </ul>
  *

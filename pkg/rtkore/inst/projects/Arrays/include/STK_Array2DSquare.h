@@ -99,26 +99,28 @@ class Array2DSquare: public IArray2D< Array2DSquare<Type_> >
   public:
     /** Type for the Interface Class. */
     typedef IArray2D< Array2DSquare<Type_> > Base;
-    typedef ArrayBase <  Array2DSquare<Type_> > LowBase;
+    typedef ArrayBase< Array2DSquare<Type_> > LowBase;
 
-    typedef typename hidden::Traits<Array2DSquare<Type_> >::Row Row;
-    typedef typename hidden::Traits<Array2DSquare<Type_> >::Col Col;
-    typedef typename hidden::Traits<Array2DSquare<Type_> >::SubRow SubRow;
-    typedef typename hidden::Traits<Array2DSquare<Type_> >::SubCol SubCol;
-    typedef typename hidden::Traits<Array2DSquare<Type_> >::SubVector SubVector;
-    typedef typename hidden::Traits<Array2DSquare<Type_> >::SubArray SubArray;
+    typedef typename hidden::Traits< Array2DSquare<Type_> >::Row Row;
+    typedef typename hidden::Traits< Array2DSquare<Type_> >::Col Col;
+    typedef typename hidden::Traits< Array2DSquare<Type_> >::SubRow SubRow;
+    typedef typename hidden::Traits< Array2DSquare<Type_> >::SubCol SubCol;
+    typedef typename hidden::Traits< Array2DSquare<Type_> >::SubVector SubVector;
+    typedef typename hidden::Traits< Array2DSquare<Type_> >::SubArray SubArray;
 
-    typedef typename hidden::Traits<Array2DSquare<Type_> >::Type Type;
-    typedef typename hidden::Traits<Array2DSquare<Type_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< Array2DSquare<Type_> >::Type Type;
+    typedef typename hidden::Traits< Array2DSquare<Type_> >::ConstReturnType ConstReturnType;
 
     enum
     {
-      structure_ = Arrays::square_,
-      orient_    = Arrays::by_col_,
-      sizeRows_  = UnknownSize,
-      sizeCols_  = UnknownSize,
-      storage_   = Arrays::dense_ // always dense
+      structure_ = hidden::Traits< Array2DSquare<Type_> >::structure_,
+      orient_    = hidden::Traits< Array2DSquare<Type_> >::orient_,
+      sizeCols_  = hidden::Traits< Array2DSquare<Type_> >::sizeCols_,
+      sizeRows_  = hidden::Traits< Array2DSquare<Type_> >::sizeRows_,
+      size_      = hidden::Traits< Array2DSquare<Type_> >::size_,
+      storage_   = hidden::Traits< Array2DSquare<Type_> >::storage_
     };
+
     /** Default constructor with cols_=(1:0) and rows_=(1:0). */
     Array2DSquare(): Base() {}
     /** Default constructor with specified Range

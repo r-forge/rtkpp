@@ -99,19 +99,19 @@ class AICCriterion: public ICriterion
 {
   public:
     /** Default Constructor. */
-    inline AICCriterion() : ICriterion() {}
+    inline AICCriterion(): ICriterion() {}
     /** Constructor.
      *  @param p_model apointer on the current model
      **/
-    inline AICCriterion( IStatModelBase* const p_model) : ICriterion(p_model) {}
+    inline AICCriterion( IStatModelBase* const p_model): ICriterion(p_model) {}
     /** Constructor.
      *  @param model the current model
      **/
-    inline AICCriterion( IStatModelBase const& model) : ICriterion(model) {}
+    inline AICCriterion( IStatModelBase const& model): ICriterion(model) {}
     /** copy Constructor.
      *  @param criterion the criterion to copy
      **/
-    inline AICCriterion( AICCriterion const& criterion) : ICriterion(criterion) {}
+    inline AICCriterion( AICCriterion const& criterion): ICriterion(criterion) {}
     /** virtual destructor. */
     inline virtual ~AICCriterion() {}
     /** clone pattern */
@@ -144,19 +144,19 @@ class BICCriterion: public ICriterion
 {
   public:
     /** Default Constructor. */
-    inline BICCriterion() : ICriterion() {}
+    inline BICCriterion(): ICriterion() {}
     /** Constructor.
      *  @param p_model apointer on the current model
      **/
-    inline BICCriterion( IStatModelBase* const p_model) : ICriterion(p_model) {}
+    inline BICCriterion( IStatModelBase* const p_model): ICriterion(p_model) {}
     /** Constructor.
      *  @param model the current model
      **/
-    inline BICCriterion( IStatModelBase const& model) : ICriterion(model) {}
+    inline BICCriterion( IStatModelBase const& model): ICriterion(model) {}
     /** copy Constructor.
      *  @param criterion the criterion to copy
      **/
-    inline BICCriterion( BICCriterion const& criterion) : ICriterion(criterion) {}
+    inline BICCriterion( BICCriterion const& criterion): ICriterion(criterion) {}
     /** virtual destructor. */
     inline virtual ~BICCriterion() {}
     /** clone pattern */

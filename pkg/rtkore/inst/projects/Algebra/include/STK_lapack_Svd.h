@@ -41,6 +41,7 @@
 
 #include "STK_ISvd.h"
 #include "STK_lapack_Util.h"
+#include "STK_transpose.h"
 
 namespace STK
 {
@@ -73,13 +74,45 @@ namespace lapack
  *    @class Svd
  *    @brief Svd computes the SVD decomposition of a real matrix using the
  *    Lapack routine dgeqrf.
- */
+ *
+ *  The method take as:
+ *  - input: a matrix A(nrow,ncol)
+ *  - output:
+ *    -# U Array (nrow,ncol).
+ *    -# D diagonal matrix (min(norw,ncol))
+ *    -# V Array (ncol,ncol).
+ *  and perform the decomposition:
+ *  - A = UDV' (transpose V).
+ *
+ *    Output can be tuned using @c jobz option:
+ *    @verbatim
+ *      jobz is Char*1
+ *      Specifies options for computing all or part of the matrix u:
+ *      = 'A':  all m columns of u and all n rows of v**T are
+ *              returned in the arrays u and vt;
+ *      = 'S':  the first min(m,n) columns of u and the first
+ *              min(m,n) rows of v**T are returned in the arrays U
+ *              and vt;
+ *      = 'O':  If m >= n, the first n columns of u are overwritten
+ *              on the array a and all rows of v**T are returned in
+ *              the array vt;
+ *              otherwise, all columns of u are returned in the
+ *              array u and the first m rows of v**T are overwritten
+ *              in the array a;
+ *      = 'N':  no columns of u or rows of v**T are computed.
+ *   @endverbatim
+ *
+ * @sa SK::ISvd, STK::Svd
+ **/
 class Svd: public ISvd<Svd>
 {
   public:
     typedef ISvd< Svd > Base;
-    typedef CArrayXX::Col ColVector;
-    typedef CArrayXX::Row RowVector;
+    typedef typename hidden::Traits<CArrayXX>::Col ColVector;
+    typedef typename hidden::Traits<CArrayXX>::Row RowVector;
+
+    using Base::norm_;
+    using Base::rank_;
     using Base::U_;
     using Base::D_;
     using Base::V_;
@@ -88,37 +121,29 @@ class Svd: public ISvd<Svd>
     using Base::nrowU;
     using Base::ncolU;
     using Base::ncolV;
-    using Base::norm_;
-    using Base::rank_;
 
     /** Default constructor.
-     *  @param A the matrix to decompose
-     *  @param ref if true, U_ is a reference of A.
-     *  @param withU if @c true save the left housolder transforms in @c U_.
-     *  @param withV if @c true save the right housolder transforms in @c V_.
+     *  @param A matrix to decompose
+     *  @param ref if @c true, U_ is a reference of A.
+     *  @param withU if @c true save the left Householder transforms in @c U_.
+     *  @param withV if @c true save the right Householder transforms in @c V_.
      **/
     inline Svd( CArrayXX const&  A, bool ref = false, bool withU= true, bool withV= true)
-             : Base(A, ref, withU, withV)
-              , jobz_( (withU|withV) ? 'O':'N') {}
+              : Base(A, ref, withU, withV), jobz_( (withU|withV) ? 'O':'N') {}
     /** constructor with other kind of array/expression
      *  @param A the matrix/expression to decompose.
-     *  @param withU if @c true save the left housolder transforms in @c U_.
-     *  @param withV if @c true save the right housolder transforms in @c V_.
+     *  @param withU if @c true save the left Householder transforms in @c U_.
+     *  @param withV if @c true save the right Householder transforms in @c V_.
      */
     template<class OtherArray>
     inline Svd( ArrayBase<OtherArray> const& A, bool withU= true, bool withV= true)
-             : Base(A, withU, withV)
-              , jobz_( (withU|withV) ? 'O':'N') {}
+              : Base(A, withU, withV), jobz_( (withU|withV) ? 'O':'N') {}
     /** Copy constructor.
      *  @param decomp the decomposition to copy
      **/
     inline Svd( Svd const& decomp): Base(decomp), jobz_(decomp.jobz_) {}
     /** virtual destructor */
     inline virtual ~Svd() {}
-    /** @return the option chosen for the svd */
-    char jobz() const { return jobz_;}
-    /** set the option chosen for the svd */
-    void setJobz(char jobz) { jobz_ = jobz;}
     /** @brief clone pattern */
     inline virtual Svd* clone() const { return new Svd(*this);}
     /** Operator = : overwrite the Svd with decomp. */
@@ -128,6 +153,13 @@ class Svd: public ISvd<Svd>
       jobz_ = decomp.jobz_;
       return *this;
     }
+    // getters
+    /** @return the option chosen for the svd */
+    char jobz() const { return jobz_;}
+    // setters
+    /** set the option chosen for the svd */
+    void setJobz(char jobz) { jobz_ = jobz;}
+
     /** @brief Run svd decomposition */
     bool runImpl();
 
@@ -156,12 +188,12 @@ inline bool Svd::runImpl()
   }
   else
   { // jobz_ == 'O' and m<n, V_ will contain u and U_ will contain vt
-    if (!computeSvd(U_, V_, D_, V_)) { return false;};
-    U_.exchange(V_); // U_ is (m,m) and V_ is (m,n)
+    if (!computeSvd(U_, V_, D_, V_)) { result = false;};
+    U_.exchange(V_); // !now U_ is (m,m) and V_ is (m,n)
   }
   U_.shift(beginRow, beginCol);
   D_.shift(beginCol);
-  V_.shift(beginCol); // u*s.diagonalize()*vt work
+  transpose(V_.shift(beginCol));
   return result;
 }
 
@@ -173,15 +205,15 @@ inline bool Svd::computeSvd(CArrayXX& a, CArrayXX& u, CVectorX& s, CArrayXX& vt)
   a.shift(0,0);
   // Workspace and status variables:
   double workSize;
-  double *work = &workSize;
-  int* iwork = new int[8*nbSv];
+  double *p_work = &workSize;
+  int* p_iwork = new int[8*nbSv];
   int lwork = -1;
   int info;
   //
   // Call dgesdd_ with lwork = -1 to query optimal workspace size:
   info = gesdd( jobz_, m, n
                , a.p_data(), m, s.p_data(), u.p_data(), m, vt.p_data(), n
-               , work, lwork, iwork);
+               , p_work, lwork, p_iwork);
   // check any error
   if (info!=0)
   {
@@ -194,7 +226,7 @@ inline bool Svd::computeSvd(CArrayXX& a, CArrayXX& u, CVectorX& s, CArrayXX& vt)
   }
   // optimal storage dimension is returned in work[0]
   lwork = workSize;
-  work = new Real[lwork];
+  p_work = new Real[lwork];
   // resize u
   if ( !((jobz_ == 'O' && m >= n) || (jobz_ == 'N')) )
   {
@@ -215,10 +247,10 @@ inline bool Svd::computeSvd(CArrayXX& a, CArrayXX& u, CVectorX& s, CArrayXX& vt)
               , a.p_data(), a.sizeRows(), s.p_data()
               , u.p_data(), u.sizeRows()
               , vt.p_data(), vt.sizeRows()
-              , work, lwork, iwork);
+              , p_work, lwork, p_iwork);
   // clean
-  delete[] work;
-  delete[] iwork;
+  delete[] p_work;
+  delete[] p_iwork;
   // check any error
   if (info!=0)
   {

@@ -158,6 +158,15 @@ class NegativeBinomial: public IUnivLaw<Integer>
      **/
     static Integer icdf(Real const& p,  int size, Real const& prob);
 
+#ifdef IS_RTKPP_LIB
+    /** @return log-cumulative distribution function */
+    virtual Real lcdf( Real const& t) const;
+    /** @return complement of cumulative distribution function */
+    virtual Real cdfc( Real const& t) const;
+    /** @return log-complement of cumulative distribution function */
+    virtual Real lcdfc( Real const& t) const;
+#endif
+
   protected:
     /** number of successes */
     int size_;
@@ -175,14 +184,13 @@ inline int NegativeBinomial::rand() const
 GetRNGstate(); int s = Rf_rnbinom(size_, prob_); PutRNGstate(); return s;
 }
 
-inline Real NegativeBinomial::pdf(Integer const& x) const
-{ return Rf_dnbinom((double)x, size_, prob_, false);}
-inline Real NegativeBinomial::lpdf(Integer const& x) const
-{ return Rf_dnbinom((double)x, size_, prob_, true);}
-inline Real NegativeBinomial::cdf(Real const& t) const
-{ return Rf_pnbinom(t, size_, prob_, true, false);}
-inline int NegativeBinomial::icdf(Real const& p) const
-{ return (int)::Rf_qnbinom(p, size_, prob_, true, false);}
+inline Real NegativeBinomial::pdf(Integer const& x) const { return Rf_dnbinom((double)x, size_, prob_, false);}
+inline Real NegativeBinomial::lpdf(Integer const& x) const { return Rf_dnbinom((double)x, size_, prob_, true);}
+inline Real NegativeBinomial::cdf(Real const& t) const { return Rf_pnbinom(t, size_, prob_, true, false);}
+inline Real NegativeBinomial::lcdf(Real const& t) const { return Rf_pnbinom(t, size_, prob_, true, true);}
+inline Real NegativeBinomial::cdfc(Real const& t) const { return Rf_pnbinom(t, size_, prob_, false, false);}
+inline Real NegativeBinomial::lcdfc(Real const& t) const { return Rf_pnbinom(t, size_, prob_, false, true);}
+inline int NegativeBinomial::icdf(Real const& p) const { return (int)Rf_qnbinom(p, size_, prob_, true, false);}
 
 inline int NegativeBinomial::rand(int size, Real const& prob)
 {

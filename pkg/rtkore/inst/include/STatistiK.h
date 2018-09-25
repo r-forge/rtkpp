@@ -30,7 +30,7 @@
 
 /** @file STatistiK.h
  *  @brief This file include all the header files of the project STatistiK.
- * 
+ *
  * @defgroup STatistiK STatistiK (Statistical tools).
  * @brief The StatistiK project contains the main tools for computing the usual
  * statistics.
@@ -92,6 +92,7 @@
 // namespace Law
 // probabilities laws
 #include <STatistiK/include/STK_Law_Util.h>
+#include <STatistiK/include/STK_Law_Functors.h>
 
 #include <STatistiK/include/STK_Law_Bernoulli.h>
 #include <STatistiK/include/STK_Law_Beta.h>

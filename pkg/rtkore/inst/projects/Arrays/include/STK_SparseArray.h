@@ -42,11 +42,9 @@ class SparseArray
 {
   public:
     SparseArray()
-    {
-    }
+    { }
     ~SparseArray()
-    {
-    }
+    { }
   private:
 };
 

@@ -47,7 +47,7 @@ namespace Law
 {
 /** @ingroup Laws
  *  @brief class for the Uniform law distribution.
- * 
+ *
  *  In probability theory and statistics, the <em>continuous uniform distribution</em>
  *  or rectangular distribution is a family of symmetric probability distributions
  *  such that for each member of the family, all intervals of the same length on
@@ -140,6 +140,15 @@ class Uniform: public IUnivLaw<Real>
      **/
     static Real icdf( Real const& p, Real const& a, Real const& b);
 
+#ifdef IS_RTKPP_LIB
+    /** @return log-cumulative distribution function */
+    virtual Real lcdf( Real const& t) const;
+    /** @return complement of cumulative distribution function */
+    virtual Real cdfc( Real const& t) const;
+    /** @return log-complement of cumulative distribution function */
+    virtual Real lcdfc( Real const& t) const;
+#endif
+
   protected:
     /** The lower bound. */
     Real a_;
@@ -163,6 +172,9 @@ inline Real Uniform::rand() const
 inline Real Uniform::pdf( Real const& x)  const { return Rf_dunif(x, a_, b_, false);}
 inline Real Uniform::lpdf( Real const& x) const { return Rf_dunif(x, a_, b_, true);}
 inline Real Uniform::cdf( Real const& t)  const { return Rf_punif(t, a_, b_, true, false);}
+inline Real Uniform::lcdf( Real const& t)  const { return Rf_punif(t, a_, b_, true, true);}
+inline Real Uniform::cdfc( Real const& t)  const { return Rf_punif(t, a_, b_, false, false);}
+inline Real Uniform::lcdfc( Real const& t)  const { return Rf_punif(t, a_, b_, false, true);}
 inline Real Uniform::icdf( Real const& p) const { return Rf_qunif(p , a_, b_, true, false);}
 
 inline Real Uniform::rand( Real const& a, Real const& b)

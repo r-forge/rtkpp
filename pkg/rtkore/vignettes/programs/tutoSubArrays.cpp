@@ -10,8 +10,8 @@ int main(int argc, char** argv)
                       , 1.,2.,3.,4.
                       , 1.,1.,1.,1.;
   std::cout << "a=\n" << a;
-  a.col(0) = b;
-  a.row(0, Range(2,2)) = 0.;
+  a.col(1) = b;
+  a.row(1, Range(2,2)) = 0.;
   a.sub(Range(1,2), Range(2,2)) = 9.;
   std::cout << "a=\n" << a;
   return 0;

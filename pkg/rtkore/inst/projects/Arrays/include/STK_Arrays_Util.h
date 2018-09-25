@@ -216,11 +216,12 @@ inline int evalSizeCapacity(int m)
  *  @return range of size n+m, where n is the first number such that m < 2^n.
  *  @param I the range of the container
  **/
-inline Range evalRangeCapacity(STK::Range const& I)
+template<int Size_>
+TRange<Size_> evalRangeCapacity(TRange<Size_> const& I)
 {
   int n = 0;
   for (int k=1; k <= I.size(); k <<= 1){ n++;}
-  return Range(I.begin(),I.size() + n);
+  return TRange<Size_>(I.begin(),I.size() + n);
 }
 
 /** @ingroup Arrays

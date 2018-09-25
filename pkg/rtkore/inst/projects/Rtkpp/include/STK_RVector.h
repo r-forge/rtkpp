@@ -23,7 +23,7 @@
 */
 
 /*
- * Project:  rtkpp
+ * Project:  stkpp
  * created on: 25 juil. 2014
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
@@ -90,6 +90,10 @@ template <typename Type_>
 class RVector: public ArrayBase< RVector<Type_> >, public TRef<1>
 {
   public:
+    /** Type for the Interface base Class. */
+    typedef ArrayBase< RVector<Type_> > Base;
+    typedef ArrayBase< RVector<Type_> > LowBase;
+
     typedef typename hidden::Traits<RVector<Type_> >::Type Type;
     typedef typename hidden::Traits<RVector<Type_> >::ReturnType ReturnType;
     enum
@@ -108,18 +112,22 @@ class RVector: public ArrayBase< RVector<Type_> >, public TRef<1>
     typedef TRange<sizeCols_> ColRange;
 
     /** Default Constructor */
-    inline RVector(): vector_(),rows_(), cols_(0,1) {}
+    RVector(): vector_(),rows_(), cols_(0,1) {}
     /** Constructor with given dimension */
-    inline RVector(int length): vector_(length),rows_(0,length), cols_(0,1) {}
+    RVector(int length): vector_(length),rows_(0,length), cols_(0,1) {}
     /** Constructor */
-    inline RVector( Rcpp::Vector<Rtype_> vector)
-                  : vector_(vector), rows_(vector.length()), cols_(0,1) {}
+    RVector( Rcpp::Vector<Rtype_> vector): Base(), vector_(vector), rows_(vector.length()), cols_(0,1) {}
     /** Constructor with SEXP */
-    inline RVector( SEXP robj)
-                  : vector_(robj), rows_(0, vector_.size()), cols_(0,1) {}
+    RVector( SEXP robj): Base(), vector_(robj), rows_(0, vector_.size()), cols_(0,1) {}
     /** Copy constructor */
-    inline RVector( RVector const& robj, bool ref)
-                  : vector_(robj), rows_(0, robj.size()), cols_(0,1) {}
+    RVector( RVector const& robj, bool ref): Base(), vector_(robj), rows_(0, robj.size()), cols_(0,1) {}
+    /** Copy constructor using an expression.
+     *  @param T the container to wrap
+     **/
+    template<class OtherDerived>
+    RVector( ExprBase<OtherDerived> const& T)
+           : Base(), vector_(T.size()),rows_(T.size()), cols_(0,1)
+    { LowBase::operator=(T);}
 
     /** @return the underlying Rcpp matrix */
     inline Rcpp::Vector<Rtype_> const& vector() const { return vector_;}
@@ -178,6 +186,19 @@ class RVector: public ArrayBase< RVector<Type_> >, public TRef<1>
       vector_ = vec;  rows_ = RowRange(0, vec.size());
       return *this;
     }
+    /** operator = : overwrite the Array2D with the right hand side T.
+     *  @param T the container to copy
+     **/
+    template<class Rhs>
+    inline RVector& operator=( ExprBase<Rhs> const& T)
+    {
+      if (T.range()!=rows_)
+      { STKRUNTIME_ERROR_NO_ARG(RVector::operator=,size not match);}
+      for(int i= rows_.begin(); i< rows_.end(); ++i)
+      { this->elt(i) = T.elt(i); }
+      return *this;
+    }
+
   private:
     Rcpp::Vector<Rtype_> vector_;
     RowRange rows_;

@@ -42,7 +42,7 @@ namespace STK
 {
 /** @ingroup DManager
  *  @brief Interface class wrapping a data set.
- *  Every data set wrapped by the end-user has to furnish an Id.
+ *  Every data set wrapped by the end-user has to furnish an Id identifying it.
  *  Derived class has to implement the pure virtual method
  *  @code
  *    int findMissing();
@@ -56,21 +56,24 @@ class IDataBridge
     /** default constructor. User must provide with the data set an Id */
     IDataBridge(std::string const& idData);
     /** copy constructor (Warning: will copy the data set)
-     *  @param manager the DataBridge to copy
+     *  @param bridge the DataBridge to copy
      **/
-    IDataBridge( IDataBridge const& manager);
+    IDataBridge( IDataBridge const& bridge);
+
     /** destructor */
     inline virtual ~IDataBridge() {}
     /** return the Id of the mixture */
     inline std::string const& idData() const { return idData_;}
-    /** getter. @return the coordinates of the missing values in the data set */
+    /** getter. @return coordinates of the missing values in the data set */
     inline MissingIndexes const& v_missing() const { return v_missing_;}
+
+    /** @return number of the missing values in data set */
+    inline int nbMissing() const { return v_missing_.size();}
 
   protected:
     /** vector with the coordinates of the missing values */
     MissingIndexes v_missing_;
-    /** utility function for lookup the data set and find missing values
-     *  coordinates.
+    /** utility function for lookup the data set and find missing values coordinates.
      *  @return the number of missing values */
     virtual size_t findMissing() =0;
 
@@ -85,9 +88,9 @@ inline IDataBridge::IDataBridge( std::string const& idData)
 /* copy constructor
  *  @param manager the IDataBridge to copy
  **/
-inline IDataBridge::IDataBridge( IDataBridge const& manager)
-                               : v_missing_(manager.v_missing_)
-                               , idData_(manager.idData_)
+inline IDataBridge::IDataBridge( IDataBridge const& bridge)
+                               : v_missing_(bridge.v_missing_)
+                               , idData_(bridge.idData_)
 {}
 
 

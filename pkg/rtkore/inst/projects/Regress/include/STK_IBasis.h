@@ -28,7 +28,7 @@
  **/
 
 /** @file STK_IBasis.h
- *  @brief In this file we define the Interface class IBasis for functional basis functions
+ *  @brief In this file we define the Interface class IBasis for basis functions
  **/
 
 #ifndef STK_IBASIS_H
@@ -42,6 +42,9 @@
 namespace STK
 {
 
+/** @ingroup Regress
+ *  Interface base class for all basis function
+ **/
 template<class Data, class Coefs = ArrayXX>
 class IBasis: public IRunnerBase
 {
@@ -75,6 +78,10 @@ class IBasis: public IRunnerBase
     inline int dim() const { return dim_;}
     /** @return the matrix with the coefficients of the basis curve. */
     inline Coefs const& coefficients() const { return coefficients_;}
+    /** @return the minimal value of the data */
+    inline Type minValue() const { return minValue_;}
+    /** @return the maximal value of the data */
+    inline Type maxValue() const { return maxValue_;}
 
     // setters
     /** Set the data set

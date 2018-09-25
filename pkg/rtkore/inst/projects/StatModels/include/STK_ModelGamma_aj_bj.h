@@ -68,10 +68,6 @@ struct StatModelTraits< ModelGamma_aj_bj<Data_, WColVector_> >
   typedef WColVector_ WColVector;
   /** Type of the data in the container */
   typedef typename Data::Type Type;
-  /** Type of the row vector of the container */
-  typedef typename Data::Row RowVector;
-  /** Type of the column vector of the container */
-  typedef typename Data::Col ColVector;
   /** Type of the parameters of the ModelGamma_aj_bj */
   typedef ModelGamma_aj_bjParameters Parameters;
 };
@@ -165,14 +161,11 @@ class ModelGamma_aj_bj: public IMultiStatModel< ModelGamma_aj_bj<Data_, WColVect
   public:
     /** Type of the container storing the data */
     typedef DataBridge<Data_> Data;
+    typedef typename hidden::Traits<Data_>::Row RowVector;
     /** Type of the array storing the weights of the data */
     typedef WColVector_ WColVector;
     /** Type of the data in the container */
     typedef typename Data::Type Type;
-    /** Type of the row vector of the container */
-    typedef typename Data::Row RowVector;
-    /** Type of the column vector of the container */
-    typedef typename Data::Col ColVector;
     /** Base class */
     typedef IMultiStatModel< ModelGamma_aj_bj<Data_, WColVector_> > Base;
     using Base::p_data;
@@ -201,7 +194,7 @@ class ModelGamma_aj_bj: public IMultiStatModel< ModelGamma_aj_bj<Data_, WColVect
     inline CPointX const& variance() const {return param().variance_;}
 
     /** compute the number of free parameters */
-    int computeNbFreeParameters() const { return 2*p_data()->sizeCols();}
+    int computeNbFreeParameters() const { return 2*p_data()->dataij().sizeCols();}
     /** compute the log Likelihood of an observation. */
     Real computeLnLikelihood( RowVector const& rowData) const;
     /** compute the parameters */
@@ -238,11 +231,11 @@ Real ModelGamma_aj_bj<Data_, WColVector_>::computeLnLikelihood( RowVector const&
 template<class Data_, class WColVector_>
 void ModelGamma_aj_bj<Data_, WColVector_>::computeParameters()
 {
-  for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
+  for (int j=p_data()->dataij().beginCols(); j < p_data()->dataij().endCols(); ++j)
   {
-    mean()[j] =  p_data()->col(j).meanSafe();
-    meanLog()[j] = p_data()->col(j).safe(1.).log().mean();
-    variance()[j] = p_data()->col(j).safe().variance();
+    mean()[j] =  p_data()->dataij().col(j).meanSafe();
+    meanLog()[j] = p_data()->dataij().col(j).safe(1.).log().mean();
+    variance()[j] = p_data()->dataij().col(j).safe().variance();
     Real x0 = (mean()[j]*mean()[j]) / variance()[j];
     Real x1 = 0.9*x0 +  0.05/(mean()[j] - meanLog()[j]);
     dloglikelihood funct(mean()[j], meanLog()[j]);
@@ -257,11 +250,11 @@ void ModelGamma_aj_bj<Data_, WColVector_>::computeParameters()
 template<class Data_, class WColVector_>
 void ModelGamma_aj_bj<Data_, WColVector_>::computeParameters( WColVector const& weights)
 {
-  for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
+  for (int j=p_data()->dataij().beginCols(); j < p_data()->dataij().endCols(); ++j)
   {
-    mean()[j] =  p_data()->col(j).safe().wmean(weights);
-    meanLog()[j] = p_data()->col(j).safe(1).log().wmean(weights);
-    variance()[j] = p_data()->col(j).safe().wvariance(weights);
+    mean()[j] =  p_data()->dataij().col(j).safe().wmean(weights);
+    meanLog()[j] = p_data()->dataij().col(j).safe(1).log().wmean(weights);
+    variance()[j] = p_data()->dataij().col(j).safe().wvariance(weights);
     Real x0 = (mean()[j]*mean()[j]) / variance()[j];
     Real x1 = 0.9*x0 +  0.05/(mean()[j] - meanLog()[j]);
     dloglikelihood funct(mean()[j], meanLog()[j]);

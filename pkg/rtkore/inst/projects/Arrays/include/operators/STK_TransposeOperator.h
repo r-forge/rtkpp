@@ -168,7 +168,7 @@ class TransposeOperator: public ExprBase< TransposeOperator<Lhs> >, public TRef<
      **/
     inline ConstReturnType elt2Impl(int i, int j) const { return lhs_.elt(j, i);}
     /** @return the element ith element of the transposed expression
-     *  @param i index of the ith element
+     *  @param i index of the element to get
      **/
     inline ConstReturnType elt1Impl(int i) const { return lhs_.elt(i);}
     /** access to the element of the transposed expression */
@@ -228,7 +228,7 @@ class TransposeAccessor: public ArrayBase< TransposeAccessor<Lhs> >, public TRef
      **/
     inline ConstReturnType elt2Impl(int i, int j) const { return lhs_.elt(j, i);}
     /** @return the element ith element of the transposed expression
-     *  @param i index of the ith element
+     *  @param i index of the element to get
      **/
     inline ConstReturnType elt1Impl(int i) const { return lhs_.elt(i);}
     /** access to the element of the transposed expression */
@@ -238,7 +238,7 @@ class TransposeAccessor: public ArrayBase< TransposeAccessor<Lhs> >, public TRef
      **/
     inline Type& elt2Impl(int i, int j) { return lhs_.elt(j, i);}
     /** @return the element ith element of the transposed expression
-     *  @param i index of the ith element
+     *  @param i index of the element to get
      **/
     inline Type& elt1Impl(int i) { return lhs_.elt(i);}
     /** access to the element of the transposed expression */

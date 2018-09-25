@@ -38,7 +38,7 @@
 #define STK_MULTIDIMREGRESSION_H
 
 #include <Arrays/include/STK_Array2D.h> // for coefs
-#include <Algebra/include/STK_InvertSymMatrix.h>
+#include <Algebra/include/STK_InvertMatrix.h>
 #include "STK_IRegression.h"
 
 namespace STK
@@ -102,9 +102,10 @@ bool MultidimRegression<Array,Weight>::regressionStep()
   ArraySquareX prod;
   prod.move(multLeftTranspose(p_x_->asDerived()));
   // compute (X'X)^{-1}
-  GInvertSymMatrix()(prod);
+//  GInvertSymMatrix<ArraySquareX>()(prod);
   // compute (X'X)^{-1}X'Y
-  coefs_.move(mult(prod, multLeftTranspose(p_x_->asDerived(), p_y_->asDerived())));
+  coefs_.move(mult(invert(prod.symmetrize()), multLeftTranspose(p_x_->asDerived(), p_y_->asDerived())));
+  //coefs_.move(mult(prod, multLeftTranspose(p_x_->asDerived(), p_y_->asDerived())));
   return true;
 }
 
@@ -116,9 +117,10 @@ bool MultidimRegression<Array,Weight>::regressionStep(Weight const& weights)
   ArraySquareX prod;
   prod.move(weightedMultLeftTranspose(p_x_->asDerived(), weights));
   // compute (X'WX)^{-1}
-  GInvertSymMatrix()(prod);
+  //GInvertSymMatrix<ArraySquareX>()(prod);
   // compute (X'WX)^{-1}X'WY
-  coefs_.move(mult(prod, wmultLeftTranspose(p_x_->asDerived(), p_y_->asDerived(), weights)));
+  coefs_.move(mult(invert(prod.symmetrize()), wmultLeftTranspose(p_x_->asDerived(), p_y_->asDerived(), weights)));
+//  coefs_.move(mult(prod, wmultLeftTranspose(p_x_->asDerived(), p_y_->asDerived(), weights)));
   return true;
 }
 

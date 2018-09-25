@@ -39,18 +39,35 @@
 #include <climits>
 
 #ifndef STKBASEARRAYS
-/** This value means that the default range for a vector or the rows/columns of
- *  a matrix is the value given by this constant.
- **/
-#define STKBASEARRAYS 0
+#define STKBASEARRAYS 0 // default is 0 based arrays
 #endif
+
+#ifndef MAXUNROLLVALUE
+#define MAXUNROLLVALUE 20 // unroll operations on fixed size containers
+#endif
+
+#ifndef MAXUNROLLSLICEVALUE
+#define MAXUNROLLSLICEVALUE 5 // unroll operations rows or columns on fixed size 2D containers
+#endif
+
+#ifndef MAXFIXEDSIZEVALUE
+#define MAXFIXEDSIZEVALUE 1024 // maximal fixed size that can be used automatically
+#endif
+
 
 namespace STK
 {
 /** @ingroup STKernel
- *  This value represents the base index of the containers created in STK++.
- **/
+ *  @brief base index of the containers created in STK++.
+ *  This value means that the default range for a vector or the rows/columns of
+ *  a matrix is the value given by this constant. **/
 const int baseIdx = STKBASEARRAYS;
+
+/** @ingroup STKernel
+ *  @brief maximal size of fixed size containers
+ *  This value is used when fixed size containers are automatically build in internal computation
+ **/
+const int maxFixedSize = MAXFIXEDSIZEVALUE;
 
 /** @ingroup STKernel
  *  This value means that an integer is not known at compile-time, and that
@@ -63,15 +80,15 @@ const int UnknownSize = INT_MAX;
  **/
 const int SqrtUnknownSize = (1 << (sizeof(int) * (CHAR_BIT/2)));
 
-//const int UnknownSize = STK::Arithmetic<int>::NA();
+/** @ingroup STKernel
+ *  When don't unroll loops on fixed size containers if fixed size is greater than this value.
+ **/
+const int MaxUnroll = MAXUNROLLVALUE;
 
 /** @ingroup STKernel
- * This value means that when we unroll loops we go until MaxUnroll */
-const int MaxUnroll = 20;
-
-/** @ingroup STKernel
- * This value means that when we unroll loops we go until MaxUnrollSquareRoot */
-const int MaxUnrollSquareRoot = 10;
+ * This value means that when we unroll loops we go until MaxUnrollSlice
+ **/
+const int MaxUnrollSlice = MAXUNROLLSLICEVALUE;
 
 } // namespace STK
 

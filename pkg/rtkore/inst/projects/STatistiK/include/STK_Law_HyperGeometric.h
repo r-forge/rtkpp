@@ -169,6 +169,15 @@ class HyperGeometric: public IUnivLaw<Integer>
      **/
     static Integer icdf(Real const& p, int nbSuccesses, int nbFailures, int nbDraws);
 
+#ifdef IS_RTKPP_LIB
+    /** @return log-cumulative distribution function */
+    virtual Real lcdf( Real const& t) const;
+    /** @return complement of cumulative distribution function */
+    virtual Real cdfc( Real const& t) const;
+    /** @return log-complement of cumulative distribution function */
+    virtual Real lcdfc( Real const& t) const;
+#endif
+
   protected:
     /** number of successes */
     int nbSuccesses_;
@@ -194,6 +203,12 @@ inline Real HyperGeometric::lpdf(Integer const& x) const
 { return Rf_dhyper((double)x, nbSuccesses_, nbFailures_, nbDraws_, true);}
 inline Real HyperGeometric::cdf(Real const& t) const
 { return Rf_phyper(t, nbSuccesses_, nbFailures_, nbDraws_, true, false);}
+inline Real HyperGeometric::lcdf(Real const& t) const
+{ return Rf_phyper(t, nbSuccesses_, nbFailures_, nbDraws_, true, true);}
+inline Real HyperGeometric::cdfc(Real const& t) const
+{ return Rf_phyper(t, nbSuccesses_, nbFailures_, nbDraws_, false, false);}
+inline Real HyperGeometric::lcdfc(Real const& t) const
+{ return Rf_phyper(t, nbSuccesses_, nbFailures_, nbDraws_, false, true);}
 inline int HyperGeometric::icdf(Real const& p) const
 { return (int)::Rf_qhyper(p, nbSuccesses_, nbFailures_, nbDraws_, true, false);}
 

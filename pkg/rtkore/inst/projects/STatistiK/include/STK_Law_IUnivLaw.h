@@ -69,11 +69,11 @@ class IUnivLaw: public ILawBase
     /** Constructor.
      *  @param name the name of the law
      **/
-    IUnivLaw(String const& name) : ILawBase(name) {}
+    IUnivLaw(String const& name): ILawBase(name) {}
     /** copy Constructor.
      *  @param law the law to copy
      **/
-    IUnivLaw(IUnivLaw const& law) : ILawBase(law.name_) {}
+    IUnivLaw(IUnivLaw const& law): ILawBase(law.name_) {}
 
   public:
     /** Virtual destructor. **/
@@ -91,14 +91,31 @@ class IUnivLaw: public ILawBase
      *  @param x the value to compute the lpdf.
      *  @return the value of the log-pdf
      **/
-    virtual Real lpdf(Type const& x) const = 0;
-    /** @brief compute the cumulative distribution function
-     *  Give the probability that a random variate is less or equal
-     *  to t.
+    virtual Real lpdf(Type const& x) const { return(std::log(pdf(x)));}
+    /** @brief compute the lower tail cumulative distribution function
+     *  Give the probability that a random variate is less or equal to t.
      *  @param t a real number
      *  @return the value of the cdf
      **/
     virtual Real cdf(Real const& t) const =0;
+    /** @brief compute the lower tail log-cumulative distribution function
+     *  Give the log-probability that a random variate is less or equal to t.
+     *  @param t a real number
+     *  @return the value of the cdf
+     **/
+    virtual Real lcdf(Real const& t) const { return(std::log(cdfc(t)));}
+    /** @brief  calculate the complement of cumulative distribution function, called in statistics the survival function.
+     *  Give the probability that a random variate is greater than t.
+     *  @param t a real number
+     *  @return the value of the cdf
+     **/
+    virtual Real cdfc(Real const& t) const { return(1. - cdf(t));}
+    /** @brief calculate the log-complement of cumulative distribution function
+     *  Give the log-probability that a random variate is greater than t.
+     *  @param t a real number
+     *  @return the value of the cdf
+     **/
+    virtual Real lcdfc(Real const& t) const { return(std::log(cdfc(t)));}
     /** @brief inverse cumulative distribution function
      *  The quantile is defined as the smallest value @e x such that
      *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.

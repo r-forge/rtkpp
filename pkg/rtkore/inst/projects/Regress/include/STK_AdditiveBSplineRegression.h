@@ -52,7 +52,7 @@ namespace STK
  *  @brief Compute an additive BSpline, multivalued, regression function using
  *  BSpline basis.
  */
-template <class YArray, class XArray, class Weights = Vector>
+template <class YArray, class XArray, class Weights = VectorX>
 class AdditiveBSplineRegression: public IRegression<YArray, XArray, Weights>
 {
   public:

@@ -32,218 +32,19 @@
  *  @brief In this file we implement the ProductOperator class.
  **/
 
-#ifndef STK_PRODUCTOPERATOR_H
-#define STK_PRODUCTOPERATOR_H
+#ifndef STK_PRODUCTOPERATORS_H
+#define STK_PRODUCTOPERATORS_H
 
-
-#define EGAL(arg1, arg2) ((arg1::structure_ == int(Arrays::arg2)))
 
 #include <Sdk/include/STK_StaticAssert.h>
 #include "../allocators/STK_CAllocator.h"
+#include "../operators/STK_BinaryImpl.h"
 #include "STK_ProductDispatcher.h"
+
+#define EGAL(arg1, arg2) ((arg1::structure_ == int(Arrays::arg2)))
 
 namespace STK
 {
-
-// forward declarations (needed because there is no CAllocator with this structure)
-template<typename> class Array2DUpperTriangular;
-template<typename> class Array2DLowerTriangular;
-
-namespace hidden
-{
-
-//------------------------------------------------------------
-// general lhs case. result is general except if rhs is vector
-/** specialization for lhs is array2D */
-template<typename Lhs, typename Rhs, int RStructure_>
-struct ProductTraits<Lhs, Rhs, Arrays::array2D_, RStructure_>
-{
-  enum
-  {
-    structure_ = Arrays::array2D_,
-    sizeRows_ = Traits<Lhs>::sizeRows_,
-    sizeCols_ = Traits<Rhs>::sizeCols_,
-    // if there is more block on the left side, we use bp --> result is by_col_
-    orient_   =  ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
-                 ? Traits<Rhs>::orient_
-                 : (Traits<Lhs>::sizeRows_)/blockSize_ < (Traits<Rhs>::sizeCols_)/blockSize_
-                   ? int(Arrays::by_row_) : int(Arrays::by_col_),
-    storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
-                ? int(Arrays::dense_) : int(Arrays::sparse_)
-  };
-
-  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
-  typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
-};
-
-//----------------------------------
-// square lhs case. result is general except if rhs square
-template<typename Lhs, typename Rhs, int RStructure_>
-struct ProductTraits<Lhs, Rhs, Arrays::square_, RStructure_>
-{
-  enum
-  {
-    structure_ = Arrays::array2D_,
-    sizeRows_ = Traits<Lhs>::sizeRows_,
-    sizeCols_ = Traits<Rhs>::sizeCols_,
-    // if there is more block on the left side, we use bp --> result is by_col_
-    orient_   =  ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
-                 ? Traits<Rhs>::orient_
-                 : (Traits<Lhs>::sizeRows_)/blockSize_ < (Traits<Rhs>::sizeCols_)/blockSize_
-                   ? int(Arrays::by_row_) : int(Arrays::by_col_),
-    storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
-              ? int(Arrays::dense_) : int(Arrays::sparse_)
-  };
-  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
-
-  typedef CAllocator<Type, sizeRows_,sizeCols_, orient_> Allocator;
-};
-
-template<typename Lhs, typename Rhs>
-struct ProductTraits<Lhs, Rhs, Arrays::square_, Arrays::square_>
-{
-  enum
-  {
-    structure_ = Arrays::square_,
-    sizeRows_ = (int(Traits<Lhs>::sizeRows_) < int(Traits<Rhs>::sizeCols_)) ? int(Traits<Lhs>::sizeRows_) : int(Traits<Rhs>::sizeCols_),
-    sizeCols_ = (int(Traits<Lhs>::sizeCols_) < int(Traits<Rhs>::sizeRows_)) ? int(Traits<Lhs>::sizeCols_) : int(Traits<Rhs>::sizeRows_),
-    // if there is more block on the left side, we use bp --> result is by_col_
-    orient_   =  ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
-                 ? Traits<Rhs>::orient_
-                 : (Traits<Lhs>::sizeRows_)/blockSize_ < (Traits<Rhs>::sizeCols_)/blockSize_
-                   ? int(Arrays::by_row_) : int(Arrays::by_col_),
-    storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
-              ? int(Arrays::dense_) : int(Arrays::sparse_)
-  };
-  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
-
-  typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
-};
-
-//----------------------------------
-// lower triangular case
-template<typename Lhs, typename Rhs, int RStructure_>
-struct ProductTraits<Lhs, Rhs, Arrays::lower_triangular_, RStructure_>
-{
-  enum
-  {
-    structure_ = Arrays::array2D_,
-    sizeRows_ = Traits<Lhs>::sizeRows_,
-    sizeCols_ = Traits<Rhs>::sizeCols_,
-    // if there is more block on the left side, we use bp --> result is by_col_
-    orient_   =  ( sizeRows_ == UnknownSize || sizeCols_ == UnknownSize)
-                 ? Traits<Rhs>::orient_
-                 : sizeRows_/blockSize_ < sizeCols_/blockSize_
-                   ? int(Arrays::by_row_) : int(Arrays::by_col_),
-    storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
-              ? int(Arrays::dense_) : int(Arrays::sparse_)
-  };
-  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
-
-  typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
-};
-
-template<typename Lhs, typename Rhs>
-struct ProductTraits<Lhs, Rhs, Arrays::lower_triangular_, Arrays::lower_triangular_>
-{
-  enum
-  {
-    structure_ = Arrays::lower_triangular_,
-    sizeRows_ = ((int)Traits<Lhs>::sizeRows_ < (int)Traits<Rhs>::sizeCols_) ? Traits<Lhs>::sizeRows_ : Traits<Rhs>::sizeCols_,
-    sizeCols_ = ((int)Traits<Lhs>::sizeCols_ < (int)Traits<Rhs>::sizeRows_) ? Traits<Lhs>::sizeCols_ : Traits<Rhs>::sizeRows_,
-    // if there is more block on the left side, we use bp --> result is by_col_
-    orient_   =  ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
-                 ? Traits<Rhs>::orient_
-                 : (Traits<Lhs>::sizeRows_)/blockSize_ < (Traits<Rhs>::sizeCols_)/blockSize_
-                   ? int(Arrays::by_row_) : int(Arrays::by_col_),
-    storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
-              ? int(Arrays::dense_) : int(Arrays::sparse_)
-  };
-  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
-
-  typedef Array2DLowerTriangular<Type> Allocator; // no CAllocator
-};
-
-//----------------------------------
-// upper triangular case
-template<typename Lhs, typename Rhs, int RStructure_>
-struct ProductTraits<Lhs, Rhs, Arrays::upper_triangular_, RStructure_>
-{
-  enum
-  {
-    structure_ = Arrays::array2D_,
-    sizeRows_ = Traits<Lhs>::sizeRows_,
-    sizeCols_ = Traits<Rhs>::sizeCols_,
-    // if there is more block on the left side, we use bp --> result is by_col_
-    orient_   =  ( sizeRows_ == UnknownSize || sizeCols_ == UnknownSize)
-                 ? Traits<Rhs>::orient_
-                 : (Traits<Lhs>::sizeRows_)/blockSize_ < (Traits<Rhs>::sizeCols_)/blockSize_
-                   ? int(Arrays::by_row_) : int(Arrays::by_col_),
-    storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
-              ? int(Arrays::dense_) : int(Arrays::sparse_)
-  };
-  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
-
-  typedef CAllocator<Type, sizeRows_ , sizeCols_, orient_> Allocator;
-};
-
-template<typename Lhs, typename Rhs>
-struct ProductTraits<Lhs, Rhs, Arrays::upper_triangular_, Arrays::upper_triangular_>
-{
-  enum
-  {
-    structure_ = Arrays::upper_triangular_,
-    sizeRows_ = ((int)Traits<Lhs>::sizeRows_ < (int)Traits<Rhs>::sizeCols_) ? Traits<Lhs>::sizeRows_ : Traits<Rhs>::sizeCols_,
-    sizeCols_ = ((int)Traits<Lhs>::sizeCols_ < (int)Traits<Rhs>::sizeRows_) ? Traits<Lhs>::sizeCols_ : Traits<Rhs>::sizeRows_,
-    // if there is more block on the left side, we use bp --> result is by_col_
-    orient_   =  ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
-                 ? Traits<Rhs>::orient_
-                 : (Traits<Lhs>::sizeRows_)/blockSize_ < (Traits<Rhs>::sizeCols_)/blockSize_
-                   ? int(Arrays::by_row_) : int(Arrays::by_col_),
-    storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
-              ? int(Arrays::dense_) : int(Arrays::sparse_)
-  };
-  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
-
-  typedef Array2DUpperTriangular<Type> Allocator;  // no CAllocator
-};
-
-} // namespace hidden
-
-/** @ingroup Arrays
-  * @class PointByArrayProduct
-  * @brief Generic expression where a product operator is
-  * applied to two expressions.
-  *
-  * @tparam Lhs the type of the left-hand side
-  * @tparam Rhs the type of the right-hand side
-  *
-  * This class represents an expression  where a product operator is applied to
-  * two expressions. The left hand Side is a point, the Right Hand Side
-  * is any compatible exprssion or matrix.
-  **/
-template<typename Lhs, typename Rhs> class PointByArrayProduct;
-
-/** @ingroup Arrays
-  * @class ArrayByVectorProduct
-  * @brief Generic expression where a product operator is
-  * applied to two expressions.
-  *
-  * @tparam Lhs the type of the left-hand side
-  * @tparam Rhs the type of the right-hand side
-  *
-  * This class represents an expression  where a product operator is applied to
-  * two expressions. The left hand Side can be of any kind, the Right Hand Side
-  * is a vector or vectorial expression.
-  **/
-template<typename Lhs, typename Rhs> class ArrayByVectorProduct;
 
 /** @ingroup Arrays
   * @class ArrayByDiagonalProduct
@@ -288,6 +89,34 @@ template<typename Lhs, typename Rhs> class DiagonalByArrayProduct;
 template<typename Lhs, typename Rhs> class VectorByPointProduct;
 
 /** @ingroup Arrays
+  * @class PointByArrayProduct
+  * @brief Generic expression where a product operator is
+  * applied to two expressions.
+  *
+  * @tparam Lhs the type of the left-hand side
+  * @tparam Rhs the type of the right-hand side
+  *
+  * This class represents an expression  where a product operator is applied to
+  * two expressions. The left hand Side is a point, the Right Hand Side
+  * is any compatible expression or matrix.
+  **/
+template<typename Lhs, typename Rhs> class PointByArrayProduct;
+
+/** @ingroup Arrays
+  * @class ArrayByVectorProduct
+  * @brief Generic expression where a product operator is
+  * applied to two expressions.
+  *
+  * @tparam Lhs the type of the left-hand side
+  * @tparam Rhs the type of the right-hand side
+  *
+  * This class represents an expression  where a product operator is applied to
+  * two expressions. The left hand Side can be of any kind, the Right Hand Side
+  * is a vector or vectorial expression.
+  **/
+template<typename Lhs, typename Rhs> class ArrayByVectorProduct;
+
+/** @ingroup Arrays
   * @class ArrayByArrayProduct
   * @brief Generic expression where a product operator is
   * applied to two expressions.
@@ -324,7 +153,7 @@ struct Traits< ArrayByDiagonalProduct < Lhs, Rhs> >
     storage_   = Lhs::storage_
   };
   typedef typename Promote<typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type ConstReturnType; // not a reference as it is a temporary
+  typedef typename RemoveConst<Type>::Type ConstReturnType;
 };
 
 } // namespace hidden
@@ -398,29 +227,6 @@ class ArrayByDiagonalProduct: public ExprBase< ArrayByDiagonalProduct<Lhs, Rhs> 
 namespace hidden
 {
 /** @ingroup hidden
- *  @brief Traits class for the VectorByPointProduct class
- */
-template< typename Lhs, typename Rhs>
-struct Traits< VectorByPointProduct < Lhs, Rhs> >
-{
-  enum
-  {
-    structure_ = Arrays::array2D_,
-    sizeRows_  = Traits<Lhs>::sizeRows_,
-    sizeCols_  = Traits<Rhs>::sizeCols_,
-    orient_    = Arrays::by_col_,
-    storage_   = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
-                 ? int(Arrays::dense_) : int(Arrays::sparse_)
-  };
-  typedef typename Promote<typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef Type ConstReturnType;
-};
-
-} // namespace hidden
-
-namespace hidden
-{
-/** @ingroup hidden
  *  @brief Traits class for the DiagonalByArrayProduct class
  */
 template< typename Lhs, typename Rhs>
@@ -443,8 +249,8 @@ struct Traits< DiagonalByArrayProduct < Lhs, Rhs> >
 /** @ingroup Arrays
   * @brief Generic expression where a product operator is applied to two expressions
   *
-  * @tparam Lhs left-hand side type
-  * @tparam Rhs right-hand side type
+  * @tparam Lhs left-hand side diagonal expression
+  * @tparam Rhs right-hand side array expression
   *
   * This class represents an expression  where a product operator is applied to
   * two expressions.
@@ -454,6 +260,9 @@ struct Traits< DiagonalByArrayProduct < Lhs, Rhs> >
   *
   * Most of the time, this is the only way that it is used, so you typically
   * don't have to name ArrayByDiagonalProduct types explicitly.
+  *
+  * @note the product is evaluated when element is needed
+  *
   **/
 template<typename Lhs, typename Rhs>
 class DiagonalByArrayProduct: public ExprBase< DiagonalByArrayProduct<Lhs, Rhs> >
@@ -506,6 +315,30 @@ class DiagonalByArrayProduct: public ExprBase< DiagonalByArrayProduct<Lhs, Rhs> 
     Rhs const& rhs_;
 };
 
+
+namespace hidden
+{
+/** @ingroup hidden
+ *  @brief Traits class for the VectorByPointProduct class
+ *  @note the product is evaluated when element is needed
+ */
+template< typename Lhs, typename Rhs>
+struct Traits< VectorByPointProduct < Lhs, Rhs> >
+{
+  enum
+  {
+    structure_ = Arrays::array2D_,
+    sizeRows_  = Traits<Lhs>::sizeRows_,
+    sizeCols_  = Traits<Rhs>::sizeCols_,
+    orient_    = Arrays::by_col_,
+    storage_   = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
+                 ? int(Arrays::dense_) : int(Arrays::sparse_)
+  };
+  typedef typename Promote<typename Lhs::Type, typename Rhs::Type>::result_type Type;
+  typedef typename RemoveConst<Type>::Type ConstReturnType; // not a reference
+};
+
+} // namespace hidden
 
 /** @ingroup Arrays
   * @brief Generic expression where a product operator is applied to two expressions
@@ -687,7 +520,6 @@ struct Traits< ArrayByVectorProduct < Lhs, Rhs> >
                   ? int(Arrays::dense_) : int(Arrays::sparse_)
    };
 
-  typedef ProductTraits<Lhs, Rhs, Lhs::structure_, Rhs::structure_> Base;
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
   typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
@@ -778,34 +610,28 @@ namespace hidden
 template< typename Lhs, typename Rhs>
 struct Traits< ArrayByArrayProduct<Lhs, Rhs> >
 {
+  // delegate to ProductTraits all the stuff
   typedef ProductTraits<Lhs, Rhs, Traits<Lhs>::structure_, Traits<Rhs>::structure_> Base;
 
   enum
   {
-    structure_ = Base::structure_,
-    sizeRows_ = Traits<Lhs>::sizeRows_,
-    sizeCols_ = Traits<Rhs>::sizeCols_,
-    // if there is more block on the left side, we use bp --> result is by_col_
-    orient_   =  ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
-                 ? Traits<Rhs>::orient_
-                 : (Traits<Lhs>::sizeRows_)/blockSize_ < (Traits<Rhs>::sizeCols_)/blockSize_
-                   ? int(Arrays::by_row_) : int(Arrays::by_col_),
-    storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
-                  ? int(Arrays::dense_) : int(Arrays::sparse_)
+    lhs_structure_  = Traits<Lhs>::structure_,
+    rhs_structure_  = Traits<Rhs>::structure_,
+    structure_      = Base::structure_,
+    sizeRows_       = Base::sizeRows_,
+    sizeCols_       = Base::sizeCols_,
+    orient_         = Base::orient_,
+    storage_        = Base::storage_,
+    useForRows_     = Base::useForRows_,
+    useForCols_     = Base::useForCols_
   };
-  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
 
-
+  typedef typename Base::Type Type;
+  typedef typename Base::ConstReturnType ConstReturnType;
   typedef typename Base::Allocator Allocator;
 };
 
 } // namespace hidden
-
-
-
-// forward declaration
-template< typename Lhs, typename Rhs> class ArrayByArrayProductBase;
 
 /** @ingroup Arrays
   * @brief Generic expression where a product operator is applied to two expressions
@@ -823,52 +649,53 @@ template< typename Lhs, typename Rhs> class ArrayByArrayProductBase;
   * don't have to name ArrayByArrayProduct types explicitly.
   **/
 template<typename Lhs, typename Rhs>
-class ArrayByArrayProduct: public ArrayByArrayProductBase< Lhs, Rhs >, public TRef<1>
+class ArrayByArrayProduct: public ExprBase< ArrayByArrayProduct<Lhs, Rhs> >, public TRef<1>
 {
   public:
-    typedef ArrayByArrayProductBase< Lhs, Rhs> Base;
-    typedef typename hidden::Traits<ArrayByArrayProduct>::Type Type;
-    typedef typename hidden::Traits<ArrayByArrayProduct>::ConstReturnType ConstReturnType;
-
-    typedef typename hidden::Traits<ArrayByArrayProduct < Lhs, Rhs> >::Allocator Allocator;
-
     enum
     {
       // All the valid cases for ArrayByArray operator
-     isValid_ =(  (EGAL(Lhs,array2D_) && !EGAL(Rhs,point_)  && !EGAL(Rhs,number_) && !EGAL(Rhs,diagonal_) )
-               || (EGAL(Lhs,square_)  && !EGAL(Rhs,point_)  && !EGAL(Rhs,number_) && !EGAL(Rhs,diagonal_) )
-               || (EGAL(Lhs,lower_triangular_) && !EGAL(Rhs,point_)  && !EGAL(Rhs,number_) && !EGAL(Rhs,diagonal_) )
-               || (EGAL(Lhs,upper_triangular_) && !EGAL(Rhs,point_)  && !EGAL(Rhs,number_) && !EGAL(Rhs,diagonal_) )
-               || (EGAL(Lhs,vector_) && EGAL(Rhs,point_) )
-               || (EGAL(Lhs,point_)  && !EGAL(Rhs,point_) && !EGAL(Rhs,vector_) && !EGAL(Rhs,number_) && !EGAL(Rhs,diagonal_) )
-               ),
-
-      structure_ = hidden::Traits<ArrayByArrayProduct>::structure_,
-      orient_    = hidden::Traits<ArrayByArrayProduct>::orient_,
-      sizeRows_  = hidden::Traits<ArrayByArrayProduct>::sizeRows_,
-      sizeCols_  = hidden::Traits<ArrayByArrayProduct>::sizeCols_,
-      storage_   = hidden::Traits<ArrayByArrayProduct>::storage_
+      isValid_ = (  EGAL(Lhs,array2D_)||EGAL(Lhs,square_)
+                  ||EGAL(Lhs,lower_triangular_)||EGAL(Lhs,upper_triangular_)
+                  ||EGAL(Lhs,symmetric_)||EGAL(Lhs,lower_symmetric_)||EGAL(Lhs,upper_symmetric_)
+                 )
+                 &&
+                 (  EGAL(Rhs,array2D_)||EGAL(Rhs,square_)
+                  ||EGAL(Rhs,lower_triangular_)||EGAL(Rhs,upper_triangular_)
+                  ||EGAL(Rhs,symmetric_)||EGAL(Rhs,lower_symmetric_)||EGAL(Rhs,upper_symmetric_)
+                 ),
+      lhs_structure_ = hidden::Traits< ArrayByArrayProduct >::lhs_structure_,
+      rhs_structure_ = hidden::Traits< ArrayByArrayProduct >::rhs_structure_,
+      structure_     = hidden::Traits< ArrayByArrayProduct >::structure_,
+      orient_        = hidden::Traits< ArrayByArrayProduct >::orient_,
+      sizeRows_      = hidden::Traits< ArrayByArrayProduct >::sizeRows_,
+      sizeCols_      = hidden::Traits< ArrayByArrayProduct >::sizeCols_,
+      storage_       = hidden::Traits< ArrayByArrayProduct >::storage_,
+      useForRows_    = hidden::Traits< ArrayByArrayProduct >::useForRows_,
+      useForCols_    = hidden::Traits< ArrayByArrayProduct >::useForCols_,
     };
+
+    typedef ExprBase< ArrayByArrayProduct<Lhs, Rhs> > Base;
+    typedef typename hidden::Traits< ArrayByArrayProduct>::Type Type;
+    typedef typename hidden::Traits< ArrayByArrayProduct>::ConstReturnType ConstReturnType;
+
+    typedef typename hidden::Traits< ArrayByArrayProduct < Lhs, Rhs> >::Allocator Allocator;
+    typedef hidden::ProductDispatcher<Lhs, Rhs, Allocator, lhs_structure_, rhs_structure_> Dispatcher;
+
+    typedef hidden::BinaryRowsImpl< Lhs, Rhs, sizeRows_, useForRows_ > RowsImpl;
+    typedef hidden::BinaryColsImpl< Lhs, Rhs, sizeCols_, useForCols_ > ColsImpl;
+
     /** Type of the Range for the rows */
     typedef TRange<sizeRows_> RowRange;
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
+    /** Constructor. Compute the result of the product and store it for further use in result_ */
+    ArrayByArrayProduct( Lhs const& lhs, Rhs const& rhs);
 
-    inline ArrayByArrayProduct( const Lhs& lhs, const Rhs& rhs)
-                             : Base(), lhs_(lhs), rhs_(rhs)
-                              , result_(lhs.sizeRows(), rhs.sizeCols(), Type(0))
-    {
-      STK_STATIC_ASSERT_PRODUCT_OPERATOR_MISMATCH( isValid_ );
-      if (lhs.cols() != rhs.rows())
-      { STKRUNTIME_ERROR_NO_ARG(ArrayByArrayProduct,sizes mismatch for 2D array);}
-      result_.shift(lhs_.beginRows(), rhs_.beginCols());
-      (orient_) ? hidden::ProductDispatcher<Lhs, Rhs, Allocator>::runpb(lhs, rhs, result_)
-                : hidden::ProductDispatcher<Lhs, Rhs, Allocator>::runbp(lhs, rhs, result_);
-    }
-    /**  @return the range of the rows */
-    inline RowRange const& rowsImpl() const { return lhs_.rows();}
-    /** @return the columns range */
-    inline ColRange const& colsImpl() const { return rhs_.cols();}
+    /** @return range of the rows */
+    inline RowRange const& rowsImpl() const { return RowsImpl::rowsImpl(lhs_, rhs_);}
+    /** @return range of the columns */
+    inline ColRange const& colsImpl() const { return ColsImpl::colsImpl(lhs_, rhs_);}
 
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_; }
@@ -876,6 +703,13 @@ class ArrayByArrayProduct: public ArrayByArrayProductBase< Lhs, Rhs >, public TR
     inline Rhs const& rhs() const { return rhs_; }
     /** @return the result */
     inline Allocator const& result() const { return result_; }
+
+    /** @return element (i,j) */
+    inline ConstReturnType elt2Impl(int i, int j) const { return result_.elt(i,j);}
+    /** @return ith element */
+    inline ConstReturnType elt1Impl(int i) const  { return result_.elt(i);}
+    /** @return number */
+    inline ConstReturnType elt0Impl() const { return result_.elt();}
 
   protected:
     Lhs const& lhs_;
@@ -885,32 +719,21 @@ class ArrayByArrayProduct: public ArrayByArrayProductBase< Lhs, Rhs >, public TR
     Allocator result_;
 };
 
-/** @ingroup Arrays
-  * @brief implement the access to the elements in the (2D) general case.
-  **/
-template< typename Lhs, typename Rhs>
-class ArrayByArrayProductBase: public ExprBase< ArrayByArrayProduct<Lhs, Rhs> >
+template<typename Lhs, typename Rhs>
+ArrayByArrayProduct<Lhs,Rhs>::ArrayByArrayProduct( Lhs const& lhs, Rhs const& rhs)
+                                                 : Base(), lhs_(lhs), rhs_(rhs)
+                                                 , result_(lhs.sizeRows(), rhs.sizeCols(), Type(0))
 {
-  public:
-    typedef ArrayByArrayProduct<Lhs, Rhs> Derived;
-    typedef ExprBase< Derived> Base;
-
-    typedef typename hidden::Traits<Derived>::Type Type;
-    typedef typename hidden::Traits<Derived>::ConstReturnType ConstReturnType;
-
-    /** constructor. */
-    inline ArrayByArrayProductBase(): Base() {}
-
-    /** access to element (i,j) */
-    inline Type const& elt2Impl(int i, int j) const { return this->asDerived().result().elt(i,j);}
-    /** access to ith element */
-    inline Type const& elt1Impl(int i) const  { return this->asDerived().result().elt(i);}
-    /** access to number */
-    inline Type const& elt0Impl() const { return this->asDerived().result().elt();}
-};
+  STK_STATIC_ASSERT_PRODUCT_OPERATOR_MISMATCH( isValid_ );
+  if (lhs.cols() != rhs.rows())
+  { STKRUNTIME_ERROR_NO_ARG(ArrayByArrayProduct,sizes mismatch for 2D array);}
+  result_.shift(lhs_.beginRows(), rhs_.beginCols());
+  // general sizes
+  Dispatcher::run(lhs, rhs, result_);
+}
 
 }  // namespace STK
 
 #undef EGAL
 
-#endif /* STK_PRODUCTOPERATOR_H */
+#endif /* STK_PRODUCTOPERATORS_H */

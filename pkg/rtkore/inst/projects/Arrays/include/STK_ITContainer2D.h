@@ -181,7 +181,6 @@ class IContainer2D
        std::swap(T.rows_, this->rows_ );
        std::swap(T.cols_, this->cols_ );
      }
-     // Deprecated
      /** Increment the end of the number of rows.
       *  @param inc the increment to apply
       **/
@@ -211,18 +210,18 @@ class IContainer2D
  *
  * The ITContainer2D class is the template base class for all
  * homogeneous two-dimensional containers containing element of type @c Type
- * where Type is note necessarily a scalar. It assumes that the derived class
- * cannot be part of an expression and is not constant, so that it can be
+ * where Type is note necessarily a scalar. Some methods assume that derived class
+ * is not part of an expression and is not constant, so that it can be
  * #- shifted,
  * #- resized
  * #- accessed in modification.
  *
  * Implement the curious recursive template paradigm : the template
  * parameter @c Derived is the name of the class that
- * implements @c ITContainer1D. For example
+ * implements @c ITContainer2D. For example
  * <code>
  * template<class Type>
- * class Derived: public ITContainer1D< Derived<Type> >
+ * class Derived: public ITContainer2D< Derived<Type> >
  * {...}
  * </code>
  *
@@ -230,32 +229,19 @@ class IContainer2D
  * derived class if necessary have the following definitions:
  * @code
  *   Type& elt2Impl(int i, int j);
- *   Type const& elt2Impl(int i, int j) const;
+ *   ConstReturnType elt2Impl(int i, int j) const;
  *   Type& elt1Impl(int pos);
- *   Type const& elt1Impl(int pos) const;
+ *   ConstReturnType elt1Impl(int pos) const;
  *   Type& elt0Impl()
- *   Type const& elt0Impl(int pos) const;
- *   void shiftImpl(int beg);
- *   Derived& resizeImpl(int size);
+ *   ConstReturnType elt0Impl(int pos) const;
+ *   void shift1Impl(int beg);
+ *   void shift2Impl(int beginRows, int beginCols);
+ *   Derived& resize1Impl(int size);
  *   resize2Impl(sizeRows, sizeCols);
- *
- *   // If derived class is a vector_ or a point_
- *   SubVector sub1Impl(Range const& I);
- * @endcode
- *
- * Constructors allowing to get sub-part of an array/vector/point used in
- * this interface and  to implement in derived class if necessary have the
- * following definitions:
- * @code
- *   Row(Derived, Range(i,1), cols();
- *   Col(Derived, rows(), Range(j,1));
- *   SubRow(Derived, Range(i,1), J);
- *   SubCol(Derived, I, Range(j,1));
- *   SubArray(Derived, I, J)
  * @endcode
  *
  *
- * @sa CAllocator
+ * @sa IContainer2D, ICArray
  *
  * @note The constant getter @c elt1Impl(pos) have to return a reference as we
  * are using derived classes for storing any kind of data.
@@ -266,16 +252,13 @@ class ITContainer2D: public IContainer2D< hidden::Traits<Derived>::sizeRows_, hi
 {
   public:
     typedef typename hidden::Traits<Derived>::Type Type;
+    typedef typename hidden::Traits<Derived>::ConstReturnType ConstReturnType;
+
     typedef typename hidden::Traits<Derived>::Row Row;
     typedef typename hidden::Traits<Derived>::Col Col;
-    typedef typename hidden::Traits<Derived>::SubRow SubRow;
-    typedef typename hidden::Traits<Derived>::SubCol SubCol;
-    typedef typename hidden::Traits<Derived>::SubArray SubArray;
-    typedef typename hidden::Traits<Derived>::SubVector SubVector;
 
     enum
     {
-      // TODO: structure_ is not part of the CAllocator class
       structure_ = hidden::Traits<Derived>::structure_,
       orient_    = hidden::Traits<Derived>::orient_,
       sizeRows_  = hidden::Traits<Derived>::sizeRows_,
@@ -308,12 +291,8 @@ class ITContainer2D: public IContainer2D< hidden::Traits<Derived>::sizeRows_, hi
     ~ITContainer2D() {}
 
   public:
-    /** @return the range of the effectively stored elements in the column. */
-    RowRange const& rangeRowsInCol(int) const { return this->rows();}
-    /** @return the range of the effectively stored elements in the row. */
-    ColRange const& rangeColsInRow(int) const { return this->cols();}
     /** @return the element (i,j) of the 2D container.
-     *  @param i, j index of the row and of the column
+     *  @param i, j indexes of the element to get
      **/
     inline Type& elt(int i, int j)
     {
@@ -326,9 +305,9 @@ class ITContainer2D: public IContainer2D< hidden::Traits<Derived>::sizeRows_, hi
       return this->asDerived().elt2Impl(i,j);
     }
     /** @return a constant reference on element (i,j) of the 2D container
-     *  @param i, j indexes of the row and of the column
+     *  @param i, j indexes of the element to get
      **/
-    inline Type const& elt(int i, int j) const
+    inline ConstReturnType elt(int i, int j) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (this->beginRows() > i) { STKOUT_OF_RANGE_2ARG(ITContainer2D::elt, i, j, beginRows() > i);}
@@ -339,59 +318,39 @@ class ITContainer2D: public IContainer2D< hidden::Traits<Derived>::sizeRows_, hi
       return this->asDerived().elt2Impl(i,j);
     }
     /** @return a reference on the ith element
-     *  @param i index of the ith element
+     *  @param i index of the element to get
      **/
     inline Type& elt(int i) { return this->asDerived().elt1Impl(i);}
     /** @return the constant ith element
-     *  @param i index of the ith element
+     *  @param i index of the element to get
+     *  @note bounds check cannot be done there as number_ does not have
+     *  begin() and end() implemented
      **/
-    inline Type const& elt(int i) const { return this->asDerived().elt1Impl(i);}
+    inline ConstReturnType elt(int i) const { return this->asDerived().elt1Impl(i);}
     /** @return a reference on the number */
     inline Type& elt() { return this->asDerived().elt0Impl();}
     /** @return a constant reference on the number */
-    inline Type const& elt() const  { return this->asDerived().elt0Impl();}
+    inline ConstReturnType elt() const  { return this->asDerived().elt0Impl();}
 
-    /** Access to the ith row of the Allocator.
-     *  @param i index of the row
-     *  @return a reference on the ith row
-     **/
-    inline Row row(int i) const { return Row(this->asDerived(), TRange<1>(i,1), this->cols());}
-    /** Access to the jth column of the Allocator.
-     *  @param j index of the column
-     *  @return a reference on the jth column
-     **/
-    inline Col col(int j) const { return Col(this->asDerived(), this->rows(), TRange<1>(j,1));}
-
-    /** resize the allocator
+    /** resize the container
      *  @param sizeRows, sizeCols size of the rows and columns
      **/
-    Derived& resize(int sizeRows, int sizeCols) { return this->asDerived().resize2Impl(sizeRows, sizeCols);}
-    /** Resize the vector or the point
+    Derived& resize(int sizeRows, int sizeCols)
+    { return this->asDerived().resize2Impl(sizeRows, sizeCols);}
+    /** Resize 1D container
      *  @param size the size to set to the vector
      **/
     Derived& resize(int size) { return this->asDerived().resize1Impl(size);}
 
-    /** shift the first indexes of the allocator.
+    /** shift the first indexes of the container
      *  @param firstRow, firstCol indexes of the first row and first column
      **/
     void shift( int firstRow, int firstCol) { this->asDerived().shift2Impl(firstRow, firstCol);}
-    /** shift the first indexes of the vector or point.
+    /** shift the first indexes of the 1D container
      *  @param beg the index of the first row or column
      **/
     void shift(int beg) { this->asDerived().shift1Impl(beg);}
 
-    /** @param pos1, pos2 position of the first and second columns to swap */
-    void swapCols(int pos1, int pos2)
-    {
-      for (int i=this->beginRows(); i< this->endRows(); ++i)
-      { std::swap(this->asDerived().elt2Impl(i, pos1),this->asDerived().elt2Impl(i, pos2));}
-    }
-    /** @param pos1, pos2 position of the first and second rows to swap */
-    void swapRows(int pos1, int pos2)
-    {
-      for (int j=this->beginCols(); j< this->endCols(); ++j)
-      { std::swap(this->asDerived().elt2Impl(pos1, j),this->asDerived().elt2Impl(pos2, j));}
-    }
 };
 
 } // namespace STK

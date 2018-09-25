@@ -114,8 +114,7 @@ class Binomial: public IUnivLaw<Integer>
      **/
     virtual Real lpdf(Integer const& x) const;
     /** @brief compute the cumulative distribution function
-     *  Give the probability that a Binomial random variate is less or equal
-     *  to t.
+     *  Give the probability that a Binomial random variate is less or equal to t.
      *  @param t a real value
      *  @return the value of the cdf
      **/
@@ -162,6 +161,15 @@ class Binomial: public IUnivLaw<Integer>
      **/
     static Integer icdf(Real const& p, int n, Real const& prob);
 
+#ifdef IS_RTKPP_LIB
+    /** @return log-cumulative distribution function */
+    virtual Real lcdf( Real const& t) const;
+    /** @return complement of cumulative distribution function */
+    virtual Real cdfc( Real const& t) const;
+    /** @return log-complement of cumulative distribution function */
+    virtual Real lcdfc( Real const& t) const;
+#endif
+
   protected:
     /** number of trials */
     int n_;
@@ -179,14 +187,13 @@ inline int Binomial::rand() const
 GetRNGstate(); int s = Rf_rbinom(n_, prob_); PutRNGstate(); return s;
 }
 
-inline Real Binomial::pdf(int const& x) const
-{ return (Real)::Rf_dbinom((double)x, (double)n_, prob_, false);}
-inline Real Binomial::lpdf(int const& x) const
-{ return (Real)::Rf_dbinom((double)x, (double)n_, prob_, true);}
-inline Real Binomial::cdf(Real const& t) const
-{ return (Real)::Rf_pbinom(t, (double)n_, prob_, true, false);}
-inline int Binomial::icdf(Real const& p) const
-{ return Rf_qbinom(p, (double)n_, prob_, true, false);}
+inline Real Binomial::pdf(int const& x) const { return (Real)Rf_dbinom((double)x, (double)n_, prob_, false);}
+inline Real Binomial::lpdf(int const& x) const { return (Real)Rf_dbinom((double)x, (double)n_, prob_, true);}
+inline Real Binomial::cdf(Real const& t) const { return (Real)Rf_pbinom((double)t, (double)n_, prob_, true, false);}
+inline Real Binomial::lcdf(Real const& t) const { return (Real)Rf_pbinom((double)t, (double)n_, prob_, true, true);}
+inline Real Binomial::cdfc(Real const& t) const { return (Real)Rf_pbinom(t, (double)n_, prob_, false, false);}
+inline Real Binomial::lcdfc(Real const& t) const { return (Real)Rf_pbinom(t, (double)n_, prob_, false, true);}
+inline int Binomial::icdf(Real const& p) const { return Rf_qbinom(p, (double)n_, prob_, true, false);}
 
 inline int Binomial::rand(int n, Real const& prob)
 {
@@ -197,11 +204,11 @@ GetRNGstate(); int s = Rf_rbinom(n, prob); PutRNGstate(); return s;
 }
 
 inline Real Binomial::pdf(int x, int n, Real const& prob)
-{ return (Real)::Rf_dbinom(x, (double)n, prob, false);}
+{ return (Real)Rf_dbinom(x, (double)n, prob, false);}
 inline Real Binomial::lpdf(int x, int n, Real const& prob)
-{ return (Real)::Rf_dbinom((double)x, (double)n, prob, true);}
+{ return (Real)Rf_dbinom((double)x, (double)n, prob, true);}
 inline Real Binomial::cdf(Real const& t, int n, Real const& prob)
-{ return (Real)::Rf_pbinom(t, (double)n, prob, true, false);}
+{ return (Real)Rf_pbinom(t, (double)n, prob, true, false);}
 inline int Binomial::icdf(Real const& p, int n, Real const& prob)
 { return Rf_qbinom(p, (double)n, prob, true, false);}
 

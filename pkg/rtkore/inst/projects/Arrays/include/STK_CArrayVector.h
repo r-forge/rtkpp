@@ -76,17 +76,9 @@ namespace hidden
 template<typename Type_, int SizeRows_, bool Orient_>
 struct Traits< CArrayVector<Type_, SizeRows_, Orient_> >
 {
-    typedef CArrayNumber<Type_, Orient_> Number;
-//    typedef CArrayNumber<Type_, Orient_> Row;
-//    typedef CArrayNumber<Type_, Orient_> SubRow;
-    typedef CArrayPoint<Type_, 1, Orient_> Row;
-    typedef CArrayPoint<Type_, 1, Orient_> SubRow;
-
+    typedef CArrayNumber<Type_, Orient_> Row;
     typedef CArrayVector<Type_, SizeRows_, Orient_> Col;
-    typedef CArrayVector<Type_, UnknownSize, Orient_> SubCol;
 
-    typedef typename  If<(SizeRows_ == 1), Number, SubCol>::Result SubVector;
-    typedef typename  If<(SizeRows_ == 1), Number, SubCol>::Result SubArray;
     // The CAllocator have to have the same structure than the CArray
     typedef CAllocator<Type_, SizeRows_, 1, Orient_> Allocator;
 
@@ -99,9 +91,11 @@ struct Traits< CArrayVector<Type_, SizeRows_, Orient_> >
       orient_    = Orient_,
       sizeRows_  = SizeRows_,
       sizeCols_  = 1,
+      size_      = SizeRows_,
       storage_   = Arrays::dense_
     };
 };
+
 
 } // namespace hidden
 
@@ -115,16 +109,19 @@ class CArrayVector: public ICArray < CArrayVector<Type_, SizeRows_, Orient_> >
     typedef ICArray < CArrayVector<Type_, SizeRows_, Orient_> > Base;
     typedef ArrayBase < CArrayVector<Type_, SizeRows_, Orient_> > LowBase;
 
+    typedef typename hidden::Traits< CArrayVector<Type_, SizeRows_, Orient_> >::Row Row;
+    typedef typename hidden::Traits< CArrayVector<Type_, SizeRows_, Orient_> >::Col Col;
     typedef typename hidden::Traits< CArrayVector<Type_, SizeRows_, Orient_> >::Type Type;
     typedef typename hidden::Traits< CArrayVector<Type_, SizeRows_, Orient_> >::ConstReturnType ConstReturnType;
 
     enum
     {
-      structure_ = hidden::Traits<CArrayVector<Type_, SizeRows_, Orient_> >::structure_,
-      orient_    = hidden::Traits<CArrayVector<Type_, SizeRows_, Orient_> >::orient_,
-      sizeRows_  = hidden::Traits<CArrayVector<Type_, SizeRows_, Orient_> >::sizeRows_,
-      sizeCols_  = hidden::Traits<CArrayVector<Type_, SizeRows_, Orient_> >::sizeCols_,
-      storage_   = hidden::Traits<CArrayVector<Type_, SizeRows_, Orient_> >::storage_
+      structure_ = hidden::Traits< CArrayVector<Type_, SizeRows_, Orient_> >::structure_,
+      orient_    = hidden::Traits< CArrayVector<Type_, SizeRows_, Orient_> >::orient_,
+      sizeRows_  = hidden::Traits< CArrayVector<Type_, SizeRows_, Orient_> >::sizeRows_,
+      sizeCols_  = hidden::Traits< CArrayVector<Type_, SizeRows_, Orient_> >::sizeCols_,
+      size_      = hidden::Traits< CArrayVector<Type_, SizeRows_, Orient_> >::size_,
+      storage_   = hidden::Traits< CArrayVector<Type_, SizeRows_, Orient_> >::storage_
     };
 
     /** Default constructor. */

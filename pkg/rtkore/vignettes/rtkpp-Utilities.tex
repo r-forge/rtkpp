@@ -1,9 +1,9 @@
-%\VignetteIndexEntry{STK++ Utilities, Reference Guide}
+%\VignetteIndexEntry{STK++ Statistical Utilities Reference Guide}
 
 \documentclass[a4paper,10pt]{article}
 
 %-------------------------
-% preamble for nice lsitings and notes
+% preamble for nice listings and notes
 \include{rtkpp-preamble}
 
 \geometry{top=2cm, bottom=2cm, left=1cm, right=1cm}
@@ -70,6 +70,9 @@ class Cauchy : public IUnivLaw<Real>
     virtual Real pdf( Real const& x) const;
     virtual Real lpdf( Real const& x) const;
     virtual Real cdf( Real const& t) const;
+    virtual Real lcdf( Real const& t) const;
+    virtual Real cdfc( Real const& t) const;
+    virtual Real lcdfc( Real const& t) const;
     virtual Real icdf( Real const& p) const;
     static Real rand( Real const& mu, Real const& scale);
     static Real pdf( Real const& x, Real const& mu, Real const& scale);
@@ -88,6 +91,12 @@ the methods have the following meaning
 \item \code{lpdf(x)} return the value $\log(f(x))$,
 \item \code{rand()} return a a realization of the density $f$,
 \item \code{cdf(t)} return the cumulative distribution function value $F(t)=\int_{-\infty}^t f(x) dx$
+\item \code{lcdf(t)} return the $\log$-cumulative distribution function value
+$\log F(t)$
+\item \code{cdfc(t)} return the complementary cumulative distribution function
+value (the survival function) $1-F(t)$
+\item \code{lcdfc(t)} return the $\log$-complementary cumulative distribution
+function value $\log(1-F(t))$
 \item \code{icdf(p)} return the inverse cumulative distribution function value $F^{-1}(p)$.
 \end{enumerate}
 
@@ -95,7 +104,8 @@ The table \ref{tab:prob} gives the list of available probability distribution.
 \begin{table}[htb]
 \begin{tabular}{|l|l|l|l|}
 \hline
-Name             & Constructor                                & R functions     & Notes\\
+Name             & Constructor                           & R functions     &
+Notes\\
 \hline
 Bernoulli        & \ttcode{Law::Bernouilli(p) }          & -               & \\
 \hline

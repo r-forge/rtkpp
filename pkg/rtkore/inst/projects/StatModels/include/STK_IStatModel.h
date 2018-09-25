@@ -89,7 +89,7 @@ class IStatModel: public IStatModelBase
     /** Type of the data contained in the container */
     typedef typename Data::Type Type;
     /** Type of the row of the data container (a sample) */
-    typedef typename Data::Row Row;
+    typedef typename hidden::Traits<Data>::Row Row;
 
   protected:
     /** Constructor with data set. */
@@ -97,7 +97,7 @@ class IStatModel: public IStatModelBase
                                 , p_dataij_(&data)
     {}
     /** Constructor with a ptr on the data set. */
-    IStatModel(Data const* p_data) : IStatModelBase(), p_dataij_(p_data)
+    IStatModel(Data const* p_data): IStatModelBase(), p_dataij_(p_data)
     { if (p_data) this->initialize(p_data->sizeRows(), p_data->sizeCols()) ;}
 
   public:

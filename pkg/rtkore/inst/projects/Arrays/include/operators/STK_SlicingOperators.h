@@ -356,7 +356,7 @@ class ColOperator: public ExprBase< ColOperator< Lhs> >, public TRef<1>
       return (lhs_.elt(i, j_));
     }
     /** @return the element ith element
-     *  @param i index of the ith element
+     *  @param i index of the element to get
      **/
     inline ConstReturnType elt1Impl(int i) const { return (lhs_.elt(i, j_));}
     /** access to the element */
@@ -427,7 +427,7 @@ class ColAccessor: public ExprBase< ColAccessor< Lhs> >, public TRef<1>
       return (lhs_.elt(i, j_));
     }
     /** @return the element ith element
-     *  @param i index of the ith element
+     *  @param i index of the element to get
      **/
     inline ConstReturnType elt1Impl(int i) const { return (lhs_.elt(i, j_));}
     /** access to the element */
@@ -444,7 +444,7 @@ class ColAccessor: public ExprBase< ColAccessor< Lhs> >, public TRef<1>
       return (lhs_.elt(i, j_));
     }
     /** @return the element ith element
-     *  @param i index of the ith element
+     *  @param i index of the element to get
      **/
     inline Type& elt1Impl(int i) { return (lhs_.elt(i, j_));}
     /** access to the element */

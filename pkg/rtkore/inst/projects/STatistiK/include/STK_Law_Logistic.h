@@ -52,7 +52,7 @@ namespace Law
  * the logistic function, which appears in logistic regression and feedforward
  * neural networks. It resembles the logistic distribution in shape but has heavier
  * tails (higher kurtosis).
- * 
+ *
  * The Logistic distribution with <em>location = m</em> and <em>scale = s>0</em>
  * has distribution function
  * \f[
@@ -89,9 +89,9 @@ class Logistic: public IUnivLaw<Real>
       if (scale<=0) STKDOMAIN_ERROR_1ARG(Logistic::setScale,scale,scale must be > 0);
        scale_ = scale;
     }
-    /** @brief Generate a pseudo logisticized Logistic random variate.
+    /** @brief Generate a pseudo Logistic random variate.
      *
-     *  Generate a pseudo logisticized Logistic random variate
+     *  Generate a pseudo Logistic random variate
      *  with location parameter @c mu_ and scale @c scale_.
      *  @return a pseudo logistic random variate
      **/
@@ -113,7 +113,7 @@ class Logistic: public IUnivLaw<Real>
      *   F(t; \mu, s) = \frac{1}{1+e^{-\frac{t-\mu}{s}}}
      *   = \frac{1}{2} + \frac{1}{2} \;\operatorname{tanh}\!\left(\frac{t-\mu}{2s}\right).
      *   \f]
-     * 
+     *
      *  @param t a real value
      *  @return the cumulative distribution function value at t
      **/
@@ -160,6 +160,15 @@ class Logistic: public IUnivLaw<Real>
      **/
     static Real icdf( Real const& p, Real const& mu, Real const& scale);
 
+#ifdef IS_RTKPP_LIB
+    /** @return log-cumulative distribution function */
+    virtual Real lcdf( Real const& t) const;
+    /** @return complement of cumulative distribution function */
+    virtual Real cdfc( Real const& t) const;
+    /** @return log-complement of cumulative distribution function */
+    virtual Real lcdfc( Real const& t) const;
+#endif
+
   protected:
     /** The mu parameter. **/
     Real mu_;
@@ -177,14 +186,13 @@ inline Real Logistic::rand() const
 GetRNGstate(); Real s = Rf_rlogis(mu_, scale_); PutRNGstate(); return s;
 }
 
-inline Real Logistic::pdf( Real const& x) const
-{ return Rf_dlogis(x, mu_, scale_, false);}
-inline Real Logistic::lpdf( Real const& x) const
-{ return Rf_dlogis(x, mu_, scale_, true);}
-inline Real Logistic::cdf( Real const& t) const
-{ return Rf_plogis(t, mu_, scale_, true, false);}
-inline Real Logistic::icdf( Real const& p) const
-{ return Rf_qlogis(p, mu_, scale_, true, false);}
+inline Real Logistic::pdf( Real const& x) const { return Rf_dlogis(x, mu_, scale_, false);}
+inline Real Logistic::lpdf( Real const& x) const { return Rf_dlogis(x, mu_, scale_, true);}
+inline Real Logistic::cdf( Real const& t) const { return Rf_plogis(t, mu_, scale_, true, false);}
+inline Real Logistic::lcdf( Real const& t) const { return Rf_plogis(t, mu_, scale_, true, true);}
+inline Real Logistic::cdfc( Real const& t) const { return Rf_plogis(t, mu_, scale_, false, false);}
+inline Real Logistic::lcdfc( Real const& t) const { return Rf_plogis(t, mu_, scale_, false, true);}
+inline Real Logistic::icdf( Real const& p) const { return Rf_qlogis(p, mu_, scale_, true, false);}
 
 inline Real Logistic::rand( Real const& mu, Real const& scale)
 {

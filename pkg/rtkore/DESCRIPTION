@@ -1,9 +1,9 @@
 Package: rtkore
 Type: Package
 Title: 'STK++' Core Library Integration to 'R' using 'Rcpp'
-Version: 1.5.1
+Version: 1.5.5
 Encoding: UTF-8
-Date: 2018-03-04
+Date: 2018-09-25
 Authors@R: c( person("Serge", "Iovleff", role=c("aut","cre"), email="serge.iovleff@stkpp.org")
             , person("Parmeet", "Bhatia", role="ctb", email="bhatia.parmeet@gmail.com"))
 Copyright: Inria, University Lille 1 and specifically inst/COPYRIGHTS for the
@@ -21,8 +21,10 @@ License: GPL (>= 2)
 BugReports: https://sourceforge.net/projects/stkpp/
 LazyLoad: yes
 Depends:
-    R (>= 3.1.0),
-    Rcpp (>= 0.11.0)
+    R (>= 3.2.0),
+    Rcpp (>= 0.12.0)
+Imports:
+    inline
 LinkingTo: Rcpp
 URL: http://www.stkpp.org
 NeedsCompilation: yes

@@ -154,6 +154,7 @@ class List1D: public ITContainer1D< List1D<Type_> >, public IContainerRef
      *  @param T the list to copy
      **/
     List1D( List1D<Type> const& T): Base(T), IContainerRef(false)
+                                  , p_begin_(0), p_last_(0), currentPosition_(0), p_current_(0)
     {
       // initialize container
       initialize(T.range());

@@ -97,6 +97,7 @@ struct Traits< Const::Identity <Type_, Size_> >
     structure_ = Arrays::diagonal_,
     sizeRows_  = Size_,
     sizeCols_  = Size_,
+    size_      = Size_,
     orient_    = Arrays::by_col_,
     storage_   = Arrays::sparse_
   };
@@ -115,6 +116,7 @@ struct Traits< Const::Vector <Type_, Size_> >
     structure_ = Arrays::vector_,
     sizeRows_  = Size_,
     sizeCols_  = 1,
+    size_      = Size_,
     orient_    = Arrays::by_col_,
     storage_   = Arrays::sparse_
   };
@@ -132,6 +134,7 @@ struct Traits< Const::Point <Type_, Size_> >
     structure_ = Arrays::point_,
     sizeRows_  = 1,
     sizeCols_  = Size_,
+    size_      = Size_,
     orient_    = Arrays::by_row_,
     storage_   = Arrays::sparse_
   };
@@ -149,6 +152,7 @@ struct Traits< Const::Square <Type_, Size_> >
     structure_ = Arrays::square_,
     sizeRows_  = Size_,
     sizeCols_  = Size_,
+    size_      = Size_,
     orient_    = Arrays::by_col_,
     storage_   = Arrays::sparse_
   };
@@ -318,7 +322,7 @@ class Identity: public IConstArray<Identity<Type_, Size_> >
      **/
     inline ConstReturnType elt2Impl(int i, int j) const { return (i==j ? Type(1) : Type(0));}
     /** @return the element ith element of the identity matrix
-     *  @param i index of the ith element
+     *  @param i index of the element to get
      **/
     inline ConstReturnType elt1Impl(int i) const { return Type(1);}
 };

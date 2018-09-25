@@ -117,10 +117,6 @@ class IMultiStatModel: public IStatModelBase, public IRecursiveTemplate<Derived>
     typedef typename hidden::StatModelTraits<Derived>::Data Data;
     /** Type of the data in the container */
     typedef typename hidden::StatModelTraits<Derived>::Type Type;
-    /** Type of the row vector of the container */
-    typedef typename hidden::StatModelTraits<Derived>::RowVector RowVector;
-    /** Type of the column vector of the container */
-    typedef typename hidden::StatModelTraits<Derived>::ColVector ColVector;
     /** Type of the vector with the weights */
     typedef typename hidden::StatModelTraits<Derived>::WColVector WColVector;
     /** Type of the parameters of the Model */
@@ -130,8 +126,8 @@ class IMultiStatModel: public IStatModelBase, public IRecursiveTemplate<Derived>
     /** default constructor. */
     IMultiStatModel(): IStatModelBase(), p_data_(0), param_() {}
     /** Constructor with data set. */
-    IMultiStatModel( Data const& data): IStatModelBase(), p_data_(&data), param_(data.cols())
-    { this->initialize(data.sizeRows(), data.sizeCols());}
+    IMultiStatModel( Data const& data): IStatModelBase(), p_data_(&data), param_(data.dataij().cols())
+    { this->initialize(data.dataij().sizeRows(), data.dataij().sizeCols());}
     /** Constructor with a ptr on the data set. */
     IMultiStatModel( Data const* p_data): IStatModelBase(), p_data_(p_data), param_()
     {
@@ -239,8 +235,8 @@ class IMultiStatModel: public IStatModelBase, public IRecursiveTemplate<Derived>
     Real computeLnLikelihood() const
     {
       Real sum = 0.0;
-      for (int i= p_data()->beginRows(); i< p_data()->endRows(); i++)
-      { sum += this->asDerived().computeLnLikelihood(p_data()->row(i));}
+      for (int i= p_data()->dataij().beginRows(); i< p_data()->dataij().endRows(); i++)
+      { sum += this->asDerived().computeLnLikelihood(p_data()->dataij().row(i));}
       return(sum);
     }
     /** update the model if a new data set is set */
@@ -248,8 +244,8 @@ class IMultiStatModel: public IStatModelBase, public IRecursiveTemplate<Derived>
     {
       if (p_data_)
       {
-        this->initialize(p_data()->sizeRows(), p_data()->sizeCols());
-        param_.resize(p_data()->cols());
+        this->initialize(p_data()->dataij().sizeRows(), p_data()->dataij().sizeCols());
+        param_.resize(p_data()->dataij().cols());
       }
       else
       { this->initialize(0,0); }

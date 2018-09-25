@@ -51,7 +51,7 @@ typedef Normal Gaussian;
 /**
  *  @ingroup Laws
  *  @brief Normal distribution law.
- * 
+ *
  *  In probability theory, the <em>normal (or Gaussian) distribution</em> is a
  *  very commonly occurring continuous probability distribution. Normal
  *  distributions are extremely important in statistics and are often used in
@@ -121,7 +121,7 @@ class Normal: public IUnivLaw<Real>
      *
      *  This is the erfc() routine only, adapted by the
      *  transform cdf(u)=erfc(-u/sqrt(2))/2
-     * 
+     *
      *  @param t a real value
      *  @return the cumulative distribution function value at t
      **/
@@ -133,7 +133,7 @@ class Normal: public IUnivLaw<Real>
      *  @see    http://home.online.no/~pjacklam/notes/invnorm/index.html
      *
      *  This function is based on the MATLAB code from the address above.
-     * 
+     *
      *  @param p a probability number.
      *  @return the inverse cumulative distribution function value at p.
      **/
@@ -173,6 +173,15 @@ class Normal: public IUnivLaw<Real>
      **/
     static Real icdf( Real const& p, Real const& mu, Real const& sigma);
 
+#ifdef IS_RTKPP_LIB
+    /** @return log-cumulative distribution function */
+    virtual Real lcdf( Real const& t) const;
+    /** @return complement of cumulative distribution function */
+    virtual Real cdfc( Real const& t) const;
+    /** @return log-complement of cumulative distribution function */
+    virtual Real lcdfc( Real const& t) const;
+#endif
+
   protected:
     /** The mu parameter. **/
     Real mu_;
@@ -194,6 +203,9 @@ GetRNGstate(); Real s = Rf_rnorm(mu_, sigma_); PutRNGstate(); return s;
 inline Real Normal::pdf( Real const& x) const {   return Rf_dnorm4(x, mu_, sigma_, false);}
 inline Real Normal::lpdf( Real const& x) const {   return Rf_dnorm4(x, mu_, sigma_, true);}
 inline Real Normal::cdf( Real const& t) const { return Rf_pnorm5(t, mu_, sigma_, true, false);}
+inline Real Normal::lcdf( Real const& t) const { return Rf_pnorm5(t, mu_, sigma_, true, true);}
+inline Real Normal::cdfc( Real const& t) const { return Rf_pnorm5(t, mu_, sigma_, false, false);}
+inline Real Normal::lcdfc( Real const& t) const { return Rf_pnorm5(t, mu_, sigma_, false, true);}
 inline Real Normal::icdf( Real const& p) const { return Rf_qnorm5(p , mu_, sigma_, true, false);}
 
 

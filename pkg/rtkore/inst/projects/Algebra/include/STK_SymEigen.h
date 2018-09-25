@@ -31,7 +31,7 @@
 /** @file STK_SymEigen.h
  *  @brief In this file we define the SymEigen class (for a symmetric matrix).
  **/
- 
+
 #ifndef STK_SYMEIGEN_H
 #define STK_SYMEIGEN_H
 
@@ -64,7 +64,7 @@ struct AlgebraTraits< SymEigen<SquareArray_> >
 /** @ingroup Algebra
  *  @brief The class SymEigen compute the eigenvalue Decomposition
  *  of a symmetric ArrayXX.
- * 
+ *
  *  The decomposition of a symmetric matrix require
  *  - Input:  A symmetric matrix A of size (n,n)
  *  - Output:
@@ -78,6 +78,8 @@ struct AlgebraTraits< SymEigen<SquareArray_> >
  *  full.
  *  Thus the user can be faced with a deficient rank matrix and with a norm and
  *  a determinant very small (but not exactly 0.0).
+ *
+ *  @sa STK::ISymEigen, STK::lapack::SymEigen
  **/
 template<class SquareArray>
 class SymEigen: public ISymEigen<SymEigen<SquareArray> >
@@ -100,7 +102,7 @@ class SymEigen: public ISymEigen<SymEigen<SquareArray> >
      */
     SymEigen( SquareArray const& data, bool ref =false);
     /** constructor.
-     *  @param data A reference on a symetric expression matrix to decompose.
+     *  @param data A reference on a symmetric expression matrix to decompose.
      **/
     template<class Derived>
     SymEigen( ExprBase<Derived> const& data);
@@ -110,8 +112,6 @@ class SymEigen: public ISymEigen<SymEigen<SquareArray> >
     SymEigen( SymEigen const& S);
     /** virtual destructor */
     virtual ~SymEigen() {}
-    /** clone pattern */
-    inline virtual SymEigen* clone() const { return new SymEigen(*this);}
 
     /** @brief Diagonalization of eigenVectors_
      *  @return @c true if no error occur, @c false otherwise
@@ -129,7 +129,7 @@ class SymEigen: public ISymEigen<SymEigen<SquareArray> >
 
   private:
     /** Temporary vector. Values of the subdiagonal. */
-    Vector F_;
+    VectorX F_;
     /** @brief compute the tri-diagonalization of eigenVectors_ */
     void tridiagonalize();
     /** @brief compute the Householder matrix and P */
@@ -148,7 +148,7 @@ SymEigen<SquareArray>::SymEigen(): Base() {}
  */
 template<class SquareArray>
 SymEigen<SquareArray>::SymEigen( SquareArray const& data, bool ref)
-                              : Base(data)
+                               : Base(data)
 {}
 /* @brief Constructor
  *  @param data reference on a symmetric square matrix
@@ -156,7 +156,7 @@ SymEigen<SquareArray>::SymEigen( SquareArray const& data, bool ref)
  */
 template<>
 inline SymEigen<CSquareX>::SymEigen( CSquareX const& data, bool ref)
-                           : Base(data, ref)
+                                   : Base(data, ref)
 {}
 
 /* constructor.
@@ -215,7 +215,7 @@ bool SymEigen<SquareArray>::runImpl()
   return true;
 }
 
-/* tridiagonalization of the symetric matrix eigenVectors_. Only the lower
+/* tridiagonalization of the symmetric matrix eigenVectors_. Only the lower
  * part of eigenVectors_ used. eigenVectors_ is overwritten with the Householder
  * vectors. eigenValues_ contains the diagonal.
  **/
@@ -235,7 +235,7 @@ void SymEigen<SquareArray>::tridiagonalize()
       )
   {
     // ref on the current column iter in the range iter1:last
-    typename CSquareX::Col v(eigenVectors_.col(range1, i));
+    typename hidden::Traits<CSquareX>::Col v(eigenVectors_.col(range1, i));
     // Compute Householder vector and get subdiagonal element
     F_[i] = house(v);
     // Save diagonal element
@@ -245,7 +245,7 @@ void SymEigen<SquareArray>::tridiagonalize()
     if (beta)
     {
       // ref on the current column iter1 in the range iter1:last
-      CSquareX::Col M1(eigenVectors_.col(range1, i1));
+      typename hidden::Traits<CSquareX>::Col M1(eigenVectors_.col(range1, i1));
       // aux1 will contain <v,p>
       Real aux1 = 0.0;
       // apply left and right Householder to eigenVectors_
@@ -299,7 +299,7 @@ void SymEigen<SquareArray>::compHouse()
       ; iter0--, iter--, iter1--)
   {
     // reference on the Householder vector
-    CSquareXd::Col v(eigenVectors_.col(Range(iter, range_.lastIdx(), 0), iter0));
+    typename hidden::Traits<CSquareX>::Col v(eigenVectors_.col(Range(iter, range_.lastIdx(), 0), iter0));
     // Get Beta
     Real beta = v[iter];
     if (beta)

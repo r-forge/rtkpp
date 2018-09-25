@@ -219,6 +219,8 @@ inline typename hidden::Traits<Derived>::Type const ExprBase<Derived>::sumSafe()
   hidden::SumVisitor<Type> visitor;
   return safe().visit(visitor);
 }
+
+//--------- Start result with return type
 /* @return the norm of this*/
 template<typename Derived>
 inline typename hidden::Traits<Derived>::Type const ExprBase<Derived>::norm() const
@@ -336,7 +338,7 @@ inline typename hidden::Traits<Derived>::Type const ExprBase<Derived>::wmean(Exp
   STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Rhs);
   Type size = weights.sum();
   if (size <= 0 || !STK::isFinite(size)) return Arithmetic<Type>::NA();
-  return wsumSafe(weights)/size;
+  return wsum(weights)/size;
 }
 
 template<typename Derived>
@@ -347,7 +349,7 @@ inline typename hidden::Traits<Derived>::Type const ExprBase<Derived>::wmeanSafe
   STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Rhs);
   Type size = weights.sumSafe();
   if (size <= 0) return Arithmetic<Type>::NA();
-  return wsum(weights)/size;
+  return wsumSafe(weights)/size;
 }
 
 /* @return the variance of all the elements of this using a Visitor*/
@@ -389,6 +391,7 @@ inline typename hidden::Traits<Derived>::Type const ExprBase<Derived>::wvariance
   STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Rhs);
   return (*this-mean).square().wmeanSafe(weights);
 }
+
 
 } // namespace STK
 

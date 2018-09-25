@@ -162,11 +162,17 @@ class DiagonalizeOperator: public ExprBase< DiagonalizeOperator< Lhs> >, public 
     inline Lhs const& lhs() const { return lhs_; }
 
     /** @return a constant reference on the (i,j) element of the expression.
-     *  @param i, j indexes of the row and of the column
+     *  @param i, j indexes of the element to get
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const { return (lhs_.elt(i, j));}
+    inline ConstReturnType elt2Impl(int i, int j) const
+    {
+#ifdef STK_BOUNDS_CHECK
+      if (i != j) { STKOUT_OF_RANGE_2ARG(DiagonalizeOperator::elt, i, j, i != j);}
+#endif
+      return (lhs_.elt(i));
+    }
     /** @return a constant reference on the ith element of the expression
-     *  @param i index of the ith element
+     *  @param i index of the element to get
      **/
     inline ConstReturnType elt1Impl(int i) const { return (lhs_.elt(i));}
     /** @return a constant reference on the element of the expression */
@@ -226,22 +232,28 @@ class DiagonalizeAccessor: public ArrayBase< DiagonalizeAccessor< Lhs> >, public
     inline Lhs const& lhs() const { return lhs_; }
 
     /** @return a constant reference on the (i,j) element of the expression.
-     *  @param i, j indexes of the row and of the column
+     *  @param i, j indexes of the element to get
      **/
     inline ConstReturnType elt2Impl(int i, int j) const { return (lhs_.elt(i, j));}
     /** @return a constant reference on the ith element of the expression
-     *  @param i index of the ith element
+     *  @param i index of the element to get
      **/
     inline ConstReturnType elt1Impl(int i) const { return (lhs_.elt(i));}
     /** @return a constant reference on the element of the expression */
     inline ConstReturnType elt0Impl() const { return (lhs_.elt());}
 
     /** @return a reference on the (i,j) element of the expression.
-     *  @param i, j indexes of the row and of the column
+     *  @param i, j indexes of the element to get
      **/
-    inline Type& elt2Impl(int i, int j) { return (lhs_.elt(i, j));}
+    inline Type& elt2Impl(int i, int j)
+    {
+#ifdef STK_BOUNDS_CHECK
+      if (i != j) { STKOUT_OF_RANGE_2ARG(DiagonalizeAccessor::elt, i, j, i != j);}
+#endif
+      return (lhs_.elt(i));
+    }
     /** @return a reference on the ith element of the expression
-     *  @param i index of the ith element
+     *  @param i index of the element to get
      **/
     inline Type& elt1Impl(int i) { return (lhs_.elt(i));}
     /** @return a reference on the element of the expression */
@@ -410,7 +422,7 @@ class DiagonalGetterOperator: public ExprBase< DiagonalGetterOperator< Lhs> >, p
      **/
     inline ConstReturnType elt2Impl(int i, int j) const { return (lhs_.elt(i, j));}
     /** @return a constant reference on the ith element of the expression
-     *  @param i index of the ith element
+     *  @param i index of the element to get
      **/
     inline ConstReturnType elt1Impl(int i) const { return (lhs_.elt(i,i));}
     /** @return a constant reference on the element of the expression */
@@ -481,7 +493,7 @@ class DiagonalGetterAccessor: public ArrayBase< DiagonalGetterAccessor< Lhs> >, 
      **/
     inline ConstReturnType elt2Impl(int i, int j) const { return (lhs_.elt(i, j));}
     /** @return a constant reference on the ith element of the expression
-     *  @param i index of the ith element
+     *  @param i index of the element to get
      **/
     inline ConstReturnType elt1Impl(int i) const { return (lhs_.elt(i,i));}
     /** @return a constant reference on the element of the expression */
@@ -492,7 +504,7 @@ class DiagonalGetterAccessor: public ArrayBase< DiagonalGetterAccessor< Lhs> >, 
      **/
     inline Type& elt2Impl(int i, int j) { return (lhs_.elt(i, j));}
     /** @return a reference on the ith element of the expression
-     *  @param i index of the ith element
+     *  @param i index of the element to get
      **/
     inline Type& elt1Impl(int i) { return (lhs_.elt(i,i));}
     /** @return a reference on the element of the expression */
@@ -667,7 +679,7 @@ class UpperTriangularizeAccessor: public ArrayBase< UpperTriangularizeAccessor< 
     }
 
     /** @return a reference on the (i,j) element of the expression.
-     *  @param i, j indexes of the row and of the column
+     *  @param i, j indexes of the element to get
      **/
     inline Type& elt2Impl(int i, int j) {
 #ifdef STK_BOUNDS_CHECK
@@ -779,7 +791,7 @@ class LowerTriangularizeOperator: public ExprBase< LowerTriangularizeOperator< L
       if (j>i)
         STKRUNTIME_ERROR_2ARG(LowerTriangularizeOperator::elt2Impl,i,j,use of the upper part);
 #endif
-      return (this->asDerived().lhs().elt(i, j));
+      return (lhs_.elt(i, j));
     }
 
   protected:
@@ -842,11 +854,11 @@ class LowerTriangularizeAccessor: public ArrayBase< LowerTriangularizeAccessor< 
       if (j>i)
         STKRUNTIME_ERROR_2ARG(LowerTriangularizeOperator::elt2Impl,i,j,use of the upper part);
 #endif
-      return (this->asDerived().lhs().elt(i, j));
+      return (lhs_.elt(i, j));
     }
 
     /** @return a constant reference on the (i,j) element of the expression.
-     *  @param i, j indexes of the row and of the column
+     *  @param i, j indexes of the element to get
      **/
     inline Type& elt2Impl(int i, int j)
     {
@@ -1015,7 +1027,7 @@ class SymmetrizeAccessor: public ArrayBase< SymmetrizeAccessor< Lhs> >, public T
     { return (lhs_.elt(i, j));}
 
     /** @return a reference on the (i,j) element of the expression.
-     *  @param i, j indexes of the row and of the column
+     *  @param i, j indexes of the element to get
      **/
     inline Type& elt2Impl(int i, int j) { return (lhs_.elt(i, j));}
 
@@ -1117,18 +1129,7 @@ class UpperSymmetrizeOperator: public ExprBase< UpperSymmetrizeOperator< Lhs> >,
      *  @param i, j index of the row and of the column
      **/
     inline ConstReturnType elt2Impl(int i, int j) const
-    {
-#ifdef STK_BOUNDS_CHECK
-      if (j<i)
-        STKRUNTIME_ERROR_2ARG(UpperSymmetrizeOperator::elt2Impl,i,j,use of the lower part);
-#endif
-      return (this->asDerived().lhs().elt(i, j));
-    }
-
-    /** @return a constant reference on the (i,j) element of the expression.
-     *  @param i, j indexes of the row and of the column
-     **/
-    inline Type& elt2Impl(int i, int j) { return (lhs_.elt(i, j));}
+    { return ((j<i) ? lhs_.elt(j, i) : lhs_.elt(i, j));}
 
   protected:
     Lhs const& lhs_;
@@ -1185,25 +1186,16 @@ class UpperSymmetrizeAccessor: public ArrayBase< UpperSymmetrizeAccessor< Lhs> >
      *  @param i, j index of the row and of the column
      **/
     inline ConstReturnType elt2Impl(int i, int j) const
-    {
-#ifdef STK_BOUNDS_CHECK
-      if (j<i)
-        STKRUNTIME_ERROR_2ARG(UpperSymmetrizeOperator::elt2Impl,i,j,use of the lower part);
-#endif
-      return (this->asDerived().lhs().elt(i, j));
-    }
+    { return ((j<i) ? lhs_.elt(j, i) : lhs_.elt(i, j));}
 
     /** @return a constant reference on the (i,j) element of the expression.
-     *  @param i, j indexes of the row and of the column
+     *  @param i, j indexes of the element to get
+     **/
+    /** @return a constant reference on the (i,j) element of the expression.
+     *  @param i, j indexes of the element to get
      **/
     inline Type& elt2Impl(int i, int j)
-    {
-#ifdef STK_BOUNDS_CHECK
-      if (j<i)
-        STKRUNTIME_ERROR_2ARG(UpperSymmetrizeAccessor::elt2Impl,i,j,use of the lower part);
-#endif
-      return (lhs_.elt(i, j));
-    }
+    { return ((j<i) ? lhs_.elt(j, i) : lhs_.elt(i, j));}
 
   protected:
     Lhs& lhs_;
@@ -1303,13 +1295,7 @@ class LowerSymmetrizeOperator: public ExprBase< LowerSymmetrizeOperator< Lhs> >,
      *  @param i, j index of the row and of the column
      **/
     inline ConstReturnType elt2Impl(int i, int j) const
-    {
-#ifdef STK_BOUNDS_CHECK
-      if (j>i)
-        STKRUNTIME_ERROR_2ARG(LowerSymmetrizeOperator::elt2Impl,i,j,use of the upper part);
-#endif
-      return (lhs_.elt(i, j));
-    }
+    { return ((j>i) ? lhs_.elt(j, i) : lhs_.elt(i, j));}
 
   protected:
     Lhs const& lhs_;
@@ -1367,25 +1353,13 @@ class LowerSymmetrizeAccessor: public ArrayBase< LowerSymmetrizeAccessor< Lhs> >
      *  @param i, j index of the row and of the column
      **/
     inline ConstReturnType elt2Impl(int i, int j) const
-    {
-#ifdef STK_BOUNDS_CHECK
-      if (j>i)
-        STKRUNTIME_ERROR_2ARG(LowerSymmetrizeOperator::elt2Impl,i,j,use of the upper part);
-#endif
-      return (lhs_.elt(i, j));
-    }
+    { return ((j>i) ? lhs_.elt(j, i) : lhs_.elt(i, j));}
 
     /** @return a reference on the (i,j) element of the expression.
-     *  @param i, j indexes of the row and of the column
+     *  @param i, j indexes of the element to get
      **/
     inline Type& elt2Impl(int i, int j)
-    {
-#ifdef STK_BOUNDS_CHECK
-      if (j>i)
-        STKRUNTIME_ERROR_2ARG(LowerSymmetrizeAccessor::elt2Impl,i,j,use of the upper part);
-#endif
-      return (lhs_.elt(i, j));
-    }
+    { return ((j>i) ? lhs_.elt(j, i) : lhs_.elt(i, j));}
 
   protected:
     Lhs& lhs_;

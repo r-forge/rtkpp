@@ -152,6 +152,15 @@ class Poisson: public IUnivLaw<int>
      **/
     static int icdf(Real const& p, Real const& lambda);
 
+#ifdef IS_RTKPP_LIB
+    /** @return log-cumulative distribution function */
+    virtual Real lcdf( Real const& t) const;
+    /** @return complement of cumulative distribution function */
+    virtual Real cdfc( Real const& t) const;
+    /** @return log-complement of cumulative distribution function */
+    virtual Real lcdfc( Real const& t) const;
+#endif
+
   protected:
     /** mean of the Poisson distribution */
     Real lambda_;
@@ -170,6 +179,9 @@ inline int Poisson::rand() const
 inline Real Poisson::pdf(int const& x) const  { return Rf_dpois((double)x, lambda_, false);}
 inline Real Poisson::lpdf(int const& x) const { return Rf_dpois((double)x, lambda_, true);}
 inline Real Poisson::cdf(Real const& t) const { return Rf_ppois(t, lambda_, true, false);}
+inline Real Poisson::lcdf(Real const& t) const { return Rf_ppois(t, lambda_, true, true);}
+inline Real Poisson::cdfc(Real const& t) const { return Rf_ppois(t, lambda_, false, false);}
+inline Real Poisson::lcdfc(Real const& t) const { return Rf_ppois(t, lambda_, false, true);}
 inline int Poisson::icdf(Real const& p) const { return (int)::Rf_qpois(p, lambda_, true, false);}
 
 

@@ -30,7 +30,7 @@
  **/
 
 /** @file STK_Householder.h
- *  @brief In this file we define the Housolder methods used by the Algebra classes.
+ *  @brief In this file we define the Housholder methods used by the Algebra classes.
  **/
 
 #ifndef STK_HOUSEHOLDER_H
@@ -60,7 +60,7 @@ Real house(IArrayBase< Vector>& x)
   Real scale  = x.normInf(), v1, norm2 = 0.0;
   if (scale)  // if not 0.0
   {
-    norm2 = (x.sub(_R(x.begin()+1,x.lastIdx()))/=scale).norm2();
+    norm2 = (x.asDerived().sub(_R(x.begin()+1,x.lastIdx()))/=scale).norm2();
   }
   // check if the lower part is significative
   if (norm2 < Arithmetic<Real>::epsilon())
@@ -73,7 +73,7 @@ Real house(IArrayBase< Vector>& x)
     // compute and save beta
     x.front() = (s = aux1-norm2)/norm2;
     // comp v and save it
-    x.sub(_R(x.begin()+1,x.lastIdx())) /= s;
+    x.asDerived().sub(_R(x.begin()+1,x.lastIdx())) /= s;
   }
   return v1;
 }
@@ -82,7 +82,8 @@ Real house(IArrayBase< Vector>& x)
  *  @brief dot product with a Householder vector.
  *
  *  Scalar product of an 1D container with a Householder vector
- *  d = < x,v>. The first composant of a Householder vector is 1.0
+ *  d = < x,v>. The first componant of a Householder vector is 1.0
+ *
  *  @param x first vector
  *  @param v the Householder vector
  **/
@@ -101,12 +102,14 @@ Real dotHouse( ExprBase< Lhs> const& x, ExprBase< Rhs> const& v)
  *
  *  Perform a left multiplication of the matrix M with a Householder
  *  matrix \f$ H=I+beta vv' \f$. Overwrite M with HM.
+ *
  *  @param M the matrix to multiply (input/output)
  *  @param v the Householder vector (input)
  **/
-template < class TContainer2D, class TContainer1D>
-void leftHouseholder( ArrayBase<TContainer2D> const& M, ExprBase<TContainer1D> const& v)
+template < class Lhs, class Rhs>
+void applyLeftHouseholderVector( ArrayBase<Lhs> const& M, ExprBase<Rhs> const& v)
 {
+  typedef typename hidden::Traits<Lhs>::Col ColVector;
   // get beta
   Real beta = v.front();
   if (beta)
@@ -115,14 +118,43 @@ void leftHouseholder( ArrayBase<TContainer2D> const& M, ExprBase<TContainer1D> c
     for (int j=M.beginCols(); j<M.endCols(); j++)
     {
       // a ref on the jth column of M
-      typename TContainer2D::Col Mj(M.asDerived(), v.range(), j);
+      ColVector Mj(M.asDerived(), v.range(), j);
       // Computation of aux=beta* <v,M^j>
       Real aux =  dotHouse( Mj, v) * beta;
-      // updating row X.begin()
+      // updating columns
       Mj.front() += aux;
       for(int i = v.begin()+1; i < v.end(); ++i) Mj[i] += v[i] * aux;
-//      Mj[_R(v.begin()+1, v.lastIdx())] += v[_R(v.begin()+1, v.lastIdx())] * aux;
     }
+  }
+}
+
+/** @ingroup Algebra
+ *  @brief left multiplication by a Householder array.
+ *
+ *  Perform a left multiplication of the Array M by a Householder Matrix H.
+ *  @c M <- HM with @c H = I + WZ'.
+ *  The matrix @c H is represented as a product of elementary reflectors
+ *  H = H(1) H(2) . . . H(k)
+ *
+ * @param M the matrix to multiply
+ * @param H the matrix with the Householder vectors
+ **/
+template < class Lhs, class Rhs>
+void applyLeftHouseholderArray( ArrayBase<Lhs> const& M, ArrayBase<Rhs> const& H)
+{
+  typedef typename hidden::Traits<Rhs>::Col ColVector;
+  // compute the number of iterations
+  int first = H.beginCols(), last = std::min( H.lastIdxCols(), H.lastIdxRows());
+  // get range of the first Householder vector
+  Range range_ve(last, H.lastIdxRows(), 0);
+  // iterations
+  for (int j=last; j>=first; j--)
+  {
+    // apply left Householder vector to M
+    ColVector v(H.asDerived(), range_ve, j);
+    applyLeftHouseholderVector(M, v);
+    // decrease range of the Householder vector
+    range_ve.decFirst(1);
   }
 }
 
@@ -136,7 +168,7 @@ void leftHouseholder( ArrayBase<TContainer2D> const& M, ExprBase<TContainer1D> c
  *  @param v the Householder vector (input)
  **/
 template < class Lhs, class Rhs>
-void rightHouseholder( ArrayBase<Lhs> const& M, ExprBase<Rhs> const& v)
+void applyRightHouseholderVector( ArrayBase<Lhs> const& M, ExprBase<Rhs> const& v)
 {
   // get beta
   Real beta = v.front();
@@ -146,7 +178,7 @@ void rightHouseholder( ArrayBase<Lhs> const& M, ExprBase<Rhs> const& v)
     for (int i=M.beginRows(); i<M.endRows(); i++)
     {
       // a ref on the ith row of M
-      typename Lhs::Row Mi(M.asDerived(), v.range(), i);
+      typename hidden::Traits<Lhs>::Row Mi(M.asDerived(), v.range(), i);
       // Computation of aux=beta* <v,M_i>
       Real aux =  dotHouse( Mi, v) * beta;
       // updating column
@@ -154,34 +186,6 @@ void rightHouseholder( ArrayBase<Lhs> const& M, ExprBase<Rhs> const& v)
       // Computation of M_i + beta <v,M_i>  v = M_i + aux v'
       for (int i=v.begin()+1; i<v.end(); i++) Mi[i] +=  v[i] * aux;
     }
-  }
-}
-
-/** @ingroup Algebra
- *  @brief left multiplication by a Householder ArrayXX.
- *
- * Perform a left multiplication of the Array M with a Householder
- * Marix H. M <- HM with H = I + WZ'. The Householder vectors are
- * stored in the columns of H.
- *
- * @param M the matrix to multiply
- * @param H the Householder ArrayXX
- **/
-template < class Lhs, class Rhs>
-void leftArrayHouseholder( ArrayBase<Lhs> const& M, ArrayBase<Rhs> const& H)
-{
-  // compute the number of iterations
-  int first = H.beginCols(), last = std::min( H.lastIdxCols(), H.lastIdxRows());
-  // get range of the first Householder vector
-  Range range_ve(last, H.lastIdxRows(), 0);
-  // iterations
-  for (int j=last; j>=first; j--)
-  {
-    // apply left Householder vector to M
-    typename Rhs::Col v(H.asDerived(), range_ve, j);
-    leftHouseholder(M, v);
-    // decrease range of the Householder vector
-    range_ve.decFirst(1);
   }
 }
 
@@ -196,7 +200,7 @@ void leftArrayHouseholder( ArrayBase<Lhs> const& M, ArrayBase<Rhs> const& H)
  * @param H the Householder ArrayXX
  **/
 template < class TContainer2D, class Rhs>
-void rightArrayHouseholder( ArrayBase<TContainer2D> const& M, ArrayBase<Rhs> const& H)
+void applyRightHouseholderArray( ArrayBase<TContainer2D> const& M, ArrayBase<Rhs> const& H)
 {
   // compute the number of iterations
   int first = H.beginCols(), last = std::min( H.lastIdxCols(), H.lastIdxRows());
@@ -207,7 +211,7 @@ void rightArrayHouseholder( ArrayBase<TContainer2D> const& M, ArrayBase<Rhs> con
   {
     // apply left Householder vector to M
     typename Rhs::Col v(H.asDerived(), range_ve, j);
-    rightHouseholder(M, v);
+    applyRightHouseholderVector(M, v);
     // decrease range of the Householder vector
     range_ve.decFirst(1);
   }

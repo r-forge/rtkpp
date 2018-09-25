@@ -23,7 +23,7 @@
 */
 
 /*
- * Project:  rtkpp
+ * Project:  stkpp
  * created on: 22 août 2014
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/

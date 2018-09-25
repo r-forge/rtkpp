@@ -45,7 +45,7 @@ namespace Law
 {
 /** @ingroup Laws
  *  @brief ChiSquared distribution law.
- * 
+ *
  *  In probability theory and statistics, the <em>chi-squared distribution</em>
  *  with k degrees of freedom is the distribution of a sum of the squares of k
  *  independent standard normal random variables. It is a special case of the
@@ -123,6 +123,15 @@ class ChiSquared: public IUnivLaw<Real>
      **/
     static Real icdf(Real const& p, int df);
 
+#ifdef IS_RTKPP_LIB
+    /** @return log-cumulative distribution function */
+    virtual Real lcdf( Real const& t) const;
+    /** @return complement of cumulative distribution function */
+    virtual Real cdfc( Real const& t) const;
+    /** @return log-complement of cumulative distribution function */
+    virtual Real lcdfc( Real const& t) const;
+#endif
+
   protected:
     /** degree of freedom */
     int df_;
@@ -142,6 +151,9 @@ inline Real ChiSquared::rand() const
 inline Real ChiSquared::pdf(const Real& x) const { return Rf_dchisq(x, df_, false);}
 inline Real ChiSquared::lpdf(const Real& x) const { return Rf_dchisq(x, df_, true);}
 inline Real ChiSquared::cdf(const Real& t) const { return Rf_pchisq(t, df_, true, false);}
+inline Real ChiSquared::lcdf(const Real& t) const { return Rf_pchisq(t, df_, true, true);}
+inline Real ChiSquared::cdfc(const Real& t) const { return Rf_pchisq(t, df_, false, false);}
+inline Real ChiSquared::lcdfc(const Real& t) const { return Rf_pchisq(t, df_, false, true);}
 inline Real ChiSquared::icdf(const Real& p) const { return Rf_qchisq(p, df_, true, false);}
 
 inline Real ChiSquared::rand(int df)

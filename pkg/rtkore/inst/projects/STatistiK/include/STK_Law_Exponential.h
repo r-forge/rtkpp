@@ -128,6 +128,15 @@ class Exponential: public IUnivLaw<Real>
      **/
     static Real icdf( Real const& p, Real const& scale);
 
+#ifdef IS_RTKPP_LIB
+    /** @return log-cumulative distribution function */
+    virtual Real lcdf( Real const& t) const;
+    /** @return complement of cumulative distribution function */
+    virtual Real cdfc( Real const& t) const;
+    /** @return log-complement of cumulative distribution function */
+    virtual Real lcdfc( Real const& t) const;
+#endif
+
   protected:
     /** The scale parameter. */
     Real scale_;
@@ -146,6 +155,9 @@ GetRNGstate(); Real s = Rf_rexp(scale_); PutRNGstate(); return s;
 inline Real Exponential::pdf( Real const& x) const {   return Rf_dexp(x, scale_, false);}
 inline Real Exponential::lpdf( Real const& x) const {   return Rf_dexp(x, scale_, true);}
 inline Real Exponential::cdf( Real const& t) const { return Rf_pexp(t, scale_, true, false);}
+inline Real Exponential::lcdf( Real const& t) const { return Rf_pexp(t, scale_, true, true);}
+inline Real Exponential::cdfc( Real const& t) const { return Rf_pexp(t, scale_, false, false);}
+inline Real Exponential::lcdfc( Real const& t) const { return Rf_pexp(t, scale_, false, true);}
 inline Real Exponential::icdf( Real const& p) const { return Rf_qexp(p , scale_, true, false);}
 
 inline Real Exponential::rand( Real const& scale)

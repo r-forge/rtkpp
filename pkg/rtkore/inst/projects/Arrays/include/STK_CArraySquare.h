@@ -75,31 +75,9 @@ namespace hidden
 template<typename Type_, int Size_, bool Orient_>
 struct Traits< CArraySquare<Type_, Size_, Orient_> >
 {
-  private:
-    class Void { };
-
-  public:
-    typedef CArrayNumber<Type_, Orient_> Number;
-
     typedef CArrayPoint<Type_, Size_, Orient_> Row;
     typedef CArrayVector<Type_, Size_, Orient_> Col;
 
-    typedef CArrayPoint<Type_, UnknownSize, Orient_> SubRow;
-    typedef CArrayVector<Type_, UnknownSize, Orient_> SubCol;
-
-    /** If one of the Size is 1, we have a Vector (a column) or a Point (a row)
-     *  (What to do if both are = 1 : Type or array (1,1) ?).
-     **/
-    typedef typename If< (Size_ == 1)||(Size_ == 1)   // one row or one column
-                       , typename If<(Size_ == 1), SubCol, SubRow>::Result
-                       , Void
-                       >::Result SubVector;
-    // FIXME does not seem optimal if we want only to get a subset of rows (columns)
-    typedef CArray<Type_, UnknownSize, UnknownSize, Orient_> SubArray;
-//    typedef typename If< Orient_ == Arrays::by_col_
-//                       , typename If<SizeRows_ != UnknownSize, FixedRowArrayDirect, FixedColArrayIndirect>::Result
-//                       , typename If<SizeCols_ != UnknownSize, FixedRowArrayIndirect, FixedColArrayDirect>::Result
-//                       >::Result SubArray;
     // The CAllocator have to have the same structure than the CArray
     typedef CAllocator<Type_, Size_, Size_, Orient_> Allocator;
 
@@ -117,6 +95,7 @@ struct Traits< CArraySquare<Type_, Size_, Orient_> >
     };
 };
 
+
 } // namespace hidden
 
 /** @ingroup Arrays
@@ -129,6 +108,9 @@ class CArraySquare: public ICArray < CArraySquare<Type_, Size_, Orient_> >
     typedef ICArray < CArraySquare<Type_, Size_, Orient_> > Base;
     typedef ArrayBase < CArraySquare<Type_, Size_, Orient_> > LowBase;
 
+    typedef typename hidden::Traits< CArraySquare <Type_, Size_> >::Row Row;
+    typedef typename hidden::Traits< CArraySquare <Type_, Size_> >::Col Col;
+
     typedef typename hidden::Traits< CArraySquare <Type_, Size_> >::Type Type;
     typedef typename hidden::Traits< CArraySquare <Type_, Size_> >::ConstReturnType ConstReturnType;
 
@@ -138,6 +120,7 @@ class CArraySquare: public ICArray < CArraySquare<Type_, Size_, Orient_> >
       orient_    = hidden::Traits< CArraySquare <Type_, Size_, Orient_> >::orient_,
       sizeRows_  = hidden::Traits< CArraySquare <Type_, Size_, Orient_> >::sizeRows_,
       sizeCols_  = hidden::Traits< CArraySquare <Type_, Size_, Orient_> >::sizeCols_,
+      size_      = hidden::Traits< CArraySquare <Type_, Size_, Orient_> >::size_,
       storage_   = hidden::Traits< CArraySquare <Type_, Size_, Orient_> >::storage_
     };
     /** Default constructor. */

@@ -130,7 +130,7 @@ class UnaryOperator: public ExprBase< UnaryOperator<UnaryOp, Lhs> >, public TRef
      **/
     inline ConstReturnType elt2Impl(int i, int j) const { return functor_(lhs_.elt(i, j));}
     /** @return the ith element of the operator
-     *  @param i index of the ith element
+     *  @param i index of the element to get
      **/
     inline ConstReturnType elt1Impl(int i) const { return functor_(lhs_.elt(i));}
     /** @return the element of the operator */

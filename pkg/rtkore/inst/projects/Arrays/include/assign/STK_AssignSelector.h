@@ -392,6 +392,25 @@ struct Copycat<  Lhs,  Rhs, Arrays::array2D_, Arrays::upper_symmetric_>
   }
 };
 
+// general <- lower_symmetric
+template < typename Lhs, typename Rhs>
+struct Copycat<  Lhs,  Rhs, Arrays::array2D_, Arrays::lower_symmetric_>
+{
+  static void runByCol(Lhs& lhs, Rhs const& rhs )
+  {
+    for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
+      for (int i = j; i < rhs.endRows(); ++i)
+      { lhs.elt(i, j) = ( lhs.elt(j, i) = rhs.elt(i, j) );}
+  }
+  static void runByRow(Lhs& lhs, Rhs const& rhs )
+  {
+    for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
+      for (int j = rhs.beginCols(); j <= i; ++j)
+      { lhs.elt(i, j) = (lhs.elt(j, i) = rhs.elt(i, j));}
+  }
+};
+
+
 // general <- vector
 template < typename Lhs, typename Rhs>
 struct Copycat<  Lhs,  Rhs, Arrays::array2D_, Arrays::vector_>
@@ -543,6 +562,61 @@ struct Copycat<  Lhs,  Rhs, Arrays::square_, Arrays::upper_triangular_>
       for (int j=rhs.beginCols(); j < rhs.endCols(); ++j) { lhs.elt(i,j) = Type(0);}
   }
 };
+
+// general <- symmetric
+template < typename Lhs, typename Rhs>
+struct Copycat< Lhs, Rhs, Arrays::square_, Arrays::symmetric_>
+{
+  static void runByCol(Lhs& lhs, Rhs const& rhs )
+  {
+    for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
+      for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
+      { lhs.elt(i, j) = rhs.elt(i, j);}
+  }
+  static void runByRow(Lhs& lhs, Rhs const& rhs )
+  {
+    for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
+      for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
+      { lhs.elt(i, j) = rhs.elt(i, j);}
+  }
+};
+
+// general <- upper_symmetric
+template < typename Lhs, typename Rhs>
+struct Copycat< Lhs, Rhs, Arrays::square_, Arrays::upper_symmetric_>
+{
+  static void runByCol(Lhs& lhs, Rhs const& rhs )
+  {
+    for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
+      for (int i = rhs.beginRows(); i <=j; ++i)
+      { lhs.elt(i, j) = ( lhs.elt(j, i) = rhs.elt(i, j) );}
+  }
+  static void runByRow(Lhs& lhs, Rhs const& rhs )
+  {
+    for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
+      for (int j = i; j < rhs.endCols(); ++j)
+      { lhs.elt(i, j) = (lhs.elt(j, i) = rhs.elt(i, j));}
+  }
+};
+
+// general <- lower_symmetric
+template < typename Lhs, typename Rhs>
+struct Copycat< Lhs, Rhs, Arrays::square_, Arrays::lower_symmetric_>
+{
+  static void runByCol(Lhs& lhs, Rhs const& rhs )
+  {
+    for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
+      for (int i = j; i < rhs.endRows(); ++i)
+      { lhs.elt(i, j) = ( lhs.elt(j, i) = rhs.elt(i, j) );}
+  }
+  static void runByRow(Lhs& lhs, Rhs const& rhs )
+  {
+    for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
+      for (int j = rhs.beginCols(); j <= i; ++j)
+      { lhs.elt(i, j) = (lhs.elt(j, i) = rhs.elt(i, j));}
+  }
+};
+
 
 //---------------------LDO----------------------------------
 // lower_triangular <- lower_triangular

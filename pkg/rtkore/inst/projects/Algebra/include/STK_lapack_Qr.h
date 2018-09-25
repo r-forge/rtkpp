@@ -61,6 +61,8 @@ template<>
 struct AlgebraTraits< lapack::Qr >
 {
   typedef ArrayXX Array;
+  typedef typename Array::Col ColVector;
+  typedef typename Array::Row RowVector;
 };
 
 } // namespace hidden
@@ -73,6 +75,14 @@ namespace lapack
  *    @class Qr
  *    @brief Qr computes the QR decomposition of a real matrix using the
  *    Lapack routine *geqrf.
+ *
+ *  - Input:  A matrix (nrow,ncol)
+ *  - Output:
+ *    -# Q  matrix (nrow,ncol) with the Housholder vectors in the min(nrow, ncol) first columns.
+ *    -# R  matrix (nrow,ncol) upper triangular.
+ *
+ *    @sa STK::IQr
+ *
  */
 class Qr: public IQr<Qr >
 {
@@ -160,12 +170,11 @@ inline bool Qr::runImpl()
 {
   int begin = Q_.beginRows(); // same first index checked at construction of QR
   int end   = std::min(Q_.endRows(), Q_.endCols());
-  int size  = std::min(Q_.sizeRows(), Q_.sizeCols());
-  CVectorX tau(size);
+  // compute results
   CArrayXX a = Q_;
+  CVectorX tau(std::min(Q_.sizeRows(), Q_.sizeCols()));
   a.shift(0, 0);
   tau.shift(0);
-  // compute results
   if (!computeQr(a, tau)) { return false;};
   // get results
   a.shift(begin, begin);

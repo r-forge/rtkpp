@@ -51,6 +51,69 @@
 
 namespace STK
 {
+namespace hidden
+{
+// forward declaration
+//template< typename Type> class Array2D;
+//template< typename Type> class Array2DSquare;
+//template< typename Type> class Array2DDiagonal;
+//template< typename Type> class Array2DNumber;
+//template< typename Type> class Array2DPoint;
+//template< typename Type> class Array2DVector;
+//template< typename Type> class Array2DLowerTriangular;
+//template< typename Type> class Array2DUpperTriangular;
+
+///** @ingroup hidden
+// *  @brief The traits struct Slice2D must be specialized allow to disambiguate return
+// *  type of the col/row/sub operators for Array2D family
+// *
+// *  @sa STK::IArray2D
+// */
+//template<typename Derived, int SizeRows, int SizeCols>
+//struct Slice2D
+//{
+//    typedef typename Traits< Derived >::Type Type;
+//    enum
+//    {
+//      structure_ = Traits<Derived>::structure_,
+//      orient_    = Traits<Derived>::orient_,
+//      sizeRows_  = Traits<Derived>::sizeRows_,
+//      sizeCols_  = Traits<Derived>::sizeCols_,
+//      storage_   = Traits<Derived>::storage_,
+//
+//      isNumber_ = (SizeRows==SizeCols)&&(SizeRows==1),
+//      isVector_ = (SizeCols == 1)&&(!isNumber_),
+//      isPoint_  = (SizeRows == 1)&&(!isNumber_),
+//      isSquare_ = (SizeRows==SizeCols)&&(SizeRows!=UnknownSize)&&(!isNumber_),
+//      isArray_  = (SizeRows!=SizeCols)&&(!isNumber_)
+//    };
+//   typedef typename If< (isNumber_), Array2DNumber<Type>
+//                      , typename If< isVector_, Array2DVector<Type>
+//                          , typename If< isPoint_, Array2DPoint<Type>
+//                              , typename If< isSquare_, Array2DSquare<Type>
+//                                           , Array2D<Type>
+//                                           >::Result
+//                                       >::Result
+//                                   >::Result
+//                      >::Result Result;
+//};
+//
+///** @ingroup hidden
+// *  helper allowing to disambiguate SubVector access
+// **/
+//template<typename Derived, int Size>
+//struct Slice2DDispatcher
+//{
+//    enum
+//    { structure_ = Traits<Derived>::structure_};
+//    typedef typename If< structure_ == (int)Arrays::vector_
+//                       , typename Slice2D<Derived, Size, 1>::Result
+//                       , typename Slice2D<Derived, 1, Size>::Result
+//                       >::Result Result;
+//};
+
+}
+
 /** @ingroup Arrays
  *  @brief template interface base class for two-dimensional arrays.
  *
@@ -80,6 +143,8 @@ class IArray2DBase: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, h
 
   public:
     typedef typename hidden::Traits<Derived>::Type Type;
+    typedef typename hidden::Traits<Derived>::ConstReturnType ConstReturnType;
+
     typedef typename hidden::Traits<Derived>::Row Row;
     typedef typename hidden::Traits<Derived>::Col Col;
     typedef typename hidden::Traits<Derived>::SubRow SubRow;
@@ -103,7 +168,7 @@ class IArray2DBase: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, h
     /** Type for the IContainer2D base Class. */
     typedef IContainer2D<sizeRows_, sizeCols_ > Base2D;
     /** Type for the Base Class. */
-    typedef AllocatorBase<PTRCOL, sizeCols_> Allocator;
+    typedef MemAllocator<PTRCOL, sizeCols_> Allocator;
     /** type of the Base Container Class. */
     typedef IArrayBase<Derived> Base;
 
@@ -117,12 +182,12 @@ class IArray2DBase: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, h
      *  @param I,J rows and columns range
      **/
     IArray2DBase( Range const& I, Range const& J)
-               : Base2D(I, J), Base(), allocator_()
+                : Base2D(I, J), Base(), allocator_()
                 , availableRows_(), rangeCols_()
                 , availableCols_(0), capacityByCols_(0)
     { mallocCols(this->cols());}
     /** Copy constructor If we want to wrap T, the main ptr will be wrapped
-     *  in AllocatorBase class. If we want to copy  T, Allocator is
+     *  in MemAllocator class. If we want to copy  T, Allocator is
      *  initialized to default values.
      *  @note bug correction, we have to use a copy of T.rangeCols_. in case
      *  we are using the code
@@ -160,7 +225,7 @@ class IArray2DBase: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, h
      *  @param I,J range of the rows and columns to wrap
      **/
     IArray2DBase( PTRCOL* q, Range const& I, Range const& J)
-               : Base2D(I, J), Base(), allocator_(q, J, true)
+                : Base2D(I, J), Base(), allocator_(q, J, true)
                 , availableRows_(J, I.size()), rangeCols_(J, I)
                 , availableCols_(I.size()), capacityByCols_(J.size())
     {}
@@ -202,64 +267,144 @@ class IArray2DBase: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, h
 
     /** access to an element.
      *  @note Take care that @c PTRCOL can be accessed using @c operator[]
-     *  @param i,j indexes of the row and of the column
+     *  @param i,j indexes of the element to get
      *  @return a reference on the (i,j) element
      **/
     inline Type& elt2Impl( int i, int j) { return this->data(j)[i];}
     /** constant access to an element.
      *  @note Take care that @c PTRCOL can be accessed using @c operator[]
-     *  @param i,j indexes of the row and of the column
+     *  @param i,j indexes of the element to get
      *  @return a constant reference on the (i,j) element
      **/
-    inline Type const& elt2Impl( int i, int j) const { return this->data(j)[i];}
+    inline ConstReturnType elt2Impl( int i, int j) const { return this->data(j)[i];}
     /** access to a part of a column.
      *  @param j index of the column
      *  @return a reference in the range I of the column j of this
      **/
-    inline Col colImpl( int j) const
+    inline Col col( int j) const
     { return Col( this->asDerived(), this->rangeRowsInCol(j), j);}
     /** access to a part of a column.
      *  @param I range of the rows
      *  @param j index of the col
      *  @return a reference in the range I of the column j of this
      **/
-    inline SubCol colImpl(Range const& I, int j) const
+    inline SubCol col(Range const& I, int j) const
     { return SubCol( this->asDerived(), inf(I, this->rangeRowsInCol(j)), j);}
     /** access to many columns.
      *  @param J range of the index of the cols
      *  @return a 2D array containing the Container in the Horizontal range @c J
      **/
-    inline SubArray colImpl(Range const& J) const
+    inline SubArray col(Range const& J) const
     { return SubArray( this->asDerived(), this->rows(), J);}
     /** access to a part of a row.
      *  @param i index of the row
      *  @return a reference of the row i.
      **/
-    inline Row rowImpl( int i) const
+    inline Row row( int i) const
     { return Row( this->asDerived(), this->rangeColsInRow(i), i);}
     /** access to a part of a row.
      *  @param i index of the row
      *  @param J range of the columns
      *  @return a reference of the row i.
      **/
-    inline SubRow rowImpl(int i, Range const& J) const
+    inline SubRow row(int i, Range const& J) const
     { return SubRow( this->asDerived(), inf(J, this->rangeColsInRow(i)), i);}
     /** access to many rows.
      *  @param I range of the index of the rows
      *  @return a 2D array containing the Container in the vertical range @c I
      **/
-    inline SubArray rowImpl(Range const& I) const
+    inline SubArray row(Range const& I) const
     { return SubArray(this->asDerived(), I, this->cols());}
     /** @return  many elements.
      *  @param J Range of the elements
      **/
-    inline SubVector subImpl(Range const& J) const
+    inline SubVector sub(Range const& J) const
     { return SubVector(this->asDerived(), J);}
     /** access to a sub-array.
      *  @param I,J range of the rows and of the columns
      **/
-    inline SubArray subImpl(Range const& I, Range const& J) const
+    inline SubArray sub(Range const& I, Range const& J) const
     { return SubArray(this->asDerived(), I, J);}
+
+    // overloaded operators
+    /** @return a constant reference on the element (i,j) of the 2D container.
+     *  @param i,j row and column indexes
+     **/
+    inline ConstReturnType operator()(int i, int j) const
+    {
+#ifdef STK_BOUNDS_CHECK
+       if (this->beginRows() > i) { STKOUT_OF_RANGE_2ARG(IArrayBase::elt, i, j, beginRows() > i);}
+       if (this->endRows() <= i)  { STKOUT_OF_RANGE_2ARG(IArrayBase::elt, i, j, endRows() <= i);}
+       if (this->beginCols() > j) { STKOUT_OF_RANGE_2ARG(IArrayBase::elt, i, j, beginCols() > j);}
+       if (this->endCols() <= j)  { STKOUT_OF_RANGE_2ARG(IArrayBase::elt, i, j, endCols() <= j);}
+#endif
+      return this->elt(i,j);}
+    /** @return a reference on the element (i,j) of the 2D container.
+     *  @param i, j indexes of the element to get
+     **/
+    inline Type& operator()(int i, int j)
+    {
+#ifdef STK_BOUNDS_CHECK
+       if (this->beginRows() > i) { STKOUT_OF_RANGE_2ARG(IArray2DBase::elt, i, j, beginRows() > i);}
+       if (this->endRows() <= i)  { STKOUT_OF_RANGE_2ARG(IArray2DBase::elt, i, j, endRows() <= i);}
+       if (this->beginCols() > j) { STKOUT_OF_RANGE_2ARG(IArray2DBase::elt, i, j, beginCols() > j);}
+       if (this->endCols() <= j)  { STKOUT_OF_RANGE_2ARG(IArray2DBase::elt, i, j, endCols() <= j);}
+#endif
+      return this->elt(i,j);
+    }
+    /** @return the ith element
+     *  @param i index of the element to get
+     **/
+    inline ConstReturnType operator[](int i) const
+    {
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+#ifdef STK_BOUNDS_CHECK
+      if (this->asDerived().begin() > i) { STKOUT_OF_RANGE_1ARG(IArra2DyBase::elt, i, begin() > i);}
+      if (this->asDerived().end() <= i)  { STKOUT_OF_RANGE_1ARG(IArray2DBase::elt, i, end() <= i);}
+#endif
+      return this->elt(i);
+    }
+    /** @return a reference on the ith element
+     *  @param i index of the element to get
+     **/
+    inline Type& operator[](int i)
+    {
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+#ifdef STK_BOUNDS_CHECK
+      if (this->asDerived().begin() > i) { STKOUT_OF_RANGE_1ARG(IArray2DBase::elt, i, begin() > i);}
+      if (this->asDerived().end() <= i)  { STKOUT_OF_RANGE_1ARG(IArray2DBase::elt, i, end() <= i);}
+#endif
+      return this->elt(i);
+    }
+    /** @return a constant reference on the number */
+    inline ConstReturnType operator()() const { return this->elt();}
+    /** @return the number */
+    inline Type& operator()() { return this->elt();}
+    // overloaded operators for sub-arrays/vectors
+    /** @return the sub-vector in given range
+     *  @param I range to get
+     **/
+    inline SubVector operator[](Range const& I) const
+    {
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+      return this->sub(I);
+    }
+    /** @param I range of the index of the rows
+     *  @param j index of the column
+     *  @return a Vertical container containing the column @c j of this
+     *  in the range @c I
+     **/
+    inline SubCol operator()(Range const& I, int j) const { return this->col(I, j);}
+    /** @param i index of the row
+     *  @param J range of the columns
+     *  @return an Horizontal container containing the row @c i of this
+     *  in the range @c J
+     **/
+    inline SubRow operator()(int i, Range const& J) const { return this->row(i, J);}
+    /** @param I,J range of the rows and of the columns
+     *  @return a 2D container containing this in the range @c I, @c J
+     **/
+    inline SubArray operator()(Range const& I, Range const& J) const { return this->sub(I, J);}
 
     /** @return a constant pointer on the j-th column of the container
      *  @param j the index of the column
@@ -325,7 +470,7 @@ class IArray2DBase: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, h
       if (this->isRef())
       { STKRUNTIME_ERROR_1ARG(IArray2DBase::shiftBeginCols,cbeg,cannot operate on references);}
       // shift beginCols()
-      allocator_.shiftData(cbeg);   // translate data
+      allocator_.shift(cbeg);   // translate data
       availableRows_.shift(cbeg);   // tranlate availableRows_
       rangeCols_.shift(cbeg);       // translate rangeCols_
       Base2D::shiftBeginCols(cbeg); // adjust dimensions
@@ -354,7 +499,7 @@ class IArray2DBase: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, h
      **/
     void exchange(IArray2DBase &T)
     {
-      // swap AllocatorBase part
+      // swap MemAllocator part
       allocator_.exchange(T.allocator_);
       // swap IContainer2D part
       Base2D::exchange(T);
@@ -404,7 +549,7 @@ class IArray2DBase: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, h
       for (int j=first; j< cols.end(); j++) { transferColumn(Tref, j, j);}
       // delete and set view on the data
       Tref.allocator().free();
-      Tref.allocator().setPtrData(allocator_.p_data_, Tref.cols(), true);
+      Tref.allocator().setPtr(allocator_.p_data(), Tref.cols(), true);
     }
     /** Append the vector @c other to @c this without copying the data
      *  explicitly. @c other is appended to this and
@@ -562,7 +707,7 @@ class IArray2DBase: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, h
     {
       // Nothing to do for reference
       if (this->isRef()) return;
-      // free memory allocated in AllocatorBase
+      // free memory allocated in MemAllocator
       allocator_.free();
       setAvailableCols(0);
       Base2D::setCols(Range(this->beginCols(), 0));

@@ -45,7 +45,7 @@ namespace Law
 {
 /** @ingroup Laws
  *  @brief Beta distribution law.
- * 
+ *
  *  In probability theory and statistics, the <em> beta distribution </em> is a
  *  family of continuous probability distributions defined on the interval [0, 1]
  *  parameterized by two positive shape parameters that appear as exponents of
@@ -87,10 +87,10 @@ class Beta: public IUnivLaw<Real>
     /** @return a pseudo Beta random variate.
      *  This function use the Gamma::rand() random generator.
      *  TODO : implement the order statistics when a and b
-     *  are small integers (Devroye p. 431). 
+     *  are small integers (Devroye p. 431).
      *  TODO : implement the rejection method from the normal
      *  pdf when a=b (Devroye p. 434).
-     *  TODO : Implement Cheng's algorithm BA for beta pdf 
+     *  TODO : Implement Cheng's algorithm BA for beta pdf
      *  (Devroye p. 438)
      **/
     virtual Real rand() const;
@@ -114,6 +114,15 @@ class Beta: public IUnivLaw<Real>
     /** @return The inverse cumulative distribution */
     static Real icdf( Real const& p, Real const& alpha, Real const& beta);
 
+#ifdef IS_RTKPP_LIB
+    /** @return log-cumulative distribution function */
+    virtual Real lcdf( Real const& t) const;
+    /** @return complement of cumulative distribution function */
+    virtual Real cdfc( Real const& t) const;
+    /** @return log-complement of cumulative distribution function */
+    virtual Real lcdfc( Real const& t) const;
+#endif
+
   protected:
     /** First parameter. */
     Real alpha_;
@@ -130,10 +139,13 @@ inline Real Beta::rand() const
   GetRNGstate(); Real s = Rf_rbeta(alpha_, beta_); PutRNGstate(); return s;
 }
 
-inline Real Beta::pdf( Real const& x) const {  return Rf_dbeta(x,alpha_, beta_, (int)false);}
-inline Real Beta::lpdf( Real const& x) const { return Rf_dbeta(x,alpha_, beta_, (int)true);}
-inline Real Beta::cdf( Real const& t) const { return Rf_pbeta(t, alpha_, beta_, (int)true, (int)false);}
-inline Real Beta::icdf( Real const& p) const { return Rf_qbeta(p , alpha_, beta_, (int)true, (int)false);}
+inline Real Beta::pdf( Real const& x) const {  return Rf_dbeta(x,alpha_, beta_, false);}
+inline Real Beta::lpdf( Real const& x) const { return Rf_dbeta(x,alpha_, beta_, true);}
+inline Real Beta::cdf( Real const& t) const { return Rf_pbeta(t, alpha_, beta_, true, false);}
+inline Real Beta::lcdf( Real const& t) const { return Rf_pbeta(t, alpha_, beta_, true, true);}
+inline Real Beta::cdfc( Real const& t) const { return Rf_pbeta(t, alpha_, beta_, false, false);}
+inline Real Beta::lcdfc( Real const& t) const { return Rf_pbeta(t, alpha_, beta_, false, true);}
+inline Real Beta::icdf( Real const& p) const { return Rf_qbeta(p , alpha_, beta_, true, false);}
 
 inline Real Beta::rand( Real const& alpha, Real const& beta)
 {

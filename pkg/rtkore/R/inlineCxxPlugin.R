@@ -46,6 +46,13 @@
 # Alternatively, a package may supply an inline plugin implicitely by defining a
 # function called inlineCxxPlugin, which does not necessarily need to be
 # exported from the namespace of the package.
+#
+# This is the implementtion of the inlineCxxPlugin function distributed with Rcpp.
+# It allows to link with rtkore in an inlined c++ function.
+#
+# example
+# helloWorld <- cppFunction("void helloWorld() {std::cout << \"hello World\";}",depends="rtkore")
+#
 inlineCxxPlugin <- function()
 {
 includes <- "
@@ -70,10 +77,10 @@ cxx  <- "`${R_HOME}/bin/Rscript -e \"rtkore:::CxxFlags()\"`"
 cpp  <- "`${R_HOME}/bin/Rscript -e \"rtkore:::CppFlags()\" ` $(SHLIB_OPENMP_CXXFLAGS)"
 libs <- "`$(R_HOME)/bin/Rscript -e \"rtkore:::LdFlags()\"` $(SHLIB_OPENMP_CFLAGS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)"
 
-out <- list( env = list( PKG_LIBS = libs, PKG_CXXFLAGS = cxx, PKG_CPPFLAGS = cpp  )
-           , includes = includes
+out <- list( env       = list( PKG_LIBS = libs, PKG_CXXFLAGS = cxx, PKG_CPPFLAGS = cpp  )
+           , includes  = includes
            , LinkingTo = LinkingTo
-           , body = body)
+           , body      = body)
 
 out
 }

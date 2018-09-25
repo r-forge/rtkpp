@@ -45,7 +45,7 @@ namespace Law
 {
 /** @ingroup Laws
  *  @brief Gamma distribution law.
- * 
+ *
  *  In probability theory and statistics, the <em>gamma distribution</em>
  *  is a two-parameter family of continuous probability distributions.
  *  The common exponential distribution and chi-squared distribution are special
@@ -165,6 +165,15 @@ class Gamma: public IUnivLaw<Real>
      **/
     static Real icdf(Real const& p, Real const& shape, Real const& scale);
 
+#ifdef IS_RTKPP_LIB
+    /** @return log-cumulative distribution function */
+    virtual Real lcdf( Real const& t) const;
+    /** @return complement of cumulative distribution function */
+    virtual Real cdfc( Real const& t) const;
+    /** @return log-complement of cumulative distribution function */
+    virtual Real lcdfc( Real const& t) const;
+#endif
+
   protected:
     /** The shape parameter */
     Real a_;
@@ -190,14 +199,13 @@ inline Real Gamma::rand() const
 GetRNGstate(); Real s = Rf_rgamma(a_, b_); PutRNGstate(); return s;
 }
 
-inline Real Gamma::pdf( Real const& x) const
-{ return Rf_dgamma(x, a_, b_, false);}
-inline Real Gamma::lpdf( Real const& x) const
-{  return Rf_dgamma(x, a_, b_, true);}
-inline Real Gamma::cdf( Real const& t) const
-{ return Rf_pgamma(t, a_, b_, true, false);}
-inline Real Gamma::icdf( Real const& p) const
-{ return Rf_qgamma(p, a_, b_, true, false);}
+inline Real Gamma::pdf( Real const& x) const { return Rf_dgamma(x, a_, b_, false);}
+inline Real Gamma::lpdf( Real const& x) const { return Rf_dgamma(x, a_, b_, true);}
+inline Real Gamma::cdf( Real const& t) const { return Rf_pgamma(t, a_, b_, true, false);}
+inline Real Gamma::lcdf( Real const& t) const { return Rf_pgamma(t, a_, b_, true, true);}
+inline Real Gamma::cdfc( Real const& t) const { return Rf_pgamma(t, a_, b_, false, false);}
+inline Real Gamma::lcdfc( Real const& t) const { return Rf_pgamma(t, a_, b_, false, true);}
+inline Real Gamma::icdf( Real const& p) const { return Rf_qgamma(p, a_, b_, true, false);}
 
 inline Real Gamma::rand( Real const& a, Real const& b)
 {

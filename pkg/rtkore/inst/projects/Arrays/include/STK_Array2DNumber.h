@@ -76,6 +76,7 @@ struct Traits< Array2DNumber<Type_> >
     orient_    = Arrays::by_col_,
     sizeRows_  = 1,
     sizeCols_  = 1,
+    size_      = 1,
     storage_   = Arrays::dense_ // always dense
   };
 };
@@ -98,23 +99,24 @@ class Array2DNumber: public IArray2D< Array2DNumber<Type_> >
     typedef IArray2D< Array2DNumber<Type_> > Base;
     typedef ArrayBase< Array2DNumber<Type_> > LowBase;
 
-    typedef typename hidden::Traits<Array2DNumber<Type_> >::Row Row;
-    typedef typename hidden::Traits<Array2DNumber<Type_> >::Col Col;
-    typedef typename hidden::Traits<Array2DNumber<Type_> >::SubRow SubRow;
-    typedef typename hidden::Traits<Array2DNumber<Type_> >::SubCol SubCol;
-    typedef typename hidden::Traits<Array2DNumber<Type_> >::SubVector SubVector;
-    typedef typename hidden::Traits<Array2DNumber<Type_> >::SubArray SubArray;
+    typedef typename hidden::Traits< Array2DNumber<Type_> >::Row Row;
+    typedef typename hidden::Traits< Array2DNumber<Type_> >::Col Col;
+    typedef typename hidden::Traits< Array2DNumber<Type_> >::SubRow SubRow;
+    typedef typename hidden::Traits< Array2DNumber<Type_> >::SubCol SubCol;
+    typedef typename hidden::Traits< Array2DNumber<Type_> >::SubVector SubVector;
+    typedef typename hidden::Traits< Array2DNumber<Type_> >::SubArray SubArray;
 
-    typedef typename hidden::Traits<Array2DNumber<Type_> >::Type Type;
-    typedef typename hidden::Traits<Array2DNumber<Type_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< Array2DNumber<Type_> >::Type Type;
+    typedef typename hidden::Traits< Array2DNumber<Type_> >::ConstReturnType ConstReturnType;
 
-   enum
+    enum
     {
-      structure_ = hidden::Traits<Array2DNumber>::structure_,
-      orient_    = hidden::Traits<Array2DNumber>::orient_,
-      sizeRows_  = hidden::Traits<Array2DNumber>::sizeRows_,
-      sizeCols_  = hidden::Traits<Array2DNumber>::sizeCols_,
-      storage_   = hidden::Traits<Array2DNumber>::storage_
+       structure_ = hidden::Traits< Array2DNumber >::structure_,
+       orient_    = hidden::Traits< Array2DNumber >::orient_,
+       sizeRows_  = hidden::Traits< Array2DNumber >::sizeRows_,
+       sizeCols_  = hidden::Traits< Array2DNumber >::sizeCols_,
+       size_      = hidden::Traits< Array2DNumber >::size_,
+       storage_   = hidden::Traits< Array2DNumber >::storage_
     };
 
     /** Default constructor */

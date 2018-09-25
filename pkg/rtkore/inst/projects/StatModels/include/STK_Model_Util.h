@@ -80,8 +80,8 @@ enum StatisticalModels
   MixturePoisson_ljk_,
   MixturePoisson_lk_,
   MixturePoisson_ljlk_,
-  MixtureKernelGaussian_sk_,
-  MixtureKernelGaussian_s_,
+  MixtureKmm_sk_,
+  MixtureKmm_s_,
   unknown_model_
 };
 

@@ -32,13 +32,14 @@
 /** @file STK_Qr.h
  *  @brief In thThis file wedefine and implement the Qr class.
  **/
- 
+
 #ifndef STK_QR_H
 #define STK_QR_H
 
 #include "STK_IQr.h"
-#include "../include/STK_Givens.h"
-#include "Arrays/include/STK_Array2DPoint.h"
+#include "STK_Givens.h"
+#include <Arrays/include/STK_Array2D.h>
+#include <Arrays/include/STK_Array2DPoint.h>
 
 #ifdef STK_ALGEBRA_DEBUG
 #include <Arrays/include/STK_Display.h>
@@ -66,34 +67,39 @@ void print(ArrayXX const& A, STK::String const& name)
 namespace STK
 {
 // forward declaration
-template<class Array> class Qr;
+class Qr;
 
 namespace hidden
 {
 /** @ingroup hidden
  *  Specialization for the Qr class.
  **/
-template<class Array_>
-struct AlgebraTraits< Qr<Array_> >
+template<>
+struct AlgebraTraits< Qr >
 {
-  typedef Array_ Array;
+  typedef ArrayXX Array;
+  typedef typename Array::Col ColVector;
+  typedef typename Array::Row RowVector;
 };
 
 } // namespace hidden
 
 /** @ingroup Algebra
- *  @brief The class Qr perform the QR decomposition of an Array.
- * 
+ *  @brief The class Qr perform the QR decomposition of an ArrayXX.
+ *
  *  - Input:  A matrix (nrow,ncol)
  *  - Output:
  *    -# Q  matrix (nrow,ncol) with the Housholder vectors in the min(nrow, ncol) first columns.
  *    -# R  matrix (nrow,ncol) upper triangular.
+ *
+ *  @sa STK::IQr
  */
-template<class Array>
-class Qr: public IQr<Qr<Array> >
+class Qr: public IQr<Qr >
 {
   public :
-    typedef IQr<Qr<Array> > Base;
+    typedef typename hidden::AlgebraTraits< Qr >::ColVector ColVector;
+    typedef typename hidden::AlgebraTraits< Qr >::RowVector RowVector;
+    typedef IQr<Qr> Base;
     using Base::Q_;
     using Base::R_;
 
@@ -101,7 +107,7 @@ class Qr: public IQr<Qr<Array> >
      *  @param A the matrix to decompose
      *  @param ref true if we overwrite A
      **/
-    inline Qr( Array const& A, bool ref = false): Base(A, ref) {}
+    inline Qr( ArrayXX const& A, bool ref = false): Base(A, ref) {}
     /** @brief Constructor
      *  @param data reference on a matrix expression
      */
@@ -129,10 +135,8 @@ class Qr: public IQr<Qr<Array> >
 };
 
 /* Computation of the QR decomposition */
-template<class Array>
-void Qr<Array>::qr()
+inline void Qr::qr()
 {
-  typedef typename Array::SubCol ColVector;
   R_.resize(Q_.rows(), Q_.cols());
   // start left householder reflections
   Range r(Q_.rows()), c(Q_.cols());
@@ -140,7 +144,7 @@ void Qr<Array>::qr()
   {
     ColVector u(Q_, r, j);// get a reference on the j-th column in the range r
     R_(j, j) = house(u);  // compute the housolder vector
-    leftHouseholder(Q_.sub(r, c.incFirst(1)), u); // apply-it to the remaining part of Q_
+    applyLeftHouseholderVector(Q_.sub(r, c.incFirst(1)), u); // apply-it to the remaining part of Q_
     R_.row(j, c).copy(Q_.row(j, c)); // copy current row of Q_ in the range c in R_
     r.incFirst(1);        // decrease the range
   }

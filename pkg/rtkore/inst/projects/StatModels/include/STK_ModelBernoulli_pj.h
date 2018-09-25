@@ -64,10 +64,6 @@ struct StatModelTraits< ModelBernoulli_pj<Data_, WColVector_> >
   typedef WColVector_ WColVector;
   /** Type of the data in the container */
   typedef typename Data::Type Type;
-  /** Type of the row vector of the container */
-  typedef typename Data::Row RowVector;
-  /** Type of the column vector of the container */
-  typedef typename Data::Col ColVector;
   /** Type of the parameters of the ModelBernoulli_pj */
   typedef Bernoulli_pjParameters Parameters;
 };
@@ -148,14 +144,11 @@ class ModelBernoulli_pj: public IMultiStatModel< ModelBernoulli_pj<Data_, WColVe
   public:
     /** Type of the container storing the data */
     typedef DataBridge<Data_> Data;
+    typedef typename hidden::Traits<Data_>::Row RowVector;
     /** Type of the array storing the weights of the data */
     typedef WColVector_ WColVector;
     /** Type of the data in the container */
     typedef typename Data::Type Type;
-    /** Type of the row vector of the container */
-    typedef typename Data::Row RowVector;
-    /** Type of the column vector of the container */
-    typedef typename Data::Col ColVector;
     /** Base class */
     typedef IMultiStatModel< ModelBernoulli_pj<Data_, WColVector_> > Base;
     using Base::p_data;
@@ -180,7 +173,7 @@ class ModelBernoulli_pj: public IMultiStatModel< ModelBernoulli_pj<Data_, WColVe
     inline CPointX const& ln1mProb() const { return param().ln1mProb();}
 
     /** compute the number of free parameters */
-    inline int computeNbFreeParameters() const { return p_data()->sizeCols();}
+    inline int computeNbFreeParameters() const { return p_data()->dataij().sizeCols();}
     /** compute the log Likelihood of an observation. */
     Real computeLnLikelihood( RowVector const& rowData) const;
     /** compute the parameters */
@@ -209,13 +202,13 @@ Real ModelBernoulli_pj<Data_, WColVector_>::computeLnLikelihood( RowVector const
 template<class Data_, class WColVector_>
 void ModelBernoulli_pj<Data_, WColVector_>::computeParameters()
 {
-  for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
+  for (int j=p_data()->dataij().beginCols(); j < p_data()->dataij().endCols(); ++j)
   {
     Real sum=0.;
-    int nbObs=p_data()->sizeRows();
+    int nbObs=p_data()->dataij().sizeRows();
 
-    for (int i=p_data()->beginRows(); i<p_data()->endRows(); ++i)
-    { (p_data()->elt(i,j) == binaryNA_) ? --nbObs : sum += p_data()->elt(i,j);}
+    for (int i=p_data()->dataij().beginRows(); i<p_data()->dataij().endRows(); ++i)
+    { (p_data()->dataij().elt(i,j) == binaryNA_) ? --nbObs : sum += p_data()->dataij().elt(i,j);}
     if (nbObs != 0) { param().prob_[j] = sum/nbObs;}
                else { param().prob_[j] = Arithmetic<Real>::NA();}
   }
@@ -225,12 +218,12 @@ template<class Data_, class WColVector_>
 void ModelBernoulli_pj<Data_, WColVector_>::computeParameters( WColVector const& weights)
 {
   // compute
-  for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
+  for (int j=p_data()->dataij().beginCols(); j < p_data()->dataij().endCols(); ++j)
   {
     Real sum=0., wsum = 0.;
-    for (int i=p_data()->beginRows(); i<p_data()->endRows(); ++i)
-    { if (p_data()->elt(i,j) != binaryNA_)
-      { sum  += weights[i]*p_data()->elt(i,j);
+    for (int i=p_data()->dataij().beginRows(); i<p_data()->dataij().endRows(); ++i)
+    { if (p_data()->dataij().elt(i,j) != binaryNA_)
+      { sum  += weights[i]*p_data()->dataij().elt(i,j);
         wsum += weights[i];
       }
     }

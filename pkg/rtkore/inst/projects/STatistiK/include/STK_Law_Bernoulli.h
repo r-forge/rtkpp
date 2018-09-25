@@ -89,13 +89,6 @@ class Bernoulli: public IUnivLaw<Binary>
 
     /** @return a Binary random variate . */
     virtual Binary rand() const;
-    /** @brief compute the cumulative distribution function
-     *  Give the probability that a Bernoulli random variate is less or equal
-     *  to t.
-     *  @param t a real value
-     *  @return the value of the cdf
-     **/
-    virtual Real cdf(Real const& t) const;
     /** @brief compute the probability distribution function (density)
      *  Give the value of the pdf at the point x.
      *  @param x a binary value
@@ -108,6 +101,12 @@ class Bernoulli: public IUnivLaw<Binary>
      *  @return the value of the log-pdf
      **/
     virtual Real lpdf(Binary const& x) const;
+    /** @brief compute the cumulative distribution function
+     *  Give the probability that a Bernoulli random variate is less or equal to t.
+     *  @param t a real value
+     *  @return the value of the cdf
+     **/
+    virtual Real cdf(Real const& t) const;
     /** @brief inverse cumulative distribution function
      *  The quantile is defined as the smallest value @e x such that
      *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.

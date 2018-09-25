@@ -136,6 +136,15 @@ class Weibull: public IUnivLaw<Real>
      **/
     static Real icdf(Real const& p, Real const& k, Real const& lambda);
 
+#ifdef IS_RTKPP_LIB
+    /** @return log-cumulative distribution function */
+    virtual Real lcdf( Real const& t) const;
+    /** @return complement of cumulative distribution function */
+    virtual Real cdfc( Real const& t) const;
+    /** @return log-complement of cumulative distribution function */
+    virtual Real lcdfc( Real const& t) const;
+#endif
+
   protected:
     /** The shape parameter */
     Real k_;
@@ -153,14 +162,13 @@ inline Real Weibull::rand() const
 GetRNGstate(); Real s = Rf_rweibull(k_, lambda_); PutRNGstate(); return s;
 }
 
-inline Real Weibull::pdf(Real const& x) const
-{ return Rf_dweibull(x, k_, lambda_, false);}
-inline Real Weibull::lpdf(Real const& x) const
-{ return Rf_dweibull(x, k_, lambda_, true);}
-inline Real Weibull::cdf(Real const& t) const
-{ return Rf_pweibull(t, k_, lambda_, true, false);}
-inline Real Weibull::icdf(Real const& p) const
-{ return Rf_qweibull(p, k_, lambda_, true, false);}
+inline Real Weibull::pdf(Real const& x) const { return Rf_dweibull(x, k_, lambda_, false);}
+inline Real Weibull::lpdf(Real const& x) const { return Rf_dweibull(x, k_, lambda_, true);}
+inline Real Weibull::cdf(Real const& t) const { return Rf_pweibull(t, k_, lambda_, true, false);}
+inline Real Weibull::lcdf(Real const& t) const { return Rf_pweibull(t, k_, lambda_, true, true);}
+inline Real Weibull::cdfc(Real const& t) const { return Rf_pweibull(t, k_, lambda_, false, false);}
+inline Real Weibull::lcdfc(Real const& t) const { return Rf_pweibull(t, k_, lambda_, false, true);}
+inline Real Weibull::icdf(Real const& p) const { return Rf_qweibull(p, k_, lambda_, true, false);}
 
 inline Real Weibull::rand( Real const& k, Real const& lambda)
 {

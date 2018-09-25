@@ -66,10 +66,6 @@ struct StatModelTraits< ModelDiagGaussian_muj_sj<Data_, WColVector_> >
   typedef WColVector_ WColVector;
   /** Type of the data in the container */
   typedef typename Data::Type Type;
-  /** Type of the row vector of the container */
-  typedef typename Data::Row RowVector;
-  /** Type of the column vector of the container */
-  typedef typename Data::Col ColVector;
   /** Type of the parameters of the ModelDiagGaussian_muj_sj */
   typedef DiagGaussian_muj_sjParameters Parameters;
 };
@@ -138,14 +134,12 @@ class ModelDiagGaussian_muj_sj: public IMultiStatModel< ModelDiagGaussian_muj_sj
   public:
     /** Type of the container storing the data */
     typedef DataBridge<Data_> Data;
-    /** Type of the array storing the weights of the data */
+    typedef typename hidden::Traits<Data_>::Row RowVector;
+     /** Type of the array storing the weights of the data */
     typedef WColVector_ WColVector;
     /** Type of the data in the container */
     typedef typename Data::Type Type;
     /** Type of the row vector of the container */
-    typedef typename Data::Row RowVector;
-    /** Type of the column vector of the container */
-    typedef typename Data::Col ColVector;
     /** Type of the parameters of the ModelDiagGaussian_muj_sj */
     typedef DiagGaussian_muj_sjParameters Parameters;
     /** Base class */
@@ -170,7 +164,7 @@ class ModelDiagGaussian_muj_sj: public IMultiStatModel< ModelDiagGaussian_muj_sj
     inline CPointX const& sigma() const {return param().sigma();}
 
     /** compute the number of free parameters */
-    inline int computeNbFreeParameters() const { return 2*p_data()->sizeCols();}
+    inline int computeNbFreeParameters() const { return 2*p_data()->dataij().sizeCols();}
     /** compute the log Likelihood of an observation. */
     Real computeLnLikelihood( RowVector const& rowData) const;
     /** compute the parameters */
@@ -195,20 +189,20 @@ Real ModelDiagGaussian_muj_sj<Data_, WColVector_>::computeLnLikelihood( RowVecto
 template<class Data_, class WColVector_>
 void ModelDiagGaussian_muj_sj<Data_, WColVector_>::computeParameters()
 {
-  for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
+  for (int j=p_data()->dataij().beginCols(); j < p_data()->dataij().endCols(); ++j)
   {
-    param().mu_[j] = p_data()->col(j).meanSafe();
-    param().sigma_[j] = std::sqrt(p_data()->col(j).varianceSafe(param().mu(j)));
+    param().mu_[j] = p_data()->dataij().col(j).meanSafe();
+    param().sigma_[j] = std::sqrt(p_data()->dataij().col(j).varianceSafe(param().mu(j)));
   }
 }
 /* compute the weighted parameters */
 template<class Data_, class WColVector_>
 void ModelDiagGaussian_muj_sj<Data_, WColVector_>::computeParameters( WColVector const& weights)
 {
-  for (int j=p_data()->beginCols(); j < p_data()->endCols(); ++j)
+  for (int j=p_data()->dataij().beginCols(); j < p_data()->dataij().endCols(); ++j)
   {
-    param().mu_[j] = p_data()->col(j).wmeanSafe(weights);
-    param().sigma_[j] = std::sqrt(p_data()->col(j).wvarianceSafe(param().mu(j), weights));
+    param().mu_[j] = p_data()->dataij().col(j).wmeanSafe(weights);
+    param().sigma_[j] = std::sqrt(p_data()->dataij().col(j).wvarianceSafe(param().mu(j), weights));
   }
 }
 

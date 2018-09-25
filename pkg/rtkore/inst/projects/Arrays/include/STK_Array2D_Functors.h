@@ -229,10 +229,10 @@ struct SumOp
   typedef BINARY_RETURN_TYPE(Lhs,Rhs) result_type;
 
   SumOp( ExprBase<Lhs> const& lhs, ExprBase<Rhs> const& rhs )
-            : lhs_(lhs.asDerived()), rhs_(rhs.asDerived())
-            , rows_(inf(lhs_.rows(), rhs_.rows()))
-            , cols_(inf(lhs_.cols(), rhs_.cols()))
-            , res_()
+        : lhs_(lhs.asDerived()), rhs_(rhs.asDerived())
+        , rows_(inf(lhs_.rows(), rhs_.rows()))
+        , cols_(inf(lhs_.cols(), rhs_.cols()))
+        , res_()
   {}
   result_type operator()()
   {

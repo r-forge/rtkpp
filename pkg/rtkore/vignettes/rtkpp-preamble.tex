@@ -1,6 +1,6 @@
+
 %-------------------
 % Useful packages
-
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 
@@ -15,7 +15,7 @@
 \usepackage{Sweave}
 
 %-------------------
-% Useful macro
+% Useful macros
 \newcommand{\Rcpp}{{\tt Rcpp}} %
 \newcommand{\rtkpp}{{\tt rtkpp}} %
 \newcommand{\rtkore}{{\tt rtkore}} %
@@ -41,12 +41,12 @@
 \begin{tabular}[#1]{@{}l@{}}#2\end{tabular}}
 
 %-------------------
-% Nice notes
+% Nice notes and warnings
 \usepackage{mdframed} % Add easy frames to paragraphs
 \usepackage{xcolor}
 \usepackage{xparse} % Add support for \NewDocumentEnvironment
 \definecolor{graylight}{cmyk}{.30,0,0,.67} % define color using xcolor syntax
-\definecolor{redlight}{rgb}{1,.2,.2} % define color using xcolor syntax
+\definecolor{redlight}{rgb}{1,.2,.2}       % define color using xcolor syntax
 
 \newmdenv[ % Define mdframe settings and store as leftrule
   linecolor=graylight,
@@ -119,6 +119,6 @@
 \newcommand{\includelstlisting}[1]{\lstinputlisting[style=customcpp]{#1}}
 \newcommand{\code}[1]{\lstinline[style=inlinecpp]@#1@}
 \newcommand{\ttcode}[1]{{\ttfamily\scriptsize #1}}
-% end nice lstlisting
+% end nice listing
 %---------------------
 

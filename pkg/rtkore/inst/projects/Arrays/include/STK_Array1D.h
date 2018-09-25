@@ -29,7 +29,7 @@
  **/
 
 /** @file STK_Array1D.h
-  * @brief Implementation of the final class Array1D
+  * @brief In this file we define and implement the final class Array1D
  **/
 
 #ifndef STK_ARRAY1D_H
@@ -39,7 +39,7 @@
 
 namespace STK
 {
-template<class Type, int Size_ = UnknownSize > class Array1D;
+template<class Type_, int Size_ = UnknownSize > class Array1D;
 
 namespace hidden
 {
@@ -49,11 +49,8 @@ namespace hidden
 template<class Type_, int Size_>
 struct Traits< Array1D<Type_, Size_> >
 {
-  typedef Array1D<Type_, 1> Row;
+  typedef Array1D<Type_, 1>     Row;
   typedef Array1D<Type_, Size_> Col;
-  typedef Array1D<Type_, UnknownSize> SubRow;
-  typedef Array1D<Type_, UnknownSize> SubCol;
-  typedef Array1D<Type_, UnknownSize> SubArray;
   typedef Array1D<Type_, UnknownSize> SubVector;
 
   typedef Type_ Type;
@@ -63,9 +60,9 @@ struct Traits< Array1D<Type_, Size_> >
   {
     structure_ = Arrays::vector_,
     orient_    = Arrays::by_col_,
-    size_      = Size_,
     sizeCols_  = 1,
     sizeRows_  = Size_,
+    size_      = Size_,
     storage_   = Arrays::dense_ // always dense
   };
 
@@ -99,32 +96,36 @@ namespace STK
  * @tparam Type of the objects stored in the @c Array1D
  * @tparam Size_ size of the vector if it known. Default is @c UnknownSize
  **/
-template<class Type, int Size_ >
-class Array1D: public IArray1D< Array1D<Type, Size_> >
+template<class Type_, int Size_ >
+class Array1D: public IArray1D< Array1D<Type_, Size_> >
 {
   public:
+    typedef IArray1D< Array1D<Type_, Size_> > Base;
+
+    typedef typename hidden::Traits< Array1D<Type_, Size_> >::Row Row;
+    typedef typename hidden::Traits< Array1D<Type_, Size_> >::Col Col;
+    typedef typename hidden::Traits< Array1D<Type_, Size_> >::SubVector SubVector;
+
     enum
     {
-      structure_ = hidden::Traits<Array1D<Type, Size_> >::structure_,
-      orient_    = hidden::Traits<Array1D<Type, Size_> >::orient_,
-      size_      = hidden::Traits<Array1D<Type, Size_> >::size_,
-      sizeCols_  = hidden::Traits<Array1D<Type, Size_> >::sizeCols_,
-      sizeRows_  = hidden::Traits<Array1D<Type, Size_> >::sizeRows_,
-      storage_   = hidden::Traits<Array1D<Type, Size_> >::storage_
+      structure_ = hidden::Traits< Array1D<Type_, Size_> >::structure_,
+      orient_    = hidden::Traits< Array1D<Type_, Size_> >::orient_,
+      sizeCols_  = hidden::Traits< Array1D<Type_, Size_> >::sizeCols_,
+      sizeRows_  = hidden::Traits< Array1D<Type_, Size_> >::sizeRows_,
+      size_      = hidden::Traits< Array1D<Type_, Size_> >::size_,
+      storage_   = hidden::Traits< Array1D<Type_, Size_> >::storage_
     };
-    typedef IArray1D< Array1D<Type, Size_> > Base;
 
-    typedef typename hidden::Traits<Array1D<Type, Size_> >::Row Row;
-    typedef typename hidden::Traits<Array1D<Type, Size_> >::Col Col;
-    typedef typename hidden::Traits<Array1D<Type, Size_> >::SubRow SubRow;
-    typedef typename hidden::Traits<Array1D<Type, Size_> >::SubCol SubCol;
-    typedef typename hidden::Traits<Array1D<Type, Size_> >::SubVector SubVector;
-    typedef typename hidden::Traits<Array1D<Type, Size_> >::SubArray SubArray;
+    typedef typename hidden::Traits< Array1D <Type_, Size_> >::Type Type;
+    typedef typename hidden::Traits< Array1D <Type_, Size_> >::ConstReturnType ConstReturnType;
 
-    typedef typename hidden::Traits<Array1D<Type, Size_> >::Iterator Iterator;
-    typedef typename hidden::Traits<Array1D<Type, Size_> >::ConstIterator ConstIterator;
-    typedef typename hidden::Traits<Array1D<Type, Size_> >::ReverseIterator ReverseIterator;
-    typedef typename hidden::Traits<Array1D<Type, Size_> >::ConstReverseIterator ConstReverseIterator;
+    typedef typename hidden::Traits< Array1D<Type_, Size_> >::Iterator Iterator;
+    typedef typename hidden::Traits< Array1D<Type_, Size_> >::ConstIterator ConstIterator;
+    typedef typename hidden::Traits< Array1D<Type_, Size_> >::ReverseIterator ReverseIterator;
+    typedef typename hidden::Traits< Array1D<Type_, Size_> >::ConstReverseIterator ConstReverseIterator;
+
+    typedef TRange<size_> RowRange;
+    typedef TRange<1>     ColRange;
 
     // Compatibility naming scheme with STL
     typedef Iterator iterator;
@@ -146,7 +147,7 @@ class Array1D: public IArray1D< Array1D<Type, Size_> >
      *  @param T the container to copy
      *  @param ref @c true if T is wrapped
      **/
-    Array1D( const Array1D &T, bool ref =false): Base(T, ref) {}
+    Array1D( Array1D const&T, bool ref =false): Base(T, ref) {}
     /** constructor by reference, ref_=1.
      *  @param T,I the container and the range of data to wrap
      **/
@@ -160,12 +161,12 @@ class Array1D: public IArray1D< Array1D<Type, Size_> >
      *  @param T the array/expression to copy
      **/
     template<class OtherArray>
-    Array1D( ExprBase<OtherArray> const& T): Base(T) {}
+    Array1D( ExprBase<OtherArray> const& T): Base(T.asDerived()) {}
     /** Wrapper constructor: the container is a reference of a C-Array.
      *  @param q, I pointer and range of data
      **/
     Array1D( Type* q, Range const& I): Base(q, I) {}
-    /** destructor: allocated memory is liberated by AllocatorBase base class. */
+    /** destructor: allocated memory is liberated by MemAllocator base class. */
     ~Array1D() {}
     /** operator = : overwrite the Array1D with T.
      *  @param T the container to copy

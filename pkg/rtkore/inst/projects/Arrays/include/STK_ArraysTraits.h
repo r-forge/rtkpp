@@ -73,9 +73,7 @@ namespace hidden
  *       storage_   = Arrays::dense_ // always dense
  *     };
  *
- *     typedef TRange<size_> RowRange;
- *     typedef TRange<1>     ColRange;
- *
+ *     // optional
  *     typedef RandomIterator1D<Array1D<Type_, Size_> > Iterator;
  *     typedef ConstRandomIterator1D<Array1D<Type_, Size_> > ConstIterator;
  *

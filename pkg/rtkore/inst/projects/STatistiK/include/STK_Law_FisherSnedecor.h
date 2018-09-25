@@ -45,7 +45,7 @@ namespace Law
 {
 /** @ingroup Laws
  *  @brief FisherSnedecor distribution law.
- * 
+ *
  *  In probability theory and statistics, the <em>F-distribution</em> is a
  *  continuous probability distribution. It is also known as Snedecor's F
  *  distribution or the Fisher–Snedecor distribution (after R. A. Fisher and
@@ -132,6 +132,15 @@ class FisherSnedecor: public IUnivLaw<Real>
      **/
     static Real icdf(Real const& p, int df1, int df2);
 
+#ifdef IS_RTKPP_LIB
+    /** @return log-cumulative distribution function */
+    virtual Real lcdf( Real const& t) const;
+    /** @return complement of cumulative distribution function */
+    virtual Real cdfc( Real const& t) const;
+    /** @return log-complement of cumulative distribution function */
+    virtual Real lcdfc( Real const& t) const;
+#endif
+
   protected:
     /** First degree of freedom */
     int df1_;
@@ -149,14 +158,13 @@ inline Real FisherSnedecor::rand() const
 GetRNGstate(); Real s = Rf_rf(df1_, df2_); PutRNGstate(); return s;
 }
 
-inline Real FisherSnedecor::pdf(Real const& x) const
-{   return Rf_df(x, df1_, df2_, false);}
-inline Real FisherSnedecor::lpdf(Real const& x) const
-{   return Rf_df(x, df1_, df2_, true);}
-inline Real FisherSnedecor::cdf(Real const& t) const
-{ return Rf_pf(t, df1_, df2_, true, false);}
-inline Real FisherSnedecor::icdf(Real const& p) const
-{ return Rf_qf(p, df1_, df2_, true, false);}
+inline Real FisherSnedecor::pdf(Real const& x) const { return Rf_df(x, df1_, df2_, false);}
+inline Real FisherSnedecor::lpdf(Real const& x) const { return Rf_df(x, df1_, df2_, true);}
+inline Real FisherSnedecor::cdf(Real const& t) const { return Rf_pf(t, df1_, df2_, true, false);}
+inline Real FisherSnedecor::lcdf(Real const& t) const { return Rf_pf(t, df1_, df2_, true, true);}
+inline Real FisherSnedecor::cdfc(Real const& t) const { return Rf_pf(t, df1_, df2_, false, false);}
+inline Real FisherSnedecor::lcdfc(Real const& t) const { return Rf_pf(t, df1_, df2_, false, true);}
+inline Real FisherSnedecor::icdf(Real const& p) const { return Rf_qf(p, df1_, df2_, true, false);}
 
 inline Real FisherSnedecor::rand( int df1, int df2)
 {

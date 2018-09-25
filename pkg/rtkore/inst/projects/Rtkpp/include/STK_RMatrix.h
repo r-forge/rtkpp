@@ -23,7 +23,7 @@
 */
 
 /*
- * Project:  rtkpp
+ * Project:  stkpp
  * created on: 25 juil. 2014
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
@@ -153,6 +153,10 @@ template <typename Type_>
 class RMatrix: public ArrayBase< RMatrix<Type_> >, public TRef<1>
 {
   public:
+    /** Type for the Interface base Class. */
+    typedef ArrayBase< RMatrix<Type_> > Base;
+    typedef ArrayBase< RMatrix<Type_> > LowBase;
+
     typedef typename hidden::Traits<RMatrix<Type_> >::Type Type;
     typedef typename hidden::Traits<RMatrix<Type_> >::ConstReturnType ConstReturnType;
     enum
@@ -174,40 +178,27 @@ class RMatrix: public ArrayBase< RMatrix<Type_> >, public TRef<1>
     typedef typename hidden::Traits<RMatrix<Type_> >::Col Col;
 
     /** Default Constructor */
-    inline RMatrix(): matrix_(),rows_(), cols_() {}
+    RMatrix(): Base(), matrix_(),rows_(), cols_() {}
     /** Constructor with given dimension */
-    inline RMatrix(int nRow, int nCol): matrix_(nRow, nCol),rows_(nRow), cols_(nCol) {}
+    RMatrix(int nRow, int nCol): Base(), matrix_(nRow, nCol),rows_(nRow), cols_(nCol) {}
     /** Constructor with SEXP */
-    inline RMatrix( SEXP robj)
-                  : matrix_(robj),rows_(0, matrix_.rows()), cols_(0, matrix_.cols())
+    RMatrix( SEXP robj): Base(), matrix_(robj),rows_(0, matrix_.rows()), cols_(0, matrix_.cols())
     {}
     /** Constructor */
-    inline RMatrix( Rcpp::Matrix<Rtype_> matrix)
-                  : matrix_(matrix), rows_(0, matrix_.rows()), cols_(0, matrix_.cols())
+    RMatrix( Rcpp::Matrix<Rtype_> matrix)
+           : Base(), matrix_(matrix), rows_(0, matrix_.rows()), cols_(0, matrix_.cols())
     {}
     /** Copy Constructor. @c ref is only there for compatibility */
-    inline RMatrix( RMatrix const& matrix, bool ref = true)
-                  : matrix_(matrix), rows_(0, matrix_.rows()), cols_(0, matrix_.cols())
+    RMatrix( RMatrix const& matrix, bool ref = true)
+           : Base(), matrix_(matrix), rows_(0, matrix_.rows()), cols_(0, matrix_.cols())
     {}
-
-    /** overwrite the RMatrix with mat, using Rcpp::operator=.
-     *  @param mat the matrix to copy
+    /** Copy constructor using an expression.
+     *  @param T the container to wrap
      **/
-    template<class OtherType>
-    inline RMatrix& operator=( RMatrix<OtherType> const& mat)
-    {
-      matrix_ = mat.matrix_;  rows_ = mat.rows_; cols_ = mat.cols_;
-      return *this;
-    }
-    /** overwrite the RMatrix with mat, using Rcpp::operator=.
-     *  @param mat the matrix to copy
-     **/
-    template<int OtherRtype>
-    inline RMatrix& operator=( Rcpp::Matrix<OtherRtype> const& mat)
-    {
-      matrix_ = mat; rows_ = mat.rows_; cols_ = mat.cols_;
-      return *this;
-    }
+    template<class OtherDerived>
+    RMatrix( ExprBase<OtherDerived> const& T)
+           : Base(), matrix_(T.sizeRows(), T.sizeCols()),rows_(T.rows()), cols_(T.cols())
+    { LowBase::operator=(T);}
 
     /** @return the underlying Rcpp matrix */
     inline Rcpp::Matrix<Rtype_> const& matrix() const { return matrix_;}
@@ -229,14 +220,22 @@ class RMatrix: public ArrayBase< RMatrix<Type_> >, public TRef<1>
       cols_ = RowRange(0, matrix_.cols());
     }
 
-    /** @return a reference on column j
+    /** @return a constant reference on column j
       *  @param j index of the column to wrap
       **/
     inline Col col( int j) const { return Col(*this, j);}
-    /** @return a reference on column j
+    /** @return a constant reference on column j
       *  @param j index of the column to wrap
       **/
     inline Row row( int i) const { return Row(*this, i);}
+    /** @return a reference on column j
+      *  @param j index of the column to wrap
+      **/
+    inline Col col( int j) { return Col(*this, j);}
+    /** @return a reference on column j
+      *  @param j index of the column to wrap
+      **/
+    inline Row row( int i) { return Row(*this, i);}
    /** @return a constant reference on element (i,j)
      *  @param i, j indexes of the row and of the column
      **/
@@ -254,6 +253,40 @@ class RMatrix: public ArrayBase< RMatrix<Type_> >, public TRef<1>
       matrix_ = mat.matrix_;  rows_ = mat.rows_; cols_ = mat.cols_;
       return *this;
     }
+    /** overwrite the RMatrix with mat, using Rcpp::operator=.
+     *  @param mat the matrix to copy
+     **/
+    template<class OtherType>
+    inline RMatrix& operator=( RMatrix<OtherType> const& mat)
+    {
+      matrix_ = mat.matrix_;  rows_ = mat.rows_; cols_ = mat.cols_;
+      return *this;
+    }
+    /** overwrite the RMatrix with mat, using Rcpp::operator=.
+     *  @param mat the matrix to copy
+     **/
+    template<int OtherRtype>
+    inline RMatrix& operator=( Rcpp::Matrix<OtherRtype> const& mat)
+    {
+      matrix_ = mat; rows_ = mat.rows_; cols_ = mat.cols_;
+      return *this;
+    }
+    /** operator = : overwrite the Array2D with the right hand side T.
+     *  @param T the container to copy
+     **/
+    template<class Rhs>
+    RMatrix& operator=( ExprBase<Rhs> const& T)
+    {
+      if ( (T.rows()!=rows_) || (T.cols() != cols_))
+      { STKRUNTIME_ERROR_NO_ARG(RMatrix::operator=,size not match);}
+      for(int j= cols_.begin(); j< cols_.end(); ++j)
+      {
+        for(int i= rows_.begin(); i< rows_.end(); ++i)
+        { this->elt(i,j) = T.elt(i,j); }
+      }
+      return *this;
+    }
+
   private:
     Rcpp::Matrix<Rtype_> matrix_;
     RowRange rows_;
@@ -311,6 +344,24 @@ class RowRMatrix: public ArrayBase< RowRMatrix<Type_> >, public TRef<1>
        *  @param j index of the column
        **/
       inline Type& elt1Impl( int j) { return (matrix_(rows_.begin(),j));}
+      /** operator = : overwrite the ColRMatrix with the right hand side T.
+       *  @param T the container to copy
+       **/
+      template<class Rhs>
+      RowRMatrix& operator=( ExprBase<Rhs> const& T)
+      {
+        if ( (T.range()!=cols_) )
+        { STKRUNTIME_ERROR_NO_ARG(ColRMatrix::operator=,size not match);}
+          for(int i= rows_.begin(); i< rows_.end(); ++i)
+          {
+            for(int j= cols_.begin(); j< cols_.end(); ++j)
+            {
+              this->elt(i,j) = T.elt(j);
+          }
+        }
+        return *this;
+      }
+
   private:
     Rcpp::Matrix<Rtype_> matrix_;
     RowRange rows_;
@@ -368,6 +419,22 @@ class ColRMatrix: public ArrayBase< ColRMatrix<Type_> >, public TRef<1>
        *  @param i index of the row
        **/
       inline Type& elt1Impl(int i) { return (matrix_(i,cols_.begin()));}
+      /** operator = : overwrite the ColRMatrix with the right hand side T.
+       *  @param T the container to copy
+       **/
+      template<class Rhs>
+      ColRMatrix& operator=( ExprBase<Rhs> const& T)
+      {
+        if ( (T.range()!=rows_) )
+        { STKRUNTIME_ERROR_NO_ARG(ColRMatrix::operator=,size not match);}
+        for(int j= cols_.begin(); j< cols_.end(); ++j)
+        {
+          for(int i= rows_.begin(); i< rows_.end(); ++i)
+          { this->elt(i,j) = T.elt(i); }
+        }
+        return *this;
+      }
+
   private:
     Rcpp::Matrix<Rtype_> matrix_;
     RowRange rows_;

@@ -140,6 +140,15 @@ class Geometric: public IUnivLaw<Integer>
      **/
     static Integer icdf(Real const& p, Real const& prob);
 
+#ifdef IS_RTKPP_LIB
+    /** @return log-cumulative distribution function */
+    virtual Real lcdf( Real const& t) const;
+    /** @return complement of cumulative distribution function */
+    virtual Real cdfc( Real const& t) const;
+    /** @return log-complement of cumulative distribution function */
+    virtual Real lcdfc( Real const& t) const;
+#endif
+
   protected:
     /** probability of success in a Bernoulli trial */
     Real prob_;
@@ -156,14 +165,13 @@ inline int Geometric::rand() const
 GetRNGstate(); int s = Rf_rgeom(prob_); PutRNGstate(); return s;
 }
 
-inline Real Geometric::pdf(Integer const& x) const
-{ return Rf_dgeom((double)x, prob_, false);}
-inline Real Geometric::lpdf(Integer const& x) const
-{ return Rf_dgeom((double)x, prob_, true);}
-inline Real Geometric::cdf(Real const& t) const
-{ return Rf_pgeom(t, prob_, true, false);}
-inline int Geometric::icdf(Real const& p) const
-{ return Rf_qgeom(p, prob_, true, false);}
+inline Real Geometric::pdf(Integer const& x) const { return Rf_dgeom((double)x, prob_, false);}
+inline Real Geometric::lpdf(Integer const& x) const { return Rf_dgeom((double)x, prob_, true);}
+inline Real Geometric::cdf(Real const& t) const { return Rf_pgeom(t, prob_, true, false);}
+inline Real Geometric::lcdf(Real const& t) const { return Rf_pgeom(t, prob_, true, true);}
+inline Real Geometric::cdfc(Real const& t) const { return Rf_pgeom(t, prob_, false, false);}
+inline Real Geometric::lcdfc(Real const& t) const { return Rf_pgeom(t, prob_, false, true);}
+inline int Geometric::icdf(Real const& p) const { return Rf_qgeom(p, prob_, true, false);}
 
 inline int Geometric::rand(Real const& prob)
 {

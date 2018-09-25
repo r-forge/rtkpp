@@ -24,13 +24,13 @@
 
 /*
  * Project:  Algebra
- * Purpose:  Define the GramScmidt Class.
+ * Purpose:  Define the GramSchmidt method.
  * Author:   Serge Iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  *
  **/
 
 /** @file STK_GramSchmidt.h
- *  @brief In this file we define the GramSchidt method.
+ *  @brief In this file we define the GramSchmidt method.
  *
  **/
 

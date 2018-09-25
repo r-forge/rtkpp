@@ -76,18 +76,9 @@ namespace hidden
 template<typename Type_, int SizeCols_, bool Orient_>
 struct Traits< CArrayPoint<Type_, SizeCols_, Orient_> >
 {
-    typedef CArrayNumber<Type_, Orient_> Number;
-//    typedef CArrayNumber<Type_, Orient_> Col;
-//    typedef CArrayNumber<Type_, Orient_> SubCol;
-    typedef CArrayVector<Type_, 1, Orient_> Col;
-    typedef CArrayVector<Type_, 1, Orient_> SubCol;
-
+    typedef CArrayNumber<Type_, Orient_> Col;
     typedef CArrayPoint<Type_, SizeCols_, Orient_> Row;
-    typedef CArrayPoint<Type_, UnknownSize, Orient_> SubRow;
 
-    /* Type or array (1,1) ? */
-    typedef typename If<(SizeCols_ == 1), Number, SubRow>::Result SubVector;
-    typedef typename If<(SizeCols_ == 1), Number, SubRow>::Result SubArray;
     // The CAllocator have to have the same structure than the CArray
     typedef CAllocator<Type_, 1, SizeCols_, Orient_> Allocator;
 
@@ -100,9 +91,11 @@ struct Traits< CArrayPoint<Type_, SizeCols_, Orient_> >
       orient_    = Orient_,
       sizeRows_  = 1,
       sizeCols_  = SizeCols_,
+      size_      = SizeCols_,
       storage_   = Arrays::dense_
     };
 };
+
 
 } // namespace hidden
 
@@ -117,16 +110,19 @@ class CArrayPoint: public ICArray < CArrayPoint<Type_, SizeCols_, Orient_> >
     typedef ICArray < CArrayPoint<Type_, SizeCols_, Orient_> > Base;
     typedef ArrayBase < CArrayPoint<Type_, SizeCols_, Orient_> > LowBase;
 
-    typedef typename hidden::Traits<CArrayPoint<Type_, SizeCols_, Orient_> >::Type Type;
-    typedef typename hidden::Traits<CArrayPoint<Type_, SizeCols_, Orient_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< CArrayPoint<Type_, SizeCols_, Orient_> >::Col Col;
+    typedef typename hidden::Traits< CArrayPoint<Type_, SizeCols_, Orient_> >::Row Row;
+    typedef typename hidden::Traits< CArrayPoint<Type_, SizeCols_, Orient_> >::Type Type;
+    typedef typename hidden::Traits< CArrayPoint<Type_, SizeCols_, Orient_> >::ConstReturnType ConstReturnType;
 
     enum
     {
-      structure_ = Arrays::point_,
-      orient_    = Orient_,
-      sizeRows_  = 1,
-      sizeCols_  = SizeCols_,
-      storage_   = Arrays::dense_
+      structure_ = hidden::Traits< CArrayPoint<Type_, SizeCols_, Orient_> >::structure_,
+      orient_    = hidden::Traits< CArrayPoint<Type_, SizeCols_, Orient_> >::orient_,
+      sizeRows_  = hidden::Traits< CArrayPoint<Type_, SizeCols_, Orient_> >::sizeRows_,
+      sizeCols_  = hidden::Traits< CArrayPoint<Type_, SizeCols_, Orient_> >::sizeCols_,
+      size_      = hidden::Traits< CArrayPoint<Type_, SizeCols_, Orient_> >::size_,
+      storage_   = hidden::Traits< CArrayPoint<Type_, SizeCols_, Orient_> >::storage_
     };
 
     /** Default constructor. */

@@ -48,15 +48,69 @@
 
 namespace STK
 {
-template< typename Type, int SizeRows_ = UnknownSize, int SizeCols_ = UnknownSize, bool Orient_ = Arrays::by_col_> class CArray;
+// forward declaration of all CArray classes
+template< typename Type, int SizeRows_, int SizeCols_, bool Orient_> class CArray;
+template< typename Type, int Size_, bool Orient_> class CArraySquare;
 template< typename Type, int SizeCols_, bool Orient_> class CArrayPoint;
 template< typename Type, int SizeRows_, bool Orient_> class CArrayVector;
 template< typename Type, bool Orient_> class CArrayNumber;
 
-/** @class ICArray
-  * @ingroup Arrays
-  *
-  * @brief Interface class for all CArray, CArrayPoint, CArrayVector and CArraySquare.
+namespace hidden
+{
+/** @ingroup hidden
+ *  @brief The traits struct CSlice must be specialized allow to disambiguate return
+ *  type of the col/row/sub operators for CArray family
+ *
+ *  @sa STK::ICArray
+ */
+template<typename Derived, int SizeRows, int SizeCols>
+struct CSlice
+{
+    typedef typename Traits< Derived >::Type Type;
+    enum
+    {
+      structure_ = Traits<Derived>::structure_,
+      orient_    = Traits<Derived>::orient_,
+      sizeRows_  = Traits<Derived>::sizeRows_,
+      sizeCols_  = Traits<Derived>::sizeCols_,
+      storage_   = Traits<Derived>::storage_,
+
+      isNumber_ = (SizeRows==SizeCols)&&(SizeRows==1),
+      isVector_ = (SizeCols == 1)&&(!isNumber_),
+      isPoint_  = (SizeRows == 1)&&(!isNumber_),
+      isSquare_ = (SizeRows==SizeCols)&&(SizeRows!=UnknownSize)&&(!isNumber_),
+      isArray_  = (SizeRows!=SizeCols)&&(!isNumber_) // not used
+    };
+   typedef typename If< (isNumber_), CArrayNumber<Type, orient_>
+                      , typename If< isVector_, CArrayVector<Type, SizeRows, orient_>
+                          , typename If< isPoint_, CArrayPoint<Type, SizeCols, orient_>
+                              , typename If< isSquare_, CArraySquare<Type, SizeRows, orient_>
+                                           , CArray<Type, SizeRows, SizeCols, orient_>
+                                           >::Result
+                                       >::Result
+                                   >::Result
+                      >::Result Result;
+};
+
+/** @ingroup hidden
+ *  helper allowing to disambiguate SubVector access
+ **/
+template<typename Derived, int Size>
+struct CSliceDispatcher
+{
+    enum
+    { structure_ = Traits<Derived>::structure_};
+    typedef typename If< structure_ == (int)Arrays::vector_
+                       , typename CSlice<Derived, Size, 1>::Result
+                       , typename CSlice<Derived, 1, Size>::Result
+                       >::Result Result;
+};
+
+}
+/** @ingroup Arrays
+  * @class ICArray
+  *s
+  * @brief Interface class for CArray, CArrayPoint, CArrayVector, CArraySquare, CArrayNumber.
   *
   * This class is the base that is inherited by all objects (matrix, vector,
   * point) which are not expression and stored as CArrays. The common API for
@@ -65,6 +119,7 @@ template< typename Type, bool Orient_> class CArrayNumber;
   * This is essentially a wrapper of a CAllocator
   *
   * @tparam Derived is the derived type, e.g., a matrix type.
+  * @sa CAllocator, CArray, CArrayPoint, CArrayVector, CArraySquare, CArrayNumber
   */
 template<class Derived>
 
@@ -72,23 +127,20 @@ class ICArray: public IArrayBase<Derived>
 {
   public:
     typedef IArrayBase<Derived> Base;
+    typedef typename hidden::Traits< Derived >::Allocator Allocator;
 
-    typedef typename hidden::Traits<Derived>::Type Type;
-    typedef typename hidden::Traits<Derived>::Row  Row;
-    typedef typename hidden::Traits<Derived>::Col  Col;
-    typedef typename hidden::Traits<Derived>::SubRow SubRow;
-    typedef typename hidden::Traits<Derived>::SubCol SubCol;
-    typedef typename hidden::Traits<Derived>::SubVector SubVector;
-    typedef typename hidden::Traits<Derived>::SubArray SubArray;
+    typedef typename hidden::Traits< Derived >::Row Row;
+    typedef typename hidden::Traits< Derived >::Col Col;
+    typedef typename hidden::Traits< Derived >::Type Type;
+    typedef typename hidden::Traits< Derived >::ConstReturnType ConstReturnType;
 
-    typedef typename hidden::Traits<Derived>::Allocator Allocator;
     enum
     {
-      structure_ = hidden::Traits<Derived>::structure_,
-      orient_    = hidden::Traits<Derived>::orient_,
-      sizeRows_  = hidden::Traits<Derived>::sizeRows_,
-      sizeCols_  = hidden::Traits<Derived>::sizeCols_,
-      storage_   = hidden::Traits<Derived>::storage_
+      structure_ = hidden::Traits< Derived >::structure_,
+      orient_    = hidden::Traits< Derived >::orient_,
+      sizeRows_  = hidden::Traits< Derived >::sizeRows_,
+      sizeCols_  = hidden::Traits< Derived >::sizeCols_,
+      storage_   = hidden::Traits< Derived >::storage_
     };
     /** Type of the Range for the rows */
     typedef TRange<sizeRows_> RowRange;
@@ -132,11 +184,10 @@ class ICArray: public IArrayBase<Derived>
      **/
     template< class OtherAllocator>
     inline ICArray( ITContainer2D<OtherAllocator> const& allocator)
-                 : Base(), allocator_(allocator.asDerived(), true)
+                  : Base(), allocator_(allocator.asDerived(), true)
     {}
     /**  destructor */
     ~ICArray() {}
-
   public:
     /** @return the Horizontal range */
     inline ColRange const& colsImpl() const { return allocator_.cols();};
@@ -144,7 +195,7 @@ class ICArray: public IArrayBase<Derived>
     inline RowRange const& rowsImpl() const { return allocator_.rows();}
 
     /** clear all allocated memory . */
-    inline void clear() { allocator_.clear();}
+    void clear() { allocator_.clear();}
 
     /** @return @c true if the container is empty, @c false otherwise */
     bool empty() const { return allocator_.empty();}
@@ -155,75 +206,194 @@ class ICArray: public IArrayBase<Derived>
     inline Allocator const& allocator() const { return allocator_;}
     /** @return a constant reference on the main pointer. */
     inline Type* const& p_data() const { return allocator_.p_data();}
-    /** @return a reference on the main pointer. */
-    inline Type*& p_data() { return allocator_.p_data();}
 
     /** implement the const element accessor */
     inline Type& elt2Impl( int i, int j) { return allocator_.elt(i, j);}
     /** implement the writable element accessor */
-    inline Type const& elt2Impl( int i, int j) const { return allocator_.elt(i, j);}
+    inline ConstReturnType elt2Impl( int i, int j) const { return allocator_.elt(i, j);}
 
     /** implement the const element accessor for vector/point/diagonal arrays*/
     inline Type& elt1Impl( int j) { return allocator_.elt(j);}
     /** implement the writable element accessor for vector/point/diagonal arrays*/
-    inline Type const& elt1Impl( int j) const { return allocator_.elt(j);}
+    inline ConstReturnType elt1Impl( int j) const{ return allocator_.elt(j);}
 
     /** implement the const element accessor for number arrays*/
     inline Type& elt0Impl() { return allocator_.elt();}
     /** implement the writable element accessor for number arrays*/
-    inline Type const& elt0Impl() const { return allocator_.elt();}
+    inline ConstReturnType elt0Impl() const { return allocator_.elt();}
 
-    /** implement the row operator using a reference on the row of the allocator */
-    inline Row rowImpl(int i) const { return  Row( allocator_.row(i));}
-    /** implement the row operator using a reference on the row of the allocator */
-    inline SubRow rowImpl(int i, Range const& J) const { return SubRow( allocator_.row( i, J));}
+    // overloaded operators
+    /** @return a reference on the element (i,j) of the 2D container.
+     *  @param i, j indexes of the element to get
+     **/
+    inline Type& operator()(int i, int j)
+    {
+#ifdef STK_BOUNDS_CHECK
+       if (this->beginRows() > i) { STKOUT_OF_RANGE_2ARG(ICArray::operator(), i, j, beginRows() > i);}
+       if (this->endRows() <= i)  { STKOUT_OF_RANGE_2ARG(ICArray::operator(), i, j, endRows() <= i);}
+       if (this->beginCols() > j) { STKOUT_OF_RANGE_2ARG(ICArray::operator(), i, j, beginCols() > j);}
+       if (this->endCols() <= j)  { STKOUT_OF_RANGE_2ARG(ICArray::operator(), i, j, endCols() <= j);}
+#endif
+      return this->elt(i,j);
+    }
+    /** @return a constant reference on the element (i,j) of the 2D container.
+     *  @param i,j row and column indexes
+     **/
+    inline ConstReturnType operator()(int i, int j) const
+    {
+#ifdef STK_BOUNDS_CHECK
+       if (this->beginRows() > i) { STKOUT_OF_RANGE_2ARG(ICArray::operator(), i, j, beginRows() > i);}
+       if (this->endRows() <= i)  { STKOUT_OF_RANGE_2ARG(ICArray::operator(), i, j, endRows() <= i);}
+       if (this->beginCols() > j) { STKOUT_OF_RANGE_2ARG(ICArray::operator(), i, j, beginCols() > j);}
+       if (this->endCols() <= j)  { STKOUT_OF_RANGE_2ARG(ICArray::operator(), i, j, endCols() <= j);}
+#endif
+      return this->elt(i,j);
+    }
 
-    /** implement the col operator using a reference on the column of the allocator */
-    inline Col colImpl(int j) const { return  Col( allocator_.col(j));}
-    /** implement the col operator using a reference on the column of the allocator */
-    inline SubCol colImpl(Range const& I, int j) const { return SubCol( allocator_.template col<UnknownSize>( I, j));}
+    /** @return a reference on the ith element
+     *  @param i index of the element to get
+     **/
+    inline Type& operator[](int i)
+    {
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+#ifdef STK_BOUNDS_CHECK
+      if (this->asDerived().begin() > i) { STKOUT_OF_RANGE_1ARG(ICArray::operator[], i, begin() > i);}
+      if (this->asDerived().end() <= i)  { STKOUT_OF_RANGE_1ARG(ICArray::operator[], i, end() <= i);}
+#endif
+      return this->elt(i);
+    }
+    /** @return the ith element
+     *  @param i index of the element to get
+     **/
+    inline ConstReturnType operator[](int i) const
+    {
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+#ifdef STK_BOUNDS_CHECK
+      if (this->asDerived().begin() > i) { STKOUT_OF_RANGE_1ARG(ICArray::operator[], i, begin() > i);}
+      if (this->asDerived().end() <= i)  { STKOUT_OF_RANGE_1ARG(ICArray::operator[], i, end() <= i);}
+#endif
+      return this->elt(i);
+    }
 
-    /** implement the sub operator for 1D arrays using a reference on the raw/column of the allocator */
-    inline SubVector subImpl( Range const& J) const
-    { return SubVector( allocator_.template sub<UnknownSize>(J));}
+    /** @return the number */
+    inline Type& operator()() { return this->elt();}
+    /** @return a constant reference on the number */
+    inline ConstReturnType operator()() const { return this->elt();}
 
-    /** implement the row operator using a reference on the rows of the allocator */
-    inline CArray<Type, UnknownSize, sizeCols_, orient_> rowImpl(Range const& I) const
-    { return CArray<Type, UnknownSize, sizeCols_, orient_>( allocator_.template sub<UnknownSize, sizeCols_>(I, this->cols()));}
-    /** implement the col operator using a reference on the columns of the allocator */
-    inline CArray<Type, sizeRows_, UnknownSize, orient_> colImpl(Range const& J) const
-    { return CArray<Type, sizeRows_, UnknownSize, orient_>( allocator_.template sub<sizeRows_, UnknownSize>( this->rows(), J));}
-    /** implement the sub operator for 2D arrays using a reference on the column of the allocator */
-    inline CArray<Type, UnknownSize, UnknownSize, orient_> subImpl(Range const& I, Range const& J) const
-    { return CArray<Type, UnknownSize, UnknownSize, orient_>(allocator_.template sub<UnknownSize, UnknownSize>(I, J));}
+    // row operators
+    /** implement the row operator using a reference on the row of the allocator
+     *  @param i index of the row to reference
+     **/
+    inline typename hidden::CSlice<Derived, 1, sizeCols_>::Result row(int i) const
+    { return typename hidden::CSlice<Derived, 1, sizeCols_>::Result( allocator_.row(i));}
+    /** implement the row operator using a reference on the row of the allocator
+     *  @param i,J index of the row and range of the columns to reference
+     **/
+    template<int Size_>
+    inline typename hidden::CSlice<Derived, 1, Size_>::Result row(int i, TRange<Size_> const& J) const
+    { return typename hidden::CSlice<Derived, 1, Size_>::Result( allocator_.row( i, J));}
+    /** @param i,J index of the row and range of the columns
+     *  @return an Horizontal container referencing row @c i in range @c J
+     **/
+    template<int Size_>
+    inline typename hidden::CSlice<Derived, 1, Size_>::Result operator()(int i, TRange<Size_> const& J) const
+    { return row(i, J);}
+    /** implement the row operator using a reference on a range of rows of the allocator
+     *  @param I range of the rows to reference
+     **/
+    template<int Size_>
+    inline typename hidden::CSlice<Derived, Size_, sizeCols_>::Result row(TRange<Size_> const& I) const
+    { return typename hidden::CSlice<Derived, Size_, sizeCols_>::Result( allocator_.sub(I, this->cols()));}
+
+    // col operators
+    /** implement the col operator using a reference on the column of the allocator
+     * @param j index of the column to reference
+     **/
+    inline typename hidden::CSlice<Derived, sizeRows_, 1>::Result col(int j) const
+    { return typename hidden::CSlice<Derived, sizeRows_, 1>::Result( allocator_.col(j));}
+    /** implement the col operator using a reference on the column of the allocator
+     * @param I,j range of the rows and index of the column to reference
+     **/
+    template<int Size_ >
+    inline typename hidden::CSlice<Derived, Size_, 1>::Result col(TRange<Size_> const& I, int j) const
+    { return typename hidden::CSlice<Derived, Size_, 1>::Result( allocator_.col( I, j));}
+    /** implement the col operator using a reference on a range of columns of the allocator
+     *  @param J range of columns to reference
+     **/
+    template<int Size_>
+    inline typename hidden::CSlice<Derived, sizeRows_, Size_>::Result col(TRange<Size_> const& J) const
+    { return typename hidden::CSlice<Derived, sizeRows_, Size_>::Result( allocator_.sub(this->rows(), J));}
+    /** @param I,j range of the rows and index of the column to reference
+     *  @return a Vertical container containing the column @c j of this in the range @c I
+     **/
+    template<int Size_>
+    inline typename hidden::CSlice<Derived, Size_, 1>::Result operator()(TRange<Size_> const& I, int j) const
+    { return col(I, j);}
+
+    // sub operators
+    /** implement the sub operator for 1D arrays using a reference on the row/column of the allocator
+     *  @param J range to get
+     **/
+    template<int Size>
+    inline typename hidden::CSliceDispatcher<Derived, Size>::Result sub( TRange<Size> const& J) const
+    {
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+      return typename hidden::CSliceDispatcher<Derived, Size>::Result( allocator_.subVector(J));
+    }
+    /** @return the sub-vector in given range
+     *  @param I range to get
+     **/
+    template<int Size>
+    inline typename hidden::CSliceDispatcher<Derived, Size>::Result operator[](TRange<Size> const& I) const
+    {
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+      return this->sub(I);
+    }
+    /** implement the sub operator for 2D arrays using references on a range of rows and columns
+     *  of the allocator
+     *  @param I,J range of the rows and columns to reference
+     **/
+    template<int OtherRows_, int OtherCols_>
+    inline typename hidden::CSlice<Derived, OtherRows_, OtherCols_>::Result sub(TRange<OtherRows_> const& I, TRange<OtherCols_> const& J) const
+    { return typename hidden::CSlice<Derived, OtherRows_, OtherCols_>::Result(allocator_.sub(I, J));}
+    /** @param I,J range of the rows and columns
+     *  @return a 2D container containing this in the range @c I, @c J
+     **/
+    template<int OtherRows_, int OtherCols_>
+    inline typename hidden::CSlice<Derived, OtherRows_, OtherCols_>::Result operator()(TRange<OtherRows_> const& I, TRange<OtherCols_> const& J) const
+    { return sub(I, J);}
 
     /** swap two elements: only for vectors an points. */
     void swap(int i, int  j) { std::swap(this->elt(i), this->elt(j)); }
     /** @param pos1, pos2 positions of the columns to swap */
     void swapCols(int pos1, int pos2)
     {
+#ifdef STK_BOUNDS_CHECK
       if (this->beginCols() > pos1)
-      { STKOUT_OF_RANGE_2ARG(ICArray::swapCols,pos1, pos2,beginCols() >pos1);}
-      if (this->lastIdxCols() < pos1)
-      { STKOUT_OF_RANGE_2ARG(ICArray::swapCols,pos1, pos2,lastIdxCols() <pos1);}
+      { STKOUT_OF_RANGE_2ARG(ICArray::swapCols,pos1, pos2,beginCols() > pos1);}
+      if (this->endCols() <= pos1)
+      { STKOUT_OF_RANGE_2ARG(ICArray::swapCols,pos1, pos2,endCols() <= pos1);}
       if (this->beginCols() > pos2)
-      { STKOUT_OF_RANGE_2ARG(ICArray::swapCols,pos1, pos2,beginCols() >pos2);}
-      if (this->lastIdxCols() < pos2)
-      { STKOUT_OF_RANGE_2ARG(ICArray::swapCols,pos1, pos2,lastIdxCols() <pos2);}
+      { STKOUT_OF_RANGE_2ARG(ICArray::swapCols,pos1, pos2,beginCols() > pos2);}
+      if (this->endCols() <= pos2)
+      { STKOUT_OF_RANGE_2ARG(ICArray::swapCols,pos1, pos2,endCols() <= pos2);}
+#endif
       // swap allocator
       allocator_.swapCols(pos1, pos2);
     }
     /** @param pos1, pos2 positions of the rows to swap */
     void swapRows(int pos1, int pos2)
     {
+#ifdef STK_BOUNDS_CHECK
       if (this->beginRows() > pos1)
-      { STKOUT_OF_RANGE_2ARG(ICArray::swapRows,pos1, pos2,beginRows() >pos1);}
-      if (this->lastIdxRows() < pos1)
-      { STKOUT_OF_RANGE_2ARG(ICArray::swapRows,pos1, pos2,lastIdxRows() <pos1);}
+      { STKOUT_OF_RANGE_2ARG(ICArray::swapRows,pos1, pos2,beginRows() > pos1);}
+      if (this->endRows() <= pos1)
+      { STKOUT_OF_RANGE_2ARG(ICArray::swapRows,pos1, pos2,endRows() <= pos1);}
       if (this->beginRows() > pos2)
-      { STKOUT_OF_RANGE_2ARG(ICArray::swapRows,pos1, pos2,beginRows() >pos2);}
-      if (this->lastIdxRows() < pos2)
-      { STKOUT_OF_RANGE_2ARG(ICArray::swapRows,pos1, pos2,lastIdxRows() <pos2);}
+      { STKOUT_OF_RANGE_2ARG(ICArray::swapRows,pos1, pos2,beginRows() > pos2);}
+      if (this->endRows() <= pos2)
+      { STKOUT_OF_RANGE_2ARG(ICArray::swapRows,pos1, pos2,endRows() <= pos2);}
+#endif
       // swap allocator
       allocator_.swapRows(pos1, pos2);
     }
@@ -290,12 +460,26 @@ class ICArray: public IArrayBase<Derived>
      *  @note if this method is used with arrays, upper triangular and lower triangular
      *  arrays, both ranges will be resized.
      **/
-    Derived& resize(Range const& I)
+    template<int Size_>
+    Derived& resize(TRange<Size_> const& I)
     {
       if (!hidden::CheckShift<Derived, structure_>::resize(this->asDerived(), I)) return this->asDerived();
       if (this->isRef())
       { STKRUNTIME_ERROR_1ARG(ICArray::resize,I,cannot operate on reference);}
       allocator_.resize(I.size()).shift(I.begin());
+      return this->asDerived();
+    }
+    /** Resize the vector/point/diagonal/square array.
+     *  @param size Range of the vector/point/diagonal/square array
+     *  @note if this method is used with arrays, upper triangular and lower triangular
+     *  arrays, both ranges will be resized.
+     **/
+    Derived& resize(int size)
+    {
+      if (!hidden::CheckShift<Derived, structure_>::resize(this->asDerived(), size)) return this->asDerived();
+      if (this->isRef())
+      { STKRUNTIME_ERROR_1ARG(ICArray::resize,size,cannot operate on reference);}
+      allocator_.resize(size);
       return this->asDerived();
     }
 };

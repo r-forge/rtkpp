@@ -53,7 +53,6 @@ template<typename> class Array2DVector;
   *
   * A Vector is a column oriented 1D container of Real.
   **/
-typedef Array2DVector<Real>   Vector;
 typedef Array2DVector<Real>   VectorX;
 typedef Array2DVector<double> VectorXd;
 typedef Array2DVector<int>    VectorXi;
@@ -82,6 +81,7 @@ struct Traits< Array2DVector<Type_> >
     orient_    = Arrays::by_col_,
     sizeCols_  = 1,
     sizeRows_  = UnknownSize,
+    size_      = UnknownSize,
     storage_ = Arrays::dense_ // always dense
   };
 };
@@ -93,7 +93,7 @@ struct Traits< Array2DVector<Type_> >
  *
  *  An Array2DVector is a Vertical container of a single column.
  *
- *  By default the index of the first element is 1 but this can be
+ *  By default the index of the first element is 0 but this can be
  *  modified using the appropriate constructor or using the method @c shift.
  *
  *  @sa Array2DPoint
@@ -103,7 +103,7 @@ class Array2DVector: public IArray2D< Array2DVector<Type_> >
 {
   public:
     typedef IArray2D< Array2DVector<Type_> > Base;
-    typedef ArrayBase < Array2DVector<Type_> > LowBase;
+    typedef ArrayBase< Array2DVector<Type_> > LowBase;
 
     typedef typename hidden::Traits<Array2DVector<Type_> >::Row Row;
     typedef typename hidden::Traits<Array2DVector<Type_> >::Col Col;
@@ -117,12 +117,14 @@ class Array2DVector: public IArray2D< Array2DVector<Type_> >
 
     enum
     {
-      structure_ = Arrays::vector_,
-      orient_    = Arrays::by_col_,
-      sizeCols_  = 1,
-      sizeRows_  = UnknownSize,
-      storage_ = Arrays::dense_ // always dense
+      structure_ = hidden::Traits< Array2DVector<Type_> >::structure_,
+      orient_    = hidden::Traits< Array2DVector<Type_> >::orient_,
+      sizeCols_  = hidden::Traits< Array2DVector<Type_> >::sizeCols_,
+      sizeRows_  = hidden::Traits< Array2DVector<Type_> >::sizeRows_,
+      size_      = hidden::Traits< Array2DVector<Type_> >::size_,
+      storage_   = hidden::Traits< Array2DVector<Type_> >::storage_
     };
+
     /** Default constructor */
     Array2DVector(): Base( Range(), Range(1)) {}
     /** constructor with specified range.

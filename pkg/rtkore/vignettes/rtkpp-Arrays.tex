@@ -91,7 +91,7 @@ vectors/points/diagonal matrices. For vectors, just pass one index in a bracket.
 Indexing starts at 0 by default. This behavior can be modify by defining the
 STKBASEARRAYS macro at compile time using the directive -DSTKBASEARRAYS=1.
 Enabling this macro allow user to get 1 based arrays like in FORTRAN.
-If you want to build code independent of the first index you should use the
+If you want to build code independent of the start index you should use the
 \code{beginCols()}, \code{beginRows()}, \code{endRows()}, \code{endCols()},
 \code{lastIdxCols()} and \code{lastIdxRows()} methods of the arrays and the
 \code{begin()}, \code{end()}, \code{lastIdx()} methods of the Row-vectors,
@@ -477,7 +477,7 @@ CArrayVector<Real> c(a.col(1), true); // c is now a reference on the column 1 of
 CArrayPoint<Real> p(a.row(1), true); // p is now a reference on the row 1 of a
 \end{lstlisting}
 
-\section{Using \ttcode{Array2D}}
+\section{Using \ttcode{Array2D} arrays}
 
 This section explains how you can add and/or remove columns/rows to an array of
 the \code{Array2D} family and how to merge arrays with the same number of rows
@@ -648,10 +648,11 @@ by column or an \code{Array2DVector} if they are applied by rows. Recall that it
 is possible to use the \code{move} method in order to store the results of the
 computation without data copy.
 
-All the functors are in the \code{Stat} namespace and compute the usual statistics
-by columns or rows. If there is the possibility of missing/NaN values add the word
-Safe to the name of the functor. If the mean by row is needed, just add ByRow
-to the name of the functor. If you want both add SafeByRow.
+All the functors computing statistics are in the \code{Stat} namespace and
+compute the usual statistics by columns or rows. If there is the possibility
+of missing/NaN values add the word \code{Safe} to the name of the functor. If
+the mean by row is needed, just add ByRow to the name of the functor. If you
+want both add SafeByRow.
 
 \begin{minipage}[t]{0.5\textwidth}
 \lstinputlisting[style=customcpp,caption=Functors]{programs/tutoStatFunctors.cpp}

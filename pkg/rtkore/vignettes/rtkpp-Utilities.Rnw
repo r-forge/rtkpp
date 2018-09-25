@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{STK++ Tools, Reference Guide}
+%\VignetteIndexEntry{STK++ Statistical Utilities Reference Guide}
 
 \documentclass[a4paper,10pt]{article}
 
@@ -15,7 +15,7 @@ rtkore.version <- packageDescription("rtkore")$Version
 rtkore.date <- packageDescription("rtkore")$Date
 @
 % Title Page
-\title{STK++ Utilities reference guide}
+\title{STK++ Statistical Utilities Reference Guide}
 \author{Serge Iovleff}
 \date{\today}
 
@@ -47,8 +47,9 @@ This section describe the main features provided by the STatistiK project. Mainl
 
 \subsection{Probabilities }
 \label{subsec:prob}
-All the probabilities handled by R are available in \rtkore{}. In the stand-alone \stkpp{} library, only a
-subset of theses probabilities are implemented. Probability distribution classes are defined in the
+All the probabilities handled by R are available in \rtkore{}. In the 
+stand-alone \stkpp{} library, only a subset of theses probabilities are
+implemented. Probability distribution classes are defined in the
 \code{namespace Law} and can be used as in this example
 
 \begin{minipage}[t]{0.66\textwidth}
@@ -71,11 +72,14 @@ class Cauchy: public IUnivLaw<Real>
     Real const& scale() const;
     void setMu( Real const& mu);
     void setScale( Real const& scale);
-    virtual Real rand() const;
-    virtual Real pdf( Real const& x) const;
-    virtual Real lpdf( Real const& x) const;
-    virtual Real cdf( Real const& t) const;
-    virtual Real icdf( Real const& p) const;
+    virtual Real rand() const;               // generate a Cauchy random variate
+    virtual Real pdf( Real const& x) const;  // probability distribution function (pdf) 
+    virtual Real lpdf( Real const& x) const; // log-pdf
+    virtual Real cdf( Real const& t) const;  // cumulative distribution function (cdf)
+    virtual Real cdfc( Real const& t) const; // complementary cdf
+    virtual Real lcdf( Real const& t) const; // log-cdf
+    virtual Real lcdfc( Real const& t) const;// log-cdfc
+    virtual Real icdf( Real const& p) const; // inverse cdf (quantiles)
     static Real rand( Real const& mu, Real const& scale);
     static Real pdf( Real const& x, Real const& mu, Real const& scale);
     static Real lpdf( Real const& x, Real const& mu, Real const& scale);
@@ -114,7 +118,7 @@ Cauchy           & \ttcode{Law::Cauchy(m,s)}             & \ttcode{*cauchy}& \\
 \hline
 ChiSquared       & \ttcode{Law::ChiSquared(n)}           & \ttcode{*chisq} & \\
 \hline
-Exponential      & \ttcode{Law::Exponential(lambda)}     & \ttcode{*exp}   & Parameterization $\frac{e^{-x/\lambda}}{\lambda}$ \\
+Exponential      & \ttcode{Law::Exponential(lambda)}     & \ttcode{*exp}   & Parameterization $\lambda e^{-\lambda x}$ \\
 \hline
 FisherSnedecor   & \ttcode{Law::FisherSnedecor(df1,df2)} &  \ttcode{*f}    & \\
 \hline
@@ -146,6 +150,10 @@ Weibull          & \ttcode{Law::Weibull(a)}              & \ttcode{*weibull} & \
 \caption{List of the available probability distribution in \rtkore{}}
 \label{tab:prob}
 \end{table}
+
+All Distribution laws methods can be applied to a vector/array/expression
+using the corresponding methods.
+
 
 \subsection{Statistical Methods and global functions}
 
@@ -316,12 +324,12 @@ vectors.\code{unbiased} is a boolean to set to \code{true} if unbiased covarianc
 is desired.}
 \end{table}
 
-\subsection{Computing factors}
+\section{Computing factors}
 
 Given a finite collection of object in a vector or an array/expression, it is possible to encode
 it as factor using the classes \code{Stat::Factor} (for vectors) and \code{Stat::MultiFactor}
-(for array). These classes are runners and you have to use the \code{run} method in order to
-trigger the computation of the factors.
+(for arrays). These classes are runners and you have to use the \code{run}
+method in order to trigger the computation of the factors.
 
 An exemple is given below
 
@@ -340,10 +348,11 @@ An exemple is given below
 \stkpp{} basic linear operation as product, dot product, sum, multiplication
 by a scalar,... are encoded in template expressions and optimized.
 
-Since \stkpp{} version 0.9 and later, LAPACK library can be used as backends for dense matrix
-matrix decompositions (QR, Svd, eigenvalues) and least square regression. In order to use lapack,
-you must activate its usage by defining the following macros \ttcode{-DSTKUSELAPACK} at
-compilation time and by linking your code with your installed lapack library using \ttcode{-llapack}
+Since \stkpp{} version 0.9 and later, \ttcode{LAPACK} library can be used as
+backends for dense matrix matrix decompositions (QR, Svd, eigenvalues) and
+least square regression. In order to use lapack, you must activate its usage by
+defining the following macros \ttcode{-DSTKUSELAPACK} at compilation time and
+by linking your code with your installed lapack library using \ttcode{-llapack}
 (at least in *nix operating systems).
 
 

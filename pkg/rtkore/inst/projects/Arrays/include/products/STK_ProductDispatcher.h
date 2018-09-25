@@ -42,10 +42,306 @@
 namespace STK
 {
 
+// forward declarations (needed because there is no CAllocator with this structure)
+template<typename> class Array2DUpperTriangular;
+template<typename> class Array2DLowerTriangular;
+
 namespace hidden
 {
-/** In the general case, e.g. when some of the structures are triangular for
- *  examples, we use the usual matrix multiplication formula.
+
+//------------------------------------------------------------
+// general lhs case. result is general except if rhs is vector
+/** specialization for lhs is array2D */
+template<typename Lhs, typename Rhs, int RStructure_>
+struct ProductTraits<Lhs, Rhs, Arrays::array2D_, RStructure_>
+{
+  enum
+  {
+    structure_ = Arrays::array2D_,
+    sizeRows_  = Traits<Lhs>::sizeRows_,
+    sizeCols_  = Traits<Rhs>::sizeCols_,
+    // use rhs orientation by default, otherwise orientation of the panel size
+    orient_    = ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
+                 ? Traits<Rhs>::orient_
+                 : int(Traits<Lhs>::sizeRows_) > int(Traits<Rhs>::sizeCols_)
+                   ? int(Traits<Lhs>::orient_) : int(Traits<Rhs>::orient_),
+    storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_))||(Traits<Rhs>::storage_ == int(Arrays::dense_))
+                ? int(Arrays::dense_) : int(Arrays::sparse_)
+    , useForRows_ = Arrays::useLhsSize_
+    , useForCols_ = Arrays::useRhsSize_
+  };
+  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+  typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
+};
+
+//------------------------------------------------------------
+// general lhs case. result is general except if rhs is vector
+/** specialization for lhs is array2D */
+template<typename Lhs, typename Rhs>
+struct ProductTraits<Lhs, Rhs, Arrays::array2D_, Arrays::square_>
+{
+  enum
+  {
+    structure_ = Arrays::array2D_,
+    sizeRows_  = Traits<Lhs>::sizeRows_,
+    sizeCols_  = Traits<Lhs>::sizeCols_ != UnknownSize ?
+                 int(Traits<Lhs>::sizeCols_) : int(Traits<Rhs>::sizeCols_),
+    // use rhs orientation by default, otherwise orientation of the panel size
+    orient_    = ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
+                 ? Traits<Rhs>::orient_
+                 : int(Traits<Lhs>::sizeRows_) > int(Traits<Rhs>::sizeCols_)
+                   ? int(Traits<Lhs>::orient_) : int(Traits<Rhs>::orient_),
+    storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
+                ? int(Arrays::dense_) : int(Arrays::sparse_)
+    , useForRows_ = Arrays::useLhsSize_
+    , useForCols_ = Traits<Lhs>::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+  };
+
+  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+  typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
+};
+
+//----------------------------------
+// square lhs case. result is general except if rhs square
+template<typename Lhs, typename Rhs, int RStructure_>
+struct ProductTraits<Lhs, Rhs, Arrays::square_, RStructure_>
+{
+  enum
+  {
+    structure_ = Arrays::array2D_,
+    sizeRows_ = int(Traits<Lhs>::sizeRows_) < int(Traits<Rhs>::sizeRows_)
+              ? int(Traits<Lhs>::sizeRows_) : int(Traits<Rhs>::sizeRows_),
+
+    sizeCols_ = Traits<Rhs>::sizeCols_,
+    // use rhs orientation by default, otherwise orientation of the panel size
+    orient_    = ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
+                 ? Traits<Rhs>::orient_
+                 : int(Traits<Lhs>::sizeRows_) > int(Traits<Rhs>::sizeCols_)
+                   ? int(Traits<Lhs>::orient_) : int(Traits<Rhs>::orient_),
+    storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
+                ? int(Arrays::dense_) : int(Arrays::sparse_)
+    , useForRows_ = Traits<Lhs>::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+    , useForCols_ = Arrays::useRhsSize_
+  };
+  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+
+  typedef CAllocator<Type, sizeRows_,sizeCols_, orient_> Allocator;
+};
+
+//----------------------------------
+// square rhs case. result is general except if rhs square
+template<typename Lhs, typename Rhs, int LStructure_>
+struct ProductTraits<Lhs, Rhs, LStructure_, Arrays::square_>
+{
+  enum
+  {
+    structure_ = Arrays::array2D_,
+    sizeRows_  = Traits<Lhs>::sizeRows_,
+
+    sizeCols_  = int(Traits<Lhs>::sizeCols_) < int(Traits<Rhs>::sizeCols_)
+               ? int(Traits<Lhs>::sizeCols_) : int(Traits<Rhs>::sizeCols_),
+
+    // use rhs orientation by default, otherwise orientation of the panel size
+    orient_    = ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
+                 ? Traits<Rhs>::orient_
+                 : int(Traits<Lhs>::sizeRows_) > int(Traits<Rhs>::sizeCols_)
+                   ? int(Traits<Lhs>::orient_) : int(Traits<Rhs>::orient_),
+    storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
+                ? int(Arrays::dense_) : int(Arrays::sparse_)
+   , useForRows_ = Arrays::useLhsSize_
+   , useForCols_ = Traits<Lhs>::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+  };
+  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+
+  typedef CAllocator<Type, sizeRows_,sizeCols_, orient_> Allocator;
+};
+
+template<typename Lhs, typename Rhs>
+struct ProductTraits<Lhs, Rhs, Arrays::square_, Arrays::square_>
+{
+  enum
+  {
+    structure_ = Arrays::square_,
+    sizeRows_ = (int(Traits<Lhs>::sizeRows_) < int(Traits<Rhs>::sizeRows_))
+                ? int(Traits<Lhs>::sizeRows_) : int(Traits<Rhs>::sizeRows_),
+    sizeCols_ = (int(Traits<Lhs>::sizeCols_) < int(Traits<Rhs>::sizeCols_))
+                ? int(Traits<Lhs>::sizeCols_) : int(Traits<Rhs>::sizeCols_),
+    // use rhs orientation by default, otherwise orientation of the panel size
+    orient_    = ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
+                 ? Traits<Rhs>::orient_
+                 : int(Traits<Lhs>::sizeRows_) > int(Traits<Rhs>::sizeCols_)
+                   ? int(Traits<Lhs>::orient_) : int(Traits<Rhs>::orient_),
+    storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
+                ? int(Arrays::dense_) : int(Arrays::sparse_)
+    , useForRows_ = Traits<Lhs>::sizeRows_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+    , useForCols_ = Traits<Rhs>::sizeCols_ != UnknownSize ? Arrays::useRhsSize_ : Arrays::useLhsSize_
+  };
+  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+
+  typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
+};
+
+//----------------------------------
+// lower triangular case
+template<typename Lhs, typename Rhs, int RStructure_>
+struct ProductTraits<Lhs, Rhs, Arrays::lower_triangular_, RStructure_>
+{
+  enum
+  {
+    structure_ = Arrays::array2D_,
+    sizeRows_ = Traits<Lhs>::sizeRows_,
+    sizeCols_ = Traits<Rhs>::sizeCols_,
+    // use rhs orientation by default, otherwise orientation of the panel size
+    orient_    = ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
+                 ? Traits<Rhs>::orient_
+                 : int(Traits<Lhs>::sizeRows_) > int(Traits<Rhs>::sizeCols_)
+                   ? int(Traits<Lhs>::orient_) : int(Traits<Rhs>::orient_),
+    storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
+                ? int(Arrays::dense_) : int(Arrays::sparse_)
+    , useForRows_ = Arrays::useLhsSize_
+    , useForCols_ = Arrays::useRhsSize_
+  };
+  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+
+  typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
+};
+
+template<typename Lhs, typename Rhs>
+struct ProductTraits<Lhs, Rhs, Arrays::lower_triangular_, Arrays::square_>
+{
+  enum
+  {
+    structure_ = Arrays::array2D_,
+    sizeRows_ = Traits<Lhs>::sizeRows_,
+    sizeCols_ = (int(Traits<Lhs>::sizeCols_) < int(Traits<Rhs>::sizeCols_))
+                ? int(Traits<Lhs>::sizeCols_) : int(Traits<Rhs>::sizeCols_),
+    // use rhs orientation by default, otherwise orientation of the panel size
+    orient_    =  ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
+                 ? Traits<Rhs>::orient_
+                 : int(Traits<Lhs>::sizeRows_) > int(Traits<Rhs>::sizeCols_)
+                   ? int(Traits<Lhs>::orient_) : int(Traits<Rhs>::orient_),
+    storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
+                ? int(Arrays::dense_) : int(Arrays::sparse_)
+    , useForRows_ = Arrays::useLhsSize_
+    , useForCols_ = Traits<Lhs>::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+  };
+  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+
+  typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
+};
+
+template<typename Lhs, typename Rhs>
+struct ProductTraits<Lhs, Rhs, Arrays::lower_triangular_, Arrays::lower_triangular_>
+{
+  enum
+  {
+    structure_ = Arrays::lower_triangular_,
+    sizeRows_  = Traits<Lhs>::sizeRows_,
+    sizeCols_  = Traits<Rhs>::sizeCols_,
+    // use rhs orientation by default, otherwise orientation of the panel size
+    orient_    =  ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
+                 ? Traits<Rhs>::orient_
+                 : int(Traits<Lhs>::sizeRows_) > int(Traits<Rhs>::sizeCols_)
+                   ? int(Traits<Lhs>::orient_) : int(Traits<Rhs>::orient_),
+    storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
+                ? int(Arrays::dense_) : int(Arrays::sparse_)
+   , useForRows_ = Arrays::useLhsSize_
+   , useForCols_ = Arrays::useRhsSize_
+};
+  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+
+  typedef Array2DLowerTriangular<Type> Allocator; // no CAllocator
+};
+
+//----------------------------------
+// upper triangular case
+template<typename Lhs, typename Rhs, int RStructure_>
+struct ProductTraits<Lhs, Rhs, Arrays::upper_triangular_, RStructure_>
+{
+  enum
+  {
+    structure_ = Arrays::array2D_,
+    sizeRows_ = Traits<Lhs>::sizeRows_,
+    sizeCols_ = Traits<Rhs>::sizeCols_,
+    // use rhs orientation by default, otherwise orientation of the panel size
+    orient_    =  ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
+                 ? Traits<Rhs>::orient_
+                 : int(Traits<Lhs>::sizeRows_) > int(Traits<Rhs>::sizeCols_)
+                   ? int(Traits<Lhs>::orient_) : int(Traits<Rhs>::orient_),
+    storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
+                ? int(Arrays::dense_) : int(Arrays::sparse_)
+    , useForRows_ = Arrays::useLhsSize_
+    , useForCols_ = Arrays::useRhsSize_
+  };
+  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+
+  typedef CAllocator<Type, sizeRows_ , sizeCols_, orient_> Allocator;
+};
+
+template<typename Lhs, typename Rhs>
+struct ProductTraits<Lhs, Rhs, Arrays::upper_triangular_, Arrays::square_>
+{
+  enum
+  {
+    structure_ = Arrays::array2D_,
+    sizeRows_ = Traits<Lhs>::sizeRows_,
+    sizeCols_ = (int(Traits<Lhs>::sizeCols_) < int(Traits<Rhs>::sizeCols_))
+                ? int(Traits<Lhs>::sizeCols_) : int(Traits<Rhs>::sizeCols_),
+    // use rhs orientation by default, otherwise orientation of the panel size
+    orient_    = ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
+                 ? Traits<Rhs>::orient_
+                 : int(Traits<Lhs>::sizeRows_) > int(Traits<Rhs>::sizeCols_)
+                   ? int(Traits<Lhs>::orient_) : int(Traits<Rhs>::orient_),
+    storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
+                ? int(Arrays::dense_) : int(Arrays::sparse_)
+   , useForRows_ = Arrays::useLhsSize_
+   , useForCols_ = Traits<Lhs>::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
+  };
+  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+
+  typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
+};
+
+template<typename Lhs, typename Rhs>
+struct ProductTraits<Lhs, Rhs, Arrays::upper_triangular_, Arrays::upper_triangular_>
+{
+  enum
+  {
+    structure_ = Arrays::upper_triangular_,
+    sizeRows_  = Traits<Lhs>::sizeRows_,
+    sizeCols_  = Traits<Rhs>::sizeCols_,
+    // use rhs orientation by default, otherwise orientation of the panel size
+    orient_    = ( Traits<Lhs>::sizeRows_ == UnknownSize || Traits<Rhs>::sizeCols_ == UnknownSize)
+                 ? Traits<Rhs>::orient_
+                 : int(Traits<Lhs>::sizeRows_) > int(Traits<Rhs>::sizeCols_)
+                   ? int(Traits<Lhs>::orient_) : int(Traits<Rhs>::orient_),
+    storage_  = ( Traits<Lhs>::storage_ == int(Arrays::dense_)) || (Traits<Rhs>::storage_ == int(Arrays::dense_))
+                ? int(Arrays::dense_) : int(Arrays::sparse_)
+   , useForRows_ = Arrays::useLhsSize_
+   , useForCols_ = Arrays::useRhsSize_
+  };
+  typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
+  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+
+  typedef Array2DUpperTriangular<Type> Allocator;  // no CAllocator
+};
+
+/** @ingroup hidden
+ *  Dispatcher allowing to choose the way to multiply two expressions.
+ *
+ *  @note In the some cases, e.g. when some of the structures are triangular for
+ *  examples, we use the usual matrix multiplication formula. This can be enhanced
+ *  in future versions.
  **/
 template < class Lhs, class Rhs, class Result
          , int lhsStructure_ = hidden::Traits<Lhs>::structure_
@@ -62,22 +358,29 @@ struct ProductDispatcher
   };
   typedef MultCoefImpl<Lhs, Rhs, Result> MultCoeff;
 
-  static void runbp(Lhs const& lhs, Rhs const& rhs, Result& res )
+  /** loop over the columns of rhs first */
+  static void run(Lhs const& lhs, Rhs const& rhs, Result& res )
   {
-    for (int j=rhs.beginCols(); j< rhs.endCols(); j++)
+    if (lhs.sizeRows()<rhs.sizeCols())
     {
-      int const end = res.rangeRowsInCol(j).end();
-      for (int i=res.rangeRowsInCol(j).begin(); i< end; i++)
-      { MultCoeff::dot(lhs, rhs, res, i, j);}
+      for (int j=rhs.beginCols(); j< rhs.endCols(); j++)
+      {
+        Range const r = res.rangeRowsInCol(j);
+//         int const begin = res.rangeRowsInCol(j).begin(), end = res.rangeRowsInCol(j).end();
+        for (int i=r.begin(); i< r.end(); i++)
+        { MultCoeff::dot(lhs, rhs, res, i, j);}
+      }
     }
-  }
-  static void runpb(Lhs const& lhs, Rhs const& rhs, Result& res )
-  {
-    for (int i=lhs.beginRows(); i< lhs.endRows(); i++)
+    else
     {
-      int const end = res.rangeColsInRow(i).end();
-      for (int j=res.rangeColsInRow(i).begin(); j< end; j++)
-      { MultCoeff::dot(lhs, rhs, res, i, j);}
+      for (int i=lhs.beginRows(); i< lhs.endRows(); i++)
+      {
+        Range const r = res.rangeColsInRow(i);
+        for (int j=r.begin(); j< r.end(); j++)
+        { MultCoeff::dot(lhs, rhs, res, i, j);}
+ //       stk_cout << "(begin,end)=("<<begin<<","<<end<<")\n";
+      }
+ //     stk_cout << "product done\n";
     }
   }
 };
@@ -94,10 +397,12 @@ struct ProductDispatcher<Lhs, Rhs, Result, Arrays::array2D_, Arrays::array2D_>
     orient_    = Traits<Result>::orient_,
     storage_   = Traits<Result>::storage_
   };
-  static void runbp(Lhs const& lhs, Rhs const& rhs, Result& res )
-  { bp<Lhs,Rhs,Result,orient_>::run(lhs, rhs, res);}
-  static void runpb(Lhs const& lhs, Rhs const& rhs, Result& res )
-  { bp<Lhs,Rhs,Result,orient_>::run(lhs, rhs, res);}
+  static void run(Lhs const& lhs, Rhs const& rhs, Result& res )
+  {
+    if (MultCoefImpl<Lhs, Rhs, Result>::multDispatcher(lhs, rhs, res)) return;
+    (lhs.sizeRows()<rhs.sizeCols()) ? BlockByPanel<Lhs,Rhs,Result>::run(lhs, rhs, res)
+                                    : PanelByBlock<Lhs,Rhs,Result>::run(lhs, rhs, res);
+  }
 };
 
 template <class Lhs, class Rhs, class Result>
@@ -111,10 +416,12 @@ struct ProductDispatcher<Lhs, Rhs, Result, Arrays::array2D_, Arrays::square_>
     orient_    = Traits<Result>::orient_,
     storage_   = Traits<Result>::storage_
   };
-  static void runbp(Lhs const& lhs, Rhs const& rhs, Result& res )
-  { bp<Lhs,Rhs,Result,orient_>::run(lhs, rhs, res);}
-  static void runpb(Lhs const& lhs, Rhs const& rhs, Result& res )
-  { bp<Lhs,Rhs,Result,orient_>::run(lhs, rhs, res);}
+  static void run(Lhs const& lhs, Rhs const& rhs, Result& res )
+  {
+    if (MultCoefImpl<Lhs, Rhs, Result>::multDispatcher(lhs, rhs, res)) return;
+    (lhs.sizeRows()<rhs.sizeCols()) ? BlockByPanel<Lhs,Rhs,Result>::run(lhs, rhs, res)
+                                    : PanelByBlock<Lhs,Rhs,Result>::run(lhs, rhs, res);
+  }
 };
 
 template <class Lhs, class Rhs, class Result>
@@ -128,12 +435,12 @@ struct ProductDispatcher<Lhs, Rhs, Result, Arrays::square_, Arrays::square_>
     orient_    = Traits<Result>::orient_,
     storage_   = Traits<Result>::storage_
   };
-  static void runbp(Lhs const& lhs, Rhs const& rhs, Result& res )
+  static void run(Lhs const& lhs, Rhs const& rhs, Result& res )
   {
-    bp<Lhs,Rhs,Result,orient_>::run(lhs, rhs, res);
+    if (MultCoefImpl<Lhs, Rhs, Result>::multDispatcher(lhs, rhs, res)) return;
+    (lhs.sizeRows()<rhs.sizeCols()) ? BlockByPanel<Lhs,Rhs,Result>::run(lhs, rhs, res)
+                                    : PanelByBlock<Lhs,Rhs,Result>::run(lhs, rhs, res);
   }
-  static void runpb(Lhs const& lhs, Rhs const& rhs, Result& res )
-  { bp<Lhs,Rhs,Result,orient_>::run(lhs, rhs, res);}
 };
 
 template <class Lhs, class Rhs, class Result>
@@ -147,10 +454,12 @@ struct ProductDispatcher<Lhs, Rhs, Result, Arrays::square_, Arrays::array2D_>
     orient_    = Traits<Result>::orient_,
     storage_   = Traits<Result>::storage_
   };
-  static void runbp(Lhs const& lhs, Rhs const& rhs, Result& res )
-  { bp<Lhs,Rhs,Result, orient_>::run(lhs, rhs, res);}
-  static void runpb(Lhs const& lhs, Rhs const& rhs, Result& res )
-  { bp<Lhs,Rhs,Result,orient_>::run(lhs, rhs, res);}
+  static void run(Lhs const& lhs, Rhs const& rhs, Result& res )
+  {
+    if (MultCoefImpl<Lhs, Rhs, Result>::multDispatcher(lhs, rhs, res)) return;
+    (lhs.sizeRows()<rhs.sizeCols()) ? BlockByPanel<Lhs,Rhs,Result>::run(lhs, rhs, res)
+                                    : PanelByBlock<Lhs,Rhs,Result>::run(lhs, rhs, res);
+  }
 };
 
 template <class Lhs, class Rhs, class Result>
@@ -234,10 +543,7 @@ struct ProductDispatcher<Lhs, Rhs, Result, Arrays::point_, Arrays::array2D_>
     storage_   = Traits<Result>::storage_
   };
   static void run(Lhs const& l, Rhs const& r, Result& res )
-  {
-    MultPointArray<Lhs, Rhs, Result>::run(l, r, res);
-    //vb<Lhs,Rhs,Result>::run(l, r, res);
-  }
+  { MultPointArray<Lhs, Rhs, Result>::run(l, r, res);}
 };
 
 template <class Lhs, class Rhs, class Result>
@@ -252,10 +558,7 @@ struct ProductDispatcher<Lhs, Rhs, Result, Arrays::point_, Arrays::square_>
     storage_   = Traits<Result>::storage_
   };
   static void run(Lhs const& l, Rhs const& r, Result& res )
-  {
-    MultPointArray<Lhs, Rhs, Result>::run(l, r, res);
-    //vb<Lhs,Rhs,Result>::run(lhs, rhs, res);
-  }
+  { MultPointArray<Lhs, Rhs, Result>::run(l, r, res);}
 };
 
 } // namespace hidden

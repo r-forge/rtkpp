@@ -58,6 +58,8 @@ RMatrix<Type>( Rcpp::Matrix<Rtype_> matrix)
 RMatrix<Type>( RMatrix const& matrix, bool ref)
 \end{lstlisting}
 
+All these arrays can be converted back 
+
 \section{STK++ Arrays and Vectors}
 
 \subsection{Containers}
@@ -249,7 +251,7 @@ The Array2D family of container allocate a small amount of supplementary memory
 so that in case of a \code{resize}, it is possible to expand the container without
 data transfer.
 
-\subsection{Arrays and vectors visitors and appliers}
+\subsection{Arrays and vVctors visitors and appliers}
 
 Visitors and appliers visit/are applied to an array or vector (or expression)
 and are automatically unrolled if the array is of fixed (small) size.
@@ -264,6 +266,8 @@ and are automatically unrolled if the array is of fixed (small) size.
   m.maxEltSafe(i,j); // can be v.maxEltSafe(i) or m.maxEltSafe()
   m.sum(); m.sumSafe();
   m.mean(); m.meanSafe();
+  Law::Gamma law(1,2); // create a Gamma distribution
+  m.pdf(law);          // return an array with law.pdf(m) values
 \end{lstlisting}
 
 \begin{lstlisting}[style=customcpp,caption=Appliers]
@@ -273,7 +277,7 @@ and are automatically unrolled if the array is of fixed (small) size.
   m.setValues(2);// fill m with value 2
   m.setZeros();  // fill m with value 0
   Law::Gamma law(1,2); // create a Gamma distribution
-  m.rand( law);        // fill m with gamma(1,2) random numbers
+  m.rand(law);        // fill m with gamma(1,2) random numbers
 \end{lstlisting}
 
 The next methods use visitors in order to compute the result, eventually safely

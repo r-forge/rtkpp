@@ -92,6 +92,7 @@ class ILeastSquare: public IRunnerBase, public IRecursiveTemplate<Derived>
   public:
     /** Destructor */
     virtual ~ILeastSquare() {};
+    // getters
     /** @return the rank of the matrix A */
     Real const& rank() const { return rank_;}
     /** @return the matrix A */
@@ -111,8 +112,8 @@ class ILeastSquare: public IRunnerBase, public IRecursiveTemplate<Derived>
      *  decomposition using @c runImpl method.
      *  @return @c true if the computation succeed, @c false otherwise
      **/
-    template<class Weights>
-    bool run(Weights const& weights);
+    template<class VecWeights>
+    bool run(VecWeights const& weights);
 
   protected:
     /** Array or vector of the left hand side. */
@@ -121,7 +122,7 @@ class ILeastSquare: public IRunnerBase, public IRecursiveTemplate<Derived>
     ArrayA a_;
     /** Array of the solution (a vector if b is a vector, a matrix otherwise) */
     ArrayB x_;
-    /** rank of the matrix A*/
+    /** rank of matrix A*/
     int rank_;
 };
 

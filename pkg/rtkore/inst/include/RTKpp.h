@@ -23,13 +23,13 @@
 */
 
 /*
- * Project:  rtkpp::rtkpp
+ * Project:  stkpp::rtkore
  * created on: 28 juil. 2014
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
 
 /** @file RTKpp.h
- *  @brief In this file we include all the files of the rtkpp projects.
+ *  @brief In this file we include all the files of the rtkore projects.
  **/
 
 

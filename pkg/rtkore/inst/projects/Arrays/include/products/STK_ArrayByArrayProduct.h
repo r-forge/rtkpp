@@ -60,6 +60,8 @@ struct BlockByPanel
   typedef typename Result::Type Type;
   typedef hidden::MultImpl<Type> Cmult;
   typedef hidden::MultCoefImpl<Lhs, Rhs, Result> MultCoeff;
+  typedef hidden::CopySubArrayImpl<Lhs, Type> CopyLhsImpl;
+  typedef hidden::CopySubArrayImpl<Rhs, Type> CopyRhsImpl;
 
   /** Main method for matrices multiplication implementation.
    *  @note res have been resized and initialized to zero outside this method.
@@ -92,11 +94,11 @@ struct BlockByPanel
       {
         // data caching
         for (int i = 0, iRow = lhs.beginRows(); i<nbBlocks; ++i, iRow += blockSize_)
-        { CopySubArrayImpl<Lhs>::arrayToBlock( lhs, tabBlock[i], iRow, kPos);}
-        CopySubArrayImpl<Lhs>::arrayToBlock( lhs, tabBlock[nbBlocks], iLastRow, kPos, bSize);
+        { CopyLhsImpl::arrayToBlock( lhs, tabBlock[i], iRow, kPos);}
+        CopyLhsImpl::arrayToBlock( lhs, tabBlock[nbBlocks], iLastRow, kPos, bSize);
         for (int j = 0, jCol = rhs.beginCols(); j<nbPanels; ++j, jCol += panelSize_)
-        { CopySubArrayImpl<Rhs>::arrayToPanel( rhs, tabPanel[j], kPos, jCol);}
-        CopySubArrayImpl<Rhs>::arrayToPanel( rhs, tabPanel[nbPanels], kPos, jLastCol, pSize);
+        { CopyRhsImpl::arrayToPanel( rhs, tabPanel[j], kPos, jCol);}
+        CopyRhsImpl::arrayToPanel( rhs, tabPanel[nbPanels], kPos, jLastCol, pSize);
         // block by panel products
 #ifdef _OPENMP
 #pragma omp parallel for
@@ -204,6 +206,8 @@ struct PanelByBlock
   typedef typename Result::Type Type;
   typedef hidden::MultImpl<Type> Cmult;
   typedef hidden::MultCoefImpl<Lhs, Rhs, Result> MultCoeff;
+  typedef hidden::CopySubArrayImpl<Lhs, Type> CopyLhsImpl;
+  typedef hidden::CopySubArrayImpl<Rhs, Type> CopyRhsImpl;
   /** Main method for Matrices multiplication implementation.
    *  @note res have been resized and initialized to zero outside this method.
    **/
@@ -237,12 +241,12 @@ struct PanelByBlock
       {
         // data caching
         for (int i = 0, iRow= lhs.beginRows(); i<nbPanels; ++i, iRow+= panelSize_)
-        { CopySubArrayImpl<Lhs>::arrayToPanelByCol( lhs, tabPanel[i], iRow, kPos);}
-        CopySubArrayImpl<Lhs>::arrayToPanelByCol( lhs, tabPanel[nbPanels], iLastRow, kPos, pSize);
+        { CopyLhsImpl::arrayToPanelByCol( lhs, tabPanel[i], iRow, kPos);}
+        CopyLhsImpl::arrayToPanelByCol( lhs, tabPanel[nbPanels], iLastRow, kPos, pSize);
         // get blocks
         for (int j = 0, jCol = rhs.beginCols(); j<nbBlocks; ++j, jCol+=blockSize_)
-        { CopySubArrayImpl<Rhs>::arrayToBlockByCol( rhs, tabBlock[j], kPos, jCol);}
-        CopySubArrayImpl<Rhs>::arrayToBlockByCol( rhs, tabBlock[nbBlocks], kPos, jLastCol, bSize);
+        { CopyRhsImpl::arrayToBlockByCol( rhs, tabBlock[j], kPos, jCol);}
+        CopyRhsImpl::arrayToBlockByCol( rhs, tabBlock[nbBlocks], kPos, jLastCol, bSize);
         // perform the products panels * blocks
 #ifdef _OPENMP
 #pragma omp parallel for

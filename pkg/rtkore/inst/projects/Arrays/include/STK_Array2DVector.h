@@ -53,6 +53,7 @@ template<typename> class Array2DVector;
   *
   * A Vector is a column oriented 1D container of Real.
   **/
+typedef Array2DVector<Real>   Vector; // [DEPRECATED]
 typedef Array2DVector<Real>   VectorX;
 typedef Array2DVector<double> VectorXd;
 typedef Array2DVector<int>    VectorXi;

@@ -450,10 +450,9 @@ struct MultCoefImpl
 /** @ingroup hidden
  *  This structure regroup the methods to used for copying part of an array in a Block or a Panel
  **/
-template<typename Array>
+template<typename Array, typename Type = typename Array::Type>
 struct CopySubArrayImpl
 {
-  typedef typename Array::Type Type;
   /**  copy a part of an Array in a Block */
   static void arrayToBlock( Array const& m, Block<Type>& block, int iRow, int jCol)
   {

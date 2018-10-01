@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{Short Introduction to rtkore}
+%\VignetteIndexEntry{Short Introduction to rtkore and STK++}
 
 \documentclass[a4paper,10pt]{article}
 
@@ -34,7 +34,7 @@ coming with the package about the functionnalities furnished by the \stkpp{} lib
 
 \section{Introduction}
 
-\stkpp{} is a versatile, fast, reliable and elegant collection of \texttt{C++}
+\stkpp{} is a versatile, fast, reliable and elegant collection of \Cpp{}
 classes for statistics, clustering, linear algebra (using native methods or
 Lapack\cite{Lapack}), arrays (with an Eigen-like API \cite{JSS:RcppEigen}),
 regression, dimension reduction, etc. Some functionalities provided by the
@@ -45,7 +45,7 @@ distributed as R packages (\texttt{MixAll} \cite{MixAll}, \texttt{blockcluster}
 The \rtkore{} package provides a subset of the \stkpp{}
 library and is only composed of templated classes and inlined functions.
 This package furnishes implementations of \texttt{Rcpp::as} and
-\texttt{Rcpp::wrap} for the \texttt{C++} classes defined in \stkpp{}.
+\texttt{Rcpp::wrap} for the \Cpp{} classes defined in \stkpp{}.
 In this sense it is similar to the \texttt{RcppEigen}
 \cite{CRAN:RcppEigen,JSS:RcppEigen} and \texttt{RcppArmadillo}
 \cite{CRAN:RcppArmadillo} packages.
@@ -63,39 +63,37 @@ typename RVector<Type>;
 typename RMatrix<Type>;
 \end{lstlisting}
 \texttt{Rcpp} facilitates conversion of objects from \texttt{R} to
-\texttt{C++} through the templated functions \texttt{Rcpp::as}.
+\Cpp{} through the templated functions \texttt{Rcpp::as}.
 The function \texttt{Rcpp::as} is re-implemented in \stkpp{} but
 it is not strictly necessary to use it. You can rather use this kind
 of code
 \begin{lstlisting}[style=customcpp]
 SEXP myFunction(SEXP data)
 {
-  STK::RMatrix<double> mat(data); // if data is not a matrix, Rcpp will throw an exception
-  // ....
-  // wrap a Rcpp matrix in a STK++ matrix
+  // wrap a R SEXP struct with a STK++ RMatrix
+  STK::RMatrix<double> mat(data); // if data is not a matrix, an exception is thrown
+  // wrap a Rcpp matrix in a STK++ RMatrix
   Rcpp::NumericMatrix rmat(100,20);
-  STK::RMatrix<double> mat(rmat);      // wrap
+  STK::RMatrix<double> mat(rmat);
   // Constructor with given dimension
   RMatrix<double> myData(100, 20);
-  // Copy constructor
-  RMatrix<double> myCopy(mat)
 }
 \end{lstlisting}
-The template class \texttt{STK::RMatrix} wraps a Rcpp matrix which itself
+The template class \code{STK::RMatrix} wraps a Rcpp matrix which itself
 wrap the \texttt{R} \verb+SEXP+ structure. You can access directly (and
 eventually modify) the \texttt{R} data in your application like
 an usual \stkpp{} array.
 
-The second template class you can use is \texttt{STK::RVector} which
-allows to wrap \texttt{Rcpp::Vector} class.
+The second template class you can use is \code{STK::RVector} which
+allows to wrap \code{SEXP} struct.
 
 \section{Converting \stkpp{} arrays and expressions to \texttt{R} data}
 
-\texttt{Rcpp} facilitates data conversion from \texttt{C++} to \texttt{R}
+\texttt{Rcpp} facilitates data conversion from \Cpp{} to \texttt{R}
 through  \texttt{Rcpp::wrap}. This function is extended by \rtkore{} for \stkpp{}
 arrays and vectors.
 
-The following example is taken from the \texttt{STK::ClusterLauncher} class 
+The following example is taken from the \code{STK::ClusterLauncher} class 
 (in MixAll package)
 \begin{lstlisting}[style=customcpp]
   Array2D<Real> mean(K, nbVariable), sigma(K, nbVariable);
@@ -156,7 +154,7 @@ PKG_LIBS     = `$(R_HOME)/bin/Rscript -e "rtkore:::LdFlags()"` \
                 $(SHLIB_OPENMP_CFLAGS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
 \end{verbatim}
 
-\section{Building a huge package using \rtkore{}}
+\section{Building huge package using \rtkore{}}
 If you are building a package with a lot of cpp files, you may find
 convenient to locate your sources in a separate directory. Hereafter we give an
 example of a Makevars you can modify at your convenience in order to handle
@@ -205,14 +203,12 @@ pkglib:
 
 \section{An example}
 
-The package countMissings can be downloaded at the
-\url{https://sourceforge.net/projects/stkpp/files/R%20packages/countMissings_1.0.tar.gz/download}
-url. It is basically composed of one R-script file (countNA.R) and one C++ file
-(countNA.cpp).
+The package countMissings is basically composed of one R-script file (countNA.R)
+and one C++ file (countNA.cpp).
 
-Given a R matrix, you will get a list composed of two vectors
-constaining respectively the number of missing values in each rows and the
-number of missing values in each columns of the R matrix.
+Given a R matrix, you get a list composed of two vectors
+constaining respectively the number of missing values in each rows and each
+columns of the R matrix.
 
 The R-script \texttt{countNA.R} is essentially
 \begin{lstlisting}[style=customcpp]

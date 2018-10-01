@@ -162,9 +162,13 @@ class ITContainerBase: public IRecursiveTemplate<Derived>, hidden::NoAssignOpera
     /** @return the index of the last row */
     inline int lastIdxRows() const { return endRows()-1;}
 
-    /** @return the range of the effectively stored elements in the column. */
+    /** @return the range of the effectively stored elements in the column.
+     * (default implementation)
+     **/
     inline RowRange const& rangeRowsInCol(int) const { return rows();}
-    /** @return the range of the effectively stored elements in the row. */
+    /** @return the range of the effectively stored elements in the row.
+     *  (default implementation)
+     **/
     inline ColRange const& rangeColsInRow(int) const { return cols();}
 
     /** @return @c true if the container is empty, @c false otherwise */
@@ -271,7 +275,7 @@ return this->asDerived().elt1Impl(i);
       if (this->asDerived().end() <= i)  { STKOUT_OF_RANGE_1ARG(ITContainerBase::at, i, end() <= i);}
       return this->asDerived().elt1Impl(i);
     }
-   // overloaded operators
+    // overloaded operators
     /** @return safely a constant value of the element (i,j) of the 2D container.
       *  @param i,j row and column indexes
       **/
@@ -337,8 +341,8 @@ return this->asDerived().elt1Impl(i);
 };
 
 /** @ingroup Arrays
- *  @brief Specialized interface class for homogeneous arrays that can be
- *  either a 2D arrays and 1D arrays.
+ *  @brief Specialized interface class for all arrays (can be either 2D arrays or 1D arrays).
+ *  An array have a mandatory structure given by STK::Arrays::Structure
  **/
 template < class Derived, int Structure_ = hidden::Traits<Derived>::structure_ >
 class ITContainer;

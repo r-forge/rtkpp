@@ -5,6 +5,6 @@ mean(a) = 2 3 4 5
 count(a > 0)= 1 2 2 2
 all(a > 0)  = 0 1 1 1
 any(a > 0)  = 1 1 1 1
-count(a.isNA())= 1 0 1 0
-countByRow(a.isNA())= 2
-0
+count(a.isNA())= 0 1 0 1
+countByRow(a.isNA())= 0
+2

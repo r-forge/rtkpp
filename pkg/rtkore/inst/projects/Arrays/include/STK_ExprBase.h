@@ -102,10 +102,6 @@ template<class Derived>
 class ExprBase: public ITContainer<Derived, hidden::Traits<Derived>::structure_>
 {
   public:
-    typedef ITContainer<Derived> Base;
-    typedef typename hidden::Traits<Derived>::Type Type;
-    typedef typename hidden::Traits<Derived>::ConstReturnType ConstReturnType;
-
     enum
     {
       structure_ = hidden::Traits<Derived>::structure_,
@@ -114,6 +110,9 @@ class ExprBase: public ITContainer<Derived, hidden::Traits<Derived>::structure_>
       sizeCols_  = hidden::Traits<Derived>::sizeCols_,
       storage_   = hidden::Traits<Derived>::storage_
     };
+    typedef ITContainer<Derived, structure_> Base;
+    typedef typename hidden::Traits<Derived>::Type Type;
+    typedef typename hidden::Traits<Derived>::ConstReturnType ConstReturnType;
 
   protected:
     /** Default constructor */

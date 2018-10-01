@@ -16,16 +16,16 @@ int main(int argc, char** argv)
   stk_cout << q.R();
   ArrayXX QR = q.R();
   applyLeftHouseholderArray(QR, q.Q());
-  stk_cout << _T("\nQR matrix:\n");
+  stk_cout << _T("QR matrix:\n");
   stk_cout << QR;
   stk_cout << _T("\nlapack QR decomposition:\n");
   stk_cout << _T("--------------------------\n");
   lapack::Qr lq(a); lq.run();
-  stk_cout << _T("\nR matrix:\n");
+  stk_cout << _T("R matrix:\n");
   stk_cout << lq.R();
   QR = lq.R();
   applyLeftHouseholderArray(QR, lq.Q());
-  stk_cout << _T("\nQR matrix:\n");
+  stk_cout << _T("QR matrix:\n");
   stk_cout << QR;
   return 0;
 }

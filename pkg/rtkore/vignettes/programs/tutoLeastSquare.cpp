@@ -12,15 +12,15 @@ int main(int argc, char** argv)
           0, 3,-1,
           3,-1, 1;
   y = x * beta + CArrayXX(1000, 3).rand(l);
-  stk_cout << _T("STK++ MultiLeastSquare:\n");
-  stk_cout << _T("-----------------------\n");
+  stk_cout << "STK++ MultiLeastSquare:\n";
+  stk_cout << "-----------------------\n";
   STK::MultiLeastSquare<CArrayXX, CArrayXX> ols(y,x); ols.run();
-  stk_cout << _T("beta matrix:\n");
+  stk_cout << "beta matrix:\n";
   stk_cout << ols.x();
-  stk_cout << _T("lapack MultiLeastSquare:\n");
-  stk_cout << _T("-----------------------\n");
+  stk_cout << "\nlapack MultiLeastSquare:\n";
+  stk_cout << "------------------------\n";
   STK::lapack::MultiLeastSquare<CArrayXX, CArrayXX> ls(y,x); ls.run();
-  stk_cout << _T("beta matrix:\n");
+  stk_cout << "beta matrix:\n";
   stk_cout << ls.x();
   return 0;
 }

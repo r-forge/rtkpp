@@ -33,4 +33,4 @@ Collate:
     'rtkore.R'
     'rtkoreFlags.R'
     'inlineCxxPlugin.R'
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0

@@ -9,21 +9,21 @@ int main(int argc, char** argv)
        2, 1, 6, 7, 8,
        0, 3,-1, 2, 3,
        3,-1, 1, 1, 0;
-  stk_cout << _T("STK++ Eigen decomposition:\n");
-  stk_cout << _T("--------------------------\n");
+  stk_cout << "STK++ Eigen decomposition:\n";
+  stk_cout << "--------------------------\n";
   SymEigen<CSquareX> s(a.upperSymmetrize()); s.run();
-  stk_cout << _T("D matrix:\n");
+  stk_cout << "D matrix:\n";
   stk_cout << s.eigenValues();
   CSquareX QDQt = s.eigenVectors() * s.eigenValues().diagonalize() * s.eigenVectors().transpose();
-  stk_cout << _T("\nQDQ' matrix:\n");
+  stk_cout << "QDQ^T matrix:\n";
   stk_cout << QDQt;
-  stk_cout << _T("\nlapack Eigen decomposition:\n");
-  stk_cout << _T("--------------------------\n");
+  stk_cout << "\nlapack Eigen decomposition:\n";
+  stk_cout << "--------------------------\n";
   lapack::SymEigen<CSquareX> ls(a); ls.run();
-  stk_cout << _T("D matrix:\n");
+  stk_cout << "D matrix:\n";
   stk_cout << ls.eigenValues();
   QDQt = ls.eigenVectors() * ls.eigenValues().diagonalize() * ls.eigenVectors().transpose();
-  stk_cout << _T("\nQDQ' matrix:\n");
+  stk_cout << "QDQ^T matrix:\n";
   stk_cout << QDQt;
   return 0;
 }

@@ -52,37 +52,46 @@ template< typename Type_, int SizeRows_ = UnknownSize, int SizeCols_ = UnknownSi
 template< typename Type_, int SizeRows_ = UnknownSize, int SizeCols_ = UnknownSize> class UpperTriangular;
 template< typename Type_, int SizeRows_ = UnknownSize, int SizeCols_ = UnknownSize> class LowerTriangular;
 
-typedef Vector<Real, UnknownSize> VectorX;
-typedef Vector<Real, 3> Vector3;
-typedef Vector<Real, 2> Vector2;
+typedef Vector<Real, UnknownSize>   VectorX;
+typedef Vector<Real, 3>             Vector3;
+typedef Vector<Real, 2>             Vector2;
 typedef Vector<double, UnknownSize> VectorXd;
-typedef Vector<double, 3> Vector3d;
-typedef Vector<double, 2> Vector2d;
-typedef Vector<int, UnknownSize> VectorXi;
-typedef Vector<int, 3> Vector3i;
-typedef Vector<int, 2> Vector2i;
+typedef Vector<double, 3>           Vector3d;
+typedef Vector<double, 2>           Vector2d;
+typedef Vector<int, UnknownSize>    VectorXi;
+typedef Vector<int, 3>              Vector3i;
+typedef Vector<int, 2>              Vector2i;
 
-typedef Point<Real, UnknownSize> PointX;
-typedef Point<Real, 3> ConstPoint3;
-typedef Point<Real, 2> ConstPoint2;
-typedef Point<double, UnknownSize> PointXd;
-typedef Point<double, 3> ConstPoint3d;
-typedef Point<double, 2> ConstPoint2d;
-typedef Point<int, UnknownSize> PointXi;
-typedef Point<int, 3> ConstPoint3i;
-typedef Point<int, 2> ConstPoint2i;
+typedef Vector<Real, UnknownSize>   ConstVectorX;
+typedef Vector<Real, 3>             ConstVector3;
+typedef Vector<Real, 2>             ConstVector2;
+typedef Vector<double, UnknownSize> ConstVectorXd;
+typedef Vector<double, 3>           ConstVector3d;
+typedef Vector<double, 2>           ConstVector2d;
+typedef Vector<int, UnknownSize>    ConstVectorXi;
+typedef Vector<int, 3>              ConstVector3i;
+typedef Vector<int, 2>              ConstVector2i;
 
-typedef Point<Real, UnknownSize> PointX;
-typedef Point<Real, 3> ConstPoint3;
-typedef Point<Real, 2> ConstPoint2;
+typedef Point<Real, UnknownSize>   PointX;
+typedef Point<Real, 3>             Point3;
+typedef Point<Real, 2>             Point2;
 typedef Point<double, UnknownSize> PointXd;
-typedef Point<double, 3> ConstPoint3d;
-typedef Point<double, 2> ConstPoint2d;
-typedef Point<int, UnknownSize> PointXi;
-typedef Point<int, 3> ConstPoint3i;
-typedef Point<int, 2> ConstPoint2i;
+typedef Point<double, 3>           Point3d;
+typedef Point<double, 2>           Point2d;
+typedef Point<int, UnknownSize>    PointXi;
+typedef Point<int, 3>              Point3i;
+typedef Point<int, 2>              Point2i;
+
+typedef Point<Real, UnknownSize>   ConstPointX;
+typedef Point<Real, 3>             ConstPoint3;
+typedef Point<Real, 2>             ConstPoint2;
+typedef Point<double, UnknownSize> ConstPointXd;
+typedef Point<double, 3>           ConstPoint3d;
+typedef Point<double, 2>           ConstPoint2d;
+typedef Point<int, UnknownSize>    ConstPointXi;
+typedef Point<int, 3>              ConstPoint3i;
+typedef Point<int, 2>              ConstPoint2i;
 }
-
 
 namespace hidden
 {

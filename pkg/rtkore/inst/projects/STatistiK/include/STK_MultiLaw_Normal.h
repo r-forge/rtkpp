@@ -132,7 +132,11 @@ class Normal: public MultiLaw::IMultiLaw<RowVector>
       sigma_ = sigma;
       // decomposition of the covariance matrix
       decomp_.setData(sigma_);
-      if (!decomp_.run()) { throw runtime_error(decomp_.error());}
+      if (!decomp_.run())
+      {
+
+        throw runtime_error(decomp_.error());
+      }
       // compute the inverse of the eigenvalues of sigma_ and the squareroot_
       // matrix needed by rand
       invEigenvalues_.resize(mu_.range());

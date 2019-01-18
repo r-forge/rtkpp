@@ -47,13 +47,16 @@
 /* Macros. */
 #include <Sdk/include/STK_MacrosVersion.h>
 #include <Sdk/include/STK_Macros.h>
+#include <Sdk/include/STK_Constants.h>
+#include <Sdk/include/STK_Typedefs.h>
+
 /* Static Assert. */
 #include <Sdk/include/STK_StaticAssert.h>
 /* Templates. */
 #include <Sdk/include/STK_MetaTemplate.h>
-
 /* Interface for all classes using the curious recursive template paradigm.*/
 #include <Sdk/include/STK_IRecursiveTemplate.h>
+
 
 /* Interface for all runners classes */
 #include <Sdk/include/STK_IRunner.h>

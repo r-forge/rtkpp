@@ -37,6 +37,8 @@
 #define STK_ARRAY2DSQUARE_H
 
 #include "STK_IArray2D.h"
+#include "STK_IArray2DSlicers.h"
+#include "STK_IArray2DModifiers.h"
 
 namespace STK
 {
@@ -69,7 +71,7 @@ struct Traits<Array2DSquare<Type_> >
     typedef Void                 SubVector;
 
     typedef Type_                Type;
-    typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+    typedef typename RemoveConst<Type>::Type const& TypeConst;
 
     enum
     {
@@ -80,6 +82,7 @@ struct Traits<Array2DSquare<Type_> >
       size_      = UnknownSize,
       storage_   = Arrays::dense_ // always dense
     };
+    typedef Array1D<Type, UnknownSize> ColVector;
 };
 
 } // namespace hidden
@@ -109,7 +112,7 @@ class Array2DSquare: public IArray2D< Array2DSquare<Type_> >
     typedef typename hidden::Traits< Array2DSquare<Type_> >::SubArray SubArray;
 
     typedef typename hidden::Traits< Array2DSquare<Type_> >::Type Type;
-    typedef typename hidden::Traits< Array2DSquare<Type_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< Array2DSquare<Type_> >::TypeConst TypeConst;
 
     enum
     {

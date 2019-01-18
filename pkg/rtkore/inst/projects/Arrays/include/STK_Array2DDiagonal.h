@@ -37,6 +37,8 @@
 #define STK_ARRAY2DDIAGONAL_H
 
 #include "STK_IArray2D.h"
+#include "STK_IArray2DSlicers.h"
+#include "STK_IArray2DModifiers.h"
 
 namespace STK
 {
@@ -68,7 +70,7 @@ struct Traits<Array2DDiagonal<Type_> >
     typedef Array2DDiagonal<Type_> SubVector;
 
     typedef Type_                Type;
-    typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+    typedef typename RemoveConst<Type>::Type const& TypeConst;
 
     enum
     {
@@ -79,6 +81,7 @@ struct Traits<Array2DDiagonal<Type_> >
       size_      = UnknownSize,
       storage_   = Arrays::dense_ // always dense
     };
+    typedef Array1D<Type, UnknownSize> ColVector;
 };
 
 } // namespace hidden
@@ -108,7 +111,7 @@ class Array2DDiagonal: public IArray2D< Array2DDiagonal<Type_> >
     typedef typename hidden::Traits<Array2DDiagonal<Type_> >::SubArray SubArray;
 
     typedef typename hidden::Traits<Array2DDiagonal<Type_> >::Type Type;
-    typedef typename hidden::Traits<Array2DDiagonal<Type_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits<Array2DDiagonal<Type_> >::TypeConst TypeConst;
 
     enum
     {
@@ -165,6 +168,12 @@ class Array2DDiagonal: public IArray2D< Array2DDiagonal<Type_> >
      **/
     Array2DDiagonal& resize1D( Range const& I)
     { Base::resize(I, I); return *this;}
+    /** Set value at position i
+     *  @param i,v position and value to set
+     **/
+    void setValue1D( int i, TypeConst v)
+    { this->setValue(i, i, v);}
+
     /** Insert n rows and column at the given position to the container.
      *  @param pos,n position and number of element to insert
      **/

@@ -238,14 +238,14 @@ struct SumOp
   {
     res_.resize(rows_, cols_); res_ = Type();
     Range cols = inf(cols_, lhs_.cols());
-    for (int j= cols.begin(); j <= cols.lastIdx(); ++j)
+    for (int j= cols.begin(); j < cols.end(); ++j)
     {
       Range rows = inf(rows_, lhs_.rangeRowsInCol(j));
       for (int i= rows.begin(); i< rows.end(); ++i)
       { res_(i,j) += lhs_(i,j);}
     }
     cols = inf(cols_, rhs_.cols());
-    for (int j= cols.begin(); j <= cols.lastIdx(); ++j)
+    for (int j= cols.begin(); j < cols.end(); ++j)
     {
       Range rows = inf(rows_, rhs_.rangeRowsInCol(j));
       for (int i= rows.begin(); i< rows.end(); ++i)
@@ -285,14 +285,14 @@ struct DifferenceOp
   {
     res_.resize(rows_, cols_); res_ = Type();
     Range cols = inf(cols_, lhs_.cols());
-    for (int j= cols.begin(); j <= cols.lastIdx(); ++j)
+    for (int j= cols.begin(); j< cols.end(); ++j)
     {
       Range rows = inf(rows_, lhs_.rangeRowsInCol(j));
       for (int i= rows.begin(); i< rows.end(); ++i)
       { res_(i,j) += lhs_(i,j);}
     }
     cols = inf(cols_, rhs_.cols());
-    for (int j= cols.begin(); j <= cols.lastIdx(); ++j)
+    for (int j= cols.begin(); j< cols.end(); ++j)
     {
       Range rows = inf(rows_, rhs_.rangeRowsInCol(j));
       for (int i= rows.begin(); i< rows.end(); ++i)
@@ -770,11 +770,11 @@ Array2DSquare<typename Derived::Type> multLeftTranspose( ExprBase<Derived> const
   for (int i=A.beginCols(); i<=A.lastIdxCols(); i++)
   {
     // diagonal
-    for (int k = A.beginRows(); k<=A.lastIdxRows(); k++) res(i, i) += A(k, i) * A(k, i);
+    for (int k = A.beginRows(); k< A.endRows(); k++) res(i, i) += A(k, i) * A(k, i);
     // outside diagonal
     for (int j=A.beginCols(); j<i; j++)
     {
-      for (int k = A.beginRows(); k<=A.lastIdxRows(); k++)
+      for (int k = A.beginRows(); k< A.endRows(); k++)
         res(i, j) += A(k, i) * A(k, j);
       res(j, i) = res(i, j);
     }
@@ -797,12 +797,12 @@ Array2DSquare<typename Derived::Type> multRightTranspose( ExprBase<Derived> cons
   for (int i=A.beginRows(); i<=A.lastIdxRows(); i++)
   {
     // compute diagonal
-    for (int k = A.beginCols(); k<=A.lastIdxCols(); k++)
+    for (int k = A.beginCols(); k< A.endCols(); k++)
       res(i, i) += A(i, k) * A(i, k);
     // compute outside diagonal
     for (int j=A.beginRows(); j<i; j++)
     {
-      for (int k = A.beginCols(); k<=A.lastIdxCols(); k++)
+      for (int k = A.beginCols(); k< A.endCols(); k++)
         res(i, j) += A(i, k) * A(j, k);
       res(j, i) = res(i, j);
     }
@@ -827,12 +827,12 @@ Array2DSquare<typename Derived::Type>
   for (int i=A.beginCols(); i<=A.lastIdxCols(); i++)
   {
     // diagonal
-    for (int k = A.beginRows(); k<=A.lastIdxRows(); k++)
+    for (int k = A.beginRows(); k< A.endRows(); k++)
       res(i, i) += weights[k] * A(k, i) * A(k, i);
     // outside diagonal
     for (int j=A.beginCols(); j<i; j++)
     {
-      for (int k = A.beginRows(); k<=A.lastIdxRows(); k++)
+      for (int k = A.beginRows(); k< A.endRows(); k++)
         res(i, j) += weights[k] * A(k, i) * A(k, j);
       res(j, i) = res(i, j);
     }
@@ -857,12 +857,12 @@ Array2DSquare<typename Derived::Type>
   for (int i=A.beginRows(); i<=A.lastIdxRows(); i++)
   {
     // compute diagonal
-    for (int k = A.beginCols(); k<=A.lastIdxCols(); k++)
+    for (int k = A.beginCols(); k< A.endCols(); k++)
       res(i, i) += weights[k] *A(i, k) * A(i, k);
     // compute outside diagonal
     for (int j=A.beginRows(); j<i; j++)
     {
-      for (int k = A.beginCols(); k<=A.lastIdxCols(); k++)
+      for (int k = A.beginCols(); k< A.endCols(); k++)
         res(i, j) += weights[k] * A(i, k) * A(j, k);
       res(j, i) = res(i, j);
     }

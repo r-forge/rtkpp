@@ -112,7 +112,7 @@ struct Traits< Const::Identity <Type_, Size_> >
   };
 
   typedef Type_                Type;
-  typedef typename RemoveConst<Type>::Type ConstReturnType;
+  typedef typename RemoveConst<Type>::Type TypeConst;
 };
 /** @ingroup hidden
  *  @brief Traits class for the identity constant matrix
@@ -130,7 +130,7 @@ struct Traits< Const::Vector <Type_, Size_> >
     storage_   = Arrays::sparse_
   };
   typedef Type_                Type;
-  typedef typename RemoveConst<Type>::Type ConstReturnType;
+  typedef typename RemoveConst<Type>::Type TypeConst;
 };
 /** @ingroup hidden
  *  @brief Traits class for the constant vector_
@@ -148,7 +148,7 @@ struct Traits< Const::Point <Type_, Size_> >
     storage_   = Arrays::sparse_
   };
   typedef Type_                Type;
-  typedef typename RemoveConst<Type>::Type ConstReturnType;
+  typedef typename RemoveConst<Type>::Type TypeConst;
 };
 /** @ingroup hidden
  *  @brief Traits class for the square constant matrix
@@ -166,7 +166,7 @@ struct Traits< Const::Square <Type_, Size_> >
     storage_   = Arrays::sparse_
   };
   typedef Type_                Type;
-  typedef typename RemoveConst<Type>::Type ConstReturnType;
+  typedef typename RemoveConst<Type>::Type TypeConst;
 };
 /** @ingroup hidden
  *  @brief Traits class for the general constant matrix
@@ -183,7 +183,7 @@ struct Traits< Const::Array<Type_, SizeRows_, SizeCols_> >
     storage_   = Arrays::sparse_
   };
   typedef Type_                Type;
-  typedef typename RemoveConst<Type>::Type ConstReturnType;
+  typedef typename RemoveConst<Type>::Type TypeConst;
 };
 /** @ingroup hidden
  *  @brief Traits class for the upper triangular constant matrix
@@ -200,7 +200,7 @@ struct Traits< Const::UpperTriangular<Type_, SizeRows_, SizeCols_> >
     storage_   = Arrays::sparse_
   };
   typedef Type_                Type;
-  typedef typename RemoveConst<Type>::Type ConstReturnType;
+  typedef typename RemoveConst<Type>::Type TypeConst;
 };
 /** @ingroup hidden
  *  @brief Traits class for the lower triangular constant matrix
@@ -217,7 +217,7 @@ struct Traits< Const::LowerTriangular<Type_, SizeRows_, SizeCols_> >
     storage_   = Arrays::sparse_
   };
   typedef Type_                Type;
-  typedef typename RemoveConst<Type>::Type ConstReturnType;
+  typedef typename RemoveConst<Type>::Type TypeConst;
 };
 
 } // namespace hidden
@@ -243,7 +243,7 @@ class IConstArray: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, hi
     /** Type for the IContainer2D base Class. */
     typedef IContainer2D<sizeRows_, sizeCols_ > Base2D;
     typedef ExprBase<Derived> Base;
-    typedef typename hidden::Traits< Derived >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< Derived >::TypeConst TypeConst;
 
   protected:
     /** default constructor */
@@ -313,7 +313,7 @@ class Identity: public IConstArray<Identity<Type_, Size_> >
   public:
     typedef IConstArray<Identity<Type_, Size_> > Base;
     typedef typename hidden::Traits< Identity<Type_, Size_> >::Type Type;
-    typedef typename hidden::Traits< Identity<Type_, Size_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< Identity<Type_, Size_> >::TypeConst TypeConst;
     enum
     {
       structure_ = hidden::Traits< Identity <Type_, Size_> >::structure_,
@@ -329,11 +329,11 @@ class Identity: public IConstArray<Identity<Type_, Size_> >
     /** @return the element (i,j) of the identity matrix.
      *  @param i,j row and column indexes
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const { return (i==j ? Type(1) : Type(0));}
+    inline TypeConst elt2Impl(int i, int j) const { return (i==j ? Type(1) : Type(0));}
     /** @return the element ith element of the identity matrix
      *  @param i index of the element to get
      **/
-    inline ConstReturnType elt1Impl(int i) const { return Type(1);}
+    inline TypeConst elt1Impl(int i) const { return Type(1);}
 };
 
 /**@ingroup Arrays
@@ -364,7 +364,7 @@ class Square: public IConstArray<Square<Type_, Size_> >
   public:
     typedef IConstArray<Square<Type_, Size_> > Base;
     typedef typename hidden::Traits< Square<Type_, Size_> >::Type Type;
-    typedef typename hidden::Traits< Square<Type_, Size_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< Square<Type_, Size_> >::TypeConst TypeConst;
     enum
     {
       structure_ = hidden::Traits< Square <Type_, Size_> >::structure_,
@@ -380,7 +380,7 @@ class Square: public IConstArray<Square<Type_, Size_> >
     /** @return the element (i,j) of the constant square matrix.
      *  @param i,j row and column indexes
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const { return (Type(1));}
+    inline TypeConst elt2Impl(int i, int j) const { return (Type(1));}
 };
 
 /**@ingroup Arrays
@@ -412,7 +412,7 @@ class Array: public IConstArray<Array<Type_, SizeRows_, SizeCols_> >
   public:
     typedef IConstArray<Array<Type_, SizeRows_, SizeCols_> > Base;
     typedef typename hidden::Traits< Array<Type_, SizeRows_, SizeCols_> >::Type Type;
-    typedef typename hidden::Traits< Array<Type_, SizeRows_, SizeCols_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< Array<Type_, SizeRows_, SizeCols_> >::TypeConst TypeConst;
 
     enum
     {
@@ -429,7 +429,7 @@ class Array: public IConstArray<Array<Type_, SizeRows_, SizeCols_> >
     /** @return the element (i,j) of the constant square matrix.
      *  @param i,j row and column indexes
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const { return (Type(1));}
+    inline TypeConst elt2Impl(int i, int j) const { return (Type(1));}
 };
 
 /**@ingroup Arrays
@@ -461,7 +461,7 @@ class UpperTriangular: public IConstArray<UpperTriangular<Type_, SizeRows_, Size
   public:
     typedef IConstArray<UpperTriangular<Type_, SizeRows_, SizeCols_> > Base;
     typedef typename hidden::Traits< UpperTriangular<Type_, SizeRows_, SizeCols_> >::Type Type;
-    typedef typename hidden::Traits< UpperTriangular<Type_, SizeRows_, SizeCols_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< UpperTriangular<Type_, SizeRows_, SizeCols_> >::TypeConst TypeConst;
 
     enum
     {
@@ -478,7 +478,7 @@ class UpperTriangular: public IConstArray<UpperTriangular<Type_, SizeRows_, Size
     /** @return the element (i,j) of the constant upper triangular matrix.
      *  @param i,j row and column indexes
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const { return i<j ? (Type(1)) : Type(0);}
+    inline TypeConst elt2Impl(int i, int j) const { return i<j ? (Type(1)) : Type(0);}
 };
 
 /**@ingroup Arrays
@@ -510,7 +510,7 @@ class LowerTriangular: public IConstArray<LowerTriangular<Type_, SizeRows_, Size
   public:
     typedef IConstArray<LowerTriangular<Type_, SizeRows_, SizeCols_> > Base;
     typedef typename hidden::Traits< LowerTriangular<Type_, SizeRows_, SizeCols_> >::Type Type;
-    typedef typename hidden::Traits< LowerTriangular<Type_, SizeRows_, SizeCols_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< LowerTriangular<Type_, SizeRows_, SizeCols_> >::TypeConst TypeConst;
 
     enum
     {
@@ -527,7 +527,7 @@ class LowerTriangular: public IConstArray<LowerTriangular<Type_, SizeRows_, Size
     /** @return the element (i,j) of the constant lower triangular matrix.
      *  @param i,j row and column indexes
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const { return (Type(1));}
+    inline TypeConst elt2Impl(int i, int j) const { return (Type(1));}
 };
 
 /**@ingroup Arrays
@@ -554,7 +554,7 @@ class Point: public IConstArray<Point<Type_, Size_> >
   public:
     typedef IConstArray<Point<Type_, Size_> > Base;
     typedef typename hidden::Traits< Point<Type_, Size_> >::Type Type;
-    typedef typename hidden::Traits< Point<Type_, Size_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< Point<Type_, Size_> >::TypeConst TypeConst;
 
     enum
     {
@@ -571,11 +571,11 @@ class Point: public IConstArray<Point<Type_, Size_> >
     /** @return the j-th element  of the constant row-vector.
      *  @param j index of the element
      **/
-    inline ConstReturnType elt1Impl(int j) const { return (Type(1));}
+    inline TypeConst elt1Impl(int j) const { return (Type(1));}
     /** @return the element (i,j) of the constant row-vector.
      *  @param i,j row and column indexes
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const { return (Type(1));}
+    inline TypeConst elt2Impl(int i, int j) const { return (Type(1));}
 };
 
 /**@ingroup Arrays
@@ -602,7 +602,7 @@ class Vector: public IConstArray<Vector<Type_, Size_> >
   public:
     typedef IConstArray<Vector<Type_, Size_> > Base;
     typedef typename hidden::Traits< Vector<Type_, Size_> >::Type Type;
-    typedef typename hidden::Traits< Vector<Type_, Size_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< Vector<Type_, Size_> >::TypeConst TypeConst;
 
     enum
     {
@@ -619,11 +619,11 @@ class Vector: public IConstArray<Vector<Type_, Size_> >
     /** @return the i-th element of the constant vector.
      *  @param i index of the element
      **/
-    inline ConstReturnType elt1Impl(int i) const { return (Type(1));}
+    inline TypeConst elt1Impl(int i) const { return (Type(1));}
     /** @return the element (i,j) of the constant vector.
      *  @param i,j row and column indexes
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const { return (Type(1));}
+    inline TypeConst elt2Impl(int i, int j) const { return (Type(1));}
 };
 
 

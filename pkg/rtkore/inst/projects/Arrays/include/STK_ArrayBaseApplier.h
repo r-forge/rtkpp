@@ -29,7 +29,7 @@
  **/
 
 /** @file STK_ArrayBaseApplier.h
- *  @brief In this file we define the ArrayBaseApplier classes.
+ *  @brief In this file we define the appliers on writable arrays
  **/
 
 #ifndef STK_ARRAYBASEAPPLIER_H
@@ -44,7 +44,7 @@ namespace STK
   * @code
   * struct MyVisitor {
   *   // called for all  coefficients
-  *   void operator() (Type& value);
+  *   Type const& value operator() ();
   * };
   * @endcode
   *
@@ -65,7 +65,7 @@ inline void ArrayBase<Derived>::apply(Visitor& visitor)
  */
 /* @brief Set the value to all the Allocator */
 template<typename Derived>
-inline Derived& ArrayBase<Derived>::setValue(Type const& value)
+inline Derived& ArrayBase<Derived>::setValue(TypeConst value)
 {
   hidden::ValueApplier<Type> visitor(value);
   apply(visitor);

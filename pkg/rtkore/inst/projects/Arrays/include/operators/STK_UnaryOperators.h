@@ -63,7 +63,7 @@ struct Traits< UnaryOperator <UnaryOp, Lhs> >
   typedef ColOperator<UnaryOperator <UnaryOp, Lhs> > Col;
 
   typedef typename UnaryOp::result_type Type;
-  typedef typename UnaryOp::result_type ConstReturnType;
+  typedef typename UnaryOp::result_type TypeConst;
 };
 
 } // end namespace hidden
@@ -96,7 +96,7 @@ class UnaryOperator: public ExprBase< UnaryOperator<UnaryOp, Lhs> >, public TRef
   public:
     typedef ExprBase<  UnaryOperator<UnaryOp, Lhs> > Base;
     typedef typename hidden::Traits< UnaryOperator<UnaryOp, Lhs> >::Type Type;
-    typedef typename hidden::Traits< UnaryOperator<UnaryOp, Lhs> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< UnaryOperator<UnaryOp, Lhs> >::TypeConst TypeConst;
 
     enum
     {
@@ -128,13 +128,13 @@ class UnaryOperator: public ExprBase< UnaryOperator<UnaryOp, Lhs> >, public TRef
      *  @param i index of the row
      *  @param j index of the column
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const { return functor_(lhs_.elt(i, j));}
+    inline TypeConst elt2Impl(int i, int j) const { return functor_(lhs_.elt(i, j));}
     /** @return the ith element of the operator
      *  @param i index of the element to get
      **/
-    inline ConstReturnType elt1Impl(int i) const { return functor_(lhs_.elt(i));}
+    inline TypeConst elt1Impl(int i) const { return functor_(lhs_.elt(i));}
     /** @return the element of the operator */
-    inline ConstReturnType elt0Impl() const { return functor_(lhs_.elt());}
+    inline TypeConst elt0Impl() const { return functor_(lhs_.elt());}
 
   protected:
     Lhs const& lhs_;

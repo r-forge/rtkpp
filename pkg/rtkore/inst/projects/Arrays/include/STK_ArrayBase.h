@@ -67,7 +67,7 @@ class ArrayBase: public ExprBase<Derived>
   public:
     typedef ExprBase<Derived> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
-    typedef typename hidden::Traits<Derived>::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits<Derived>::TypeConst TypeConst;
 
     enum
     {
@@ -92,7 +92,7 @@ class ArrayBase: public ExprBase<Derived>
       * @code
       * struct MyVisitor {
       *   // called for all  coefficients
-      *   void operator() (Type& value);
+      *   Type const& value operator() ();
       * };
       * @endcode
       *
@@ -123,7 +123,18 @@ class ArrayBase: public ExprBase<Derived>
     /** set a value to this container. @sa apply(), setOnes(), setZeros()
      *  @param value the value to set
      **/
-    Derived& setValue(Type const& value);
+    Derived& setValue(TypeConst value);
+    /** set a value to this container at index i.
+     *  @param i,value index and value to set
+     **/
+    inline void setValue(int i, TypeConst value)
+    { this->asDerived().setValueImpl(i, value);}
+    /** set a value to this container at position (i,j).
+     *  @param i,j,value indexes and value to set
+     **/
+    inline void setValue(int i, int j, TypeConst value)
+    { this->asDerived().setValueImpl(i, j, value);}
+
     /** @return a copy of @c rhs inside @c this object.
      *  If the ranges of @c this and @c rhs are not exactly the same, the assign
      *  method will call the resize method on this.

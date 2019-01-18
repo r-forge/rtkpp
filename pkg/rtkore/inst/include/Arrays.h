@@ -79,6 +79,16 @@
 /* Functors applied to  Array2D */
 #include <Arrays/include/STK_Array2D_Functors.h>
 
+/* SArray2D */
+#include <Arrays/include/STK_SArray2DPoint.h>
+#include <Arrays/include/STK_SArray2DVector.h>
+#include <Arrays/include/STK_SArray2D.h>
+#include <Arrays/include/STK_SArray2DSquare.h>
+#include <Arrays/include/STK_SArray2DDiagonal.h>
+#include <Arrays/include/STK_SArray2DUpperTriangular.h>
+#include <Arrays/include/STK_SArray2DLowerTriangular.h>
+#include <Arrays/include/STK_SArray2DNumber.h>
+
 /* CArray */
 #include <Arrays/include/STK_CArray.h>
 #include <Arrays/include/STK_CArrayPoint.h>
@@ -94,5 +104,7 @@
 
 /* Uni-dimensionnal Array. */
 #include <Arrays/include/STK_Array1D.h>
+#include <Arrays/include/STK_SArray1D.h>
+#include <Arrays/include/STK_Array1D_InnerIterator.h>
 
 #endif  /* ARRAYS_H */

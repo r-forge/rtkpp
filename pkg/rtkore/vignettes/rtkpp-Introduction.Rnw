@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{Short Introduction to rtkore and STK++}
+%\VignetteIndexEntry{STK++: Short Introduction to rtkore package}
 
 \documentclass[a4paper,10pt]{article}
 

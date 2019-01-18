@@ -84,7 +84,7 @@ struct TRef<-1>
     /** swap this with the container T.
      *  @param T the container to swap with this
      **/
-    void exchange(TRef const& T) { std::swap(ref_, T.ref_);}
+    inline void exchange(TRef const& T) { std::swap(ref_, T.ref_);}
     /** Modify the container : can become a reference or the owner of
      *  the data. To use with care if we want to avoid memory leak.
      *  @param ref : false if this own its own data.

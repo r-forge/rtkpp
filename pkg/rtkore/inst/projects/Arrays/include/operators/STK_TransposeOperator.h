@@ -93,7 +93,7 @@ struct Traits< TransposeOperator <Lhs> >
   typedef RowOperator<TransposeOperator < Lhs> > Row;
   typedef ColOperator<TransposeOperator < Lhs> > Col;
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 
 /** @ingroup hidden
@@ -113,7 +113,7 @@ struct Traits< TransposeAccessor<Lhs> >
   typedef RowOperator<TransposeAccessor < Lhs> > Row;
   typedef ColOperator<TransposeAccessor < Lhs> > Col;
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 
 } // end namespace hidden
@@ -139,7 +139,7 @@ class TransposeOperator: public ExprBase< TransposeOperator<Lhs> >, public TRef<
   public:
     typedef ExprBase< TransposeOperator<Lhs> > Base;
     typedef typename hidden::Traits< TransposeOperator<Lhs> >::Type Type;
-    typedef typename hidden::Traits< TransposeOperator<Lhs> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< TransposeOperator<Lhs> >::TypeConst TypeConst;
 
     enum
     {
@@ -166,13 +166,13 @@ class TransposeOperator: public ExprBase< TransposeOperator<Lhs> >, public TRef<
     /** @return the element (i,j) of the transposed expression.
      *  @param i, j index of the row and of the column
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const { return lhs_.elt(j, i);}
+    inline TypeConst elt2Impl(int i, int j) const { return lhs_.elt(j, i);}
     /** @return the element ith element of the transposed expression
      *  @param i index of the element to get
      **/
-    inline ConstReturnType elt1Impl(int i) const { return lhs_.elt(i);}
+    inline TypeConst elt1Impl(int i) const { return lhs_.elt(i);}
     /** access to the element of the transposed expression */
-    inline ConstReturnType elt0Impl() const { return lhs_.elt();}
+    inline TypeConst elt0Impl() const { return lhs_.elt();}
 
   protected:
     Lhs const& lhs_;
@@ -198,7 +198,7 @@ class TransposeAccessor: public ArrayBase< TransposeAccessor<Lhs> >, public TRef
   public:
     typedef ArrayBase< TransposeAccessor<Lhs> > Base;
     typedef typename hidden::Traits< TransposeOperator<Lhs> >::Type Type;
-    typedef typename hidden::Traits< TransposeOperator<Lhs> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< TransposeOperator<Lhs> >::TypeConst TypeConst;
 
     enum
     {
@@ -226,13 +226,13 @@ class TransposeAccessor: public ArrayBase< TransposeAccessor<Lhs> >, public TRef
     /** @return the element (i,j) of the transposed expression.
      *  @param i, j index of the row and of the column
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const { return lhs_.elt(j, i);}
+    inline TypeConst elt2Impl(int i, int j) const { return lhs_.elt(j, i);}
     /** @return the element ith element of the transposed expression
      *  @param i index of the element to get
      **/
-    inline ConstReturnType elt1Impl(int i) const { return lhs_.elt(i);}
+    inline TypeConst elt1Impl(int i) const { return lhs_.elt(i);}
     /** access to the element of the transposed expression */
-    inline ConstReturnType elt0Impl() const { return lhs_.elt();}
+    inline TypeConst elt0Impl() const { return lhs_.elt();}
     /** @return the element (i,j) of the transposed expression.
      *  @param i, j index of the row and of the column
      **/

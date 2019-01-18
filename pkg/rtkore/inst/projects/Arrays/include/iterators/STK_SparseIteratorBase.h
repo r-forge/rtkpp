@@ -1,3 +1,4 @@
+
 /*--------------------------------------------------------------------*/
 /*     Copyright (C) 2004-2016  Serge Iovleff, Université Lille 1, Inria
 
@@ -28,23 +29,23 @@
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
 
-/** @file STK_IteratorBase.h
- *  @brief In this file we base class for Iterators.
+/** @file STK_SparseIteratorBase.h
+ *  @brief In this file we define the base class for Iterators on sparse arrays
  **/
 
 #ifndef STK_ITERATORBASE_H
 #define STK_ITERATORBASE_H
 
 #include <Sdk/include/STK_IRecursiveTemplate.h>
-#include "../STK_Constants.h"
+#include <Sdk/include/STK_Constants.h>
 
 namespace STK
 {
 namespace hidden
 {
-/** @ingroup hidden, STKernel
+/** @ingroup hidden, Arrays
  *  @brief The traits struct IteratorTraits must be specialized for any iterator
- *  derived from the base class IteratorBase.
+ *  derived from the base class SparseIteratorBase.
  *
  *  @note We use the type names defined by the STL for the iterator_traits class.
  *
@@ -70,33 +71,39 @@ template <typename Derived> struct IteratorTraits;
 
 } // namespace hidden
 
-/** @ingroup STKernel
- *  @brief IteratorBase is a base class for all iterators on arrays/matrix/vector/expressions
+/** @ingroup Arrays
+ *  @brief IteratorBase is a base class for all iterators on dense
+ *  arrays/matrix/vector/expressions
  *
- *  @tparam Array the container on which iterate
+ *  @tparam Derived the derived class
  **/
-template<class Array>
-struct IteratorBase: public IRecursiveTemplate<Array>
+template<class Derived>
+struct SparseIteratorBase: public IRecursiveTemplate<Derived>
 {
-    typedef typename hidden::IteratorTraits<Array>::iterator_category iterator_category;
-    typedef typename hidden::IteratorTraits<Array>::value_type value_type;
-    typedef typename hidden::IteratorTraits<Array>::reference reference;
-    typedef typename hidden::IteratorTraits<Array>::pointer pointer;
-    typedef typename hidden::IteratorTraits<Array>::difference_type difference_type;
+  private:
+    /** default constructor */
+    SparseIteratorBase(): pos_(){}
+
+    typedef typename hidden::IteratorTraits<Derived>::Index Index;
+
+    typedef typename hidden::IteratorTraits<Derived>::iterator_category iterator_category;
+    typedef typename hidden::IteratorTraits<Derived>::value_type value_type;
+    typedef typename hidden::IteratorTraits<Derived>::reference reference;
+    typedef typename hidden::IteratorTraits<Derived>::pointer pointer;
+    typedef typename hidden::IteratorTraits<Derived>::difference_type difference_type;
 
   protected:
-    /** default constructor */
-    IteratorBase(): pos_(baseIdx) {}
+
     /** constructor with specified position
      *  @param pos position of the iterator on the array
      **/
-    IteratorBase( int pos): pos_(pos) {}
+    SparseIteratorBase( Index& pos): pos_(pos) {}
     /** copy constructor.
      *  @param it iterator to copy
      **/
-    IteratorBase( IteratorBase const& it):  pos_(it.pos_) {}
+    SparseIteratorBase( SparseIteratorBase const& it):  pos_(it.pos_) {}
     /** destructor */
-    ~IteratorBase() {}
+    ~SparseIteratorBase() {}
 
   public:
     /** @return the position of the iterator */
@@ -104,53 +111,54 @@ struct IteratorBase: public IRecursiveTemplate<Array>
 
     // moving
     /** next position */
-    Array& operator++()         { ++pos_; return this->asDerived(); }
+    Derived& operator++()         { ++pos_; return this->asDerived(); }
     /** next position */
-    Array& operator++(int junk) { ++pos_; return this->asDerived(); }
+    Derived& operator++(int junk) { ++pos_; return this->asDerived(); }
     /** previous position */
-    Array& operator--()         { --pos_; return this->asDerived(); }
+    Derived& operator--()         { --pos_; return this->asDerived(); }
     /** previous position */
-    Array& operator--(int)      { --pos_; return this->asDerived(); }
+    Derived& operator--(int)      { --pos_; return this->asDerived(); }
 
-    Array& operator+=(int n)    { pos_+=n; return this->asDerived(); }
-    Array& operator-=(int n)    { pos_-=n; return this->asDerived(); }
-    friend IteratorBase operator+( IteratorBase const& it, int n)
-    { IteratorBase r(it); r+=n ; return r; }
-    friend IteratorBase operator+(int n, IteratorBase const& it)
-    { IteratorBase r(it); r+=n ; return r; }
-    friend IteratorBase operator-( IteratorBase const& it, int n)
-    { IteratorBase r(it); r-=n ; return r; }
-    friend IteratorBase operator-(int n, IteratorBase const& it)
-    { IteratorBase r(it); r-=n ; return r; }
+    Derived& operator+=(int n)    { pos_+=n; return this->asDerived(); }
+    Derived& operator-=(int n)    { pos_-=n; return this->asDerived(); }
+    friend SparseIteratorBase operator+( SparseIteratorBase const& it, int n)
+    { SparseIteratorBase r(it); r+=n ; return r; }
+    friend SparseIteratorBase operator+(int n, SparseIteratorBase const& it)
+    { SparseIteratorBase r(it); r+=n ; return r; }
+    friend SparseIteratorBase operator-( SparseIteratorBase const& it, int n)
+    { SparseIteratorBase r(it); r-=n ; return r; }
+    friend SparseIteratorBase operator-(int n, SparseIteratorBase const& it)
+    { SparseIteratorBase r(it); r-=n ; return r; }
 
-    friend difference_type operator-(IteratorBase it1, IteratorBase it2)
+    friend difference_type operator-(SparseIteratorBase it1, SparseIteratorBase it2)
     { return it1.pos_ - it2.pos_;}
 
     // comparing
     /** comparing two iterators (only position is compared !) */
-    bool operator==( IteratorBase const& rhs) { return(pos_ ==rhs.pos_); }
+    bool operator==( SparseIteratorBase const& rhs) { return(pos_ ==rhs.pos_); }
     /** comparing two iterators (only position is compared !) */
-    bool operator!=( IteratorBase const& rhs) { return(pos_!=rhs.pos_); }
+    bool operator!=( SparseIteratorBase const& rhs) { return(pos_!=rhs.pos_); }
 
     /** comparing two iterators (only position is compared !) */
-    friend bool operator<(IteratorBase const& lhs, IteratorBase const& rhs)
+    friend bool operator<(SparseIteratorBase const& lhs, SparseIteratorBase const& rhs)
     { return lhs.pos_ < rhs.pos_; };
     /** comparing two iterators (only position is compared !) */
-    friend bool operator>(IteratorBase const& lhs, IteratorBase const& rhs)
+    friend bool operator>(SparseIteratorBase const& lhs, SparseIteratorBase const& rhs)
     { return lhs.pos_ > rhs.pos_; };
     /** comparing two iterators (only position is compared !) */
-    friend bool operator<=(IteratorBase const& lhs, IteratorBase const& rhs)
+    friend bool operator<=(SparseIteratorBase const& lhs, SparseIteratorBase const& rhs)
     { return lhs.pos_ <= rhs.pos_; };
     /** comparing two iterators (only position is compared !) */
-    friend bool operator>=(IteratorBase const& lhs, IteratorBase const& rhs)
+    friend bool operator>=(SparseIteratorBase const& lhs, SparseIteratorBase const& rhs)
     { return lhs.pos_ >= rhs.pos_; };
 
     /** swap two iterators (only position is swaped) */
-    friend void swap(IteratorBase& lhs, IteratorBase& rhs)
+    friend void swap(SparseIteratorBase& lhs, SparseIteratorBase& rhs)
     { std::swap(lhs.pos_, rhs.pos_);}
 
   protected:
-    int pos_;
+    /** Current position */
+    Index& pos_;
 };
 
 

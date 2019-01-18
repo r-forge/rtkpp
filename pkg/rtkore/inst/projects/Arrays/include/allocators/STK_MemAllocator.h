@@ -49,49 +49,120 @@ namespace STK
 namespace hidden
 {
 
-/** @ingroup hidden Helper class allowing to use std::memcpy or std::memmove for
- * fundamental types
+/** @ingroup hidden
+ *  Helper class allowing to free memory (or not)
+ *  @note for fixed size containers, free do nothing, realloc adjust the shift
  **/
-template<int, class Type_> struct memChooser;
-
-/** @ingroup Specialization for fundamental types
- *  copy or move memory using standard C copy and move functions  */
-template<class Type_> struct memChooser<1, Type_>
+template<typename Type_, int Size_> struct MemHandler
 {
-  static Type_* memcpy(Type_* p, int pos, Type_* q, Range const& range)
-  { return static_cast<Type_*>(std::memcpy( p+pos, q+range.begin(), sizeof(Type_)*range.size()));}
-  static Type_* memmove(Type_* p, int pos, Range const& range)
-  { return static_cast<Type_*>(std::memmove( p + pos, p+ range.begin(), sizeof(Type_)*range.size()));}
+  typedef TRange<Size_> AllocatorRange;
+  /** do nothing for fixed size allocators ! */
+  static Type_* free(Type_* p_data, AllocatorRange const& range) { return p_data;}
+  /** malloc memory. allocate memory is not allocated yet, otherwise
+   *  do nothing.
+   **/
+  static Type_* malloc(Type_* p_data, AllocatorRange const& range)
+  {
+    if (!p_data)
+    {
+      if(range.size()>0)
+      {
+        p_data = new Type_[range.size()];
+        p_data -= range.begin();
+      }
+    }
+    return p_data;
+  }
+  /** realloc main pointer and copy existing data. */
+  template<int OtherSize>
+  static Type_* realloc( Type_* p_data, AllocatorRange const& range, TRange<OtherSize> const& I)
+  {
+    // fixed size, just shift
+    return p_data + range.begin() - I.begin();
+  }
 };
 
-/** @ingroup Specialization for other types using loop and operator= */
-template<class Type_> struct memChooser<0, Type_>
+/** @ingroup hidden
+ *  Specialization for dynamic size arrays.
+ * */
+template<class Type_> struct MemHandler<Type_, UnknownSize>
 {
-    /** copy mem using loop */
-  static Type_* memcpy(Type_* p, int pos, Type_* q, Range const& range)
+  typedef TRange<UnknownSize> AllocatorRange;
+  /** shift data pointer and delete allocated memory */
+  static Type_* free(Type_* p_data, AllocatorRange const& range)
   {
-    Type_* ptr = p+pos-range.begin();
-    for (int k=range.begin(); k<range.end(); k++) { ptr[k] = q[k];}
-    return p;
-  }
-  /** move mem without overlapping using loop */
-  static Type_* memmove(Type_* p, int pos, Range const& range)
-  {
-    if (range.begin() < pos)
+    // if there is elts
+    if (p_data)
     {
-      for(int iSrc=range.lastIdx(), iDst=pos+range.size()-1; iSrc>=range.begin(); iSrc--, iDst--)
-      { p[iDst] = p[iSrc];}
+      p_data+=range.begin();
+      delete [] p_data; // erase
+      p_data = 0;
+    }
+    return p_data;
+  }
+  /** p_data should not point on existing data. Just set default value. */
+  static Type_* malloc(Type_* p_data, AllocatorRange const& range)
+  {
+    if(range.size()>0)
+    {
+      p_data = new Type_[range.size()];
+      p_data -= range.begin();
     }
     else
-    {
-      for(int iSrc=range.begin(), iDst=pos; iSrc<range.end(); iSrc++, iDst++)
-      { p[iDst] = p[iSrc];}
-    }
-   return p;
+    { p_data = 0;}
+    return p_data;
+  }
+  /** realloc main pointer and copy existing data. */
+  template<int OtherSize>
+  static Type_* realloc( Type_* p_data, AllocatorRange const& range, TRange<OtherSize> const& I)
+  {
+    Type_* p = 0;
+    p = malloc(p, I);
+    Range r = inf(range, I);
+    for (int i = r.begin(); i<r.end(); ++i) { p[i] = p_data[i];}
+    p_data = free(p_data, range);
+    return p;
+  }
+};
+
+/** @ingroup hidden Helper class allowing to use std::memcpy or std::memmove for
+ *  fundamental types
+ **/
+template<int, class Type_> struct MemChooser;
+
+/** @ingroup hidden
+ *  Specialization for fundamental types.
+ *  copy or move memory using standard C copy and move functions
+ * */
+template<class Type_> struct MemChooser<1, Type_>
+{
+  static Type_* memcpy(Type_* p, Type_* q, size_t size)
+  { return static_cast<Type_*>(std::memcpy( p , q, sizeof(Type_)*size));}
+
+  static Type_* memmove(Type_* p, Type_* q, size_t size)
+  { return static_cast<Type_*>(std::memmove( p, q, sizeof(Type_)*size));}
+};
+
+/** @ingroup hidden
+ *  Specialization for other types using loop and operator= */
+template<class Type_> struct MemChooser<0, Type_>
+{
+  static Type_* memcpy(Type_* p, Type_* q, size_t size)
+  {
+    for (size_t k=0; k<size; k++) { p[k] = q[k];}
+    return p;
+  }
+  static Type_* memmove(Type_* p, Type_* q, size_t size)
+  {
+    if (size == 0) return p;
+    if (p<q) { for (size_t k=0; k<size; k++)    { p[k] = q[k];}}
+    else     { for (size_t k=size-1; k==0; --k) { p[k] = q[k];}}
+    return p;
   }
 };
 
 } // namespace hidden
+
 /** @ingroup Arrays
  *  @brief template base class for all Allocator classes.
  *
@@ -100,7 +171,6 @@ template<class Type_> struct memChooser<0, Type_>
  *  class as an array stored in memory can always be wrapped in some way or be
  *  a wrapper of some data stored in memory.
  *
- *  This class can also be used as a concrete class.
  *  @tparam Type_ can be any type of data that can be stored in memory.
  *  @tparam Size_ size of the data if it is known at compile time
  **/
@@ -108,8 +178,11 @@ template<typename Type_, int Size_>
 struct MemAllocator: public IContainerRef
 {
   enum { isNumeric_ = hidden::IsArithmetic<Type_>::yes};
+  typedef hidden::MemHandler<Type_, Size_> MemHandler;
+  typedef hidden::MemChooser<isNumeric_, Type_> MemChooser;
+
   typedef Type_  Type;
-  typedef typename hidden::RemoveConst<Type>::Type const& ConstReturnType;
+  typedef typename hidden::RemoveConst<Type>::Type const& TypeConst;
 
   typedef TRange<Size_> AllocatorRange;
   using IContainerRef::isRef;
@@ -120,31 +193,29 @@ struct MemAllocator: public IContainerRef
   /** constructor with specified Range
    *  @param I range of the data
    **/
-  MemAllocator( Range const& I);
+  MemAllocator( AllocatorRange const& I);
+  /** constructor with specified Range and initial value
+   *  @param I,value range and value of the data
+   **/
+  MemAllocator( AllocatorRange const& I, Type const& value);
   /** Copy constructor. We don't know, how the user classes want to copy the
    *  data if this is not a reference.
    *  @param T the array to copy or reference
-   *  @param ref is this a wrapper of T ?
-   *  @warning if ref is @c false, the derived class is responsible of the data copy
+   *  @param ref is this a wrapper of T ? (@c false by default)
    **/
   MemAllocator( MemAllocator const& T, bool ref = false);
-  /** Copy constructor. We don't know, how the user classes want to copy the
-   *  data if this is not a reference.
+  /** Copy constructor. Copy data or create a reference.
    *  @param T the array to copy or reference
-   *  @param ref is this a wrapper of T ?
-   *  @warning if ref is @c false, the derived class is responsible of the data copy
+   *  @param ref is this a wrapper of T ? (false by default)
    **/
   template<int OtherSize_>
-  inline MemAllocator( MemAllocator<Type, OtherSize_> const& T, bool ref = false);
-  /** constructor by reference.
+  MemAllocator( MemAllocator<Type, OtherSize_> const& T, bool ref = false);
+  /** Copy constructor. Map a range of T.
    *  @param T,I the allocator and range to reference
-   **/
-  MemAllocator( MemAllocator const& T, Range const& I);
-  /** constructor by reference.
-   *  @param T,I the allocator and range to reference
+   *  @param ref is this a wrapper of a part of T ? (@c true by default)
    **/
   template<int OtherSize_>
-  inline MemAllocator( MemAllocator<Type, OtherSize_> const& T, Range const& I);
+  MemAllocator( MemAllocator<Type, OtherSize_> const& T,  AllocatorRange const& I, bool ref = true);
   /** @brief Wrapper or copy constructor.
    *  @param q,I ptr and range of the data to wrap
    *  @param ref is this a wrapper ? If @c true data will not be freed when this
@@ -153,12 +224,12 @@ struct MemAllocator: public IContainerRef
   MemAllocator( Type* const& q, Range const& I, bool ref);
   /** Wrapper or copy constructor: second form. This constructor assumes the
    *  data as a C-like array. Thus first index is 0.
-   *  @param q, size ptr and size of the data to wrap
+   *  @param q,size ptr and size of the data to wrap
    *  @param ref is this a wrapper ? If @c true data will not be freed when this
    *  object is released
    **/
   MemAllocator( Type* const& q, int size, bool ref);
-  /** destructor. */
+  /** destructor. Release memory.*/
   ~MemAllocator();
 
   /** @return the range of the data*/
@@ -170,43 +241,95 @@ struct MemAllocator: public IContainerRef
   /** @return the size of the data */
   inline int size() const { return range_.size();}
 
-  /** Get the a constant pointer on p_data_ */
+  /** Get constant pointer on data */
   inline Type* const& p_data() const { return p_data_;}
-  /** Get the pointer on p_data_ */
-  inline Type*& p_data() { return p_data_;}
+
+  /** This method allows to set a value to the allocator
+   *  @param value value to set
+   **/
+  void setValue(TypeConst value)
+  {
+    for(int pos=begin(); pos < end(); ++pos)
+    { p_data_[pos] = value;}
+  }
+  /** This method allows to set a value to the position @c pos
+   *  @param pos,value index and value to set
+   **/
+  inline void setValue(int pos, TypeConst value)
+  {
+#ifdef STK_BOUNDS_CHECK
+    if (pos < begin())
+    { STKOUT_OF_RANGE_1ARG(MemAllocator::elt,pos,MemAllocator::begin() > pos);}
+    if (pos >= end())
+    { STKOUT_OF_RANGE_1ARG(MemAllocator::elt,pos,MemAllocator::end() <= pos);}
+#endif
+    p_data_[pos] = value;
+  }
 
   /** Get the const element number pos.
    *  @param pos the position of the element we get
    **/
-  inline ConstReturnType data( int pos) const
+  inline TypeConst elt( int pos) const
   {
 #ifdef STK_BOUNDS_CHECK
     if (pos < begin())
-    { STKOUT_OF_RANGE_1ARG(MemAllocator::data,pos,MemAllocator::begin() > pos);}
+    { STKOUT_OF_RANGE_1ARG(MemAllocator::elt,pos,MemAllocator::begin() > pos);}
     if (pos >= end())
-    { STKOUT_OF_RANGE_1ARG(MemAllocator::data,pos,MemAllocator::end() <= pos);}
+    { STKOUT_OF_RANGE_1ARG(MemAllocator::elt,pos,MemAllocator::end() <= pos);}
 #endif
     return p_data_[pos];
   }
+  /** @return a constant reference on the ith  element
+   *  @param i index of the element to get
+   **/
+  inline TypeConst operator[](int i) const
+  {
+#ifdef STK_BOUNDS_CHECK
+    if (begin() > i) { STKOUT_OF_RANGE_1ARG(MemAllocator::operator[], i, begin() > i);}
+    if (end() <= i)  { STKOUT_OF_RANGE_1ARG(MemAllocator::operator[], i, end() <= i);}
+#endif
+    return elt(i);
+  }
+
   /** Get the element number pos.
    *  @param pos the position of the element we get
    **/
-  inline Type& data(int pos)
+  inline Type& elt(int pos)
   {
 #ifdef STK_BOUNDS_CHECK
     if (pos < begin())
-    { STKOUT_OF_RANGE_1ARG(MemAllocator::data,pos,MemAllocator::begin() > pos);}
+    { STKOUT_OF_RANGE_1ARG(MemAllocator::elt,pos,MemAllocator::begin() > pos);}
     if (pos >= end())
-    { STKOUT_OF_RANGE_1ARG(MemAllocator::data,pos,MemAllocator::end() <= pos);}
+    { STKOUT_OF_RANGE_1ARG(MemAllocator::elt,pos,MemAllocator::end() <= pos);}
 #endif
     return p_data_[pos];
   }
-  /** swap two elements of the Allocator.
-   *  @param pos1, pos2 the positions of the first and second element
+  /** @return ith element
+   *  @param i index of the element to get
    **/
-  void swap(int pos1, int pos2)
-  { std::swap(p_data_[pos1], p_data_[pos2]);}
-  /** @brief main ptr memory allocation.
+  inline Type& operator[](int i)
+  {
+#ifdef STK_BOUNDS_CHECK
+    if (begin() > i) { STKOUT_OF_RANGE_1ARG(ITContainer1D::operator[], i, begin() > i);}
+    if (end() <= i)  { STKOUT_OF_RANGE_1ARG(ITContainer1D::operator[], i, end() <= i);}
+#endif
+    return elt(i);
+  }
+  /** swap two elements of the Allocator.
+   *  @param pos1, pos2 the positions to swap
+   **/
+  inline void swap(int pos1, int pos2)
+  {
+#ifdef STK_BOUNDS_CHECK
+    if (begin() > pos1) { STKOUT_OF_RANGE_2ARG(MemAllocator::swap, pos1, pos2, begin() > pos1);}
+    if (begin() > pos2) { STKOUT_OF_RANGE_2ARG(MemAllocator::swap, pos1, pos2, begin() > pos2);}
+    if (end() <= pos1)  { STKOUT_OF_RANGE_2ARG(MemAllocator::swap[], pos1, pos2, end() <= pos1);}
+    if (end() <= pos2)  { STKOUT_OF_RANGE_2ARG(MemAllocator::swap[], pos1, pos2, end() <= pos2);}
+#endif
+    std::swap(p_data_[pos1], p_data_[pos2]);
+  }
+
+  /** @brief main method for memory allocation.
    *  @param I range of the data allocated
    **/
   template<int OtherSize>
@@ -225,47 +348,35 @@ struct MemAllocator: public IContainerRef
   void realloc( TRange<OtherSize> const& I);
   /** function for main ptr memory deallocation. */
   void free();
+
   /** function copying a part of allocator T in this.
    *  @param pos position where will be copied data
    *  @param T,range the array of data and the range of the data to copy  */
-  template<int OtherSize__>
-  void memcpy(int pos, MemAllocator<Type, OtherSize__> const& T, Range const& range);
-
-  /** function copying a part of allocator T2 in allocator T2.
-   *  @param T1,pos,T2,range the arrays the position and the range of the data to copy
+  template<int OtherSize_, int RangeSize_>
+  void memcpy(int pos, MemAllocator<Type, OtherSize_> const& T, TRange<RangeSize_> const& range);
+  /** function moving a part of the allocator.
+   *  @param pos,range position and range in form [begin,end) to move
    **/
-  template<int OtherSize_1_, int OtherSize_2_>
-  static void memcpy( MemAllocator<Type, OtherSize_1_>& T1, int pos
-                    , MemAllocator<Type, OtherSize_2_> const& T2, Range const& range)
-  { T1.memcpy(pos, T2, range);}
-
-  /** function moving a part of allocator T.
-   *  @param pos,range position and range in form [begin,end) to move */
-  void memmove(int pos, Range const& range);
-  /** function moving a part of allocator T.
-   *  @param T,pos,range data, position and range of data to move */
-  template<int OtherSize__>
-  static void memmove( MemAllocator<Type, OtherSize__>& T, int pos, Range const& range)
-  {
-#ifdef STK_BOUNDS_CHECK
-    if (pos < T.begin()){ STKOUT_OF_RANGE_1ARG(MemAllocator::memmove,pos,T.begin() > pos);}
-    if (pos >= T.end()) { STKOUT_OF_RANGE_1ARG(MemAllocator::memmove,pos,T.end() <= pos);}
-    if (!T.range().isContaining(range))
-    { STKOUT_OF_RANGE_1ARG(MemAllocator::memmove,range,range not in T.range());}
-#endif
-    std::memmove( T.p_data_ + pos, T.p_data_+ range.begin(), sizeof(Type)*range.size());
-  }
+  template< int RangeSize_>
+  void memmove(int pos, TRange<RangeSize_> const& range);
 
   /** exchange this with T.
    *  @param T the container to exchange with T
    **/
-  MemAllocator& exchange(MemAllocator &T);
+  void exchange(MemAllocator &T);
   /** @brief copy the Allocator T by value.
    *  The memory is free and the Allocator T is physically copied in this.
    *  @param T the allocator to copy by value
    *  @return a copy of T
    **/
   MemAllocator& assign( MemAllocator const& T);
+  /** @brief assign a value to allocator.
+   *  @param I,value range and value to assign
+   *  @return a copy
+   **/
+  template<int OtherSize_>
+  MemAllocator& assign(TRange<OtherSize_> const& I, Type const& value);
+
   /** @brief move the Allocator T to this.
    *  The memory of this is freed and T becomes a reference of this. This
    *  method allow to move the data of T to this without using physical copy.
@@ -279,7 +390,7 @@ struct MemAllocator: public IContainerRef
   /** shift the first index of the data to first.
    *  @param first the index of the first data to set
    **/
-  void shift(int const& first);
+  MemAllocator& shift(int first);
   /** @brief Set address and range of allocated data.
    *  This method is to be used when the memory have been allocated outside.
    *  If allocator wrap allocated memory, it is not freed.
@@ -295,42 +406,50 @@ struct MemAllocator: public IContainerRef
     Type* p_data_;
 
   private:
-    /** Set array members to default values. */
-    void setDefault()
-    {
-      p_data_ = 0;
-      range_ = AllocatorRange();
-      setRef(false);
-    }
-    /** Increment the address of the data.
-     *  @param inc the increment to apply
-     **/
-    void incPtr( int inc)
-    {
-      if (p_data_) { p_data_ += inc;}
-      range_.dec(inc);
-    }
-    /** Decrement the address of the data.
-     *  @param dec the increment to apply
-     **/
-    void decPtr( int dec)
-    {
-      if (p_data_) { p_data_ -= dec;}
-      range_.inc(dec);
-    }
     /** Range of the data */
     AllocatorRange range_;
+    /** move main pointer on data
+     *  @param inc the increment to apply
+     **/
+    void shiftPtr( int inc)
+    {
+      if (p_data_) { p_data_ -= inc;}
+      range_.inc(inc);
+    }
+    /** function for main ptr memory deallocation. Force memory deallocation, even
+     *  for fixed size allocators.
+     **/
+    void forcedFree()
+    {
+      if(!isRef())
+      { p_data_ = hidden::MemHandler<Type, UnknownSize>::free(p_data_, range_);}
+    }
 };
 
 /* Default constructor. */
 template<typename Type, int Size_>
-MemAllocator<Type,Size_>::MemAllocator(): IContainerRef(false), p_data_(0), range_() {}
+MemAllocator<Type,Size_>::MemAllocator(): IContainerRef(false)
+                                        , p_data_(0)
+                                        , range_()
+{ malloc(range_);}
 /* constructor with specified Range
  *  @param I range of the data
  **/
 template<typename Type, int Size_>
-MemAllocator<Type,Size_>::MemAllocator( Range const& I): IContainerRef(false), p_data_(0), range_(I)
+MemAllocator<Type,Size_>::MemAllocator( TRange<Size_> const& I)
+                                      : IContainerRef(false), p_data_(0), range_(I)
 { malloc(I);}
+
+/* constructor with specified Range and value
+ *  @param I range of the data
+ **/
+template<typename Type, int Size_>
+MemAllocator<Type,Size_>::MemAllocator( TRange<Size_> const& I, Type const& value)
+                                      : IContainerRef(false), p_data_(0), range_(I)
+{ malloc(I);
+  assign(I, value);
+}
+
 /* Copy constructor. We don't know, how the user classes want to copy the
  *  data if this is not a reference.
  *  @param T the array to copy or reference
@@ -338,11 +457,18 @@ MemAllocator<Type,Size_>::MemAllocator( Range const& I): IContainerRef(false), p
  *  @note if ref is @c false, the derived class is responsible of the data copy
  **/
 template<typename Type, int Size_>
-MemAllocator<Type,Size_>::MemAllocator( MemAllocator const& T, bool ref)
-             : IContainerRef(ref)
-             , p_data_(ref ? T.p_data_: 0)
-             , range_(T.range_)
-{/* derived class has to copy the data if ref==false */}
+MemAllocator<Type, Size_>::MemAllocator( MemAllocator const& T, bool ref)
+                                       : IContainerRef(ref)
+                                       , p_data_(ref ? T.p_data(): 0)
+                                       , range_(T.range())
+{
+  if (!ref)
+  {
+    malloc(range());
+    memcpy(begin(), T, range());
+  }
+}
+
 /* Copy constructor. We don't know, how the user classes want to copy the
  *  data if this is not a reference.
  *  @param T the array to copy or reference
@@ -351,26 +477,35 @@ MemAllocator<Type,Size_>::MemAllocator( MemAllocator const& T, bool ref)
  **/
 template<typename Type, int Size_>
 template<int OtherSize_>
-inline MemAllocator<Type,Size_>::MemAllocator( MemAllocator<Type, OtherSize_> const& T, bool ref)
-                    : IContainerRef(ref)
-                    , p_data_(ref ? T.p_data(): 0)
-                    , range_(T.range())
-{ /* derived class has to copy the data if ref==false */}
-/* constructor by reference.
- *  @param T,I the allocator and range to reference
- **/
-template<typename Type, int Size_>
-MemAllocator<Type,Size_>::MemAllocator( MemAllocator const& T, Range const& I)
-             : IContainerRef(true), p_data_(T.p_data_), range_(I)
-{}
+MemAllocator<Type, Size_>::MemAllocator( MemAllocator<Type, OtherSize_> const& T, bool ref)
+                                       : IContainerRef(ref)
+                                       , p_data_(ref ? T.p_data(): 0)
+                                       , range_(T.range())
+{
+  if (!ref)
+  {
+    malloc(range());
+    memcpy(begin(), T, range());
+  }
+}
 /* constructor by reference.
  *  @param T,I the allocator and range to reference
  **/
 template<typename Type, int Size_>
 template<int OtherSize_>
-inline MemAllocator<Type,Size_>::MemAllocator( MemAllocator<Type, OtherSize_> const& T, Range const& I)
-                                             : IContainerRef(true), p_data_(T.p_data()), range_(I)
-{}
+MemAllocator<Type, Size_>::MemAllocator( MemAllocator<Type, OtherSize_> const& T, TRange<Size_> const& I, bool ref)
+                                      : IContainerRef(true)
+                                      , p_data_(ref ? T.p_data() : 0)
+                                      , range_(I)
+{
+  if (!ref)
+  {
+    malloc(I);
+    for(int i=I.begin(); i< I.end(); ++i)
+    { p_data_[i] = T.elt(i);}
+  }
+}
+
 /* @brief Wrapper or copy constructor.
  *  @param q,I ptr and range of the data to wrap
  *  @param ref is this a wrapper ? If @c true data will not be freed when this
@@ -379,7 +514,8 @@ inline MemAllocator<Type,Size_>::MemAllocator( MemAllocator<Type, OtherSize_> co
 template<typename Type, int Size_>
 MemAllocator<Type,Size_>::MemAllocator( Type* const& q, Range const& I, bool ref)
              : IContainerRef(ref), p_data_(q), range_(I)
-{ /* derived class have to copy the data if ref==false */}
+{ /* derived class have to delete data if ref==false */}
+
 /* Wrapper or copy constructor: second form. This constructor assumes the
  *  data as a C-like array. Thus first index is 0.
  *  @param q, size ptr and size of the data to wrap
@@ -390,20 +526,21 @@ template<typename Type, int Size_>
 MemAllocator<Type,Size_>::MemAllocator( Type* const& q, int size, bool ref)
              : IContainerRef(ref), p_data_(q), range_(AllocatorRange(0,size))
 { /* derived class have to copy the data if ref==false */}
-/** destructor. */
+
+/* destructor. */
 template<typename Type, int Size_>
-MemAllocator<Type,Size_>::~MemAllocator() { free();}
+MemAllocator<Type,Size_>::~MemAllocator()
+{ forcedFree();}
 
 /* exchange this with T.
  *  @param T the container to exchange with T
  **/
 template<typename Type, int Size_>
-MemAllocator<Type,Size_>& MemAllocator<Type,Size_>::exchange(MemAllocator<Type,Size_> &T)
+void MemAllocator<Type,Size_>::exchange(MemAllocator<Type,Size_> &T)
 {
   std::swap(p_data_, T.p_data_);
   std::swap(range_, T.range_);
   IContainerRef::exchange(T);
-  return *this;
 }
 /* @brief copy the Allocator T by value.
  *  The memory is free and the Allocator T is physically copied in this.
@@ -415,9 +552,16 @@ MemAllocator<Type,Size_>& MemAllocator<Type,Size_>::assign( MemAllocator<Type,Si
 {
   // allocate memory if necessary
   malloc(T.range_);
-  // copy values
-  for (int pos= T.begin(); pos < T.end(); ++pos)
-  { p_data_[pos] = T.p_data_[pos];}
+  memcpy(begin(), T, range());
+  return *this;
+}
+
+/* @brief a value.*/
+template<typename Type, int Size_>
+template<int OtherSize_>
+MemAllocator<Type,Size_>& MemAllocator<Type,Size_>::assign(TRange<OtherSize_> const& I, Type const& value)
+{
+  for (int pos= I.begin(); pos < I.end(); ++pos) { p_data_[pos] = value;}
   return *this;
 }
 /* @brief move the Allocator T to this.
@@ -433,24 +577,24 @@ template<typename Type, int Size_>
 MemAllocator<Type, Size_>& MemAllocator<Type,Size_>::move( MemAllocator<Type, Size_> const& T)
 {
   if (this == &T) return *this;
-  free();
+  forcedFree();
   setPtr(T.p_data_, T.range_, T.isRef());
   T.setRef(true); // T become a reference of the data it own
   return *this;
 }
 template<typename Type, int Size_>
-void MemAllocator<Type,Size_>::shift(int const& first)
+MemAllocator<Type,Size_>& MemAllocator<Type,Size_>::shift(int first)
 {
   // check if there is something to do
-  if (first == begin()) return;
+  if (first == begin()) return *this;
   // check for reference
   if (isRef())
-    STKRUNTIME_ERROR_1ARG(MemAllocator::shift, first, cannot operate on reference.);
-  // compute increment
-  int inc = first - begin();
+    STKRUNTIME_ERROR_1ARG(MemAllocator::shift,first,cannot operate on reference);
   // translate data
-  decPtr(inc);
+  shiftPtr(first - begin());
+  return *this;
 }
+
 template<typename Type, int Size_>
 template<int OtherSize>
 void MemAllocator<Type,Size_>::malloc( TRange<OtherSize> const& I)
@@ -458,24 +602,19 @@ void MemAllocator<Type,Size_>::malloc( TRange<OtherSize> const& I)
   // there is no necessity to allocate if data is already allocated, range_
   // is the same and the data is not owned by an other allocator
   if ((range_ == I)&&(p_data_)&&(!isRef())) return;
-  // free any existing data
-  free();
-  if (I.size() <= 0)  // check size
-  {
-    setPtr(0, I, false);
-    return;
-  }
   // allocate memory
   try
-  { // set (p_data_, range_, ref_)
-    setPtr(new Type[I.size()], Range(0, I.size()), false);
+  {
+    // free any existing data and allocate it again (do nothing for fixed size allocators)
+    p_data_ = MemHandler::free(p_data_, range_);
+    p_data_ = MemHandler::malloc(p_data_, I);
+    setPtr(p_data_, I, false);
   }
   catch (std::bad_alloc const& error)
   {
-    setDefault();
+    setPtr(0, AllocatorRange(), false);
     STKRUNTIME_ERROR_1ARG(MemAllocator::malloc, I, memory allocation failed);
   }
-  decPtr(I.begin());
 }
 
 template<typename Type, int Size_>
@@ -485,21 +624,17 @@ void MemAllocator<Type,Size_>::realloc( TRange<OtherSize> const& I)
   // there is no necessity to allocate if data is already allocated, range_
   // is the same and the data is not owned by an other allocator
   if ((range_ == I)&&(p_data_)&&(!isRef())) return;
-  if (I.size() <= 0)
-  {
-    free();
-    setPtr(0, I, false);
-    return;
-  }
+
   try
   {
-    // allocate memory and apply increment
-    Type* p  = new Type[I.size()];
-    p -= I.begin();
-    // copy data and liberate old memory and set (p_data_, range_, ref_)
-    range_ = inf(range_, I);
-    for (int i = range_.begin(); i<range_.end(); ++i) { p[i] = p_data_[i];}
-    free();
+    // allocate memory and copy data in the same range
+    Type* p  = MemHandler::malloc(p_data_, I);
+    // copy data in common range
+    Range r = inf(range_, I);
+    if (r.size()>0)
+    { MemChooser::memcpy(p+r.begin(), p_data_+r.begin(), r.size());      }
+//    for (int i = r.begin(); i<r.end(); ++i) { p[i] = p_data_[i];}
+    p_data_ = MemHandler::free(p_data_, range_);
     setPtr(p, I, false);
   }
   catch (std::bad_alloc const& error)
@@ -511,18 +646,14 @@ void MemAllocator<Type,Size_>::free()
 {
   // nothing to do for reference
   if (isRef()) return;
-  // if there is elts
-  if (p_data_)
-  {
-    incPtr(begin());   // translate
-    delete [] p_data_; // erase
-    setDefault();      // set default values
-  }
+  p_data_ = MemHandler::free(p_data_, range_);
+  // if there is no elements range_ is set to default
+  if (!p_data_) { range_ = AllocatorRange();}
 }
 
 template<typename Type, int Size_>
-template<int OtherSize__>
-void MemAllocator<Type,Size_>::memcpy(int pos, MemAllocator<Type, OtherSize__> const& T, Range const& range)
+template<int OtherSize_, int RangeSize_>
+void MemAllocator<Type,Size_>::memcpy(int pos, MemAllocator<Type, OtherSize_> const& T, TRange<RangeSize_> const& range)
 {
   if (range.size() <= 0) return;
 #ifdef STK_BOUNDS_CHECK
@@ -531,13 +662,14 @@ void MemAllocator<Type,Size_>::memcpy(int pos, MemAllocator<Type, OtherSize__> c
   if (!T.range().isContaining(range))
   { STKOUT_OF_RANGE_1ARG(MemAllocator::memcopy,range,range not in T.range());}
 #endif
-  hidden::memChooser<isNumeric_, Type>::memcpy(p_data_, pos, T.p_data_, range);
+  MemChooser::memcpy(p_data_+pos, T.p_data()+range.begin(), range.size());
 }
 
 template<typename Type, int Size_>
-void MemAllocator<Type,Size_>::memmove(int pos, Range const& range)
+template< int RangeSize_>
+void MemAllocator<Type,Size_>::memmove(int pos, TRange<RangeSize_> const& range)
 {
-  if (range.size() <= 0) return;
+  if ((range.size() <= 0)||(range.begin() == pos)) return;
 #ifdef STK_BOUNDS_CHECK
   if (pos < begin())
   { STKOUT_OF_RANGE_1ARG(MemAllocator::memmove,pos,MemAllocator::begin() > pos);}
@@ -546,7 +678,7 @@ void MemAllocator<Type,Size_>::memmove(int pos, Range const& range)
   if (!range_.isContaining(range))
   { STKOUT_OF_RANGE_1ARG(MemAllocator::memmove,range,range not in range_);}
 #endif
-  hidden::memChooser<isNumeric_, Type>::memmove( p_data_, pos, range);
+  MemChooser::memmove( p_data_+pos, p_data_+range.begin(), range.size());
 }
 
 

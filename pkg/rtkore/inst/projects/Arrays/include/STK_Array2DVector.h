@@ -40,6 +40,8 @@
 #define STK_ARRAY2DVECTOR_H
 
 #include "STK_IArray2D.h"
+#include "STK_IArray2DSlicers.h"
+#include "STK_IArray2DModifiers.h"
 
 namespace STK
 {
@@ -74,7 +76,7 @@ struct Traits< Array2DVector<Type_> >
   typedef Array2DVector<Type_> SubVector;
 
   typedef Type_                Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+  typedef typename RemoveConst<Type>::Type const& TypeConst;
 
   enum
   {
@@ -85,6 +87,7 @@ struct Traits< Array2DVector<Type_> >
     size_      = UnknownSize,
     storage_ = Arrays::dense_ // always dense
   };
+  typedef Array1D<Type, UnknownSize> ColVector;
 };
 
 } // namespace hidden
@@ -114,7 +117,7 @@ class Array2DVector: public IArray2D< Array2DVector<Type_> >
     typedef typename hidden::Traits<Array2DVector<Type_> >::SubArray SubArray;
 
     typedef typename hidden::Traits<Array2DVector<Type_> >::Type Type;
-    typedef typename hidden::Traits<Array2DVector<Type_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits<Array2DVector<Type_> >::TypeConst TypeConst;
 
     enum
     {
@@ -125,7 +128,7 @@ class Array2DVector: public IArray2D< Array2DVector<Type_> >
       size_      = hidden::Traits< Array2DVector<Type_> >::size_,
       storage_   = hidden::Traits< Array2DVector<Type_> >::storage_
     };
-
+    using Base::elt;
     /** Default constructor */
     Array2DVector(): Base( Range(), Range(1)) {}
     /** constructor with specified range.
@@ -143,13 +146,13 @@ class Array2DVector: public IArray2D< Array2DVector<Type_> >
      *  @param ref true if this is a wrapper of T
      **/
     Array2DVector( const Array2DVector &T, bool ref =false)
-                : Base(T, ref) {}
+                 : Base(T, ref) {}
     /** constructor by reference, ref_=1.
      *  @param T the container to wrap
      *  @param I the columns range to wrap
      **/
     Array2DVector( const Array2DVector& T, Range const& I)
-                : Base(T, I, T.cols())
+                 : Base(T, I, T.cols())
     {}
     /** constructor by reference, ref_=1.
      *  @param T the container to wrap
@@ -158,7 +161,7 @@ class Array2DVector: public IArray2D< Array2DVector<Type_> >
      **/
     template<class OtherArray>
     Array2DVector( IArray2D<OtherArray> const& T, Range const& I, int col)
-               : Base(T, I, Range(col, 1))
+                 : Base(T, I, Range(col, 1))
     {}
     /** Copy constructor using an expression.
      *  @param T the container to wrap
@@ -176,23 +179,30 @@ class Array2DVector: public IArray2D< Array2DVector<Type_> >
     {}
     /** destructor. */
     ~Array2DVector() {}
+
     /** @return a constant reference on the ith element
      *  @param i index of the element (const)
      **/
-    Type const & elt1Impl( int i) const { return this->data(this->beginCols())[i];}
+    Type const& elt1Impl( int i) const { return this->elt(i, this->beginCols());}
     /** @return a reference on the ith element
      *  @param i index of the element
      **/
-    inline Type& elt1Impl( int i) { return this->data(this->beginCols())[i];}
+    inline Type& elt1Impl( int i) { return this->elt(i, this->beginCols());}
     /** New first index for the object.
      *  @param rbeg the index of the first row to set
      **/
     void shift1D( int rbeg) { Base::shift(rbeg, this->beginCols());}
-    /**  Resize the container.
+    /** Resize the container.
      *  @param I the range to set to the container
      **/
     Array2DVector<Type>& resize1D( Range const& I)
     { Base::resize(I, this->cols()); return *this;}
+    /** Set value at position i
+     *  @param i,v position and value to set
+     **/
+    void setValue1D( int i, TypeConst v)
+    { this->setValue(i, this->beginCols(), v);}
+
     /** Add n elements to the container.
      *  @param n number of elements to add
      **/

@@ -92,7 +92,7 @@ struct Traits< BinaryOperator<FunctorOp, Lhs, Rhs> >
   typedef RowOperator<BinaryOperator<FunctorOp, Lhs, Rhs> > Row;
   typedef ColOperator<BinaryOperator<FunctorOp, Lhs, Rhs> > Col;
   typedef typename FunctorOp::result_type Type;
-  typedef typename FunctorOp::result_type ConstReturnType;
+  typedef typename FunctorOp::result_type TypeConst;
 };
 
 } // end namespace hidden
@@ -125,7 +125,7 @@ class BinaryOperator: public ExprBase< BinaryOperator<FunctorOp, Lhs, Rhs> >
     typedef hidden::BinaryRowsImpl< Lhs, Rhs, EltImpl::sizeRows_, EltImpl::useForRows_ > RowsImpl;
     typedef hidden::BinaryColsImpl< Lhs, Rhs, EltImpl::sizeCols_, EltImpl::useForCols_ > ColsImpl;
 
-    typedef typename hidden::Traits< BinaryOperator >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< BinaryOperator >::TypeConst TypeConst;
     typedef typename hidden::Traits<BinaryOperator >::Type Type;
 
     enum
@@ -182,11 +182,11 @@ class BinaryOperator: public ExprBase< BinaryOperator<FunctorOp, Lhs, Rhs> >
     inline FunctorOp const& functor() const { return functor_; }
 
     /** @return element (i,j) */
-    inline ConstReturnType elt2Impl(int i, int j) const { return EltImpl::elt2Impl(functor_, lhs_, rhs_, i, j);}
+    inline TypeConst elt2Impl(int i, int j) const { return EltImpl::elt2Impl(functor_, lhs_, rhs_, i, j);}
     /** @return element i */
-    inline ConstReturnType elt1Impl(int i) const { return EltImpl::elt1Impl(functor_, lhs_, rhs_, i);}
+    inline TypeConst elt1Impl(int i) const { return EltImpl::elt1Impl(functor_, lhs_, rhs_, i);}
     /** @return element */
-    inline ConstReturnType elt0Impl() const { return EltImpl::elt0Impl(functor_, lhs_, rhs_);}
+    inline TypeConst elt0Impl() const { return EltImpl::elt0Impl(functor_, lhs_, rhs_);}
     /** @return range of the rows */
     inline RowRange const& rowsImpl() const { return RowsImpl::rowsImpl(lhs_, rhs_);}
     /** @return range of the columns */

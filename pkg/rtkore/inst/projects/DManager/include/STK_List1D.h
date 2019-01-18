@@ -44,8 +44,8 @@
 namespace STK
 {
 template< class Type> class List1D;
-template<class Derived> struct BiDirectionalIterator1D;
-template<class Derived> struct ConstBiDirectionalIterator1D;
+template<class Derived> struct BiDirectionalIterator;
+template<class Derived> struct ConstBiDirectionalIterator;
 
 
 namespace hidden
@@ -65,7 +65,7 @@ struct Traits< List1D<Type_> >
 
   typedef Type_ Type;
   typedef typename RemoveConst<Type_>::Type const& ReturnType;
-  typedef typename RemoveConst<Type_>::Type const& ConstReturnType;
+  typedef typename RemoveConst<Type_>::Type const& TypeConst;
 
   enum
   {
@@ -76,11 +76,15 @@ struct Traits< List1D<Type_> >
     sizeRows_  = 1,
     storage_ = Arrays::dense_ // always dense
   };
+
   typedef TRange<size_> RowRange;
   typedef TRange<1>     ColRange;
 
-  typedef BiDirectionalIterator1D<List1D<Type_> > Iterator;
-  typedef ConstBiDirectionalIterator1D<List1D<Type_> > ConstIterator;
+
+  typedef int Index;
+
+  typedef BiDirectionalIterator<List1D<Type_> > Iterator;
+  typedef ConstBiDirectionalIterator<List1D<Type_> > ConstIterator;
 
   typedef std::reverse_iterator<Iterator> ReverseIterator;
   typedef std::reverse_iterator<ConstIterator> ConstReverseIterator;
@@ -88,9 +92,8 @@ struct Traits< List1D<Type_> >
 
 
 } // namespace hidden
-} // namespace STK
 
-#include "../../STKernel/include/iterators/STK_BiDirectionalIterator1D.h"
+} // namespace STK
 
 namespace STK
 {
@@ -170,9 +173,11 @@ class List1D: public ITContainer1D< List1D<Type_> >, public IContainerRef
     /** access to many elements.
      *  @param T the list to reference
      *  @param J the range of the elements
+     *  @param ref is this a reference of T ?
      *  @return a list with a reference to the elements in the given range
      **/
-    List1D( List1D<Type> const& T, Range const& J): Base(J), IContainerRef(true)
+    List1D( List1D<Type> const& T, Range const& J, bool ref = true)
+          : Base(J), IContainerRef(ref)
     {
 #ifdef STK_BOUNDS_CHECK
       if ((J.begin()<T.begin()))
@@ -180,12 +185,20 @@ class List1D: public ITContainer1D< List1D<Type_> >, public IContainerRef
       if ((J.lastIdx()>T.lastIdx()))
       { STKOUT_OF_RANGE_1ARG(List1D::List1D,J,J.lastIdx()>T.lastIdx());}
 #endif
-      T.moveCurrentPosition(J.begin());
-      p_begin_ = T.p_current_;
-      moveCurrentPosition(J.lastIdx());
-      p_last_ = T.p_current_;
-      currentPosition_  = this->begin();
-      p_current_ = p_begin_;
+      if (!ref)
+      {
+        initialize(J);
+        (*this) = T;
+      }
+      else
+      {
+        T.moveCurrentPosition(J.begin());
+        p_begin_ = T.p_current_;
+        moveCurrentPosition(J.lastIdx());
+        p_last_ = T.p_current_;
+        currentPosition_  = this->begin();
+        p_current_ = p_begin_;
+      }
     }
     /**  @return the range of the rows of the container */
     inline RowRange const& rows() const  { return this->range();}

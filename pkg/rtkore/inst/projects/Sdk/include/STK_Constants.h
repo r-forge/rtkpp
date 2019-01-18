@@ -57,35 +57,35 @@
 
 namespace STK
 {
-/** @ingroup STKernel
+/** @ingroup Sdk
  *  @brief base index of the containers created in STK++.
  *  This value means that the default range for a vector or the rows/columns of
  *  a matrix is the value given by this constant. **/
 const int baseIdx = STKBASEARRAYS;
 
-/** @ingroup STKernel
+/** @ingroup Sdk
  *  @brief maximal size of fixed size containers
  *  This value is used when fixed size containers are automatically build in internal computation
  **/
 const int maxFixedSize = MAXFIXEDSIZEVALUE;
 
-/** @ingroup STKernel
+/** @ingroup Sdk
  *  This value means that an integer is not known at compile-time, and that
  *  instead the value is stored in some runtime variable. This is the same value
  *  that the value used for representing NA Integers when Integer is int.
  **/
 const int UnknownSize = INT_MAX;
-/** @ingroup STKernel
+/** @ingroup Sdk
  *  Same as floor(sqrt(INT_MAX+1))
  **/
 const int SqrtUnknownSize = (1 << (sizeof(int) * (CHAR_BIT/2)));
 
-/** @ingroup STKernel
+/** @ingroup Sdk
  *  When don't unroll loops on fixed size containers if fixed size is greater than this value.
  **/
 const int MaxUnroll = MAXUNROLLVALUE;
 
-/** @ingroup STKernel
+/** @ingroup Sdk
  * This value means that when we unroll loops we go until MaxUnrollSlice
  **/
 const int MaxUnrollSlice = MAXUNROLLSLICEVALUE;

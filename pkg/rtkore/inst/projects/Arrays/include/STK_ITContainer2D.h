@@ -79,7 +79,7 @@ class IContainer2D
     ~IContainer2D() {}
 
     /** @return the columns range */
-    inline ColRange const &cols() const { return cols_;}
+    inline ColRange const& cols() const { return cols_;}
     /** @return the index of the first column */
     inline int beginCols() const { return cols_.begin();}
     /** @return the ending index of the columns */
@@ -122,7 +122,7 @@ class IContainer2D
     /** Set the first index of the rows.
      *  @param beg the first index of the rows
      **/
-    void shiftBeginRows( int beg) { rows_.shift(beg);}
+    void shiftRows( int beg) { rows_.shift(beg);}
     /** Increment the range of the number of rows.
      *  @param inc the increment to apply
      **/
@@ -151,7 +151,7 @@ class IContainer2D
     /** Shift the columns first index to beg.
      *  @param beg the new first index
      **/
-    void shiftBeginCols( int beg) { cols_.shift(beg);}
+    void shiftCols( int beg) { cols_.shift(beg);}
     /** Increment the columns range.
      *  @param inc the increment to apply the range
      **/
@@ -229,11 +229,11 @@ class IContainer2D
  * derived class if necessary have the following definitions:
  * @code
  *   Type& elt2Impl(int i, int j);
- *   ConstReturnType elt2Impl(int i, int j) const;
+ *   TypeConst elt2Impl(int i, int j) const;
  *   Type& elt1Impl(int pos);
- *   ConstReturnType elt1Impl(int pos) const;
+ *   TypeConst elt1Impl(int pos) const;
  *   Type& elt0Impl()
- *   ConstReturnType elt0Impl(int pos) const;
+ *   TypeConst elt0Impl(int pos) const;
  *   void shift1Impl(int beg);
  *   void shift2Impl(int beginRows, int beginCols);
  *   Derived& resize1Impl(int size);
@@ -252,7 +252,7 @@ class ITContainer2D: public IContainer2D< hidden::Traits<Derived>::sizeRows_, hi
 {
   public:
     typedef typename hidden::Traits<Derived>::Type Type;
-    typedef typename hidden::Traits<Derived>::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits<Derived>::TypeConst TypeConst;
 
     typedef typename hidden::Traits<Derived>::Row Row;
     typedef typename hidden::Traits<Derived>::Col Col;
@@ -307,7 +307,7 @@ class ITContainer2D: public IContainer2D< hidden::Traits<Derived>::sizeRows_, hi
     /** @return a constant reference on element (i,j) of the 2D container
      *  @param i, j indexes of the element to get
      **/
-    inline ConstReturnType elt(int i, int j) const
+    inline TypeConst elt(int i, int j) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (this->beginRows() > i) { STKOUT_OF_RANGE_2ARG(ITContainer2D::elt, i, j, beginRows() > i);}
@@ -326,11 +326,11 @@ class ITContainer2D: public IContainer2D< hidden::Traits<Derived>::sizeRows_, hi
      *  @note bounds check cannot be done there as number_ does not have
      *  begin() and end() implemented
      **/
-    inline ConstReturnType elt(int i) const { return this->asDerived().elt1Impl(i);}
+    inline TypeConst elt(int i) const { return this->asDerived().elt1Impl(i);}
     /** @return a reference on the number */
     inline Type& elt() { return this->asDerived().elt0Impl();}
     /** @return a constant reference on the number */
-    inline ConstReturnType elt() const  { return this->asDerived().elt0Impl();}
+    inline TypeConst elt() const  { return this->asDerived().elt0Impl();}
 
     /** resize the container
      *  @param sizeRows, sizeCols size of the rows and columns

@@ -37,7 +37,7 @@
 #ifndef STK_METATEMPLATE_H
 #define STK_METATEMPLATE_H
 
-#include <STKernel/include/STK_Constants.h>
+#include "STK_Constants.h"
 
 namespace STK
 {

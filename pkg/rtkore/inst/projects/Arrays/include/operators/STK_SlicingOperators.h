@@ -74,7 +74,7 @@ struct Traits< RowOperator <Lhs> >
   typedef RowOperator<RowOperator < Lhs> > Row;
   typedef ColOperator<RowOperator < Lhs> > Col;
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 
 /** @ingroup hidden
@@ -93,7 +93,7 @@ struct Traits< RowAccessor <Lhs> >
     storage_   = Lhs::storage_
   };
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 
 } // namespace hidden
@@ -117,7 +117,7 @@ class RowOperator: public ExprBase< RowOperator< Lhs> >, public TRef<1>
   public:
     typedef ExprBase< RowOperator< Lhs> > Base;
     typedef typename hidden::Traits< RowOperator< Lhs> >::Type Type;
-    typedef typename hidden::Traits< RowOperator< Lhs> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< RowOperator< Lhs> >::TypeConst TypeConst;
     enum
     {
         structure_ = hidden::Traits< RowOperator<Lhs> >::structure_,
@@ -145,7 +145,7 @@ class RowOperator: public ExprBase< RowOperator< Lhs> >, public TRef<1>
     /** @return the element (i,j)
      *  @param i, j index of the row and column
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const
+    inline TypeConst elt2Impl(int i, int j) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (i != i_) { STKRUNTIME_ERROR_2ARG(RowOperatorBase::elt2Impl,i,j,row index is not valid);}
@@ -155,9 +155,9 @@ class RowOperator: public ExprBase< RowOperator< Lhs> >, public TRef<1>
     /** @return the element jth element
      *  @param j index of the jth element
      **/
-    inline ConstReturnType elt1Impl(int j) const { return (lhs().elt(i_, j));}
+    inline TypeConst elt1Impl(int j) const { return (lhs().elt(i_, j));}
     /** accesses to the element */
-    inline ConstReturnType elt0Impl() const { return (lhs().elt());}
+    inline TypeConst elt0Impl() const { return (lhs().elt());}
 
   protected:
     Lhs const& lhs_;
@@ -186,7 +186,7 @@ class RowAccessor: public ExprBase< RowAccessor< Lhs> >, public TRef<1>
   public:
     typedef ExprBase< RowAccessor< Lhs> > Base;
     typedef typename hidden::Traits< RowAccessor< Lhs> >::Type Type;
-    typedef typename hidden::Traits< RowAccessor< Lhs> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< RowAccessor< Lhs> >::TypeConst TypeConst;
     enum
     {
         structure_ = hidden::Traits< RowAccessor<Lhs> >::structure_,
@@ -214,7 +214,7 @@ class RowAccessor: public ExprBase< RowAccessor< Lhs> >, public TRef<1>
     /** @return the element (i,j)
      *  @param i, j index of the row and column
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const
+    inline TypeConst elt2Impl(int i, int j) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (i != i_) { STKRUNTIME_ERROR_2ARG(RowOperatorBase::elt2Impl,i,j,row index is not valid);}
@@ -224,9 +224,9 @@ class RowAccessor: public ExprBase< RowAccessor< Lhs> >, public TRef<1>
     /** @return the element jth element
      *  @param j index of the jth element
      **/
-    inline ConstReturnType elt1Impl(int j) const { return (lhs().elt(i_, j));}
+    inline TypeConst elt1Impl(int j) const { return (lhs().elt(i_, j));}
     /** accesses to the element */
-    inline ConstReturnType elt0Impl() const { return (lhs().elt());}
+    inline TypeConst elt0Impl() const { return (lhs().elt());}
 
     /** @return the element (i,j)
      *  @param i, j index of the row and column
@@ -274,7 +274,7 @@ struct Traits< ColOperator <Lhs> >
   typedef RowOperator<ColOperator < Lhs> > Row;
   typedef ColOperator<ColOperator < Lhs> > Col;
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 
 /** @ingroup hidden
@@ -293,7 +293,7 @@ struct Traits< ColAccessor <Lhs> >
     storage_   = Lhs::storage_
   };
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 
 } // namespace hidden
@@ -318,7 +318,7 @@ class ColOperator: public ExprBase< ColOperator< Lhs> >, public TRef<1>
   public:
     typedef ExprBase< ColOperator< Lhs> > Base;
     typedef typename hidden::Traits< ColOperator<Lhs> >::Type Type;
-    typedef typename hidden::Traits< ColOperator<Lhs> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< ColOperator<Lhs> >::TypeConst TypeConst;
     enum
     {
         structure_ = hidden::Traits< ColOperator<Lhs> >::structure_,
@@ -348,7 +348,7 @@ class ColOperator: public ExprBase< ColOperator< Lhs> >, public TRef<1>
     /** @return the ith element of the column
      *  @param i,j indexes of the element
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const
+    inline TypeConst elt2Impl(int i, int j) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (j != j_) { STKRUNTIME_ERROR_2ARG(ColOperatorBase::elt2Impl,i,j,column index is not valid);}
@@ -358,9 +358,9 @@ class ColOperator: public ExprBase< ColOperator< Lhs> >, public TRef<1>
     /** @return the element ith element
      *  @param i index of the element to get
      **/
-    inline ConstReturnType elt1Impl(int i) const { return (lhs_.elt(i, j_));}
+    inline TypeConst elt1Impl(int i) const { return (lhs_.elt(i, j_));}
     /** access to the element */
-    inline ConstReturnType elt0Impl() const { return (lhs_.elt(j_));}
+    inline TypeConst elt0Impl() const { return (lhs_.elt(j_));}
 
   protected:
     Lhs const& lhs_;
@@ -389,7 +389,7 @@ class ColAccessor: public ExprBase< ColAccessor< Lhs> >, public TRef<1>
   public:
     typedef ExprBase< ColAccessor< Lhs> > Base;
     typedef typename hidden::Traits< ColAccessor<Lhs> >::Type Type;
-    typedef typename hidden::Traits< ColAccessor<Lhs> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< ColAccessor<Lhs> >::TypeConst TypeConst;
     enum
     {
         structure_ = hidden::Traits< ColAccessor<Lhs> >::structure_,
@@ -419,7 +419,7 @@ class ColAccessor: public ExprBase< ColAccessor< Lhs> >, public TRef<1>
     /** @return the ith element of the column
      *  @param i,j indexes of the element
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const
+    inline TypeConst elt2Impl(int i, int j) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (j != j_) { STKRUNTIME_ERROR_2ARG(ColOperatorBase::elt2Impl,i,j,column index is not valid);}
@@ -429,9 +429,9 @@ class ColAccessor: public ExprBase< ColAccessor< Lhs> >, public TRef<1>
     /** @return the element ith element
      *  @param i index of the element to get
      **/
-    inline ConstReturnType elt1Impl(int i) const { return (lhs_.elt(i, j_));}
+    inline TypeConst elt1Impl(int i) const { return (lhs_.elt(i, j_));}
     /** access to the element */
-    inline ConstReturnType elt0Impl() const { return (lhs_.elt(j_));}
+    inline TypeConst elt0Impl() const { return (lhs_.elt(j_));}
 
     /** @return the ith element of the column
      *  @param i,j indexes of the element
@@ -477,7 +477,7 @@ struct Traits< SubVectorOperator <Lhs, Size_> >
   typedef RowOperator<SubVectorOperator <Lhs, Size_> > Row;
   typedef ColOperator<SubVectorOperator <Lhs, Size_> > Col;
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 
 /** @ingroup hidden
@@ -497,7 +497,7 @@ struct Traits< SubVectorAccessor <Lhs, Size_> >
   typedef RowOperator<SubVectorOperator <Lhs, Size_> > Row;
   typedef ColOperator<SubVectorOperator <Lhs, Size_> > Col;
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 
 } // namespace hidden
@@ -531,7 +531,7 @@ class SubVectorOperator: public SubVectorOperatorBase< Lhs, Size_
 {
   public:
     typedef typename hidden::Traits< SubVectorOperator< Lhs, Size_> >::Type Type;
-    typedef typename hidden::Traits< SubVectorOperator< Lhs, Size_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< SubVectorOperator< Lhs, Size_> >::TypeConst TypeConst;
     enum
     {
       structure_ = hidden::Traits< SubVectorOperator<Lhs, Size_> >::structure_,
@@ -554,13 +554,13 @@ class SubVectorOperator: public SubVectorOperatorBase< Lhs, Size_
     /** @return element (i,j)
      *  @param i,j row and column indexes
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const { return (lhs_.elt2Impl(i, j));}
+    inline TypeConst elt2Impl(int i, int j) const { return (lhs_.elt2Impl(i, j));}
     /** @return i-th element
      *  @param i element index
      **/
-    inline ConstReturnType elt1Impl(int i) const { return (lhs_.elt1Impl(i));}
+    inline TypeConst elt1Impl(int i) const { return (lhs_.elt1Impl(i));}
     /** accesses to the element */
-    inline ConstReturnType elt0Impl() const { return (lhs_.elt());}
+    inline TypeConst elt0Impl() const { return (lhs_.elt());}
 
   protected:
     /** @return element (i,j)
@@ -692,7 +692,7 @@ class SubVectorAccessor: public SubVectorAccessorBase< Lhs, Size_
 {
   public:
     typedef typename hidden::Traits< SubVectorAccessor< Lhs, Size_> >::Type Type;
-    typedef typename hidden::Traits< SubVectorAccessor< Lhs, Size_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< SubVectorAccessor< Lhs, Size_> >::TypeConst TypeConst;
     enum
     {
       structure_ = hidden::Traits< SubVectorAccessor<Lhs, Size_> >::structure_,
@@ -715,13 +715,13 @@ class SubVectorAccessor: public SubVectorAccessorBase< Lhs, Size_
     /** @return element (i,j)
      *  @param i,j row and column indexes
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const { return (lhs_.elt2Impl(i, j));}
+    inline TypeConst elt2Impl(int i, int j) const { return (lhs_.elt2Impl(i, j));}
     /** @return i-th element
      *  @param i element index
      **/
-    inline ConstReturnType elt1Impl(int i) const { return (lhs_.elt1Impl(i));}
+    inline TypeConst elt1Impl(int i) const { return (lhs_.elt1Impl(i));}
     /** accesses to the element */
-    inline ConstReturnType elt0Impl() const { return (lhs_.elt());}
+    inline TypeConst elt0Impl() const { return (lhs_.elt());}
 
     /** @return element (i,j)
      *  @param i,j row and column indexes
@@ -848,7 +848,7 @@ struct Traits< SubOperator <Lhs, SizeRows_, SizeCols_> >
     storage_   = Lhs::storage_
   };
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 /** @ingroup hidden
  *  @brief Traits class for the sub accessor
@@ -865,7 +865,7 @@ struct Traits< SubAccessor <Lhs, SizeRows_, SizeCols_> >
     storage_   = Lhs::storage_
   };
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 
 } // namespace hidden
@@ -890,7 +890,7 @@ class SubOperator: public ExprBase< SubOperator<Lhs, SizeRows_, SizeCols_> >
 {
   public:
     typedef typename hidden::Traits< SubOperator<Lhs, SizeRows_, SizeCols_> >::Type Type;
-    typedef typename hidden::Traits< SubOperator<Lhs, SizeRows_, SizeCols_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< SubOperator<Lhs, SizeRows_, SizeCols_> >::TypeConst TypeConst;
     enum
     {
       structure_ = hidden::Traits< SubOperator<Lhs, SizeRows_, SizeCols_> >::structure_,
@@ -919,13 +919,13 @@ class SubOperator: public ExprBase< SubOperator<Lhs, SizeRows_, SizeCols_> >
     /** @return element (i,j)
      *  @param i,j row and column indexes
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const { return (lhs_.elt2Impl(i, j));}
+    inline TypeConst elt2Impl(int i, int j) const { return (lhs_.elt2Impl(i, j));}
     /** @return i-th element
      *  @param i element index
      **/
-    inline ConstReturnType elt1Impl(int i) const { return (lhs_.elt1Impl(i));}
+    inline TypeConst elt1Impl(int i) const { return (lhs_.elt1Impl(i));}
     /** accesses to the element */
-    inline ConstReturnType elt0Impl() const { return (lhs_.elt());}
+    inline TypeConst elt0Impl() const { return (lhs_.elt());}
 
   protected:
     Lhs const& lhs_;
@@ -953,7 +953,7 @@ class SubAccessor: public ExprBase< SubAccessor<Lhs, SizeRows_, SizeCols_> >
 {
   public:
     typedef typename hidden::Traits< SubAccessor<Lhs, SizeRows_, SizeCols_> >::Type Type;
-    typedef typename hidden::Traits< SubAccessor<Lhs, SizeRows_, SizeCols_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< SubAccessor<Lhs, SizeRows_, SizeCols_> >::TypeConst TypeConst;
     enum
     {
       structure_ = hidden::Traits< SubAccessor<Lhs, SizeRows_, SizeCols_> >::structure_,
@@ -982,13 +982,13 @@ class SubAccessor: public ExprBase< SubAccessor<Lhs, SizeRows_, SizeCols_> >
     /** @return element (i,j)
      *  @param i,j row and column indexes
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const { return (lhs_.elt2Impl(i, j));}
+    inline TypeConst elt2Impl(int i, int j) const { return (lhs_.elt2Impl(i, j));}
     /** @return i-th element
      *  @param i element index
      **/
-    inline ConstReturnType elt1Impl(int i) const { return (lhs_.elt1Impl(i));}
+    inline TypeConst elt1Impl(int i) const { return (lhs_.elt1Impl(i));}
     /** accesses to the element */
-    inline ConstReturnType elt0Impl() const { return (lhs_.elt());}
+    inline TypeConst elt0Impl() const { return (lhs_.elt());}
 
     /** @return element (i,j)
      *  @param i,j row and column indexes

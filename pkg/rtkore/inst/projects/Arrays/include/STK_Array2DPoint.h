@@ -37,6 +37,8 @@
 #define STK_ARRAY2DPOINT_H
 
 #include "STK_IArray2D.h"
+#include "STK_IArray2DSlicers.h"
+#include "STK_IArray2DModifiers.h"
 
 namespace STK
 {
@@ -68,7 +70,7 @@ struct Traits< Array2DPoint<Type_> >
   typedef Array2DPoint<Type_>  SubVector;
 
   typedef Type_                Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+  typedef typename RemoveConst<Type>::Type const& TypeConst;
 
   enum
   {
@@ -79,6 +81,7 @@ struct Traits< Array2DPoint<Type_> >
     size_      = UnknownSize,
     storage_   = Arrays::dense_ // always dense
   };
+  typedef Array1D<Type, UnknownSize> ColVector;
 };
 
 } // namespace hidden
@@ -107,7 +110,7 @@ class Array2DPoint: public IArray2D< Array2DPoint<Type_> >
     typedef typename hidden::Traits< Array2DPoint<Type_> >::SubArray SubArray;
 
     typedef typename hidden::Traits< Array2DPoint<Type_> >::Type Type;
-    typedef typename hidden::Traits< Array2DPoint<Type_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< Array2DPoint<Type_> >::TypeConst TypeConst;
 
     enum
     {
@@ -171,11 +174,12 @@ class Array2DPoint: public IArray2D< Array2DPoint<Type_> >
     /** @return a constant reference on the jth element
      *  @param j index of the element (const)
      **/
-    Type const & elt1Impl(int const& j) const { return this->data(j)[this->beginRows()];}
+    Type const& elt1Impl(int const& j) const
+    { return this->elt(this->beginRows(), j);}
     /** @return a reference on the jth element
      *  @param j index of the element
      **/
-    inline Type& elt1Impl(int const& j) { return this->data(j)[this->beginRows()];}
+    inline Type& elt1Impl(int const& j) { return this->elt(this->beginRows(), j);}
     /** New first indexes for the object.
      *  @param cbeg the index of the first column to set
      **/
@@ -185,6 +189,12 @@ class Array2DPoint: public IArray2D< Array2DPoint<Type_> >
      **/
     Array2DPoint<Type>& resize1D(Range const& J)
     { Base::resize(this->rows(), J); return *this;}
+    /** Set value at position j
+     *  @param j,v position and value to set
+     **/
+    void setValue1D( int j, TypeConst v)
+    { this->setValue(this->beginRows(), j, v);}
+
     /** Add n elements to the container.
      *  @param n number of elements to add
      **/

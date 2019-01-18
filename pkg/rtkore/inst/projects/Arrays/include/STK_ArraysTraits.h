@@ -61,7 +61,7 @@ namespace hidden
  *     typedef Array1D<Type_, UnknownSize> SubVector;
  *
  *     typedef Type_ Type;
- *     typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+ *     typedef typename RemoveConst<Type>::Type const& TypeConst;
  *
  *     enum
  *     {
@@ -74,8 +74,8 @@ namespace hidden
  *     };
  *
  *     // optional
- *     typedef RandomIterator1D<Array1D<Type_, Size_> > Iterator;
- *     typedef ConstRandomIterator1D<Array1D<Type_, Size_> > ConstIterator;
+ *     typedef DenseRandomIterator<Array1D<Type_, Size_> > Iterator;
+ *     typedef ConstDenseRandomIterator<Array1D<Type_, Size_> > ConstIterator;
  *
  *     typedef std::reverse_iterator<Iterator> ReverseIterator;
  *     typedef std::reverse_iterator<ConstIterator> ConstReverseIterator;
@@ -89,12 +89,13 @@ template <typename Derived> struct Traits;
  *  @brief Traits class to get the correct returned Structure, Type, allocator,...
  *  of operator*. This traits struct is used by the functors classes operating
  *  on the STK::Array2D, STK::CArray,... classes.
- *  @note Impossible cases are tracked in ArrayByArrayProduct class.
+ *
+ *  @note Impossible products are tracked in ArrayByArrayProduct class.
  **/
 template<typename Lhs, typename Rhs, int LStructure_, int RStructure_>
 struct ProductTraits;
 
-/** @ingroup hidden
+/** @ingroup hidden, Arrays
  *  Utility class that will select the type of operator to apply.
  *  The result can be either a number if the data are in a vector or a point,
  *  or a vector if the data are in a matrix
@@ -102,7 +103,33 @@ struct ProductTraits;
 template<typename Derived, template<class> class Functor>
 struct FunctorTraits;
 
-} // hidden
+/** @ingroup hidden, Arrays
+ *  @brief The traits struct IteratorTraits must be specialized for any iterator
+ *  derived from the base classes STK::IteratorBase and STK::InnerOperatorBase.
+ *
+ *  We use the type names defined by the STL for the iterator_traits class.
+ *
+ *  For example:
+ *  @code
+ *  template<typename Type>
+ *  struct IteratorTraits
+ *  {
+ *    /// One of the iterator_tags types
+ *    typedef std::random_access_iterator_tag  iterator_category;
+ *    /// The type "pointed to" by the iterator.
+ *    typedef Type        value_type;
+ *    /// Distance between iterators is represented as this type.
+ *    typedef int  difference_type;
+ *    /// This type represents a pointer-to-value_type.
+ *    typedef Type*   pointer;
+ *    /// This type represents a reference-to-value_type.
+ *    typedef Type& reference;
+ *  };
+ *  @endcode
+ */
+template <typename Derived> struct IteratorTraits;
+
+} // namespace hidden
 
 } // namespace STK
 

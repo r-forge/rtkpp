@@ -132,7 +132,7 @@ class ICArray: public IArrayBase<Derived>
     typedef typename hidden::Traits< Derived >::Row Row;
     typedef typename hidden::Traits< Derived >::Col Col;
     typedef typename hidden::Traits< Derived >::Type Type;
-    typedef typename hidden::Traits< Derived >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< Derived >::TypeConst TypeConst;
 
     enum
     {
@@ -210,17 +210,22 @@ class ICArray: public IArrayBase<Derived>
     /** implement the const element accessor */
     inline Type& elt2Impl( int i, int j) { return allocator_.elt(i, j);}
     /** implement the writable element accessor */
-    inline ConstReturnType elt2Impl( int i, int j) const { return allocator_.elt(i, j);}
+    inline TypeConst elt2Impl( int i, int j) const { return allocator_.elt(i, j);}
 
     /** implement the const element accessor for vector/point/diagonal arrays*/
     inline Type& elt1Impl( int j) { return allocator_.elt(j);}
     /** implement the writable element accessor for vector/point/diagonal arrays*/
-    inline ConstReturnType elt1Impl( int j) const{ return allocator_.elt(j);}
+    inline TypeConst elt1Impl( int j) const{ return allocator_.elt(j);}
 
     /** implement the const element accessor for number arrays*/
     inline Type& elt0Impl() { return allocator_.elt();}
     /** implement the writable element accessor for number arrays*/
-    inline ConstReturnType elt0Impl() const { return allocator_.elt();}
+    inline TypeConst elt0Impl() const { return allocator_.elt();}
+
+    /** implement setValue for vector/point/diagonal arrays*/
+    inline void setValueImpl( int j, TypeConst value) { allocator_.elt(j) = value ;}
+    /** implement setValue for vector/point/diagonal arrays*/
+    inline void setValueImpl( int i, int j, TypeConst value) { allocator_.elt(i,j) = value ;}
 
     // overloaded operators
     /** @return a reference on the element (i,j) of the 2D container.
@@ -239,7 +244,7 @@ class ICArray: public IArrayBase<Derived>
     /** @return a constant reference on the element (i,j) of the 2D container.
      *  @param i,j row and column indexes
      **/
-    inline ConstReturnType operator()(int i, int j) const
+    inline TypeConst operator()(int i, int j) const
     {
 #ifdef STK_BOUNDS_CHECK
        if (this->beginRows() > i) { STKOUT_OF_RANGE_2ARG(ICArray::operator(), i, j, beginRows() > i);}
@@ -265,7 +270,7 @@ class ICArray: public IArrayBase<Derived>
     /** @return the ith element
      *  @param i index of the element to get
      **/
-    inline ConstReturnType operator[](int i) const
+    inline TypeConst operator[](int i) const
     {
       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
 #ifdef STK_BOUNDS_CHECK
@@ -278,7 +283,7 @@ class ICArray: public IArrayBase<Derived>
     /** @return the number */
     inline Type& operator()() { return this->elt();}
     /** @return a constant reference on the number */
-    inline ConstReturnType operator()() const { return this->elt();}
+    inline TypeConst operator()() const { return this->elt();}
 
     // row operators
     /** implement the row operator using a reference on the row of the allocator

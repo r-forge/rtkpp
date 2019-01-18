@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{STK++ Arrays, User Guide}
+%\VignetteIndexEntry{STK++ Arrays: User Guide}
 
 \documentclass[a4paper,10pt]{article}
 
@@ -15,7 +15,7 @@ rtkore.version <- packageDescription("rtkore")$Version
 rtkore.date <- packageDescription("rtkore")$Date
 @
 % Title Page
-\title{ User Guide: STK++ Arrays}
+\title{User Guide: \stkpp{} Arrays}
 \author{Serge Iovleff}
 \date{\today}
 
@@ -25,12 +25,12 @@ rtkore.date <- packageDescription("rtkore")$Date
 
 \maketitle
 \begin{abstract}
-This user guide gives a general review of the STK++ arrays and of their usages.
+This user guide gives a general review of the \stkpp{} arrays and of their usages.
 After giving a general review of the capability of the library, we detail the
 various accessors/mutators available. We give a complete list of
-constructors. We focus on the Array2D class and give some hints about their
+constructors. We focus on the \code{Array2D} class and give some hints about their
 capabilities. We then present the different visitors, appliers and functors
-implemented in STK++ allowing to compute quantities or arrays of interests. We
+implemented in \stkpp{} allowing to compute quantities or arrays of interests. We
 then explain how it is possible to use or modify slices of arrays. Finally we end
 this document by detailing the way to construct reference arrays.
 \end{abstract}
@@ -39,21 +39,21 @@ this document by detailing the way to construct reference arrays.
 
 The containers/arrays you use in order to store and process the data in your
 application greatly influence the speed and the memory usage of your application.
-STK++ proposes a large choice of containers/arrays and methods that you can used
+\stkpp{} proposes a large choice of containers/arrays and methods that you can used
 in conjunction with them.
 
 There are mainly two kinds of arrays and a wrapper you can use in \stkpp{}:
 \begin{itemize}
 \item The \code{Array2D} family classes which are the classes defined in the
-oldest versions of STK++,
+oldest versions of \stkpp{},
 \item the \code{CArray} family classes which have been introduced in version
-0.4 of STK++ library.
+0.4 of \stkpp{} library.
 \item For \rtkore{} users, the \code{RVector} and \code{RMatrix} wrap the
 R \code{SEXP} stucture.
 \end{itemize}
 
 Before explaining the usage and differences between the different arrays,
-we first introduce some vocabulary. The terminology used in STK++ project for
+we first introduce some vocabulary. The terminology used in \stkpp{} project for
 the arrays is the following:
 \begin{itemize}
 \item An array is often called a matrix.
@@ -68,8 +68,8 @@ of a data array is often named a point.
 
 The \code{Array2D} classes are very flexible if you need to add, insert, remove,
 resize,... quickly rows or columns to your container. On the other hand, the
-storing scheme of the the CArray classes allow you to used them easily with
-other linear algebra libraries (e.g. Lapack, Blas, ...).
+storing scheme of the the \code{CArray} classes allow you to used them easily
+with other linear algebra libraries (e.g. \lapack{}).
 
 \section{A detailed introductory example}
 Consider the following example:
@@ -84,9 +84,8 @@ Consider the following example:
 \end{minipage}
 
 \subsection{Accessors}
-The primary coefficient accessors and mutators in STK++ are the overloaded
-parenthesis operators. For matrices, the row index is always
-passed first.
+The primary coefficient accessors and mutators in \stkpp{} are the overloaded
+parenthesis operators. For matrices, the row index is always passed first.
 
 The \code{operator[]} is also overloaded for index-based access in
 vectors, but keep in mind that \Cpp{} doesn't allow \code{operator[]} to take
@@ -94,13 +93,13 @@ more than one argument. The \code{operator[]} is thus restricted to
 vectors/points/diagonal matrices. For vectors, just pass one index in a bracket.
 
 Indexing starts at 0 by default. This behavior can be modify by defining the
-STKBASEARRAYS macro at compile time using the directive -DSTKBASEARRAYS=1.
-Enabling this macro allow user to get 1 based arrays like in FORTRAN.
-If you want to build code independent of the first index you should use the
-\code{beginCols()}, \code{beginRows()}, \code{endRows()}, \code{endCols()},
+\ttcode{STKBASEARRAYS} macro at compile time using the directive
+\ttcode{-DSTKBASEARRAYS=1}. Enabling this macro allow user to get 1 based arrays
+like in FORTRAN. If you want to build code independent of the first index you
+should use the \code{beginCols()}, \code{beginRows()}, \code{endRows()}, \code{endCols()},
 \code{lastIdxCols()} and \code{lastIdxRows()} methods of the arrays and the
-\code{begin()}, \code{end()}, \code{lastIdx()} methods of the Row-vectors,
-Column-Vectors, square matrices and diagonal matrices.
+\code{begin()}, \code{end()}, \code{lastIdx()} methods of the Points
+(Row-vectors), Vectors, square matrices and diagonal matrices.
 
 Here an example
 
@@ -144,7 +143,7 @@ Only the first template parameter is mandatory.
 
 \subsection{Accessing rows/columns/parts of an array}
 
-You can access rows, columns and sub-part of STK++ arrays easily. Here is an example:
+You can access rows, columns and sub-part of \stkpp{} arrays easily. Here is an example:
 
 \begin{minipage}[t]{0.66\textwidth}
 \lstinputlisting[style=customcpp,caption=Example]{programs/tutoSubArrays.cpp}
@@ -215,12 +214,12 @@ perform the operations:
 \end{itemize}
 
 \begin{note}
-Many more examples can be found in the test files coming with the STK++ library.
+Many more examples can be found in the test files coming with the \stkpp{} library.
 \end{note}
 
 \section{Arrays classes and their constructors}
 
-As say in the Introduction, there is two kind of arrays provides by the STK++ library: the
+As say in the Introduction, there is two kind of arrays provides by the \stkpp{} library: the
 arrays part of the \code{Array2D} family and the arrays part of the \code{CArray} family.
 Constructors depends of the structure of the array you want to obtain. In
 this part we will review all the existing arrays and the different way
@@ -235,7 +234,7 @@ classes for storing scalars. The values are stored in an array of range
 \code{[beginRows:endRows)}$\times$\code{[beginCols:endCols)}.
 
 \begin{lstlisting}[style=customcpp]
-template<typename Type> class Array2D;
+template<typename Type> class \code{Array2D};
 template< typename Type, int SizeRows_ = UnknownSize, int SizeCols_ = UnknownSize, bool Orient_ = Arrays::by_col_>
 class CArray;
 \end{lstlisting}
@@ -247,8 +246,8 @@ and  \code{CArrayPoint} classes allow to store scalars in column and row
 vectors. The values are stored in arrays of range \code{[begin:end)}.
 
 \begin{lstlisting}[style=customcpp]
-template<typename Type> Array2DVector;
-template<typename Type> Array2DPoint;
+template<typename Type> \code{Array2D}Vector;
+template<typename Type> \code{Array2D}Point;
 template< typename Type, int SizeRows_=UnknownSize, bool Orient_ = Arrays::by_col_> class CArrayVector;
 template< typename Type, int SizeCols_=UnknownSize, bool Orient_ = Arrays::by_row_> class CArrayPoint;
 \end{lstlisting}
@@ -263,7 +262,7 @@ The \code{Array2DSquare} and  \code{CArraySquare} classes are general classes fo
 a square matrix. The values are stored in an array of range \code{[begin:end)}$\times$\code{[begin:end)}.
 
 \begin{lstlisting}[style=customcpp]
-template<typename Type> Array2DSquare;
+template<typename Type> \code{Array2D}Square;
 template< typename Type_, int Size_ = UnknownSize, bool Orient_ = Arrays::by_col_>
 class CArraySquare;
 \end{lstlisting}
@@ -282,7 +281,7 @@ a diagonal matrix. The values are stored in an array of range
 
 
 \begin{lstlisting}[style=customcpp]
-template<typename Type> Array2DDiagonal;
+template<typename Type> \code{Array2D}Diagonal;
 \end{lstlisting}
 
 \begin{note}
@@ -299,8 +298,8 @@ respectively lower and upper part of the array.
 
 
 \begin{lstlisting}[style=customcpp]
-template<typename Type> Array2DUpperTriangular;
-template<typename Type> Array2DLowerTriangular;
+template<typename Type> \code{Array2D}UpperTriangular;
+template<typename Type> \code{Array2D}LowerTriangular;
 \end{lstlisting}
 
 \begin{note}
@@ -371,13 +370,13 @@ Array2DVector<Real> a( 10, 2.);
 All arrays have a copy constructor. In the following examples, the resulting array is either a
 copy of the array \code{T} (if \code{ref == false}) or a reference of the array \code{T}  (if \code{ref == true})
 \begin{lstlisting}[style=customcpp]
-Array2D<Type>( Array2D<Type> const& T, bool ref=false) a; // a is a physical copy of T
-Array2DVector<Type>( Array2DVector<Type> const& T, bool ref=false) v;  // v is a physical copy of T
-Array2DPoint<Type>( Array2DPoint<Type> const& T, bool ref=false);
-Array2DSquare<Type>( Array2DSquare<Type> const& T, bool ref=false);
-Array2DDiagonal<Type>( Array2DDiagonal<Type> const& T, bool ref=false);
-Array2DLowerTriangular<Type>( Array2DLowerTriangular<Type> const& T, bool ref=false);
-Array2DUpperTriangular<Type>( Array2DUpperTriangular<Type> const& T, bool ref=false);
+Array2D<Type>( \code{Array2D}<Type> const& T, bool ref=false) a; // a is a physical copy of T
+Array2DVector<Type>( \code{Array2D}Vector<Type> const& T, bool ref=false) v;  // v is a physical copy of T
+Array2DPoint<Type>( \code{Array2D}Point<Type> const& T, bool ref=false);
+Array2DSquare<Type>( \code{Array2D}Square<Type> const& T, bool ref=false);
+Array2DDiagonal<Type>( \code{Array2D}Diagonal<Type> const& T, bool ref=false);
+Array2DLowerTriangular<Type>( \code{Array2D}LowerTriangular<Type> const& T, bool ref=false);
+Array2DUpperTriangular<Type>( \code{Array2D}UpperTriangular<Type> const& T, bool ref=false);
 \end{lstlisting}
 
 The following code copy the array \code{a} in a new array \code{b} and create a
@@ -584,7 +583,7 @@ copying the data using the merge method.
 
 \section{Using Visitors, Appliers and Functors}
 
-This page explains STK++'s visitors and appliers and how they
+This page explains \stkpp{}'s visitors and appliers and how they
 can be used on the arrays and in expressions.
 
 \subsection{Visitors}
@@ -673,8 +672,8 @@ to the name of the functor. If you want both add SafeByRow.
 \section{Slicing arrays and expressions}
 
 This part explains the slicing operations. A slice is a rectangular part of an
-array or expression. Arrays slices can be used both as \ttcode{rvalue} and as \ttcode{lvalue}
-while Expression slice can only be used as \ttcode{rvalue}.
+array or expression. Arrays slices can be used both as \ttcode{rvalue} and as
+\ttcode{lvalue} while Expression slice can only be used as \ttcode{rvalue}.
 
 \subsection{Rows and Columns}
 

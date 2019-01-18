@@ -30,8 +30,8 @@
  **/
 
 /** @file STK_IArray2D.h
- *  @brief Interface base class for the Array1D, this is an internal header file,
- *  included by other Containers library headers.
+ *  @brief Interface base class for the Array2D classes, this is an internal
+ *  header file, included by other containers library headers.
  *
  *  You should not attempt to use it directly but rather used one of the
  *  derived class like Array2D, except if you want to create your own
@@ -41,59 +41,64 @@
 #ifndef STK_IARRAY2D_H
 #define STK_IARRAY2D_H
 
-#include "STK_IArray2DBase.h"
+#include "STK_IArrayBase.h"
+
+#include "STK_ArrayBaseApplier.h"
+#include "STK_ArrayBaseAssign.h"
+#include "STK_ArrayBaseInitializer.h"
+
+#include "STK_Array1D.h"
 
 namespace STK
 {
 
 /** @ingroup Arrays
-  * @brief Interface base class for two-dimensional arrays.
-  *
-  * A IArray2D is a specialized interface class for two-dimensional
-  * arrays stored in columns. All derived class from @c IArray2D
-  * access to a column using a @c Type* ptr.
-  *
-  * All memory is allocated there using the @c rangeRowsInCol method.
-  *
-  * The available methods for manipulating the derived (2D) arrays are
-  * @code
-  *     void shift( int rbeg, int cbeg);
-  *     void pushBackRows( int n=1);
-  *     void pushBackRows( int n=1);
-  *     void pushFrontRows( int n=1);
-  *     void insertRows(int pos, int n=1);
-  *     void eraseRows(int pos, int n=1);
-  *     void pushBackCols( int n=1);
-  *     void pushFrontCols( int n=1);
-  *     void insertCols(int pos, int n=1);
-  *     void eraseCols(int pos, int n=1);
-  *     Derived& resize( Range const& I, Range const& J);
-  *     template<class Other>
-  *     Derived& pushFrontRows(ExprBase<Other> const& other);
-  *     template<class Other>
-  *     Derived& pushBackRows(ExprBase<Other> const& other);
-  *     template<class Other>
-  *     Derived& pushFrontCols(ExprBase<Other> const& other);
-  *     template<class Other>
-  *     Derived& pushBackCols(ExprBase<Other> const& other);
-  *     template<class Other>
-  *     Derived& pushFrontCols(ExprBase<Other> const& other);
-  *     template<class Other>
-  *     Derived& pushBackCols(ITContainer1D<Other> const& other);
-  * @endcode
-  *
-  * @tparam Derived is the name of the class implementing an @c IArray2D.
-  * @sa Array2D, @sa Array2DDiagonal, @sa Array2DLowerTriangular,
-  * @sa Array2DUpperTriangular, @sa Array2DPoint, @sa Array2DVector;
-  * @sa Array2DSquare.
+ *  @brief template interface base class for two-dimensional arrays.
+ *
+ * A IArray2D is an interface class for two-dimensional Arrays
+ * stored in columns and having flexible dimensions. It is possible
+ * to add, remove easily columns and rows in Derived class.
+ *
+ * Each column has a Range stored in the array @c rangeCols_.
+ * It should be worth noting that we always have
+ * @code
+ *   (rangeCols_[j].size() <= capacityCol(j)) == true;
+ *   (rangeCols_[j].isIn(this->rows()) == true;
+ * @endcode
+ *
+ * Pseudo virtual function expected by this interface in derived classes are
+ * @code
+ *   void setValue1D(int i, TypeConst value); // for 1D arrays
+ *   void resize1D(Range const& I); // for 1D arrays
+ *   void shift1D(beg); // for 1D arrays*
+ *
+ *   void pushBack(int n=1);
+ * @endcode
+ *
+ * @tparam Derived is the name of the class that implements @c IArray2D.
  **/
-template < class  Derived  >
-class IArray2D: public IArray2DBase< typename hidden::Traits<Derived>::Type*, Derived>
+template < class Derived>
+class IArray2D: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, hidden::Traits<Derived>::sizeCols_>
+              , public IArrayBase<Derived>
 {
+   // needed by merge
+   template < class OtherDerived> friend class IArray2D;
+
   public:
     typedef typename hidden::Traits<Derived>::Type Type;
-    typedef typename hidden::Traits<Derived>::Row  Row;
-    typedef typename hidden::Traits<Derived>::Col  Col;
+    typedef typename hidden::Traits<Derived>::TypeConst TypeConst;
+
+    typedef typename hidden::Traits<Derived>::Row Row;
+    typedef typename hidden::Traits<Derived>::Col Col;
+    typedef typename hidden::Traits<Derived>::SubRow SubRow;
+    typedef typename hidden::Traits<Derived>::SubCol SubCol;
+    typedef typename hidden::Traits<Derived>::SubArray SubArray;
+    // for 1D container
+    typedef typename hidden::Traits<Derived>::SubVector SubVector;
+
+    typedef typename hidden::Traits<Derived>::ColVector ColVector;
+    typedef ColVector* PtrCol;
+    typedef ColVector const* PtrColConst;
 
     enum
     {
@@ -103,1086 +108,948 @@ class IArray2D: public IArray2DBase< typename hidden::Traits<Derived>::Type*, De
       sizeCols_  = hidden::Traits<Derived>::sizeCols_,
       storage_   = hidden::Traits<Derived>::storage_
     };
+    /** Type of the Range for the rows */
+    typedef TRange<sizeRows_> RowRange;
+    /** Type of the Range for the columns */
+    typedef TRange<sizeCols_> ColRange;
+    /** Type for the IContainer2D base Class. */
+    typedef IContainer2D<sizeRows_, sizeCols_ > Base2D;
+    /** Type for the Base Class. */
+    typedef MemAllocator<PtrCol, sizeCols_> Allocator;
+    /** type of the Base Container Class. */
+    typedef IArrayBase<Derived> Base;
 
-     typedef IArray2DBase< Type*, Derived> Base;
+    using Base::elt;
+    using Base2D::setCols;
+    using Base2D::setRows;
 
- protected:
+  protected:
     /** Default constructor */
-    IArray2D(): Base() {}
-    /** Constructor with specified ranges
-     *  @param I range of the Rows
-     *  @param J range of the Cols
+    IArray2D();
+    /** constructor with specified ranges
+     *  @param I,J rows and columns range
      **/
-    IArray2D( Range const& I, Range const& J): Base(I, J)
-    { initializeCols(J);}
-    /** Copy constructor
-     *  @param T the array to copy
+    IArray2D( Range const& I, Range const& J);
+    /** Copy constructor If we want to wrap T, the main ptr will be wrapped
+     *  in MemAllocator class. If we want to copy  T, Allocator is
+     *  initialized to default values.
+     *  @note bug correction, we have to use a copy of T.rangeCols_. in case
+     *  we are using the code
+     *  @code
+     *  Array2DVector<TYPE> Dref(D.sub(J), true)
+     *  @endcode
+     *  we would get an error.
+     *  @param T the container to copy
      *  @param ref true if we wrap T
      **/
-    IArray2D( const IArray2D& T, bool ref =false): Base(T, ref)
-    {
-      if (!ref)
-      {
-        // initialize the Columns and Rows
-        initializeCols(T.cols());
-        for (int j=T.beginCols(); j<T.endCols(); j++)
-        { copyColumnForward(T, j, j);}
-      }
-    }
+    IArray2D( IArray2D const& T, bool ref =false);
     /** constructor by reference, ref_=1.
-     *  @param T the array to copy
-     *  @param I,J ranges of the rows and columns to wrap
+     *  @param T the container to wrap
+     *  @param I,J rows and columns to wrap
      **/
-    template<class OtherArray>
-    IArray2D( IArray2D<OtherArray> const& T, Range const& I, Range const& J)
-           : Base(T, I, J)
-    {}
-    /** Wrapper constructor the Container is a ref.
-     *  @param q pointer on data
-     *  @param I range of the Rows to wrap
-     *  @param J range of the Columns to wrap
+    template<class OtherDerived>
+    IArray2D( IArray2D< OtherDerived> const& T, Range const& I, Range const& J);
+    /** destructor. Allocated horizontal memory (the array with the pointers
+     *  on the columns) is liberated by the Allocator.
      **/
-    IArray2D( Type** q, Range const& I, Range const& J): Base(q, I, J) {}
-    /** destructor.
-     *  free the vertically allocated memory (the columns). The horizontally
-     *  allocated memory is handled by the Allocator class.
-     **/
-    ~IArray2D() { if (!this->isRef()) this->freeCols(this->cols());}
+    ~IArray2D();
 
   public:
-    /** set a value to the whole array */
-    Derived& setValue(Type const& v)
-    {
-      for (int j=this->beginCols(); j<this->endCols(); j++)
-      {
-        Type* p(this->data(j));
-        for (int i=this->rangeCols_[j].begin(); i<this->rangeCols_[j].end(); i++) p[i]= v;
-      }
-      return this->asDerived();
-    }
+    /** clear the object.
+     *  This will free all allocated memory and reset all range to Range().
+     *  (while freeMem() does not modify rows range (rows_)
+     **/
+    void clear();
     /** move T to this.
      *  @note : T is not modified but just set as a reference of the data it was responsible.
      *  @param T the array to move.
      **/
-     Derived& move(Derived const& T)
-     {
-       if (this->asPtrDerived() == &T) return this->asDerived();
-       if (!this->isRef()) { freeCols(this->cols());}
-       // move Base part
-       Base::move(T);
-       return this->asDerived();
-     }
-    /** clear the object.
-     *  This will free all allocated memory and reset all range to Range().
+    Derived& move(Derived const& T);
+    /** exchange this container with T.
+     *  @param T the container to exchange with this
      **/
-    void clear()
+    void exchange(IArray2D &T);
+    // getters
+    /**  @return @c true if the container is empty, @c false otherwise */
+    bool isRef() const { return allocator_.isRef();}
+    /** @return the Vertical range */
+    inline RowRange const& rowsImpl() const { return Base2D::rows();}
+    /**@return the Horizontal range */
+    inline ColRange const& colsImpl() const { return Base2D::cols();}
+
+    /** @return the Vertical range */
+    inline RowRange const& rows() const { return Base2D::rows();}
+    /** @return the index of the first row */
+    inline int beginRows() const { return Base2D::beginRows();}
+    /** @return the ending index of the rows */
+    inline int endRows() const { return Base2D::endRows();}
+    /** @return the number of rows */
+    inline int sizeRows() const { return Base2D::sizeRows();}
+
+    /**@return the Horizontal range */
+    inline ColRange const& cols() const { return Base2D::cols();}
+    /** @return the index of the first column */
+    inline int beginCols() const { return Base2D::beginCols();}
+    /**  @return the ending index of columns */
+    inline int endCols() const { return Base2D::endCols();}
+    /** @return the number of columns */
+    inline int sizeCols() const { return Base2D::sizeCols();}
+
+    /**  @return the index of the last column */
+    inline int lastIdxCols() const { return Base2D::lastIdxCols();}
+    /** @return the index of the last row */
+    inline int lastIdxRows() const { return Base2D::lastIdxRows();}
+
+    /**  @return @c true if the container is empty, @c false otherwise */
+    inline bool empty() const { return Base2D::empty();}
+
+    /** @return the allocator. */
+    inline Allocator const& allocator() const { return allocator_;}
+    /** @return a constant pointer on the j-th column of the container
+     *  @param j the index of the column
+     **/
+    inline PtrColConst ptr(int j) const { return allocator_.elt(j);}
+    /** @return the maximum possible number of columns without reallocation. */
+    inline int availableCols() const { return allocator_.size();}
+    /** @return the capacity of the column @c col.
+     *  @param col index of the column we want the capacity
+     **/
+    inline int capacityCol(int col) const { return ptr(col) ? ptr(col)->capacity() : 0;}
+    /** @return the range of each columns. */
+    inline Array1D<Range, sizeCols_> const& rangeCols() const { return rangeCols_;}
+    /** @return the range of a column.
+     *  @param col index of the column we want the range
+     **/
+    inline Range const& rangeCol(int col) const { return rangeCols_[col];}
+
+    /** implement setValue for vector/point/diagonal arrays*/
+    inline void setValueImpl( int j, TypeConst v) { this->asDerived().setValue1D(j, v);}
+    /** implement setValue for vector/point/diagonal arrays*/
+    inline void setValueImpl( int i, int j, TypeConst v) { allocator_.elt(j)->setValue(i, v);}
+
+    /** access to an element.
+     *  @param i,j indexes of the element to get
+     *  @return a reference on the (i,j) element
+     **/
+    inline Type& elt2Impl( int i, int j) { return allocator_.elt(j)->elt(i);}
+    /** constant access to an element.
+     *  @param i,j indexes of the element to get
+     *  @return a constant reference on the (i,j) element
+     **/
+    inline TypeConst elt2Impl( int i, int j) const { return ptr(j)->elt(i);}
+
+    // overloaded operators
+    /** @return a constant reference on the element (i,j) of the 2D container.
+     *  @param i,j row and column indexes
+     **/
+    inline TypeConst operator()(int i, int j) const
     {
-      // Nothing to do for reference
-      if (this->isRef()) return;
-      // free the Rows memory
-      this->freeMem();
-      this->setRanges();
-      // initialize if necessary
-      this->mallocCols(this->cols());
-      initializeCols(this->cols());
+#ifdef STK_BOUNDS_CHECK
+       if (beginRows() > i) { STKOUT_OF_RANGE_2ARG(IArray::elt, i, j, beginRows() > i);}
+       if (endRows() <= i)  { STKOUT_OF_RANGE_2ARG(IArray::elt, i, j, endRows() <= i);}
+       if (beginCols() > j) { STKOUT_OF_RANGE_2ARG(IArray::elt, i, j, beginCols() > j);}
+       if (endCols() <= j)  { STKOUT_OF_RANGE_2ARG(IArray::elt, i, j, endCols() <= j);}
+#endif
+      return elt(i,j);
     }
+    /** @return a reference on the element (i,j) of the 2D container.
+     *  @param i, j indexes of the element to get
+     **/
+    inline Type& operator()(int i, int j)
+    {
+#ifdef STK_BOUNDS_CHECK
+       if (this->beginRows() > i) { STKOUT_OF_RANGE_2ARG(IArray2D::elt, i, j, beginRows() > i);}
+       if (this->endRows() <= i)  { STKOUT_OF_RANGE_2ARG(IArray2D::elt, i, j, endRows() <= i);}
+       if (this->beginCols() > j) { STKOUT_OF_RANGE_2ARG(IArray2D::elt, i, j, beginCols() > j);}
+       if (this->endCols() <= j)  { STKOUT_OF_RANGE_2ARG(IArray2D::elt, i, j, endCols() <= j);}
+#endif
+      return elt(i,j);
+    }
+    /** @return the ith element
+     *  @param i index of the element to get
+     **/
+    inline TypeConst operator[](int i) const
+    {
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+#ifdef STK_BOUNDS_CHECK
+      if (this->asDerived().begin() > i) { STKOUT_OF_RANGE_1ARG(IArray2D::elt, i, begin() > i);}
+      if (this->asDerived().end() <= i)  { STKOUT_OF_RANGE_1ARG(IArray2D::elt, i, end() <= i);}
+#endif
+      return elt(i);
+    }
+    /** @return a reference on the ith element
+     *  @param i index of the element to get
+     **/
+    inline Type& operator[](int i)
+    {
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+#ifdef STK_BOUNDS_CHECK
+      if (this->asDerived().begin() > i) { STKOUT_OF_RANGE_1ARG(IArray2D::elt, i, begin() > i);}
+      if (this->asDerived().end() <= i)  { STKOUT_OF_RANGE_1ARG(IArray2D::elt, i, end() <= i);}
+#endif
+      return elt(i);
+    }
+    /** @return a constant reference on the number */
+    inline TypeConst operator()() const { return elt();}
+    /** @return the number */
+    inline Type& operator()() { return elt();}
+
+    //slicing
+    /** access to a part of a column.
+     *  @param j index of the column
+     *  @return a reference in the range I of the column j of this
+     **/
+    Col col( int j) const;
+    /** access to a part of a column.
+     *  @param I range of the rows
+     *  @param j index of the col
+     *  @return a reference in the range I of the column j of this
+     **/
+    SubCol col(Range const& I, int j) const;
+    /** access to many columns.
+     *  @param J range of the index of the cols
+     *  @return a 2D array containing the Container in the Horizontal range @c J
+     **/
+    SubArray col(Range const& J) const;
+    /** access to a part of a row.
+     *  @param i index of the row
+     *  @return a reference of the row i.
+     **/
+    Row row( int i) const;
+    /** access to a part of a row.
+     *  @param i,J index of the row and range of the columns
+     *  @return a reference of the row i.
+     **/
+    SubRow row(int i, Range const& J) const;
+    /** access to many rows.
+     *  @param I range of the index of the rows
+     *  @return a 2D array containing the Container in the vertical range @c I
+     **/
+    SubArray row(Range const& I) const;
+    /** @return  many elements.
+     *  @param J Range of the elements
+     **/
+    SubVector sub(Range const& J) const;
+    /** access to a sub-array.
+     *  @param I,J range of the rows and of the columns
+     **/
+    SubArray sub(Range const& I, Range const& J) const;
+    // overloaded operators for sub-arrays/vectors
+    /** @return the sub-vector in given range
+     *  @param I range to get
+     **/
+    SubVector operator[](Range const& I) const;
+    /** @param I,j range of the rows and index of the column
+     *  @return a Vertical container containing the column @c j of this
+     *  in the range @c I
+     **/
+    SubCol operator()(Range const& I, int j) const;
+    /** @param i,J index of the row and range of the columns
+     *  @return an Horizontal container containing the row @c i of this
+     *  in the range @c J
+     **/
+    SubRow operator()(int i, Range const& J) const;
+    /** @param I,J range of the rows and of the columns
+     *  @return a 2D container containing this in the range @c I, @c J
+     **/
+    SubArray operator()(Range const& I, Range const& J) const;
+    /** @return the column j.
+     *  @param j index of the column
+     **/
+    SubCol atCol(int j) const;
+    /** @return the row i.
+     *  @param i the index of the row
+     **/
+    Row atRow(int i) const;
+
+    // modifiers
+    /** function for reserving memory in all the columns
+     *  @param sizeRows,sizeCols the size to reserve for the rows and columns
+     **/
+    void reserve(int sizeRows, int sizeCols);
+    /** Reserve a certain amount of rows in all columns
+     *  @param size the size to reserve
+     **/
+    void reserveRows(int size);
+    /** Reserve a certain amount of columns
+     *  @param sizeCols the size to reserve.
+     **/
+    void reserveCols(int sizeCols);
+
     /** @brief Set new beginning indexes to the array.
      *  @param rbeg, cbeg the indexes of the first row and first column to set
      **/
-    void shift( int rbeg, int cbeg)
-    {
-      // move begin of the columns
-      this->shiftBeginCols(cbeg);
-      // move begin of the rows
-      this->shiftBeginRows(rbeg);
-    }
+    void shift( int rbeg, int cbeg);
+    /** New first index for the object (only for vectors/points/square/... arrays)
+     *  @param beg the index of the first element to set
+     **/
+    void shift( int beg);
+    /** New first index for the rows of the array.
+     *  @param beg the index of the first row to set
+     **/
+    void shiftRows( int beg);
+    /** New beginning index for the columns of the object.
+     *  @param cbeg the index of the first column to set
+     **/
+    void shiftCols(int cbeg);
+
     /** resize the array.
-     *
      *  @note The implicit assumption made by this method is that it is easiest
      *  and faster to add column than add rows to the 2D array.
      *
      * @param I the new range for the rows of the array
      * @param J the new range for the columns of the array
      **/
-    Derived& resize( Range const& I, Range const& J)
-    {
-      // check if there is something to do
-      if ((this->rows() == I) && (this->cols() == J)) return this->asDerived();
-      if (this->isRef())
-      { STKRUNTIME_ERROR_2ARG(IArray2D::resize,I,J,cannot operate on reference);}
-      //  translate beg
-      this->shift(I.begin(), J.begin());
-      // check again if there is something to do
-      if ((this->rows() == I) && (this->cols() == J)) return this->asDerived();
-      // just clear empty container
-      if (I.size()<=0 || J.size() <= 0) { this->clear(); return this->asDerived();}
-      // number of rows and columns to delete or add
-      int rinc = I.end() - this->endRows();
-      int cinc = J.end() - this->endCols();
-      // check if we add columns
-      if ((cinc >=0)) // work first on rows as we add columns
-      {
-        if (rinc < 0)
-        { this->popBackRows(-rinc);}  // less rows
-        else
-        { this->pushBackRows(rinc);} // more rows
-        this->pushBackCols(cinc); // add columns
-        return this->asDerived();
-      }
-      // work first on columns as we remove column
-      this->popBackCols(-cinc); // remove columns
-      if (rinc < 0) this->popBackRows(-rinc); // less rows
-      else          this->pushBackRows(rinc); // more rows
-      return this->asDerived();
-    }
-    /** New first index for the object.
-     *  @param beg the index of the first element to set
-     **/
-    void shift( int beg) { this->asDerived().shift1D(beg);}
-    /** @return the resized row or column vector
+    Derived& resize( Range const& I, Range const& J);
+    /** @return the resized row/column/square array
      *  @param I the new range for the vector/point
      **/
-    Derived& resize( Range const& I) { return this->asDerived().resize1D(I);}
-    /** New first index for the Rfws of the array.
-     *  @param rbeg the index of the first row to set
-     **/
-    void shiftBeginRows( int rbeg)
-    {
-      // compute increment
-      int rinc = rbeg - this->beginRows();
-      // if there is something to do
-      if (rinc == 0) return;
-      // is this structure just a pointer?
-      if (this->isRef())
-      { STKRUNTIME_ERROR_1ARG(IArray2D::shiftBeginRows,rbeg,cannot operate on reference);}
-      // translate rows_()
-      Base::shiftBeginRows(rbeg);
-      // For all cols, move begin
-      for (int j=this->beginCols(); j<this->endCols(); j++)
-      { shiftCol(j, this->rangeCols_[j].begin()+rinc);}
-    }
-    /** Add n Rows to the array.
-     *  @param n number of Rows to add
-     **/
-    void pushBackRows( int n=1)
-    {
-      // if n<=0 nothing to do
-      if (n <= 0) return;
-      // is this structure just a pointer?
-      if (this->isRef())
-      { STKRUNTIME_ERROR_1ARG(IArray2D::pushBackRows,n,cannot operate on reference);}
-      // If the array have no rows : create its
-      if (this->sizeRows() <=0)
-      {
-        // update the range of the array
-        this->incLastIdxRows(n);
-        // initialize the array
-        this->initializeCols(this->cols());
-      }
-      else
-      {
-        // update the range of the rows
-        this->incLastIdxRows(n);
-        // allocate new Rows for each Col
-        for (int j=this->beginCols(); j<this->endCols(); j++)
-        {
-          // compute range from the leaf
-          Range range(this->asDerived().rangeRowsInCol(j));
-          // if there is no column or the end is less than the array
-          // end
-          if ((range.size()>0)&&(range.lastIdx()>this->lastIdxRows()-n))
-          {
-            // if the column is empty create it
-            if (this->rangeCols_[j].size()<=0)
-            {
-              this->initializeCol(j, range);
-            }
-            else
-            {
-              // compute position
-             int pos(this->lastIdxRows()-n+1);
-              // add elts
-              insertRowsToCol(j, pos, range.lastIdx() - pos +1);
-            }
-          }
-        }
-      }
-    }
-    /** Insert n Rows in front of the array.
-     *  @param n number of elements to insert (default 1)
-     **/
-    void pushFrontRows(int n =1)
-    {
-      // if n<=0 nothing to do
-      if (n <= 0) return;
-      // is this structure just a pointer?
-      if (this->isRef())
-      { STKRUNTIME_ERROR_1ARG(IArray2D::pushFrontRows,n,cannot operate on reference);}
-      int pos = this->beginRows();      // update the range of the rows
-      this->incLastIdxRows(n);
-      // allocate new Rows for each Col
-      for (int j=this->beginCols(); j<this->endCols(); j++)
-      {
-        // check position
-        if ( (pos >= this->rangeCols_[j].begin())
-           ||(pos <= this->rangeCols_[j].end())
-           )
-        { insertRowsToCol(j, pos, n);}
-      }
-    }
-    /** Insert n Rows at the position pos of the array.
-     *  If pos is outside the range of a column, then the
-     *  method do nothing.
-     *  @param pos index where to insert Rows
-     *  @param n number of elements to insert (default 1)
-     **/
-    void insertRows(int pos, int n =1)
-    {
-      // if n<=0 nothing to do
-      if (n <= 0) return;
-      // is this structure just a pointer?
-      if (this->isRef())
-      { STKRUNTIME_ERROR_2ARG(IArray2D::insertRows,pos,n,cannot operate on reference);}
-      if (this->beginRows() > pos)
-      { STKOUT_OF_RANGE_2ARG(IArray2D::insertRows,pos,n,beginRows() > pos);}
-      if (this->endRows() < pos)
-      { STKOUT_OF_RANGE_2ARG(IArray2D::insertRows,pos,n,endRows() < pos);}
-      // update the range of the rows
-      this->incLastIdxRows(n);
-      // allocate new Rows for each Col
-      for (int j=this->beginCols(); j<this->endCols(); j++)
-      {
-        // check position
-        if ( (pos >= this->rangeCols_[j].begin())
-           ||(pos <= this->rangeCols_[j].end())
-           )
-        { insertRowsToCol(j, pos, n);}
-      }
-    }
-    /** Delete n latest rows of the array.
-     *  @param n number of rows to delete
-     **/
-    void popBackRows( int n = 1)
-    {
-      // if n<=0 nothing to do
-      if (n <= 0) return;
-      // is this structure just a pointer?
-      if (this->isRef())
-      { STKRUNTIME_ERROR_1ARG(IArray2D::popBackRows,n,cannot operate on reference);}
-      if (this->sizeRows() < n)
-      { STKOUT_OF_RANGE_1ARG(IArray2D::popBackRows,n,sizeRows() < n);}
-      this->decLastIdxRows(n);
-      // decrease range of each Col
-      for (int j= this->beginCols(); j< this->endCols(); j++)
-        eraseRowsToCol(j, this->endRows(), n);
-    }
+    Derived& resize( Range const& I);
 
-    /** Delete n Rows at the pos index to the array.
+    // rows
+    /** Insert n rows at position pos in the array
+     *  If pos is outside the range of a column, then the method do nothing
+     *  (useful for triangular/diagonal/... arrays).
+     *  @param pos index where to insert rows
+     *  @param n number of elements to insert (default is 1)
+     **/
+    void insertRows(int pos, int n =1);
+    /** Delete n rows at the position pos
      *  @param pos index where to delete elements
-     *  @param n number of elements to delete (default 1)
+     *  @param n number of rows to delete (default is 1)
     **/
-    void eraseRows(int pos, int n=1)
-    {
-      // if n==0 nothing to do
-      if (n<=0) return;
-      // is this structure just a pointer?
-      if (this->isRef())
-      { STKRUNTIME_ERROR_2ARG(IArray2D::eraseRows,pos,n,cannot operate on reference);}
-      if (this->beginRows() > pos)
-      { STKOUT_OF_RANGE_2ARG(IArray2D::eraseRows,pos,n,beginRows() > pos);}
-      if (this->lastIdxRows() < pos)
-      { STKOUT_OF_RANGE_2ARG(IArray2D::eraseRows,pos,n,lastIdxRows() < pos);}
-      if (this->lastIdxRows() < pos+n-1)
-      { STKOUT_OF_RANGE_2ARG(IArray2D::eraseRows,pos,n,lastIdxRows() < pos+n-1);}
-      // update each Col
-      for (int j=this->beginCols(); j<this->endCols(); j++)
-        eraseRowsToCol(j, pos, n);
-      // update dimensions
-      this->decLastIdxRows(n);
-    }
-    /** Add n Columns at the end of the array.
-     *  @param n the number of Columns to add
+    void eraseRows(int pos, int n=1);
+    /** Insert n rows in front of the array.
+     *  @param n number of elements to insert (default is 1)
      **/
-    void pushBackCols(int n = 1)
-    {
-      // if n<=0 nothing to do
-      if (n <= 0) return;
-      // is this structure just a pointer?
-      if (this->isRef())
-      { STKRUNTIME_ERROR_1ARG(IArray2D::pushBackCols,n,cannot operate on reference);}
-      // If the array have no Columns : create its
-      if (this->sizeCols() <=0)
-      {
-        this->incLastIdxCols(n);
-        this->mallocCols( this->cols());
-        initializeCols( this->cols());
-      }
-      else // else insert to the end of the array
-      { insertCols(this->endCols(), n);}
-    }
-    /** Insert n Columns at the beginning of the array.
-     *  @param n the number of column to insert
+    void pushFrontRows(int n =1);
+    /** Add n rows to the array.
+     *  @param n number of rows to add (default is 1)
      **/
-    void pushFrontCols(int n =1)
-    {
-      // if n<=0 nothing to do
-      if (n <= 0) return;
-      // is this structure just a pointer?
-      if (this->isRef())
-      { STKRUNTIME_ERROR_1ARG(IArray2D::pushFrontCols,n,cannot operate on reference);}
-      // compute horizontal range of the array after insertion
-      Range range_ho(this->cols());
-      range_ho.incLast(n);
-      // allocate, if necessary, the mem for the Cols
-      if (this->availableCols() < range_ho.size()) //  not enough space
-      {
-        // exchange with Taux
-        Derived Taux;
-        this->exchange(Taux);
-        // initialize columns of the array
-        try
-        {
-          this->mallocCols(range_ho);
-        }
-        catch (Exception const& error)   // if an error occur
-        {
-          this->exchange(Taux);   // restore array
-          throw error;            // and send again the exception
-        }
-        // set the ranges
-        this->setCols(range_ho);
-        this->setRows(Taux.rows());
-        // translate and copy last Columns from Taux to this
-        for (int k=Taux.lastIdxCols(); k>=Taux.beginCols(); k--)
-          this->transferColumn(Taux, k+n, k);
-      }
-      else // enough space -> shift the last Cols
-      {
-        Range addRange(this->endCols(), n);
-        // insert default capacity for the new Columns
-        this->availableRows_.insert(addRange, 0);
-        // insert default range for the new Columns
-        this->rangeCols_.insert(addRange, Range());
-        // update range_
-        this->incLastIdxCols(n);
-        // translate data
-        for (int k=this->lastIdxCols()-n; k>=this->beginCols(); k--)
-          this->transferColumn( this->asDerived(), k+n, k);
-      }
-      // initialize the rows for n first Columns
-      this->initializeCols(Range(this->beginCols(), n));
-    }
-    /** Insert n Columns at the index pos to the array.
-     *  @param pos the position of the inserted Columns
-     *  @param n the number of column to insert
+    void pushBackRows( int n=1);
+    /** Delete n first rows of the array.
+     *  @param n number of rows to delete  (default is 1)
      **/
-    void insertCols(int pos, int n =1)
-    {
-      // if n<=0 nothing to do
-      if (n <= 0) return;
-      // is this structure just a pointer?
-      if (this->isRef())
-      { STKRUNTIME_ERROR_2ARG(IArray2D::insertCols,pos,n,cannot operate on reference);}
-      if (this->beginCols() > pos)
-      { STKOUT_OF_RANGE_2ARG(IArray2D::insertCols,pos,n,beginCols() > pos);}
-      if (this->endCols() < pos)
-      { STKOUT_OF_RANGE_2ARG(IArray2D::insertCols,pos,n,endCols() < pos);}
-      // compute horizontal range of the array after insertion
-      Range range_ho(this->cols());
-      range_ho.incLast(n);
-      // allocate, if necessary, the mem for the Cols
-      if (this->availableCols() < range_ho.size()) //  not enough space
-      {
-        // exchange with Taux
-        Derived Taux;
-        this->exchange(Taux);
-        // initialize columns of the array
-        try
-        {
-          this->mallocCols(range_ho);
-        }
-        catch (Exception & error)   // if an error occur
-        {
-          this->exchange(Taux);   // restore array
-          throw error;        // and send again the exception
-        }
-        // set the ranges
-        this->setCols(range_ho);
-        this->setRows(Taux.rows());
-        // move first Columns from Taux to this
-        for (int k=Taux.beginCols(); k<pos; k++)
-          this->transferColumn(Taux, k, k);
-        // translate and copy last Columns from Taux to this
-        for (int k=Taux.lastIdxCols(); k>=pos; k--)
-          this->transferColumn(Taux, k+n, k);
-      }
-      else // enough space -> shift the last Cols
-      {
-        Range addRange(this->lastIdxCols()+1, n);
-        // insert default capacity for the new Columns
-        this->availableRows_.insert(addRange, 0);
-        // insert default range for the new Columns
-        this->rangeCols_.insert(addRange, Range());
-        // update range_
-        this->incLastIdxCols(n);
-        // translate data
-        for (int k=this->lastIdxCols()-n; k>=pos; k--)
-          this->transferColumn( this->asDerived(), k+n, k);
-      }
-      // initialize the rows for the Cols, this->availableRows_, this->rangeCols_
-      // in the range pos:pos+n-1
-      this->initializeCols(Range(pos, n));
-    }
-    /** Delete last Columns of the array
-     *  @param n the number of Columns to delete
+    void popFrontRows( int n = 1);
+    /** Delete n latest rows of the array.
+     *  @param n number of rows to delete  (default is 1)
      **/
-    void popBackCols( int n =1)
-    {
-      // if n<=0 nothing to do
-      if (n<=0) return;
-      // is this structure just a pointer?
-      if (this->isRef())
-      { STKRUNTIME_ERROR_1ARG(IArray2D::popBackCols,n,cannot operate on reference);}
-      if (this->sizeCols() < n)
-      { STKOUT_OF_RANGE_1ARG(IArray2D::popBackCols,n,sizeCol() < n);}
-      // delete each col
-      this->freeCols(Range(this->lastIdxCols()-n+1, this->lastIdxCols(), 0));
-      // update this->availableRows_
-      this->availableRows_.popBack(n);
-      // update this->rangeCols_
-      this->rangeCols_.popBack(n);
-      // update cols
-      this->decLastIdxCols(n);
-      // if there is no more Cols
-      if (this->sizeCols() == 0) this->freeMem();
-    }
-    /** Delete n Columns at the specified position of the array.
-     *  @param pos the position of the deleted Columns
-     *  @param n the number of column to delete
-     **/
-    void eraseCols(int pos, int n = 1)
-    {
-      if (n<=0) return; // if n<=0 nothing to do
-      // is this structure just a pointer?
-      if (this->isRef())
-      { STKRUNTIME_ERROR_2ARG(IArray2D::eraseCols,pos,n,cannot operate on reference);}
-      if (this->beginCols() > pos)
-      { STKOUT_OF_RANGE_2ARG(IArray2D::eraseCols,pos,n,beginCols() > pos);}
-      if (this->lastIdxCols() < pos)
-      { STKOUT_OF_RANGE_2ARG(IArray2D::eraseCols,pos,n,lastIdxCols() < pos);}
-      if (this->lastIdxCols() < pos+n-1)
-      { STKOUT_OF_RANGE_2ARG(IArray2D::eraseCols,pos,n,lastIdxCols() < pos+n-1);}
-      // delete each col
-      this->freeCols(Range(pos, n));
-      // update cols_
-      this->decLastIdxCols(n);
-      // shift Cols
-      for (int k=pos; k<this->endCols(); k++)
-        this->data(k) = this->data(k+n);
-      // update this->availableRows_
-      this->availableRows_.erase(pos, n);
-      // update this->rangeCols_
-      this->rangeCols_.erase(pos, n);
-      // if there is no more Cols
-      if (this->sizeCols() == 0) this->freeMem();
-    }
-    /** Update the columns of the array in the specified range.
-     *  @param J range of the column to update
-     **/
-    void update(Range const& J)
-    {
-      if (this->beginCols() > J.begin())
-      { STKOUT_OF_RANGE_1ARG(IArray2D::update,J,beginCols() > J.begin());}
-      if (this->endCols() < J.end())
-      { STKOUT_OF_RANGE_1ARG(IArray2D::update,J,endCols() < J.end());}
-      for ( int icol = J.begin(); icol < J.end() ; ++icol)
-      { update(icol);}
-    }
-
-    /** Update the column of the array in the specified position.
-     *  @param col index of the column to update
-     **/
-    void update(int col)
-    {
-      if (this->beginCols() > col)
-      { STKOUT_OF_RANGE_1ARG(IArray2D::update,col,beginCols() > col);}
-      if (this->lastIdxCols() < col)
-      { STKOUT_OF_RANGE_1ARG(IArray2D::update,col,lastIdxCols() < col);}
-      if (this->asDerived().rangeRowsInCol(col) != this->rangeCol(col))
-      { resizeCol(col, this->asDerived().rangeRowsInCol(col));}
-    }
-
-    /** overwrite @c this with @c src.
-     *  @note If the size match, @c this is not resized, and in this case,
-     *  the method take care of the possibly of overlapping.
-     *  @param src the array to copy
-     *  @return a copy of src
-     **/
-    Derived& assign( IArray2D const& src);
-
-    /** merge (by value) the array other with this.
-     *  @param other the array to merge to this
-     **/
-    template<class Other>
-    Derived& pushFrontCols(ExprBase<Other> const& other)
-    {
-      // check if the array is empty
-      if (this->empty())
-      {
-        this->asDerived() = other.asDerived();
-        return this->asDerived();
-      }
-      // this is not empty
-      if (other.rows() != this->rows())
-      { STKRUNTIME_ERROR_NO_ARG(IArray2D::pushFrontCols,range of the rows are different);}
-      // if the array is not empty we add the column and copy other inside
-      int size = other.sizeCols(), first = this->beginCols();
-      insertCols(first,size);
-      for (int j0= first, j1= other.beginCols(); j1 < other.endCols(); ++j0, ++j1)
-      {
-        for (int i=other.beginRows(); i<other.endRows(); i++)
-          (*this)(i, j0) = other(i,j1);
-      }
-      // return this
-      return this->asDerived();
-    }
-    /** merge (by value) the array other with this.
-     *  @param other the array to merge to this
-     **/
-    template<class Other>
-    Derived& pushBackCols(ExprBase<Other> const& other)
-    {
-      // check if the array is empty
-      if (this->empty())
-      {
-        this->asDerived() = other.asDerived();
-        return this->asDerived();
-      }
-      // this is not empty
-      if (other.rows() != this->rows())
-      { STKRUNTIME_ERROR_NO_ARG(IArray2D::pushBackCols,range of the rows are different);}
-      // if the array is not empty we add the column and copy other inside
-     int size = other.sizeCols(), first = this->lastIdxCols()+1;
-      pushBackCols(size);
-      for (int j0= first, j1= other.beginCols(); j1 < other.endCols(); ++j0, ++j1)
-      {
-        for (int i=other.beginRows(); i<other.endRows(); i++)
-          (*this)(i, j0) = other(i,j1);
-      }
-      // return this
-      return this->asDerived();
-    }
-    /** Specialization for Array1D. merge (by value) the array other with this
-     *  @param other the column to add to this
-     **/
-    template<class Other>
-    Derived& pushBackCols(IArray1D<Other> const& other)
-    {
-      // check if the array is empty
-      if (this->empty())
-      {
-        resize(other.rows(),1);
-        for (int i=other.begin(); i<other.end(); i++)
-          (*this)(i, baseIdx) = other[i];
-        return this->asDerived();
-      }
-      // not empty
-      if (other.rows() != this->rows())
-      { STKRUNTIME_ERROR_NO_ARG(IArray2D::pushBackCols(other),other.rows() != rows());}
-      // if the array is not empty we add the column and copy other inside
-      int size = other.sizeCols(), first = this->lastIdxCols()+1;
-      pushBackCols(size);
-      for (int i=other.begin(); i<other.end(); i++)
-        (*this)(i, first) = other[i];
-      // return this
-      return this->asDerived();
-    }
+    void popBackRows( int n = 1);
     /** set other at the beginning of this (concatenate). Perform a copy of the
      *  values stored in other to this.
      *  @param other the array to add
      *  @note the size and the type have to match
      **/
     template<class Other>
-    Derived& pushFrontRows(ExprBase<Other> const& other)
-    {
-      // check if the array is empty
-      if (this->empty())
-      {
-        this->asDerived() = other.asDerived();
-        return this->asDerived();
-      }
-      // not empty
-      if (other.cols() != this->cols())
-        STKRUNTIME_ERROR_NO_ARG(IArray2D::pushBackRows,range of the columns are different);
-      // add nbRow to existing rows
-      int nbRow = other.sizeRows();
-      pushFrontRows(nbRow);
-      for (int j=this->beginCols(); j< this->endCols(); ++j)
-      {
-        for (int i=this->beginRows(), iOther= other.beginRows(); iOther<other.endRows(); ++i, ++iOther)
-        { this->elt(i,j) = other.elt(iOther,j);}
-      }
-      // return this
-      return this->asDerived();
-    }
+    Derived& pushFrontRows(ExprBase<Other> const& other);
     /** set other at the end of this (concatenate). Perform a copy of the
      *  values stored in other to this.
      *  @param other the array to add back
      *  @note the size and the type have to match
      **/
     template<class Other>
-    Derived& pushBackRows(ExprBase<Other> const& other)
-    {
-      // check if the array is empty
-      if (this->empty())
-      {
-        this->asDerived() = other.asDerived();
-        return this->asDerived();
-      }
-      // not empty
-      if (other.cols() != this->cols())
-        STKRUNTIME_ERROR_NO_ARG(IArray2D::pushBackRows,range of the columns are different);
-      // add nbRow to existing rows
-      int nbRow = other.sizeRows();
-      pushBackRows(nbRow);
-      for (int j=this->beginCols(); j< this->endCols(); ++j)
-      {
-        // start from the end in order to avoid
-        for (int i=this->lastIdxRows(), iOther= other.lastIdxRows(); iOther>=other.beginRows(); --i, --iOther)
-        { this->elt(i,j) = other.elt(iOther,j);}
-      }
-      // return this
-      return this->asDerived();
-    }
-    /** @brief function for reserving memory in all the columns
-     *  @param sizeRows the size to reserve for the rows
-     *  @param sizeCols the size to reserve for the columns
+    Derived& pushBackRows(ExprBase<Other> const& other);
+    // columns modifiers
+    /** Insert n columns at the index pos to the array.
+     *  @param pos position to insert columns
+     *  @param n the number of column to insert (default is 1)
      **/
-    void reserve(int sizeRows, int sizeCols)
-    {
-      this->reserveCols(sizeCols);
-      reserveRows(sizeRows);
-    }
-    /** @brief function for reserving memory in all the columns
-     *  @param size the size to reserve
+    void insertCols(int pos, int n =1);
+    /** Delete n columns at the specified position of the array.
+     *  @param pos the position of the deleted Columns
+     *  @param n the number of column to delete (default is 1)
      **/
-    void reserveRows(int size) { reserveRows(this->cols(), size);}
-
-    // for one dimension containers
-    /** STL compatibility: insert element @c v in the range @c I of the Array.
-     *  @param v,I value and range of indexes
+    void eraseCols(int pos, int n = 1);
+    /** Insert n columns at the beginning of the array.
+     *  @param n the number of column to insert (default is 1)
      **/
-    void insert( Range const& I, Type const& v)
-    { // insert defined for vector, point and diagonal arrays
-      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
-      this->asDerived().insertElt(I.begin(), I.size());
-      for (int i=I.begin(); i<I.end(); i++) this->elt(i) = v;
-    }
+    void pushFrontCols(int n =1);
+    /** Add n columns at the end of the array.
+     *  @param n the number of Columns to add (default is 1)
+     **/
+    void pushBackCols(int n = 1);
+    /** Delete first columns of the array
+     *  @param n the number of Columns to delete (default is 1)
+     **/
+    void popFrontCols( int n =1);
+    /** Delete last columns of the array
+     *  @param n the number of Columns to delete (default is 1)
+     **/
+    void popBackCols( int n =1);
+    /** merge (by value) the array other with this.
+     *  @param other the array to merge to this
+     **/
+    template<class Other>
+    Derived& pushFrontCols(ExprBase<Other> const& other);
+    /** Specialization for Array1D. merge (by value) the array other with this
+     *  @param other the column to add to this
+     **/
+    template<class Other>
+    Derived& pushBackCols(IArray1D<Other> const& other);
+    // modifiers, STL compatibility: for one dimension containers
     /** STL compatibility: push front an element.
      *  @param v value to push front
      **/
-    void push_front(Type const& v)
-    { // push_front defined for vector, point and diagonal arrays
-      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
-      insert(Range(this->begin(), 1), v);
-    }
+    void push_front(Type const& v);
     /** STL compatibility: append an element v.
      *  @param v value to append back
      **/
-    void push_back(Type const& v)
-    { // push_back defined for vector, point and diagonal arrays
-      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
-      this->asDerived().pushBack();
-      this->back() = v;
-    }
+    void push_back(Type const& v);
+    /** STL compatibility: insert element @c v in the range @c I of the Array.
+     *  @param v,I value and range of indexes
+     **/
+    void insert( Range const& I, Type const& v);
+
+     // Useful
+     /** Swapping two columns.
+      *  @param pos1, pos2 positions of the columns to swap
+      **/
+     void swapCols(int pos1, int pos2)
+     {
+ #ifdef STK_BOUNDS_CHECK
+       if (this->beginCols() > pos1)
+       { STKOUT_OF_RANGE_2ARG(IArray2D::swapCols,pos1, pos2,beginCols() >pos1);}
+       if (this->endCols() <= pos1)
+       { STKOUT_OF_RANGE_2ARG(IArray2D::swapCols,pos1, pos2,endCols() <= pos1);}
+       if (this->beginCols() > pos2)
+       { STKOUT_OF_RANGE_2ARG(IArray2D::swapCols,pos1, pos2,beginCols() >pos2);}
+       if (this->endCols() <= pos2)
+       { STKOUT_OF_RANGE_2ARG(IArray2D::swapCols,pos1, pos2,endCols() <=pos2);}
+ #endif
+       allocator_.swap(pos1, pos2);
+       rangeCols_.swap(pos1,pos2);
+     }
+     /** swap two elements: only for vectors and points
+      * @param i,j indexes of the elemet to swap
+      **/
+     void swap(int i, int  j) { std::swap(elt(i), elt(j)); }
+     /** Append the container @c other to @c this without copying the data
+      *  explicitly. The column of @c other are appended to this.
+      *
+      *  Observe that the @c const keyword is not respected in this method:
+      *  but it is useful to define this method even for constant objects.
+      *
+      *  @note data in itself are not altered nor duplicated, thus other and
+      *  this possess the same columns.
+      *  @param other the container to merge with this
+      **/
+     template<class OtherDerived>
+     void merge(IArray2D< OtherDerived> const& other)
+     {
+       //checks
+       if (isRef())
+       { STKRUNTIME_ERROR_NO_ARG(IArray2D::merge(other),*this is a reference.);}
+       if (other.isRef())
+       { STKRUNTIME_ERROR_NO_ARG(IArray2D::merge(other),other is a reference.);}
+       // if there is no columns, we can safely modify the vertical range
+       if (this->sizeCols() <= 0) setRows(other.rows());
+       if (this->rows() != other.rows())
+       { STKRUNTIME_ERROR_NO_ARG(IArray2D::merge(other),this->rows() != other.rows());}
+
+       // break const reference
+       IArray2D< OtherDerived>& Tref = const_cast<IArray2D< OtherDerived>&>(other);
+       // compute horizontal range of the container after insertion
+       Range cols(this->cols());
+
+       // save first index of the first column added before modification of cols
+       const int first = cols.end();
+       // reallocate memory for the columns
+       cols.incLast(Tref.sizeCols());
+       reallocCols(cols);
+
+       // copy data from other
+       Tref.shiftCols(first); // easiest like that
+       for (int j=first; j< cols.end(); j++)
+       { transferCol(Tref, j);}
+
+       // delete and set view on the data
+       Tref.allocator().free();
+       Tref.allocator().setPtr(allocator_.p_data(), Tref.cols(), true);
+     }
+     /** Append the vector @c other to @c this without copying the data
+      *  explicitly. @c other is appended to this and
+      *  @c other will become a reference container. The data in itself are not
+      *  altered, the Array1D become a reference on its own data.
+      *  @param other the container to merge with this
+      **/
+     template<class OtherDerived>
+     void merge(IArray1D<OtherDerived> const& other)
+     {
+       // checks
+       if (isRef())
+       { STKRUNTIME_ERROR_NO_ARG(IArray2D::merge(IArray1D),*this is a reference.);}
+       if (other.isRef())
+       { STKRUNTIME_ERROR_NO_ARG(IArray2D::merge(IArray1D),other is a reference.);}
+       // if there is no columns, we can safely modify the vertical range
+       if (this->sizeCols() <= 0) setRows(other.range());
+       if (this->rows() != other.range())
+       { STKRUNTIME_ERROR_NO_ARG(IArray2D::merge(IArray1D),this->rows() != other.range());}
+
+       // compute horizontal range of the container after insertion
+       Range cols(this->cols());
+
+       // reallocate memory for the columns
+       cols.incLast(1);
+       reallocCols(cols);
+
+       // set column
+       allocator_.elt(cols.lastIdx()) = const_cast<OtherDerived*>(other.asPtrDerived());
+       rangeCols_[cols.lastIdx()] = other.range();
+
+       // set other as reference
+       other.setRef(true);
+     }
+     /** @brief Update columns of the array at a specified range.
+      *  @param J range of the columns to update
+      **/
+     void update(Range const& J)
+     {
+ #ifdef STK_BOUNDS_CHECK
+       if (beginCols() > J.begin())
+       { STKOUT_OF_RANGE_1ARG(IArray2D::update,J,beginCols() > J.begin());}
+       if (endCols() < J.end())
+       { STKOUT_OF_RANGE_1ARG(IArray2D::update,J,endCols() < J.end());}
+ #endif
+       for ( int icol = J.begin(); icol < J.end() ; ++icol)
+       { update(icol);}
+     }
+     /** @brief Update column of the array at specified position.
+      *  @param col index of the column to update
+      **/
+     void update(int col)
+     {
+ #ifdef STK_BOUNDS_CHECK
+       if (beginCols() > col)
+       { STKOUT_OF_RANGE_1ARG(IArray2D::update,col,beginCols() > col);}
+       if (this->lastIdxCols() < col)
+       { STKOUT_OF_RANGE_1ARG(IArray2D::update,col,lastIdxCols() < col);}
+ #endif
+       if (this->rangeRowsInCol(col) != rangeCols_[col])
+       { resizeRowCol(col, this->rangeRowsInCol(col));}
+     }
 
   protected:
-    /** copy forward the column @c srcCol of @c src in the column @c dstCol of this. */
-    void copyColumnForward(IArray2D const& src, int jDst, int jSrc)
-    {
-      Type *dp =this->data(jDst), *sp =src.data(jSrc);
-      const int tfirst(this->rangeCols_[jDst].begin());
-      const int sfirst(src.rangeCols_[jSrc].begin());
-      const int send (src.rangeCols_[jSrc].end());
-      for ( int it=tfirst, is=sfirst; is<send; it++, is++) dp[it] = sp[is];
-    }
-    /** copy backward the column @c jSrc of @c src in the column @c jDst of this. */
-    void copyColumnBackward(IArray2D const& src, int jDst, int jSrc)
-    {
-      Type *dp =this->data(jDst), *sp =src.data(jSrc);
-      const int tlast (this->rangeCols_[jDst].lastIdx())
-              , sfirst(src.rangeCols_[jSrc].begin())
-              , slast (src.rangeCols_[jSrc].lastIdx());
+    /** allocator of the column data set */
+    Allocator allocator_;
+    /** range of the index of the columns of the container. **/
+    Array1D<Range, sizeCols_> rangeCols_;
 
-      for ( int it=tlast, is=slast; is>=sfirst; it--, is--) dp[it] = sp[is];
-    }
-    /** Memory deallocation.
-     *  This method clear all allocated memory. The range of the Cols
-     *  is set to (beginHo_:beginHo_-1). The range of the Rows remain
-     *  unmodified.
+    /** @return the allocator. */
+    inline Allocator& allocator() { return allocator_;}
+
+    /** Transfer the column pos2 to the column pos1 of this.
+     *  @param pos1,pos2 indexes of the columns
      **/
-    void freeMem()
+    void transferCol( int pos1, int pos2)
     {
-      // Nothing to do for reference
-      if (this->isRef()) return;
-      // free the Rows memory
-      this->freeCols(this->cols());
-      // liberate horizontally
-      this->freeRows();
+      // copy by address pointer on column pos2 of T in pos1 of this
+      allocator_.elt(pos1) = allocator_.elt(pos2);
+      rangeCols_[pos1] = rangeCols_[pos2];
     }
+    /** Method for memory reallocation and initialization of the horizontal
+     *  range of the container.
+     *  The vertical range is not set in this method. If an
+     *  error occur, we set the cols_ of the container to default.
+     *  @param J horizontal range
+     **/
+    void reallocCols(Range const& J);
+
+    /** Internal method for initializing to default values (null pointer and null range)
+     *  to a range of columns.
+     *  @param J horizontal range
+     **/
+    void nullCols(ColRange const& J);
 
   private:
-    /** @brief internal function for reserving memory in a range of columns.
-     *  @param J range of the Columns to initialize
-     *  @param size the size to reserve
+    /** @brief Internal method for memory deallocation.
+     *  This method clear all allocated memory and reset ranges to default value.
+     *  Do nothing if this is a reference
+     *  Range of the columns is set to default.
+     *  Range of the rows (rows_) remains unmodified.
      **/
-    void reserveRows(Range const& J, int size)
-    {
-      for (int j=J.begin(); j<J.end(); j++)
-      {
-        try
-        {
-          this->reserveRowsToCol(j, size);
-        }
-        catch(Exception const& error)// if an error occur just stop iterations
-        {
-#ifdef STK_DEBUG
-          stk_cout << STKERROR_2ARG2(IArray2D::reserveRows,J, size,memory allocation failed.);
-#endif
-          // and throw an exception
-          STKRUNTIME_ERROR_2ARG(IArray2D::reserveRows,J, size,memory allocation failed.);
-        }
-      }
-    }
-    /** @brief main function for memory allocation and initialization of the columns.
-     *  The capacity for the Rows have to be set before calling this method.
+    void freeMem();
+    /** Internal method for memory allocation and initialization of the horizontal
+     *  range of the container. This method is called once at creation of the container.
+     *
+     *  The range of the column is not set in this method. Except if an error
+     *  occur during memory allocation, cols_ will be set to default and an error
+     *  thrown.
+     *  @param J horizontal range
+     **/
+    void mallocCols(ColRange const& J);
+    /** @brief Internal method for memory allocation and initialization of a range of columns.
+     *  The capacity for the rows have to be set before calling this method.
      *  @param J vertical range of the Columns to initialize
      **/
-    void initializeCols(Range const& J)
-    {
-      for (int j=J.begin(); j<J.end(); j++)
-      {
-        try
-        {
-          // initialize the column with the range specific to the array
-          this->initializeCol(j, this->rangeRowsInCol(j));
-        }
-        catch (Exception const& error)   // if an error occur
-        {
-          // free each column allocated
-          for (int k=J.begin(); k<j; k++) this->freeCol(k);
-          // put default for the other Cols
-          for (int k=j; k<J.end(); k++) this->data(k) = 0;
-          // and throw an exception
-          throw error;
-        }
-      }
-    }
-    /** @brief internal method for initializing a column.
+    void initializeCols(Range const& J);
+    /** @brief Internal method for releasing memory in a given range of columns.
+     *  @param J range of columns to liberate.
+     **/
+    void freeCols(Range const& J);
+    /** @brief Internal method for reserving memory in a range of columns.
+     *  @param J range of the columns to initialize
+     *  @param size the size to reserve
+     **/
+    void reserveRowsCols(Range const& J, int size);
+    // single column methods
+    /** copy column j of src into column j of this
+     *  @param src source to copy
+     *  @param j index of the columns to copy
+     **/
+    void copyCol(IArray2D const& src, int j);
+    /** Internal method transferring column pos of container T to column
+     *  pos of this. Set the column pos in T to zero.
+     *  The column pos in this should not exists or should be deleted previously
+     *  otherwise user will experiment a memory leak.
      *
-     *  Method for the the allocation of memory of the col
-     *  pos with the given range.
-     *  @param pos the index of the column to initialize
-     *  @param I   range of the Col
+     *  @param T the container with the column to transfer
+     *  @param pos index of the column to transfer
      **/
-    void initializeCol(int pos, Range const& I)
+    template<class OtherDerived>
+    void transferCol( IArray2D< OtherDerived>& T, int pos)
     {
-      if (I.size() <=0)
-      {
-        // set default for ptr
-        this->data(pos) = 0;
-        // set default value for this->availableRows_[pos]
-        this->availableRows_[pos] = 0;
-        // set default value for this->rangeCols_[pos]
-        this->rangeCols_[pos] = I;
-        // return
-        return;
-      }
-      // compute the size necessary (cannot be 0)
-      int size = Arrays::evalSizeCapacity(I.size());
-      // try to allocate memory
-      try
-      {
-        this->data(pos) = new Type[size];
-      }
-      catch (std::bad_alloc & error)  // if an alloc error occur
-      {
-        // set default for ptr
-        this->data(pos) = 0;
-        // set default value for this->availableRows_[pos]
-        this->availableRows_[pos] = 0;
-        // set default value for this->rangeCols_[pos]
-        this->rangeCols_[pos] = Range();
-        // and throw an exception
-        STKRUNTIME_ERROR_2ARG(IArray2D::initializeCol,pos, I,memory allocation failed.);
-      }
-      // increment ptr of the column
-      this->data(pos) -= I.begin();
-      // set size for this->availableRows_[pos]
-      this->availableRows_[pos] = size;
-      // set value for this->rangeCols_[pos]
-      this->rangeCols_[pos] = I;
+      allocator_.elt(pos) = T.allocator_.elt(pos);
+      rangeCols_[pos]     = T.rangeCols_[pos];
+      T.nullCol(pos);
     }
-    /** vertical memory deallocation.
-     *  @param J range of the columns to liberate.
+    /** Internal method setting default parameters and dimension to a column of the container.
+     *  @param col the position of the column to initialize to a default value.
+     *  @note if data is allocated, it will be lost
      **/
-    void freeCols(Range const& J)
-    { for (int j=J.begin(); j<J.end(); j++) { freeCol(j);}}
+    void nullCol(int col);
+    /** @brief Internal method for initializing a column.
+     *  Method for the allocation of memory of the column col with given range I.
+     *  @param col,I index and range of the column to initialize
+     **/
+    void initializeCol(int col, Range const& I);
     /** @brief Internal method for memory deallocation.
      *  @param col the number of the column to free
      **/
-    void freeCol(int col)
-    {
-      if (this->data(col)) // if there is a column at this position
-      {
-        // increment the ptr
-        this->data(col) += this->rangeCols_[col].begin();
-        // delete allocated mem for the column col
-        delete [] this->data(col);
-        // set default value for ptr
-        this->data(col) =0;
-        // set default value for this->availableRows_[col]
-        this->availableRows_[col] = 0;
-        // set default value for this->rangeCols_[col]
-        this->rangeCols_[col] = Range();
-      }
-    }
+    void freeCol(int col);
+    // modifiers
     /** @brief internal method for translating a column.
      *
      *  Method for the the allocation of memory of the column
      *  pos with the given range.
-     *  @param col the index of the column to translate
-     *  @param beg new begin of the column
+     *  @param col,beg index of the column and new begin of the column
      **/
-    void shiftCol( int col, int beg)
-    {
-      // check if there is data
-      if (this->data(col))
-      { this->data(col) -= (beg - this->rangeCols_[col].begin());}
-      // translate this->rangeCols_
-      this->rangeCols_[col].shift(beg);
-    }
-    /** @brief Internal method for reserving rows to a specified column.
-     *
-     *  reserve @c size memory place to the column @c col of the array.
-     *  @param col index of the column
-     *  @param size to reserve
-     **/
-    void reserveRowsToCol( int col, int size)
-    {
-      // nothing to do
-      if (this->availableRows_[col] > size) return;
-      // wrap old Col
-      Type* p_oldCol(this->data(col));
-      // create new Col
-      try
-      {
-        this->data(col) = new Type[size];
-        this->availableRows_[col] = size;
-      }
-      catch (std::bad_alloc & error)  // if an alloc error occur
-      {
-        this->data(col) = p_oldCol;
-        STKRUNTIME_ERROR_2ARG(IArray2D::reserveRowsToCol,col,size,memory allocation failed.);
-      }
-      // increment ptr of the column
-      this->data(col) -= this->rangeCols_[col].begin();
-      // ger ptr on the new col
-      Type* p_newCol = this->data(col);
-      // copy Elts
-      for (int i=this->rangeCols_[col].begin(); i<this->rangeCols_[col].end(); i++)
-        p_newCol[i] = p_oldCol[i];
-      // if there is allocated memory, liberate it
-      if (p_oldCol)
-      {
-        p_oldCol += this->rangeCols_[col].begin();
-        delete [] p_oldCol;
-      }
-    }
+    void shiftRowCol( int col, int beg);
     /** @brief Internal method for resizing a column with a specified range.
      *
      *  This method resize the column @c col to the desired range using:
-     * - @c shiftCol
+     * - @c shiftRow
      * - either @c popBackRowsToCol or @c pushBackRowsToCol if needed.
      *  @param col index of the column
      *  @param I range to set to the column
-    **/
-    void resizeCol( int col, Range const& I)
-    {
-      // check if there is something to do
-      if (this->rangeCol(col) == I) return;
-      // shift to the desired first index
-      shiftCol(col, I.begin());
-      // compute difference of size
-      int inc = this->rangeCol(col).size() - I.size();
-      // nothing to do
-      if (inc == 0) return;
-      // add row
-      if (inc < 0) { pushBackRowsToCol(col, -inc);}
-      else         { popBackRowsToCol(col, inc);}
-    }
+     **/
+    void resizeRowCol( int col, Range const& I);
+    /** @brief Internal method for reserving rows to a specified column.
+     *  reserve @c size memory place to the column @c col of the array
+     *  @param col,size index of the column and size to reserve
+     **/
+    void reserveRowCol( int col, int size);
     /** @brief Internal method for inserting rows to a specified column.
      *
-     *  Insert n Rows at the position pos to the column column of the
+     *  Insert n rows at the position pos to the column column of the
      *  array. No check is done about the index.
-     *  @param col column index
-     *  @param pos index where to insert Rows
-     *  @param n number of elements to insert (default 1)
+     *  @param col,pos,n column position, row position and number of rows to insert
      **/
-    void insertRowsToCol( int col, int pos, int n =1)
-    {
-      // wrap old Column
-      Type* p_oldCol(this->data(col));
-      // get vertical range of the Column
-      Range oldRange(this->rangeCols_[col]);
-      // update range
-      this->rangeCols_[col].incLast(n);
-      // allocate if necessary the Col
-      if (this->availableRows_[col] < this->rangeCols_[col].size())
-      {
-        // create new Col
-        this->initializeCol(col, this->rangeCols_[col]);
-        // if there was data, copy and liberate
-        if (p_oldCol)
-        {
-          // get ptr on the new col
-          Type* p_newCol(this->data(col));
-          // copy first Elts
-          for (int k=oldRange.begin(); k<pos; k++) p_newCol[k] = p_oldCol[k];
-          // translate and copy last Elts
-          for (int k=oldRange.lastIdx(); k>=pos; k--) p_newCol[k+n] = p_oldCol[k];
-          // increment ptr_col
-          p_oldCol += oldRange.begin();
-          // and free old col
-          delete [] p_oldCol;
-        }
-      }
-      else // enough space
-      {
-        // translate last Elts
-        for (int k=oldRange.lastIdx(); k>=pos; k--)
-          p_oldCol[k+n] = p_oldCol[k];
-      }
-    }
-    /** @brief Internal method for appending rows to a specified column.
-     *
-     *  Push back n Rows at the end of the column @c col of the array.
-     *  @param col column index
-     *  @param n number of elements to append (default 1)
-     **/
-    void pushBackRowsToCol( int col, int n =1)
-    {
-      // wrap old Col
-      Type* p_oldCol(this->data(col));
-      // get vertical range of the Col
-      Range oldRange(this->rangeCols_[col]);
-      // compute vertical range of the Col after insertion
-      this->rangeCols_[col].incLast(n);
-      // allocate if necessary the Col
-      if (this->availableRows_[col] < this->rangeCols_[col].size())
-      {
-        // create new Col
-        this->initializeCol(col, this->rangeCols_[col]);
-        // ger ptr on the new col
-        Type* p_newCol(this->data(col));
-        // copy Elts
-        for (int k=oldRange.begin(); k<oldRange.end(); k++) p_newCol[k] = p_oldCol[k];
-        // if there is allocated memory, liberate it
-        if (p_oldCol)
-        {
-          p_oldCol += oldRange.begin();
-          delete [] p_oldCol;
-        }
-      }
-    }
+    void insertRowsCol( int col, int pos, int n);
     /** @brief Internal method for deleting rows from a specified column.
+     *  Delete n rows at the position @c pos to the column @c col of the array.
      *
-     *  Delete n Rows at the position @c pos to the column @c col of the array.
-     *  No check is done about indexes. It is possible to remove data
-     *  outside the range of the column. In this case it is assumed
-     *  that the data are known and there was no necessity to store
-     *  them inside the array (think to a triangular matrix).
+     *  @note It is possible to remove data outside the range of the column (but not
+     *  outside the range of the array). In this case it is assumed
+     *  that the data are zero and are not stored by the array
+     *  (like for triangular or diagonal matrices).
      *
-     *  @param col index of the Column
-     *  @param pos index where to delete elements
-     *  @param n number of elements to delete (default 1)
-    **/
-    void eraseRowsToCol( int col, int pos, int n=1)
-    {
-      // check trivial cases
-      if (this->rangeCols_[col].lastIdx() < pos) return;
-      if (this->rangeCols_[col].begin()> pos+n-1)
-      { shiftCol( col, this->rangeCols_[col].begin() - n); return;}
-      // find the exisiting rows to delete
-      Range rangeDel(pos, n);
-      rangeDel.inf(this->rangeCols_[col]);
-      if (rangeDel == this->rangeCols_[col]) { freeCol(col); return;}
-      // shift data, rangeDel is inside the rang of the column
-      Type* p_col(this->data(col));
-      for ( int k=rangeDel.begin(), k1=rangeDel.end(); k1<this->rangeCols_[col].end(); k++, k1++)
-      {  p_col[k]   = p_col[k1];}
-      // update size of the range
-      this->rangeCols_[col].decLast(rangeDel.size());
-      // and shift if necessary
-      if (pos < rangeDel.begin())
-      { shiftCol( col, this->rangeCols_[col].begin() - (n-rangeDel.size()));}
-    }
-    /** @brief Internal method for deleting last rows to a specified column.
+     *  @warning No check is done about indexes.
      *
-     *  Delete the  n latest Rows to the array.
-     *
-     *  @param col index of the Column
-     *  @param n number of elements to delete (default is 1)
-    **/
-    void popBackRowsToCol( int col, int n=1)
-    {
-      // check if there is something to do
-      if (n <= 0) return;
-      // update range
-      this->rangeCols_[col].decLast(n);
-      // free mem if necessary
-      if (this->rangeCols_[col].size()==0) freeCol(col);
-    }
+     *  @param col,pos,n index of the column, row position and number of elements to delete
+     **/
+    void eraseRowsCol( int col, int pos, int n);
 };
 
-
-/** overwrite @c this with @c src.
- *  @note If the size match, @c this is not resized, and in this case,
- *  the method take care of the possibly of overlapping.
- *  @param src the array to copy
+/* Default constructor */
+template < class  Derived  >
+IArray2D<Derived>::IArray2D(): Base2D(), Base()
+                             , allocator_()
+                             , rangeCols_()
+{ mallocCols(this->cols());}
+/** Constructor with specified ranges
+ *  @param I,J range of the rows and columns
  **/
 template < class  Derived  >
-Derived& IArray2D<Derived>::assign( IArray2D const& src)
+IArray2D<Derived>::IArray2D( Range const& I, Range const& J)
+                           : Base2D(I,J), Base()
+                           , allocator_()
+                           , rangeCols_()
+{  mallocCols(this->cols()); initializeCols(J);}
+/* Copy constructor
+ *  @param T the array to copy
+ *  @param ref true if we wrap T
+ **/
+template < class  Derived  >
+IArray2D<Derived>::IArray2D( IArray2D const& T, bool ref)
+                           : Base2D(T), Base()
+                           , allocator_(T.allocator_, ref)
+                           , rangeCols_(T.rangeCols_, false) //  have to be created again, in case T is a temporary
 {
-  // Resize if necessary.
-  if ( (this->sizeRows() != src.sizeRows()) ||(this->sizeCols() != src.sizeCols()) )
-  { this->resize(src.rows(), src.cols());}
-  // Copy without overlapping
-  if (src.beginRows()>=this->beginRows())
+  if (!ref)
   {
-    if (src.beginCols()>this->beginCols())
-    {
-      for ( int jSrc=src.beginCols(), jDst=this->beginCols(); jSrc<src.endCols(); jDst++, jSrc++)
-      { this->copyColumnForward(src, jDst, jSrc);}
-      return this->asDerived();
-    }
-    for ( int jSrc=src.lastIdxCols(), jDst=this->lastIdxCols(); jSrc>=src.beginCols(); jDst--, jSrc--)
-    { this->copyColumnForward(src, jDst, jSrc);}
-    return this->asDerived();
+    initializeCols(T.cols()); // initialize the Columns
+    for (int j=T.beginCols(); j<T.endCols(); j++)
+    { copyCol(T, j);}
   }
-  // src.beginRows()<this->beginRows()
-  if (src.beginCols()>=this->beginCols())
-  {
-    for ( int jSrc=src.beginCols(), jDst=this->beginCols(); jSrc<src.endCols(); jDst++, jSrc++)
-    { this->copyColumnBackward(src, jDst, jSrc);}
-    return this->asDerived();
-  }
-  // src.beginCols()<this->beginCols()
-  for ( int jSrc=src.lastIdxCols(), jDst=this->lastIdxCols(); jSrc>=src.beginCols(); jDst--, jSrc--)
-  { this->copyColumnBackward(src, jDst, jSrc);}
+}
+/* constructor by reference, ref_=1.
+ *  @param T the array to copy
+ *  @param I,J ranges of the rows and columns to wrap
+ **/
+template < class  Derived  >
+template<class OtherDerived>
+IArray2D<Derived>::IArray2D( IArray2D<OtherDerived> const& T, Range const& I, Range const& J)
+                           : Base2D(I,J), Base()
+                           , allocator_(T.allocator_, J, true)  // a reference
+                           , rangeCols_(T.rangeCols_, J, false) //  have to be created again, in case T is a temporary
+                                          // T.rangeCols_ is itself a temporary that will be deleted
+                                          // Tref(T.sub(J), true) for example
+{
+  for (int j=J.begin(); j<J.end(); j++)
+  { rangeCols_[j] = inf(I, T.rangeCols()[j]);}
+}
+/* destructor.
+ *  free the vertically allocated memory (the columns). The horizontally
+ *  allocated memory is handled by the Allocator class.
+ **/
+template < class  Derived  >
+IArray2D<Derived>::~IArray2D() { if (!isRef()) freeCols(cols());}
 
+/* clear the object.
+ *  This will free all allocated memory and reset all range to Range().
+ *  (while freeMem() does not modify rows range (rows_)
+ **/
+template < class  Derived  >
+void IArray2D<Derived>::clear()
+{
+  // Nothing to do for reference
+  if (isRef()) return;
+  freeMem();
+  this->setRanges();
+}
+/* move T to this.
+ *  @note : T is not modified but just set as a reference of the data it was responsible.
+ *  @param T the array to move.
+ **/
+template < class  Derived  >
+Derived& IArray2D<Derived>::move(Derived const& T)
+{
+  if (this->asPtrDerived() == &T) return this->asDerived();
+  if (!isRef()) { freeCols(cols());}
+  // move Base part
+  allocator_.move(T.allocator_); // T become a reference
+  rangeCols_.move(T.rangeCols_);
+  // Set IContainer2D part
+  setCols(T.cols());
+  setRows(T.rows());
   return this->asDerived();
 }
+/* exchange this container with T.
+ *  @param T the container to exchange with this
+ **/
+template < class  Derived  >
+void IArray2D<Derived>::exchange(IArray2D &T)
+{
+  // swap MemAllocator part
+  allocator_.exchange(T.allocator_);
+  Base2D::exchange(T);
+  rangeCols_.exchange(T.rangeCols_);
+}
+
+/* @brief Internal method for memory deallocation.
+ *  This method clear all allocated memory and reset ranges to default value.
+ *  Do nothing if this is a reference
+ *  Range of the columns is set to default.
+ *  Range of the rows (rows_) remains unmodified.
+ **/
+template< class Derived>
+void IArray2D< Derived>::freeMem()
+{
+  if (isRef()) return;
+  freeCols(cols());
+  // free memory allocated in allocator.
+  // For fixed size arrays, the size remain the same
+  allocator_.free();
+  setCols(allocator_.range());
+  // clear arrays
+  rangeCols_.resize(cols());
+}
+/* Method for memory allocation and initialization of the horizontal
+ *  range of the container.
+ *  The vertical range is not set in this method. If an
+ *  error occur, we set the cols_ of the container to default.
+ *  @param J horizontal range
+ **/
+template< class Derived>
+void IArray2D< Derived>::mallocCols(ColRange const& J)
+{
+  // try to allocate memory
+  try
+  {
+    if (J.size() > availableCols())
+    {
+      // compute the necessary size
+      int size= Arrays::evalSizeCapacity(J.size());
+      allocator_.malloc(Range(J.begin(), size)); // allocate memory for the columns
+    }
+    rangeCols_.resize(J);
+  }
+  catch (Exception const& error)   // if an error occur
+  {
+    Base2D::setCols();      // set default range
+    rangeCols_.clear();     // clear this->rangeCols_
+    allocator_.free();      // initialize with zero
+    allocator_.setValue(0); // initialize with zero
+    throw error;            // throw the error
+  }
+  allocator_.setValue(0); // initialize with zero
+}
+/* @brief Internal method for memory allocation and initialization of a range of columns.
+ *  The capacity for the rows have to be set before calling this method.
+ *  @param J vertical range of the Columns to initialize
+ **/
+template< class Derived>
+void IArray2D< Derived>::initializeCols(Range const& J)
+{
+#ifdef STK_BOUNDS_CHECK
+if (beginCols() > J.begin())
+{ STKOUT_OF_RANGE_1ARG(IArray2D::initializeCols, J, beginCols() > J.begin());}
+if (endCols() < J.end())
+{ STKOUT_OF_RANGE_1ARG(IArray2D::initializeCols, J, endCols() < J.end());}
+#endif
+  for (int j=J.begin(); j<J.end(); j++)
+  {
+    try
+    { initializeCol(j, this->rangeRowsInCol(j));}
+    catch (Exception const& error) // if an error occur
+    {
+      // free each column allocated and throw exception
+      for (int k=J.begin(); k<j; k++) freeCol(k);
+      throw error;
+    }
+  }
+}
+/* @brief Internal method for releasing memory in a given range of columns.
+ *  @param J range of columns to liberate.
+ **/
+template< class Derived>
+void IArray2D< Derived>::freeCols(Range const& J)
+{ for (int j=J.begin(); j<J.end(); j++) { freeCol(j);}}
+/* copy column j of src into column j of this
+ *  @param src source to copy
+ *  @param j index of the columns to copy
+ **/
+template< class Derived>
+void IArray2D< Derived>::copyCol(IArray2D const& src, int j)
+{
+  PtrCol dp =allocator_.elt(j), sp =src.allocator_.elt(j);
+  dp->assign(*sp);
+}
+
+/* Method for memory reallocation and initialization of the horizontal
+ *  range of the container.
+ *  The vertical range is not set in this method. If an
+ *  error occur, we set the cols_ of the container to default.
+ *  @param J horizontal range
+ **/
+template< class Derived>
+void IArray2D< Derived>::reallocCols(Range const& J)
+{
+  Range oldRange(cols());
+  // try to allocate memory
+  if (J.size() > availableCols())
+  {
+    int size= Arrays::evalSizeCapacity(J.size());
+    Range newRange(J.begin(), size);
+    allocator_.realloc( newRange ); // reallocate memory for the columns
+  }
+  rangeCols_.resize(J);        // initialize this->rangeCols_
+  setCols(J);
+}
+
+/* Internal method for initializing to default values (null pointer and null range)
+ *  to a range of columns.
+ *  @param J horizontal range
+ **/
+template< class Derived>
+void IArray2D< Derived>::nullCols(ColRange const& J)
+{
+#ifdef STK_BOUNDS_CHECK
+  if (beginCols() > J.begin())
+  { STKOUT_OF_RANGE_1ARG(IArray2D::nullCols, J, beginCols() > J.begin());}
+  if (endCols() < J.end())
+  { STKOUT_OF_RANGE_1ARG(IArray2D::nullCols, J, endCols() < J.end());}
+#endif
+  for (int j=J.begin(); j<J.end(); ++j) { nullCol(j);}
+}
+/* Internal method setting default parameters and dimension to a column of the container.
+ *  @param col the position of the column to initialize to a default value.
+ *  @note if data is allocated, it will be lost
+ **/
+template< class Derived>
+void IArray2D< Derived>::nullCol(int col)
+{
+  allocator_.elt(col) = 0;
+  rangeCols_[col] = Range();
+}
+
+/* @brief Internal method for initializing a column.
+ *  Method for the the allocation of memory of the column col with range I.
+ *  @param col,I index and range of the column to initialize
+ **/
+template< class Derived>
+void IArray2D< Derived>::initializeCol(int col, Range const& I)
+{
+#ifdef STK_DEBUG_ARRAY2D
+  stk_cout << _T("Entering initializeCol\n");
+  stk_cout << _T("Initialize col=") << col <<_T(", I=") << I <<_T("\n");
+#endif
+  if (I.size() <=0)
+  {
+    allocator_.elt(col) = 0;
+    rangeCols_[col] = I;
+    return;
+  }
+  // try to allocate memory
+  try
+  { allocator_.elt(col) = new ColVector(I);}
+  catch (std::bad_alloc & error)  // if an alloc error occur
+  {
+    allocator_.elt(col) = 0;
+    rangeCols_[col] = Range();
+    STKRUNTIME_ERROR_2ARG(IArray2D::initializeCol,col, I,memory allocation failed.);
+  }
+  rangeCols_[col] = I;
+}
+/* @brief Internal method for memory deallocation.
+ *  @param col the number of the column to free
+ **/
+template< class Derived>
+void IArray2D< Derived>::freeCol(int col)
+{
+#ifdef STK_DEBUG_ARRAY2D
+  stk_cout << _T("Entering freeCol\n");
+  stk_cout << _T("Deleting col=") << col <<_T(", rangeCols_[col]=") << rangeCols_[col] <<_T("\n");
+  stk_cout << _T("allocator_.elt(col)=") << allocator_.elt(col) <<_T("\n");
+#endif
+  if (allocator_.elt(col)) // if there is a column at this position
+  {
+    delete allocator_.elt(col);
+    allocator_.elt(col) =0;
+    rangeCols_[col] = Range();
+  }
+}
+
 } // namespace STK
 
 #endif

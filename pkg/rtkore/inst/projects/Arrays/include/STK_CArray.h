@@ -106,7 +106,7 @@ struct Traits< CArray<Type_, SizeRows_, SizeCols_, Orient_> >
     typedef CAllocator<Type_, SizeRows_, SizeCols_, Orient_> Allocator;
 
     typedef Type_                Type;
-    typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+    typedef typename RemoveConst<Type>::Type const& TypeConst;
 
     enum
     {
@@ -135,7 +135,7 @@ class CArray: public ICArray < CArray<Type_, SizeRows_, SizeCols_, Orient_> >
     typedef typename hidden::Traits< CArray<Type_, SizeRows_, SizeCols_, Orient_> >::Row Row;
     typedef typename hidden::Traits< CArray<Type_, SizeRows_, SizeCols_, Orient_> >::Col Col;
     typedef typename hidden::Traits< CArray<Type_, SizeRows_, SizeCols_, Orient_> >::Type Type;
-    typedef typename hidden::Traits< CArray<Type_, SizeRows_, SizeCols_, Orient_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< CArray<Type_, SizeRows_, SizeCols_, Orient_> >::TypeConst TypeConst;
 
     enum
     {

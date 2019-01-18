@@ -61,7 +61,7 @@ struct Traits< DotProduct < Lhs, Rhs> >
     storage_   = Arrays::dense_
   };
   typedef typename Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+  typedef typename RemoveConst<Type>::Type const& TypeConst;
   typedef CAllocator<Type, sizeRows_, sizeCols_, (bool)orient_> Allocator;
 };
 
@@ -88,7 +88,7 @@ class DotProduct: public ExprBase< DotProduct<Lhs, Rhs> >
 {
   public:
     typedef typename hidden::Traits<DotProduct>::Type Type;
-    typedef typename hidden::Traits<DotProduct>::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits<DotProduct>::TypeConst TypeConst;
     typedef typename hidden::Traits<DotProduct>::Allocator Allocator;
 
     enum
@@ -123,7 +123,7 @@ class DotProduct: public ExprBase< DotProduct<Lhs, Rhs> >
     inline ColRange const& colsImpl() const { return result_.cols();}
 
     /** access to the element */
-    inline ConstReturnType elt2Impl(int i, int j) const
+    inline TypeConst elt2Impl(int i, int j) const
     {
 #ifdef STK_BOUNDS_CHECK
       if ( (result_.beginRows() != i) || (result_.beginCols() !=j) )
@@ -132,7 +132,7 @@ class DotProduct: public ExprBase< DotProduct<Lhs, Rhs> >
       return result_.elt(i, j);
     }
     /** access to the element */
-    inline ConstReturnType elt0Impl() const { return result_.elt();}
+    inline TypeConst elt0Impl() const { return result_.elt();}
 
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_; }

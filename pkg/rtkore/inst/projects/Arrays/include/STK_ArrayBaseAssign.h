@@ -220,15 +220,19 @@ template<class Derived>
 template<class Rhs>
 inline Derived& ArrayBase<Derived>::copy( ExprBase<Rhs> const& rhs)
 {
+  STK_STATIC_ASSERT_DENSE_ONLY(Derived)
   // check
   if (this->sizeRows() != rhs.sizeRows())
   { STKRUNTIME_ERROR_2ARG(ArrayBase<Derived>::copy,this->sizeRows(), rhs.sizeRows(),sizeRows are not the sames);}
   if (this->sizeCols() != rhs.sizeCols())
   { STKRUNTIME_ERROR_2ARG(ArrayBase<Derived>::copy,this->sizeCols(), rhs.sizeCols(),sizeCols are not the sames);}
-  // copy
+  // copy. TODO: Use iterators
+  //this->asDerived().reserve(this->sizeRows(), this->sizeCols());
   for ( int jRhs=rhs.beginCols(), jLhs=this->beginCols(); jRhs<rhs.endCols(); jLhs++, jRhs++)
     for ( int iRhs=rhs.beginRows(), iLhs=this->beginRows(); iRhs<rhs.endRows(); iLhs++, iRhs++)
-  { this->elt(iLhs, jLhs) = rhs(iRhs, jRhs);}
+    {
+      setValue(iLhs, jLhs, rhs.elt(iRhs, jRhs));
+    }
   // return this
   return this->asDerived();
 }

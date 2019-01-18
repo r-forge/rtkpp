@@ -39,7 +39,7 @@
 #
 # \tabular{ll}{
 #   Package: \tab rtkore\cr
-#   Type: \tab Package\cr
+#   Type: \tab Package
 #   Version: \tab 0.8.1\cr
 #   Date: \tab 2014-07-05\cr
 #   License: \tab GPL for the rtkore side, LGPL for the stkpp side  + file LICENSE\cr

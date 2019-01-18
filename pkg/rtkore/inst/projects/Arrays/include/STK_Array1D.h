@@ -35,6 +35,7 @@
 #ifndef STK_ARRAY1D_H
 #define STK_ARRAY1D_H
 
+#include "allocators/STK_MemAllocator.h"
 #include "STK_IArray1D.h"
 
 namespace STK
@@ -54,7 +55,7 @@ struct Traits< Array1D<Type_, Size_> >
   typedef Array1D<Type_, UnknownSize> SubVector;
 
   typedef Type_ Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+  typedef typename RemoveConst<Type>::Type const& TypeConst;
 
   enum
   {
@@ -66,11 +67,15 @@ struct Traits< Array1D<Type_, Size_> >
     storage_   = Arrays::dense_ // always dense
   };
 
+  typedef MemAllocator<Type, size_> Allocator;
+
   typedef TRange<size_> RowRange;
   typedef TRange<1>     ColRange;
 
-  typedef RandomIterator1D<Array1D<Type_, Size_> > Iterator;
-  typedef ConstRandomIterator1D<Array1D<Type_, Size_> > ConstIterator;
+  typedef int Index;
+
+  typedef DenseRandomIterator< Array1D<Type_, Size_> > Iterator;
+  typedef ConstDenseRandomIterator< Array1D<Type_, Size_> > ConstIterator;
 
   typedef std::reverse_iterator<Iterator> ReverseIterator;
   typedef std::reverse_iterator<ConstIterator> ConstReverseIterator;
@@ -79,8 +84,6 @@ struct Traits< Array1D<Type_, Size_> >
 } // namespace hidden
 
 }
-
-//#include "iterators/STK_RandomIterator1D.h"
 
 namespace STK
 {
@@ -101,10 +104,7 @@ class Array1D: public IArray1D< Array1D<Type_, Size_> >
 {
   public:
     typedef IArray1D< Array1D<Type_, Size_> > Base;
-
-    typedef typename hidden::Traits< Array1D<Type_, Size_> >::Row Row;
-    typedef typename hidden::Traits< Array1D<Type_, Size_> >::Col Col;
-    typedef typename hidden::Traits< Array1D<Type_, Size_> >::SubVector SubVector;
+    typedef typename hidden::Traits< Array1D<Type_, Size_> >::Allocator Allocator;
 
     enum
     {
@@ -117,15 +117,15 @@ class Array1D: public IArray1D< Array1D<Type_, Size_> >
     };
 
     typedef typename hidden::Traits< Array1D <Type_, Size_> >::Type Type;
-    typedef typename hidden::Traits< Array1D <Type_, Size_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< Array1D <Type_, Size_> >::TypeConst TypeConst;
+
+    typedef typename hidden::Traits< Array1D <Type_, Size_> >::RowRange RowRange;
+    typedef typename hidden::Traits< Array1D <Type_, Size_> >::ColRange ColRange;
 
     typedef typename hidden::Traits< Array1D<Type_, Size_> >::Iterator Iterator;
     typedef typename hidden::Traits< Array1D<Type_, Size_> >::ConstIterator ConstIterator;
     typedef typename hidden::Traits< Array1D<Type_, Size_> >::ReverseIterator ReverseIterator;
     typedef typename hidden::Traits< Array1D<Type_, Size_> >::ConstReverseIterator ConstReverseIterator;
-
-    typedef TRange<size_> RowRange;
-    typedef TRange<1>     ColRange;
 
     // Compatibility naming scheme with STL
     typedef Iterator iterator;
@@ -133,6 +133,8 @@ class Array1D: public IArray1D< Array1D<Type_, Size_> >
     typedef ReverseIterator reverse_iterator;
     typedef ConstReverseIterator const_reverse_iterator;
 
+    /** Inner operator class */
+    class InnerOperator;
     /** Default constructor. */
     Array1D(): Base(){}
     /** constructor with a specified Range
@@ -147,21 +149,30 @@ class Array1D: public IArray1D< Array1D<Type_, Size_> >
      *  @param T the container to copy
      *  @param ref @c true if T is wrapped
      **/
-    Array1D( Array1D const&T, bool ref =false): Base(T, ref) {}
-    /** constructor by reference, ref_=1.
-     *  @param T,I the container and the range of data to wrap
-     **/
-    Array1D( Array1D const& T, Range const& I): Base(T, I) {}
-    /** constructor by reference, ref_=1.
-     *  @param T,I the container and the range of data to wrap
+    Array1D( Array1D const& T, bool ref =false): Base(T, ref) {}
+    /** Copy constructor
+     *  @param T the container to copy
+     *  @param ref @c true if T is wrapped
      **/
     template<int OtherSize>
-    Array1D( Array1D<Type, OtherSize> const& T, Range const& I): Base(T, I) {}
+    Array1D( Array1D<Type, OtherSize> const& T, bool ref =false): Base(T, ref) {}
+    /** constructor by reference, ref_=1.
+     *  @param T,I the container and the range of data to wrap
+     *  @param ref @c true if T is wrapped (the default)
+     **/
+    template<int OtherSize>
+    Array1D( Array1D<Type, OtherSize> const& T, RowRange const& I, bool ref = true)
+           : Base(T, I, ref) {}
     /** Copy an other type of array/expression in an Array1D.
      *  @param T the array/expression to copy
      **/
     template<class OtherArray>
     Array1D( ExprBase<OtherArray> const& T): Base(T.asDerived()) {}
+    /** Wrapper constructor
+     *  @param A,I range and allocator to wrap
+     *  @param ref @c true if A is wrapped
+     **/
+    Array1D( Allocator const& A, Range const& I, bool ref): Base(A, I, ref) {}
     /** Wrapper constructor: the container is a reference of a C-Array.
      *  @param q, I pointer and range of data
      **/

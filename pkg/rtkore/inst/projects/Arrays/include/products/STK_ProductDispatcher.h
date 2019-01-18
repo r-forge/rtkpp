@@ -71,7 +71,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::array2D_, RStructure_>
     , useForCols_ = Arrays::useRhsSize_
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+  typedef typename RemoveConst<Type>::Type const& TypeConst;
   typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
 };
 
@@ -99,7 +99,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::array2D_, Arrays::square_>
   };
 
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+  typedef typename RemoveConst<Type>::Type const& TypeConst;
   typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
 };
 
@@ -126,7 +126,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::square_, RStructure_>
     , useForCols_ = Arrays::useRhsSize_
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+  typedef typename RemoveConst<Type>::Type const& TypeConst;
 
   typedef CAllocator<Type, sizeRows_,sizeCols_, orient_> Allocator;
 };
@@ -155,7 +155,7 @@ struct ProductTraits<Lhs, Rhs, LStructure_, Arrays::square_>
    , useForCols_ = Traits<Lhs>::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+  typedef typename RemoveConst<Type>::Type const& TypeConst;
 
   typedef CAllocator<Type, sizeRows_,sizeCols_, orient_> Allocator;
 };
@@ -181,7 +181,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::square_, Arrays::square_>
     , useForCols_ = Traits<Rhs>::sizeCols_ != UnknownSize ? Arrays::useRhsSize_ : Arrays::useLhsSize_
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+  typedef typename RemoveConst<Type>::Type const& TypeConst;
 
   typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
 };
@@ -207,7 +207,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::lower_triangular_, RStructure_>
     , useForCols_ = Arrays::useRhsSize_
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+  typedef typename RemoveConst<Type>::Type const& TypeConst;
 
   typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
 };
@@ -232,7 +232,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::lower_triangular_, Arrays::square_>
     , useForCols_ = Traits<Lhs>::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+  typedef typename RemoveConst<Type>::Type const& TypeConst;
 
   typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
 };
@@ -256,7 +256,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::lower_triangular_, Arrays::lower_triangul
    , useForCols_ = Arrays::useRhsSize_
 };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+  typedef typename RemoveConst<Type>::Type const& TypeConst;
 
   typedef Array2DLowerTriangular<Type> Allocator; // no CAllocator
 };
@@ -282,7 +282,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::upper_triangular_, RStructure_>
     , useForCols_ = Arrays::useRhsSize_
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+  typedef typename RemoveConst<Type>::Type const& TypeConst;
 
   typedef CAllocator<Type, sizeRows_ , sizeCols_, orient_> Allocator;
 };
@@ -307,7 +307,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::upper_triangular_, Arrays::square_>
    , useForCols_ = Traits<Lhs>::sizeCols_ != UnknownSize ? Arrays::useLhsSize_ : Arrays::useRhsSize_
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+  typedef typename RemoveConst<Type>::Type const& TypeConst;
 
   typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
 };
@@ -331,7 +331,7 @@ struct ProductTraits<Lhs, Rhs, Arrays::upper_triangular_, Arrays::upper_triangul
    , useForCols_ = Arrays::useRhsSize_
   };
   typedef typename hidden::Promote< typename Lhs::Type, typename Rhs::Type>::result_type Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+  typedef typename RemoveConst<Type>::Type const& TypeConst;
 
   typedef Array2DUpperTriangular<Type> Allocator;  // no CAllocator
 };

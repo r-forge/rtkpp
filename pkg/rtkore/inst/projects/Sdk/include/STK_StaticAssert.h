@@ -160,6 +160,10 @@ STK_STATIC_ASSERT( ( int(hidden::Traits<EXPR>::structure_) == int(Arrays::vector
 STK_STATIC_ASSERT( int(hidden::Traits<LHS>::structure_)== int(hidden::Traits<RHS>::structure_) \
                  ,YOU_HAVE_TO_USE_TWO_ARRAYS_WITH_THE_SAME_ORIENTATION)
 
+#define STK_STATIC_ASSERT_DENSE_ONLY(EXPR) \
+STK_STATIC_ASSERT( int(hidden::Traits<EXPR>::storage_) == int(Arrays::dense_) \
+                 ,YOU_TRIED_CALLING_A_DENSE_METHOD_ON_SPARSE_STORAGE)
+
 #define STK_STATIC_ASSERT_POINT_ONLY(EXPR) \
 STK_STATIC_ASSERT( int(hidden::Traits<EXPR>::structure_) == int(Arrays::point_) \
                  ,YOU_TRIED_CALLING_A_POINT_METHOD_ON_SOMETHING_ELSE)

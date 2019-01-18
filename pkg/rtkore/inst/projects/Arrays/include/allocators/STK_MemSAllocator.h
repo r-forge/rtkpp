@@ -28,7 +28,7 @@
  **/
 
 /** @file STK_MemSAllocator.h
- *  @brief In this file we
+ *  @brief In this file we define and implement the MemSAllocator class
  **/
 
 
@@ -43,6 +43,10 @@
 
 namespace STK
 {
+// forward declaration
+template< typename Type_, int NzMax_ = UnknownSize, int Size_ = UnknownSize>
+class MemSAllocator;
+
 /** @ingroup Arrays
  *  @brief memory allocator for sparse Array classes.
  *  The data are stored either in the compressed sparse row (CSR) format
@@ -50,39 +54,54 @@ namespace STK
  *  any orientation and can be used for both kind of storage.
  *
  *  @tparam Type_ type of elements stored in this allocator
- *  @tparam Size_ number of rows on CSR format, the number of columns in CSC format
  *  @tparam NzMax_ maximal number of element in sparse matrix
+ *  @tparam Size_ size (if known): number of rows (columns)
+ *
  */
-template< typename Type_, int Size_, int NzMax_>
+template< typename Type_, int NzMax_, int Size_>
 class MemSAllocator: public IContainerRef
 {
   public:
-    typedef Type_  Type;
-    typedef typename hidden::RemoveConst<Type_>::Type const& ConstReturnType;
+    enum
+    {
+      nzmax_ = NzMax_,
+      size_  = (Size_< (UnknownSize-1)) ? Size_+1 : UnknownSize
+    };
 
+    typedef Type_  Type;
+    typedef typename hidden::RemoveConst<Type_>::Type const& TypeConst;
     /** values stored by pair (row/column index, value) */
     typedef std::pair<int, Type> IndexedValue;
-    /** Type of the base allocator allocating data */
+
+    using IContainerRef::isRef;
+    using IContainerRef::setRef;
+
+    /** Type of the base allocator allocating data. Can be of fixed size NzMax_ */
     typedef Array1D<IndexedValue, NzMax_> Allocator;
-    /** Type of the base allocator allocating index pointer */
-    typedef Array1D<int, Size_> PtrIdx;
+    /** Type of the base allocator allocating index pointer. Can be of fixed size Size_ */
+    typedef Array1D<int, size_> PtrIdx;
+
+    //typedef TRange<NzMax_> AllocatorRange;
+    typedef TRange<Size_> AllocatorRange;
 
     /** default constructor */
-    MemSAllocator(): IContainerRef(false), ptr_(Range().incEnd(1),baseIdx), idx_(), zero_(0)
-    { idx_ = IndexedValue(Arithmetic<int>::NA(), zero_);}
+    MemSAllocator(): IContainerRef(false)
+                   , ptr_(incLast(Range()))
+                   , idx_()
+                   , zero_(0)
+    {
+      ptr_ = baseIdx;
+      idx_ = IndexedValue(Arithmetic<int>::NA(), zero_);
+    }
     /** constructor with specified dimension
      *  @param I range of the rows (or columns)
      **/
-    MemSAllocator( Range const& I): IContainerRef(false), ptr_(Range(I).incEnd(1), baseIdx), idx_(), zero_(0)
-    { idx_ = IndexedValue(Arithmetic<int>::NA(), zero_);}
-    /** constructor with specified dimensions
-     * @param I range of the rows (or columns)
-     * @param nzmax maximal number of data by column (or rows)
-     **/
-    MemSAllocator( Range const& I, int nzmax)
-                 : IContainerRef(false), ptr_(Range(I).incEnd(1), baseIdx), idx_(), zero_(0)
+    MemSAllocator( AllocatorRange const& I): IContainerRef(false)
+                                           , ptr_(incLast(I))
+                                           , idx_()
+                                           , zero_(0)
     {
-      idx_.reserve(nzmax);
+      ptr_ = baseIdx;
       idx_ = IndexedValue(Arithmetic<int>::NA(), zero_);
     }
     /** copy constructor
@@ -90,7 +109,10 @@ class MemSAllocator: public IContainerRef
      *  @param ref @c true if this copy is just a reference, @c false otherwise
      **/
     MemSAllocator( MemSAllocator const& A, bool ref =false)
-                 : IContainerRef(ref), ptr_(A.ptr_, ref), idx_(A.idx_, ref), zero_(A.zero_)
+                 : IContainerRef(ref)
+                 , ptr_(A.ptr_, ref)
+                 , idx_(A.idx_, ref)
+                 , zero_(A.zero_)
     {}
     /** reference constructor
      *  @param A allocator to copy
@@ -98,10 +120,19 @@ class MemSAllocator: public IContainerRef
      **/
     MemSAllocator( MemSAllocator const& A, Range const& I)
                  : IContainerRef(true)
-                 , ptr_(A.ptr_, I, true), idx_(A.idx_, true), zero_(A.zero_)
+                 , ptr_(A.ptr_, I, true)
+                 , idx_(A.idx_, true)
+                 , zero_(A.zero_)
     {}
 
     // getters
+    /** @return the first index of the data. */
+    inline int begin() const { return ptr_.begin();}
+    /**@return the ending index of the data */
+    inline int end() const { return ptr_.end()-1;}
+    /** @return the size of the data */
+    inline int size() const { return ptr_.size()-1;}
+
     /** @return the vector with the pointers on rows (or columns) */
     inline PtrIdx const& ptr() const { return ptr_;}
     /** @return the vector with the (index,value) pairs columns (or rows) */
@@ -124,7 +155,7 @@ class MemSAllocator: public IContainerRef
      *  @param s_idx the index of the column (or row)
      *  @return 0 if the element is not stored, the value of the element otherwise
      **/
-    ConstReturnType getValue(int p_idx, int s_idx) const;
+    TypeConst getValue(int p_idx, int s_idx) const;
     /** This method allows to overwrite or insert an element to the position (p_idx,  s_idx)
      *  @param p_idx index of the row (respectively column)
      *  @param s_idx index of the column (respectively row)
@@ -141,8 +172,6 @@ class MemSAllocator: public IContainerRef
   private:
     /** zero value */
     const Type zero_;
-    /** */
-    void removeValue(int p_idx, int t);
 };
 
 
@@ -151,8 +180,8 @@ class MemSAllocator: public IContainerRef
  *  @param s_idx the index of the column (or row)
  *  @return 0 if the element is not stored, the value of the element otherwise
  **/
-template< typename Type_, int Size_, int NzMax_>
-typename MemSAllocator<Type_, Size_, NzMax_>::ConstReturnType MemSAllocator<Type_, Size_, NzMax_>::getValue(int p_idx, int s_idx) const
+template< typename Type_, int NzMax_, int Size_>
+typename MemSAllocator<Type_, NzMax_, Size_>::TypeConst MemSAllocator<Type_, NzMax_, Size_>::getValue(int p_idx, int s_idx) const
 {
   for (int t=ptr_[p_idx]; t<ptr_[p_idx+1]; ++t)
   { if (idx_[t].first == s_idx) return idx_[t].second;}
@@ -164,8 +193,8 @@ typename MemSAllocator<Type_, Size_, NzMax_>::ConstReturnType MemSAllocator<Type
  *  @param s_idx index of the column (respectively row)
  *  @param value value to set
  **/
-template< typename Type_, int Size_, int NzMax_>
-void MemSAllocator<Type_, Size_, NzMax_>::addValue(int p_idx, int s_idx, Type const& value)
+template< typename Type_, int NzMax_, int Size_>
+void MemSAllocator<Type_, NzMax_, Size_>::addValue(int p_idx, int s_idx, Type const& value)
 {
   // loop over already entries in this row/column
   for (int t=ptr_[p_idx]; t<ptr_[p_idx+1]; ++t)

@@ -38,72 +38,13 @@
 
 #include <limits>
 #include "STK_Base_Util.h"
+#include <Sdk/include/STK_Typedefs.h>
 
 namespace STK
 {
 // forward declarations
 template<typename Type> struct Arithmetic;
 template<typename Type> struct IdTypeImpl;
-
-/** @ingroup Base
- *  @brief STK fundamental type of a Char.
- *
- *  The type Char is defined for the internal representation
- *  of the characters. Note that if you change the representation,
- *  you don't have to modify the stream classes defined in
- *  the file STK_StreamBase.h, but you have to modify the
- *  global stream objects std::cout, std::cin, std::cerr, std::clog
- *  in order to access to the standard I/O channels.
- **/
-#ifdef STK_UNICODE
-
-typedef wchar_t Char;
-
-/** Transform x to wchar_t
- **/
-#define _T(x) L ## x
-
-/** Standard stk output stream
- **/
-#define stk_cout std::wcout
-
-/** Standard stk input stream
- **/
-#define stk_cin  std::wcin
-
-/** Standard stk error stream
- **/
-#define stk_cerr std::wcerr
-
-/** Standard stk log stream
- **/
-#define stk_clog std::wclog
-
-#else // !Unicode
-
-typedef char Char;
-
-/** Let x unmodified
- **/
-#define _T(x) x
-
-/** Standard stk output stream
- **/
-#define stk_cout std::cout
-
-/** Standard stk input stream
- **/
-#define stk_cin  std::cin
-
-/** Standard stk error stream
- **/
-#define stk_cerr std::cerr
-
-/** Standard stk log stream
- **/
-#define stk_log std::clog
-
-#endif // STK_UNICODE
 
 /** @ingroup Arithmetic
  *  @brief Specialization of the struct Arithmetic for Char.

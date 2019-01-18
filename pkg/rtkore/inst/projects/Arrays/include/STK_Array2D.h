@@ -35,6 +35,8 @@
 #define STK_ARRAY2D_H
 
 #include "STK_IArray2D.h"
+#include "STK_IArray2DSlicers.h"
+#include "STK_IArray2DModifiers.h"
 
 namespace STK
 {
@@ -73,7 +75,7 @@ struct Traits< Array2D<Type_> >
     typedef Void                 SubVector;
 
     typedef Type_                Type;
-    typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+    typedef typename RemoveConst<Type>::Type const& TypeConst;
 
     enum
     {
@@ -83,6 +85,7 @@ struct Traits< Array2D<Type_> >
       sizeCols_  = UnknownSize,
       storage_ = Arrays::dense_ // always dense
     };
+    typedef Array1D<Type, UnknownSize> ColVector;
 };
 
 } // namespace hidden
@@ -125,7 +128,7 @@ class Array2D: public IArray2D< Array2D<Type_> >
     typedef typename hidden::Traits<Array2D<Type_> >::SubArray SubArray;
 
     typedef typename hidden::Traits<Array2D<Type_> >::Type Type;
-    typedef typename hidden::Traits<Array2D<Type_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits<Array2D<Type_> >::TypeConst TypeConst;
 
     enum
     {
@@ -141,7 +144,7 @@ class Array2D: public IArray2D< Array2D<Type_> >
      *  @param I,J range of the rows and columns
      **/
     Array2D( Range const& I, Range const& J): Base(I, J) {}
-    /** constructor with rbeg, rend, cbeg and cend specified,
+    /** constructor with rows and columns ranges specified and
      *  initialization with a constant.
      *  @param I,J range of the rows and columns
      *  @param v initial value of the container

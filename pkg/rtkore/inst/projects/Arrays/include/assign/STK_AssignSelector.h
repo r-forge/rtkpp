@@ -253,13 +253,13 @@ struct Copycat<  Lhs,  Rhs, Arrays::array2D_, Arrays::array2D_>
   {
     for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
       for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
-      { lhs.elt(i, j) = rhs.elt(i, j);}
+      { lhs.setValue(i, j, rhs.elt(i, j));}
   }
   static void runByRow(Lhs& lhs, Rhs const& rhs )
   {
     for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
       for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
-      { lhs.elt(i, j) = rhs.elt(i, j);}
+      { lhs.setValue(i, j, rhs.elt(i, j));}
   }
 };
 
@@ -271,13 +271,13 @@ struct Copycat<  Lhs,  Rhs, Arrays::array2D_, Arrays::square_>
   {
     for (int i = rhs.begin(); i< rhs.end(); ++i)
       for (int j = rhs.begin(); j < rhs.end(); ++j)
-      { lhs.elt(i, j) = rhs.elt(i, j);}
+      { lhs.setValue(i, j, rhs.elt(i, j));}
   }
   static void runByRow(Lhs& lhs, Rhs const& rhs )
   {
     for (int j = rhs.begin(); j < rhs.lend(); ++j)
       for (int i = rhs.begin(); i< rhs.end(); ++i)
-      { lhs.elt(i, j) = rhs.elt(i, j);}
+      { lhs.setValue(i, j, rhs.elt(i, j));}
   }
 };
 
@@ -289,12 +289,14 @@ struct Copycat<  Lhs,  Rhs, Arrays::array2D_, Arrays::diagonal_>
   static void runByCol(Lhs& lhs, Rhs const& rhs )
   {
     lhs.setValue(Type(0));
-    for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i,i) = rhs.elt(i);}
+    for (int i = rhs.begin(); i< rhs.end(); ++i)
+    { lhs.setValue(i, i, rhs.elt(i));}
   }
   static void runByRow(Lhs& lhs, Rhs const& rhs )
   {
     lhs.setValue(Type(0));
-    for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i,i) = rhs.elt(i);}
+    for (int i = rhs.begin(); i< rhs.end(); ++i)
+    { lhs.setValue(i, i, rhs.elt(i));}
   }
 };
 
@@ -308,22 +310,24 @@ struct Copycat<  Lhs,  Rhs, Arrays::array2D_,   Arrays::lower_triangular_>
     const int end = std::min(rhs.endRows(), rhs.endCols());
     for (int j = rhs.beginCols(); j < end; ++j)
     { int i = rhs.beginRows();
-      for (; i < j; ++i)             { lhs.elt(i,j) = Type(0);}
-      for (; i < rhs.endRows(); ++i) { lhs.elt(i,j) = rhs.elt(i, j);}
+      for (; i < j; ++i)             { lhs.setValue(i, j, Type(0));}
+      for (; i < rhs.endRows(); ++i) { lhs.setValue(i, j, rhs.elt(i, j));}
     }
     for (int j= end; j < rhs.endCols(); ++j)
-      for (int i = rhs.beginRows(); i < rhs.endRows(); ++i) { lhs.elt(i,j) = Type(0);}
+      for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
+      { lhs.setValue(i, j, Type(0));}
   }
   static void runByRow(Lhs& lhs, Rhs const& rhs )
   {
     const int end = std::min(rhs.endRows(), rhs.endCols());
     for (int i = rhs.beginRows(); i < end; ++i)
     { int j = rhs.beginCols();
-      for (; j <=i; ++j)             { lhs.elt(i,j) = rhs.elt(i, j);}
-      for (; j < rhs.endCols(); ++j) { lhs.elt(i,j) = Type(0);}
+      for (; j <=i; ++j)             { lhs.setValue(i, j, rhs.elt(i, j));}
+      for (; j < rhs.endCols(); ++j) { lhs.setValue(i, j, Type(0));}
     }
     for (int i= end; i < rhs.endRows(); ++i)
-      for (int j=rhs.beginCols(); j < rhs.endCols(); ++j) { lhs.elt(i,j) = rhs.elt(i, j);}
+      for (int j=rhs.beginCols(); j < rhs.endCols(); ++j)
+      { lhs.setValue(i, j, rhs.elt(i, j));}
   }
 };
 
@@ -337,22 +341,24 @@ struct Copycat<  Lhs,  Rhs, Arrays::array2D_, Arrays::upper_triangular_>
     const int end = std::min(rhs.endRows(), rhs.endCols());
     for (int j = rhs.beginCols(); j < end; ++j)
     { int i = rhs.beginRows();
-      for (; i <= j; ++i)            { lhs.elt(i,j) = rhs.elt(i, j);}
-      for (; i < rhs.endRows(); ++i) { lhs.elt(i,j) =  Type(0);}
+      for (; i <= j; ++i)            { lhs.setValue(i, j, rhs.elt(i, j));}
+      for (; i < rhs.endRows(); ++i) { lhs.setValue(i, j, Type(0));}
     }
     for (int j= end; j < rhs.endCols(); ++j)
-      for (int i = rhs.beginRows(); i < rhs.endRows(); ++i) { lhs.elt(i,j) = rhs.elt(i, j);}
+      for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
+      { lhs.setValue(i, j, rhs.elt(i, j));}
   }
   static void runByRow(Lhs& lhs, Rhs const& rhs )
   {
     const int end = std::min(lhs.endRows(), lhs.endCols());
     for (int i = rhs.beginRows(); i < end; ++i)
     { int j = rhs.beginCols();
-      for (; j <i; ++j)               { lhs.elt(i,j) = Type(0);}
-      for (; j < rhs.endCols(); ++j) { lhs.elt(i,j) = rhs.elt(i, j);}
+      for (; j <i; ++j)              { lhs.setValue(i, j, Type(0));}
+      for (; j < rhs.endCols(); ++j) { lhs.setValue(i, j, rhs.elt(i, j));}
     }
     for (int i= end; i < rhs.endRows(); ++i)
-      for (int j=rhs.beginCols(); j < rhs.endCols(); ++j) { lhs.elt(i,j) = Type(0);}
+      for (int j=rhs.beginCols(); j < rhs.endCols(); ++j)
+      { lhs.setValue(i, j, Type(0));}
   }
 };
 
@@ -364,13 +370,13 @@ struct Copycat<  Lhs,  Rhs, Arrays::array2D_, Arrays::symmetric_>
   {
     for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
       for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
-      { lhs.elt(i, j) = rhs.elt(i, j);}
+      { lhs.setValue(i, j,  rhs.elt(i, j));}
   }
   static void runByRow(Lhs& lhs, Rhs const& rhs )
   {
     for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
       for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
-      { lhs.elt(i, j) = rhs.elt(i, j);}
+      { lhs.setValue(i, j,  rhs.elt(i, j));}
   }
 };
 
@@ -419,13 +425,13 @@ struct Copycat<  Lhs,  Rhs, Arrays::array2D_, Arrays::vector_>
   {
     int j = lhs.beginCols();
     for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
-    { lhs.elt(i, j) = rhs.elt(i);}
+    { lhs.setValue(i, j, rhs.elt(i));}
   }
   static void runByRow(Lhs& lhs, Rhs const& rhs )
   {
     int j = rhs.beginCols();
     for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
-    { lhs.elt(i, j) = rhs.elt(i);}
+    { lhs.setValue(i, j, rhs.elt(i));}
   }
 };
 
@@ -437,13 +443,13 @@ struct Copycat<  Lhs,  Rhs, Arrays::array2D_, Arrays::point_>
   {
     int i = lhs.beginRows();
     for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
-    { lhs.elt(i, j) = rhs.elt(j);}
+    { lhs.setValue(i, j, rhs.elt(j));}
   }
   static void runByRow(Lhs& lhs, Rhs const& rhs )
   {
     int i = lhs.beginRows();
     for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
-    { lhs.elt(i, j) = rhs.elt(j);}
+    { lhs.setValue(i, j, rhs.elt(j));}
   }
 };
 
@@ -458,13 +464,13 @@ struct Copycat<  Lhs,  Rhs, Arrays::square_, Arrays::array2D_>
   {
     for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
       for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
-      { lhs.elt(i, j) = rhs.elt(i, j);}
+      { lhs.setValue(i, j,  rhs.elt(i, j));}
   }
   static void runByRow(Lhs& lhs, Rhs const& rhs )
   {
     for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
       for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
-      { lhs.elt(i, j) = rhs.elt(i, j);}
+      { lhs.setValue(i, j,  rhs.elt(i, j));}
   }
 };
 
@@ -476,13 +482,13 @@ struct Copycat<  Lhs,  Rhs, Arrays::square_, Arrays::square_>
   {
     for (int j = rhs.begin(); j < rhs.end(); ++j)
       for (int i = rhs.begin(); i< rhs.end(); ++i)
-      { lhs.elt(i, j) = rhs.elt(i, j);}
+      { lhs.setValue(i, j,  rhs.elt(i, j));}
   }
   static void runByRow(Lhs& lhs, Rhs const& rhs )
   {
     for (int i = rhs.begin(); i< rhs.end(); ++i)
       for (int j = rhs.begin(); j < rhs.end(); ++j)
-      { lhs.elt(i, j) = rhs.elt(i, j);}
+      { lhs.setValue(i, j,  rhs.elt(i, j));}
   }
 };
 
@@ -495,13 +501,15 @@ struct Copycat<  Lhs,  Rhs, Arrays::square_, Arrays::diagonal_>
   {
     lhs.setValue(Type(0));
     const int end = std::min(lhs.endRows(), lhs.endCols());
-    for (int i = rhs.beginRows(); i < end; ++i) { lhs.elt(i,i) = rhs.elt(i);}
+    for (int i = rhs.beginRows(); i < end; ++i)
+    { lhs.setValue(i, i, rhs.elt(i));}
   }
   static void runByRow(Lhs& lhs, Rhs const& rhs )
   {
     lhs.setValue(Type(0));
     const int end = std::min(lhs.endRows(), lhs.endCols());
-    for (int i = rhs.beginRows(); i < end; ++i) { lhs.elt(i,i) = rhs.elt(i);}
+    for (int i = rhs.beginRows(); i < end; ++i)
+    { lhs.setValue(i, i, rhs.elt(i));}
   }
 };
 
@@ -515,22 +523,24 @@ struct Copycat<  Lhs,  Rhs, Arrays::square_,   Arrays::lower_triangular_>
     const int end = std::min(rhs.endRows(), rhs.endCols());
     for (int j = rhs.beginCols(); j < end; ++j)
     { int i = rhs.beginRows();
-      for (; i < j; ++i)                 { lhs.elt(i,j) = Type(0);}
-      for (; i < rhs.endRows(); ++i) { lhs.elt(i,j) = rhs.elt(i, j);}
+      for (; i < j; ++i)             { lhs.setValue(i, j, Type(0));}
+      for (; i < rhs.endRows(); ++i) { lhs.setValue(i, j, rhs.elt(i, j));}
     }
     for (int j= end; j < rhs.endCols(); ++j)
-      for (int i = rhs.beginRows(); i < rhs.endRows(); ++i) { lhs.elt(i,j) = Type(0);}
+      for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
+      { lhs.setValue(i, j, Type(0));}
   }
   static void runByRow(Lhs& lhs, Rhs const& rhs )
   {
     const int end = std::min(rhs.endRows(), rhs.endCols());
     for (int i = rhs.beginRows(); i < end; ++i)
     { int j = rhs.beginCols();
-      for (; j <=i; ++j)                 { lhs.elt(i,j) = rhs.elt(i, j);}
-      for (; j < rhs.endCols(); ++j) { lhs.elt(i,j) = Type(0);}
+      for (; j <=i; ++j)             { lhs.setValue(i, j,  rhs.elt(i, j));}
+      for (; j < rhs.endCols(); ++j) { lhs.setValue(i, j, Type(0));}
     }
     for (int i= end; i < rhs.endRows(); ++i)
-      for (int j=rhs.beginCols(); j < rhs.endCols(); ++j) { lhs.elt(i,j) = rhs.elt(i, j);}
+      for (int j=rhs.beginCols(); j < rhs.endCols(); ++j)
+      { lhs.setValue(i, j, rhs.elt(i, j));}
   }
 };
 
@@ -544,22 +554,24 @@ struct Copycat<  Lhs,  Rhs, Arrays::square_, Arrays::upper_triangular_>
     const int end = std::min(rhs.endRows(), rhs.endCols());
     for (int j = rhs.beginCols(); j < end; ++j)
     { int i = rhs.beginRows();
-      for (; i <= j; ++i)            { lhs.elt(i,j) = rhs.elt(i, j);}
-      for (; i < rhs.endRows(); ++i) { lhs.elt(i,j) =  Type(0);}
+      for (; i <= j; ++i)            { lhs.setValue(i, j, rhs.elt(i, j));}
+      for (; i < rhs.endRows(); ++i) { lhs.setValue(i, j, Type(0));}
     }
     for (int j= end; j < rhs.endCols(); ++j)
-      for (int i = rhs.beginRows(); i < rhs.endRows(); ++i) { lhs.elt(i,j) = rhs.elt(i, j);}
+      for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
+      { lhs.setValue(i, j,  rhs.elt(i, j));}
   }
   static void runByRow(Lhs& lhs, Rhs const& rhs )
   {
     const int end = std::min(lhs.endRows(), lhs.endCols());
     for (int i = rhs.beginRows(); i < end; ++i)
     { int j = rhs.beginCols();
-      for (; j <i; ++j)                  { lhs.elt(i,j) = Type(0);}
-      for (; j < rhs.endCols(); ++j) { lhs.elt(i,j) = rhs.elt(i, j);}
+      for (; j <i; ++j)              { lhs.setValue(i, j, Type(0));}
+      for (; j < rhs.endCols(); ++j) { lhs.setValue(i, j, rhs.elt(i, j));}
     }
     for (int i= end; i < rhs.endRows(); ++i)
-      for (int j=rhs.beginCols(); j < rhs.endCols(); ++j) { lhs.elt(i,j) = Type(0);}
+      for (int j=rhs.beginCols(); j < rhs.endCols(); ++j)
+      { lhs.setValue(i, j, Type(0));}
   }
 };
 
@@ -571,13 +583,13 @@ struct Copycat< Lhs, Rhs, Arrays::square_, Arrays::symmetric_>
   {
     for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
       for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
-      { lhs.elt(i, j) = rhs.elt(i, j);}
+      { lhs.setValue(i, j,  rhs.elt(i, j));}
   }
   static void runByRow(Lhs& lhs, Rhs const& rhs )
   {
     for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
       for (int j = rhs.beginCols(); j < rhs.endCols(); ++j)
-      { lhs.elt(i, j) = rhs.elt(i, j);}
+      { lhs.setValue(i, j,  rhs.elt(i, j));}
   }
 };
 
@@ -629,17 +641,17 @@ struct Copycat<  Lhs,  Rhs, Arrays::lower_triangular_, Arrays::lower_triangular_
     const int end = std::min(rhs.endRows(), rhs.endCols());
     for (int j = rhs.beginCols(); j < end; ++j)
       for (int i=j; i < rhs.endRows(); ++i)
-      { lhs.elt(i,j) = rhs.elt(i, j);}
+      { lhs.setValue(i, j,  rhs.elt(i, j));}
   }
   static void runByRow(Lhs& lhs, Rhs const& rhs )
   {
     const int end = std::min(rhs.endRows(), rhs.endCols());
     for (int i = rhs.beginRows(); i < end; ++i)
-    {
-      for (int j = rhs.beginCols(); j <=i; ++j) { lhs.elt(i,j) = rhs.elt(i, j);}
-    }
+      for (int j = rhs.beginCols(); j <=i; ++j)
+      { lhs.setValue(i, j,  rhs.elt(i, j));}
     for (int i= end; i < rhs.endRows(); ++i)
-      for (int j=rhs.beginCols(); j < rhs.endCols(); ++j) { lhs.elt(i,j) = rhs.elt(i, j);}
+      for (int j=rhs.beginCols(); j < rhs.endCols(); ++j)
+      { lhs.setValue(i, j,  rhs.elt(i, j));}
   }
 };
 
@@ -653,17 +665,18 @@ struct Copycat<  Lhs,  Rhs, Arrays::upper_triangular_, Arrays::upper_triangular_
   {
     const int end = std::min(rhs.endRows(), rhs.endCols());
     for (int j = rhs.beginCols(); j < end; ++j)
-    {
-      for (int i = rhs.beginRows(); i <= j; ++i) { lhs.elt(i,j) = rhs.elt(i, j);}
-    }
+      for (int i = rhs.beginRows(); i <= j; ++i)
+      { lhs.setValue(i, j,  rhs.elt(i, j));}
     for (int j= end; j < rhs.endCols(); ++j)
-      for (int i = rhs.beginRows(); i < rhs.endRows(); ++i) { lhs.elt(i,j) = rhs.elt(i, j);}
+      for (int i = rhs.beginRows(); i < rhs.endRows(); ++i)
+      { lhs.setValue(i, j,  rhs.elt(i, j));}
   }
   static void runByRow(Lhs& lhs, Rhs const& rhs )
   {
     const int last = std::min(lhs.lastIdxRows(), lhs.lastIdxCols());
     for (int i = rhs.beginRows(); i <= last; ++i)
-    { for (int j=i; j < rhs.endCols(); ++j) { lhs.elt(i,j) = rhs.elt(i, j);}}
+     for (int j=i; j < rhs.endCols(); ++j)
+     { lhs.setValue(i, j,  rhs.elt(i, j));}
   }
 };
 
@@ -674,9 +687,9 @@ template < typename Lhs, typename Rhs>
 struct Copycat<  Lhs,  Rhs, Arrays::diagonal_, Arrays::diagonal_>
 {
   static void runByCol(Lhs& lhs, Rhs const& rhs )
-  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
+  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.setValue(i,  rhs.elt(i));}}
   static void runByRow(Lhs& lhs, Rhs const& rhs )
-  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
+  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.setValue(i,  rhs.elt(i));}}
 };
 
 // diagonal <- vector
@@ -684,9 +697,9 @@ template < typename Lhs, typename Rhs>
 struct Copycat<  Lhs,  Rhs, Arrays::diagonal_, Arrays::vector_>
 {
   static void runByCol(Lhs& lhs, Rhs const& rhs )
-  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
+  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.setValue(i,  rhs.elt(i));}}
   static void runByRow(Lhs& lhs, Rhs const& rhs )
-  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
+  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.setValue(i,  rhs.elt(i));}}
 };
 
 // diagonal <- point
@@ -694,9 +707,9 @@ template < typename Lhs, typename Rhs>
 struct Copycat<  Lhs,  Rhs, Arrays::diagonal_, Arrays::point_>
 {
   static void runByCol(Lhs& lhs, Rhs const& rhs )
-  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
+  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.setValue(i,  rhs.elt(i));}}
   static void runByRow(Lhs& lhs, Rhs const& rhs )
-  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
+  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.setValue(i,  rhs.elt(i));}}
 };
 
 //---------------------VECTOR----------------------------------
@@ -705,9 +718,9 @@ template < typename Lhs, typename Rhs>
 struct Copycat<  Lhs,  Rhs, Arrays::vector_, Arrays::diagonal_>
 {
   static void runByCol(Lhs& lhs, Rhs const& rhs )
-  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
+  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.setValue(i,  rhs.elt(i));}}
   static void runByRow(Lhs& lhs, Rhs const& rhs )
-  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
+  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.setValue(i,  rhs.elt(i));}}
 };
 
 //  vector <- vector
@@ -715,18 +728,18 @@ template < typename Lhs, typename Rhs>
 struct Copycat<  Lhs,  Rhs, Arrays::vector_, Arrays::vector_>
 {
   static void runByCol(Lhs& lhs, Rhs const& rhs )
-  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
+  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.setValue(i,  rhs.elt(i));}}
   static void runByRow(Lhs& lhs, Rhs const& rhs )
-  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
+  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.setValue(i,  rhs.elt(i));}}
 };
 // vector <- point
 template < typename Lhs, typename Rhs>
 struct Copycat<  Lhs,  Rhs, Arrays::vector_, Arrays::point_>
 {
   static void runByCol(Lhs& lhs, Rhs const& rhs )
-  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
+  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.setValue(i,  rhs.elt(i));}}
   static void runByRow(Lhs& lhs, Rhs const& rhs )
-  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
+  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.setValue(i,  rhs.elt(i));}}
 };
 
 //---------------------POINT----------------------------------
@@ -735,9 +748,9 @@ template < typename Lhs, typename Rhs>
 struct Copycat<  Lhs,  Rhs, Arrays::point_, Arrays::diagonal_>
 {
   static void runByCol(Lhs& lhs, Rhs const& rhs )
-  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
+  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.setValue(i,  rhs.elt(i));}}
   static void runByRow(Lhs& lhs, Rhs const& rhs )
-  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
+  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.setValue(i,  rhs.elt(i));}}
 };
 
 //  vector <- vector
@@ -745,18 +758,18 @@ template < typename Lhs, typename Rhs>
 struct Copycat<  Lhs,  Rhs, Arrays::point_, Arrays::vector_>
 {
   static void runByCol(Lhs& lhs, Rhs const& rhs )
-  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
+  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.setValue(i,  rhs.elt(i));}}
   static void runByRow(Lhs& lhs, Rhs const& rhs )
-  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
+  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.setValue(i,  rhs.elt(i));}}
 };
 // vector <- point
 template < typename Lhs, typename Rhs>
 struct Copycat<  Lhs,  Rhs, Arrays::point_, Arrays::point_>
 {
   static void runByCol(Lhs& lhs, Rhs const& rhs )
-  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
+  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.setValue(i,  rhs.elt(i));}}
   static void runByRow(Lhs& lhs, Rhs const& rhs )
-  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.elt(i) = rhs.elt(i);}}
+  { for (int i = rhs.begin(); i< rhs.end(); ++i) { lhs.setValue(i,  rhs.elt(i));}}
 };
 
 
@@ -766,9 +779,9 @@ template < typename Lhs, typename Rhs>
 struct Copycat<  Lhs,  Rhs, Arrays::number_, Arrays::number_>
 {
   inline static void runByCol(Lhs& lhs, Rhs const& rhs )
-  { lhs.elt() = rhs.elt();}
+  { lhs.setValue(rhs.elt());}
   inline static void runByRow(Lhs& lhs, Rhs const& rhs )
-  { lhs.elt() = rhs.elt();}
+  { lhs.setValue(rhs.elt());}
 };
 
 /** @ingroup hidden

@@ -71,8 +71,9 @@ struct Traits< RVector<Type_> >
     typedef Void Number;
 
     typedef Type_ Type;
-    typedef Type const& ReturnType;
-    typedef Type const& ConstReturnType;
+    typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+    typedef typename RemoveConst<Type>::Type const& ReturnType;
+    typedef typename RemoveConst<Type>::Type const& TypeConst;
 
     enum
     {
@@ -96,6 +97,8 @@ class RVector: public ArrayBase< RVector<Type_> >, public TRef<1>
 
     typedef typename hidden::Traits<RVector<Type_> >::Type Type;
     typedef typename hidden::Traits<RVector<Type_> >::ReturnType ReturnType;
+    typedef typename hidden::Traits<RVector<Type_> >::TypeConst TypeConst;
+
     enum
     {
       structure_ = hidden::Traits<RVector<Type_> >::structure_,
@@ -155,11 +158,27 @@ class RVector: public ArrayBase< RVector<Type_> >, public TRef<1>
      *  @param i, j indexes of the row and of the column
      **/
     inline Type const& elt2Impl(int i, int j) const
-    { return static_cast<Type const&>(vector_[i]);}
+    { return vector_[i];}
+//    { return static_cast<Type const&>(vector_[i]);}
     /** @return a reference on the element (i,j)
      *  @param i, j indexes of the row and of the column
      **/
-    inline Type& elt2Impl(int i, int j) { return static_cast<Type&>(vector_[i]);}
+    inline Type& elt2Impl(int i, int j)
+    { return vector_[i];}
+//    { return static_cast<Type&>(vector_[i]);}
+    /** set value
+     *  @param i index of the ith element
+     *  @param value value to set
+     **/
+    inline void setValueImpl(int i, Type const& value)
+    { vector_[i] = value;}
+    /** set value
+     *  @param i,j index of the ith element and of the column
+     *  @param value value to set
+     **/
+    inline void setValueImpl(int i, int j, Type const& value)
+    { static_cast<Type&>(vector_[i]) = value;}
+
     /** overwrite the RVector with vec using Rcpp::operator=.
      *  @param vec the vector to copy
      **/

@@ -37,6 +37,8 @@
 #define STK_ARRAY2DNUMBER_H
 
 #include "STK_IArray2D.h"
+#include "STK_IArray2DSlicers.h"
+#include "STK_IArray2DModifiers.h"
 
 namespace STK
 {
@@ -68,7 +70,7 @@ struct Traits< Array2DNumber<Type_> >
   typedef Array2DNumber<Type_>  SubVector;
 
   typedef Type_                Type;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+  typedef typename RemoveConst<Type>::Type const& TypeConst;
 
   enum
   {
@@ -79,6 +81,8 @@ struct Traits< Array2DNumber<Type_> >
     size_      = 1,
     storage_   = Arrays::dense_ // always dense
   };
+  typedef Array1D<Type, UnknownSize> ColVector;
+  typedef ColVector* PtrCol;
 };
 
 } // namespace hidden
@@ -107,7 +111,7 @@ class Array2DNumber: public IArray2D< Array2DNumber<Type_> >
     typedef typename hidden::Traits< Array2DNumber<Type_> >::SubArray SubArray;
 
     typedef typename hidden::Traits< Array2DNumber<Type_> >::Type Type;
-    typedef typename hidden::Traits< Array2DNumber<Type_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< Array2DNumber<Type_> >::TypeConst TypeConst;
 
     enum
     {
@@ -154,12 +158,12 @@ class Array2DNumber: public IArray2D< Array2DNumber<Type_> >
                  : Base(p_data, Range(row, 1), Range(col, 1)) {}
     /** destructor. */
     ~Array2DNumber() {}
-    /** @return a constant reference on the jth element
-     **/
-    inline Type const& elt0Impl() const { return this->data(this->beginCols())[this->beginRows()];}
-    /** @return a reference on the jth element
-     **/
-    inline Type& elt0Impl() { return this->data(this->beginCols())[this->beginRows()];}
+    /** @return a constant reference to element */
+    inline Type const& elt0Impl() const
+    { return (this->allocator_.elt(this->beginCols()))->elt(this->beginRows());}
+    /** @return a reference on to the element */
+    inline Type& elt0Impl()
+    { return (this->allocator_.elt(this->beginCols()))->elt(this->beginRows());}
     /** New first indexes for the object.
      *  @param cbeg the index of the first column to set
      **/

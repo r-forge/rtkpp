@@ -56,7 +56,7 @@ template< typename Type_, int SizeRows_, int SizeCols_, bool Orient_>
 struct Traits< SAllocator<Type_, SizeRows_, SizeCols_, Orient_> >
 {
   typedef Type_  Type;
-  typedef typename RemoveConst<Type_>::Type const& ConstReturnType;
+  typedef typename RemoveConst<Type_>::Type const& TypeConst;
 
   enum
   {

@@ -46,14 +46,6 @@
 
 namespace STK
 {
-/** @ingroup Base
- *  @brief STK fundamental type of a String.
- *
- *  The type String is defined for the internal representation
- *  of the string variables (strings).
- **/
-typedef std::basic_string<Char> String;
-
 /** @ingroup Arithmetic
  *  @brief Specialization for String.
  *

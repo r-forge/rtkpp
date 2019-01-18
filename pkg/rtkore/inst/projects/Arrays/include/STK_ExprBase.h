@@ -112,7 +112,7 @@ class ExprBase: public ITContainer<Derived, hidden::Traits<Derived>::structure_>
     };
     typedef ITContainer<Derived, structure_> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
-    typedef typename hidden::Traits<Derived>::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits<Derived>::TypeConst TypeConst;
 
   protected:
     /** Default constructor */
@@ -127,7 +127,7 @@ class ExprBase: public ITContainer<Derived, hidden::Traits<Derived>::structure_>
      *  @param visitor the visitor to run
      **/
     template<typename Visitor>
-    typename Visitor::ConstReturnType visit(Visitor& visitor) const;
+    typename Visitor::TypeConst visit(Visitor& visitor) const;
     /** @brief compute the value of non-zero element in an expression.
      *  For example
      *  @code

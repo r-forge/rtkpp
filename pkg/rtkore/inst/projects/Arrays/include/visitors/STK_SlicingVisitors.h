@@ -94,7 +94,7 @@ struct Traits< VisitorByCol <Derived, Visitor> >
   typedef typename Derived::Type Type_;
   typedef Visitor<Type_> VisitorType;
   typedef typename VisitorType::Type Type;
-  typedef typename VisitorType::ConstReturnType ConstReturnType;
+  typedef typename VisitorType::TypeConst TypeConst;
 
 //  typedef RowOperator< VisitorByCol <Derived, Visitor> > Row;
 //  typedef ColOperator< VisitorByCol <Derived, Visitor> > Col;
@@ -118,7 +118,7 @@ class VisitorByCol: public ExprBase< VisitorByCol<Derived, Visitor> >, public TR
   public:
     typedef typename hidden::Traits< VisitorByCol<Derived, Visitor> >::VisitorType VisitorType;
     typedef typename hidden::Traits< VisitorByCol<Derived, Visitor> >::Type Type;
-    typedef typename hidden::Traits< VisitorByCol<Derived, Visitor> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< VisitorByCol<Derived, Visitor> >::TypeConst TypeConst;
     typedef typename hidden::Traits< VisitorByCol<Derived, Visitor> >::Allocator Allocator;
     typedef VisitorByCol Result;
     enum
@@ -192,7 +192,7 @@ struct Traits< VisitorByRow <Derived, Visitor> >
   typedef typename Derived::Type Type_;
   typedef Visitor<Type_> VisitorType;
   typedef typename VisitorType::Type Type;
-  typedef typename VisitorType::ConstReturnType ConstReturnType;
+  typedef typename VisitorType::TypeConst TypeConst;
 
 //  typedef RowOperator< VisitorByRow <Derived, Visitor> > Row;
 //  typedef ColOperator< VisitorByRow <Derived, Visitor> > Col;
@@ -213,7 +213,7 @@ class VisitorByRow: public ExprBase< VisitorByRow<Derived, Visitor> >, public TR
 
     typedef typename hidden::Traits< VisitorByRow<Derived, Visitor> >::Type Type;
     typedef typename hidden::Traits< VisitorByRow<Derived, Visitor> >::VisitorType VisitorType;
-    typedef typename hidden::Traits< VisitorByRow<Derived, Visitor> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< VisitorByRow<Derived, Visitor> >::TypeConst TypeConst;
     typedef typename hidden::Traits< VisitorByRow<Derived, Visitor> >::Allocator Allocator;
 
     typedef VisitorByRow Result;

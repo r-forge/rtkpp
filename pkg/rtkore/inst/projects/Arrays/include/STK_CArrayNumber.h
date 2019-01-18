@@ -70,7 +70,7 @@ struct Traits< CArrayNumber<Type_, Orient_> >
     typedef CAllocator<Type_, 1, 1, Orient_> Allocator;
 
     typedef Type_                Type;
-    typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+    typedef typename RemoveConst<Type>::Type const& TypeConst;
 
     enum
     {
@@ -100,7 +100,7 @@ class CArrayNumber: public ICArray < CArrayNumber<Type_, Orient_> >
     typedef typename hidden::Traits< CArrayNumber<Type_, Orient_> >::Row Row;
     typedef typename hidden::Traits< CArrayNumber<Type_, Orient_> >::Col Col;
     typedef typename hidden::Traits< CArrayNumber<Type_, Orient_> >::Type Type;
-    typedef typename hidden::Traits< CArrayNumber<Type_, Orient_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< CArrayNumber<Type_, Orient_> >::TypeConst TypeConst;
 
     enum
     {
@@ -121,7 +121,7 @@ class CArrayNumber: public ICArray < CArrayNumber<Type_, Orient_> >
      *  @param T the container to copy
      *  @param ref true if T is wrapped
      **/
-    CArrayNumber( const CArrayNumber &T, bool ref=false): Base(T, ref) {}
+    CArrayNumber( CArrayNumber const& T, bool ref=false): Base(T, ref) {}
     /** wrapper constructor for 0 based C-Array.
      *  @param q pointer on the array
      **/
@@ -130,7 +130,7 @@ class CArrayNumber: public ICArray < CArrayNumber<Type_, Orient_> >
      *  @param allocator the allocator to wrap
      **/
     template<class OtherAllocator>
-    CArrayNumber( OtherAllocator const& allocator): Base(allocator) {}
+    CArrayNumber( ITContainer2D<OtherAllocator> const& allocator): Base(allocator) {}
     /** Copy constructor using an expression.
      *  @param T the container to wrap
      **/

@@ -1,6 +1,13 @@
 \name{NEWS}
 \title{News for Package 'rtkore}
 
+\section{Changes in rtkore version 1.6.0 (2019-01-07)}{
+  \itemize{
+    \item C++ 11 chosen by default
+    \item Adding sparse matrices and vectors
+  }
+}
+
 \section{Changes in rtkore version 1.5.1 (2018-02-24)}{
   \itemize{
     \item Adding slicing operators for RVector and RMatrix classes

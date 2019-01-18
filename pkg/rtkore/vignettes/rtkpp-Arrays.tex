@@ -22,7 +22,7 @@
 \begin{abstract}
 This user guide gives a general review of the STK++ arrays and of their usages.
 After giving a general review of the capability of the library, we detail the
-various accessors/mutators available. We give a complete list of
+various accessors/mutators available. We give a complete list of the
 constructors. We focus on the Array2D class and give some hints about their
 capabilities. We then present the different visitors, appliers and functors
 implemented in STK++ allowing to compute quantities or arrays of interests. We
@@ -91,7 +91,7 @@ vectors/points/diagonal matrices. For vectors, just pass one index in a bracket.
 Indexing starts at 0 by default. This behavior can be modify by defining the
 STKBASEARRAYS macro at compile time using the directive -DSTKBASEARRAYS=1.
 Enabling this macro allow user to get 1 based arrays like in FORTRAN.
-If you want to build code independent of the start index you should use the
+If you want to build code independent of the first index you should use the
 \code{beginCols()}, \code{beginRows()}, \code{endRows()}, \code{endCols()},
 \code{lastIdxCols()} and \code{lastIdxRows()} methods of the arrays and the
 \code{begin()}, \code{end()}, \code{lastIdx()} methods of the Row-vectors,
@@ -158,13 +158,13 @@ columns/rows/part of an array:
 \begin{lstlisting}[style=customcpp,caption=Review of the main accessors]
 // access to the ith row
  a.row(i);
-// access to the element [first, first+size-1] of the ith row
+// access to the element [first, first+size) of the ith row
  a.row(i, Range(first, size));
 // access to the jth column
  a.col(j);
-// access to the element [first, first+size-1] of the jth columns
+// access to the element [first, first+size) of the jth columns
  a.col(j, Range(first, size));
-// access to the element [first, first+size-1] of the jth columns
+// access to the element [first, first+size) of the jth columns
  a.col(j, Range(first, size));
 // Create ranges
  Range I(3,2), J(4,2);

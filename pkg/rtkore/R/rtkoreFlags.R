@@ -64,7 +64,7 @@ LdFlags <- function() { cat(.rtkoreLdFlags()) }
 
 # Provide compiler flags -- i.e. -I/path/to/RTKpp.h
 # @keywords internal
-.rtkoreCxxFlags <- function(cpp11=FALSE)
+.rtkoreCxxFlags <- function(cpp11=TRUE)
 {
   path1 <- .rtkore.system.file( "include" )
   path2 <- .rtkore.system.file( "projects" )
@@ -78,7 +78,7 @@ LdFlags <- function() { cat(.rtkoreLdFlags()) }
 
 # Provide internal STK++ macros
 # @keywords internal
-.rtkoreCppFlags <- function(cpp11=FALSE)
+.rtkoreCppFlags <- function(cpp11=TRUE)
 {
   paste("-DIS_RTKPP_LIB -DSTKUSELAPACK", sep="")
 }

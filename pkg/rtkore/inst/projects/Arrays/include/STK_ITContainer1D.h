@@ -37,11 +37,10 @@
 #define STK_ITCONTAINER1D_H
 
 
+#include <Arrays/include/iterators/STK_BiDirectionalIterator.h>
+#include <Arrays/include/iterators/STK_DenseRandomIterator.h>
 #include <Sdk/include/STK_IRecursiveTemplate.h>
 #include <Sdk/include/STK_Macros.h>
-#include <STKernel/include/iterators/STK_BiDirectionalIterator1D.h>
-#include <STKernel/include/iterators/STK_RandomIterator1D.h>
-
 #include "STK_ArraysTraits.h"
 #include "STK_Arrays_Util.h"
 
@@ -90,18 +89,20 @@ class ITContainer1D: public IRecursiveTemplate<Derived>
     };
 
     typedef typename hidden::Traits<Derived>::Type Type;
-    typedef typename hidden::Traits<Derived>::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits<Derived>::TypeConst TypeConst;
+
+    typedef typename hidden::Traits< Derived >::RowRange RowRange;
+    typedef typename hidden::Traits< Derived >::ColRange ColRange;
 
     typedef typename hidden::Traits<Derived>::Row Row;
     typedef typename hidden::Traits<Derived>::Col Col;
     typedef typename hidden::Traits<Derived>::SubVector SubVector;
 
+
     typedef typename hidden::Traits<Derived>::Iterator Iterator;
     typedef typename hidden::Traits<Derived>::ConstIterator ConstIterator;
     typedef typename hidden::Traits<Derived>::ReverseIterator ReverseIterator;
     typedef typename hidden::Traits<Derived>::ConstReverseIterator ConstReverseIterator;
-
-    typedef TRange<size_> Range1D;
 
   protected:
     /** Default constructor */
@@ -109,17 +110,13 @@ class ITContainer1D: public IRecursiveTemplate<Derived>
     /** constructor with a specified range.
      *  @param I : the range of the container
      **/
-    ITContainer1D( Range const& I): range_(I) {}
-    /** Copy constructor
-     *  @param T the container to copy
-     **/
-    ITContainer1D( ITContainer1D const& T): range_(T.range_) {}
+    ITContainer1D( RowRange const& I): range_(I) {}
     /** destructor. */
     ~ITContainer1D() {}
 
   public:
     /**  @return the range of the container */
-    inline Range1D const& range() const  { return range_;}
+    inline RowRange const& range() const  { return range_;}
     /** @return the index of the first element */
     inline int begin() const { return range_.begin();}
     /**  @return the ending index of the elements */
@@ -169,7 +166,7 @@ class ITContainer1D: public IRecursiveTemplate<Derived>
     /** @return a constant reference on the ith element for vector_, point_ and diagonal_ containers
      *  @param i index of the element to get
      **/
-    inline ConstReturnType elt(int i) const
+    inline TypeConst elt(int i) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (begin() > i) { STKOUT_OF_RANGE_1ARG(ITContainer1D::elt, i, begin() > i);}
@@ -191,7 +188,7 @@ class ITContainer1D: public IRecursiveTemplate<Derived>
     /** @return a constant reference on the ith  element
      *  @param i index of the element to get
      **/
-    inline ConstReturnType operator[](int i) const
+    inline TypeConst operator[](int i) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (begin() > i) { STKOUT_OF_RANGE_1ARG(ITContainer1D::operator[], i, begin() > i);}
@@ -211,7 +208,7 @@ class ITContainer1D: public IRecursiveTemplate<Derived>
     /** @return safely the constant jth element
      *  @param i index of the element
      **/
-    ConstReturnType at(int i) const
+    TypeConst at(int i) const
     {
       if (begin() > i)
       { STKOUT_OF_RANGE_1ARG(ITContainer1D::at, i, begin() > i);}
@@ -231,17 +228,17 @@ class ITContainer1D: public IRecursiveTemplate<Derived>
       if ((I.end()>end()))
       { STKOUT_OF_RANGE_1ARG(ITContainer1D::sub,I,I.end()>end());}
 #endif
-      return SubVector(this->asDerived(),I);
+      return SubVector(this->asDerived(), I, true);
     }
 
     /** @return a reference on the first element. */
     inline Type& front() { return elt(begin());}
     /** @return a constant reference on the first element */
-    inline ConstReturnType front() const { return elt(begin());}
+    inline TypeConst front() const { return elt(begin());}
     /** @return a reference on the last element */
     inline Type& back() { return elt(lastIdx());}
     /** @return a constant reference on the last element */
-    inline ConstReturnType back() const { return elt(lastIdx());}
+    inline TypeConst back() const { return elt(lastIdx());}
 
     /**  @param beg the index of the first column to set */
     void shift(int beg)
@@ -252,7 +249,8 @@ class ITContainer1D: public IRecursiveTemplate<Derived>
     /** @return the resized container.
      *  @param I the range of the container
      **/
-    Derived& resize(Range const& I) { return this->asDerived().resizeImpl(I);}
+    Derived& resize(Range const& I =RowRange())
+    { return this->asDerived().resizeImpl(I);}
 
   protected:
     /** exchange this container with T
@@ -262,31 +260,31 @@ class ITContainer1D: public IRecursiveTemplate<Derived>
     /** Set range of the rows of the container.
      *  @param I the range to set (default empty)
      **/
-    void setRange(Range const& I = Range1D()) { range_ = I;}
+    void setRange(RowRange const& I = RowRange()) { range_ = I;}
     /** increment the range of the container (can be negative).
-     *  @param inc increment to apply to the range
+     *  @param n increment to apply to the range
      **/
-    void incRange(int inc =1) { range_.inc(inc);}
+    void incRange(int n =1) { range_.inc(n);}
     /** increment the beginning of the container (can be negative).
-     *  @param inc the increment to apply to the beginning of the range
+     *  @param n increment to apply to the beginning of the range
      **/
-    void incFirst(int inc =1) { range_.incFirst(inc);}
+    void incFirst(int n =1) { range_.incFirst(n);}
     /** decrement the beginning of the container.
-     *  @param inc the decrement to apply to the beginning of the range
+     *  @param n decrement to apply to the beginning of the range
      **/
-    void decFirst(int inc =1) { range_.decFirst(inc);}
+    void decFirst(int n =1) { range_.decFirst(n);}
     /** increment the end of the container (can be negative).
-     *  @param inc the increment to apply to the end of the range
+     *  @param n increment to apply to the end of the range
      **/
-    void incLast(int inc =1) { range_.incLast(inc);}
+    void incLast(int n =1) { range_.incLast(n);}
     /** decrement the end of the container.
-     *  @param inc the decrement to apply to the end of the range
+     *  @param n decrement to apply to the end of the range
      **/
-    void decLast(int inc =1) { range_.decLast(inc);}
+    void decLast(int n =1) { range_.decLast(n);}
 
   private:
     /** range of the array. */
-    Range1D range_;
+    RowRange range_;
 };
 
 } // namespace STK

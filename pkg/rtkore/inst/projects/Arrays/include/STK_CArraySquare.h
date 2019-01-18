@@ -82,7 +82,7 @@ struct Traits< CArraySquare<Type_, Size_, Orient_> >
     typedef CAllocator<Type_, Size_, Size_, Orient_> Allocator;
 
     typedef Type_                Type;
-    typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+    typedef typename RemoveConst<Type>::Type const& TypeConst;
 
     enum
     {
@@ -112,7 +112,7 @@ class CArraySquare: public ICArray < CArraySquare<Type_, Size_, Orient_> >
     typedef typename hidden::Traits< CArraySquare <Type_, Size_> >::Col Col;
 
     typedef typename hidden::Traits< CArraySquare <Type_, Size_> >::Type Type;
-    typedef typename hidden::Traits< CArraySquare <Type_, Size_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< CArraySquare <Type_, Size_> >::TypeConst TypeConst;
 
     enum
     {

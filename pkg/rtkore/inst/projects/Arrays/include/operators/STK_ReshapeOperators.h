@@ -84,7 +84,7 @@ struct Traits< DiagonalizeOperator <Lhs> >
   typedef RowOperator<DiagonalizeOperator < Lhs> > Row;
   typedef ColOperator<DiagonalizeOperator < Lhs> > Col;
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 /** @ingroup hidden
  *  @brief Traits class for DiagonalizeAccessor operator
@@ -107,7 +107,7 @@ struct Traits< DiagonalizeAccessor <Lhs> >
   typedef RowOperator<DiagonalizeAccessor < Lhs> > Row;
   typedef ColOperator<DiagonalizeAccessor < Lhs> > Col;
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 
 } // namespace hidden
@@ -134,7 +134,7 @@ class DiagonalizeOperator: public ExprBase< DiagonalizeOperator< Lhs> >, public 
   public:
     typedef ExprBase< DiagonalizeOperator< Lhs> > Base;
     typedef typename hidden::Traits< DiagonalizeOperator<Lhs> >::Type Type;
-    typedef typename hidden::Traits< DiagonalizeOperator<Lhs> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< DiagonalizeOperator<Lhs> >::TypeConst TypeConst;
     enum
     {
         structure_ = hidden::Traits< DiagonalizeOperator<Lhs> >::structure_,
@@ -164,7 +164,7 @@ class DiagonalizeOperator: public ExprBase< DiagonalizeOperator< Lhs> >, public 
     /** @return a constant reference on the (i,j) element of the expression.
      *  @param i, j indexes of the element to get
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const
+    inline TypeConst elt2Impl(int i, int j) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (i != j) { STKOUT_OF_RANGE_2ARG(DiagonalizeOperator::elt, i, j, i != j);}
@@ -174,9 +174,9 @@ class DiagonalizeOperator: public ExprBase< DiagonalizeOperator< Lhs> >, public 
     /** @return a constant reference on the ith element of the expression
      *  @param i index of the element to get
      **/
-    inline ConstReturnType elt1Impl(int i) const { return (lhs_.elt(i));}
+    inline TypeConst elt1Impl(int i) const { return (lhs_.elt(i));}
     /** @return a constant reference on the element of the expression */
-    inline ConstReturnType elt0Impl() const { return (lhs_.elt());}
+    inline TypeConst elt0Impl() const { return (lhs_.elt());}
 
   protected:
     Lhs const& lhs_;
@@ -204,7 +204,7 @@ class DiagonalizeAccessor: public ArrayBase< DiagonalizeAccessor< Lhs> >, public
   public:
     typedef ArrayBase< DiagonalizeAccessor< Lhs> > Base;
     typedef typename hidden::Traits< DiagonalizeAccessor<Lhs> >::Type Type;
-    typedef typename hidden::Traits< DiagonalizeAccessor<Lhs> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< DiagonalizeAccessor<Lhs> >::TypeConst TypeConst;
     enum
     {
         structure_ = hidden::Traits< DiagonalizeAccessor<Lhs> >::structure_,
@@ -234,13 +234,13 @@ class DiagonalizeAccessor: public ArrayBase< DiagonalizeAccessor< Lhs> >, public
     /** @return a constant reference on the (i,j) element of the expression.
      *  @param i, j indexes of the element to get
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const { return (lhs_.elt(i, j));}
+    inline TypeConst elt2Impl(int i, int j) const { return (lhs_.elt(i, j));}
     /** @return a constant reference on the ith element of the expression
      *  @param i index of the element to get
      **/
-    inline ConstReturnType elt1Impl(int i) const { return (lhs_.elt(i));}
+    inline TypeConst elt1Impl(int i) const { return (lhs_.elt(i));}
     /** @return a constant reference on the element of the expression */
-    inline ConstReturnType elt0Impl() const { return (lhs_.elt());}
+    inline TypeConst elt0Impl() const { return (lhs_.elt());}
 
     /** @return a reference on the (i,j) element of the expression.
      *  @param i, j indexes of the element to get
@@ -294,7 +294,7 @@ struct Traits< DiagonalGetterOperator <Lhs> >
   typedef RowOperator<DiagonalGetterOperator < Lhs> > Row;
   typedef ColOperator<DiagonalGetterOperator < Lhs> > Col;
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 
 /** @ingroup hidden
@@ -325,7 +325,7 @@ struct Traits< DiagonalGetterAccessor <Lhs> >
   typedef RowOperator<DiagonalGetterAccessor < Lhs> > Row;
   typedef ColOperator<DiagonalGetterAccessor < Lhs> > Col;
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 
 /** @ingroup hidden
@@ -382,7 +382,7 @@ class DiagonalGetterOperator: public ExprBase< DiagonalGetterOperator< Lhs> >, p
   public:
     typedef ExprBase< DiagonalGetterOperator< Lhs> > Base;
     typedef typename hidden::Traits< DiagonalGetterOperator<Lhs> >::Type Type;
-    typedef typename hidden::Traits< DiagonalGetterOperator<Lhs> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< DiagonalGetterOperator<Lhs> >::TypeConst TypeConst;
 
     enum
     {
@@ -420,13 +420,13 @@ class DiagonalGetterOperator: public ExprBase< DiagonalGetterOperator< Lhs> >, p
     /** @return a constant reference on the (i,j) element of the expression.
      *  @param i, j index of the row and of the column
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const { return (lhs_.elt(i, j));}
+    inline TypeConst elt2Impl(int i, int j) const { return (lhs_.elt(i, j));}
     /** @return a constant reference on the ith element of the expression
      *  @param i index of the element to get
      **/
-    inline ConstReturnType elt1Impl(int i) const { return (lhs_.elt(i,i));}
+    inline TypeConst elt1Impl(int i) const { return (lhs_.elt(i,i));}
     /** @return a constant reference on the element of the expression */
-    inline ConstReturnType elt0Impl() const { return (lhs_.elt());}
+    inline TypeConst elt0Impl() const { return (lhs_.elt());}
 
   protected:
     Lhs const& lhs_;
@@ -453,7 +453,7 @@ class DiagonalGetterAccessor: public ArrayBase< DiagonalGetterAccessor< Lhs> >, 
   public:
     typedef ArrayBase< DiagonalGetterAccessor< Lhs> > Base;
     typedef typename hidden::Traits< DiagonalGetterAccessor<Lhs> >::Type Type;
-    typedef typename hidden::Traits< DiagonalGetterAccessor<Lhs> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< DiagonalGetterAccessor<Lhs> >::TypeConst TypeConst;
 
     enum
     {
@@ -491,13 +491,13 @@ class DiagonalGetterAccessor: public ArrayBase< DiagonalGetterAccessor< Lhs> >, 
     /** @return a constant reference on the (i,j) element of the expression.
      *  @param i, j index of the row and of the column
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const { return (lhs_.elt(i, j));}
+    inline TypeConst elt2Impl(int i, int j) const { return (lhs_.elt(i, j));}
     /** @return a constant reference on the ith element of the expression
      *  @param i index of the element to get
      **/
-    inline ConstReturnType elt1Impl(int i) const { return (lhs_.elt(i,i));}
+    inline TypeConst elt1Impl(int i) const { return (lhs_.elt(i,i));}
     /** @return a constant reference on the element of the expression */
-    inline ConstReturnType elt0Impl() const { return (lhs_.elt());}
+    inline TypeConst elt0Impl() const { return (lhs_.elt());}
 
     /** @return a reference on the (i,j) element of the expression.
      *  @param i, j index of the row and of the column
@@ -533,7 +533,7 @@ struct Traits< UpperTriangularizeOperator<Lhs> >
   typedef RowOperator< UpperTriangularizeOperator< Lhs> > Row;
   typedef ColOperator< UpperTriangularizeOperator< Lhs> > Col;
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 
 /** @ingroup hidden
@@ -553,7 +553,7 @@ struct Traits< UpperTriangularizeAccessor<Lhs> >
   typedef RowOperator< UpperTriangularizeAccessor< Lhs> > Row;
   typedef ColOperator< UpperTriangularizeAccessor< Lhs> > Col;
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 
 } // namespace hidden
@@ -580,7 +580,7 @@ class UpperTriangularizeOperator: public ExprBase< UpperTriangularizeOperator< L
   public:
     typedef ExprBase< UpperTriangularizeOperator< Lhs> > Base;
     typedef typename hidden::Traits< UpperTriangularizeOperator<Lhs> >::Type Type;
-    typedef typename hidden::Traits< UpperTriangularizeOperator<Lhs> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< UpperTriangularizeOperator<Lhs> >::TypeConst TypeConst;
 
     enum
     {
@@ -607,7 +607,7 @@ class UpperTriangularizeOperator: public ExprBase< UpperTriangularizeOperator< L
     /** @return a constant reference on the (i,j) element of the expression.
      *  @param i, j index of the row and of the column
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const
+    inline TypeConst elt2Impl(int i, int j) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (j<i)
@@ -642,7 +642,7 @@ class UpperTriangularizeAccessor: public ArrayBase< UpperTriangularizeAccessor< 
   public:
     typedef ArrayBase< UpperTriangularizeAccessor< Lhs> > Base;
     typedef typename hidden::Traits< UpperTriangularizeAccessor<Lhs> >::Type Type;
-    typedef typename hidden::Traits< UpperTriangularizeAccessor<Lhs> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< UpperTriangularizeAccessor<Lhs> >::TypeConst TypeConst;
 
     enum
     {
@@ -669,7 +669,7 @@ class UpperTriangularizeAccessor: public ArrayBase< UpperTriangularizeAccessor< 
     /** @return a constant reference on the (i,j) element of the expression.
      *  @param i, j index of the row and of the column
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const
+    inline TypeConst elt2Impl(int i, int j) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (j<i)
@@ -712,7 +712,7 @@ struct Traits< LowerTriangularizeOperator<Lhs> >
   typedef RowOperator< LowerTriangularizeOperator< Lhs> > Row;
   typedef ColOperator< LowerTriangularizeOperator< Lhs> > Col;
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 /** @ingroup hidden
  *  @brief Traits class for LowerTriangularizeAccessor operator
@@ -731,7 +731,7 @@ struct Traits< LowerTriangularizeAccessor<Lhs> >
   typedef RowOperator< LowerTriangularizeAccessor< Lhs> > Row;
   typedef ColOperator< LowerTriangularizeAccessor< Lhs> > Col;
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 
 } // namespace hidden
@@ -758,7 +758,7 @@ class LowerTriangularizeOperator: public ExprBase< LowerTriangularizeOperator< L
   public:
     typedef ExprBase< LowerTriangularizeOperator< Lhs> > Base;
     typedef typename hidden::Traits< LowerTriangularizeOperator<Lhs> >::Type Type;
-    typedef typename hidden::Traits< LowerTriangularizeOperator<Lhs> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< LowerTriangularizeOperator<Lhs> >::TypeConst TypeConst;
 
     enum
     {
@@ -785,7 +785,7 @@ class LowerTriangularizeOperator: public ExprBase< LowerTriangularizeOperator< L
     /** @return a constant reference on the (i,j) element of the expression.
      *  @param i, j index of the row and of the column
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const
+    inline TypeConst elt2Impl(int i, int j) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (j>i)
@@ -821,7 +821,7 @@ class LowerTriangularizeAccessor: public ArrayBase< LowerTriangularizeAccessor< 
   public:
     typedef ArrayBase< LowerTriangularizeAccessor< Lhs> > Base;
     typedef typename hidden::Traits< LowerTriangularizeAccessor<Lhs> >::Type Type;
-    typedef typename hidden::Traits< LowerTriangularizeAccessor<Lhs> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< LowerTriangularizeAccessor<Lhs> >::TypeConst TypeConst;
 
     enum
     {
@@ -848,7 +848,7 @@ class LowerTriangularizeAccessor: public ArrayBase< LowerTriangularizeAccessor< 
     /** @return a constant reference on the (i,j) element of the expression.
      *  @param i, j index of the row and of the column
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const
+    inline TypeConst elt2Impl(int i, int j) const
     {
 #ifdef STK_BOUNDS_CHECK
       if (j>i)
@@ -892,7 +892,7 @@ struct Traits< SymmetrizeOperator<Lhs> >
   typedef RowOperator< SymmetrizeOperator< Lhs> > Row;
   typedef ColOperator< SymmetrizeOperator< Lhs> > Col;
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 /** @ingroup hidden
  *  @brief Traits class for SymmetrizeAccessor operator
@@ -911,7 +911,7 @@ struct Traits< SymmetrizeAccessor<Lhs> >
   typedef RowOperator< SymmetrizeAccessor< Lhs> > Row;
   typedef ColOperator< SymmetrizeAccessor< Lhs> > Col;
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 
 } // namespace hidden
@@ -938,7 +938,7 @@ class SymmetrizeOperator: public ExprBase< SymmetrizeOperator< Lhs> >, public TR
   public:
     typedef ExprBase< SymmetrizeOperator< Lhs> > Base;
     typedef typename hidden::Traits< SymmetrizeOperator<Lhs> >::Type Type;
-    typedef typename hidden::Traits< SymmetrizeOperator<Lhs> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< SymmetrizeOperator<Lhs> >::TypeConst TypeConst;
 
     enum
     {
@@ -966,7 +966,7 @@ class SymmetrizeOperator: public ExprBase< SymmetrizeOperator< Lhs> >, public TR
     /** @return a constant reference on the (i,j) element of the expression.
      *  @param i, j index of the row and of the column
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const
+    inline TypeConst elt2Impl(int i, int j) const
     { return (lhs_.elt(i, j));}
 
   protected:
@@ -995,7 +995,7 @@ class SymmetrizeAccessor: public ArrayBase< SymmetrizeAccessor< Lhs> >, public T
   public:
     typedef ArrayBase< SymmetrizeAccessor< Lhs> > Base;
     typedef typename hidden::Traits< SymmetrizeAccessor<Lhs> >::Type Type;
-    typedef typename hidden::Traits< SymmetrizeAccessor<Lhs> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< SymmetrizeAccessor<Lhs> >::TypeConst TypeConst;
 
     enum
     {
@@ -1023,7 +1023,7 @@ class SymmetrizeAccessor: public ArrayBase< SymmetrizeAccessor< Lhs> >, public T
     /** @return a constant reference on the (i,j) element of the expression.
      *  @param i, j index of the row and of the column
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const
+    inline TypeConst elt2Impl(int i, int j) const
     { return (lhs_.elt(i, j));}
 
     /** @return a reference on the (i,j) element of the expression.
@@ -1054,7 +1054,7 @@ struct Traits< UpperSymmetrizeOperator<Lhs> >
   typedef RowOperator< UpperSymmetrizeOperator< Lhs> > Row;
   typedef ColOperator< UpperSymmetrizeOperator< Lhs> > Col;
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 /** @ingroup hidden
  *  @brief Traits class for UpperSymmetrizeAccessor operator
@@ -1073,7 +1073,7 @@ struct Traits< UpperSymmetrizeAccessor<Lhs> >
   typedef RowOperator< UpperSymmetrizeAccessor< Lhs> > Row;
   typedef ColOperator< UpperSymmetrizeAccessor< Lhs> > Col;
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 
 } // namespace hidden
@@ -1100,7 +1100,7 @@ class UpperSymmetrizeOperator: public ExprBase< UpperSymmetrizeOperator< Lhs> >,
   public:
     typedef ExprBase< UpperSymmetrizeOperator< Lhs> > Base;
     typedef typename hidden::Traits< UpperSymmetrizeOperator<Lhs> >::Type Type;
-    typedef typename hidden::Traits< UpperSymmetrizeOperator<Lhs> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< UpperSymmetrizeOperator<Lhs> >::TypeConst TypeConst;
 
     enum
     {
@@ -1128,7 +1128,7 @@ class UpperSymmetrizeOperator: public ExprBase< UpperSymmetrizeOperator< Lhs> >,
     /** @return a constant reference on the (i,j) element of the expression.
      *  @param i, j index of the row and of the column
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const
+    inline TypeConst elt2Impl(int i, int j) const
     { return ((j<i) ? lhs_.elt(j, i) : lhs_.elt(i, j));}
 
   protected:
@@ -1157,7 +1157,7 @@ class UpperSymmetrizeAccessor: public ArrayBase< UpperSymmetrizeAccessor< Lhs> >
   public:
     typedef ArrayBase< UpperSymmetrizeAccessor< Lhs> > Base;
     typedef typename hidden::Traits< UpperSymmetrizeAccessor<Lhs> >::Type Type;
-    typedef typename hidden::Traits< UpperSymmetrizeAccessor<Lhs> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< UpperSymmetrizeAccessor<Lhs> >::TypeConst TypeConst;
 
     enum
     {
@@ -1185,7 +1185,7 @@ class UpperSymmetrizeAccessor: public ArrayBase< UpperSymmetrizeAccessor< Lhs> >
     /** @return a constant reference on the (i,j) element of the expression.
      *  @param i, j index of the row and of the column
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const
+    inline TypeConst elt2Impl(int i, int j) const
     { return ((j<i) ? lhs_.elt(j, i) : lhs_.elt(i, j));}
 
     /** @return a constant reference on the (i,j) element of the expression.
@@ -1220,7 +1220,7 @@ struct Traits< LowerSymmetrizeOperator<Lhs> >
   typedef RowOperator< LowerSymmetrizeOperator< Lhs> > Row;
   typedef ColOperator< LowerSymmetrizeOperator< Lhs> > Col;
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 /** @ingroup hidden
  *  @brief Traits class for LowerSymmetrizeAccessor operator
@@ -1239,7 +1239,7 @@ struct Traits< LowerSymmetrizeAccessor<Lhs> >
   typedef RowOperator< LowerSymmetrizeAccessor< Lhs> > Row;
   typedef ColOperator< LowerSymmetrizeAccessor< Lhs> > Col;
   typedef typename Lhs::Type Type;
-  typedef typename Lhs::ConstReturnType ConstReturnType;
+  typedef typename Lhs::TypeConst TypeConst;
 };
 
 } // end namespace hidden
@@ -1266,7 +1266,7 @@ class LowerSymmetrizeOperator: public ExprBase< LowerSymmetrizeOperator< Lhs> >,
   public:
     typedef ExprBase< LowerSymmetrizeOperator< Lhs> > Base;
     typedef typename hidden::Traits< LowerSymmetrizeOperator<Lhs> >::Type Type;
-    typedef typename hidden::Traits< LowerSymmetrizeOperator<Lhs> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< LowerSymmetrizeOperator<Lhs> >::TypeConst TypeConst;
 
     enum
     {
@@ -1294,7 +1294,7 @@ class LowerSymmetrizeOperator: public ExprBase< LowerSymmetrizeOperator< Lhs> >,
     /** @return a constant reference on the (i,j) element of the expression.
      *  @param i, j index of the row and of the column
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const
+    inline TypeConst elt2Impl(int i, int j) const
     { return ((j>i) ? lhs_.elt(j, i) : lhs_.elt(i, j));}
 
   protected:
@@ -1324,7 +1324,7 @@ class LowerSymmetrizeAccessor: public ArrayBase< LowerSymmetrizeAccessor< Lhs> >
   public:
     typedef ArrayBase< LowerSymmetrizeAccessor< Lhs> > Base;
     typedef typename hidden::Traits< LowerSymmetrizeAccessor<Lhs> >::Type Type;
-    typedef typename hidden::Traits< LowerSymmetrizeAccessor<Lhs> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits< LowerSymmetrizeAccessor<Lhs> >::TypeConst TypeConst;
 
     enum
     {
@@ -1352,7 +1352,7 @@ class LowerSymmetrizeAccessor: public ArrayBase< LowerSymmetrizeAccessor< Lhs> >
     /** @return a constant reference on the (i,j) element of the expression.
      *  @param i, j index of the row and of the column
      **/
-    inline ConstReturnType elt2Impl(int i, int j) const
+    inline TypeConst elt2Impl(int i, int j) const
     { return ((j>i) ? lhs_.elt(j, i) : lhs_.elt(i, j));}
 
     /** @return a reference on the (i,j) element of the expression.

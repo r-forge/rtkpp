@@ -59,14 +59,7 @@ class IArrayBase: public ArrayBase<Derived>
   public:
     typedef ArrayBase<Derived> Base;
     typedef typename hidden::Traits<Derived>::Type Type;
-    typedef typename hidden::Traits<Derived>::ConstReturnType ConstReturnType;
-
-    //typedef typename hidden::Traits<Derived>::Row Row;
-    //typedef typename hidden::Traits<Derived>::Col Col;
-    //typedef typename hidden::Traits<Derived>::SubRow SubRow;
-    //typedef typename hidden::Traits<Derived>::SubCol SubCol;
-    //typedef typename hidden::Traits<Derived>::SubVector SubVector;
-//    typedef typename hidden::Traits<Derived>::SubArray SubArray;
+    typedef typename hidden::Traits<Derived>::TypeConst TypeConst;
 
     enum
     {
@@ -89,7 +82,7 @@ class IArrayBase: public ArrayBase<Derived>
     /** @return a constant reference on the element (i,j) of the 2D container.
      *  @param i,j row and column indexes
      **/
-    inline ConstReturnType operator()(int i, int j) const
+    inline TypeConst operator()(int i, int j) const
     {
 #ifdef STK_BOUNDS_CHECK
        if (this->beginRows() > i) { STKOUT_OF_RANGE_2ARG(IArrayBase::elt, i, j, beginRows() > i);}
@@ -114,7 +107,7 @@ class IArrayBase: public ArrayBase<Derived>
     /** @return the ith element
      *  @param i index of the element to get
      **/
-    inline ConstReturnType operator[](int i) const
+    inline TypeConst operator[](int i) const
     {
       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
 #ifdef STK_BOUNDS_CHECK
@@ -136,7 +129,7 @@ class IArrayBase: public ArrayBase<Derived>
       return this->elt(i);
     }
     /** @return a constant reference on the number */
-    inline ConstReturnType operator()() const
+    inline TypeConst operator()() const
     {
       return this->elt();
     }
@@ -145,31 +138,6 @@ class IArrayBase: public ArrayBase<Derived>
     {
       return this->elt();
     }
-//    // overloaded operators for sub-arrays/vectors
-//    /** @return the sub-vector in given range
-//     *  @param I range to get
-//     **/
-//    inline SubVector operator[](Range const& I) const
-//    {
-//      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
-//      return this->sub(I);
-//    }
-//    /** @param I range of the index of the rows
-//     *  @param j index of the column
-//     *  @return a Vertical container containing the column @c j of this
-//     *  in the range @c I
-//     **/
-//    inline SubCol operator()(Range const& I, int j) const { return this->col(I, j);}
-//    /** @param i index of the row
-//     *  @param J range of the columns
-//     *  @return an Horizontal container containing the row @c i of this
-//     *  in the range @c J
-//     **/
-//    inline SubRow operator()(int i, Range const& J) const { return this->row(i, J);}
-//    /** @param I,J range of the rows and of the columns
-//     *  @return a 2D container containing this in the range @c I, @c J
-//     **/
-//    inline SubArray operator()(Range const& I, Range const& J) const { return this->sub(I, J);}
 };
 
 } // namespace STK

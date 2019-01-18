@@ -46,14 +46,6 @@
 
 namespace STK
 {
-/** @ingroup Base
-  *  @brief STK fundamental type of discrete values.
-  *
-  *  The type Integer is defined for the numerical computation and the
-  *  internal representation of the discrete variables.
-  **/
-typedef int Integer ;
-
 /** @ingroup Arithmetic
  *  @brief Specialization for Integer (long).
  *

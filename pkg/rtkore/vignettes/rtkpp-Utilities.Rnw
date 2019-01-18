@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{\stkpp{} Statistics and Algebra Reference Guide}
+%\VignetteIndexEntry{STK++: Statistics and Algebra Reference Guide}
 
 \documentclass[a4paper,10pt]{article}
 
@@ -28,7 +28,7 @@ rtkore.date <- packageDescription("rtkore")$Date
 \begin{abstract}
 This reference guide gives a general review of the capabilities offered
 by the \stkpp{} library. The library is divided in various \emph{projects}.
-The "Arrays" project is described in detail in the vignette "\stkpp{} Arrays,
+The "Arrays" project is described in detail in the vignette "STK++ Arrays,
 User Guide" (\cite{rtkore-Arrays}) and the quick reference guide.
 This vignette focus on the "STatistiK" project (which provides statistical tools)
 and the "Algebra" project (which provide, mainly, matrix decomposition/inversion
@@ -46,8 +46,9 @@ This section describe the main features provided by the STatistiK project. Mainl
 \item the descriptive statistical methods,
 \item the utilities related methods.
 \end{enumerate}
-The creation of a factors using as input a vector or a matrix is detailed in
-section (\ref{sec:factors})
+
+The computation of factors using as input a vector or a matrix is detailed in
+section (\ref{sec:factors}).
 
 \subsection{Probabilities }
 \label{subsec:prob}
@@ -83,7 +84,7 @@ class Cauchy: public IUnivLaw<Real>
     virtual Real cdf( Real const& t) const;  // cumulative distribution function (cdf)
     virtual Real cdfc( Real const& t) const; // complementary cdf
     virtual Real lcdf( Real const& t) const; // log-cdf
-    virtual Real lcdfc( Real const& t) const;// log-cdfc
+    virtual Real lcdfc( Real const& t) const;// log-complementary  cdf
     virtual Real icdf( Real const& p) const; // inverse cdf (quantiles)
     static Real rand( Real const& mu, Real const& scale);
     static Real pdf( Real const& x, Real const& mu, Real const& scale);
@@ -114,7 +115,7 @@ The table \ref{tab:prob} gives the list of available probability distribution.
 \begin{table}[htb]
 \begin{tabular}{|l|l|l|l|}
 \hline
-Name             & Constructor                                & R functions     & Notes\\
+Name             & Constructor                          & R functions     &Notes\\
 \hline
 Bernoulli        & \scode{Law::Bernouilli(p) }          & -               & \\
 \hline
@@ -122,7 +123,7 @@ Binomial         & \scode{Law::Binomial(n,p)}           & \scode{*binom} & \\
 \hline
 Beta             & \scode{Law::Beta(alpha,beta)}        & \scode{*beta} & \\
 \hline
-Categorical      & \scode{Law::Categorical(p)}          & -               & p can be any \stkpp{} vector \\
+Categorical      & \scode{Law::Categorical(p)}          & -              & p can be any \stkpp{} vector \\
 \hline
 Cauchy           & \scode{Law::Cauchy(m,s)}             & \scode{*cauchy}& \\
 \hline

@@ -35,7 +35,6 @@
 #define STK_VARIABLE_H
 
 #include <Arrays/include/STK_IArray1D.h>
-//#include <Arrays/include/STK_ExprBase.h>
 #include "STK_IVariable.h"
 
 namespace STK
@@ -60,7 +59,7 @@ struct Traits< Variable<Type_> >
 
   typedef Type_          Type;
   typedef typename RemoveConst<Type>::Type const& ReturnType;
-  typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+  typedef typename RemoveConst<Type>::Type const& TypeConst;
 
   enum
   {
@@ -69,14 +68,18 @@ struct Traits< Variable<Type_> >
     sizeCols_  = 1,
     sizeRows_  = UnknownSize,
     size_      = UnknownSize,
-    storage_ = Arrays::dense_ // always dense
+    storage_   = Arrays::dense_ // always dense
   };
+
+  typedef MemAllocator<Type, UnknownSize> Allocator;
 
   typedef TRange<size_> RowRange;
   typedef TRange<1>     ColRange;
 
-  typedef RandomIterator1D<Variable<Type_> > Iterator;
-  typedef ConstRandomIterator1D<Variable<Type_> > ConstIterator;
+  typedef int Index;
+
+  typedef DenseRandomIterator<Variable<Type_> > Iterator;
+  typedef ConstDenseRandomIterator<Variable<Type_> > ConstIterator;
 
   typedef std::reverse_iterator<Iterator> ReverseIterator;
   typedef std::reverse_iterator<ConstIterator> ConstReverseIterator;
@@ -91,7 +94,7 @@ struct Traits< Variable<Type_> >
  **/
 template<class Type>
 class Variable: public IVariable
-               , public IArray1D< Variable<Type> >
+              , public IArray1D< Variable<Type> >
 {
   public:
     typedef Variable<Type> Row;
@@ -103,14 +106,17 @@ class Variable: public IVariable
 
     enum
     {
-      structure_ = hidden::Traits<Variable<Type> >::structure_,
-      orient_    = hidden::Traits<Variable<Type> >::orient_,
-      size_      = hidden::Traits<Variable<Type> >::size_,
-      sizeCols_  = hidden::Traits<Variable<Type> >::sizeCols_,
-      sizeRows_  = hidden::Traits<Variable<Type> >::sizeRows_,
-      storage_   = hidden::Traits<Variable<Type> >::storage_
+      structure_ = hidden::Traits< Variable<Type> >::structure_,
+      orient_    = hidden::Traits< Variable<Type> >::orient_,
+      size_      = hidden::Traits< Variable<Type> >::size_,
+      sizeCols_  = hidden::Traits< Variable<Type> >::sizeCols_,
+      sizeRows_  = hidden::Traits< Variable<Type> >::sizeRows_,
+      storage_   = hidden::Traits< Variable<Type> >::storage_
     };
-    typedef MemAllocator<Type*, UnknownSize> Allocator;
+
+    typedef typename hidden::Traits< Variable<Type> >::Allocator Allocator;
+
+    //typedef MemAllocator<Type, size_> Allocator;
     typedef IArray1D< Variable<Type> > Base;
 
     using Base::elt;
@@ -145,7 +151,7 @@ class Variable: public IVariable
     { this->setValue(v);}
     /** copy/reference constructor.
      *  @param V the Variable to copy
-     *  @param ref true if we want to wrap V
+     *  @param ref @c true if we want to wrap V
      **/
     explicit Variable( Variable const& V, bool ref = false)
                      : IVariable(V)
@@ -153,9 +159,10 @@ class Variable: public IVariable
     {}
     /** reference constructor
      *  @param V,I Variable and range to wrap
+     *  @param ref @c true if we want to wrap V
      **/
-    explicit Variable( Variable const& V, Range const& I)
-                     : IVariable(V), Base(V, I)
+    explicit Variable( Variable const& V, Range const& I, bool ref = true)
+                     : IVariable(V), Base(V, I, true)
     {}
     /** constructor by reference, ref_=1.
      *  @param T the container to wrap
@@ -163,7 +170,7 @@ class Variable: public IVariable
     template<class OtherArray>
     Variable( IArray1D<OtherArray> const& T)
             : IVariable(IdTypeImpl<Type>::returnType(), stringNa)
-            , Base(T, T.range())
+            , Base(T, T.range(), true)
     {}
     /** Copy an other type of array/expression in a Variable.
      *  @param T the array/expression to copy

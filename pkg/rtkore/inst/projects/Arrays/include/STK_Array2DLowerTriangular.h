@@ -33,10 +33,12 @@
   * @brief In this file we define the Array2DLowerTriangular class
  **/
 
-#ifndef STK_MATRIXLOWERTRIANGULAR_H
-#define STK_MATRIXLOWERTRIANGULAR_H
+#ifndef STK_ARRAY2DLOWERTRIANGULAR_H
+#define STK_ARRAY2DLOWERTRIANGULAR_H
 
 #include "STK_IArray2D.h"
+#include "STK_IArray2DSlicers.h"
+#include "STK_IArray2DModifiers.h"
 
 namespace STK
 {
@@ -74,7 +76,7 @@ struct Traits< Array2DLowerTriangular<Type_> >
     typedef Void                          SubVector;
 
     typedef Type_                Type;
-    typedef typename RemoveConst<Type>::Type const& ConstReturnType;
+    typedef typename RemoveConst<Type>::Type const& TypeConst;
 
    enum
    {
@@ -84,6 +86,7 @@ struct Traits< Array2DLowerTriangular<Type_> >
      sizeCols_  = UnknownSize,
      storage_ = Arrays::dense_ // always dense
    };
+   typedef Array1D<Type, UnknownSize> ColVector;
 };
 
 }
@@ -117,7 +120,7 @@ class Array2DLowerTriangular: public IArray2D< Array2DLowerTriangular<Type_> >
     typedef typename hidden::Traits<Array2DLowerTriangular<Type_> >::SubArray SubArray;
 
     typedef typename hidden::Traits<Array2DLowerTriangular<Type_> >::Type Type;
-    typedef typename hidden::Traits<Array2DLowerTriangular<Type_> >::ConstReturnType ConstReturnType;
+    typedef typename hidden::Traits<Array2DLowerTriangular<Type_> >::TypeConst TypeConst;
 
    enum
    {
@@ -201,4 +204,4 @@ class Array2DLowerTriangular: public IArray2D< Array2DLowerTriangular<Type_> >
 } // namespace STK
 
 #endif
-// STK_MATRIXLOWERTRIANGULAR_H
+// STK_ARRAY2DLOWERTRIANGULAR_H

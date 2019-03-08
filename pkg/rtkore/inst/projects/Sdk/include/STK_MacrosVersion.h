@@ -42,7 +42,7 @@
 // between 0 and 99
 #define STK_MAJOR_VERSION 9
 // between 0 and 99
-#define STK_MINOR_VERSION 11
+#define STK_MINOR_VERSION 13
 
 
 #endif /* STK_MACROSVERSION_H */

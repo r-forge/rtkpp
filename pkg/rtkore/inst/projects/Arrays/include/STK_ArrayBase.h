@@ -37,7 +37,9 @@
 #define STK_ARRAYBASE_H
 
 #include "STK_ExprBase.h"
-#include "STatistiK/include/STK_Law_IUnivLaw.h"
+#include "operators/STK_SlicingAccessors.h"
+#include "operators/STK_TransposeAccessor.h"
+#include "operators/STK_ReshapeAccessors.h"
 
 /// utility macro allowing to construct unary operators
 #define MAKE_RESHAPE_OPERATOR(OPERATOR, SHAPE) \
@@ -245,6 +247,60 @@ class ArrayBase: public ExprBase<Derived>
       return SubAccessor<Derived, SizeRows_, SizeCols_>(this->asDerived(), I, J);
     }
 
+    // overloaded operators
+    /** @return a constant reference on the element (i,j) of the 2D container.
+     *  @param i,j row and column indexes
+     **/
+    inline TypeConst operator()(int i, int j) const
+    {
+#ifdef STK_BOUNDS_CHECK
+       if (this->beginRows() > i) { STKOUT_OF_RANGE_2ARG(IArrayBase::elt, i, j, beginRows() > i);}
+       if (this->endRows() <= i)  { STKOUT_OF_RANGE_2ARG(IArrayBase::elt, i, j, endRows() <= i);}
+       if (this->beginCols() > j) { STKOUT_OF_RANGE_2ARG(IArrayBase::elt, i, j, beginCols() > j);}
+       if (this->endCols() <= j)  { STKOUT_OF_RANGE_2ARG(IArrayBase::elt, i, j, endCols() <= j);}
+#endif
+      return this->elt(i,j);}
+    /** @return a reference on the element (i,j) of the 2D container.
+     *  @param i, j indexes of the element to get
+     **/
+    inline Type& operator()(int i, int j)
+    {
+#ifdef STK_BOUNDS_CHECK
+       if (this->beginRows() > i) { STKOUT_OF_RANGE_2ARG(IArrayBase::elt, i, j, beginRows() > i);}
+       if (this->endRows() <= i)  { STKOUT_OF_RANGE_2ARG(IArrayBase::elt, i, j, endRows() <= i);}
+       if (this->beginCols() > j) { STKOUT_OF_RANGE_2ARG(IArrayBase::elt, i, j, beginCols() > j);}
+       if (this->endCols() <= j)  { STKOUT_OF_RANGE_2ARG(IArrayBase::elt, i, j, endCols() <= j);}
+#endif
+      return this->elt(i,j);
+    }
+    /** @return the ith element
+     *  @param i index of the element to get
+     **/
+    inline TypeConst operator[](int i) const
+    {
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+#ifdef STK_BOUNDS_CHECK
+      if (this->begin() > i) { STKOUT_OF_RANGE_1ARG(IArrayBase::elt, i, begin() > i);}
+      if (this->end() <= i)  { STKOUT_OF_RANGE_1ARG(IArrayBase::elt, i, end() <= i);}
+#endif
+      return this->elt(i);
+    }
+    /** @return a reference on the ith element
+     *  @param i index of the element to get
+     **/
+    inline Type& operator[](int i)
+    {
+      STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+#ifdef STK_BOUNDS_CHECK
+      if (this->begin() > i) { STKOUT_OF_RANGE_1ARG(IArrayBase::elt, i, begin() > i);}
+      if (this->end() <= i)  { STKOUT_OF_RANGE_1ARG(IArrayBase::elt, i, end() <= i);}
+#endif
+      return this->elt(i);
+    }
+    /** @return a constant reference on the number */
+    inline TypeConst operator()() const { return this->elt();}
+    /** @return the number */
+    inline Type& operator()() { return this->elt();}
     /** Convenient operator to set the coefficients of a matrix.
      *
      * The coefficients must be provided in the row/column order and exactly
@@ -260,5 +316,9 @@ class ArrayBase: public ExprBase<Derived>
 } // namespace STK
 
 #undef MAKE_RESHAPE_OPERATOR
+
+#include "STK_ArrayBaseApplier.h"
+#include "STK_ArrayBaseAssign.h"
+#include "STK_ArrayBaseInitializer.h"
 
 #endif /* STK_ARRAYBASE_H_ */

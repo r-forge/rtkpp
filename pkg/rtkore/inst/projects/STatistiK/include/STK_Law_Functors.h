@@ -36,8 +36,6 @@
 #ifndef STK_LAW_FUNCTORS_H
 #define STK_LAW_FUNCTORS_H
 
-#include "STK_Law_IUnivLaw.h"
-
 namespace STK
 {
 

@@ -35,8 +35,7 @@
 #ifndef STK_IQR_H
 #define STK_IQR_H
 
-#include <STKernel/include/STK_Real.h>
-#include <Sdk/include/STK_IRunner.h>
+#include <Sdk.h>
 
 #include <Arrays/include/STK_Array2DVector.h>
 #include <Arrays/include/STK_Array2DUpperTriangular.h>
@@ -300,33 +299,81 @@ void IQr<Derived>::eraseCol(int pos)
   if (pos < R_.beginCols())
   { STKOUT_OF_RANGE_1ARG(Qr::eraseCol,pos,pos<R_.beginCols());}
   if (R_.lastIdxCols() < pos)
-  { STKOUT_OF_RANGE_1ARG(Qr::eraseCol,pos,pos<R_.lastIdxCols()<pos);}
+  { STKOUT_OF_RANGE_1ARG(Qr::eraseCol,pos,R_.lastIdxCols()<pos);}
   // if Q_ is not computed yet
   if (!compq_) compQ();
   // compute the number of iteration for updating to zeroed
   int niter = std::min(R_.lastIdxCols(), R_.lastIdxRows());//R_.beginCols()-1+std::min(R_.sizeRows(), R_.sizeCols());
+#ifdef LARS_DEBUG
+  stk_cerr << _T("pos=")  <<pos  <<std::endl;
+  stk_cerr << _T("niter=")<<niter<<std::endl;
+  stk_cout << _T("R_.rows() =") << R_.rows()  << _T("\n");
+  stk_cout << _T("R_.cols() =") << R_.cols()  << _T("\n");
+#endif
   // Zeroed the remaining elements (z)
   for (int iter = pos+1; iter<= niter; iter++)
   {
+#ifdef LARS_DEBUG
+  stk_cerr << _T("iter=")  <<iter  <<std::endl;
+#endif
     Real sinus, cosinus;
     // compute the Givens rotation
     R_(iter-1, iter) = compGivens( R_(iter-1, iter), R_(iter, iter), cosinus, sinus);
     R_(iter, iter)   = 0.0;
     // if necessary update R_ and Q_
-    if (sinus)
+    //    if (sinus)
+    if (sinus && (iter<R_.lastIdxCols()))
     {
       // create a reference on the sub-ArrayXX
       ArrayUpperTriangularXX Rsub(R_.col( _R(iter+1, R_.lastIdxCols()) ), true);
+#ifdef LARS_DEBUG
+      ArrayUpperTriangularXX const& test2 = Rsub;
+      stk_cerr << _T("print: Rsub\n");
+      stk_cerr << _T("Rsub.isRef() =")                 << test2.isRef()  << _T("\n");
+      stk_cerr << _T("Rsub.allocator().isRef() =")     << test2.allocator().isRef() << _T("\n");
+      stk_cerr << _T("Rsub.rangeCols().isRef() =")     << test2.rangeCols().isRef() << _T("\n");
+      stk_cerr << _T("Rsub.rows() =")                  << test2.rows()  << _T("\n");
+      stk_cerr << _T("Rsub.cols() =")                  << test2.cols()  << _T("\n");
+      stk_cerr << _T("Rsub.allocator().range() =")     << test2.allocator().range()  << _T("\n");
+      stk_cerr << _T("Rsub.rangeCols().range() =")     << test2.rangeCols().range() << _T("\n");
+      stk_cerr << _T("Rsub.availableCols() =")         << test2.availableCols()  << _T("\n");
+#endif
       // Update the next rows (iter1:ncolr_) of R_
       leftGivens(Rsub, iter-1, iter, cosinus, sinus);
       // Update the cols of Q_
       rightGivens(Q_, iter-1, iter, cosinus, sinus);
     }
   }
+#ifdef LARS_DEBUG
+  stk_cerr << _T("R_.eraseCols(") << pos << _T(")") <<std::endl;
+  stk_cerr << _T("print: R_\n");
+  stk_cerr << _T("R_.isRef() =")                 << R().isRef()  << _T("\n");
+  stk_cerr << _T("R_.allocator().isRef() =")     << R().allocator().isRef() << _T("\n");
+  stk_cerr << _T("R_.rangeCols().isRef() =")     << R().rangeCols().isRef() << _T("\n");
+  stk_cerr << _T("R_.rows() =")                  << R().rows()  << _T("\n");
+  stk_cerr << _T("R_.cols() =")                  << R().cols()  << _T("\n");
+  stk_cerr << _T("R_.allocator().range() =")     << R().allocator().range()  << _T("\n");
+  stk_cerr << _T("R_.rangeCols().range() =")     << R().rangeCols().range() << _T("\n");
+  stk_cerr << _T("R_.availableCols() =")         << R().availableCols()  << _T("\n");
+  stk_cerr << _T("R_.rangeCols() =")         << R().rangeCols()  << _T("\n");
+#endif
   // erase the column pos
   R_.eraseCols(pos);
+#ifdef LARS_DEBUG
+  stk_cerr << _T("R_.eraseCols(") << pos << _T(") done") <<std::endl;
+  stk_cerr << _T("print: R_\n");
+  stk_cerr << _T("R_.isRef() =")                 << R().isRef()  << _T("\n");
+  stk_cerr << _T("R_.allocator().isRef() =")     << R().allocator().isRef() << _T("\n");
+  stk_cerr << _T("R_.rangeCols().isRef() =")     << R().rangeCols().isRef() << _T("\n");
+  stk_cerr << _T("R_.rows() =")                  << R().rows()  << _T("\n");
+  stk_cerr << _T("R_.cols() =")                  << R().cols()  << _T("\n");
+  stk_cerr << _T("R_.allocator().range() =")     << R().allocator().range()  << _T("\n");
+  stk_cerr << _T("R_.rangeCols().range() =")     << R().rangeCols().range() << _T("\n");
+  stk_cerr << _T("R_.availableCols() =")         << R().availableCols()  << _T("\n");
+  stk_cerr << _T("R_.rangeCols() =")         << R().rangeCols()  << _T("\n");
+#endif
   // update the range of the remaining cols of the container
-  R_.update( Range(pos, std::min(R_.lastIdxRows(), R_.lastIdxCols()), 0));
+  R_.update( _R(pos, std::min(R_.lastIdxRows(), R_.lastIdxCols())));
 }
 
 /* Adding the last column and update the QR decomposition. */

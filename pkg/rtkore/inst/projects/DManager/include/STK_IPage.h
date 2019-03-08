@@ -36,7 +36,6 @@
 #define STK_IPAGE_H
 
 #include <vector>
-
 #include "STK_Option.h"
 
 namespace STK

@@ -134,7 +134,7 @@ class Array2DVector: public IArray2D< Array2DVector<Type_> >
     /** constructor with specified range.
      *  @param I range of the container
      **/
-    Array2DVector( Range const& I) :Base(I, Range(1)) {}
+    Array2DVector( Range const& I): Base(I, Range(1)) {}
     /** constructor with specified range, initialization with a constant.
      *  @param I range of the container
      *  @param v initial value of the container

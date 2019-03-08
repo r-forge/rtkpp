@@ -38,7 +38,6 @@
 #ifndef STK_CHRONO_H
 #define STK_CHRONO_H
 
-#include "STK_Real.h"
 #include <ctime>
 
 namespace STK

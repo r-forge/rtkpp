@@ -41,10 +41,6 @@ namespace STK
 {
 // forward declaration
 template< typename Type, int SizeRows_=UnknownSize, bool Orient_ = Arrays::by_col_> class CArrayVector;
-
-template< typename Type, int SizeRows_, int SizeCols_, bool Orient_> class CArray;
-template< typename Type, int Size_, bool Orient_> class CArraySquare;
-template< typename Type, int SizeCols_, bool Orient_> class CArrayPoint;
 template< typename Type, bool Orient_> class CArrayNumber;
 
 // useful typedef
@@ -188,7 +184,7 @@ class CArrayVector: public ICArray < CArrayVector<Type_, SizeRows_, Orient_> >
      *  @param v the value to set
      **/
     CArrayVector& operator=(Type const& v) { return LowBase::setValue(v);}
-    /** operator = : overwrite the CArrayPoint with the Right hand side T.
+    /** operator = : overwrite the CArrayVector with the Right hand side T.
      *  @param T the container to copy
      **/
     template<class Rhs>

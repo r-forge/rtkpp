@@ -36,8 +36,7 @@
 #ifndef STK_IMULTIPARAMETERS_H
 #define STK_IMULTIPARAMETERS_H
 
-#include "Sdk/include/STK_IRecursiveTemplate.h"
-#include "STKernel/include/STK_Range.h"
+#include <STKernel.h>
 
 namespace STK
 {

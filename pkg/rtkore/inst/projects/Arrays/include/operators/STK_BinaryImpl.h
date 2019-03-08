@@ -1298,11 +1298,66 @@ struct BinaryColsImpl< Lhs, Rhs,Size_, Arrays::useRhsOtherSize_>
   inline static ColRange const& colsImpl(Lhs const& lhs, Rhs const& rhs) { return rhs.rows();}
 };
 
+/** @ingroup hidden
+ *  Allow to disambiguate the call to range to use */
+template<typename Lhs, int Size_, int use_>
+struct DiagonalRangeImpl
+{
+  /** Type of the Range for the rows */
+  typedef TRange<Size_> RangeType;
+  /**  @return the range of the rows */
+  inline static RangeType const& rangeImpl(Lhs const& lhs) { return lhs.range();}
+};
+
+template<typename Lhs, int Size_>
+struct DiagonalRangeImpl<Lhs, Size_, Arrays::useLhsSize_>
+{
+  /** Type of the Range for the rows */
+  typedef TRange<Size_> RangeType;
+  /**  @return the range of the rows */
+  inline static RangeType const& rangeImpl(Lhs const& lhs) { return lhs.rows();}
+};
+
+template<typename Lhs, int Size_>
+struct DiagonalRangeImpl<Lhs, Size_, Arrays::useLhsOtherSize_>
+{
+  /** Type of the Range for the rows */
+  typedef TRange<Size_> RangeType;
+  /**  @return the range of the rows */
+  inline static RangeType const& rangeImpl(Lhs const& lhs) { return lhs.cols();}
+};
+
+
+/** @ingroup hidden
+  * Helper Traits class for transposed operator. Default is structure_ unmodified
+  * by transpose operator.
+  **/
+template<int Structure_> struct TransposeTraits
+{ enum { structure_ = Structure_}; };
+/** specialization for lower_triangular_ */
+template<> struct TransposeTraits<Arrays::lower_triangular_>
+{ enum { structure_ = Arrays::upper_triangular_}; };
+/** specialization for upper_triangular_ */
+template<> struct TransposeTraits<Arrays::upper_triangular_>
+{ enum { structure_ = Arrays::lower_triangular_}; };
+/** specialization for lower_triangular_ */
+template<> struct TransposeTraits<Arrays::lower_symmetric_>
+{ enum { structure_ = Arrays::upper_symmetric_}; };
+/** specialization for upper_triangular_ */
+template<> struct TransposeTraits<Arrays::upper_symmetric_>
+{ enum { structure_ = Arrays::lower_symmetric_}; };
+/** specialization for vector_ */
+template<> struct TransposeTraits<Arrays::vector_>
+{ enum { structure_ = Arrays::point_}; };
+/** specialization for point_ */
+template<> struct TransposeTraits<Arrays::point_>
+{ enum { structure_ = Arrays::vector_}; };
 
 } // end namespace hidden
 
 
 } // namespace STK
+
 
 #undef EGAL
 

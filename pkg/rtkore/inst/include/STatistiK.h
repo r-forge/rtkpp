@@ -85,15 +85,14 @@
 #ifndef STATISTIK_H
 #define STATISTIK_H
 
+// probabilities laws
+#include <STatistiK/include/STK_Law_Util.h>
+
 // random number generators
 #include <STatistiK/include/MersenneTwister.h>
 #include <STatistiK/include/STK_RandBase.h>
 
 // namespace Law
-// probabilities laws
-#include <STatistiK/include/STK_Law_Util.h>
-#include <STatistiK/include/STK_Law_Functors.h>
-
 #include <STatistiK/include/STK_Law_Bernoulli.h>
 #include <STatistiK/include/STK_Law_Beta.h>
 #include <STatistiK/include/STK_Law_Binomial.h>

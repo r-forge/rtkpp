@@ -35,8 +35,9 @@
 #ifndef STK_STAT_MULTIVARIATE_H
 #define STK_STAT_MULTIVARIATE_H
 
+#include <Sdk.h>
+
 #include "Arrays/include/STK_Array2DVector.h"
-#include "Sdk/include/STK_IRunner.h"
 
 namespace STK
 {

@@ -37,7 +37,6 @@
 #define STK_LAW_IUNIVLAW_H
 
 #include "STK_Law_ILawBase.h"
-#include <STKernel/include/STK_Real.h>
 
 namespace STK
 {
@@ -48,19 +47,25 @@ namespace Law
  *  @brief Interface base class for all the univariate distributions.
  *
  *  A general probability law (discrete or real) possess a
- *  probability density law. It can be simulated.
+ *  probability distribution function (pdf), a cumulative distribution function (cdt)
+ *  and an inverse cumulative distribution function (icdf). It can be simulated (random
+ *  number generation).
  *
  * Interface base class for the univariate distributions. Every derived
  * class have to furnish :
  * - a random generator method
  * @code Type rand() const @endcode
+ * - a probability distribution function (pdf)
+ * @code Real pdf(Type const& x) const @endcode
+ * - a log-probability distribution function (log-pdf)
+ * @code Real lpdf(Type const& x) const @endcode
  * - a quantile method (inverse cdf)
  * @code Type icdf(Real const& p) const @endcode .
  *
  * The derived objects should also furnish the same static functions.
  * Instantiation of a derived object is interesting when one want to
- * simulate independent identical distributed random variates : the
- * creation of the object initialize all parameter-dependent variables.
+ * simulate independent identical distributed random variates: at
+ * creation, the object initializes all parameter-dependent variables.
  **/
 template <class Type>
 class IUnivLaw: public ILawBase
@@ -78,6 +83,7 @@ class IUnivLaw: public ILawBase
   public:
     /** Virtual destructor. **/
     inline virtual ~IUnivLaw() {}
+    // pure virtual metods
     /** @return a @c Type random variate . */
     virtual Type rand() const =0;
     /** @brief compute the probability distribution function (density) in the
@@ -86,6 +92,14 @@ class IUnivLaw: public ILawBase
      *  @return the value of the pdf
      **/
     virtual Real pdf(Type const& x) const =0;
+    /** @brief inverse cumulative distribution function
+     *  The quantile is defined as the smallest value @e x such that
+     *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.
+     *  @param p a probability
+     **/
+    virtual Type icdf(Real const& p) const=0;
+
+    // virtual methods with default implementation
     /** @brief compute the log probability distribution function
      *  Give the value of the log-pdf at the point x.
      *  @param x the value to compute the lpdf.
@@ -103,9 +117,9 @@ class IUnivLaw: public ILawBase
      *  @param t a real number
      *  @return the value of the cdf
      **/
-    virtual Real lcdf(Real const& t) const { return(std::log(cdfc(t)));}
-    /** @brief  calculate the complement of cumulative distribution function, called in statistics the survival function.
-     *  Give the probability that a random variate is greater than t.
+    virtual Real lcdf(Real const& t) const { return(std::log(cdf(t)));}
+    /** @brief  calculate the complement of cumulative distribution function, called in statistics
+     *  the survival function. Give the probability that a random variate is greater than t.
      *  @param t a real number
      *  @return the value of the cdf
      **/
@@ -116,12 +130,6 @@ class IUnivLaw: public ILawBase
      *  @return the value of the cdf
      **/
     virtual Real lcdfc(Real const& t) const { return(std::log(cdfc(t)));}
-    /** @brief inverse cumulative distribution function
-     *  The quantile is defined as the smallest value @e x such that
-     *  <em> F(x) >= p </em>, where @e F is the cumulative distribution function.
-     *  @param p a probability
-     **/
-    virtual Type icdf(Real const& p) const=0;
 };
 
 } // namespace Law

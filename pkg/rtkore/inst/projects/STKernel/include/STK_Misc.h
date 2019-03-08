@@ -40,9 +40,6 @@
 #include <cmath> // for sqrt
 #include <cstdlib> // for rand
 
-#include "STK_Integer.h"
-#include "STK_Real.h"
-
 namespace STK
 {
 /** @ingroup Base

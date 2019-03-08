@@ -35,6 +35,8 @@
 #ifndef STK_EXPRBASEVISITOR_H
 #define STK_EXPRBASEVISITOR_H
 
+#include "visitors/STK_VisitorsImpl.h"
+#include "visitors/STK_VisitorSelector.h"
 #include "visitors/STK_Visitors.h"
 #include "visitors/STK_Appliers.h"
 #include "visitors/STK_SlicingVisitors.h"

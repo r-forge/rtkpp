@@ -36,8 +36,6 @@
 #ifndef STK_ARRAY_UTIL_H
 #define STK_ARRAY_UTIL_H
 
-#include <STKernel/include/STK_Range.h>
-
 namespace STK
 {
 
@@ -201,45 +199,11 @@ enum RangeOpUse
 };
 
 /** @ingroup Arrays
- *  @return n+m, where n is the first number such that m < 2^n.
- *  @param m the size of the container
- **/
-inline int evalSizeCapacity(int m)
-{
-  int n = 0;
-  for (int k=1; k <= m; k <<= 1) {n++;}
-  return(m+n);
-}
-
-/** @ingroup Arrays
- *  @param I range of the container
- *  @tparam Size_ The size of the array. For fixed size return the range unmodified
- **/
-template<int Size_>
-TRange<Size_> evalRangeCapacity(TRange<Size_> const& I)
-{
-//  int n = 0;
-//  for (int k=1; k <= I.size(); k <<= 1){ n++;}
-  return I;
-}
-/** @ingroup Arrays
- * Specialization for array with unknown size
- *  @param I the range of the container
- **/
-template<>
-inline Range evalRangeCapacity(Range const& I)
-{
-  int n = 0;
-  for (int k=1; k <= I.size(); k <<= 1){ n++;}
-  return Range(I.begin(),I.size() + n);
-}
-
-/** @ingroup Arrays
  *  convert an Arrays::Structure to a String.
  *  @param type the type of Structure we want to convert
  *  @return the string associated to this type.
  **/
-inline std::string structureToString( Structure const& type)
+inline String structureToString( Structure const& type)
 {
   if (type == array2D_)          return String(_T("array2D"));
   if (type == square_)           return String(_T("square"));

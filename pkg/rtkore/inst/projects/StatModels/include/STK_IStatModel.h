@@ -37,10 +37,10 @@
 #define STK_ISTATMODEL_H
 
 #include <cmath>
+#include <Sdk.h>
 
 #include "STK_IStatModelBase.h"
 #include "STK_Model_Util.h"
-#include <Sdk/include/STK_Macros.h>
 #include <STatistiK/include/STK_MultiLaw_IMultiLaw.h>
 
 namespace STK

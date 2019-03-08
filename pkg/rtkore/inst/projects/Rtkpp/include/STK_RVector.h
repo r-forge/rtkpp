@@ -36,13 +36,13 @@
 #ifndef STK_RVECTOR_H
 #define STK_RVECTOR_H
 
-#include <Arrays/include/STK_ExprBaseVisitor.h>
-#include <Arrays/include/STK_ExprBaseDot.h>
-#include <Arrays/include/STK_ExprBaseProduct.h>
-
-#include <Arrays/include/STK_ArrayBaseApplier.h>
-#include <Arrays/include/STK_ArrayBaseAssign.h>
-#include <Arrays/include/STK_ArrayBaseInitializer.h>
+//#include <Arrays/include/STK_ExprBaseVisitor.h>
+//#include <Arrays/include/STK_ExprBaseDot.h>
+//#include <Arrays/include/STK_ExprBaseProduct.h>
+//
+//#include <Arrays/include/STK_ArrayBaseApplier.h>
+//#include <Arrays/include/STK_ArrayBaseAssign.h>
+//#include <Arrays/include/STK_ArrayBaseInitializer.h>
 
 namespace STK
 {

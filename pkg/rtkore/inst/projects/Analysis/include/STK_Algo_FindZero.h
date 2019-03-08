@@ -35,10 +35,7 @@
 #ifndef STK_ALGO_FINDZERO_H
 #define STK_ALGO_FINDZERO_H
 
-#include "Sdk/include/STK_Macros.h"
-
-#include "STKernel/include/STK_Integer.h"
-#include "STKernel/include/STK_Real.h"
+#include <Sdk.h>
 
 #include "STK_IFunction.h"
 

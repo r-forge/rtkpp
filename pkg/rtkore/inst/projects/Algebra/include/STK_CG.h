@@ -36,10 +36,7 @@
 #ifndef STK_CG_H
 #define STK_CG_H
 
-#include <Sdk/include/STK_Macros.h>
-#include <Sdk/include/STK_IRunner.h>
-
-//#include "Arrays/include/STK_Display.h"
+#include <Sdk.h>
 
 namespace STK
 {

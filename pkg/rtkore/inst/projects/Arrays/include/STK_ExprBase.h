@@ -35,12 +35,48 @@
 #ifndef STK_EXPRBASE_H
 #define STK_EXPRBASE_H
 
+namespace STK
+{
+// forward declaration
+template<class Derived> class ExprBase;
+template<class Derived> class ArrayBase;
+}
+
+
+#include <STatistiK/include/STK_Law_IUnivLaw.h>
+#include <STatistiK/include/STK_Law_Functors.h>
+#include "STK_ArraysTraits.h"
+#include "STK_Arrays_Util.h"
 #include "STK_ITContainer.h"
+#include "STK_IContainerRef.h"
+#include "operators/STK_BinaryImpl.h"
+#include "products/STK_ProductDispatcher.h"
+#include "products/STK_ProductOperators.h"
+#include "products/STK_DotProduct.h"
+#include "operators/STK_SlicingOperators.h"
+#include "operators/STK_TransposeOperator.h"
+#include "operators/STK_ReshapeOperators.h"
+#include "operators/STK_UnaryOperators.h"
+#include "operators/STK_BinaryOperators.h"
+
+// forward declarations
+namespace STK
+{
+template<class Derived> class ArrayInitializer;
+
+namespace hidden
+{
+  template<typename Lhs, typename Rhs, int LStructure_, int RStructure_> struct ProductSelector;
+  template<typename Lhs, typename Rhs, int operatorType_> struct OperatorSelector;
+} // namespace hidden
+
+} // namespace STK
+
 
 /// utility macro allowing to define binary operators
 #define DEFINE_BINARY_OPERATOR(OPERATORNAME, BINARYOPERATORNAME) \
 template<typename Rhs> \
-typename hidden::OperatorHelper<Derived, Rhs, Arrays::BINARYOPERATORNAME>::Result const \
+typename hidden::OperatorSelector<Derived, Rhs, Arrays::BINARYOPERATORNAME>::Result const \
 OPERATORNAME( ExprBase<Rhs> const& other) const;
 
 /// utility macro allowing to construct unary operators
@@ -58,31 +94,6 @@ OPERATORNAME( ExprBase<Rhs> const& other) const;
   inline OPERATOR##Operator< Derived> const SHAPE() const \
   { return OPERATOR##Operator< Derived>(this->asDerived()); }
 
-
-// forward declarations
-namespace STK
-{
-template<class Derived> class ExprBase;
-template<class Derived> class ArrayBase;
-//<class Derived, class Rhs> struct  ProductProductType;
-template<class Derived> class  ArrayInitializer;
-namespace hidden
-{
-template<typename Lhs, typename Rhs, int LStructure_, int RStructure_> struct ProductSelector;
-}
-
-} // namespace STK
-
-#include <STKernel/include/STK_Functors.h>
-#include <STatistiK/include/STK_Law_Functors.h>
-
-#include "products/STK_ProductOperators.h"
-#include "products/STK_DotProduct.h"
-#include "operators/STK_TransposeOperator.h"
-#include "operators/STK_ReshapeOperators.h"
-#include "operators/STK_UnaryOperators.h"
-#include "operators/STK_BinaryOperators.h"
-#include "operators/STK_BinarySelector.h"
 
 namespace STK
 {

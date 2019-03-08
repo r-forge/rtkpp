@@ -125,6 +125,18 @@ namespace Rcpp
     { res(iRes) = vec.elt(i);}
     return Rcpp::wrap(res);
   }
+  template <typename Type, int Size_>
+  SEXP wrap( STK::Array1D<Type, Size_> const& vec)
+  {
+    enum
+    {
+      Rtype_ = STK::hidden::RcppTraits<Type>::Rtype_
+    };
+    Vector<Rtype_> res(vec.size());
+    for(int i=vec.begin(), iRes=0; i< vec.end(); i++, iRes++)
+    { res(iRes) = vec.elt(i);}
+    return Rcpp::wrap(res);
+  }
 } // namespace Rcpp
 
 

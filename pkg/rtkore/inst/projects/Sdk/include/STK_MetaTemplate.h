@@ -37,8 +37,6 @@
 #ifndef STK_METATEMPLATE_H
 #define STK_METATEMPLATE_H
 
-#include "STK_Constants.h"
-
 namespace STK
 {
 namespace hidden

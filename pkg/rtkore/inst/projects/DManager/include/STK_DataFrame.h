@@ -36,9 +36,10 @@
 #ifndef STK_DATAFRAME_H
 #define STK_DATAFRAME_H
 
-#include <Arrays/include/STK_ITContainer2D.h>
+
 #include "STK_List1D.h"
 #include "STK_IVariable.h"
+#include <Arrays/include/STK_IContainer2D.h>
 
 
 namespace STK

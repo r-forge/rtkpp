@@ -36,10 +36,6 @@
 #ifndef STK_DENSEITERATORBASE_H
 #define STK_DENSEITERATORBASE_H
 
-#include <Sdk/include/STK_IRecursiveTemplate.h>
-#include <Sdk/include/STK_Constants.h>
-#include "../STK_ArraysTraits.h"
-
 namespace STK
 {
 namespace hidden

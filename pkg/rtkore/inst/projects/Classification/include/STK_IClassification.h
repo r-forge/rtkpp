@@ -36,8 +36,7 @@
 #ifndef STK_ICLASSIFICATION_H
 #define STK_ICLASSIFICATION_H
 
-#include <Sdk/include/STK_IRunner.h>
-#include <Sdk/include/STK_Macros.h>
+#include <Sdk.h>
 
 namespace STK
 {

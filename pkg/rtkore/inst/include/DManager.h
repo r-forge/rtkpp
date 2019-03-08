@@ -67,13 +67,14 @@
 #include <DManager/include/STK_DManager_Util.h>
 #include <DManager/include/STK_Import_Util.h>
 
+/* List1D */
+#include <DManager/include/STK_Cell.h>
+#include <DManager/include/STK_List1D.h>
+
 /* Interface Variable class and Variable class */
-#include <DManager/include/STK_IVariable.h>
 #include <DManager/include/STK_Variable.h>
 
 /* DataFrame. */
-#include <DManager/include/STK_Cell.h>
-#include <DManager/include/STK_List1D.h>
 #include <DManager/include/STK_DataFrame.h>
 
 /* Cross Validation utilities */

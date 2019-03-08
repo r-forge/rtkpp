@@ -35,7 +35,7 @@
 #ifndef STK_STAT_MULTIFACTOR_H
 #define STK_STAT_MULTIFACTOR_H
 
-#include <Sdk/include/STK_IRunner.h>
+#include <Sdk.h>
 #include <Arrays/include/STK_CArrayPoint.h>
 #include <Arrays/include/STK_CArray.h>
 #include <Arrays/include/STK_Array2DVector.h>

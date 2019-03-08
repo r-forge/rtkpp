@@ -36,8 +36,6 @@
 #ifndef STK_MEMSALLOCATOR_H
 #define STK_MEMSALLOCATOR_H
 
-#include <Sdk/include/STK_Macros.h>
-#include <Sdk/include/STK_MetaTemplate.h>
 #include "../STK_Array1D.h"
 
 

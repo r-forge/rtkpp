@@ -35,9 +35,6 @@
 #ifndef STK_CALLOCATOR_H
 #define STK_CALLOCATOR_H
 
-#include "../STK_ITContainer2D.h"
-#include "STK_MemAllocator.h"
-
 namespace STK
 {
 
@@ -732,13 +729,6 @@ class StructuredCAllocator<Derived, SizeRows_, 1>
     { Base::exchange(T);
       std::swap(col_, T.col_);
     }
-//    /** @return the index of the first element */
-//    inline int begin() const { return this->beginRows();}
-//    /**  @return the ending index of the elements */
-//    inline int end() const { return this->endRows();}
-//    /**  @return the size of the allocator */
-//    inline int size() const { return this->sizeRows();}
-
     /** @return a constant reference on the element (i,j) of the Allocator.
      *  @param i index of the row
      **/

@@ -35,9 +35,9 @@
 #ifndef STK_ISYMEIGEN_H
 #define STK_ISYMEIGEN_H
 
+#include <Sdk.h>
 #include "STK_Algebra_Util.h"
 
-#include <Sdk/include/STK_IRunner.h>
 #include <Arrays/include/STK_CArraySquare.h>
 #include <Arrays/include/STK_CArrayVector.h>
 

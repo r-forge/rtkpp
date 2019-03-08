@@ -36,12 +36,13 @@
 #ifndef STK_RANDBASE_H
 #define STK_RANDBASE_H
 
-#include "STKernel/include/STK_Misc.h"
-
 #ifdef IS_RTKPP_LIB /* is rtkpp lib */
 
 #include <R_ext/Random.h>
 #include <Rmath.h>
+#include <Rcpp/sugar/undoRmath.h>
+
+#include <STKernel.h>
 
 namespace STK
 {
@@ -61,11 +62,12 @@ class RandBase
      *  \f]
      *  @return a uniform number in (0,1) using the R random generator
     **/
-    inline Real randUnif() { GetRNGstate();
-                             Real s = Rf_runif(0, 1);
-                             PutRNGstate();
-                             return s;
-                           }
+    inline Real randUnif()
+    { GetRNGstate();
+      Real s = Rf_runif(0, 1);
+      PutRNGstate();
+      return s;
+    }
     /** @return same as randUnif().*/
     inline Real operator()() { return randUnif(); }
     /** Pseudo-random gaussian generator of the gaussian probability law:
@@ -76,20 +78,24 @@ class RandBase
      * @return a real number from a normal (Gaussian) distribution.
     **/
     inline Real randGauss( Real const& mu = 0, Real const& sigma = 1)
-                         { GetRNGstate();
-                           Real s = Rf_rnorm(mu, sigma);
-                           PutRNGstate();
-                           return s;
-                         }
+    { GetRNGstate();
+      Real s = Rf_rnorm(mu, sigma);
+      PutRNGstate();
+      return s;
+    }
     /** real number in (0,n) */
-    inline Real rand( Real const& n ) { GetRNGstate();
-                                        Real s = Rf_runif(0, n);
-                                        PutRNGstate();
-                                              return s;}
+    inline Real rand( Real const& n )
+    { GetRNGstate();
+      Real s = Rf_runif(0, n);
+      PutRNGstate();
+      return s;
+    }
     /** DEPRECATED. real number in (0,n) */
     inline Real randDblExc( Real const& n ) { return rand(n);}
 };
 } // namespace STK
+
+
 
 #else
 

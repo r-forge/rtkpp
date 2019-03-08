@@ -37,7 +37,6 @@
 #define STK_BINARY_H
 
 #include <map>
-#include "STK_String.h"
 
 namespace STK
 {

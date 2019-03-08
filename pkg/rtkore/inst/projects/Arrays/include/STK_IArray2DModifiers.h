@@ -467,25 +467,49 @@ template < class  Derived  >
 template < class  Derived  >
  void IArray2D< Derived>::eraseCols(int pos, int n)
  {
+#ifdef LARS_DEBUG
+  stk_cerr << _T("Entering IArray2D< Derived>::eraseCols(") << pos << _T(",") << n << _T(")") <<std::endl;
+#endif
    if (n<=0) return;
    if (isRef())
    { STKRUNTIME_ERROR_2ARG(IArray2D::eraseCols,pos,n,cannot operate on reference);}
 #ifdef STK_BOUNDS_CHECK
    if (beginCols() > pos)
    { STKOUT_OF_RANGE_2ARG(IArray2D::eraseCols,pos,n,beginCols() > pos);}
-   if (this->lastIdxCols() < pos)
-   { STKOUT_OF_RANGE_2ARG(IArray2D::eraseCols,pos,n,lastIdxCols() < pos);}
+   if (endCols() <= pos)
+   { STKOUT_OF_RANGE_2ARG(IArray2D::eraseCols,pos,n,endCols() <= pos);}
    if (endCols() < pos+n)
    { STKOUT_OF_RANGE_2ARG(IArray2D::eraseCols,pos,n,endCols() < pos+n);}
 #endif
+#ifdef LARS_DEBUG
+  stk_cerr << _T("IArray2D< Derived>::eraseCols(") << pos << _T(",") << n << _T(")") <<std::endl;
+  stk_cerr << _T("Check done\n");
+#endif
    // delete each col
    freeCols(Range(pos, n));
+#ifdef LARS_DEBUG
+  stk_cerr << _T("IArray2D< Derived>::eraseCols(") << pos << _T(",") << n << _T(")") <<std::endl;
+  stk_cerr << _T("freeCols done\n");
+#endif
    // update cols_, rangeCols_
    this->decLastIdxCols(n);
    rangeCols_.erase(pos, n);
-   allocator_.memmove(pos, Range(pos+n, endCols()-pos+1));
+#ifdef LARS_DEBUG
+  stk_cerr << _T("IArray2D< Derived>::eraseCols(") << pos << _T(",") << n << _T(")") <<std::endl;
+  stk_cerr << _T("rangeCols_.erase(pos, n) done\n");
+  stk_cerr << _T("allocator_.memmove(pos, Range(pos+n, endCols()-pos))\n");
+  stk_cerr << _T("allocator_.memmove(") << pos << _T(",") << Range(pos+n, endCols()-pos) << _T(")\n");
+#endif
+   allocator_.memmove(pos, Range(pos+n, endCols()-pos));
+#ifdef LARS_DEBUG
+  stk_cerr << _T("IArray2D< Derived>::eraseCols(") << pos << _T(",") << n << _T(")") <<std::endl;
+  stk_cerr << _T("allocator_.memmove(pos, Range(pos+n, endCols()-pos+1)) done\n");
+#endif
    // liberate memory if there is no more columns (don't use clear(), as we want to preserve rows_)
    if (sizeCols() == 0) { freeMem();}
+#ifdef LARS_DEBUG
+  stk_cerr << _T("IArray2D< Derived>::eraseCols(") << pos << _T(",") << n << _T(") done") <<std::endl;
+#endif
  }
 
  // rows
@@ -534,8 +558,8 @@ template < class  Derived  >
 #ifdef STK_BOUNDS_CHECK
    if (beginRows() > pos)
    { STKOUT_OF_RANGE_2ARG(IArray2D::eraseRows,pos,n,beginRows() > pos);}
-   if (this->lastIdxRows() < pos)
-   { STKOUT_OF_RANGE_2ARG(IArray2D::eraseRows,pos,n,lastIdxRows() < pos);}
+   if (endRows() <= pos)
+   { STKOUT_OF_RANGE_2ARG(IArray2D::eraseRows,pos,n,endRows() <= pos);}
    if (endRows() < pos+n)
    { STKOUT_OF_RANGE_2ARG(IArray2D::eraseRows,pos,n,endRows() < pos+n);}
 #endif
@@ -573,6 +597,19 @@ void IArray2D< Derived>::insert( Range const& I, Type const& v)
   STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
   this->asDerived().insertElt(I.begin(), I.size());
   for (int i=I.begin(); i<I.end(); i++) { elt(i) = v;}
+}
+
+/*  STL compatibility:Delete n elements at the @c pos index from the container.
+ *  @param pos index where to delete elements
+ *  @param n number of elements to delete (default 1)
+ **/
+template < class  Derived  >
+void IArray2D< Derived>::erase(int pos, int n)
+{
+  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
+  if (structure_ == Arrays::vector_) { eraseRows(pos, n); }
+  else { eraseCols(pos, n); }
+
 }
 
 

@@ -39,8 +39,9 @@
 #define STK_READWRITECSV_H
 
 #include <iomanip>
-#include "STK_Variable.h"
 #include <Arrays/include/STK_Array1D.h>
+#include <Arrays/include/STK_ArrayBase.h>
+#include "STK_Variable.h"
 
 namespace STK
 {

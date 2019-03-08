@@ -35,8 +35,7 @@
 #ifndef STK_ISERIE_H
 #define STK_ISERIE_H
 
-#include "STKernel/include/STK_Real.h"
-#include "Sdk/include/STK_IRecursiveTemplate.h"
+#include <STKernel.h>
 
 namespace STK
 {
@@ -45,14 +44,14 @@ namespace STK
  *  @brief Interface base class for Series.
  *
  * The ISerie class is the template base class for all Series.
- * 
+ *
  * ISerie takes a Serie template parameter. This parameter
  * is the type of the class which derives from it. For exemple
  * @code
  * class Serie: public ISerie<Serie>
  * {...}
  * @endcode
-  * 
+  *
  * The pseudo virtual function defined in this interface have the
  * following definition:
  * @code

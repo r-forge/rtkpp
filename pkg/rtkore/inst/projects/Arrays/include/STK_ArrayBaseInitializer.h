@@ -36,8 +36,6 @@
 #ifndef STK_ARRAYBASEINITIALIZER_H
 #define STK_ARRAYBASEINITIALIZER_H
 
-#include "Sdk/include/STK_Macros.h"
-
 namespace STK
 {
 /** @brief Helper class used by the comma initializer operator

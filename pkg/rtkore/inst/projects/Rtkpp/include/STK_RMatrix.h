@@ -36,13 +36,13 @@
 #ifndef STK_RMATRIX_H
 #define STK_RMATRIX_H
 
-#include <Arrays/include/STK_ExprBaseVisitor.h>
-#include <Arrays/include/STK_ExprBaseDot.h>
-#include <Arrays/include/STK_ExprBaseProduct.h>
-
-#include <Arrays/include/STK_ArrayBaseApplier.h>
-#include <Arrays/include/STK_ArrayBaseAssign.h>
-#include <Arrays/include/STK_ArrayBaseInitializer.h>
+//#include <Arrays/include/STK_ExprBaseVisitor.h>
+//#include <Arrays/include/STK_ExprBaseDot.h>
+//#include <Arrays/include/STK_ExprBaseProduct.h>
+//
+//#include <Arrays/include/STK_ArrayBaseApplier.h>
+//#include <Arrays/include/STK_ArrayBaseAssign.h>
+//#include <Arrays/include/STK_ArrayBaseInitializer.h>
 
 
 namespace STK
@@ -75,8 +75,9 @@ struct Traits< RMatrix<Type_> >
     typedef Void Number;
 
     typedef Type_ Type;
-    typedef typename RemoveConst<Type>::Type const& ConstReturnType;
-    typedef typename RemoveConst<Type>::Type const& TypeConst;
+    typedef typename RemoveConst<Type_>::Type const& ConstReturnType;
+    typedef typename RemoveConst<Type_>::Type const& ReturnType;
+    typedef typename RemoveConst<Type_>::Type const& TypeConst;
 
    enum
     {
@@ -106,8 +107,9 @@ struct Traits< RowRMatrix<Type_> >
     typedef Void Number;
 
     typedef Type_                Type;
-    typedef typename RemoveConst<Type>::Type const& ConstReturnType;
-    typedef typename RemoveConst<Type>::Type const& TypeConst;
+    typedef typename RemoveConst<Type_>::Type const& ConstReturnType;
+    typedef typename RemoveConst<Type_>::Type const& ReturnType;
+    typedef typename RemoveConst<Type_>::Type const& TypeConst;
 
    enum
     {
@@ -137,9 +139,9 @@ struct Traits< ColRMatrix<Type_> >
     typedef Void Number;
 
     typedef Type_                Type;
-    typedef typename RemoveConst<Type>::Type const& ConstReturnType;
-    typedef typename RemoveConst<Type>::Type const& ReturnType;
-    typedef typename RemoveConst<Type>::Type const& TypeConst;
+    typedef typename RemoveConst<Type_>::Type const& ConstReturnType;
+    typedef typename RemoveConst<Type_>::Type const& ReturnType;
+    typedef typename RemoveConst<Type_>::Type const& TypeConst;
 
    enum
     {

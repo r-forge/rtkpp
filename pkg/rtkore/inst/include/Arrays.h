@@ -65,11 +65,25 @@
 #ifndef ARRAYS_H
 #define ARRAYS_H
 
+/* Uni-dimensionnal Array. */
+#include <Arrays/include/STK_Array1D.h>
+#include <Arrays/include/STK_SArray1D.h>
+#include <Arrays/include/STK_Array1D_InnerIterator.h>
+
+/* CArray */
+#include <Arrays/include/STK_CArray.h>
+#include <Arrays/include/STK_CArrayPoint.h>
+#include <Arrays/include/STK_CArrayVector.h>
+#include <Arrays/include/STK_CArraySquare.h>
+#include <Arrays/include/STK_CArrayNumber.h>
+
+/* constant Arrays */
+#include <Arrays/include/STK_Const_Arrays.h>
 
 /* Array2D */
+#include <Arrays/include/STK_Array2D.h>
 #include <Arrays/include/STK_Array2DPoint.h>
 #include <Arrays/include/STK_Array2DVector.h>
-#include <Arrays/include/STK_Array2D.h>
 #include <Arrays/include/STK_Array2DSquare.h>
 #include <Arrays/include/STK_Array2DDiagonal.h>
 #include <Arrays/include/STK_Array2DUpperTriangular.h>
@@ -89,22 +103,7 @@
 #include <Arrays/include/STK_SArray2DLowerTriangular.h>
 #include <Arrays/include/STK_SArray2DNumber.h>
 
-/* CArray */
-#include <Arrays/include/STK_CArray.h>
-#include <Arrays/include/STK_CArrayPoint.h>
-#include <Arrays/include/STK_CArrayVector.h>
-#include <Arrays/include/STK_CArraySquare.h>
-#include <Arrays/include/STK_CArrayNumber.h>
-
-/* constant Arrays */
-#include <Arrays/include/STK_Const_Arrays.h>
-
 /* display arrays and expressions */
 #include <Arrays/include/STK_Display.h>
-
-/* Uni-dimensionnal Array. */
-#include <Arrays/include/STK_Array1D.h>
-#include <Arrays/include/STK_SArray1D.h>
-#include <Arrays/include/STK_Array1D_InnerIterator.h>
 
 #endif  /* ARRAYS_H */

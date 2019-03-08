@@ -39,8 +39,7 @@
 #define STK_DMANAGER_UTIL_H
 
 #include <list>
-
-#include <STKernel/include/STK_Integer.h>
+#include <STKernel.h>
 
 namespace STK
 {
@@ -196,8 +195,6 @@ void writeList( ostream& os, std::list<TYPE> const& lst, Char sep = CHAR_SEP)
  *  @param is the stream to parse.
  **/
 int nbEndOfLine( istream& is);
-
-
 
 } // namespace DManager
 

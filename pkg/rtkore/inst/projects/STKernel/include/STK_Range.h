@@ -36,9 +36,19 @@
 #ifndef STK_RANGE_H
 #define STK_RANGE_H
 
-#include <Sdk/include/STK_IRecursiveTemplate.h>
-#include "STK_String.h"
 #include <map>
+
+/** @ingroup Sdk
+ *  @brief base index of the containers created in STK++.
+ *  This value means that the default range for a vector or the rows/columns of
+ *  a matrix is the value given by this constant. **/
+#ifndef IS_RTKPP_LIB
+#if defined(STKBASEARRAYS)
+const int firstIdx_ = STKBASEARRAYS;
+#else
+const int firstIdx_ = 0; // default is 0 based array
+#endif
+#endif
 
 
 /** Utility macro that can be used in a similar way that first:last */
@@ -46,10 +56,6 @@
 
 namespace STK
 {
-// forward declaration
-template<typename Type> struct Arithmetic;
-template<typename Type> struct IdTypeImpl;
-
 // forward declaration
 template<int Size_> class TRange;
 typedef TRange<UnknownSize> Range;
@@ -63,20 +69,26 @@ ostream& operator<< (ostream& s, TRange<Size_> const& I);
 template<class Derived>
 class RangeBase: public IRecursiveTemplate<Derived>
 {
-  public:
+  protected:
     /** Default constructor*/
-    inline RangeBase(): begin_(baseIdx) {}
+    inline RangeBase(): begin_(firstIdx_) {}
     /** constructor.
      * @param begin beginning of range
      **/
     inline RangeBase( int begin): begin_(begin) {}
-    /** constructor.
-     * @param range range to copy
+    /** Copy constructor.
+     * @param I range to copy
      **/
-    inline RangeBase( RangeBase const& range): begin_(range.begin_) {}
+    inline RangeBase( RangeBase const& I): begin_(I.begin_) {}
+    /** Copy constructor.
+     *  @param I range to copy
+     **/
+    template<class OtherDerived>
+    inline RangeBase( RangeBase<OtherDerived> const& I): begin_(I.begin()) {}
+
+  public:
     /** destructor. */
     inline ~RangeBase() {}
-
     /** get the first index of the TRange.
      *  @return the first index of the range
      **/
@@ -154,23 +166,26 @@ class TRange: public RangeBase< TRange<Size_> >
     using Base::begin_;
 
     /** Default constructor. Give the size of the sub-region.
-     *  @param size size of the sub-region
+     *  @param size size of the sub-region (size is not used in fixed size range)
      **/
-    inline TRange( int size = Size_): Base(baseIdx) {}
+    inline TRange( int size = Size_): Base() {}
     /** Full constructor. Give the beginning and the size of the sub-region.
-     *  @param first, size beginning and size of the sub-region
+     *  @param first beginning of the sub-region
      **/
-    inline TRange( int first, int size): Base(first) {}
-    /** Complete constructor. Give the beginning and the end of the sub-region.
-     *  @param first, last first and last indexes of the sub-region
-     *  @param junk allow to use the constructor (begin,last) rather than (begin,size)
+    inline TRange( int first, int ): Base(first) {}
+    /** Complete constructor. Give the beginning and the last indexes of the sub-region.
+     *  @param first first index of the sub-region
      **/
-    inline TRange( int first, int last, bool junk): Base(first) {}
+    inline TRange( int first, int , bool ): Base(first) {}
+    /** copy constructor
+     *  @param I Range to copy
+     **/
+    inline TRange(TRange const& I): Base(I) {}
     /** copy constructor
      *  @param I Range to copy
      **/
     template<int OtherSize_>
-    inline TRange(TRange<OtherSize_> const& I): Base(I.begin()) {}
+    inline TRange(TRange<OtherSize_> const& I): Base(I) {}
     /** destructor. */
     inline ~TRange() {}
     /** get the ending index of the TRange.
@@ -291,10 +306,10 @@ class TRange<UnknownSize>: public RangeBase< TRange<UnknownSize> >
     typedef RangeBase<TRange<UnknownSize> > Base;
     using Base::begin_;
 
-    /** constructor. By default the first index is defined by the baseIdx macro.
+    /** constructor. By default the first index is defined by the firstIdx macro.
      *  @param size size of the sub-region
      **/
-    inline TRange( int size =0): Base(baseIdx), size_(size) {}
+    inline TRange( int size =0): Base(), size_(size) {}
     /** Complete constructor. Give the beginning and the size of the sub-region.
      *  @param first, size beginning and size of the range
      **/
@@ -308,8 +323,13 @@ class TRange<UnknownSize>: public RangeBase< TRange<UnknownSize> >
      *  Create a copy of an existing TRange.
      *  @param I range to copy
      **/
+    inline TRange(TRange const& I): Base(I), size_(I.size_) {}
+    /** @brief Copy constructor.
+     *  Create a copy of an existing TRange.
+     *  @param I range to copy
+     **/
     template<int OtherSize_>
-    inline TRange(TRange<OtherSize_> const& I): Base(I.begin()), size_(I.size()) {}
+    inline TRange(TRange<OtherSize_> const& I): Base(I), size_(I.size()) {}
     /** destructor. */
     inline ~TRange() {}
     /** get the ending index of the TRange.
@@ -445,7 +465,7 @@ class TRange<UnknownSize>: public RangeBase< TRange<UnknownSize> >
 */
 template<int SizeI_, int SizeJ_>
 Range sup(TRange<SizeI_> const& I, TRange<SizeJ_> const& J)
-{ return Range(std::min(I.begin(), J.begin()), std::max(I.end(), J.end())-1, 0);}
+{ return Range(std::min(I.begin(), J.begin()), std::max(I.lastIdx(), J.lastIdx()), 0);}
 /** @ingroup STKernel
  *  @brief compute inf(I,J).
  *  Take the largest value of I.begin() and J.begin() for begin
@@ -454,7 +474,7 @@ Range sup(TRange<SizeI_> const& I, TRange<SizeJ_> const& J)
  */
 template<int SizeI_, int SizeJ_>
 Range inf(TRange<SizeI_> const& I, TRange<SizeJ_> const& J)
-{ return Range(std::max(I.begin(), J.begin()), std::min(I.end(), J.end())-1, 0);}
+{ return Range(std::max(I.begin(), J.begin()), std::min(I.lastIdx(), J.lastIdx()), 0);}
 /** @ingroup STKernel
  *  @brief if I=a:b, return a+1:b
  *  @return range I with first index + 1

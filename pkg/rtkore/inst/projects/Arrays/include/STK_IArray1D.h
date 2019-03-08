@@ -39,11 +39,50 @@
 #ifndef STK_IARRAY1D_H
 #define STK_IARRAY1D_H
 
-#include "STK_ExprBase.h"
+#include <STKernel.h>
+#include "STK_IContainerRef.h"
+#include "STK_ArraysTraits.h"
+#include "STK_Arrays_Util.h"
 #include "STK_ITContainer1D.h"
+#include "allocators/STK_MemAllocator.h"
+#include "iterators/STK_BiDirectionalIterator.h"
+#include "iterators/STK_DenseRandomIterator.h"
 
 namespace STK
 {
+
+namespace Arrays
+{
+/** @ingroup Arrays
+ *  @return n+m, where n is the first number such that m < 2^n.
+ *  @param m the size of the container
+ **/
+inline int evalSizeCapacity(int m)
+{
+  int n = 0;
+  for (int k=1; k <= m; k <<= 1) {n++;}
+  return(m+n);
+}
+
+/** @ingroup Arrays
+ *  @param I range of the container
+ *  @tparam Size_ The size of the array. For fixed size return the range unmodified
+ **/
+template<int Size_>
+inline TRange<Size_> evalRangeCapacity(TRange<Size_> const& I) { return I;}
+/** @ingroup Arrays
+ * Specialization for array with unknown size
+ *  @param I the range of the container
+ **/
+template<>
+inline Range evalRangeCapacity(Range const& I)
+{
+  int n = 0;
+  for (int k=1; k <= I.size(); k <<= 1){ n++;}
+  return Range(I.begin(),I.size() + n);
+}
+
+} // namespace Arrays
 
 /** @ingroup Arrays
  *  @brief template one dimensional Array.
@@ -117,11 +156,6 @@ class IArray1D: public ITContainer1D<Derived>
      **/
     template<class OtherDerived>
     IArray1D( IArray1D<OtherDerived> const& T, bool ref);
-    /** Copy constructor
-     *  @param T the container to copy
-     **/
-    template<class OtherDerived>
-    IArray1D( ExprBase<OtherDerived> const& T);
     /** copy constructor.
      *  @param T,I the container and the range of data to wrap
      *  @param ref @c true if T is wrapped (the default)
@@ -333,19 +367,6 @@ IArray1D<Derived>::IArray1D( IArray1D<OtherDerived> const& T, bool ref)
                            : Base(T.range())
                            , allocator_(T.allocator(), ref)
 {}
-
-/* Copy constructor
- *  @param T the container to copy
- **/
-template<class Derived>
-template<class OtherDerived>
-IArray1D<Derived>::IArray1D( ExprBase<OtherDerived> const& T)
-                           : Base(T.range())
-                           , allocator_(Arrays::evalRangeCapacity(T.range()))
-{
-  STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(OtherDerived);
-  for (int i=begin(); i<end(); i++) allocator_.setValue(i, T.elt(i));
-}
 
 /* copy constructor.
  *  @param T,I the container and the range of data to wrap

@@ -36,7 +36,7 @@
 #ifndef STK_KERNEL_UTIL_H
 #define STK_KERNEL_UTIL_H
 
-#include <STKernel/include/STK_String.h>
+#include <STKernel.h>
 
 namespace STK
 {

@@ -36,9 +36,7 @@
 #ifndef STK_ISVD_H
 #define STK_ISVD_H
 
-#include <Sdk/include/STK_IRunner.h>
-#include <Sdk/include/STK_IRecursiveTemplate.h>
-#include <STKernel/include/STK_Real.h>
+#include <STKernel.h>
 
 #include "STK_Algebra_Util.h"
 

@@ -35,7 +35,6 @@
 #ifndef STK_ARRAY1D_H
 #define STK_ARRAY1D_H
 
-#include "allocators/STK_MemAllocator.h"
 #include "STK_IArray1D.h"
 
 namespace STK
@@ -163,11 +162,6 @@ class Array1D: public IArray1D< Array1D<Type_, Size_> >
     template<int OtherSize>
     Array1D( Array1D<Type, OtherSize> const& T, RowRange const& I, bool ref = true)
            : Base(T, I, ref) {}
-    /** Copy an other type of array/expression in an Array1D.
-     *  @param T the array/expression to copy
-     **/
-    template<class OtherArray>
-    Array1D( ExprBase<OtherArray> const& T): Base(T.asDerived()) {}
     /** Wrapper constructor
      *  @param A,I range and allocator to wrap
      *  @param ref @c true if A is wrapped
@@ -193,17 +187,6 @@ class Array1D: public IArray1D< Array1D<Type_, Size_> >
       // check size
       if (this->range()!=T.range()) this->resize(T.range());
       for (int i=this->begin(); i<this->end(); i++) this->elt(i) = T.elt(i);
-      return *this;
-    }
-    /** Copy an other type of array/expression in an Array1D.
-     *  @param T the array/expression to copy
-     **/
-    template<class OtherArray>
-    Array1D& operator=(ExprBase<OtherArray> const& T)
-    {
-      // check size
-      if (this->size()!=T.size()) this->resize(T.range());
-      for (int i=this->begin(); i<this->end(); i++) this->elt(i)= T.elt(i);
       return *this;
     }
     /** operator= : set the container to a constant value.

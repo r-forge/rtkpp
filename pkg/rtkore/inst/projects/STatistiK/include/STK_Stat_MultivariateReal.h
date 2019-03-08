@@ -35,14 +35,13 @@
 #ifndef STK_STAT_MULTIVARIATEREAL_H
 #define STK_STAT_MULTIVARIATEREAL_H
 
-#include "STKernel/include/STK_Misc.h"
+//#include <STKernel.h>
 
 #include "Arrays/include/STK_Array2DPoint.h"
 #include "Arrays/include/STK_Array2DSquare.h"
 
 #include "STK_Stat_Covariance.h"
 #include "STK_Stat_Multivariate.h"
-#include "STK_Stat_Functors.h"
 
 namespace STK
 {

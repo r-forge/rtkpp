@@ -35,7 +35,7 @@
 #ifndef STK_FUNCT_BETARATIO_H
 #define STK_FUNCT_BETARATIO_H
 
-#include <STKernel/include/STK_Real.h>
+#include <STKernel.h>
 
 namespace STK
 {

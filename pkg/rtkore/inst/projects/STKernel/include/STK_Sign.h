@@ -37,7 +37,6 @@
 #define STK_SIGN_H
 
 #include <map>
-#include "STK_String.h"
 
 namespace STK
 {
@@ -46,11 +45,11 @@ namespace STK
  *
  *  The type Signed is an other representation of dichotomic variables
  **/
- enum Sign
- { negative_ =-1, ///< negative sign
-   positive_ = 1, ///< positive sign
-   signNA_ = INT_MIN  ///< Not Available value
- };
+enum Sign
+{ negative_ =-1, ///< negative sign
+ positive_ = 1, ///< positive sign
+ signNA_ = INT_MIN  ///< Not Available value
+};
 
 // forward declaration
 template<typename Type> struct Arithmetic;

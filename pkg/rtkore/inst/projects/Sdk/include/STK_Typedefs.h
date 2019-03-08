@@ -36,6 +36,8 @@
 #ifndef STK_TYPEDEFS_H
 #define STK_TYPEDEFS_H
 
+#include <string>
+
 namespace STK
 {
 /** @ingroup Sdk
@@ -113,7 +115,7 @@ typedef  float Real;
   *  internal representation of the continuous variables. By default it is the
   *  double type, but it can be overridden at compile-time, if needed.
   **/
-typedef  double Real;
+typedef double Real;
 
 #endif
 

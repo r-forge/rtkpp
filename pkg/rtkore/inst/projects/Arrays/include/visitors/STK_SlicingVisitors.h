@@ -65,8 +65,6 @@ typename hidden::SliceVisitorSelector<Derived, hidden::VISITOR, Arrays::by_row_>
 FUNC##ByRow(Derived const& A) \
 { return typename hidden::SliceVisitorSelector<Derived, hidden::VISITOR, Arrays::by_row_>::VisitorOp(A);}
 
-#include "../allocators/STK_CAllocator.h"
-
 namespace STK
 {
 
@@ -95,9 +93,6 @@ struct Traits< VisitorByCol <Derived, Visitor> >
   typedef Visitor<Type_> VisitorType;
   typedef typename VisitorType::Type Type;
   typedef typename VisitorType::TypeConst TypeConst;
-
-//  typedef RowOperator< VisitorByCol <Derived, Visitor> > Row;
-//  typedef ColOperator< VisitorByCol <Derived, Visitor> > Col;
 
   typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
 };
@@ -193,9 +188,6 @@ struct Traits< VisitorByRow <Derived, Visitor> >
   typedef Visitor<Type_> VisitorType;
   typedef typename VisitorType::Type Type;
   typedef typename VisitorType::TypeConst TypeConst;
-
-//  typedef RowOperator< VisitorByRow <Derived, Visitor> > Row;
-//  typedef ColOperator< VisitorByRow <Derived, Visitor> > Col;
 
   typedef CAllocator<Type, sizeRows_, sizeCols_, orient_> Allocator;
 };

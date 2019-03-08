@@ -36,14 +36,10 @@
 #ifndef STK_BINARYOPERATORS_H
 #define STK_BINARYOPERATORS_H
 
-#include "STK_SlicingOperators.h"
-#include "STK_BinaryImpl.h"
-
 #define EGAL(arg1, arg2) ((arg1::structure_ == int(Arrays::arg2)))
 
 namespace STK
 {
-
 // forward declaration
 template<typename FunctorOp, typename Lhs, typename Rhs>
 class BinaryOperator;

@@ -40,24 +40,68 @@
  * STK++ whole project. The aim is to unified the syntax and the treatment
  * realized by the statistical methods.
  **/
+/** @ingroup Sdk
+ *  @defgroup Arithmetic Arithmetic properties.
+ *
+ *  These classes extend the @c numeric_limits C++ struct. They
+ *  allow to handle in a transparent way a possible
+ *  Not Available (NA) value in the data.
+ **/
+/** @ingroup Sdk
+ *  @defgroup RTTI Runtime Type Identification.
+ *
+ *  These classes allow to handle the Runtime type identification (RTTI)
+ *  problem and are useful when working with heterogeneous data.
+ **/
+/** @ingroup Sdk
+ *  @defgroup iostream I/O stream declarations
+ *
+ *  Nearly all of the I/O classes are parameterized on the type of
+ *  characters they read and write (The major exception is ios_base at
+ *  the top of the hierarchy).
+ *
+ *  For ease of use, all of the basic_* I/O-related
+ *  classes are given typedef names in the namespace STK. For example:
+ *
+ *  @code
+ *     typedef basic_ifstream<Char>  ifstream;
+ *  @endcode
+ *  These declarations in the STK namespace would be very useful if you
+ *  modify the built-in type representation of Char (say wchar_t).
+ **/
+
+
+/** @ingroup Sdk
+ *  @namespace STK::Base
+ *  @brief the namespace Base contain all the internal stuff needed by the STK++
+ *  fundamental types.
+ **/
 
 #ifndef SDK_H
 #define SDK_H
 
-/* Macros. */
+/* Macros and typedefs */
 #include <Sdk/include/STK_MacrosVersion.h>
-#include <Sdk/include/STK_Macros.h>
+/* Constants */
 #include <Sdk/include/STK_Constants.h>
-#include <Sdk/include/STK_Typedefs.h>
-
-/* Static Assert. */
-#include <Sdk/include/STK_StaticAssert.h>
-/* Templates. */
-#include <Sdk/include/STK_MetaTemplate.h>
 /* Interface for all classes using the curious recursive template paradigm.*/
 #include <Sdk/include/STK_IRecursiveTemplate.h>
-
-
+/* struct extending numeric_limits.*/
+#include <Sdk/include/STK_Arithmetic.h>
+/* struct for RTTI (Run Time Type Identification) */
+#include <Sdk/include/STK_IdTypeImpl.h>
+/* typedefs */
+#include <Sdk/include/STK_Typedefs.h>
+/* streaming */
+#include <Sdk/include/STK_Stream.h>
+/* Templates */
+#include <Sdk/include/STK_MetaTemplate.h>
+/* Static Assert. */
+#include <Sdk/include/STK_StaticAssert.h>
+/* Exceptions */
+#include <Sdk/include/STK_Exceptions.h>
+/* Macros */
+#include <Sdk/include/STK_Macros.h>
 /* Interface for all runners classes */
 #include <Sdk/include/STK_IRunner.h>
 

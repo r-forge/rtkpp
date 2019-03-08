@@ -41,8 +41,6 @@
 #include <fstream>
 #include <sstream>
 
-#include "STK_Char.h"
-
 namespace STK
 {
 /**@ingroup iostream

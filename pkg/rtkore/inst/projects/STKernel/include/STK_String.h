@@ -36,13 +36,8 @@
 #ifndef STK_STRING_H
 #define STK_STRING_H
 
-#include <string>
-#include <algorithm>
 #include <ctype.h>
-
-#include "STK_Stream.h"
-#include "STK_Arithmetic.h"
-#include "STK_IdTypeImpl.h"
+#include <algorithm>
 
 namespace STK
 {
@@ -192,8 +187,7 @@ namespace STK
  *  @note The operator >> have been overloaded for the @c Proxy class in order
  *  to return a NA value if the conversion fail.
  *
- *  @param t The value to get from the String
- *  @param s the String to convert
+ *  @param t,s value to get from the String and String to convert
  *  @param f flags
  *  @return @c true if the conversion succeed, @c false otherwise
  **/

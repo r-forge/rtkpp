@@ -40,13 +40,6 @@
 #ifndef STK_ITCONTAINER_H
 #define STK_ITCONTAINER_H
 
-#include <Sdk/include/STK_IRecursiveTemplate.h>
-#include <Sdk/include/STK_Macros.h>
-#include <Sdk/include/STK_StaticAssert.h>
-
-#include "STK_ArraysTraits.h"
-#include "STK_Arrays_Util.h"
-
 namespace STK
 {
 

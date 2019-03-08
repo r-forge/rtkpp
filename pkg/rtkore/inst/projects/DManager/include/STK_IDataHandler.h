@@ -36,10 +36,8 @@
 #ifndef STK_IDATAHANDLER_H
 #define STK_IDATAHANDLER_H
 
-#include <map>
-#include <string>
+#include <Sdk.h>
 
-#include "STKernel/include/STK_Stream.h"
 
 namespace STK
 {

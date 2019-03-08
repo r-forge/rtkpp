@@ -1,9 +1,9 @@
 Package: rtkore
 Type: Package
 Title: 'STK++' Core Library Integration to 'R' using 'Rcpp'
-Version: 1.6.1
+Version: 1.6.4
 Encoding: UTF-8
-Date: 2019-01-09
+Date: 2019-02-01
 Authors@R: c( person("Serge", "Iovleff", role=c("aut","cre"), email="serge.iovleff@stkpp.org")
             , person("Parmeet", "Bhatia", role="ctb", email="bhatia.parmeet@gmail.com"))
 Copyright: Inria, University Lille 1 and specifically inst/COPYRIGHTS for the

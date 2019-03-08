@@ -35,13 +35,11 @@
 #ifndef STK_DOTPRODUCT_H
 #define STK_DOTPRODUCT_H
 
-#include "../allocators/STK_CAllocator.h"
-
 namespace STK
 {
-
-
+// forward declarations
 template<typename Lhs, typename Rhs> class DotProduct;
+template<typename Type, int SizeRows_, int SizeCols_, bool Orient_> class CAllocator;
 
 namespace hidden
 {

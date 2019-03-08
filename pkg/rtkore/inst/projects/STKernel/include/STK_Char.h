@@ -36,15 +36,8 @@
 #ifndef STK_CHAR_H
 #define STK_CHAR_H
 
-#include <limits>
-#include "STK_Base_Util.h"
-#include <Sdk/include/STK_Typedefs.h>
-
 namespace STK
 {
-// forward declarations
-template<typename Type> struct Arithmetic;
-template<typename Type> struct IdTypeImpl;
 
 /** @ingroup Arithmetic
  *  @brief Specialization of the struct Arithmetic for Char.

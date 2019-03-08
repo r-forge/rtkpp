@@ -38,11 +38,10 @@
 #define STK_IMULTISTATMODEL_H
 
 #include <cmath>
+#include <Sdk.h>
 
 #include "STK_IStatModelBase.h"
 
-#include <Sdk/include/STK_IRunner.h>
-#include <Sdk/include/STK_Macros.h>
 #include <DManager/include/STK_DataBridge.h>
 #include <STatistiK/include/STK_MultiLaw_IMultiLaw.h>
 

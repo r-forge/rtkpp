@@ -35,11 +35,8 @@
 #ifndef STK_UNARYOPERATORS_H
 #define STK_UNARYOPERATORS_H
 
-#include "STK_SlicingOperators.h"
-
 namespace STK
 {
-
 // forward declaration
 template<typename UnaryOp, typename Lhs> class UnaryOperator;
 

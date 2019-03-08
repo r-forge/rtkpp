@@ -37,6 +37,7 @@
 #define STK_IVARIABLE_H
 
 #include "STK_DManager_Util.h"
+//#include <Arrays/include/STK_Display.h>
 
 namespace STK
 {

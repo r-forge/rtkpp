@@ -36,8 +36,7 @@
 #ifndef STK_HOUSEHOLDER_H
 #define STK_HOUSEHOLDER_H
 
-#include <STKernel/include/STK_Misc.h>
-#include <Arrays/include/STK_IArrayBase.h>
+#include <Arrays/include/STK_ArrayBase.h>
 
 namespace STK
 {
@@ -54,7 +53,7 @@ namespace STK
  *  @param x the vector to rotate, it is overwritten by v
  **/
 template <class Vector>
-Real house(IArrayBase< Vector>& x)
+Real house(ArrayBase< Vector>& x)
 {
   // compute L^{\infty} norm of X, declare result and norm2 of X
   Real scale  = x.normInf(), v1, norm2 = 0.0;

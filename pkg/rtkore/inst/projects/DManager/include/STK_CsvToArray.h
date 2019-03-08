@@ -39,7 +39,7 @@
 #define STK_CSVTOARRAY_H
 
 #include "STK_ReadWriteCsv.h"
-#include <Arrays.h>
+#include <Arrays/include/STK_CArray.h>
 
 namespace STK
 {

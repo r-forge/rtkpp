@@ -36,8 +36,6 @@
 #ifndef STK_PROXY_H
 #define STK_PROXY_H
 
-#include <Sdk/include/STK_MetaTemplate.h>
-
 namespace STK
 {
 /** @ingroup Base

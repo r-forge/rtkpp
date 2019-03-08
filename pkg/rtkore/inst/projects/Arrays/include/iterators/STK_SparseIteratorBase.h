@@ -36,8 +36,7 @@
 #ifndef STK_ITERATORBASE_H
 #define STK_ITERATORBASE_H
 
-#include <Sdk/include/STK_IRecursiveTemplate.h>
-#include <Sdk/include/STK_Constants.h>
+#include <Sdk.h>
 
 namespace STK
 {

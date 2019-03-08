@@ -36,8 +36,6 @@
 #ifndef STK_MEMSALLOCATOR1D_H
 #define STK_MEMSALLOCATOR1D_H
 
-#include <Sdk/include/STK_Macros.h>
-#include <Sdk/include/STK_MetaTemplate.h>
 #include "../STK_Array1D.h"
 
 namespace STK
@@ -501,7 +499,7 @@ MemSAllocator1D<Type_, NzMax_>& STK::MemSAllocator1D<Type_, NzMax_>::memcpy(int 
   if (pos < begin()) { STKOUT_OF_RANGE_1ARG(MemSAllocator1D::memcpy,pos,begin() > pos);}
   if (pos >= end())  { STKOUT_OF_RANGE_1ARG(MemSAllocator1D::memcpy,pos,end() <= pos);}
   if (!T.range().isContaining(range))
-  { STKOUT_OF_RANGE_1ARG(MemAllocator::memcopy,range,range not in T.range());}
+  { STKOUT_OF_RANGE_1ARG(MemSAllocator::memcopy,range,range not in T.range());}
 #endif
   for (int k=range.begin(); k<range.end(); ++k, ++pos)
   { setValue(pos, T.elt(k));}
@@ -517,9 +515,9 @@ void STK::MemSAllocator1D<Type_, NzMax_>::memmove(int pos, Range const& range)
   if ((range.size() <= 0)||(range.begin() == pos)) return;
 #ifdef STK_BOUNDS_CHECK
   if (pos < begin())
-  { STKOUT_OF_RANGE_1ARG(MemSAllocator1D::memmove,pos,MemAllocator::begin() > pos);}
+  { STKOUT_OF_RANGE_1ARG(MemSAllocator1D::memmove,pos,begin() > pos);}
   if (pos >= end())
-  { STKOUT_OF_RANGE_1ARG(MemSAllocator1D::memmove,pos,MemAllocator::end() <= pos);}
+  { STKOUT_OF_RANGE_1ARG(MemSAllocator1D::memmove,pos,end() <= pos);}
   if (!range_.isContaining(range))
   { STKOUT_OF_RANGE_1ARG(MemSAllocator1D::memmove,range,range not in range_);}
 #endif

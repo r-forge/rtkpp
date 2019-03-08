@@ -40,11 +40,11 @@
 #ifndef STK_ICARRAY_H
 #define STK_ICARRAY_H
 
-#include "STK_IArrayBase.h"
-
-#include "STK_ArrayBaseApplier.h"
-#include "STK_ArrayBaseAssign.h"
-#include "STK_ArrayBaseInitializer.h"
+#include "STK_ArrayBase.h"
+#include "STK_IContainer2D.h"
+#include "STK_ITContainer2D.h"
+#include "allocators/STK_MemAllocator.h"
+#include "allocators/STK_CAllocator.h"
 
 namespace STK
 {
@@ -58,7 +58,7 @@ template< typename Type, bool Orient_> class CArrayNumber;
 namespace hidden
 {
 /** @ingroup hidden
- *  @brief The traits struct CSlice must be specialized allow to disambiguate return
+ *  @brief The traits struct CSlice allows to disambiguate return
  *  type of the col/row/sub operators for CArray family
  *
  *  @sa STK::ICArray
@@ -75,7 +75,7 @@ struct CSlice
       sizeCols_  = Traits<Derived>::sizeCols_,
       storage_   = Traits<Derived>::storage_,
 
-      isNumber_ = (SizeRows==SizeCols)&&(SizeRows==1),
+      isNumber_ = (SizeRows==1)&&(SizeCols==1),
       isVector_ = (SizeCols == 1)&&(!isNumber_),
       isPoint_  = (SizeRows == 1)&&(!isNumber_),
       isSquare_ = (SizeRows==SizeCols)&&(SizeRows!=UnknownSize)&&(!isNumber_),
@@ -123,10 +123,10 @@ struct CSliceDispatcher
   */
 template<class Derived>
 
-class ICArray: public IArrayBase<Derived>
+class ICArray: public ArrayBase<Derived>
 {
   public:
-    typedef IArrayBase<Derived> Base;
+    typedef ArrayBase<Derived> Base;
     typedef typename hidden::Traits< Derived >::Allocator Allocator;
 
     typedef typename hidden::Traits< Derived >::Row Row;

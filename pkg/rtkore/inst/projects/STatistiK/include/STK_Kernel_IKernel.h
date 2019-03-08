@@ -36,7 +36,7 @@
 #ifndef STK_KERNEL_IKERNEL_H
 #define STK_KERNEL_IKERNEL_H
 
-#include <Sdk/include/STK_IRunner.h>
+#include <Sdk.h>
 #include <Arrays/include/STK_CArraySquare.h>
 
 namespace STK

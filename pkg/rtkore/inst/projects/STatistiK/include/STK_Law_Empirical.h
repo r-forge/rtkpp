@@ -36,8 +36,6 @@
 #define STK_LAW_CAUCHY_H
 
 #include "STK_Law_IUnivLaw.h"
-#include <Sdk/include/STK_Macros.h>
-#include <STKernel/include/STK_Real.h>
 
 namespace STK
 {

@@ -35,8 +35,7 @@
 #ifndef STK_STAT_FACTOR_H
 #define STK_STAT_FACTOR_H
 
-#include <Sdk/include/STK_IRunner.h>
-#include <Sdk/include/STK_Macros.h>
+#include <Sdk.h>
 
 namespace STK
 {

@@ -35,8 +35,6 @@
 #ifndef STK_ALGO_H
 #define STK_ALGO_H
 
-#include <STKernel/include/STK_Misc.h>
-
 #include "STK_Const_Math.h"
 #include "STK_ISerie.h"
 #include "STK_IFunction.h"
@@ -46,7 +44,7 @@ namespace STK
 
 /** @ingroup Analysis
  * @brief Sum an alternating series using the Chebichev polynomials.
- * 
+ *
  * Compute
  *  \f[
  *  S = \sum_{k=0}^{+\infty} (-1)^k a_k
@@ -59,7 +57,7 @@ namespace STK
  *      \frac{2}{(3+\sqrt(8))^n} < \epsilon,
  *  \f]
  * where \f$ \epsilon \f$ is the precision of the type Real.
- * 
+ *
  * @param f the ISerie giving the terms of the serie
  * @param n the number of iterations
 **/
@@ -72,8 +70,8 @@ Real sumAlternateSerie(const ISerie<Serie>& f, int const& n = 0)
   int niter = n;
   if (niter==0)
   {
-    niter = (int )( log(Arithmetic<Real>::epsilon())
-                  / (Const::_LN2_-log(rate))
+    niter = (int )( std::log(Arithmetic<Real>::epsilon())
+                  / (Const::_LN2_-std::log(rate))
                   ) + 1;
   }
   // initialization
@@ -94,7 +92,7 @@ Real sumAlternateSerie(const ISerie<Serie>& f, int const& n = 0)
 
 /** @ingroup Analysis
  * @brief Sum a serie using the epsilon acceleration process.
- * 
+ *
  * Compute
  * \f[
  *  S = \sum_{k=0}^{+\infty} a_k
@@ -104,7 +102,7 @@ Real sumAlternateSerie(const ISerie<Serie>& f, int const& n = 0)
  *
  * The series should be monotone in absolute value.
  * We use the epsilon algorithm acceleration process with 6 epsilon.
- * 
+ *
  * @param f the functor giving the terms of the serie
  * @param iter_max the number of iterations
 **/
@@ -126,7 +124,7 @@ Real sumSerie(const ISerie<Serie>& f, int const& iter_max = 10)
   e0[4] = e0[3] + f.next();
   e0[5] = e0[4] + f.next();
   e0[6] = e0[5] + f.next();
-  
+
   // first epsilon e_{-1}[n] = 0
   e1[0] = 1/(e0[1] - e0[0]);
   e1[1] = 1/(e0[2] - e0[1]);
@@ -134,7 +132,7 @@ Real sumSerie(const ISerie<Serie>& f, int const& iter_max = 10)
   e1[3] = 1/(e0[4] - e0[3]);
   e1[4] = 1/(e0[5] - e0[4]);
   e1[5] = 1/(e0[6] - e0[5]);
-  
+
   // second epsilon
   e2[0] = e0[0] + 1/(e1[1] - e1[0]);
   e2[1] = e0[1] + 1/(e1[2] - e1[1]);
@@ -166,13 +164,13 @@ Real sumSerie(const ISerie<Serie>& f, int const& iter_max = 10)
     e0[4] = e0[5];
     e0[5] = e0[6];
     e0[6] += f.next();
-  
+
     // roll first epsilon
     e1[3] = e1[4];
     e1[4] = e1[5];
     if ( (delta = (e0[6] - e0[5])) == 0) break;
     e1[5] = 1./delta;
-  
+
     // roll second epsilon
     e2[2] = e2[3];
     e2[3] = e2[4];
@@ -204,12 +202,12 @@ Real sumSerie(const ISerie<Serie>& f, int const& iter_max = 10)
     if (sum1 == sum) break;
     sum = sum1;
   }
-  
+
   return sum;
 }
 /** @ingroup Analysis
  *  @brief Evaluate a continued fraction.
- * 
+ *
  * Compute
  * \f[
  *  S = \frac{a_1}{b_1+}\frac{a_2}{b_2+}\frac{a_3}{b_3+}\frac{a_4}{b_4+}

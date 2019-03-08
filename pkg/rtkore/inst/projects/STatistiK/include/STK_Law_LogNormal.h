@@ -35,8 +35,9 @@
 #ifndef STK_LAW_LOGNORMAL_H
 #define STK_LAW_LOGNORMAL_H
 
+#include <Sdk.h>
+
 #include "STK_Law_IUnivLaw.h"
-#include <Sdk/include/STK_Macros.h>
 
 namespace STK
 {

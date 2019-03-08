@@ -69,58 +69,16 @@
  *  throughout the STK++ project, especially in the Arrays project.
  **/
 
-/** @ingroup Base
- *  @defgroup Arithmetic Arithmetic properties.
- *
- *  These classes extend the @c numeric_limits C++ struct. They
- *  allow to handle in a transparent way a possible
- *  Not Available (NA) value in the data.
- **/
-
-/** @ingroup Base
- *  @defgroup RTTI Runtime Type Identification.
- *
- *  These classes allow to handle the Runtime type identification (RTTI)
- *  problem and are useful when working with heterogeneous data.
- **/
-
-/** @ingroup Base
- *  @defgroup iostream I/O stream declarations
- *
- *  Nearly all of the I/O classes are parameterized on the type of
- *  characters they read and write (The major exception is ios_base at
- *  the top of the hierarchy).
- *
- *  For ease of use, all of the basic_* I/O-related
- *  classes are given typedef names in the namespace STK. For example:
- *
- *  @code
- *     typedef basic_ifstream<Char>  ifstream;
- *  @endcode
- *  These declarations in the STK namespace would be very useful if you
- *  modify the built-in type representation of Char (say wchar_t).
- **/
-
-/** @ingroup STKernel
- *  @namespace STK::Base
- *  @brief the namespace Base contain all the internal stuff needed by the STK++
- *  fundamental types.
- **/
-
 #ifndef STKERNEL_H
 #define STKERNEL_H
 
-/* Fundamental types of STKpp.  */
+/* Fundamental types */
 #include <STKernel/include/STK_TypeBase.h>
-/* Index range. */
-#include <STKernel/include/STK_Range.h>
-/* Standard exceptions */
-#include <STKernel/include/STK_Exceptions.h>
-/* STK streams parameterized with Char.  */
+/* Functors */
 #include <STKernel/include/STK_Functors.h>
-/* Chrono functions.  */
-#include <STKernel/include/STK_Chrono.h>
 /* Miscellaneous functions. */
 #include <STKernel/include/STK_Misc.h>
+/* Chrono functions.  */
+#include <STKernel/include/STK_Chrono.h>
 
 #endif  /* STKERNEL_H */

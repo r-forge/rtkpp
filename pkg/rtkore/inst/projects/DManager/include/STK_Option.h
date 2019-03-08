@@ -37,15 +37,9 @@
 #ifndef STK_OPTION_H
 #define STK_OPTION_H
 
-// C++ headers
 #include <list>
-
-// STK+ headers
-#include "STKernel/include/STK_Real.h"
-#include "STKernel/include/STK_Range.h"
-#include "STKernel/include/STK_Stream.h"
-
 #include "../include/STK_DManager_Util.h"
+#include <Arrays/include/STK_Display.h>
 
 namespace STK
 {

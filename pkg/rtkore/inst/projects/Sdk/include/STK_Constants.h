@@ -38,10 +38,6 @@
 
 #include <climits>
 
-#ifndef STKBASEARRAYS
-#define STKBASEARRAYS 0 // default is 0 based arrays
-#endif
-
 #ifndef MAXUNROLLVALUE
 #define MAXUNROLLVALUE 20 // unroll operations on fixed size containers
 #endif
@@ -61,7 +57,13 @@ namespace STK
  *  @brief base index of the containers created in STK++.
  *  This value means that the default range for a vector or the rows/columns of
  *  a matrix is the value given by this constant. **/
+#ifndef IS_RTKPP_LIB
+#if defined(STKBASEARRAYS)
 const int baseIdx = STKBASEARRAYS;
+#else
+const int baseIdx = 0; // default is 0 based array
+#endif
+#endif
 
 /** @ingroup Sdk
  *  @brief maximal size of fixed size containers

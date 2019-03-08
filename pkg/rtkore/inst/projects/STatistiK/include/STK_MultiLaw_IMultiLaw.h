@@ -38,7 +38,6 @@
 #ifndef STK_MULTILAW_ITMULTILAW_H
 #define STK_MULTILAW_ITMULTILAW_H
 
-#include "STKernel/include/STK_Real.h"
 #include "Arrays/include/STK_Array1D.h"
 #include "STK_Law_ILawBase.h"
 

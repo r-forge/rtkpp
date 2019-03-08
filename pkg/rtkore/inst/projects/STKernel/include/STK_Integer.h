@@ -37,7 +37,6 @@
 #define STK_INTEGER_H
 
 #include <map>
-#include "STK_String.h"
 
 // for building
 #ifdef IS_RTKPP_LIB

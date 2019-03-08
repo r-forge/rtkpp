@@ -35,40 +35,41 @@
 #ifndef STK_EXPRBASEOPERATORS_H
 #define STK_EXPRBASEOPERATORS_H
 
+#include "operators/STK_BinarySelector.h"
+
 /// utility macro allowing to implement binary operators
 #define IMPLEMENT_BINARY_OPERATOR(OPERATORNAME, BINARYOPERATORNAME) \
 template<class Derived> \
 template<typename Rhs> \
-inline typename hidden::OperatorHelper<Derived, Rhs, Arrays::BINARYOPERATORNAME>::Result const \
+inline typename hidden::OperatorSelector<Derived, Rhs, Arrays::BINARYOPERATORNAME>::Result const \
 ExprBase<Derived>::OPERATORNAME( ExprBase<Rhs> const& other) const \
-{ return hidden::OperatorHelper<Derived, Rhs, Arrays::BINARYOPERATORNAME>::Selector::run(this->asDerived(), other.asDerived());}
+{ return hidden::OperatorSelector<Derived, Rhs, Arrays::BINARYOPERATORNAME>::Selector::run(this->asDerived(), other.asDerived());}
 
 
 namespace STK
 {
-IMPLEMENT_BINARY_OPERATOR(operator==,equalOp_)
-IMPLEMENT_BINARY_OPERATOR(operator!=,notEqualOp_)
-IMPLEMENT_BINARY_OPERATOR(operator>,greaterThanOp_)
-IMPLEMENT_BINARY_OPERATOR(operator<,lessThanOp_)
-IMPLEMENT_BINARY_OPERATOR(operator>=,greaterThanOrEqualOp_)
-IMPLEMENT_BINARY_OPERATOR(operator<=,lessThanOrEqualOp_)
+  IMPLEMENT_BINARY_OPERATOR(operator==,equalOp_)
+  IMPLEMENT_BINARY_OPERATOR(operator!=,notEqualOp_)
+  IMPLEMENT_BINARY_OPERATOR(operator>,greaterThanOp_)
+  IMPLEMENT_BINARY_OPERATOR(operator<,lessThanOp_)
+  IMPLEMENT_BINARY_OPERATOR(operator>=,greaterThanOrEqualOp_)
+  IMPLEMENT_BINARY_OPERATOR(operator<=,lessThanOrEqualOp_)
 
-IMPLEMENT_BINARY_OPERATOR(operator+,sumOp_)
-IMPLEMENT_BINARY_OPERATOR(operator-,differenceOp_)
-IMPLEMENT_BINARY_OPERATOR(prod,productOp_)
-IMPLEMENT_BINARY_OPERATOR(operator/,divisionOp_)
-IMPLEMENT_BINARY_OPERATOR(operator%,moduloOp_)
+  IMPLEMENT_BINARY_OPERATOR(operator+,sumOp_)
+  IMPLEMENT_BINARY_OPERATOR(operator-,differenceOp_)
+  IMPLEMENT_BINARY_OPERATOR(prod,productOp_)
+  IMPLEMENT_BINARY_OPERATOR(operator/,divisionOp_)
+  IMPLEMENT_BINARY_OPERATOR(operator%,moduloOp_)
 
-IMPLEMENT_BINARY_OPERATOR(min,minOp_)
-IMPLEMENT_BINARY_OPERATOR(max,maxOp_)
+  IMPLEMENT_BINARY_OPERATOR(min,minOp_)
+  IMPLEMENT_BINARY_OPERATOR(max,maxOp_)
 
-IMPLEMENT_BINARY_OPERATOR(operator&&,logicalAndOp_)
-IMPLEMENT_BINARY_OPERATOR(operator||,logicalOrOp_)
+  IMPLEMENT_BINARY_OPERATOR(operator&&,logicalAndOp_)
+  IMPLEMENT_BINARY_OPERATOR(operator||,logicalOrOp_)
 
-IMPLEMENT_BINARY_OPERATOR(operator&,bitwiseAndOp_)
-IMPLEMENT_BINARY_OPERATOR(operator|,bitwiseOrOp_)
-IMPLEMENT_BINARY_OPERATOR(operator^,bitwiseXorOp_)
-
+  IMPLEMENT_BINARY_OPERATOR(operator&,bitwiseAndOp_)
+  IMPLEMENT_BINARY_OPERATOR(operator|,bitwiseOrOp_)
+  IMPLEMENT_BINARY_OPERATOR(operator^,bitwiseXorOp_)
 } // namespace STK
 
 #undef IMPLEMENT_BINARY_OPERATOR

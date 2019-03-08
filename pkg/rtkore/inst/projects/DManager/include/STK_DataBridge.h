@@ -37,8 +37,6 @@
 
 #include "STK_IDataBridge.h"
 
-#include <Arrays/include/STK_ITContainer2D.h>
-
 namespace STK
 {
 

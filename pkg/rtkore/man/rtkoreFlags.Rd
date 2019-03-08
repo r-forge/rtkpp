@@ -8,7 +8,7 @@
 \usage{
 CxxFlags(cpp11 = FALSE)
 
-CppFlags()
+CppFlags(cpp11 = FALSE)
 
 LdFlags()
 }

@@ -35,7 +35,8 @@
 #ifndef STK_EXPRBASEFUNCTORS_H
 #define STK_EXPRBASEFUNCTORS_H
 
-#include "STK_ExprBase.h"
+#include "STK_CArrayPoint.h"
+#include "STK_CArrayVector.h"
 
 namespace STK
 {

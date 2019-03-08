@@ -45,6 +45,7 @@ namespace STK
 // forward declarations (needed because there is no CAllocator with this structure)
 template<typename> class Array2DUpperTriangular;
 template<typename> class Array2DLowerTriangular;
+template<typename Type, int SizeRows_, int SizeCols_, bool Orient_> class CAllocator;
 
 namespace hidden
 {

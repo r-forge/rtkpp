@@ -51,7 +51,7 @@
 #ifndef MERSENNETWISTER_H
 #define MERSENNETWISTER_H
 
-#include <iostream>
+//#include <iostream>
 #include <limits.h>
 #include <stdio.h>
 #include <time.h>

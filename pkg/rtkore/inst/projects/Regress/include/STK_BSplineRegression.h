@@ -36,7 +36,6 @@
 #ifndef STK_BSPLINEREGRESSION_H
 #define STK_BSPLINEREGRESSION_H
 
-#include "STK_Regress_Util.h"
 #include "STK_BSplineCoefficients.h"
 #include "STK_IRegression.h"
 

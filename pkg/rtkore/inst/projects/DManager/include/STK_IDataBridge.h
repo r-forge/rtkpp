@@ -36,7 +36,6 @@
 #define STK_DATABRIDGEBASE_H
 
 #include <vector>
-#include <string>
 
 namespace STK
 {

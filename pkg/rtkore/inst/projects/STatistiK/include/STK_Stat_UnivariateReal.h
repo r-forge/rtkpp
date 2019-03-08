@@ -392,8 +392,8 @@ class Univariate<TContainer1D, Real>
         }
         else
         {
-          min_ = std::min(V_[i], min_);    // update min_
-          max_ = std::max(V_[i], max_);    // update max_
+          min_ = std::min((Real)V_[i], min_);    // update min_
+          max_ = std::max((Real)V_[i], max_);    // update max_
         }
       }
       // all weights are 1/n.
@@ -651,8 +651,9 @@ class Univariate<TContainer1D, Real>
         if (!weighted_) heapSort(V_);
         else // otherwise we have to sort V_and W_ using indirection
         {
+          TContainer1D const& Vconst = V_;
           Array2DVector<int> I; // auxiliary Array for indirection
-          heapSort(I, V_);
+          heapSort(I, Vconst);
           applySort1D(V_, I);
           applySort1D(W_, I);
         }
@@ -674,8 +675,8 @@ class Univariate<TContainer1D, Real>
     int    nbMiss_;      ///< Number of missing samples
 
     // containers
-    Variable<Real> V_;   ///< local copy of the variable
-    Variable<Real> W_;   ///< local copy of the weights
+    TContainer1D V_;   ///< local copy of the variable
+    TContainer1D W_;   ///< local copy of the weights
 
     // Some flag about the internal state of the object
     bool weighted_;       ///< Samples are weighted ?

@@ -36,7 +36,7 @@
 #ifndef STK_ARITHMETIC_H
 #define STK_ARITHMETIC_H
 
-#include <climits>
+#include <limits>
 
 namespace STK
 {

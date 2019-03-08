@@ -36,7 +36,7 @@
 #ifndef STK_ILEASTSQUARE_H
 #define STK_ILEASTSQUARE_H
 
-#include <Sdk/include/STK_IRunner.h>
+#include <Sdk.h>
 #include "STK_Algebra_Util.h"
 
 namespace STK

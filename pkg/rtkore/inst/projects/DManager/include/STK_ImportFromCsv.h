@@ -36,9 +36,7 @@
 #ifndef STK_IMPORTFROMCSV_H
 #define STK_IMPORTFROMCSV_H
 
-#include <list>
-
-#include "Sdk/include/STK_IRunner.h"
+#include <Sdk.h>
 
 #include "STK_Import_Util.h"
 #include "STK_ReadWriteCsv.h"

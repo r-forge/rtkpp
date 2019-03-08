@@ -35,7 +35,7 @@
 #ifndef STK_STAT_TRANSFORM_H
 #define STK_STAT_TRANSFORM_H
 
-#include <STKernel/include/STK_Misc.h>
+//#include <STKernel.h>
 #include "STK_Stat_Functors.h"
 
 namespace STK

@@ -36,8 +36,8 @@
 #ifndef STK_EXPORTCSV_H
 #define STK_EXPORTCSV_H
 
-#include "STK_DataFrame.h"
 #include "STK_ReadWriteCsv.h"
+#include "STK_DataFrame.h"
 
 namespace STK
 {

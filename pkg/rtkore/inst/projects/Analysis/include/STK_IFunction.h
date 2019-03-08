@@ -35,8 +35,9 @@
 #ifndef STK_IFUNCTION_H
 #define STK_IFUNCTION_H
 
-#include "STKernel/include/STK_Real.h"
-#include "Sdk/include/STK_IRecursiveTemplate.h"
+#include "Sdk.h"
+
+#include <STKernel.h>
 
 namespace STK
 {

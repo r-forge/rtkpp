@@ -35,17 +35,17 @@
 #ifndef STK_PRODUCTOPERATORS_H
 #define STK_PRODUCTOPERATORS_H
 
-
-#include <Sdk/include/STK_StaticAssert.h>
-#include "../allocators/STK_CAllocator.h"
-#include "../operators/STK_BinaryImpl.h"
-#include "STK_ProductDispatcher.h"
+// forward declaration
+namespace STK
+{
+  template<class Derived> class ExprBase;
+  template<typename Type, int SizeRows_, int SizeCols_, bool Orient_> class CAllocator;
+}
 
 #define EGAL(arg1, arg2) ((arg1::structure_ == int(Arrays::arg2)))
 
 namespace STK
 {
-
 /** @ingroup Arrays
   * @class ArrayByDiagonalProduct
   * @brief Generic expression where a product operator is

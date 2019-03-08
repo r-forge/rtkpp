@@ -50,7 +50,7 @@ class SAllocator;
 namespace hidden
 {
 /** @ingroup hidden
- *  @brief Specialization of the Traits class for CAllocator.
+ *  @brief Specialization of the Traits class for SAllocator.
  */
 template< typename Type_, int SizeRows_, int SizeCols_, bool Orient_>
 struct Traits< SAllocator<Type_, SizeRows_, SizeCols_, Orient_> >

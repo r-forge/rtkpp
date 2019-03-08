@@ -36,7 +36,6 @@
 #define STK_LAW_FISHERSNEDECOR
 
 #include "STK_Law_IUnivLaw.h"
-#include <Sdk/include/STK_Macros.h>
 
 namespace STK
 {

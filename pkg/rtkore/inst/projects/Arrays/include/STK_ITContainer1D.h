@@ -37,14 +37,6 @@
 #define STK_ITCONTAINER1D_H
 
 
-#include <Arrays/include/iterators/STK_BiDirectionalIterator.h>
-#include <Arrays/include/iterators/STK_DenseRandomIterator.h>
-#include <Sdk/include/STK_IRecursiveTemplate.h>
-#include <Sdk/include/STK_Macros.h>
-#include "STK_ArraysTraits.h"
-#include "STK_Arrays_Util.h"
-
-
 namespace STK
 {
 /** @ingroup Arrays

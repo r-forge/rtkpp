@@ -41,12 +41,8 @@
 #ifndef STK_IARRAY2D_H
 #define STK_IARRAY2D_H
 
-#include "STK_IArrayBase.h"
-
-#include "STK_ArrayBaseApplier.h"
-#include "STK_ArrayBaseAssign.h"
-#include "STK_ArrayBaseInitializer.h"
-
+#include "STK_ArrayBase.h"
+#include "STK_IContainer2D.h"
 #include "STK_Array1D.h"
 
 namespace STK
@@ -79,7 +75,7 @@ namespace STK
  **/
 template < class Derived>
 class IArray2D: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, hidden::Traits<Derived>::sizeCols_>
-              , public IArrayBase<Derived>
+              , public ArrayBase<Derived>
 {
    // needed by merge
    template < class OtherDerived> friend class IArray2D;
@@ -117,7 +113,7 @@ class IArray2D: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, hidde
     /** Type for the Base Class. */
     typedef MemAllocator<PtrCol, sizeCols_> Allocator;
     /** type of the Base Container Class. */
-    typedef IArrayBase<Derived> Base;
+    typedef ArrayBase<Derived> Base;
 
     using Base::elt;
     using Base2D::setCols;
@@ -499,6 +495,11 @@ class IArray2D: protected IContainer2D<hidden::Traits<Derived>::sizeRows_, hidde
      *  @param v,I value and range of indexes
      **/
     void insert( Range const& I, Type const& v);
+    /**  STL compatibility:Delete n elements at the @c pos index from the container.
+     *  @param pos index where to delete elements
+     *  @param n number of elements to delete (default 1)
+     **/
+    void erase(int pos, int n=1);
 
      // Useful
      /** Swapping two columns.
@@ -902,6 +903,8 @@ void IArray2D< Derived>::mallocCols(ColRange const& J)
       int size= Arrays::evalSizeCapacity(J.size());
       allocator_.malloc(Range(J.begin(), size)); // allocate memory for the columns
     }
+    else
+    { allocator_.shift(J.begin());}
     rangeCols_.resize(J);
   }
   catch (Exception const& error)   // if an error occur

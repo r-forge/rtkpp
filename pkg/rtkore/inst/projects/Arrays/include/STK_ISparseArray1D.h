@@ -35,12 +35,7 @@
 #ifndef STK_ISPARSEARRAY1D_H
 #define STK_ISPARSEARRAY1D_H
 
-#include <vector>
-#include <string>
-
-#include "STK_ExprBase.h"
 #include "allocators/STK_MemSAllocator.h"
-#include "STK_ITContainer1D.h"
 
 
 namespace STK

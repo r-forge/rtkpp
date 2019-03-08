@@ -35,9 +35,7 @@
 #ifndef STK_STAT_ONLINE_H
 #define STK_STAT_ONLINE_H
 
-#include <STKernel/include/STK_Real.h>
-#include <STKernel/include/STK_Range.h>
-#include <Sdk/include/STK_StaticAssert.h>
+#include <STKernel.h>
 
 namespace STK
 {

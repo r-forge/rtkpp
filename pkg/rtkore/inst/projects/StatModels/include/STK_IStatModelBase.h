@@ -37,7 +37,7 @@
 #define STK_ISTATMODELBASE_H
 
 #include <cmath>
-#include <STKernel/include/STK_Real.h>
+#include <STKernel.h>
 
 namespace STK
 {

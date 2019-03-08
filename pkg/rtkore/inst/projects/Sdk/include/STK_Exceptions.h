@@ -36,12 +36,11 @@
 #define STK_EXCEPTIONS_H
 
 #include <exception>
-#include "STK_String.h"
 
 namespace STK
 {
-/** @ingroup Base
- *  @brief Base class for all library Exceptions.
+/** @ingroup Sdk
+ *  @brief Sdk class for all library Exceptions.
  *
  *  This is the base class for all Exceptions thrown by the standard
  *  library, and by certain language expressions.  You are free to derive
@@ -64,7 +63,7 @@ class Exception
 };
 
 
-/**  @ingroup Base
+/**  @ingroup Sdk
  *  Logic errors represent problems in the internal logic of a program;
  *  in theory, these are preventable, and even detectable before the
  *  program runs (e.g., violations of class invariants).
@@ -78,7 +77,7 @@ class logic_error: public Exception
     virtual ~logic_error() throw();
 };
 
-/** @ingroup Base
+/** @ingroup Sdk
  *  Thrown by the library, or by you, to report domain errors (domain in
  *  the mathematical sense).  */
 class domain_error: public logic_error
@@ -88,7 +87,7 @@ class domain_error: public logic_error
     virtual ~domain_error() throw();
 };
 
-/** @ingroup Base
+/** @ingroup Sdk
  *  Thrown to report invalid arguments to functions.  */
 class invalid_argument: public logic_error
 {
@@ -97,7 +96,7 @@ class invalid_argument: public logic_error
     virtual ~invalid_argument() throw();
 };
 
-/** @ingroup Base
+/** @ingroup Sdk
  *  Thrown when an object is constructed that would exceed its maximum
  *  permitted size (e.g., a basic_String instance).  */
 class length_error: public logic_error
@@ -107,7 +106,7 @@ class length_error: public logic_error
     virtual ~length_error() throw();
 };
 
-/** @ingroup Base
+/** @ingroup Sdk
  *  This represents an argument whose value is not within the expected
  *  range (e.g., boundary checks in basic_String).  */
 class out_of_range: public logic_error
@@ -117,7 +116,7 @@ class out_of_range: public logic_error
     virtual ~out_of_range() throw();
 };
 
-/** @ingroup Base
+/** @ingroup Sdk
  *  Runtime errors represent problems outside the scope of a program;
  *  they cannot be easily predicted and can generally only be caught as
  *  the program executes.
@@ -131,7 +130,7 @@ class runtime_error: public Exception
     virtual ~runtime_error() throw();
 };
 
-/** @ingroup Base
+/** @ingroup Sdk
  *  Thrown to indicate range errors in internal computations.  */
 class range_error: public runtime_error
 {

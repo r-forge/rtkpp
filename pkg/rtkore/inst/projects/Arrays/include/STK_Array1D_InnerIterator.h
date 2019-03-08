@@ -67,7 +67,7 @@ class Array1D<Type_, Size_>::InnerOperator: public InnerIteratorBase< Array1D<Ty
     using Base::col_;
 
     /** default constructor.
-     *  @param p_array pointer on the instance to iterate
+     *  @param array instance to iterate
      **/
     InnerOperator( Array1D <Type_, Size_>& array): Base(&array) {}
     /** copy constructor.

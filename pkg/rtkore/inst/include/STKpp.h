@@ -148,10 +148,10 @@
 //#include <omp.h>
 //#endif
 
-// STKernel project
-#include "STKernel.h"
 // Sdk project
 #include "Sdk.h"
+// STKernel project
+#include <STKernel.h>
 // Arrays project
 #include "Arrays.h"
 // Data Manager project

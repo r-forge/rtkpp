@@ -36,7 +36,6 @@
 
 #include "STK_Regress_Util.h"
 
-#include <Sdk/include/STK_IRunner.h>
 #include <Arrays/include/STK_Array2D.h>
 
 namespace STK

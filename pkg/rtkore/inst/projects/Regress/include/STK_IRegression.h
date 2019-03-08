@@ -36,7 +36,7 @@
 #ifndef STK_IREGRESSION_H
 #define STK_IREGRESSION_H
 
-#include <STKernel/include/STK_String.h>
+#include <STKernel.h>
 
 namespace STK
 {
@@ -55,7 +55,7 @@ namespace STK
  * to a function of <em>X</em> and <em>β</em>.
  * \f$ Y \approx f (\mathbf {X}, \boldsymbol{\beta} ) \f$
  *
- * The approximation is usually formalized as \f$ E(Y|X)=f(X,β) \f$. To carry out
+ * The approximation is usually formalized as \f$ E(Y|X)=f(X,\beta) \f$. To carry out
  * regression analysis, the form of the function <em>f</em> must be specified.
  * Sometimes the form of this function is based on knowledge about the relationship
  * between <em>Y</em> and <em>X</em> that does not rely on the data. If no such

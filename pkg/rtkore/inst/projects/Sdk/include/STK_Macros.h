@@ -38,8 +38,6 @@
 #ifndef STK_MACROS_H
 #define STK_MACROS_H
 
-#include <STKernel/include/STK_Exceptions.h>
-
 /** @ingroup Sdk
  * generate an Error message with no arguments. All Error message have the form :
  * "Error in classname::methodname()\nWhat: error message."

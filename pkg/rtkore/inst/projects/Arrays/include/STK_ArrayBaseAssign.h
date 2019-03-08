@@ -115,7 +115,7 @@ inline Derived&  ArrayBase<Derived>::operator+=( ExprBase<Rhs> const& rhs)
   enum { orient_     = hidden::Traits<Derived>::orient_
        , RStructure_ = hidden::Traits<Rhs>::structure_
        };
-  typedef typename hidden::OperatorHelper<Derived, Rhs, Arrays::sumOp_>::Result Res;
+  typedef typename hidden::OperatorSelector<Derived, Rhs, Arrays::sumOp_>::Result Res;
   hidden::CopycatSelector<Derived, Res, orient_>::run(this->asDerived(), this->asDerived() + rhs.asDerived());
   return this->asDerived();
 }
@@ -126,7 +126,7 @@ inline Derived&  ArrayBase<Derived>::operator-=( ExprBase<Rhs> const& rhs)
     enum { orient_     = hidden::Traits<Derived>::orient_
          , RStructure_ = hidden::Traits<Rhs>::structure_
          };
-  typedef typename hidden::OperatorHelper<Derived, Rhs, Arrays::differenceOp_>::Result Res;
+  typedef typename hidden::OperatorSelector<Derived, Rhs, Arrays::differenceOp_>::Result Res;
   hidden::CopycatSelector<Derived, Res, orient_>::run(this->asDerived(), this->asDerived() - rhs.asDerived());
   return this->asDerived();
 }
@@ -138,7 +138,7 @@ inline Derived&  ArrayBase<Derived>::operator/=( ExprBase<Rhs> const& rhs)
     enum { orient_     = hidden::Traits<Derived>::orient_
          , RStructure_ = hidden::Traits<Rhs>::structure_
          };
-  typedef typename hidden::OperatorHelper<Derived, Rhs, Arrays::divisionOp_>::Result Res;
+  typedef typename hidden::OperatorSelector<Derived, Rhs, Arrays::divisionOp_>::Result Res;
   hidden::CopycatSelector<Derived, Res, orient_>::run(this->asDerived(), this->asDerived() / rhs.asDerived());
   return this->asDerived();
 }
@@ -164,7 +164,7 @@ inline Derived&  ArrayBase<Derived>::operator%=( ExprBase<Rhs> const& rhs)
     enum { orient_     = hidden::Traits<Derived>::orient_
          , RStructure_ = hidden::Traits<Rhs>::structure_
          };
-  typedef typename hidden::OperatorHelper<Derived, Rhs, Arrays::moduloOp_>::Result Res;
+  typedef typename hidden::OperatorSelector<Derived, Rhs, Arrays::moduloOp_>::Result Res;
   hidden::CopycatSelector<Derived, Res, orient_>::run(this->asDerived(), this->asDerived() % rhs.asDerived());
   return this->asDerived();
 }

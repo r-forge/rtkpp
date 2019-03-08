@@ -33,12 +33,11 @@
  **/
 
 
-#ifndef RTKPPFORWARD_H
-#define RTKPPFORWARD_H
+#ifndef RCPP_RTKPPFORWARD_H
+#define RCPP_RTKPPFORWARD_H
 
 #include <RcppCommon.h>
-#include <Rmath.h>
-#include "STKpp.h"
+//#include <Rmath.h>
 
 /* forward declarations */
 namespace STK
@@ -46,6 +45,17 @@ namespace STK
 template <typename Type> class RVector;
 template <typename Type> class RMatrix;
 
+template<typename Derived> class ExprBase;
+
+template <typename Type> class Array2D;
+template <typename Type> class Array2DVector;
+template <typename Type> class Array2DPoint;
+
+template <typename Type, int SizeRows_, int SizeCols_, bool Orient_> class CArray;
+template <typename Type, int SizeRows_, bool Orient_> class CArrayVector;
+template <typename Type, int SizeCols_, bool Orient_> class CArrayPoint;
+
+template <typename Type, int Size_> class Array1D;
 } // namespace STK
 
 

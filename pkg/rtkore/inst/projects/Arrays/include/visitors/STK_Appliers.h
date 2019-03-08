@@ -35,11 +35,6 @@
 #ifndef STK_APPLIERS_H
 #define STK_APPLIERS_H
 
-#include <STatistiK/include/STK_Law_IUnivLaw.h>
-
-#include "STK_VisitorsImpl.h"
-#include "STK_VisitorSelector.h"
-
 
 namespace STK
 {

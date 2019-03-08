@@ -36,9 +36,6 @@
 #define STK_LAW_BINOMIAL_H
 
 #include "STK_Law_IUnivLaw.h"
-#include <Sdk/include/STK_Macros.h>
-#include <STKernel/include/STK_Integer.h>
-
 
 namespace STK
 {

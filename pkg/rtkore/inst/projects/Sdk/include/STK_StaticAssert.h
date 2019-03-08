@@ -37,8 +37,6 @@
 #ifndef STK_STATICASSERT_H
 #define STK_STATICASSERT_H
 
-#include "STK_MetaTemplate.h"
-
 #define STK_SINGLE_ARG2(A,B) A,B
 #define STK_SINGLE_ARG3(A,B,C) A,B,C
 #define STK_SINGLE_ARG4(A,B,C,D) A,B,C,D

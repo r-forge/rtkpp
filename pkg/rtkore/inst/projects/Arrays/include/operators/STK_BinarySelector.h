@@ -48,7 +48,7 @@ namespace hidden
  *  of the form expr + number and expr + other_expr
  **/
 template<typename Lhs, typename Rhs, int operatorType_>
-struct OperatorHelper;
+struct OperatorSelector;
 
 /** @ingroup hidden
  *  @brief allow to disambiguate the case expr + number from the case expr + other_expr */
@@ -82,7 +82,7 @@ struct OperatorImpl<Functor, Lhs, Rhs, false>
 /** @ingroup hidden
  *  @brief allow to disambiguate the case expr + number from the case expr + other_expr */
 template<typename Lhs, typename Rhs, typename UnaryFunctor, typename BinaryFunctor>
-struct OperatorSelector
+struct OperatorHelper
 {
   enum
   {
@@ -111,9 +111,9 @@ struct OperatorSelector
  *  @brief specialization for operator==
  **/
 template<typename Lhs, typename Rhs>
-struct OperatorHelper<Lhs, Rhs, Arrays::equalOp_>
+struct OperatorSelector<Lhs, Rhs, Arrays::equalOp_>
 {
-  typedef OperatorSelector< Lhs
+  typedef OperatorHelper< Lhs
                           , Rhs
                           , EqualWithOp<typename hidden::Traits<Lhs>::Type>
                           , EqualOp<typename hidden::Traits<Rhs>::Type, typename hidden::Traits<Rhs>::Type>
@@ -124,9 +124,9 @@ struct OperatorHelper<Lhs, Rhs, Arrays::equalOp_>
  *  @brief specialization for operator!=
  **/
 template<typename Lhs, typename Rhs>
-struct OperatorHelper<Lhs, Rhs, Arrays::notEqualOp_>
+struct OperatorSelector<Lhs, Rhs, Arrays::notEqualOp_>
 {
-  typedef OperatorSelector< Lhs
+  typedef OperatorHelper< Lhs
                           , Rhs
                           , NotEqualWithOp<typename hidden::Traits<Lhs>::Type>
                           , NotEqualOp<typename hidden::Traits<Rhs>::Type, typename hidden::Traits<Rhs>::Type>
@@ -137,9 +137,9 @@ struct OperatorHelper<Lhs, Rhs, Arrays::notEqualOp_>
  *  @brief specialization for operator>
  **/
 template<typename Lhs, typename Rhs>
-struct OperatorHelper<Lhs, Rhs, Arrays::greaterThanOp_>
+struct OperatorSelector<Lhs, Rhs, Arrays::greaterThanOp_>
 {
-  typedef OperatorSelector< Lhs
+  typedef OperatorHelper< Lhs
                           , Rhs
                           , GreaterThanOp<typename hidden::Traits<Lhs>::Type>
                           , GreaterOp<typename hidden::Traits<Rhs>::Type, typename hidden::Traits<Rhs>::Type>
@@ -150,9 +150,9 @@ struct OperatorHelper<Lhs, Rhs, Arrays::greaterThanOp_>
  *  @brief specialization for operator<
  **/
 template<typename Lhs, typename Rhs>
-struct OperatorHelper<Lhs, Rhs, Arrays::lessThanOp_>
+struct OperatorSelector<Lhs, Rhs, Arrays::lessThanOp_>
 {
-  typedef OperatorSelector< Lhs
+  typedef OperatorHelper< Lhs
                           , Rhs
                           , LessThanOp<typename hidden::Traits<Lhs>::Type>
                           , LessOp<typename hidden::Traits<Rhs>::Type, typename hidden::Traits<Rhs>::Type>
@@ -163,9 +163,9 @@ struct OperatorHelper<Lhs, Rhs, Arrays::lessThanOp_>
  *  @brief specialization for operator>=
  **/
 template<typename Lhs, typename Rhs>
-struct OperatorHelper<Lhs, Rhs, Arrays::greaterThanOrEqualOp_>
+struct OperatorSelector<Lhs, Rhs, Arrays::greaterThanOrEqualOp_>
 {
-  typedef OperatorSelector< Lhs
+  typedef OperatorHelper< Lhs
                           , Rhs
                           , GeqThanOp<typename hidden::Traits<Lhs>::Type>
                           , GeqOp<typename hidden::Traits<Rhs>::Type, typename hidden::Traits<Rhs>::Type>
@@ -176,9 +176,9 @@ struct OperatorHelper<Lhs, Rhs, Arrays::greaterThanOrEqualOp_>
  *  @brief specialization for operator<=
  **/
 template<typename Lhs, typename Rhs>
-struct OperatorHelper<Lhs, Rhs, Arrays::lessThanOrEqualOp_>
+struct OperatorSelector<Lhs, Rhs, Arrays::lessThanOrEqualOp_>
 {
-  typedef OperatorSelector< Lhs
+  typedef OperatorHelper< Lhs
                           , Rhs
                           , LeqThanOp<typename hidden::Traits<Lhs>::Type>
                           , LeqOp<typename hidden::Traits<Rhs>::Type, typename hidden::Traits<Rhs>::Type>
@@ -189,9 +189,9 @@ struct OperatorHelper<Lhs, Rhs, Arrays::lessThanOrEqualOp_>
  *  @brief specialization for operator+
  **/
 template<typename Lhs, typename Rhs>
-struct OperatorHelper<Lhs, Rhs, Arrays::sumOp_>
+struct OperatorSelector<Lhs, Rhs, Arrays::sumOp_>
 {
-  typedef OperatorSelector< Lhs
+  typedef OperatorHelper< Lhs
                           , Rhs
                           , SumWithOp<typename hidden::Traits<Lhs>::Type>
                           , SumOp<typename hidden::Traits<Rhs>::Type, typename hidden::Traits<Rhs>::Type>
@@ -202,9 +202,9 @@ struct OperatorHelper<Lhs, Rhs, Arrays::sumOp_>
  *  @brief specialization for operator-
  **/
 template<typename Lhs, typename Rhs>
-struct OperatorHelper<Lhs, Rhs, Arrays::differenceOp_>
+struct OperatorSelector<Lhs, Rhs, Arrays::differenceOp_>
 {
- typedef OperatorSelector< Lhs
+ typedef OperatorHelper< Lhs
                          , Rhs
                          , DifferenceWithOp<typename hidden::Traits<Lhs>::Type>
                          , DifferenceOp<typename hidden::Traits<Rhs>::Type, typename hidden::Traits<Rhs>::Type>
@@ -215,9 +215,9 @@ struct OperatorHelper<Lhs, Rhs, Arrays::differenceOp_>
  *  @brief specialization for operator*
  **/
 template<typename Lhs, typename Rhs>
-struct OperatorHelper<Lhs, Rhs, Arrays::productOp_>
+struct OperatorSelector<Lhs, Rhs, Arrays::productOp_>
 {
- typedef OperatorSelector< Lhs
+ typedef OperatorHelper< Lhs
                          , Rhs
                          , ProductWithOp<typename hidden::Traits<Lhs>::Type>
                          , ProductOp<typename hidden::Traits<Rhs>::Type, typename hidden::Traits<Rhs>::Type>
@@ -228,9 +228,9 @@ struct OperatorHelper<Lhs, Rhs, Arrays::productOp_>
  *  @brief specialization for operator/
  **/
 template<typename Lhs, typename Rhs>
-struct OperatorHelper<Lhs, Rhs, Arrays::divisionOp_>
+struct OperatorSelector<Lhs, Rhs, Arrays::divisionOp_>
 {
- typedef OperatorSelector< Lhs
+ typedef OperatorHelper< Lhs
                          , Rhs
                          , DivisionWithOp<typename hidden::Traits<Lhs>::Type>
                          , DivisionOp<typename hidden::Traits<Rhs>::Type, typename hidden::Traits<Rhs>::Type>
@@ -241,9 +241,9 @@ struct OperatorHelper<Lhs, Rhs, Arrays::divisionOp_>
  *  @brief specialization for operator%
  **/
 template<typename Lhs, typename Rhs>
-struct OperatorHelper<Lhs, Rhs, Arrays::moduloOp_>
+struct OperatorSelector<Lhs, Rhs, Arrays::moduloOp_>
 {
- typedef OperatorSelector< Lhs
+ typedef OperatorHelper< Lhs
                          , Rhs
                          , ModuloWithOp<typename hidden::Traits<Lhs>::Type>
                          , ModuloOp<typename hidden::Traits<Rhs>::Type, typename hidden::Traits<Rhs>::Type>
@@ -254,9 +254,9 @@ struct OperatorHelper<Lhs, Rhs, Arrays::moduloOp_>
  *  @brief specialization for operator min
  **/
 template<typename Lhs, typename Rhs>
-struct OperatorHelper<Lhs, Rhs, Arrays::minOp_>
+struct OperatorSelector<Lhs, Rhs, Arrays::minOp_>
 {
- typedef OperatorSelector< Lhs
+ typedef OperatorHelper< Lhs
                          , Rhs
                          , MinWithOp<typename hidden::Traits<Lhs>::Type>
                          , MinOp<typename hidden::Traits<Rhs>::Type, typename hidden::Traits<Rhs>::Type>
@@ -267,9 +267,9 @@ struct OperatorHelper<Lhs, Rhs, Arrays::minOp_>
  *  @brief specialization for operator max
  **/
 template<typename Lhs, typename Rhs>
-struct OperatorHelper<Lhs, Rhs, Arrays::maxOp_>
+struct OperatorSelector<Lhs, Rhs, Arrays::maxOp_>
 {
- typedef OperatorSelector< Lhs
+ typedef OperatorHelper< Lhs
                          , Rhs
                          , MaxWithOp<typename hidden::Traits<Lhs>::Type>
                          , MaxOp<typename hidden::Traits<Rhs>::Type, typename hidden::Traits<Rhs>::Type>
@@ -280,9 +280,9 @@ struct OperatorHelper<Lhs, Rhs, Arrays::maxOp_>
  *  @brief specialization for operator&&
  **/
 template<typename Lhs, typename Rhs>
-struct OperatorHelper<Lhs, Rhs, Arrays::logicalAndOp_>
+struct OperatorSelector<Lhs, Rhs, Arrays::logicalAndOp_>
 {
- typedef OperatorSelector< Lhs
+ typedef OperatorHelper< Lhs
                          , Rhs
                          , LogicalAndWithOp<typename hidden::Traits<Lhs>::Type>
                          , LogicalAndOp<typename hidden::Traits<Rhs>::Type, typename hidden::Traits<Rhs>::Type>
@@ -293,9 +293,9 @@ struct OperatorHelper<Lhs, Rhs, Arrays::logicalAndOp_>
  *  @brief specialization for operator||
  **/
 template<typename Lhs, typename Rhs>
-struct OperatorHelper<Lhs, Rhs, Arrays::logicalOrOp_>
+struct OperatorSelector<Lhs, Rhs, Arrays::logicalOrOp_>
 {
- typedef OperatorSelector< Lhs
+ typedef OperatorHelper< Lhs
                          , Rhs
                          , LogicalOrWithOp<typename hidden::Traits<Lhs>::Type>
                          , LogicalOrOp<typename hidden::Traits<Rhs>::Type, typename hidden::Traits<Rhs>::Type>
@@ -306,9 +306,9 @@ struct OperatorHelper<Lhs, Rhs, Arrays::logicalOrOp_>
  *  @brief specialization for operator&
  **/
 template<typename Lhs, typename Rhs>
-struct OperatorHelper<Lhs, Rhs, Arrays::bitwiseAndOp_>
+struct OperatorSelector<Lhs, Rhs, Arrays::bitwiseAndOp_>
 {
- typedef OperatorSelector< Lhs
+ typedef OperatorHelper< Lhs
                          , Rhs
                          , BitwiseAndWithOp<typename hidden::Traits<Lhs>::Type>
                          , BitwiseAndOp<typename hidden::Traits<Rhs>::Type, typename hidden::Traits<Rhs>::Type>
@@ -319,9 +319,9 @@ struct OperatorHelper<Lhs, Rhs, Arrays::bitwiseAndOp_>
  *  @brief specialization for operator|
  **/
 template<typename Lhs, typename Rhs>
-struct OperatorHelper<Lhs, Rhs, Arrays::bitwiseOrOp_>
+struct OperatorSelector<Lhs, Rhs, Arrays::bitwiseOrOp_>
 {
- typedef OperatorSelector< Lhs
+ typedef OperatorHelper< Lhs
                          , Rhs
                          , BitwiseOrWithOp<typename hidden::Traits<Lhs>::Type>
                          , BitwiseOrOp<typename hidden::Traits<Rhs>::Type, typename hidden::Traits<Rhs>::Type>
@@ -332,9 +332,9 @@ struct OperatorHelper<Lhs, Rhs, Arrays::bitwiseOrOp_>
  *  @brief specialization for operator^
  **/
 template<typename Lhs, typename Rhs>
-struct OperatorHelper<Lhs, Rhs, Arrays::bitwiseXorOp_>
+struct OperatorSelector<Lhs, Rhs, Arrays::bitwiseXorOp_>
 {
- typedef OperatorSelector< Lhs
+ typedef OperatorHelper< Lhs
                          , Rhs
                          , BitwiseXorWithOp<typename hidden::Traits<Lhs>::Type>
                          , BitwiseXorOp<typename hidden::Traits<Rhs>::Type, typename hidden::Traits<Rhs>::Type>

@@ -28,28 +28,26 @@
  * Author:   iovleff, S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
  **/
 
-/** @file STK_TransposeOperator.h
- *  @brief In this file we implement the TransposeOperator class.
+/** @file STK_TransposeAccessor.h
+ *  @brief In this file we implement the TransposeAccessor class.
  **/
 
-#ifndef STK_TRANSPOSEOPERATOR_H
-#define STK_TRANSPOSEOPERATOR_H
+#ifndef STK_TRANSPOSEACCESSOR_H
+#define STK_TRANSPOSEACCESSOR_H
 
 namespace STK
 {
 
-
 // forward declaration
-template< typename Array> class TransposeOperator;
+template< typename Array> class TransposeAccessor;
 
 namespace hidden
 {
-
 /** @ingroup hidden
  *  @brief Traits class for the transposed operator
  */
 template<typename Lhs>
-struct Traits< TransposeOperator <Lhs> >
+struct Traits< TransposeAccessor<Lhs> >
 {
   enum
   {
@@ -59,8 +57,8 @@ struct Traits< TransposeOperator <Lhs> >
     sizeCols_  = Lhs::sizeRows_,
     storage_   = Lhs::storage_
   };
-  typedef RowOperator<TransposeOperator < Lhs> > Row;
-  typedef ColOperator<TransposeOperator < Lhs> > Col;
+  typedef RowOperator<TransposeAccessor < Lhs> > Row;
+  typedef ColOperator<TransposeAccessor < Lhs> > Col;
   typedef typename Lhs::Type Type;
   typedef typename Lhs::TypeConst TypeConst;
 };
@@ -69,7 +67,7 @@ struct Traits< TransposeOperator <Lhs> >
 
 
 /** @ingroup Arrays
- *  @class TransposeOperator
+ *  @class TransposeAccessor
   *
   * \brief Generic expression when an expression is transposed
   *
@@ -80,13 +78,13 @@ struct Traits< TransposeOperator <Lhs> >
   * an expression. It is the return type of the transpose operation.
   *
   * Most of the time, this is the only way that it is used, so you typically
-  * don't have to name TransposeOperator type explicitly.
+  * don't have to name TransposeAccessor type explicitly.
   */
 template< typename Lhs>
-class TransposeOperator: public ExprBase< TransposeOperator<Lhs> >, public TRef<1>
+class TransposeAccessor: public ArrayBase< TransposeAccessor<Lhs> >, public TRef<1>
 {
   public:
-    typedef ExprBase< TransposeOperator<Lhs> > Base;
+    typedef ArrayBase< TransposeAccessor<Lhs> > Base;
     typedef typename hidden::Traits< TransposeOperator<Lhs> >::Type Type;
     typedef typename hidden::Traits< TransposeOperator<Lhs> >::TypeConst TypeConst;
 
@@ -103,7 +101,7 @@ class TransposeOperator: public ExprBase< TransposeOperator<Lhs> >, public TRef<
     /** Type of the Range for the columns */
     typedef TRange<sizeCols_> ColRange;
     /** Constructor */
-    inline TransposeOperator( Lhs const& lhs): Base(), lhs_(lhs) {}
+    inline TransposeAccessor( Lhs& lhs): Base(), lhs_(lhs) {}
 
     /**  @return the range of the rows */
     inline RowRange const& rowsImpl() const { return lhs_.cols();}
@@ -112,6 +110,7 @@ class TransposeOperator: public ExprBase< TransposeOperator<Lhs> >, public TRef<
 
     /** @return the left hand side expression */
     inline Lhs const& lhs() const { return lhs_; }
+
     /** @return the element (i,j) of the transposed expression.
      *  @param i, j index of the row and of the column
      **/
@@ -122,11 +121,21 @@ class TransposeOperator: public ExprBase< TransposeOperator<Lhs> >, public TRef<
     inline TypeConst elt1Impl(int i) const { return lhs_.elt(i);}
     /** access to the element of the transposed expression */
     inline TypeConst elt0Impl() const { return lhs_.elt();}
+    /** @return the element (i,j) of the transposed expression.
+     *  @param i, j index of the row and of the column
+     **/
+    inline Type& elt2Impl(int i, int j) { return lhs_.elt(j, i);}
+    /** @return the element ith element of the transposed expression
+     *  @param i index of the element to get
+     **/
+    inline Type& elt1Impl(int i) { return lhs_.elt(i);}
+    /** access to the element of the transposed expression */
+    inline Type& elt0Impl() { return lhs_.elt();}
 
   protected:
-    Lhs const& lhs_;
+    Lhs& lhs_;
 };
 
 } // namespace STK
 
-#endif /* STK_TRANSPOSEOPERATOR_H */
+#endif /* STK_TRANSPOSEACCESSOR_H */

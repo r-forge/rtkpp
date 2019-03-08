@@ -38,7 +38,7 @@
 
 #include <iterator>
 
-#include <Sdk/include/STK_IRecursiveTemplate.h>
+#include <Sdk.h>
 
 namespace STK
 {

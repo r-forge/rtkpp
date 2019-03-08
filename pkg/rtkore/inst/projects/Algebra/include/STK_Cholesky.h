@@ -36,7 +36,8 @@
 #ifndef STK_CHOLESKY_H
 #define STK_CHOLESKY_H
 
-#include <Sdk/include/STK_Macros.h>
+#include <Sdk.h>
+
 #include <Arrays/include/STK_Array2DDiagonal.h>
 #include <Arrays/include/STK_Array2DLowerTriangular.h>
 #include <Arrays/include/STK_CArraySquare.h>

@@ -37,7 +37,6 @@
 #define STK_REAL_H
 
 #include <map>
-#include "STK_String.h"
 
 #ifdef IS_RTKPP_LIB
 #include "Rtkpp/include/STK_RcppTraits.h"

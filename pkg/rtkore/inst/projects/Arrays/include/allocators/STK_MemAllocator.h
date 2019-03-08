@@ -37,11 +37,13 @@
 #define STK_MEMALLOCATOR_H
 
 #include <cstring>
-
+#include "../STK_IContainerRef.h"
+#include <Sdk/include/STK_Arithmetic.h>
+#include <Sdk/include/STK_IdTypeImpl.h>
+#include <STKernel/include/STK_String.h>
+#include <Sdk/include/STK_Exceptions.h>
 #include <STKernel/include/STK_Range.h>
 #include <Sdk/include/STK_Macros.h>
-#include <Sdk/include/STK_MetaTemplate.h>
-#include "../STK_IContainerRef.h"
 
 namespace STK
 {
@@ -355,10 +357,14 @@ struct MemAllocator: public IContainerRef
   template<int OtherSize_, int RangeSize_>
   void memcpy(int pos, MemAllocator<Type, OtherSize_> const& T, TRange<RangeSize_> const& range);
   /** function moving a part of the allocator.
-   *  @param pos,range position and range in form [begin,end) to move
+   *  @param pos,range range in form [begin,end) to move at position pos
    **/
   template< int RangeSize_>
   void memmove(int pos, TRange<RangeSize_> const& range);
+  /** function moving a part of the allocator.
+   *  @param pos,begin,size range in form [begin,begin+size) to move at position pos
+   **/
+  void memmove(int pos, int begin, int size);
 
   /** exchange this with T.
    *  @param T the container to exchange with T
@@ -666,9 +672,30 @@ void MemAllocator<Type,Size_>::memcpy(int pos, MemAllocator<Type, OtherSize_> co
 }
 
 template<typename Type, int Size_>
+void MemAllocator<Type,Size_>::memmove(int pos, int start, int size)
+{
+  if ((size <= 0)||(start == pos)) return;
+#ifdef STK_BOUNDS_CHECK
+  if (pos < begin())
+  { STKOUT_OF_RANGE_1ARG(MemAllocator::memmove,pos,MemAllocator::begin() > pos);}
+  if (pos >= end())
+  { STKOUT_OF_RANGE_1ARG(MemAllocator::memmove,pos,MemAllocator::end() <= pos);}
+  if (!range_.isContaining(Range(start,size)))
+  { STKOUT_OF_RANGE_1ARG(MemAllocator::memmove,range,range not in range_);}
+#endif
+  MemChooser::memmove( p_data_+pos, p_data_+ start, size);
+}
+
+template<typename Type, int Size_>
 template< int RangeSize_>
 void MemAllocator<Type,Size_>::memmove(int pos, TRange<RangeSize_> const& range)
 {
+#ifdef LARS_DEBUG
+  stk_cerr << _T("MemAllocator<Type,Size_>::memmove(") << pos << _T(",") << range << _T(")") <<std::endl;
+  stk_cerr << _T("begin()=") << begin() << _T("\n");
+  stk_cerr << _T("end()=") << end() << _T("\n");
+#endif
+
   if ((range.size() <= 0)||(range.begin() == pos)) return;
 #ifdef STK_BOUNDS_CHECK
   if (pos < begin())

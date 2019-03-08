@@ -32,15 +32,16 @@
 /** @file STK_TypeBase.h
  *  @brief In this file we include all the headers of the fundamental types used
  *  internally in the STK applications. You can add any type matching your need.
- * 
- *   Actually (the 20070216) the fundamental types defined are:
- * - Char (char)
+ *
+ *   Actually (the 20190228) the fundamental types defined are:
+ * - Char       (char)
  * - String     (std::string)
- * - Real      (double)
- * - int  (long)
- * - Binary    enum : {0, 1}
- * - Sign    enum : {-1, 1}
- * 
+ * - Real       (double)
+ * - int        (long)
+ * - Binary     enum {0, 1}
+ * - Sign       enum {-1, 1}
+ * - Range      (int begin; int size)
+ *
  *  If you add a type:
  *  -# Specialize the struct Arithmetic, otherwise
  *     the type will not have NA value defined.
@@ -54,12 +55,14 @@
 #ifndef STK_TYPEBASE_H
 #define STK_TYPEBASE_H
 
-#include "STK_String.h"
+#include <Sdk.h>
+#include "STK_Char.h"
 
+#include "STK_String.h"
 #include "STK_Integer.h"
 #include "STK_Real.h"
-
 #include "STK_Binary.h"
 #include "STK_Sign.h"
+#include "STK_Range.h"
 
 #endif /* STK_TYPEBASE_H */

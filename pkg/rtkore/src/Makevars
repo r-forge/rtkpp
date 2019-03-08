@@ -19,6 +19,8 @@
 #   Authors:    Serge IOVLEFF <serge_DOT_iov..._AT_stkpp_DOT_org>
 #-----------------------------------------------------------------------
 ## define PKG_CPPFLAGS (preprocessor & includes) and PKG_CXXFLAGS (compiler flags)
+CXX_STD = CXX11
+
 PKG_CPPFLAGS = -I../inst/projects/ -I../inst/include/ -DIS_RTKPP_LIB  -DSTKUSELAPACK
 PKG_CXXFLAGS = $(STK_FLAGS) $(SHLIB_OPENMP_CXXFLAGS)
 PKG_LIBS     = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(STKPP_LIB) $(SHLIB_OPENMP_CXXFLAGS)

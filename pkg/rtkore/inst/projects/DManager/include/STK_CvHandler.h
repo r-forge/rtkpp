@@ -37,9 +37,10 @@
 #ifndef STK_CVHANDLER_H
 #define STK_CVHANDLER_H
 
+#include <Sdk.h>
+
 #include <Arrays/include/STK_CArrayVector.h>
 #include <STatistiK/include/STK_Law_UniformDiscrete.h>
-#include <Sdk/include/STK_IRunner.h>
 
 namespace STK
 {

@@ -36,7 +36,6 @@
 #define STK_SARRAY1D_H
 
 #include "allocators/STK_MemSAllocator1D.h"
-#include "STK_IArray1D.h"
 
 namespace STK
 {
@@ -164,11 +163,6 @@ class SArray1D: public IArray1D< SArray1D<Type_, Size_, NzMax_> >
     template<int OtherSize_, int OtherNzMax_>
     SArray1D( SArray1D<Type, OtherSize_, OtherNzMax_> const& T, RowRange const& I, bool ref = true)
             : Base(T, I, ref) {}
-    /** Copy an other type of array/expression in an SArray1D.
-     *  @param T the array/expression to copy
-     **/
-    template<class OtherArray>
-    SArray1D( ExprBase<OtherArray> const& T): Base(T.asDerived()) {}
     /** Wrapper constructor: the container is a reference of a C-Array.
      *  @param q, I pointer and range of data
      **/
@@ -188,18 +182,6 @@ class SArray1D: public IArray1D< SArray1D<Type_, Size_, NzMax_> >
     {
       // check size
       if (range() != T.range()) { resize(T.range());}
-      for (int i=begin(); i<end(); i++)
-      { allocator().setValue(i, T.elt(i));}
-      return *this;
-    }
-    /** Copy an other type of array/expression in an SArray1D.
-     *  @param T the array/expression to copy
-     **/
-    template<class OtherArray>
-    SArray1D& operator=(ExprBase<OtherArray> const& T)
-    {
-      // check size
-      if (range()!=T.range()) resize(T.range());
       for (int i=begin(); i<end(); i++)
       { allocator().setValue(i, T.elt(i));}
       return *this;

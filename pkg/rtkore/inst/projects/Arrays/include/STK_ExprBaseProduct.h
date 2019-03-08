@@ -36,8 +36,6 @@
 #ifndef STK_EXPRBASEPRODUCT_H
 #define STK_EXPRBASEPRODUCT_H
 
-#include "Sdk/include/STK_StaticAssert.h"
-
 namespace STK
 {
 

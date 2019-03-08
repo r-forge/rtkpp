@@ -37,10 +37,7 @@
 #define STK_DATAHANDLERBASE_H
 
 #include <map>
-#include <string>
-
-#include <STKernel/include/STK_Stream.h>
-#include <Sdk/include/STK_IRecursiveTemplate.h>
+#include <Sdk.h>
 
 namespace STK
 {

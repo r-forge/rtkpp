@@ -690,12 +690,6 @@ template<typename Type, int Size_>
 template< int RangeSize_>
 void MemAllocator<Type,Size_>::memmove(int pos, TRange<RangeSize_> const& range)
 {
-#ifdef LARS_DEBUG
-  stk_cerr << _T("MemAllocator<Type,Size_>::memmove(") << pos << _T(",") << range << _T(")") <<std::endl;
-  stk_cerr << _T("begin()=") << begin() << _T("\n");
-  stk_cerr << _T("end()=") << end() << _T("\n");
-#endif
-
   if ((range.size() <= 0)||(range.begin() == pos)) return;
 #ifdef STK_BOUNDS_CHECK
   if (pos < begin())

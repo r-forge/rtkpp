@@ -467,9 +467,6 @@ template < class  Derived  >
 template < class  Derived  >
  void IArray2D< Derived>::eraseCols(int pos, int n)
  {
-#ifdef LARS_DEBUG
-  stk_cerr << _T("Entering IArray2D< Derived>::eraseCols(") << pos << _T(",") << n << _T(")") <<std::endl;
-#endif
    if (n<=0) return;
    if (isRef())
    { STKRUNTIME_ERROR_2ARG(IArray2D::eraseCols,pos,n,cannot operate on reference);}
@@ -481,35 +478,14 @@ template < class  Derived  >
    if (endCols() < pos+n)
    { STKOUT_OF_RANGE_2ARG(IArray2D::eraseCols,pos,n,endCols() < pos+n);}
 #endif
-#ifdef LARS_DEBUG
-  stk_cerr << _T("IArray2D< Derived>::eraseCols(") << pos << _T(",") << n << _T(")") <<std::endl;
-  stk_cerr << _T("Check done\n");
-#endif
    // delete each col
    freeCols(Range(pos, n));
-#ifdef LARS_DEBUG
-  stk_cerr << _T("IArray2D< Derived>::eraseCols(") << pos << _T(",") << n << _T(")") <<std::endl;
-  stk_cerr << _T("freeCols done\n");
-#endif
    // update cols_, rangeCols_
    this->decLastIdxCols(n);
    rangeCols_.erase(pos, n);
-#ifdef LARS_DEBUG
-  stk_cerr << _T("IArray2D< Derived>::eraseCols(") << pos << _T(",") << n << _T(")") <<std::endl;
-  stk_cerr << _T("rangeCols_.erase(pos, n) done\n");
-  stk_cerr << _T("allocator_.memmove(pos, Range(pos+n, endCols()-pos))\n");
-  stk_cerr << _T("allocator_.memmove(") << pos << _T(",") << Range(pos+n, endCols()-pos) << _T(")\n");
-#endif
    allocator_.memmove(pos, Range(pos+n, endCols()-pos));
-#ifdef LARS_DEBUG
-  stk_cerr << _T("IArray2D< Derived>::eraseCols(") << pos << _T(",") << n << _T(")") <<std::endl;
-  stk_cerr << _T("allocator_.memmove(pos, Range(pos+n, endCols()-pos+1)) done\n");
-#endif
    // liberate memory if there is no more columns (don't use clear(), as we want to preserve rows_)
    if (sizeCols() == 0) { freeMem();}
-#ifdef LARS_DEBUG
-  stk_cerr << _T("IArray2D< Derived>::eraseCols(") << pos << _T(",") << n << _T(") done") <<std::endl;
-#endif
  }
 
  // rows

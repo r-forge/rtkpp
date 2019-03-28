@@ -672,7 +672,7 @@ class ArrayByArrayProduct: public ExprBase< ArrayByArrayProduct<Lhs, Rhs> >, pub
       sizeCols_      = hidden::Traits< ArrayByArrayProduct >::sizeCols_,
       storage_       = hidden::Traits< ArrayByArrayProduct >::storage_,
       useForRows_    = hidden::Traits< ArrayByArrayProduct >::useForRows_,
-      useForCols_    = hidden::Traits< ArrayByArrayProduct >::useForCols_,
+      useForCols_    = hidden::Traits< ArrayByArrayProduct >::useForCols_
     };
 
     typedef ExprBase< ArrayByArrayProduct<Lhs, Rhs> > Base;

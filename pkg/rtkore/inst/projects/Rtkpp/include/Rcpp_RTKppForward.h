@@ -48,10 +48,12 @@ template <typename Type> class RMatrix;
 template<typename Derived> class ExprBase;
 
 template <typename Type> class Array2D;
+template <typename Type> class Array2DSquare;
 template <typename Type> class Array2DVector;
 template <typename Type> class Array2DPoint;
 
 template <typename Type, int SizeRows_, int SizeCols_, bool Orient_> class CArray;
+template <typename Type, int Size_, bool Orient_> class CArraySquare;
 template <typename Type, int SizeRows_, bool Orient_> class CArrayVector;
 template <typename Type, int SizeCols_, bool Orient_> class CArrayPoint;
 
@@ -75,6 +77,8 @@ namespace Rcpp
 
   template<typename Type>
   SEXP wrap( STK::Array2D<Type> const& matrix);
+  template<typename Type>
+  SEXP wrap( STK::Array2DSquare<Type> const& matrix);
   template<typename Type>
   SEXP wrap( STK::Array2DVector<Type> const& vec);
   template<typename Type>

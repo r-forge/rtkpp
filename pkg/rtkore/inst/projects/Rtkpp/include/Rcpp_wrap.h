@@ -57,6 +57,23 @@ namespace Rcpp
   }
   /* support for wrap */
   template<typename Type>
+  SEXP wrap( STK::Array2DSquare<Type> const& matrix)
+  {
+    enum
+    {
+      Rtype_ = STK::hidden::RcppTraits<Type>::Rtype_
+    };
+
+    Matrix<Rtype_> res(matrix.sizeRows(), matrix.sizeCols());
+    for(int j=matrix.begin(), jRes=0; j< matrix.end(); j++, jRes++)
+    {
+      for(int i=matrix.begin(), iRes=0; i< matrix.end(); i++, iRes++)
+      { res(iRes, jRes) = matrix.elt(i,j);}
+    }
+    return Rcpp::wrap(res);
+  }
+  /* support for wrap */
+  template<typename Type>
   SEXP wrap( STK::Array2DVector<Type> const& vec)
   {
     enum

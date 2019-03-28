@@ -352,7 +352,7 @@ class ICArray: public ArrayBase<Derived>
     inline typename hidden::CSliceDispatcher<Derived, Size>::Result operator[](TRange<Size> const& I) const
     {
       STK_STATIC_ASSERT_ONE_DIMENSION_ONLY(Derived);
-      return this->sub(I);
+      return sub(I);
     }
     /** implement the sub operator for 2D arrays using references on a range of rows and columns
      *  of the allocator

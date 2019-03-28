@@ -1,7 +1,7 @@
 Package: rtkore
 Type: Package
 Title: 'STK++' Core Library Integration to 'R' using 'Rcpp'
-Version: 1.6.5
+Version: 1.6.6
 Encoding: UTF-8
 Date: 2019-03-09
 Authors@R: c( person("Serge", "Iovleff", role=c("aut","cre"), email="serge.iovleff@stkpp.org")
@@ -30,7 +30,6 @@ URL: http://www.stkpp.org
 NeedsCompilation: yes
 SystemRequirements: GNU make
 Collate:
-    'rtkore.R'
     'rtkoreFlags.R'
     'inlineCxxPlugin.R'
 RoxygenNote: 6.1.1

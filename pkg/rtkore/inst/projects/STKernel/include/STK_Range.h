@@ -42,12 +42,10 @@
  *  @brief base index of the containers created in STK++.
  *  This value means that the default range for a vector or the rows/columns of
  *  a matrix is the value given by this constant. **/
-#ifndef IS_RTKPP_LIB
 #if defined(STKBASEARRAYS)
 const int firstIdx_ = STKBASEARRAYS;
 #else
 const int firstIdx_ = 0; // default is 0 based array
-#endif
 #endif
 
 
@@ -248,43 +246,6 @@ class TRange: public RangeBase< TRange<Size_> >
     inline TRange& decLast(int dec =1){ return *this;}
 };
 
-/** @ingroup Arithmetic
- *  @brief Partial Specialization for TRange.
- *  NA (not available) numbers is part of the TRange.
- */
-template<int Size_>
-struct Arithmetic< TRange<Size_> >: public std::numeric_limits< TRange<Size_> >
-{
-  /** Adding a Non Available (NA) special number. */
-  static inline  TRange<Size_> NA() throw()
-  { return TRange<Size_>(std::numeric_limits<int>::min(), std::numeric_limits<int>::min(), 0);}
-  /** True if the type has a representation for a "Not Available". */
-  static const bool hasNA = true;
-  /** Test if x is a Non Available (NA) special number
-   *  @param x the Binary number to test.
-   **/
-  static inline bool isNA(TRange<Size_> const& x) throw()
-  { return (x.begin() == std::numeric_limits<int>::min());}
-  /** test if x is  infinite.
-   *  @param x the Binary number to test.
-   **/
-  static inline bool isInfinite(TRange<Size_> const& x) throw() { return false; }
-  /** test if x is  finite.
-   *  @param x the Binary number to test.
-   **/
-  static inline bool isFinite(TRange<Size_> const& x) throw() { return (!isNA(x) && !isInfinite(x));}
-};
-
-/** @ingroup RTTI
- *  @brief Partial Specialization of the IdTypeImpl for the Type TRange.
- **/
-template<int Size_>
-struct IdTypeImpl< TRange<Size_> >
-{
-  /** @return the IdType of the type TRange. */
-  static inline Base::IdType returnType() { return(Base::range_);}
-};
-
 /** @ingroup STKernel
  *  @brief Index sub-vector region: Specialization when the size is unknown.
  *
@@ -422,40 +383,80 @@ class TRange<UnknownSize>: public RangeBase< TRange<UnknownSize> >
      *  @param I the range to set
      *  @return is stream
      **/
-    friend inline istream& operator>> (istream& is, Range& I)
-    {
-      String str;
-      std::getline(is, str, _T(':'));
-      // get first number
-      if (!stringToType(I.begin_, str))
-      {
-        I = Arithmetic<Range>::NA();
-        is.clear(); is.setstate(std::ios::failbit);
-        return is;
-      }
-      // check if the istream is exhausted
-      if (is.eof())
-      {
-        I.size_ = 1;
-        return is;
-      }
-      // skip the current char ":"
-      is.peek();
-      // get second number
-      if ((is >> I.size_).fail())
-      {
-        I = Arithmetic<Range>::NA();
-        is.clear(); is.setstate(std::ios::failbit);
-        return is;
-      }
-      else { I.size_ -= I.begin_ ;}
-      return is;
-    }
+    friend istream& operator>> (istream& is, Range& I);
 
   private:
     int size_;     ///< theoretic Dimension size_ = end_- begin_
 
 };
+
+/** @ingroup Arithmetic
+ *  @brief Partial Specialization for TRange.
+ *  NA (not available) numbers is part of the TRange.
+ */
+template<int Size_>
+struct Arithmetic< TRange<Size_> >: public std::numeric_limits< TRange<Size_> >
+{
+  /** Adding a Non Available (NA) special number. */
+  static inline  TRange<Size_> NA() throw()
+  { return TRange<Size_>(std::numeric_limits<int>::min(), std::numeric_limits<int>::min(), 0);}
+  /** True if the type has a representation for a "Not Available". */
+  static const bool hasNA = true;
+  /** Test if x is a Non Available (NA) special number
+   *  @param x the Binary number to test.
+   **/
+  static inline bool isNA(TRange<Size_> const& x) throw()
+  { return (x.begin() == std::numeric_limits<int>::min());}
+  /** test if x is  infinite.
+   *  @param x the Binary number to test.
+   **/
+  static inline bool isInfinite(TRange<Size_> const& x) throw() { return false; }
+  /** test if x is  finite.
+   *  @param x the Binary number to test.
+   **/
+  static inline bool isFinite(TRange<Size_> const& x) throw() { return (!isNA(x) && !isInfinite(x));}
+};
+
+/** @ingroup RTTI
+ *  @brief Partial Specialization of the IdTypeImpl for the Type TRange.
+ **/
+template<int Size_>
+struct IdTypeImpl< TRange<Size_> >
+{
+  /** @return the IdType of the type TRange. */
+  static inline Base::IdType returnType() { return(Base::range_);}
+};
+
+
+inline istream& operator>> (istream& is, Range& I)
+{
+  String str;
+  std::getline(is, str, _T(':'));
+  // get first number
+  if (!stringToType(I.begin_, str))
+  {
+    I = Arithmetic<Range>::NA();
+    is.clear(); is.setstate(std::ios::failbit);
+    return is;
+  }
+  // check if the istream is exhausted
+  if (is.eof())
+  {
+    I.size_ = 1;
+    return is;
+  }
+  // skip the current char ":"
+  is.peek();
+  // get second number
+  if ((is >> I.size_).fail())
+  {
+    I = Arithmetic<Range>::NA();
+    is.clear(); is.setstate(std::ios::failbit);
+    return is;
+  }
+  else { I.size_ -= I.begin_ ;}
+  return is;
+}
 
 /** @ingroup STKernel
  *  @brief compute sup(I,J).

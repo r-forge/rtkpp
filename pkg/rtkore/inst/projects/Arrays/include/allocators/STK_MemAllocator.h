@@ -681,7 +681,7 @@ void MemAllocator<Type,Size_>::memmove(int pos, int start, int size)
   if (pos >= end())
   { STKOUT_OF_RANGE_1ARG(MemAllocator::memmove,pos,MemAllocator::end() <= pos);}
   if (!range_.isContaining(Range(start,size)))
-  { STKOUT_OF_RANGE_1ARG(MemAllocator::memmove,range,range not in range_);}
+  { STKOUT_OF_RANGE_2ARG(MemAllocator::memmove,start,size,Range(start,size) not in range_);}
 #endif
   MemChooser::memmove( p_data_+pos, p_data_+ start, size);
 }

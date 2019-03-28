@@ -57,12 +57,10 @@ namespace STK
  *  @brief base index of the containers created in STK++.
  *  This value means that the default range for a vector or the rows/columns of
  *  a matrix is the value given by this constant. **/
-#ifndef IS_RTKPP_LIB
 #if defined(STKBASEARRAYS)
 const int baseIdx = STKBASEARRAYS;
 #else
 const int baseIdx = 0; // default is 0 based array
-#endif
 #endif
 
 /** @ingroup Sdk

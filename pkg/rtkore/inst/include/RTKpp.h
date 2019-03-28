@@ -36,14 +36,6 @@
 #ifndef RTKPP_H
 #define RTKPP_H
 
-#if defined(STKBASEARRAYS)
-const int baseIdx = STKBASEARRAYS;
-const int firstIdx_ = STKBASEARRAYS;
-#else
-const int baseIdx = 0; // default is 0 based array
-const int firstIdx_ = 0;
-#endif
-
 #include <Rtkpp/include/Rcpp_RTKppForward.h>
 #include <Rtkpp/include/STK_RcppTraits.h>
 #include <STKpp.h>

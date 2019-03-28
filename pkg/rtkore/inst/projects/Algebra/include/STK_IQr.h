@@ -35,7 +35,8 @@
 #ifndef STK_IQR_H
 #define STK_IQR_H
 
-#include <Sdk.h>
+#include <STKernel/include/STK_Real.h>
+#include <Sdk/include/STK_IRunner.h>
 
 #include <Arrays/include/STK_Array2DVector.h>
 #include <Arrays/include/STK_Array2DUpperTriangular.h>
@@ -299,7 +300,7 @@ void IQr<Derived>::eraseCol(int pos)
   if (pos < R_.beginCols())
   { STKOUT_OF_RANGE_1ARG(Qr::eraseCol,pos,pos<R_.beginCols());}
   if (R_.lastIdxCols() < pos)
-  { STKOUT_OF_RANGE_1ARG(Qr::eraseCol,pos,R_.lastIdxCols()<pos);}
+  { STKOUT_OF_RANGE_1ARG(Qr::eraseCol,pos,pos<R_.lastIdxCols()<pos);}
   // if Q_ is not computed yet
   if (!compq_) compQ();
   // compute the number of iteration for updating to zeroed
@@ -312,8 +313,7 @@ void IQr<Derived>::eraseCol(int pos)
     R_(iter-1, iter) = compGivens( R_(iter-1, iter), R_(iter, iter), cosinus, sinus);
     R_(iter, iter)   = 0.0;
     // if necessary update R_ and Q_
-    //    if (sinus)
-    if (sinus && (iter<R_.lastIdxCols()))
+    if (sinus)
     {
       // create a reference on the sub-ArrayXX
       ArrayUpperTriangularXX Rsub(R_.col( _R(iter+1, R_.lastIdxCols()) ), true);
@@ -326,7 +326,7 @@ void IQr<Derived>::eraseCol(int pos)
   // erase the column pos
   R_.eraseCols(pos);
   // update the range of the remaining cols of the container
-  R_.update( _R(pos, std::min(R_.lastIdxRows(), R_.lastIdxCols())));
+  R_.update( Range(pos, std::min(R_.lastIdxRows(), R_.lastIdxCols()), 0));
 }
 
 /* Adding the last column and update the QR decomposition. */

@@ -32,7 +32,7 @@
  *  @brief In this file we implement the XemStrategy class
  **/
 
-#include <STKernel/include/STK_Exceptions.h>
+#include <Sdk.h>
 
 #include "../include/MixtureStrategy/STK_XemStrategy.h"
 #include "../include/MixtureInit/STK_MixtureInit.h"

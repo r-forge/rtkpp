@@ -36,8 +36,10 @@
 #ifndef STK_GAMMAMIXTUREMANAGER_H
 #define STK_GAMMAMIXTUREMANAGER_H
 
-#include "../GammaModels/STK_GammaBridge.h"
 #include "../STK_IMixtureManager.h"
+#include "../STK_Clust_Util.h"
+
+#include "STK_GammaBridge.h"
 
 #define STK_CREATE_MIXTURE(Data, Bridge) \
           Data* p_data = new Data(idData); \
@@ -47,6 +49,38 @@
 
 namespace STK
 {
+
+// forward declaration
+template<class DataHandler> class GammaMixtureManager;
+
+namespace hidden
+{
+/** @ingroup hidden
+ *  Specialization for GammaMixtureManager */
+template <class DataHandler_>
+struct MixtureManagerTraits< GammaMixtureManager<DataHandler_> >
+{
+  /** type of data */
+  typedef DataHandler_ DataHandler;
+  /** type of data */
+  typedef Real Type;
+  /** Type of the array storing missing values indexes */
+  typedef std::vector< std::pair<int,int> > MissingIndexes;
+  /** Type of the array storing missing values */
+  typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
+
+  // All data handlers will store and return a specific container for
+  // the data they handle. The DataHandlerTraits class allow us to know the
+  // type of these containers when data is of type Type.
+  /** */
+  /** type of the data set */
+  typedef typename DataHandlerTraits<DataHandler, Type>::Data Data;
+  // Classes wrapping the Real and Integer containers
+  /** class wrapping the data set */
+  typedef DataBridge<Data>  DataBridgeType;
+};
+
+}
 /** @ingroup Clustering
  *  @brief A mixture manager is a factory class for injection dependency in the
  *  STK++ derived class of the MixtureComposer class.
@@ -57,45 +91,44 @@ namespace STK
  *  @tparam DataHandler is any concrete class from the interface DataHandlerBase
  */
 template<class DataHandler>
-class GammaMixtureManager: public IMixtureManager<DataHandler>
+class GammaMixtureManager: public IMixtureManager<GammaMixtureManager<DataHandler> >
 {
   public:
-    typedef IMixtureManager<DataHandler> Base;
+    typedef typename hidden::MixtureManagerTraits< GammaMixtureManager >::Type Type;
+    typedef typename hidden::MixtureManagerTraits< GammaMixtureManager >::MissingIndexes MissingIndexes;
+    typedef typename hidden::MixtureManagerTraits< GammaMixtureManager >::MissingValues MissingValues;
+    typedef typename hidden::MixtureManagerTraits< GammaMixtureManager >::Data Data;
+    typedef typename hidden::MixtureManagerTraits< GammaMixtureManager >::DataBridgeType DataBridgeType;
+
+    typedef IMixtureManager<GammaMixtureManager> Base;
     using Base::registerDataBridge;
     using Base::getDataBridge;
     using Base::getIdModel;
     using Base::p_handler;
 
-    // All data handlers will store and return a specific container for
-    // the data they handle. The DataHandlerTraits class allow us to know the
-    // type of these containers when data is Real and Integer.
-    typedef typename hidden::DataHandlerTraits<DataHandler, Real>::Data DataReal;
-    // Classes wrapping the Real and Integer containers
-    typedef DataBridge<DataReal> DataBridgeReal;
-
     // All Gamma bridges
-    typedef GammaBridge<Clust::Gamma_ajk_bjk_, DataReal> MixtureBridge_ajk_bjk;
-    typedef GammaBridge<Clust::Gamma_ajk_bk_,  DataReal> MixtureBridge_ajk_bk;
-    typedef GammaBridge<Clust::Gamma_ajk_bj_,  DataReal> MixtureBridge_ajk_bj;
-    typedef GammaBridge<Clust::Gamma_ajk_b_,   DataReal> MixtureBridge_ajk_b;
-    typedef GammaBridge<Clust::Gamma_ak_bjk_,  DataReal> MixtureBridge_ak_bjk;
-    typedef GammaBridge<Clust::Gamma_ak_bk_,   DataReal> MixtureBridge_ak_bk;
-    typedef GammaBridge<Clust::Gamma_ak_bj_,   DataReal> MixtureBridge_ak_bj;
-    typedef GammaBridge<Clust::Gamma_ak_b_,    DataReal> MixtureBridge_ak_b;
-    typedef GammaBridge<Clust::Gamma_aj_bjk_,  DataReal> MixtureBridge_aj_bjk;
-    typedef GammaBridge<Clust::Gamma_aj_bk_,   DataReal> MixtureBridge_aj_bk;
-    typedef GammaBridge<Clust::Gamma_a_bjk_,   DataReal> MixtureBridge_a_bjk;
-    typedef GammaBridge<Clust::Gamma_a_bk_,    DataReal> MixtureBridge_a_bk;
+    typedef GammaBridge<Clust::Gamma_ajk_bjk_, Data> MixtureBridge_ajk_bjk;
+    typedef GammaBridge<Clust::Gamma_ajk_bk_,  Data> MixtureBridge_ajk_bk;
+    typedef GammaBridge<Clust::Gamma_ajk_bj_,  Data> MixtureBridge_ajk_bj;
+    typedef GammaBridge<Clust::Gamma_ajk_b_,   Data> MixtureBridge_ajk_b;
+    typedef GammaBridge<Clust::Gamma_ak_bjk_,  Data> MixtureBridge_ak_bjk;
+    typedef GammaBridge<Clust::Gamma_ak_bk_,   Data> MixtureBridge_ak_bk;
+    typedef GammaBridge<Clust::Gamma_ak_bj_,   Data> MixtureBridge_ak_bj;
+    typedef GammaBridge<Clust::Gamma_ak_b_,    Data> MixtureBridge_ak_b;
+    typedef GammaBridge<Clust::Gamma_aj_bjk_,  Data> MixtureBridge_aj_bjk;
+    typedef GammaBridge<Clust::Gamma_aj_bk_,   Data> MixtureBridge_aj_bk;
+    typedef GammaBridge<Clust::Gamma_a_bjk_,   Data> MixtureBridge_a_bjk;
+    typedef GammaBridge<Clust::Gamma_a_bk_,    Data> MixtureBridge_a_bk;
 
     /** Default constructor, need an instance of a DataHandler.  */
     GammaMixtureManager(DataHandler const& handler): Base(&handler) {}
     /** destructor */
-    virtual ~GammaMixtureManager() {}
+    ~GammaMixtureManager() {}
     /** get the parameters from an IMixture.
      *  @param p_mixture pointer on the mixture
      *  @param param the array to return with the parameters
      **/
-    void getParameters(IMixture* p_mixture, ArrayXX& param) const
+    void getParametersImpl(IMixture* p_mixture, ArrayXX& param) const
     {
       Clust::Mixture idModel = getIdModel(p_mixture->idData());
       if (idModel == Clust::unknown_mixture_) return;
@@ -147,7 +180,7 @@ class GammaMixtureManager: public IMixtureManager<DataHandler>
      *  @param p_mixture pointer on the mixture
      *  @param param the array with the parameters to set
      **/
-    virtual void setParameters(IMixture* p_mixture, ArrayXX const& param) const
+    void setParametersImpl(IMixture* p_mixture, ArrayXX const& param) const
     {
       Clust::Mixture idModel = getIdModel(p_mixture->idData());
       if (idModel == Clust::unknown_mixture_) return;
@@ -196,16 +229,17 @@ class GammaMixtureManager: public IMixtureManager<DataHandler>
       }
     }
 
-  protected:
     /** create a concrete mixture and initialize it.
-     *  @param modelName, idData Id names of the model and of the data
+     *  @param modelName a valid model name
+     *  @param idData Id of the data
      *  @param nbCluster number of cluster of the model
      **/
-    virtual IMixture* createMixtureImpl(String const&  modelName, String const& idData, int nbCluster)
+    IMixture* createMixtureImpl(String const&  modelName, String const& idData, int nbCluster)
     {
       Clust::Mixture idModel = Clust::stringToMixture(modelName);
       return createMixtureImpl(idModel, idData, nbCluster);
     }
+
   private:
     /** create a concrete mixture and initialize it.
      *  @param idModel Id name of the model
@@ -218,39 +252,39 @@ class GammaMixtureManager: public IMixtureManager<DataHandler>
       {
         // gamma models
         case Clust::Gamma_ajk_bjk_:
-        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_ajk_bjk)}
+        { STK_CREATE_MIXTURE(DataBridgeType, MixtureBridge_ajk_bjk)}
         break;
         case Clust::Gamma_ajk_bk_:
-        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_ajk_bk)}
+        { STK_CREATE_MIXTURE(DataBridgeType, MixtureBridge_ajk_bk)}
         break;
         case Clust::Gamma_ajk_bj_:
-        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_ajk_bj)}
+        { STK_CREATE_MIXTURE(DataBridgeType, MixtureBridge_ajk_bj)}
         break;
         case Clust::Gamma_ajk_b_:
-        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_ajk_b)}
+        { STK_CREATE_MIXTURE(DataBridgeType, MixtureBridge_ajk_b)}
         break;
         case Clust::Gamma_ak_bjk_:
-        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_ak_bjk)}
+        { STK_CREATE_MIXTURE(DataBridgeType, MixtureBridge_ak_bjk)}
         break;
         case Clust::Gamma_ak_bk_:
-        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_ak_bk)}
+        { STK_CREATE_MIXTURE(DataBridgeType, MixtureBridge_ak_bk)}
         break;
         case Clust::Gamma_ak_bj_:
-        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_ak_bj)}
+        { STK_CREATE_MIXTURE(DataBridgeType, MixtureBridge_ak_bj)}
         break;
         case Clust::Gamma_ak_b_:
-        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_ak_b)}
+        { STK_CREATE_MIXTURE(DataBridgeType, MixtureBridge_ak_b)}
         break;
         case Clust::Gamma_aj_bjk_:
-        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_aj_bjk)}
+        { STK_CREATE_MIXTURE(DataBridgeType, MixtureBridge_aj_bjk)}
         break;
         case Clust::Gamma_aj_bk_:
-        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_aj_bk)}
+        { STK_CREATE_MIXTURE(DataBridgeType, MixtureBridge_aj_bk)}
         case Clust::Gamma_a_bjk_:
-        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_a_bjk)}
+        { STK_CREATE_MIXTURE(DataBridgeType, MixtureBridge_a_bjk)}
         break;
         case Clust::Gamma_a_bk_:
-        { STK_CREATE_MIXTURE(DataBridgeReal, MixtureBridge_a_bk)}
+        { STK_CREATE_MIXTURE(DataBridgeType, MixtureBridge_a_bk)}
         default:
           return 0; // 0 if idModel is not implemented
           break;

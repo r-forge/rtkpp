@@ -86,18 +86,18 @@ class Poisson_ljk: public PoissonBase<Poisson_ljk<Array> >
     /** destructor */
     ~Poisson_ljk() {}
     /** Initialize randomly the parameters of the Poisson mixture. */
-    void randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) ;
+    void randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk) ;
     /** Compute the MStep for the lambda_jk
      *  \f$ \lambda_jk = \sum_i X_{ij} t_{ik} \f$ */
-    bool run( CArrayXX const*  p_tik, CPointX const* p_tk) ;
+    bool run( CArrayXX const* const& p_tik, CPointX const* const& p_tk) ;
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
-    { return this->nbCluster()*this->nbVariable();}
+    { return this->nbCluster()*p_data()->sizeCols();}
 };
 
 /* Initialize randomly the parameters of the Poisson mixture. */
 template<class Array>
-void Poisson_ljk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)
+void Poisson_ljk<Array>::randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk)
 {
   for (int j=p_data()->beginCols(); j< p_data()->endCols(); ++j)
   {
@@ -110,7 +110,7 @@ void Poisson_ljk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk
 
 /* Compute the lambda_jk  */
 template<class Array>
-bool Poisson_ljk<Array>::run( CArrayXX const*  p_tik, CPointX const* p_tk)
+bool Poisson_ljk<Array>::run( CArrayXX const* const& p_tik, CPointX const* const& p_tk)
 {
   for (int j=p_data()->beginCols(); j< p_data()->endCols(); ++j)
   {

@@ -38,9 +38,6 @@
 #ifndef STK_IMIXTURESTRATEGY_H
 #define STK_IMIXTURESTRATEGY_H
 
-#include <Sdk/include/STK_IRunner.h>
-#include <STKernel/include/STK_Real.h>
-
 namespace STK
 {
 // forward declarations

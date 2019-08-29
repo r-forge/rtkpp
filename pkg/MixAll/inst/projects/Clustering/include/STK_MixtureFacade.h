@@ -38,7 +38,7 @@
 #ifndef STK_MIXTUREFACADE_H
 #define STK_MIXTUREFACADE_H
 
-#include <Sdk/include/STK_IRunner.h>
+#include <Sdk.h>
 #include "STK_Clust_Util.h"
 
 namespace STK

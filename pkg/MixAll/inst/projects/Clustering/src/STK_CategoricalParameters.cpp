@@ -38,22 +38,25 @@
 namespace STK
 {
 
+/*------------------Categorical_pjk_--------------- */
 /* default constructor
  *  @param nbCluster the number of class of the mixture
  **/
-ModelParameters<Clust::Categorical_pjk_>::ModelParameters(int nbCluster): proba_(nbCluster) {}
+ModelParameters<Clust::Categorical_pjk_>::ModelParameters(int nbCluster)
+               : proba_(nbCluster), stat_proba_(nbCluster) {}
 /* copy constructor.
  *  @param param the parameters to copy.
  **/
 ModelParameters<Clust::Categorical_pjk_>::ModelParameters( ModelParameters const& param)
-               : proba_(param.proba_)
+               : proba_(param.proba_), stat_proba_(param.stat_proba_)
 {}
 /* copy operator.
  *  @param param the parameters to copy.
  **/
 ModelParameters<Clust::Categorical_pjk_>& ModelParameters<Clust::Categorical_pjk_>::operator=( ModelParameters const& param)
 {
-  proba_ = param.proba_;
+  proba_      = param.proba_;
+  stat_proba_ = param.stat_proba_;
   return *this;
 }
 /* destructor */
@@ -62,18 +65,46 @@ ModelParameters<Clust::Categorical_pjk_>::~ModelParameters() {}
 void ModelParameters<Clust::Categorical_pjk_>::resize(Range const& rangeModalities, Range const& rangeCols)
 {
   for (int k = proba_.begin(); k< proba_.end(); ++k)
-  { proba_[k].resize(rangeModalities, rangeCols) = 1./rangeModalities.size();}
+  {
+    proba_[k].resize(rangeModalities, rangeCols) = 1./rangeModalities.size();
+    stat_proba_[k].resize(rangeModalities, rangeCols);
+  }
 }
 
+/* update statistics of the parameters. */
+void ModelParameters<Clust::Categorical_pjk_>::updateStatistics()
+{
+  for(int k=stat_proba_.begin(); k<stat_proba_.end(); ++k)
+  { stat_proba_[k].update(proba_[k]);}
+}
+/* set and release the computed statistics */
+void ModelParameters<Clust::Categorical_pjk_>::setStatistics()
+{
+  for(int k=stat_proba_.begin(); k<stat_proba_.end(); ++k)
+  {
+    proba_[k] = stat_proba_[k].mean();
+    stat_proba_[k].release();
+  }
+}
+
+/* Set the computed statistics */
+void ModelParameters<Clust::Categorical_pjk_>::releaseStatistics()
+{
+  for(int k=stat_proba_.begin(); k<stat_proba_.end(); ++k)
+  { stat_proba_[k].release();}
+}
+
+/*------------------Categorical_pk_--------------- */
 /* default constructor
  *  @param nbCluster the number of class of the mixture
  **/
-ModelParameters<Clust::Categorical_pk_>::ModelParameters(int nbCluster): proba_(nbCluster) {}
+ModelParameters<Clust::Categorical_pk_>::ModelParameters(int nbCluster)
+               : proba_(nbCluster), stat_proba_(nbCluster) {}
 /* copy constructor.
  *  @param param the parameters to copy.
  **/
 ModelParameters<Clust::Categorical_pk_>::ModelParameters( ModelParameters const& param)
-               : proba_(param.proba_)
+               : proba_(param.proba_), stat_proba_(param.stat_proba_)
 {}
 /* destructor */
 ModelParameters<Clust::Categorical_pk_>::~ModelParameters() {}
@@ -82,15 +113,40 @@ ModelParameters<Clust::Categorical_pk_>::~ModelParameters() {}
  **/
 ModelParameters<Clust::Categorical_pk_>& ModelParameters<Clust::Categorical_pk_>::operator=( ModelParameters const& param)
 {
-  proba_ = param.proba_;
+  proba_      = param.proba_;
+  stat_proba_ = param.stat_proba_;
   return *this;
 }
 
 /* resize the set of parameter */
-void ModelParameters<Clust::Categorical_pk_>::resize(Range const& rangeModalities, Range const& range)
+void ModelParameters<Clust::Categorical_pk_>::resize(Range const& rangeModalities, Range const& rangeCols)
 {
   for (int k = proba_.begin(); k< proba_.end(); ++k)
-  { proba_[k].resize(rangeModalities) = 1./rangeModalities.size();}
+  {
+    proba_[k].resize(rangeModalities) = 1./rangeModalities.size();
+    stat_proba_[k].resize(rangeModalities);
+  }
+}
+/* update statistics of the parameters. */
+void ModelParameters<Clust::Categorical_pk_>::updateStatistics()
+{
+  for(int k=stat_proba_.begin(); k<stat_proba_.end(); ++k)
+  { stat_proba_[k].update(proba_[k]);}
+}
+/* set the computed statistics */
+void ModelParameters<Clust::Categorical_pk_>::setStatistics()
+{
+  for(int k=stat_proba_.begin(); k<stat_proba_.end(); ++k)
+  {
+    proba_[k] = stat_proba_[k].mean();
+    stat_proba_[k].release();
+  }
+}
+/* release the computed statistics */
+void ModelParameters<Clust::Categorical_pk_>::releaseStatistics()
+{
+  for(int k=stat_proba_.begin(); k<stat_proba_.end(); ++k)
+  { stat_proba_[k].release();}
 }
 
 } // namespace STK

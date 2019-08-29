@@ -131,7 +131,7 @@ clusterMixedData <- function( data, models, nbCluster=2
   resFlag  <- FALSE;
   if (length(nbCluster) >0)
   {
-    resFlag = .Call("clusterMixedData", model, nbCluster, strategy, criterion, nbCore, PACKAGE="MixAll");
+    resFlag = .Call("clusterMixedData", model, nbCluster, nbCore, PACKAGE="MixAll");
   }
   # set names
   if (resFlag != TRUE) {cat("WARNING: An error occurs during the clustering process");}

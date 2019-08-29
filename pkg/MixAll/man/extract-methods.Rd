@@ -9,22 +9,17 @@
 \alias{[}
 \alias{[<-,ClusterAlgo-method}
 \alias{[,ClusterAlgoPredict-method}
-\alias{[}
 \alias{[<-,ClusterAlgoPredict-method}
 \alias{[,ClusterInit-method}
-\alias{[}
 \alias{[<-,ClusterInit-method}
 \alias{[,ClusterStrategy-method}
-\alias{[}
 \alias{[<-,ClusterStrategy-method}
-\alias{[}
 \alias{Extract}
 \alias{[,ClusterCategoricalComponent-method}
 \alias{[,ClusterDiagGaussianComponent-method}
 \alias{[,ClusterGammaComponent-method}
 \alias{[,ClusterPoissonComponent-method}
 \alias{[,LearnAlgo-method}
-\alias{[}
 \alias{[<-,LearnAlgo-method}
 \alias{[,KmmComponent-method}
 \title{Extract parts of a MixAll S4 class}

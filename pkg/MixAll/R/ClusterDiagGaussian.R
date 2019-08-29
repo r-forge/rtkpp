@@ -114,7 +114,7 @@ clusterDiagGaussian <- function( data, nbCluster=2
   model@criterionName = criterion
 
   # start estimation of the models
-  resFlag = .Call("clusterMixture", model, nbCluster, models, PACKAGE="MixAll");
+  resFlag = .Call("clusterMixture", model, nbCluster, models, nbCore, PACKAGE="MixAll");
   # set names
   if (resFlag != TRUE ) {cat("WARNING: An error occur during the clustering process");}
   colnames(model@component@mean)  <- colnames(model@component@data);

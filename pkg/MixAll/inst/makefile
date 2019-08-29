@@ -34,6 +34,7 @@ include $(RELATIVEMAKEVARS)
 #-----------------------------------------------------------------------
 # main directories
 MIXALL_PROJECTS_DIR  = projects/
+MIXALL_INCLUDES_DIR  = include/
 MIXALL_BIN_DIR = bin/
 MIXALL_LIB_DIR = lib/
 MIXALL_LIB = $(MIXALL_LIB_DIR)$(LIB_MIXALL_A)
@@ -43,11 +44,13 @@ TOP_DIR      = ../../../
 BIN_DIR      = $(TOP_DIR)$(MIXALL_BIN_DIR)
 MAKEVARS     = $(TOP_DIR)$(RELATIVEMAKEVARS)
 PROJECTS_DIR = $(TOP_DIR)$(MIXALL_PROJECTS_DIR)
+INCLUDES_DIR = $(TOP_DIR)$(MIXALL_INCLUDES_DIR)
 
 export RELATIVEMAKEVARS
-export MAKEVARS
 export BIN_DIR
+export MAKEVARS
 export PROJECTS_DIR
+export INCLUDES_DIR
 
 #-----------------------------------------------------------------------
 # Create the library. Build the objects of each projects and then add them

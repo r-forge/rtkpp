@@ -32,7 +32,7 @@
  *  @brief In this file we implement the SimpleStratefy class
  **/
 
-#include <STKernel/include/STK_Exceptions.h>
+#include <Sdk.h>
 
 #include "../include/MixtureStrategy/STK_SimpleStrategy.h"
 #include "../include/MixtureInit/STK_MixtureInit.h"

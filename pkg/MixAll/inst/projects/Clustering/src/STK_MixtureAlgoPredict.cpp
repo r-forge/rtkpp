@@ -33,7 +33,8 @@
  *  @brief In this file we implement the run method of the mixture algorithms.
  **/
 
-#include <STKernel/include/STK_Exceptions.h>
+#include <Sdk.h>
+
 #include "../include/MixtureAlgo/STK_MixtureAlgoPredict.h"
 #include "../include/STK_IMixtureComposer.h"
 
@@ -43,11 +44,11 @@ namespace STK
 bool EMPredict::run()
 {
   if (p_model_->computeNbMissingValues() == 0) { return predictBayesClassifier();}
-#ifdef STK_MIXTURE_VERY_VERBOSE
+#ifdef STK_MIXTURE_VERBOSE
   stk_cout << _T("-------------------------------\n");
   stk_cout << _T("Entering EMPredict::run() with:\n")
-           << _T("nbIterMax_ = ") << nbIterMax_ << _T("\n")
-           << _T("epsilon_ = ") << epsilon_ << _T("\n");
+           << _T("nbIterBurn_ = ") << nbIterBurn_ << _T("\n")
+           << _T("nbIterLong_ = ") << nbIterLong_ << _T("\n");
 #endif
   try
   {
@@ -117,8 +118,9 @@ bool SemiSEMPredict::run()
 
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("------------------------------------\n");
-  stk_cout << _T("Entering SemiSEMPredict::run() with:\n")
-           << _T("nbIterMax_ = ") << nbIterMax_ << _T("\n")
+  stk_cout << _T("Entering SemiSEMPredict::run() with:\n");
+  stk_cout << _T("nbIterBurn_ = ") << nbIterBurn_ << _T("\n")
+           << _T("nbIterLong_ = ") << nbIterLong_
            << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
 #endif
   try

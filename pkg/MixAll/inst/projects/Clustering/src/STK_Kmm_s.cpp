@@ -64,35 +64,34 @@ Real Kmm_s::lnComponentProbability(int i, int k) const
 }
 
 /* Initialize randomly the parameters of the Gaussian mixture. */
-void Kmm_s::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)
+void Kmm_s::randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk)
 {
 #if STK_Kernel_DEBUG | STK_MIXTURE_VERBOSE
-  stk_cout << _T("Entering Kmm_s::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)\n");
+  stk_cout << _T("Entering Kmm_s::randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk)\n");
 #endif
   // compute the standard deviation
   compute_dik(p_tik, p_tk);
   param_.sigma2_ = dik_.prod(*p_tik).sum()/(this->nbSample() * param_.dim_.sum())
                  + std::abs(Law::generator.randGauss(0, 0.05));
 #ifdef STK_MIXTURE_VERBOSE
-  stk_cout << _T("Kmm_s::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)  done\n");
+  stk_cout << _T("Kmm_s::randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk)  done\n");
   stk_cout << param_.sigma2_ << "\n";
 #endif
 }
 
 /* Compute the weighted means and the weighted standard deviations. */
-bool Kmm_s::run( CArrayXX const*  p_tik, CPointX const* p_tk)
+bool Kmm_s::run( CArrayXX const* const& p_tik, CPointX const* const& p_tk)
 {
 #if STK_Kernel_DEBUG | STK_MIXTURE_VERBOSE
-  stk_cout << _T("Entering Kmm_s::run( CArrayXX const*  p_tik, CPointX const* p_tk)\n");
+  stk_cout << _T("Entering Kmm_s::run( CArrayXX const* const& p_tik, CPointX const* const& p_tk)\n");
 #endif
   compute_dik(p_tik, p_tk);
-  param_.sigma2_ =  dik_.prod( *p_tik ).sum()/(this->nbSample() * param_.dim_.sum());
+  param_.sigma2_ =  p_tik->prod(dik_).sum()/p_tk->dot(param_.dim_);
 #ifdef STK_MIXTURE_VERBOSE
-  stk_cout << _T("Kmm_s::run( CArrayXX const*  p_tik, CPointX const* p_tk) done\n");
+  stk_cout << _T("Kmm_s::run( CArrayXX const* const& p_tik, CPointX const* const& p_tk) done\n");
   stk_cout << param_.sigma2_ << "\n";
 #endif
-  if (param_.sigma2_ <= 0.)  return false;
-  return true;
+  return (param_.sigma2_ <= 0.) ? false : true;
 }
 
 } // namespace STK

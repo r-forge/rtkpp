@@ -32,7 +32,7 @@
  *  @brief In this file we implement the initialization methods.
  **/
 
-#include <STKernel/include/STK_Exceptions.h>
+#include <Sdk.h>
 
 #include "../include/MixtureInit/STK_MixtureInit.h"
 #include "../include/MixtureAlgo/STK_MixtureAlgo.h"

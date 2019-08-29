@@ -1069,6 +1069,23 @@ $$
 \hat{\sigma}^2 = \frac{1}{nd} \sum_{i=1}^n \sum_{k=1}^K t_{ik} \|\bx_i-\bmu_k\|^2.
 $$
 
+\subsection{M Step of the gaussian sjsk model}
+
+Using the equation (\ref{eq:mStepEM}) and dropping the constant, we obtain that
+we have to maximize in $\bsigma = (\sigma^j)^2(\sigma_k)^2$, for $j=1,\ldots,d$ and
+$k=1,\ldots,K$ the expression
+\begin{equation} \label{eq:gaussian_sjk}
+l(\bsigma | {\bx}_{1},\ldots,{\bx}_{n}, {\bt}^m) = \sum_{i=1}^{n} \sum_{k=1}^{K} t_{ik}^m
+ \sum_{j=1}^d \left[ - \frac{1}{(\sigma^j\sigma_k)^2}
+ (x_i^j - \hat{\mu}_j^k)^2 - \log((\sigma^j\sigma_k)^2) \right].
+\end{equation}
+
+%For this model, the variance is updated using the formula:
+%$$
+%(\hat{\sigma}^j_k)^2 = \frac{1}{t_{.k}} \sum_{i=1}^n t_{ik} (x^j_i-\hat{\mu}^j_k)^2.
+%$$
+
+
 \section{M step computation for the Gamma models}
 In this section, given the array $\bt$ of conditional probabilities, we will write
 $t_{.k} = \sum_{i=1}^n t_{ik}$, for $k=1,\ldots,K$ and will denote

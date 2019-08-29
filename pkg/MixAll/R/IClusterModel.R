@@ -137,7 +137,8 @@ setMethod(
 #' @slot tik       Matrix of size \eqn{n \times K} with the posterior probability of
 #' the ith individual to belong to kth cluster.
 #' @slot lnFi      Vector of size n with the log-likelihood of the ith individuals.
-#' @slot zi        Vector of integer of size n  with the attributed class label of the individuals.
+#' @slot zi        Vector of integer of size n with the attributed class label of the individuals.
+#' @slot ziFit     Vector of integer of size n with the fitted class label of the individuals (only used in supervised learning).
 #' @slot lnLikelihood Real given the ln-liklihood of the Cluster model.
 #' @slot criterion    Real given the value of the AIC, BIC, ICL or ML criterion.
 #' @slot criterionName string with the name of the criterion. Possible values
@@ -163,6 +164,7 @@ setClass(
                 , tik             = "matrix"
                 , lnFi            = "numeric"
                 , zi              = "integer"
+                , ziFit           = "integer"
                 , lnLikelihood    = "numeric"
                 , criterionName   = "character"
                 , criterion       = "numeric"
@@ -205,16 +207,17 @@ setClass(
     # check zi
     if (length(object@zi) != nbSample)
     {stop("zi must have nbSample size.")}
-    return(TRUE)
-
+    if (length(object@ziFit) != nbSample)
+    {stop("ziFit must have nbSample size.")}
+    
     # check criterion
-    if(sum(criterionName %in% c("BIC","AIC", "ICL", "ML")) != 1)
+    if(sum(object@criterionName %in% c("BIC","AIC", "ICL", "ML")) != 1)
     { stop("criterionName is not valid. See ?IClusterModel for the list of valid criterion\n")}
     # check nbFreeParameter
     if (round(object@nbFreeParameter)!=object@nbFreeParameter)
     {stop("nbFreeParameter must be an integer.")}
 
-    if(class(strategy)[1] != "ClusterStrategy")
+    if(class(object@strategy)[1] != "ClusterStrategy")
     {stop("strategy is not a Cluster Strategy class (must be an instance of the class ClusterStrategy).")}
 
     return(TRUE)
@@ -242,10 +245,11 @@ setMethod(
     if(missing(nbCluster)) { stop("nbCluster is mandatory in IClusterModel.")}
     .Object@nbCluster<-nbCluster
     # resize
-    .Object@pk   <- rep(1/nbCluster, nbCluster)
-    .Object@tik  <- matrix(1/nbCluster, nbSample, nbCluster)
-    .Object@lnFi <- rep(0, nbSample)
-    .Object@zi   <- as.integer(rep(1, nbSample))
+    .Object@pk    <- rep(1/nbCluster, nbCluster)
+    .Object@tik   <- matrix(1/nbCluster, nbSample, nbCluster)
+    .Object@lnFi  <- rep(0, nbSample)
+    .Object@zi    <- as.integer(rep(1, nbSample))
+    .Object@ziFit <- as.integer(rep(1, nbSample))
     # set default values
     .Object@lnLikelihood = -Inf
     .Object@criterionName=  "ICL"

@@ -34,6 +34,10 @@
 #ifndef MIXALL_H
 #define MIXALL_H
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 #ifdef __cplusplus
 extern "C"
 {

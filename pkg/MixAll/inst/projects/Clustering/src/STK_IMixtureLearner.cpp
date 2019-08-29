@@ -42,6 +42,7 @@ namespace STK
  **/
 IMixtureLearner::IMixtureLearner( int nbSample, int nbCluster)
                                 : IMixtureStatModel(nbSample, nbCluster)
+                                , ziPred_(tik_.rows())
                                 , state_(Clust::modelCreated_)
 {}
 /* copy constructor.
@@ -52,5 +53,26 @@ IMixtureLearner::IMixtureLearner( IMixtureLearner const& model)
 {}
 /* destructor */
 IMixtureLearner::~IMixtureLearner() {}
+
+/* Compute ziPred using the Map estimate. */
+void IMixtureLearner::mapStep()
+{
+  CPointX lnComp_(tik_.cols());
+  int kmax;
+  Real max;
+  for (int i=tik_.beginRows(); i < tik_.endRows(); i++)
+  {
+    // get maximal element of ln(x_i,\theta_k) + ln(p_k)
+    for (int k=tik_.beginCols(); k< tik_.endCols(); k++)
+    { lnComp_[k] = std::log(pk_[k])+lnComponentProbability(i,k);}
+    if (lnComp_.isInfinite().any()) { throw(Clust::mapStepFail_);}
+    max = lnComp_.maxElt(kmax);
+    // set ziPred_
+    ziPred_[i] = kmax;
+    // return  max + sum_k p_k exp{lnCom_k - lnComp_kmax}
+    Real sum =  (tik_.row(i) = (lnComp_ - max).exp()).sum();
+    tik_.row(i) /= sum;
+  }
+}
 
 } // namespace STK

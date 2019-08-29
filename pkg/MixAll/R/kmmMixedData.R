@@ -32,7 +32,7 @@ NULL
 #' mixture models according to the \code{criterion} among the number of clusters
 #' given in \code{nbCluster} using the strategy specified in [\code{strategy}].
 #'
-#' @param data [\code{list}] containing the data sets (matrices and/or data.frames).
+#' @param ldata [\code{list}] containing the data sets (matrices and/or data.frames).
 #' @param lmodels a [\code{list}] of same length than data. It contains the model
 #' names, kernel names and kernel parameter names to use in order to fit each
 #' data set.
@@ -52,10 +52,10 @@ NULL
 #' data(bullsEye)
 #' data(bullsEye.cat)
 #' ## with default values
-#' ldata  = list(bullsEye, bullsEye.cat)
+#' ldata     <- list(bullsEye, bullsEye.cat)
 #' modelcont <- list(modelName="kmm_pk_s", dim = 10, kernelName="Gaussian")
 #' modelcat  <- list(modelName="kmm_pk_s", dim = 20, kernelName="Hamming", kernelParameters = c(0.6))
-#' lmodels = list( modelcont, modelcat)
+#' lmodels   <- list( modelcont, modelcat)
 #' 
 #' model <- kmmMixedData(ldata, lmodels, nbCluster=2:5, strategy = clusterFastStrategy())
 #'
@@ -71,7 +71,7 @@ NULL
 #' @return An instance of the [\code{\linkS4class{KmmMixedDataModel}}] class.
 #' @author Serge Iovleff
 #'
-kmmMixedData <- function( data, lmodels, nbCluster=2
+kmmMixedData <- function( ldata, lmodels, nbCluster=2
                         , strategy=clusterStrategy()
                         , criterion="ICL"
                         , nbCore = 1)
@@ -91,17 +91,17 @@ kmmMixedData <- function( data, lmodels, nbCluster=2
   {stop("strategy is not a Cluster Stategy class (must be an instance of the class ClusterStrategy).")}
   validObject(strategy);
   
-  # check data and models
-  if (!is.list(data))    { stop("data must be a list")}
+  # check ldata and lmodels
+  if (!is.list(ldata))   { stop("data must be a list")}
   if (!is.list(lmodels)) { stop("lmodels must be a list")}
-  if (length(data) != length(lmodels)) { stop("data and lmodels must be of equal lengths");}
+  if (length(ldata) != length(lmodels)) { stop("data and lmodels must be of equal lengths");}
   
   # create list of models
-  lcomponent <- vector("list", length(data));
-  for (i in 1:length(data))
+  lcomponent <- vector("list", length(ldata));
+  for (i in 1:length(ldata))
   {
     # check data
-    data[[i]] <- as.matrix(data[[i]])
+    ldata[[i]] <- as.matrix(ldata[[i]])
     # check parameter
     param <- lmodels[[i]];
     if (is.list(param))
@@ -131,7 +131,7 @@ kmmMixedData <- function( data, lmodels, nbCluster=2
     { stop("kernelName is not valid. See ?kmm for the list of valid model names")}
     
     # create component
-    lcomponent[[i]] = new( "KmmComponent", data[[i]], dim
+    lcomponent[[i]] = new( "KmmComponent", ldata[[i]], dim
                          , nbClusterMin
                          , modelName
                          , kernelName, kernelParameters, kernelComputation)
@@ -139,14 +139,14 @@ kmmMixedData <- function( data, lmodels, nbCluster=2
   
   # Create model
   model = new("KmmMixedDataModel", lcomponent)
-  model@strategy = strategy;
+  model@strategy      = strategy;
   model@criterionName = criterion
   
   # start estimation of the models
   resFlag  <- FALSE;
   if (length(nbCluster) >0)
   {
-    resFlag = .Call("kmmMixedData", model, nbCluster, strategy, criterion, nbCore, PACKAGE="MixAll");
+    resFlag = .Call("kmmMixedData", model, nbCluster, nbCore, PACKAGE="MixAll");
   }
   # set names
   if (resFlag != TRUE) {cat("WARNING: An error occurs during the clustering process");}

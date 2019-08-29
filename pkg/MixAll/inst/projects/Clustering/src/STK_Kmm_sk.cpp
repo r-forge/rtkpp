@@ -64,37 +64,37 @@ int Kmm_sk::computeNbFreeParameters() const
 Real Kmm_sk::lnComponentProbability(int i, int k) const
 {
   return(- dik_.elt(i,k)/(2.*param_.sigma2_[k])
-         - (std::log(param_.sigma2_[k])+2.*Const::_LNSQRT2PI_)*param_.dim_[k]/2.);
+         - (std::log(param_.sigma2_[k]) +2.*Const::_LNSQRT2PI_)*param_.dim_[k]/2.);
 }
 
 /* Initialize randomly the parameters of the Gaussian mixture. */
-void Kmm_sk::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)
+void Kmm_sk::randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk)
 {
 #if STK_Kernel_DEBUG | STK_MIXTURE_VERBOSE
-  stk_cout << _T("Entering Kmm_sk::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)\n");
+  stk_cout << _T("Entering Kmm_sk::randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk)\n");
 #endif
   compute_dik(p_tik, p_tk);
   param_.sigma2_ = sum( dik_.prod(*p_tik) )/ (*p_tk * param_.dim_)
                  + CPointX(p_tik->cols()).rand(Law::Normal(0, 0.05)).abs();
 #ifdef STK_MIXTURE_VERY_VERBOSE
-  stk_cout << _T("Kmm_sk::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) done\n");
+  stk_cout << _T("Kmm_sk::randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk) done\n");
   stk_cout << param_.sigma2_ << "\n";
 #endif
 }
 
 /* Compute the weighted means and the weighted standard deviations. */
-bool Kmm_sk::run( CArrayXX const*  p_tik, CPointX const* p_tk)
+bool Kmm_sk::run( CArrayXX const* const& p_tik, CPointX const* const& p_tk)
 {
 #if STK_Kernel_DEBUG | STK_MIXTURE_VERBOSE
-  stk_cout << _T("Entering Kmm_sk::run( CArrayXX const*  p_tik, CPointX const* p_tk)\n");
+  stk_cout << _T("Entering Kmm_sk::run( CArrayXX const* const& p_tik, CPointX const* const& p_tk)\n");
 #endif
   compute_dik(p_tik, p_tk);
 #ifdef STK_Kernel_DEBUG
   stk_cout<< _T("Stat::sumByCol( dik_.prod(*p_tik) ) =\n")  << Stat::sumByCol( dik_.prod(*p_tik) ) << "\n";
 #endif
-  param_.sigma2_ =  Stat::sumByCol( dik_.prod(*p_tik) )/ (*p_tk * param_.dim_);
+  param_.sigma2_ =  Stat::sumByCol( p_tik->prod(dik_) ) / (p_tk->prod(param_.dim_));
 #ifdef STK_MIXTURE_VERBOSE
-  stk_cout << _T("Kmm_sk::run( CArrayXX const*  p_tik, CPointX const* p_tk) done\n");
+  stk_cout << _T("Kmm_sk::run( CArrayXX const* const& p_tik, CPointX const* const& p_tk) done\n");
   stk_cout << _T("sigma2 = ") << param_.sigma2_ << "\n";
 #endif
   return true;

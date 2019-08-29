@@ -75,7 +75,7 @@ ILauncher::~ILauncher()
 
 
 /* create the managers for models with real data */
-void ILauncher::createContinuousDataSets( std::string const& idData
+void ILauncher::createContinuousDataSets( String const& idData
                                         , Rcpp::S4 s4_component
                                         , Clust::Mixture model
                                         )
@@ -85,7 +85,7 @@ void ILauncher::createContinuousDataSets( std::string const& idData
 }
 
 /* create the managers for models with real data */
-void ILauncher::createDiscreteDataSets( std::string const& idData
+void ILauncher::createDiscreteDataSets( String const& idData
                                       , Rcpp::S4 s4_component
                                       , Clust::Mixture model
                                       )
@@ -104,9 +104,9 @@ void ILauncher::createMixtures(IMixtureStatModel* p_model)
 }
 
 /* fill the s4_component with the parameters */
-void ILauncher::getParameters(IMixtureStatModel* p_model, std::string const& idData, Rcpp::S4 s4_component)
+void ILauncher::getParameters(IMixtureStatModel* p_model, String const& idData, Rcpp::S4 s4_component)
 {
-  std::string rModelName = s4_component.slot("modelName");
+  String rModelName = s4_component.slot("modelName");
   bool freeProp;
   switch (Clust::mixtureToMixtureClass(Clust::stringToMixture(rModelName, freeProp)))
   {

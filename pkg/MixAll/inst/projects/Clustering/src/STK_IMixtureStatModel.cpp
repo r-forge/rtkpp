@@ -45,18 +45,20 @@ namespace STK
 IMixtureStatModel::IMixtureStatModel( int nbSample, int nbCluster)
                                     : IStatModelBase(nbSample)
                                     , nbCluster_(nbCluster)
-                                    , pk_(nbCluster, 1./nbCluster), tik_(nbSample, nbCluster, 1./nbCluster)
-                                    , tk_(nbCluster, nbSample/nbCluster), zi_(nbSample, baseIdx)
+                                    , pk_(nbCluster, 1./nbCluster)
+                                    , tik_(nbSample, nbCluster, 1./nbCluster)
+                                    , tk_(nbCluster, Real(nbSample)/nbCluster)
+                                    , zi_(nbSample, baseIdx)
                                     , v_mixtures_()
 {}
 
 /* copy constructor */
 IMixtureStatModel::IMixtureStatModel( IMixtureStatModel const& model)
-                                   : IStatModelBase(model)
-                                   , nbCluster_(model.nbCluster_)
-                                   , pk_(model.pk_), tik_(model.tik_)
-                                   , tk_(model.tk_), zi_(model.zi_)
-                                   , v_mixtures_(model.v_mixtures_)
+                                    : IStatModelBase(model)
+                                    , nbCluster_(model.nbCluster_)
+                                    , pk_(model.pk_), tik_(model.tik_)
+                                    , tk_(model.tk_), zi_(model.zi_)
+                                    , v_mixtures_(model.v_mixtures_.size())
 {
   // clone mixtures
   for (size_t l = 0; l < v_mixtures_.size(); ++l)
@@ -66,7 +68,11 @@ IMixtureStatModel::IMixtureStatModel( IMixtureStatModel const& model)
   }
 }
 /* destructor */
-IMixtureStatModel::~IMixtureStatModel() {}
+IMixtureStatModel::~IMixtureStatModel()
+{
+  for (MixtIterator it = v_mixtures_.begin() ; it != v_mixtures_.end(); ++it)
+  { delete (*it);}
+}
 
 Real IMixtureStatModel::computeLikelihood(int i) const
 { return std::exp(computeLnLikelihood(i));}
@@ -118,13 +124,12 @@ IMixture* IMixtureStatModel::getMixture( String const& idData) const
 void IMixtureStatModel::registerMixture(IMixture* p_mixture)
 {
 #ifdef STK_MIXTURE_VERBOSE
-  stk_cout << _T("In MixtureComposer::registerMixture, registering mixture: ")
+  stk_cout << _T("In IMixtureStatModel::registerMixture, registering mixture: ")
            << p_mixture->idData() << _T("\n");
 #endif
   p_mixture->setMixtureModel(this);
   v_mixtures_.push_back(p_mixture);
-  // update nbVariables and NbFreeParameters
-  setNbVariable(nbVariable()+p_mixture->nbVariable());
+  // update NbFreeParameters
   setNbFreeParameter(nbFreeParameter()+p_mixture->nbFreeParameter());
 }
 
@@ -138,8 +143,6 @@ void IMixtureStatModel::releaseMixture( String const& idData)
   {
     if ((*it)->idData() == idData)
     {
-      // update nbVariable and nbFreeParameters
-       setNbVariable(nbVariable()-(*it)->nbVariable());
        setNbFreeParameter(nbFreeParameter()-(*it)->nbFreeParameter());
        // remove mixture
        delete (*it);
@@ -175,19 +178,6 @@ int IMixtureStatModel::computeNbMissingValues() const
   { sum+= (*it)->nbMissingValues();}
   return sum;
 }
-
-
-/* @brief compute the number of variables of the model.
- *  lookup on the mixtures and sum the nbFreeParameter.
- **/
-int IMixtureStatModel::computeNbVariables() const
-{
-  int sum = 0;
-  for (ConstMixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
-  { sum+= (*it)->nbVariable();}
-  return sum;
-}
-
 
 /* @brief Initialize the model before its first use.
  *  This function can be overloaded in derived class for initialization of

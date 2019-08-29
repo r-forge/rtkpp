@@ -32,66 +32,69 @@
 \usage{
 \S4method{initialize}{ClusterAlgo}(.Object, algo, nbIteration, epsilon)
 
-\S4method{initialize}{ClusterAlgoPredict}(.Object, algo, nbIterBurn, nbIterLong,
-  epsilon)
+\S4method{initialize}{ClusterAlgoPredict}(.Object, algo, nbIterBurn,
+  nbIterLong, epsilon)
 
-\S4method{initialize}{ClusterInit}(.Object, method = "class", nbInit = 5,
-  algo = clusterAlgo("EM", 20, 0))
+\S4method{initialize}{ClusterInit}(.Object, method = "class",
+  nbInit = 5, algo = clusterAlgo("EM", 20, 0))
 
-\S4method{initialize}{ClusterStrategy}(.Object, nbTry, nbShortRun, initMethod,
-  shortAlgo, longAlgo)
+\S4method{initialize}{ClusterStrategy}(.Object, nbTry, nbShortRun,
+  initMethod, shortAlgo, longAlgo)
 
 \S4method{initialize}{IClusterComponent}(.Object, data, modelName)
 
 \S4method{initialize}{IClusterModel}(.Object, nbSample, nbCluster)
 
-\S4method{initialize}{ClusterCategoricalComponent}(.Object, data = matrix(nrow
-  = 0, ncol = 0), nbCluster = 2, modelName = "categorical_pk_pjk")
+\S4method{initialize}{ClusterCategoricalComponent}(.Object,
+  data = matrix(nrow = 0, ncol = 0), nbCluster = 2,
+  modelName = "categorical_pk_pjk")
 
-\S4method{initialize}{ClusterCategorical}(.Object, data = matrix(nrow = 0,
-  ncol = 0), nbCluster = 2, modelName = "categorical_pk_pjk")
+\S4method{initialize}{ClusterCategorical}(.Object, data = matrix(nrow =
+  0, ncol = 0), nbCluster = 2, modelName = "categorical_pk_pjk")
 
 \S4method{initialize}{ClusterDiagGaussianComponent}(.Object,
   data = matrix(nrow = 0, ncol = 0), nbCluster = 2,
   modelName = "gaussian_pk_sjk")
 
-\S4method{initialize}{ClusterDiagGaussian}(.Object, data = matrix(nrow = 0,
-  ncol = 0), nbCluster = 2, modelName = "gaussian_pk_sjk")
+\S4method{initialize}{ClusterDiagGaussian}(.Object, data = matrix(nrow =
+  0, ncol = 0), nbCluster = 2, modelName = "gaussian_pk_sjk")
 
-\S4method{initialize}{ClusterGammaComponent}(.Object, data = matrix(nrow = 0,
-  ncol = 0), nbCluster = 2, modelName = "gamma_pk_ajk_bjk")
+\S4method{initialize}{ClusterGammaComponent}(.Object, data = matrix(nrow
+  = 0, ncol = 0), nbCluster = 2, modelName = "gamma_pk_ajk_bjk")
 
-\S4method{initialize}{ClusterGamma}(.Object, data = matrix(nrow = 0, ncol =
-  0), nbCluster = 2, modelName = "gamma_pk_ajk_bjk")
+\S4method{initialize}{ClusterGamma}(.Object, data = matrix(nrow = 0, ncol
+  = 0), nbCluster = 2, modelName = "gamma_pk_ajk_bjk")
 
 \S4method{initialize}{ClusterMixedDataModel}(.Object, lcomponent,
   nbCluster = 2)
 
-\S4method{initialize}{ClusterPoissonComponent}(.Object, data = matrix(nrow =
-  0, ncol = 0), nbCluster = 2, modelName = "poisson_pk_ljk")
+\S4method{initialize}{ClusterPoissonComponent}(.Object,
+  data = matrix(nrow = 0, ncol = 0), nbCluster = 2,
+  modelName = "poisson_pk_ljk")
 
-\S4method{initialize}{ClusterPoisson}(.Object, data = matrix(nrow = 0, ncol =
-  0), nbCluster = 2, modelName = "poisson_pk_ljk")
+\S4method{initialize}{ClusterPoisson}(.Object, data = matrix(nrow = 0,
+  ncol = 0), nbCluster = 2, modelName = "poisson_pk_ljk")
 
-\S4method{initialize}{IClusterPredict}(.Object, nbSample, nbCluster, algo)
+\S4method{initialize}{IClusterPredict}(.Object, nbSample, model, algo)
 
-\S4method{initialize}{ClusterPredict}(.Object, data, nbCluster,
+\S4method{initialize}{ClusterPredict}(.Object, data, model,
   algo = clusterAlgoPredict())
 
-\S4method{initialize}{ClusterPredictMixedData}(.Object, ldata, nbCluster,
+\S4method{initialize}{ClusterPredictMixedData}(.Object, ldata, model,
   algo = clusterAlgoPredict())
 
 \S4method{initialize}{LearnAlgo}(.Object, algo, nbIteration, epsilon)
 
-\S4method{initialize}{KmmComponent}(.Object, data, dim = 10, nbCluster = 2,
-  modelName = "kmm_pk_s", kernelName = "Gaussian",
+\S4method{initialize}{KmmComponent}(.Object, data, dim = 10,
+  nbCluster = 2, modelName = "kmm_pk_s", kernelName = "Gaussian",
   kernelParameters = c(1), kernelComputation = TRUE)
 
 \S4method{initialize}{KmmModel}(.Object, data, nbCluster = 2,
   modelName = "kmm_pk_s", dim = 10, kernelName = "Gaussian",
   kernelParameters = c(1), kernelComputation = TRUE)
 
-\S4method{initialize}{KmmMixedDataModel}(.Object, lcomponent, nbCluster = 2)
+\S4method{initialize}{KmmMixedDataModel}(.Object, lcomponent,
+  nbCluster = 2)
 }
 \description{
 Initialization method of the [\code{\linkS4class{ClusterAlgo}}] class.

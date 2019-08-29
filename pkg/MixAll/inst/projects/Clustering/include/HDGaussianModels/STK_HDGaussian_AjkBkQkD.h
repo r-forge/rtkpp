@@ -29,11 +29,11 @@
  **/
 
 /** @file STK_HDGaussian_ajk_bk_qk_d.h
- *  @brief In this file we define the HDGaussian_ajk_bk_qk_d class
+ *  @brief In this file we define the HDGaussian_AjkBkQkDk class
  **/
 
-#ifndef STK_MIXTUREHDGAUSSIAN_AJK_BK_QK_D_H
-#define STK_MIXTUREHDGAUSSIAN_AJK_BK_QK_D_H
+#ifndef STK_HDGAUSSIAN_AJKBKQKD_H
+#define STK_HDGAUSSIAN_AJKBKQKD_H
 
 #include "../HDGaussianModels/STK_HDGaussianBase.h"
 
@@ -41,18 +41,18 @@ namespace STK
 {
 
 //forward declaration, to allow for recursive template
-template<class Array>class MixtureHDGaussian_ajk_bk_qk_d;
+template<class Array>class HDGaussian_AjkBkQkD;
 
 namespace hidden
 {
 /** @ingroup Clustering
  *  Traits class for the MixtureHDGaussian_ajk_bk_qk_d traits policy. */
 template<class Array_>
-struct MixtureTraits< MixtureHDGaussian_ajk_bk_qk_d<Array_> >
+struct MixtureTraits< HDGaussian_AjkBkQkD_<Array_> >
 {
   typedef Array_ Array;
   /** Type of the structure storing the parameters of a MixturGaussian_sjk model*/
-  typedef ModelParameters<Clust::HDGaussian_ajk_bk_qk_d_> Parameters;
+  typedef ModelParameters<Clust::HDGaussian_AjkBkQkD_> Parameters;
 };
 
 } // namespace hidden
@@ -61,7 +61,7 @@ struct MixtureTraits< MixtureHDGaussian_ajk_bk_qk_d<Array_> >
  *  Structure encapsulating the parameters of a MixturGaussian_sj model.
  */
 template<>
-struct ModelParameters<Clust::HDGaussian_ajk_bk_qk_d_>
+struct ModelParameters<Clust::HDGaussian_AjkBkQkD_>
 {
     /** array of size nbCluster with the parameters mean of the variables */
     Array1D<CPointX> mean_;
@@ -94,32 +94,28 @@ struct ModelParameters<Clust::HDGaussian_ajk_bk_qk_d_>
 };
 
 /** @ingroup Clustering
- *  The diagonal Gaussian mixture model @c MixtureHDGaussian_ajk_bk_qk_d is
- *  the most general diagonal Gaussian model and have a density function of the
+ *  The diagonal Gaussian mixture model @c HDGaussian_AjkBkQkD is
+ *  the most general HD Gaussian model and have a density function of the
  *  form
- * \f[
- *  f(\mathbf{x}|\theta) = \sum_{k=1}^K p_k \prod_{j=1}^d
- *    \frac{1}{\sqrt{2\pi}\sigma^j_{k}} \exp\left\{-\frac{(x^j-\mu^j_k)^2}{2(\sigma^j_{k})^2}\right\}.
- * \f]
  **/
 template<class Array>
-class MixtureHDGaussian_ajk_bk_qk_d: public HDGaussianBase<MixtureHDGaussian_ajk_bk_qk_d<Array> >
+class HDGaussian_AjkBkQkD: public HDGaussianBase<HDGaussian_AjkBkQkD<Array> >
 {
   public:
-    typedef DiagGaussianBase<MixtureHDGaussian_ajk_bk_qk_d<Array> > Base;
+    typedef DiagGaussianBase<HDGaussian_AjkBkQkDk<Array> > Base;
     using Base::param_;
     using Base::p_data;
 
     /** default constructor
      * @param nbCluster number of cluster in the model
      **/
-    MixtureHDGaussian_ajk_bk_qk_d( int nbCluster): Base(nbCluster) {}
+    HDGaussian_AjkBkQkD( int nbCluster): Base(nbCluster) {}
     /** copy constructor
      *  @param model The model to copy
      **/
-    MixtureHDGaussian_ajk_bk_qk_d( MixtureHDGaussian_ajk_bk_qk_d const& model): Base(model) {}
+    HDGaussian_AjkBkQkD( HDGaussian_AjkBkQkD const& model): Base(model) {}
     /** destructor */
-    ~MixtureHDGaussian_ajk_bk_qk_d() {}
+    ~HDGaussian_AjkBkQkD() {}
     /** @return the value of the probability of the i-th sample in the k-th component.
      *  @param i,k indexes of the sample and of the component
      **/
@@ -137,12 +133,12 @@ class MixtureHDGaussian_ajk_bk_qk_d: public HDGaussianBase<MixtureHDGaussian_ajk
      *  will be selected randomly among the data set and the standard-deviation
      *  will be set to 1.
      */
-    void randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) ;
+    void randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk) ;
     /** Compute the weighted mean and the common standard deviation. */
-    bool run( CArrayXX const*  p_tik, CPointX const* p_tk) ;
+    bool run( CArrayXX const* const& p_tik, CPointX const* const& p_tk) ;
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
-    { return 2*this->nbCluster()*this->nbVariable();}
+    { return 2*this->nbCluster()*p_data()->sizeCols();}
 };
 
 /* Initialize randomly the parameters of the Gaussian mixture. The centers
@@ -150,7 +146,7 @@ class MixtureHDGaussian_ajk_bk_qk_d: public HDGaussianBase<MixtureHDGaussian_ajk
  *  will be set to 1.
  */
 template<class Array>
-void MixtureHDGaussian_ajk_bk_qk_d<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)
+void HDGaussian_AjkBkQkD<Array>::randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk)
 {
   this->randomMean(p_tik);
   // compute the standard deviation
@@ -159,13 +155,13 @@ void MixtureHDGaussian_ajk_bk_qk_d<Array>::randomInit( CArrayXX const*  p_tik, C
     param_.sigma_[k] = Stat::varianceWithFixedMean(*p_data(), p_tik->col(k), param_.mean_[k], false).sqrt();
   }
 #ifdef STK_MIXTURE_VERY_VERBOSE
-  stk_cout << _T("MixtureHDGaussian_ajk_bk_qk_d<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)  done\n");
+  stk_cout << _T("MixtureHDGaussian_ajk_bk_qk_d<Array>::randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk)  done\n");
 #endif
 }
 
 /* Compute the weighted means and the weighted standard deviations. */
 template<class Array>
-bool MixtureHDGaussian_ajk_bk_qk_d<Array>::run( CArrayXX const*  p_tik, CPointX const* p_tk)
+bool HDGaussian_AjkBkQkD<Array>::run( CArrayXX const* const& p_tik, CPointX const* const& p_tk)
 {
   // compute the means
   if (!this->updateMean(p_tik)) return false;
@@ -188,4 +184,4 @@ bool MixtureHDGaussian_ajk_bk_qk_d<Array>::run( CArrayXX const*  p_tik, CPointX 
 
 } // namespace STK
 
-#endif /* STK_MIXTUREHDGAUSSIAN_AJK_BK_QK_D_H */
+#endif /* STK_HDGAUSSIAN_AJKBKQKD_H */

@@ -43,7 +43,6 @@ namespace STK
 IMixtureModelBase::IMixtureModelBase( int nbCluster)
                                     : nbCluster_(nbCluster)
                                     , nbSample_(0)
-                                    , nbVariable_(0)
 {}
 /* copy constructor. If the pointer on the mixture parameters are not zero
  *  then they are cloned.
@@ -54,7 +53,6 @@ IMixtureModelBase::IMixtureModelBase( int nbCluster)
 IMixtureModelBase::IMixtureModelBase( IMixtureModelBase const& model)
                                     : nbCluster_(model.nbCluster_)
                                     , nbSample_(model.nbSample_)
-                                    , nbVariable_(model.nbVariable_)
 {}
 
 /* destructor */

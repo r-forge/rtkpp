@@ -132,9 +132,9 @@ template<class Derived>
 void HDGaussianBase<Derived>::randomMean( CArrayXX const*  p_tik)
 {
   // indexes array
-  VectorXi indexes(p_data()->rows());
+  VectorXi indexes(this->nbSample());
   for(int i=p_data()->beginRows(); i< p_data()->endRows(); ++i) { indexes[i] = i;}
-  Range rind = p_data()->rows();
+  Range rind = this->nbSample();
   // sample without repetition
   for (int k= p_tik->beginCols(); k < p_tik->endCols(); ++k)
   {

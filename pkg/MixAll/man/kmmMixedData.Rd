@@ -4,11 +4,11 @@
 \alias{kmmMixedData}
 \title{Create an instance of the [\code{\linkS4class{KmmMixedDataModel}}] class}
 \usage{
-kmmMixedData(data, lmodels, nbCluster = 2, strategy = clusterStrategy(),
-  criterion = "ICL", nbCore = 1)
+kmmMixedData(ldata, lmodels, nbCluster = 2,
+  strategy = clusterStrategy(), criterion = "ICL", nbCore = 1)
 }
 \arguments{
-\item{data}{[\code{list}] containing the data sets (matrices and/or data.frames).}
+\item{ldata}{[\code{list}] containing the data sets (matrices and/or data.frames).}
 
 \item{lmodels}{a [\code{list}] of same length than data. It contains the model
 names, kernel names and kernel parameter names to use in order to fit each
@@ -42,10 +42,10 @@ For each data set in data, we need to specify a list of parameters
 data(bullsEye)
 data(bullsEye.cat)
 ## with default values
-ldata  = list(bullsEye, bullsEye.cat)
+ldata     <- list(bullsEye, bullsEye.cat)
 modelcont <- list(modelName="kmm_pk_s", dim = 10, kernelName="Gaussian")
 modelcat  <- list(modelName="kmm_pk_s", dim = 20, kernelName="Hamming", kernelParameters = c(0.6))
-lmodels = list( modelcont, modelcat)
+lmodels   <- list( modelcont, modelcat)
 
 model <- kmmMixedData(ldata, lmodels, nbCluster=2:5, strategy = clusterFastStrategy())
 

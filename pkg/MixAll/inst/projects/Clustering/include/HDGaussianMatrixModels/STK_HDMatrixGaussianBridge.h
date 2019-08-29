@@ -29,45 +29,45 @@
  * Originally created by Parmeet Bhatia <b..._DOT_p..._AT_gmail_Dot_com>
  **/
 
-/** @file STK_HDGaussianBridge.h
- *  @brief In this file we define the bridge classes between the HD
+/** @file STK_HDMatrixGaussianBridge.h
+ *  @brief In this file we define the bridge classes between the HD matrix valued
  *  Gaussian mixtures and the composer.
  **/
 
-#ifndef STK_HDGAUSSIANBRIDGE_H
-#define STK_HDGAUSSIANBRIDGE_H
+#ifndef STK_HDMATRIXGAUSSIANBRIDGE_H
+#define STK_HDMATRIXGAUSSIANBRIDGE_H
 
-#include <Clustering/include/HDGaussianModels/STK_HDGaussian_AjkBkQkD.h>
+#include "STK_HDMatrixGaussianModel.h"
 #include "../STK_IMixtureBridge.h"
 
 namespace STK
 {
 
 // forward declaration
-template<int Id, class Data> class HDGaussianBridge;
+template<int IdRow, int IdCol, class Data_> class HDMatrixGaussianBridge;
 
 namespace hidden
 {
 /** @ingroup hidden
- *  Partial specialization of the MixtureBridgeTraits for the HDGaussian_ajk_bk_qk_d_ model
+ *  Partial specialization of the MixtureBridgeTraits for the HDCovariance_AjkBkQkDk model
  **/
-template<class Data_>
-struct MixtureBridgeTraits< HDGaussianBridge< Clust::HDGaussian_AjkBkQkD_, Data_> >
+template<int IdRow_, int IdCol_, class Data_>
+struct MixtureBridgeTraits< HDMatrixGaussianBridge<IdRow_, IdCol_, Data_> >
 {
   typedef Data_ Data;
   /** Data Type */
-  typedef typename Data_::Type Type;
+  typedef typename hidden::Traits<Data_>::Type Type;
   /** Type of the mixture model */
-  typedef HDGaussian_AjkBkQkD<Data> Mixture;
+  typedef HDMatrixGaussianModel<IdRow_, IdCol_, Data_> Mixture;
   /** Type of the structure storing the mixture parameters */
-  typedef ModelParameters<Clust::HDGaussian_ajk_bk_qk_d_> Parameters;
+  typedef HDMatrixModelParameters<Data_> Parameters;
   /** Type of the array storing missing values indexes */
   typedef std::vector<std::pair<int,int> > MissingIndexes;
   /** Type of the array storing missing values */
   typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
   enum
   {
-    idMixtureClass_ = Clust::HDGaussian_
+    idMixtureClass_ = Clust::HDMatrixGaussian_
   };
 };
 
@@ -90,21 +90,21 @@ struct MixtureBridgeTraits< HDGaussianBridge< Clust::HDGaussian_AjkBkQkD_, Data_
  *
  * @tparam Data container of the data used by the STK::DataBridge class
  */
-template<int Id, class Data>
-class HDGaussianBridge: public IMixtureBridge< HDGaussianBridge<Id,Data> >
+template<int IdRow, int IdCol, class Data>
+class HDMatrixGaussianBridge: public IMixtureBridge< HDMatrixGaussianBridge<IdRow, IdCol,Data> >
 {
   public:
     // Base class
-    typedef IMixtureBridge< HDGaussianBridge<Id,Data> > Base;
+    typedef IMixtureBridge< HDMatrixGaussianBridge<IdRow, IdCol,Data> > Base;
     // type of Mixture
-    typedef typename hidden::MixtureBridgeTraits< HDGaussianBridge<Id,Data> >::Mixture Mixture;
-    typedef typename hidden::MixtureBridgeTraits< HDGaussianBridge<Id,Data> >::Parameters Parameters;
+    typedef typename hidden::MixtureBridgeTraits< HDMatrixGaussianBridge<IdRow, IdCol, Data> >::Mixture Mixture;
+    typedef typename hidden::MixtureBridgeTraits< HDMatrixGaussianBridge<IdRow, IdCol, Data> >::Parameters Parameters;
     // type of data
-    typedef typename hidden::MixtureBridgeTraits< HDGaussianBridge<Id,Data> >::Type Type;
+    typedef typename hidden::MixtureBridgeTraits< HDMatrixGaussianBridge<IdRow, IdCol, Data> >::Type Type;
     // class of mixture
     enum
     {
-      idMixtureClass_ = Clust::HDGaussian_
+      idMixtureClass_ = Clust::HDMatrixGaussian_
     };
     typedef std::vector<std::pair<int,int> >::const_iterator ConstIterator;
     using Base::mixture_;
@@ -119,32 +119,34 @@ class HDGaussianBridge: public IMixtureBridge< HDGaussianBridge<Id,Data> >
      *  @param idData id name of the mixture model
      *  @param nbCluster number of cluster
      **/
-    HDGaussianBridge( Data* p_dataij, String const& idData, int nbCluster)
-                    : Base( p_dataij, idData, nbCluster)
+    HDMatrixGaussianBridge( Data* p_dataij, String const& idData
+                          , int nbRow
+                          , int nbCluster
+                          )
+                          : Base( p_dataij, idData, nbCluster)
     {
       removeMissing(); // remove missing from data only once at creation
       mixture_.setData(p_data_->dataij());
     }
     /** copy constructor */
-    HDGaussianBridge( HDGaussianBridge const& bridge): Base(bridge) {}
+    HDMatrixGaussianBridge( HDMatrixGaussianBridge const& bridge): Base(bridge) {}
     /** destructor */
-    virtual ~HDGaussianBridge() {}
+    virtual ~HDMatrixGaussianBridge() {}
     /** This is a standard clone function in usual sense. It must be defined to
      *  provide new object of your class with values of various parameters
      *  equal to the values of calling object. In other words, this is
      *  equivalent to polymorphic copy constructor.
      *  @return New instance of class as that of calling object.
      */
-    virtual HDGaussianBridge* clone() const { return new HDGaussianBridge(*this);}
+    virtual HDMatrixGaussianBridge* clone() const { return new HDMatrixGaussianBridge(*this);}
     /** This is a standard create function in usual sense. It must be defined to
      *  provide new object of your class with correct dimensions and state.
      *  In other words, this is equivalent to virtual constructor.
      *  @return New instance of class as that of calling object.
      */
-    virtual HDGaussianBridge* create() const
+    virtual HDMatrixGaussianBridge* create() const
     {
-      HDGaussianBridge* p_bridge = new HDGaussianBridge( mixture_, this->idData(), this->nbCluster());
-      p_bridge->p_data_ = p_data_;
+      HDMatrixGaussianBridge* p_bridge = new HDMatrixGaussianBridge( mixture_, this->idData(), this->nbCluster());
       p_bridge->p_dataij_ = p_dataij_;
       p_bridge->mixture_.setData(*p_dataij_);
       p_bridge->v_missing_ = v_missing_;
@@ -153,7 +155,7 @@ class HDGaussianBridge: public IMixtureBridge< HDGaussianBridge<Id,Data> >
     /** @return a safe value for the jth variable
      *  @param j index of the column with the safe value needed */
     Type safeValue( int j) const
-    { return p_data_->dataij().col(j).meanSafe();}
+    { return p_dataij_->col(j).meanSafe();}
 
   private:
     /** protected constructor to use in order to create a bridge.
@@ -161,11 +163,11 @@ class HDGaussianBridge: public IMixtureBridge< HDGaussianBridge<Id,Data> >
      *  @param idData id name of the mixture
      *  @param nbCluster number of cluster
      **/
-    HDGaussianBridge( Mixture const& mixture, String const& idData, int nbCluster)
-                   : Base(mixture, idData, nbCluster)
+    HDMatrixGaussianBridge( Mixture const& mixture, String const& idData, int nbCluster)
+                          : Base(mixture, idData, nbCluster)
     {}
 };
 
 } // namespace STK
 
-#endif /* STK_HDGAUSSIANBRIDGE_H */
+#endif /* STK_HDMATRIXGAUSSIANBRIDGE_H */

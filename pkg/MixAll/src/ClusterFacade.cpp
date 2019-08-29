@@ -51,25 +51,25 @@ void ClusterFacade::createFullStrategy(Rcpp::S4 s4_strategy)
   Rcpp::S4 R_longAlgo = s4_strategy.slot("longAlgo");
 
   // get fields of the initMethod
-  std::string method = R_initMethod.slot("method");
+  String method = R_initMethod.slot("method");
   STK::Clust::initType init = STK::Clust::stringToInit(method);
   int nbInit = R_initMethod.slot("nbInit");
   Rcpp::S4 R_initAlgo = R_initMethod.slot("algo");
 
   // get fields of the initAlgo
-  std::string initAlgoName = R_initAlgo.slot("algo");
+  String initAlgoName = R_initAlgo.slot("algo");
   STK::Clust::algoType initAlgo = STK::Clust::stringToAlgo(initAlgoName);
   int nbInitIter = R_initAlgo.slot("nbIteration");
   STK::Real initEpsilon = R_initAlgo.slot("epsilon");
 
   // get fields of the shortAlgo
-  std::string shortAlgoName = R_shortAlgo.slot("algo");
+  String shortAlgoName = R_shortAlgo.slot("algo");
   STK::Clust::algoType shortAlgo = STK::Clust::stringToAlgo(shortAlgoName);
   int nbShortIter = R_shortAlgo.slot("nbIteration");
   STK::Real shortEpsilon = R_shortAlgo.slot("epsilon");
 
   // get fields of the longAlgo
-  std::string longAlgoName = R_longAlgo.slot("algo");
+  String longAlgoName = R_longAlgo.slot("algo");
   STK::Clust::algoType longAlgo = STK::Clust::stringToAlgo(longAlgoName);
   int nbLongIter = R_longAlgo.slot("nbIteration");
   STK::Real longEpsilon = R_longAlgo.slot("epsilon");

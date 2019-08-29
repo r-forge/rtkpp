@@ -38,7 +38,7 @@
 #ifndef STK_CLUST_UTIL_H
 #define STK_CLUST_UTIL_H
 
-#include <STKernel/include/STK_Real.h>
+#include <STKernel.h>
 
 namespace STK
 {
@@ -58,13 +58,13 @@ class IMixtureCriterion;
  *  in STK::Clust::Mixture enumeration.
  **/
 template <int Id> struct ModelParameters;
-/** @ingroup Clustering
- *  @brief struct handling the parameters for Monte-Carlo estimation.
- *  Parameters handlers of a mixture model have an
- *  unique Id defined in STK::Clust::Mixture enumeration.
- **/
-template <int Id> struct ParametersHandler;
 
+/** @ingroup Clustering
+ *  @brief struct storing the parameters of the matrix valued mixture.
+ *  Parameters of a matrix mixture model have two Id defined
+ *  in STK::Clust::HDCovarianceModel enumeration.
+ **/
+template <class Array_> struct HDMatrixModelParameters;
 
 namespace hidden
 {
@@ -80,6 +80,14 @@ template<class Derived> struct MixtureBridgeTraits;
  *  Mixture deriving from the Interface IMixtureDensity.
  **/
 template <class Mixture> struct MixtureTraits;
+
+/** @ingroup hidden
+ *  Main class for the mixture managers traits policy.
+ *  The traits struct MixtureManagerTraits must be specialized for any
+ *  STK::Clust::MixtureClass manager.
+ *  @sa CategoricalMixtureManager, DiagGaussianMixtureManager
+ **/
+template <class Manager> struct MixtureManagerTraits;
 
 } // namespace hidden
 
@@ -102,7 +110,7 @@ enum initType
   randomParamInit_ = 0, ///< initialize randomly the parameters
   randomClassInit_ = 1, ///< initialize randomly the class labels
   randomFuzzyInit_ = 2, ///< initialize randomly the partnership class probabilities
-  valuePramaInit_ = 3   ///< initialize parameters using given values
+  valueParamInit_ = 3   ///< initialize parameters using given values
 };
 
 /** @ingroup Clustering
@@ -122,7 +130,7 @@ enum initType
  *  @note if the string is not found in the list above,the type Clust::randomClassInit_
  *  is returned.
  **/
-initType stringToInit( std::string const& type);
+initType stringToInit( String const& type);
 
 /** @ingroup Clustering
  *  Estimation algorithms
@@ -147,14 +155,14 @@ enum algoType
  * <tr> <td> "em"          </td></tr>
  * <tr> <td> "cem"         </td></tr>
  * <tr> <td> "sem"         </td></tr>
- * <tr> <td> "semiSem"         </td></tr>
+ * <tr> <td> "semiSem"     </td></tr>
  * </table>
  *  @param type the type of algorithm wanted
  *  @return the algoType corresponding (default is emAlgo)
  *  @note The capitalized letters have no effect and if the string is not found
  *  in the list above, the type Clust::emAlgo_ is returned.
  **/
-algoType stringToAlgo( std::string const& type);
+algoType stringToAlgo( String const& type);
 
 /** @ingroup Clustering
  *  Learning estimation algorithms
@@ -177,7 +185,7 @@ enum algoPredictType
  *  @note The capitalized letters have no effect and if the string is not found
  *  in the list above, the type Clust::emPredictAlgo_ is returned.
  **/
-algoPredictType stringToPredictAlgo( std::string const& type);
+algoPredictType stringToPredictAlgo( String const& type);
 
 /** @ingroup Clustering
  *  Learning estimation algorithms
@@ -202,7 +210,7 @@ enum algoLearnType
  *  @note The capitalized letters have no effect and if the string is not found
  *  in the list above,the type Clust::emAlgo_ is returned.
  **/
-algoLearnType stringToLearnAlgo( std::string const& type);
+algoLearnType stringToLearnAlgo( String const& type);
 
 /** @ingroup Clustering
  *  strategy of estimation
@@ -240,7 +248,7 @@ enum criterionType
  *  @note The capitalized letters have no effect and if the string is not found
  *  in the list above,the type Clust::bic_ is returned.
  **/
-criterionType stringToCriterion( std::string const& type);
+criterionType stringToCriterion( String const& type);
 
 /** @ingroup Clustering
  *  Specific exceptions allowing to handle the erroros that can occur in the
@@ -256,6 +264,7 @@ enum exceptions
   initializeStepFail_,
   mStepFail_,
   eStepFail_,
+  mapStepFail_,
   cStepFail_,
   sStepFail_
 };
@@ -281,6 +290,328 @@ enum modelState
 };
 
 /** @ingroup Clustering
+ *  list of the parsimonious covariance models that can be used
+ **/
+enum ParsimoniousCovarianceModel
+{
+  Covariance_EII_ =100,
+  Covariance_VII_,
+  Covariance_EEI_,
+  Covariance_VEI_,
+  Covariance_EVI_,
+  Covariance_VVI_,
+  Covariance_EEE_,
+  Covariance_VEE_,
+  Covariance_EVE_,
+  Covariance_VVE_,
+  Covariance_EEV_,
+  Covariance_VEV_,
+  Covariance_EVV_,
+  Covariance_VVV_  // =114
+};
+/** @ingroup Clustering
+ *  list of the HD covariance models that can be used
+ **/
+enum HDCovarianceModel
+{
+  HDCovariance_AjkBkQkDk_ =120,
+  HDCovariance_AjkBkQkD_,
+  HDCovariance_AjkBkQDk_,
+  HDCovariance_AjkBkQD_,
+  HDCovariance_AjkBQkDk_,
+  HDCovariance_AjkBQkD_,
+  HDCovariance_AjkBQDk_,
+  HDCovariance_AjkBQD_,
+  HDCovariance_AkBkQkDk_,
+  HDCovariance_AkBkQkD_,
+  HDCovariance_AkBkQDk_,
+  HDCovariance_AkBkQD_,
+  HDCovariance_AkBQkDk_,
+  HDCovariance_AkBQkD_,
+  HDCovariance_AkBQDk_,
+  HDCovariance_AkBQD_,
+  HDCovariance_AjBkQkDk_,
+  HDCovariance_AjBkQkD_,
+  HDCovariance_AjBkQDk_,
+  HDCovariance_AjBkQD_,
+  HDCovariance_AjBQkDk_,
+  HDCovariance_AjBQkD_,
+  HDCovariance_AjBQDk_,
+  HDCovariance_AjBQD_,
+  HDCovariance_ABkQkDk_,
+  HDCovariance_ABkQkD_,
+  HDCovariance_ABkQDk_,
+  HDCovariance_ABkQD_,
+  HDCovariance_ABQkDk_,
+  HDCovariance_ABQkD_,
+  HDCovariance_ABQDk_,
+  HDCovariance_ABQD_ // =151
+};
+
+} // namespace Clust
+
+namespace hidden
+{
+template<int Id> struct HDCovarianceChooser;
+
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_AjkBkQkDk_>
+{
+  const bool isAj_ = true;
+  const bool isAk_ = true;
+  const bool isBk_ = true;
+  const bool isQk_ = true;
+  const bool isDk_ = true;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_AjkBkQkD_>
+{
+  const bool isAj_ = true;
+  const bool isAk_ = true;
+  const bool isBk_ = true;
+  const bool isQk_ = true;
+  const bool isDk_ = false;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_AjkBkQDk_>
+{
+  const bool isAj_ = true;
+  const bool isAk_ = true;
+  const bool isBk_ = true;
+  const bool isQk_ = false;
+  const bool isDk_ = true;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_AjkBkQD_>
+{
+  const bool isAj_ = true;
+  const bool isAk_ = true;
+  const bool isBk_ = true;
+  const bool isQk_ = false;
+  const bool isDk_ = false;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_AjkBQkDk_>
+{
+  const bool isAj_ = true;
+  const bool isAk_ = true;
+  const bool isBk_ = false;
+  const bool isQk_ = true;
+  const bool isDk_ = true;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_AjkBQkD_>
+{
+  const bool isAj_ = true;
+  const bool isAk_ = true;
+  const bool isBk_ = false;
+  const bool isQk_ = true;
+  const bool isDk_ = false;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_AjkBQDk_>
+{
+  const bool isAj_ = true;
+  const bool isAk_ = true;
+  const bool isBk_ = false;
+  const bool isQk_ = false;
+  const bool isDk_ = true;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_AjkBQD_>
+{
+  const bool isAj_ = true;
+  const bool isAk_ = true;
+  const bool isBk_ = false;
+  const bool isQk_ = false;
+  const bool isDk_ = false;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_AkBkQkDk_>
+{
+  const bool isAj_ = false;
+  const bool isAk_ = true;
+  const bool isBk_ = true;
+  const bool isQk_ = true;
+  const bool isDk_ = true;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_AkBkQkD_>
+{
+  const bool isAj_ = false;
+  const bool isAk_ = true;
+  const bool isBk_ = true;
+  const bool isQk_ = true;
+  const bool isDk_ = false;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_AkBkQDk_>
+{
+  const bool isAj_ = false;
+  const bool isAk_ = true;
+  const bool isBk_ = true;
+  const bool isQk_ = false;
+  const bool isDk_ = true;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_AkBkQD_>
+{
+  const bool isAj_ = false;
+  const bool isAk_ = true;
+  const bool isBk_ = true;
+  const bool isQk_ = false;
+  const bool isDk_ = false;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_AkBQkDk_>
+{
+  const bool isAj_ = false;
+  const bool isAk_ = true;
+  const bool isBk_ = false;
+  const bool isQk_ = true;
+  const bool isDk_ = true;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_AkBQkD_>
+{
+  const bool isAj_ = false;
+  const bool isAk_ = true;
+  const bool isBk_ = false;
+  const bool isQk_ = true;
+  const bool isDk_ = false;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_AkBQDk_>
+{
+  const bool isAj_ = false;
+  const bool isAk_ = true;
+  const bool isBk_ = false;
+  const bool isQk_ = false;
+  const bool isDk_ = true;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_AkBQD_>
+{
+  const bool isAj_ = false;
+  const bool isAk_ = true;
+  const bool isBk_ = false;
+  const bool isQk_ = false;
+  const bool isDk_ = false;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_AjBkQkDk_>
+{
+  const bool isAj_ = true;
+  const bool isAk_ = false;
+  const bool isBk_ = true;
+  const bool isQk_ = true;
+  const bool isDk_ = true;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_AjBkQkD_>
+{
+  const bool isAj_ = true;
+  const bool isAk_ = false;
+  const bool isBk_ = true;
+  const bool isQk_ = true;
+  const bool isDk_ = false;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_AjBkQDk_>
+{
+  const bool isAj_ = true;
+  const bool isAk_ = false;
+  const bool isBk_ = true;
+  const bool isQk_ = false;
+  const bool isDk_ = true;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_AjBkQD_>
+{
+  const bool isAj_ = true;
+  const bool isAk_ = false;
+  const bool isBk_ = true;
+  const bool isQk_ = false;
+  const bool isDk_ = false;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_AjBQkDk_>
+{
+  const bool isAj_ = true;
+  const bool isAk_ = false;
+  const bool isBk_ = false;
+  const bool isQk_ = true;
+  const bool isDk_ = true;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_AjBQkD_>
+{
+  const bool isAj_ = true;
+  const bool isAk_ = false;
+  const bool isBk_ = false;
+  const bool isQk_ = true;
+  const bool isDk_ = false;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_ABkQkDk_>
+{
+  const bool isAj_ = false;
+  const bool isAk_ = false;
+  const bool isBk_ = true;
+  const bool isQk_ = true;
+  const bool isDk_ = true;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_ABkQkD_>
+{
+  const bool isAj_ = false;
+  const bool isAk_ = false;
+  const bool isBk_ = true;
+  const bool isQk_ = true;
+  const bool isDk_ = false;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_ABkQDk_>
+{
+  const bool isAj_ = false;
+  const bool isAk_ = false;
+  const bool isBk_ = true;
+  const bool isQk_ = false;
+  const bool isDk_ = true;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_ABkQD_>
+{
+  const bool isAj_ = false;
+  const bool isAk_ = false;
+  const bool isBk_ = true;
+  const bool isQk_ = false;
+  const bool isDk_ = false;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_ABQkDk_>
+{
+  const bool isAj_ = false;
+  const bool isAk_ = false;
+  const bool isBk_ = false;
+  const bool isQk_ = true;
+  const bool isDk_ = true;
+};
+template<>
+struct HDCovarianceChooser<Clust::HDCovariance_ABQkD_>
+{
+  const bool isAj_ = false;
+  const bool isAk_ = false;
+  const bool isBk_ = false;
+  const bool isQk_ = true;
+  const bool isDk_ = false;
+};
+
+}  // namespace hidden
+
+namespace Clust
+{
+/** @ingroup Clustering
  * list of the mixtures that can be used by the composer
  **/
 enum Mixture
@@ -302,34 +633,6 @@ enum Mixture
   Gaussian_sj_,
   Gaussian_s_,
   Gaussian_sjsk_, // = 24
-  HDGaussian_ajk_bk_qk_dk_ =120,
-  HDGaussian_ajk_bk_qk_d_,
-  HDGaussian_ajk_bk_q_dk_,
-  HDGaussian_ajk_bk_q_d_,
-  HDGaussian_ajk_b_qk_dk_,
-  HDGaussian_ajk_b_qk_d_,
-  HDGaussian_ajk_b_q_dk_,
-  HDGaussian_ajk_b_q_d_,
-  HDGaussian_ak_bk_qk_dk_,
-  HDGaussian_ak_bk_qk_d_,
-  HDGaussian_ak_bk_q_dk_,
-  HDGaussian_ak_bk_q_d_,
-  HDGaussian_ak_b_qk_dk_,
-  HDGaussian_ak_b_qk_d_,
-  HDGaussian_ak_b_q_dk_,
-  HDGaussian_ak_b_q_d_,
-  HDGaussian_aj_bk_qk_dk_,
-  HDGaussian_aj_bk_qk_d_,
-  HDGaussian_aj_bk_q_dk_,
-  HDGaussian_aj_bk_q_d_,
-  HDGaussian_aj_b_qk_dk_,
-  HDGaussian_aj_b_qk_d_,
-  HDGaussian_a_bk_qk_dk_,
-  HDGaussian_a_bk_qk_d_,
-  HDGaussian_a_bk_q_dk_,
-  HDGaussian_a_bk_q_d_,
-  HDGaussian_a_b_qk_dk_,
-  HDGaussian_a_b_qk_d_, // =147
   Categorical_pjk_ =40,
   Categorical_pk_,
   Poisson_ljk_ = 60,
@@ -337,17 +640,62 @@ enum Mixture
   Poisson_ljlk_,
   Kmm_sk_ = 80,
   Kmm_s_,
+  HDGaussian_AjkBkQkDk_ =120,
+  HDGaussian_AjkBkQkD_,
+  HDGaussian_AjkBkQDk_,
+  HDGaussian_AjkBkQD_,
+  HDGaussian_AjkBQkDk_,
+  HDGaussian_AjkBQkD_,
+  HDGaussian_AjkBQDk_,
+  HDGaussian_AjkBQD_,
+  HDGaussian_AkBkQkDk_,
+  HDGaussian_AkBkQkD_,
+  HDGaussian_AkBkQDk_,
+  HDGaussian_AkBkQD_,
+  HDGaussian_AkBQkDk_,
+  HDGaussian_AkBQkD_,
+  HDGaussian_AkBQDk_,
+  HDGaussian_AkBQD_,
+  HDGaussian_AjBkQkDk_,
+  HDGaussian_AjBkQkD_,
+  HDGaussian_AjBkQDk_,
+  HDGaussian_AjBkQD_,
+  HDGaussian_AjBQkDk_,
+  HDGaussian_AjBQkD_,
+  HDGaussian_ABkQkDk_,
+  HDGaussian_ABkQkD_,
+  HDGaussian_ABkQDk_,
+  HDGaussian_ABkQD_,
+  HDGaussian_ABQkDk_,
+  HDGaussian_ABQkD_,
+  HDGaussian_ABQD_,   // =148
   unknown_mixture_ = -1
+};
+
+/** @ingroup Clustering
+ *  list of the class of mixture implemented in stkpp
+ **/
+enum MixtureClass
+{
+  Gamma_,
+  DiagGaussian_,
+  Categorical_,
+  Poisson_,
+  Kmm_,
+  Matrix_,
+  HDGaussian_,
+  HDMatrixGaussian_,
+  unknown_mixture_class_ = -1
 };
 
 /** @ingroup Clustering
  *  Convert a String to a Mixture. The recognized strings are
  * <table >
  * <tr> <th> Model             </th> </tr>
- * <tr> <td> "Gamma_ajk_bjk"   </td></tr>
- * <tr> <td> "Gamma_ajk_bk"    </td></tr>
- * <tr> <td> "Gamma_ajk_bj"    </td></tr>
- * <tr> <td> "Gamma_ajk_b"     </td></tr>
+ * <tr> <td> "Gamma_Ajkbjk"   </td></tr>
+ * <tr> <td> "Gamma_Ajkbk"    </td></tr>
+ * <tr> <td> "Gamma_Ajkbj"    </td></tr>
+ * <tr> <td> "Gamma_Ajkb"     </td></tr>
  * <tr> <td> "Gamma_ak_bjk"    </td></tr>
  * <tr> <td> "Gamma_ak_bk"     </td></tr>
  * <tr> <td> "Gamma_ak_bj"     </td></tr>
@@ -361,34 +709,35 @@ enum Mixture
  * <tr> <td> "Gaussian_sj"     </td></tr>
  * <tr> <td> "Gaussian_s"      </td></tr>
  * <tr> <td> "Gaussian_sjsk"   </td></tr>
- * <tr> <td> "HDGaussian_ajk_bk_qk_dk" </td></tr>
- * <tr> <td> "HDGaussian_ajk_bk_qk_d"  </td></tr>
- * <tr> <td> "HDGaussian_ajk_bk_q_dk"  </td></tr>
- * <tr> <td> "HDGaussian_ajk_bk_q_d"   </td></tr>
- * <tr> <td> "HDGaussian_ajk_b_qk_dk"  </td></tr>
- * <tr> <td> "HDGaussian_ajk_b_qk_d"   </td></tr>
- * <tr> <td> "HDGaussian_ajk_b_q_dk"   </td></tr>
- * <tr> <td> "HDGaussian_ajk_b_q_d"    </td></tr>
- * <tr> <td> "HDGaussian_ak_bk_qk_dk"  </td></tr>
- * <tr> <td> "HDGaussian_ak_bk_qk_d"   </td></tr>
- * <tr> <td> "HDGaussian_ak_bk_q_dk"   </td></tr>
- * <tr> <td> "HDGaussian_ak_bk_q_d"    </td></tr>
- * <tr> <td> "HDGaussian_ak_b_qk_dk"   </td></tr>
- * <tr> <td> "HDGaussian_ak_b_qk_d"    </td></tr>
- * <tr> <td> "HDGaussian_ak_b_q_dk"    </td></tr>
- * <tr> <td> "HDGaussian_ak_b_q_d"     </td></tr>
- * <tr> <td> "HDGaussian_aj_bk_qk_dk"  </td></tr>
- * <tr> <td> "HDGaussian_aj_bk_qk_d"   </td></tr>
- * <tr> <td> "HDGaussian_aj_bk_q_dk"   </td></tr>
- * <tr> <td> "HDGaussian_aj_bk_q_d"    </td></tr>
- * <tr> <td> "HDGaussian_aj_b_qk_dk"   </td></tr>
- * <tr> <td> "HDGaussian_aj_b_qk_d"    </td></tr>
- * <tr> <td> "HDGaussian_a_bk_qk_dk"   </td></tr>
- * <tr> <td> "HDGaussian_a_bk_qk_d" </td></tr>
- * <tr> <td> "HDGaussian_a_bk_q_dk" </td></tr>
- * <tr> <td> "HDGaussian_a_bk_q_d," </td></tr>
- * <tr> <td> "HDGaussian_a_b_qk_dk" </td></tr>
- * <tr> <td> "HDGaussian_a_b_qk_d"  </td></tr>
+ * <tr> <td> "HDGaussian_AjkBkQkDk" </td></tr>
+ * <tr> <td> "HDGaussian_AjkBkQkD"  </td></tr>
+ * <tr> <td> "HDGaussian_AjkBkQdk"  </td></tr>
+ * <tr> <td> "HDGaussian_AjkBkQd"   </td></tr>
+ * <tr> <td> "HDGaussian_AjkBQkDk"  </td></tr>
+ * <tr> <td> "HDGaussian_AjkBQkD"   </td></tr>
+ * <tr> <td> "HDGaussian_AjkBQdk"   </td></tr>
+ * <tr> <td> "HDGaussian_AjkBQd"    </td></tr>
+ * <tr> <td> "HDGaussian_AkBkQkDk"  </td></tr>
+ * <tr> <td> "HDGaussian_AkBkQkD"   </td></tr>
+ * <tr> <td> "HDGaussian_AkBkQdk"   </td></tr>
+ * <tr> <td> "HDGaussian_AkBkQd"    </td></tr>
+ * <tr> <td> "HDGaussian_AkBQkDk"   </td></tr>
+ * <tr> <td> "HDGaussian_AkBQkD"    </td></tr>
+ * <tr> <td> "HDGaussian_AkBQdk"    </td></tr>
+ * <tr> <td> "HDGaussian_AkBQd"     </td></tr>
+ * <tr> <td> "HDGaussian_AjBkQkDk"  </td></tr>
+ * <tr> <td> "HDGaussian_AjBkQkD"   </td></tr>
+ * <tr> <td> "HDGaussian_AjBkQdk"   </td></tr>
+ * <tr> <td> "HDGaussian_AjBkQd"    </td></tr>
+ * <tr> <td> "HDGaussian_AjBQkDk"   </td></tr>
+ * <tr> <td> "HDGaussian_AjBQkD"    </td></tr>
+ * <tr> <td> "HDGaussian_ABkQkDk"   </td></tr>
+ * <tr> <td> "HDGaussian_ABkQkD"    </td></tr>
+ * <tr> <td> "HDGaussian_ABkQdk"    </td></tr>
+ * <tr> <td> "HDGaussian_ABkQd,"    </td></tr>
+ * <tr> <td> "HDGaussian_ABQkDk"    </td></tr>
+ * <tr> <td> "HDGaussian_ABQkD"     </td></tr>
+ * <tr> <td> "HDGaussian_ABQD"      </td></tr>
  * <tr> <td> "Categorical_pjk"      </td></tr>
  * <tr> <td> "Categorical_pk"       </td></tr>
  * <tr> <td> "Poisson_ljk"          </td></tr>
@@ -401,7 +750,7 @@ enum Mixture
  *  @return the Mixture represented by the String @c type. if the string
  *  does not match any known name, the @c unknown_mixture_ type is returned.
  **/
-Mixture stringToMixture( std::string const& type);
+Mixture stringToMixture( String const& type);
 
 /** @ingroup Clustering
  *  convert a string to a Mixture and specify if the model is with free proportions
@@ -425,55 +774,56 @@ Mixture stringToMixture( std::string const& type);
  * <tr> <td> "Gaussian_pk_sj"     </td><td> "Gaussian_p_sj"     </td> </tr>
  * <tr> <td> "Gaussian_pk_s"      </td><td> "Gaussian_p_s"      </td> </tr>
  * <tr> <td> "Gaussian_pk_sjsk"   </td><td> "Gaussian_p_sjsk"   </td> </tr>
- * <tr> <td> "HDGaussian_pk_ajk_bk_qk_dk" </td><td> "HDGaussian_p_ajk_bk_qk_dk" </td></tr>
- * <tr> <td> "HDGaussian_pk_ajk_bk_qk_d"  </td><td> "HDGaussian_p_ajk_bk_qk_d"  </td>/tr>
- * <tr> <td> "HDGaussian_pk_ajk_bk_q_dk"  </td><td> "HDGaussian_p_ajk_bk_q_dk"  </td></tr>
- * <tr> <td> "HDGaussian_pk_ajk_bk_q_d"   </td><td> "HDGaussian_p_ajk_bk_q_d"   </td></tr>
- * <tr> <td> "HDGaussian_pk_ajk_b_qk_dk"  </td><td> "HDGaussian_p_ajk_b_qk_dk"  </td></tr>
- * <tr> <td> "HDGaussian_pk_ajk_b_qk_d"   </td><td> "HDGaussian_p_ajk_b_qk_d"   </td></tr>
- * <tr> <td> "HDGaussian_pk_ajk_b_q_dk"   </td><td> "HDGaussian_p_ajk_b_q_dk"   </td></tr>
- * <tr> <td> "HDGaussian_pk_ajk_b_q_d"    </td><td> "HDGaussian_p_ajk_b_q_d"    </td></tr>
- * <tr> <td> "HDGaussian_pk_ak_bk_qk_dk"  </td><td> "HDGaussian_p_ak_bk_qk_dk"  </td></tr>
- * <tr> <td> "HDGaussian_pk_ak_bk_qk_d"   </td><td> "HDGaussian_p_ak_bk_qk_d"   </td></tr>
- * <tr> <td> "HDGaussian_pk_ak_bk_q_dk"   </td><td> "HDGaussian_p_ak_bk_q_dk"   </td></tr>
- * <tr> <td> "HDGaussian_pk_ak_bk_q_d"    </td><td> "HDGaussian_p_ak_bk_q_d"    </td></tr>
- * <tr> <td> "HDGaussian_pk_ak_b_qk_dk"   </td><td> "HDGaussian_p_ak_b_qk_dk"   </td></tr>
- * <tr> <td> "HDGaussian_pk_ak_b_qk_d"    </td><td> "HDGaussian_p_ak_b_qk_d"    </td></tr>
- * <tr> <td> "HDGaussian_pk_ak_b_q_dk"    </td><td> "HDGaussian_p_ak_b_q_dk"    </td></tr>
- * <tr> <td> "HDGaussian_pk_ak_b_q_d"     </td><td> "HDGaussian_p_ak_b_q_d"     </td></tr>
- * <tr> <td> "HDGaussian_pk_aj_bk_qk_dk"  </td><td> "HDGaussian_p_aj_bk_qk_dk"  </td></tr>
- * <tr> <td> "HDGaussian_pk_aj_bk_qk_d"   </td><td> "HDGaussian_p_aj_bk_qk_d"   </td></tr>
- * <tr> <td> "HDGaussian_pk_aj_bk_q_dk"   </td><td> "HDGaussian_p_aj_bk_q_dk"   </td></tr>
- * <tr> <td> "HDGaussian_pk_aj_bk_q_d"    </td><td> "HDGaussian_p_aj_bk_q_d"    </td></tr>
- * <tr> <td> "HDGaussian_pk_aj_b_qk_dk"   </td><td> "HDGaussian_p_aj_b_qk_dk"   </td></tr>
- * <tr> <td> "HDGaussian_pk_aj_b_qk_d"    </td><td> "HDGaussian_p_aj_b_qk_d"    </td></tr>
- * <tr> <td> "HDGaussian_pk_a_bk_qk_dk"   </td><td> "HDGaussian_p_a_bk_qk_dk"   </td></tr>
- * <tr> <td> "HDGaussian_pk_a_bk_qk_d"    </td><td> "HDGaussian_p_a_bk_qk_d"    </td></tr>
- * <tr> <td> "HDGaussian_pk_a_bk_q_dk"    </td><td> "HDGaussian_p_a_bk_q_dk"    </td></tr>
- * <tr> <td> "HDGaussian_pk_a_bk_q_d,"    </td><td> "HDGaussian_p_a_bk_q_d,"    </td></tr>
- * <tr> <td> "HDGaussian_pk_a_b_qk_dk"    </td><td> "HDGaussian_p_a_b_qk_dk"    </td></tr>
- * <tr> <td> "HDGaussian_pk_a_b_qk_d"     </td><td> "HDGaussian_p_a_b_qk_d"     </td></tr>
- * <tr> <td> "Categorical_pk_pjk"  </td><td> "Categorical_p_pjk" </td> </tr>
- * <tr> <td> "Categorical_pk_pk"   </td><td> "Categorical_p_pk"  </td> </tr>
- * <tr> <td> "Poisson_pk_ljk"      </td><td> "Poisson_p_ljk"     </td> </tr>
- * <tr> <td> "Poisson_pk_lk"       </td><td> "Poisson_p_lk"      </td> </tr>
- * <tr> <td> "Poisson_pk_ljlk"     </td><td> "Poisson_p_ljlk"    </td> </tr>
- * <tr> <td> "Kmm_pk_sk"           </td><td> "Kmm_p_sk"    </td> </tr>
- * <tr> <td> "Kmm_pk_s"            </td><td> "Kmm_p_s"    </td> </tr>
+ * <tr> <td> "HDGaussian_pk_AjkBkQkDk" </td><td> "HDGaussian_p_AjkBkQkDk" </td></tr>
+ * <tr> <td> "HDGaussian_pk_AjkBkQkD"  </td><td> "HDGaussian_p_AjkBkQkD"  </td></tr>
+ * <tr> <td> "HDGaussian_pk_AjkBkQdk"  </td><td> "HDGaussian_p_AjkBkQdk"  </td></tr>
+ * <tr> <td> "HDGaussian_pk_AjkBkQd"   </td><td> "HDGaussian_p_AjkBkQd"   </td></tr>
+ * <tr> <td> "HDGaussian_pk_AjkBQkDk"  </td><td> "HDGaussian_p_AjkBQkDk"  </td></tr>
+ * <tr> <td> "HDGaussian_pk_AjkBQkD"   </td><td> "HDGaussian_p_AjkBQkD"   </td></tr>
+ * <tr> <td> "HDGaussian_pk_AjkBQdk"   </td><td> "HDGaussian_p_AjkBQdk"   </td></tr>
+ * <tr> <td> "HDGaussian_pk_AjkBQd"    </td><td> "HDGaussian_p_AjkBQd"    </td></tr>
+ * <tr> <td> "HDGaussian_pk_AkBkQkDk"  </td><td> "HDGaussian_p_AkBkQkDk"  </td></tr>
+ * <tr> <td> "HDGaussian_pk_AkBkQkD"   </td><td> "HDGaussian_p_AkBkQkD"   </td></tr>
+ * <tr> <td> "HDGaussian_pk_AkBkQdk"   </td><td> "HDGaussian_p_AkBkQdk"   </td></tr>
+ * <tr> <td> "HDGaussian_pk_AkBkQd"    </td><td> "HDGaussian_p_AkBkQd"    </td></tr>
+ * <tr> <td> "HDGaussian_pk_AkBQkDk"   </td><td> "HDGaussian_p_AkBQkDk"   </td></tr>
+ * <tr> <td> "HDGaussian_pk_AkBQkD"    </td><td> "HDGaussian_p_AkBQkD"    </td></tr>
+ * <tr> <td> "HDGaussian_pk_AkBQdk"    </td><td> "HDGaussian_p_AkBQdk"    </td></tr>
+ * <tr> <td> "HDGaussian_pk_AkBQd"     </td><td> "HDGaussian_p_AkBQd"     </td></tr>
+ * <tr> <td> "HDGaussian_pk_AjBkQkDk"  </td><td> "HDGaussian_p_AjBkQkDk"  </td></tr>
+ * <tr> <td> "HDGaussian_pk_AjBkQkD"   </td><td> "HDGaussian_p_AjBkQkD"   </td></tr>
+ * <tr> <td> "HDGaussian_pk_AjBkQdk"   </td><td> "HDGaussian_p_AjBkQdk"   </td></tr>
+ * <tr> <td> "HDGaussian_pk_AjBkQd"    </td><td> "HDGaussian_p_AjBkQd"    </td></tr>
+ * <tr> <td> "HDGaussian_pk_AjBQkDk"   </td><td> "HDGaussian_p_AjBQkDk"   </td></tr>
+ * <tr> <td> "HDGaussian_pk_AjBQkD"    </td><td> "HDGaussian_p_AjBQkD"    </td></tr>
+ * <tr> <td> "HDGaussian_pk_ABkQkDk"   </td><td> "HDGaussian_p_ABkQkDk"   </td></tr>
+ * <tr> <td> "HDGaussian_pk_ABkQkD"    </td><td> "HDGaussian_p_ABkQkD"    </td></tr>
+ * <tr> <td> "HDGaussian_pk_ABkQdk"    </td><td> "HDGaussian_p_ABkQdk"    </td></tr>
+ * <tr> <td> "HDGaussian_pk_ABkQd,"    </td><td> "HDGaussian_p_ABkQd,"    </td></tr>
+ * <tr> <td> "HDGaussian_pk_ABQkDk"    </td><td> "HDGaussian_p_ABQkDk"    </td></tr>
+ * <tr> <td> "HDGaussian_pk_ABQkD"     </td><td> "HDGaussian_p_ABQkD"     </td></tr>
+ * <tr> <td> "HDGaussian_pk_ABQD"      </td><td> "HDGaussian_p_ABQD"      </td></tr>
+ * <tr> <td> "Categorical_pk_pjk"     </td><td> "Categorical_p_pjk" </td> </tr>
+ * <tr> <td> "Categorical_pk_pk"      </td><td> "Categorical_p_pk"  </td> </tr>
+ * <tr> <td> "Poisson_pk_ljk"         </td><td> "Poisson_p_ljk"     </td> </tr>
+ * <tr> <td> "Poisson_pk_lk"          </td><td> "Poisson_p_lk"      </td> </tr>
+ * <tr> <td> "Poisson_pk_ljlk"        </td><td> "Poisson_p_ljlk"    </td> </tr>
+ * <tr> <td> "Kmm_pk_sk"              </td><td> "Kmm_p_sk"          </td> </tr>
+ * <tr> <td> "Kmm_pk_s"               </td><td> "Kmm_p_s"           </td> </tr>
  * </table>
  *  @param type the String we want to convert
  *  @param[out] freeProp @c true if the model have free proportions, @c false otherwise.
  *  @return the Mixture represented by the String @c type. if the string
  *  does not match any known name, the @c unknown_mixture_ type is returned.
  **/
-Mixture stringToMixture( std::string const& type, bool& freeProp);
+Mixture stringToMixture( String const& type, bool& freeProp);
 
 /** @ingroup Clustering
  *  convert a Mixture to a String.
  *  @param type the type of Mixture we want to convert
  *  @return the string associated to this type.
  **/
-std::string mixtureToString( Mixture const& type);
+String mixtureToString( Mixture const& type);
 
 /** @ingroup Clustering
  *  convert a Mixture to a string specifying if the model is with free
@@ -483,21 +833,7 @@ std::string mixtureToString( Mixture const& type);
  *  @param freeProp @c true if the model have free proportions, @c false otherwise.
  *  @return the string represented by the Mixture @c type.
  **/
-std::string mixtureToString(Mixture type, bool freeProp);
-
-/** @ingroup Clustering
- *  list of the class of mixture implemented in stkpp
- **/
-enum MixtureClass
-{
-  Gamma_,
-  DiagGaussian_,
-  HDGaussian_,
-  Categorical_,
-  Poisson_,
-  Kmm_,
-  unknown_mixture_class_ = -1
-};
+String mixtureToString(Mixture type, bool freeProp);
 
 /** @ingroup Clustering
  *  convert a Mixture to a MixtureClass.
@@ -555,7 +891,7 @@ IMixtureCriterion* createCriterion( Clust::criterionType criterion);
 /** @return a pointer on the class computing the criterion
  *  @param criterion string with the criterion name
  **/
-STK::IMixtureCriterion* createCriterion( std::string const& criterion);
+STK::IMixtureCriterion* createCriterion( String const& criterion);
 
 /** @ingroup Clustering
  *  utility function for creating an estimation algorithm.
@@ -602,7 +938,7 @@ inline IMixtureAlgo* createShortRunAlgo( Clust::algoType algo = defaultAlgoShort
                                        , Real epsilon         = defaultEpsilonShortRun)
 { return createAlgo(algo, nbIterMax, epsilon);}
 /** @ingroup Clustering
- *  utility function for creating a a short Run algorithm.
+ *  utility function for creating a long Run algorithm.
  *  @param algo the algorithm to create
  *  @param nbIterMax the maximal number of iteration of the algorithm
  *  @param epsilon the tolerance of the algorithm

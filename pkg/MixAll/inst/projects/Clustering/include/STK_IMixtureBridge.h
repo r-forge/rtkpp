@@ -48,7 +48,7 @@ namespace STK
  *
  *  This interface produce a default implementation to all the virtual
  *  functions required by the STK::IMixture interface by delegating
- *  to the bridged Mixture or ParamHandler the computations.
+ *  to the derived bridged Mixture the computations.
  *
  *  The virtual methods to implement in derived class are
  *  @code
@@ -56,14 +56,13 @@ namespace STK
  *    virtual Derived* clone() const;
  *  @endcode
  *
- *  Pseudo virtual method to implement in derived classe are
+ *  Pseudo virtual method to implement in derived class are
  *  @code$
  *    safeValue(j); // return a safe value for column j
  *  @endcode
  *  The members of this interface are the following
  *  @code
  *    Mixture mixture_;           // concrete class deriving from STK::IMixtureDensity
- *    ParamHandler paramHandler_; // specialization of the STK::ParametersHandler struct
  *    MissingIndexes v_missing_;  // array with the indexes (i,j) of the missing values
  *    Data* p_dataij_;
  *  @endcode
@@ -77,17 +76,16 @@ class IMixtureBridge: public IMixture, public IRecursiveTemplate<Derived>
     typedef typename hidden::MixtureBridgeTraits<Derived>::Data Data;
     typedef typename hidden::MixtureBridgeTraits<Derived>::Type Type;
     typedef typename hidden::MixtureBridgeTraits<Derived>::Parameters Parameters;
-    typedef typename hidden::MixtureBridgeTraits<Derived>::ParamHandler ParamHandler;
+    typedef typename hidden::MixtureBridgeTraits<Derived>::MissingIndexes MissingIndexes;
+    typedef typename hidden::MixtureBridgeTraits<Derived>::MissingValues MissingValues;
+    typedef typename MissingIndexes::const_iterator ConstIterator;
+
     enum
     {
       // class of mixture
       idMixtureClass_ = hidden::MixtureBridgeTraits<Derived>::idMixtureClass_
     };
 
-    // iterator on the index pair of missing values
-    typedef std::vector<std::pair<int,int> > MissingIndexes;
-    typedef MissingIndexes::const_iterator ConstIterator;
-    typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
 
   protected:
     /** default constructor.
@@ -95,11 +93,17 @@ class IMixtureBridge: public IMixture, public IRecursiveTemplate<Derived>
      *  @param idData id name of the data
      *  @param nbCluster number of cluster
      **/
-    IMixtureBridge( Data* p_data, std::string const& idData, int nbCluster);
+    IMixtureBridge( Data* p_data, String const& idData, int nbCluster);
     /** copy constructor
      *  @param bridge the IMixtureBridge to copy
      **/
     IMixtureBridge( IMixtureBridge const& bridge);
+    /** protected constructor to use in order to create a bridge.
+     *  @param mixture the mixture to copy
+     *  @param idData id name of the mixture
+     *  @param nbCluster number of cluster
+     **/
+    IMixtureBridge( Mixture const& mixture, String const& idData, int nbCluster);
     /** destructor */
     virtual ~IMixtureBridge() {}
 
@@ -107,8 +111,6 @@ class IMixtureBridge: public IMixture, public IRecursiveTemplate<Derived>
     // getters
     /** @return the mixture */
     inline Mixture const& mixture() const { return mixture_;}
-    /** @return the structure managing parameters. */
-    inline ParamHandler const& paramHandler() const { return paramHandler_;}
     /** @return coordinates of the missing values in the data set */
     inline MissingIndexes const& v_missing() const { return v_missing_;}
     /** @return the pointer on the data set */
@@ -120,6 +122,7 @@ class IMixtureBridge: public IMixture, public IRecursiveTemplate<Derived>
      *  @param data the array to return with the missing values
      **/
     void getMissingValues( MissingValues& data) const;
+
     // getter and setter of the parameters
     /** get the parameters of the model */
     inline void getParameters( Parameters& param) const { param = mixture_.param_;}
@@ -136,7 +139,7 @@ class IMixtureBridge: public IMixture, public IRecursiveTemplate<Derived>
     /** This function is used in order to set the current values of the
      *  parameters to the parameters using an array.
      *  @param param the array/expression with the parameters of the mixture to
-     *  store in the ParamHandler.
+     *  store in the Parameters.
      **/
     template<class Array>
     inline void setParameters(ExprBase<Array> const& param)
@@ -144,6 +147,7 @@ class IMixtureBridge: public IMixture, public IRecursiveTemplate<Derived>
 
     // start default implementation of virtual method inherited from IMixture
     /** @brief Initialize the mixture model before its use by the composer.
+     *
      *  The parameters values are set to their default values if the mixture_
      *  is newly created. if IMixtureBridge::initializeStep is used during a
      *  cloning, mixture class have to take care of the existing values of the
@@ -179,29 +183,25 @@ class IMixtureBridge: public IMixture, public IRecursiveTemplate<Derived>
      *  @return Number of missing values
      */
     virtual int nbMissingValues() const { return v_missing_.size();}
-    /** This function must return the number of variables.
-     *  @return Number of variables
-     **/
-    inline virtual int nbVariable() const { return mixture_.nbVariable();}
     /** @brief This function should be used to store any intermediate results
      *  during various iterations after the burn-in period.
      *  @param iteration Provides the iteration number beginning after the burn-in
      *  period.
      **/
     inline virtual void storeIntermediateResults(int iteration)
-    { paramHandler_.updateStatistics(mixture_.param_);}
+    { mixture_.param_.updateStatistics();}
     /**@brief This step can be used to signal to the mixtures that they must
      * release the stored results. This is usually called if the estimation
      * process failed.
      **/
     inline virtual void releaseIntermediateResults()
-    { paramHandler_.releaseStatistics();}
+    { mixture_.param_.releaseStatistics();}
     /** @brief set the parameters of the model.
      *  This step should be used to set the initialize the statistics to the
      *  current value of the parameters.
      **/
     inline virtual void setParametersStep()
-    { paramHandler_.setStatistics(mixture_.param_);}
+    { mixture_.param_.setStatistics();}
     /** @brief This step can be used by developer to finalize any thing. It will
      *  be called only once after we finish running the estimation algorithm.
      */
@@ -223,31 +223,24 @@ class IMixtureBridge: public IMixture, public IRecursiveTemplate<Derived>
     { mixture_.writeParameters(p_tik(), os);}
 
   protected:
-    /** protected constructor to use in order to create a bridge.
-     *  @param mixture the mixture to copy
-     *  @param idData id name of the mixture
-     *  @param nbCluster number of cluster
-     **/
-    IMixtureBridge( Mixture const& mixture, std::string const& idData, int nbCluster);
     /** utility function for lookup the data set and find missing values coordinates.
      *  @return the number of missing values
      **/
    virtual std::vector< std::pair<int,int> >::size_type findMissing();
 
-    /** @brief This function will be used for imputation of the missing data
+    /** @brief This function will be used once for imputation of missing data
      *  at the initialization step (@see initializeStep).
      *
      *  By default missing values in a column will be replaced by the mean or map (maximum a
      *  posteriori) value of the column.
      *  Derived class as to implement the safeValue(i,j) method.
-     *  The method is virtual as derived class may want to implement a more efficient algorithm.
+     *  @note This method is virtual as derived class may want to implement a more
+     *  efficient algorithm.
      **/
     virtual void removeMissing();
 
     /** The Mixture to bridge with the composer */
     Mixture mixture_;
-    /** The parameter handler associated to the mixture_ */
-    ParamHandler paramHandler_;
     /** vector with the coordinates of the missing values */
     MissingIndexes v_missing_;
     /** pointer on the data set */
@@ -260,10 +253,9 @@ class IMixtureBridge: public IMixture, public IRecursiveTemplate<Derived>
  *  @param nbCluster number of cluster
  **/
 template< class Derived>
-IMixtureBridge<Derived>::IMixtureBridge( Data* p_dataij, std::string const& idData, int nbCluster)
+IMixtureBridge<Derived>::IMixtureBridge( Data* p_dataij, String const& idData, int nbCluster)
                                        : IMixture(idData)
                                        , mixture_(nbCluster)
-                                       , paramHandler_(nbCluster)
                                        , v_missing_()
                                        , p_dataij_(p_dataij)
 {// find coordinates of the missing values
@@ -274,11 +266,9 @@ template< class Derived>
 IMixtureBridge<Derived>::IMixtureBridge( IMixtureBridge const& bridge)
                                        : IMixture(bridge)
                                        , mixture_(bridge.mixture_)
-                                       , paramHandler_(bridge.paramHandler_)
                                        , v_missing_(bridge.v_missing_)
                                        , p_dataij_(bridge.p_dataij_)
 {}
-
 // implementation
 template< class Derived>
 void IMixtureBridge<Derived>::imputationStep()
@@ -301,10 +291,9 @@ void IMixtureBridge<Derived>::samplingStep()
  *  @param nbCluster number of cluster
  **/
 template< class Derived>
-IMixtureBridge<Derived>::IMixtureBridge( Mixture const& mixture, std::string const& idData, int nbCluster)
+IMixtureBridge<Derived>::IMixtureBridge( Mixture const& mixture, String const& idData, int nbCluster)
                                        : IMixture(idData)
                                        , mixture_(mixture)
-                                       , paramHandler_(nbCluster)
                                        , v_missing_()
                                        , p_dataij_(0)
 {}

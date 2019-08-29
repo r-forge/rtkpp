@@ -72,7 +72,7 @@ class ClusterLauncher: public ILauncher
     /** vector with the number of cluster to try */
     Rcpp::IntegerVector   v_nbCluster_;
     /** character string with the model selection criterion name */
-    std::string           criterion_;
+    String           criterion_;
 
   private:
     /** Select the best model among the models and nbCluster given.

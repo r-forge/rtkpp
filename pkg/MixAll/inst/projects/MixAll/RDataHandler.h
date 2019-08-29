@@ -73,12 +73,15 @@ class RDataHandler: public DataHandlerBase<RDataHandler>
   public:
     typedef DataHandlerBase<RDataHandler> Base;
     typedef Base::InfoMap InfoMap;
-    typedef std::map<std::string, int> InfoType;
+    typedef std::map<String, int> InfoType;
 
     /** default constructor */
     inline RDataHandler(): Base() {}
     /** destructor */
     inline ~RDataHandler() {}
+
+    /** @return List of R data */
+    Rcpp::List const& data() const { return data_;}
 
     /** Add a Matrix to the existing data sets
      *  @param idData Id of the data set
@@ -88,7 +91,7 @@ class RDataHandler: public DataHandlerBase<RDataHandler>
      *  in the next release of Rcpp).
      **/
     template<int Rtype>
-    void addData( Rcpp::Matrix<Rtype> const& data, std::string idData, std::string const& idModel )
+    void addData( Rcpp::Matrix<Rtype> const& data, String idData, String const& idModel )
     {
       if (addInfo(idData, idModel))
       {
@@ -98,7 +101,7 @@ class RDataHandler: public DataHandlerBase<RDataHandler>
     }
     /** return in an CArray the copied data with the given idData */
     template<typename Type>
-    void getData(std::string const& idData, CArray<Type>& data, int& nbVariable) const
+    void getData(String const& idData, CArray<Type>& data, int& nbVariable) const
     {
       enum
       {
@@ -111,7 +114,7 @@ class RDataHandler: public DataHandlerBase<RDataHandler>
     }
     /** return in an CArray the copied data with the given idData */
     template<typename Type>
-    void getData(std::string const& idData, CArray<Type>& data) const
+    void getData(String const& idData, CArray<Type>& data) const
     {
       enum
       {
@@ -130,7 +133,7 @@ class RDataHandler: public DataHandlerBase<RDataHandler>
      *  @return @c false if there exists already idData associated to an other
      *  Rtype, @c true otherwise.
      **/
-    bool addType(std::string const& idData, int Rtype);
+    bool addType(String const& idData, int Rtype);
     /** List of R data */
     Rcpp::List data_;
     /** Store the Rtype of a given data set by pair:

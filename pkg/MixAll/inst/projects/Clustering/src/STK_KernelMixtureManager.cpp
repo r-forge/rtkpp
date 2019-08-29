@@ -67,7 +67,7 @@ void KernelMixtureManager::setDim(IMixture* p_mixture, Real const& dim) const
  *  @param p_mixture pointer on the mixture
  *  @param param the array to return with the parameters
  **/
-void KernelMixtureManager::getParameters(IMixture* p_mixture, ArrayXX& param) const
+void KernelMixtureManager::getParametersImpl(IMixture* p_mixture, ArrayXX& param) const
 {
   if (!p_mixture) return;
   Clust::Mixture idModel = getIdModel(p_mixture->idData());
@@ -89,7 +89,7 @@ void KernelMixtureManager::getParameters(IMixture* p_mixture, ArrayXX& param) co
  *  @param p_mixture pointer on the mixture
  *  @param param the array with the parameters to set
  **/
-void KernelMixtureManager::setParameters(IMixture* p_mixture, ArrayXX const& param) const
+void KernelMixtureManager::setParametersImpl(IMixture* p_mixture, ArrayXX const& param) const
 {
   if (!p_mixture) return;
   Clust::Mixture idModel = getIdModel(p_mixture->idData());

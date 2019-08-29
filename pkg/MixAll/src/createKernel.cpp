@@ -41,7 +41,7 @@
  *  @param r_kernelParameters vector of parameters
  **/
 STK::Kernel::IKernel* createKernel( Rcpp::S4 s4_component
-                                  , std::string const& kernelName
+                                  , STK::String const& kernelName
                                   , Rcpp::DoubleVector const& r_kernelParameters
                                   , bool computeGramMatrix
                                   )

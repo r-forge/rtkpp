@@ -77,20 +77,18 @@ class KernelHandler: public DataHandlerBase<KernelHandler>
   public:
     typedef DataHandlerBase<KernelHandler> Base;
     typedef DataHandlerBase<KernelHandler>::InfoMap InfoMap;
-    typedef std::pair<Kernel::IKernel*, std::string> TaggedKernel;
+    typedef std::pair<Kernel::IKernel*, String> TaggedKernel;
     typedef Array1D< TaggedKernel >::iterator Iterator;
     typedef Array1D< TaggedKernel >::const_iterator ConstIterator;
 
     /** default constructor */
     KernelHandler();
     /** constructor with an instance of a kernel to handle*/
-    KernelHandler(Kernel::IKernel* p_kernel, std::string const& idData, std::string const& idModel);
+    KernelHandler(Kernel::IKernel* p_kernel, String const& idData, String const& idModel);
     /** destructor. All pointer on kernels will be deleted. */
     ~KernelHandler();
     /** @return the number of sample (the number of rows of the data) */
     inline int nbSample() const { return nbSample_;}
-    /** @return the number of sample (the number of columns of the data) */
-    inline int nbVariable() const { return nbVariable_;}
     /** add an instance of a kernel to the handler
      * @param p_kernel an instance of a kernel
      * @param idData can be any string given by the user for identifying data.
@@ -99,7 +97,7 @@ class KernelHandler: public DataHandlerBase<KernelHandler>
      * @return @c true if the pair (idData,idModel) has been successfully added
      * to the handler
      **/
-    bool addKernel(Kernel::IKernel* p_kernel, std::string const& idData, std::string const& idModel);
+    bool addKernel(Kernel::IKernel* p_kernel, String const& idData, String const& idModel);
     /** add an instance of a kernel to the handler
      * @param kernelName name of the kernel
      * @param data data set associated to the kernel
@@ -111,21 +109,21 @@ class KernelHandler: public DataHandlerBase<KernelHandler>
      * to the handler
      **/
     template<class Derived, class Array>
-    bool addKernel( std::string const& kernelName
+    bool addKernel( String const& kernelName
                   , Array const& data
                   , ExprBase<Derived> const& param
-                  , std::string const& idData
-                  , std::string const& idModel);
+                  , String const& idData
+                  , String const& idModel);
     /** get an instance of a kernel from the handler
      * @param idData can be any string given by the user for identifying data.
      * @return @c 0 if the idData has not been found, a pointer to the kernel
      * otherwise
      */
-    Kernel::IKernel const* getKernel( std::string const& idData) const;
+    Kernel::IKernel const* getKernel( String const& idData) const;
     /** remove an instance of a kernel to the handler
      *  @param idData can be any string given by the user for identifying data.
      */
-    void removeKernel( std::string const& idData);
+    void removeKernel( String const& idData);
     /** utility lookup function allowing to know if some pointer on a kernel
      *  is handled by the KernelHandler.
      *  @return @c true if the pointed kernel is found, @c false otherwise
@@ -135,18 +133,16 @@ class KernelHandler: public DataHandlerBase<KernelHandler>
   protected:
     /** Number of sample */
     int nbSample_;
-    /** Number of variable */
-    int nbVariable_;
     /** Array of the kernels */
     Array1D< TaggedKernel > v_kernel_;
 };
 
 template<class Derived, class Array>
-bool KernelHandler::addKernel( std::string const& kernelName
+bool KernelHandler::addKernel( String const& kernelName
                              , Array const& data
                              , ExprBase<Derived> const& param
-                             , std::string const& idData
-                             , std::string const& idModel)
+                             , String const& idData
+                             , String const& idModel)
 {
   // check if the idData already exists
   Array1D< TaggedKernel >::Iterator it;
@@ -186,7 +182,6 @@ bool KernelHandler::addKernel( std::string const& kernelName
   // add kernel to
   v_kernel_.push_back(TaggedKernel(p_kernel, idData));
   nbSample_   = p_kernel->nbSample();
-  nbVariable_ += p_kernel->nbVariable();
   return addInfo(idData, idModel);
 }
 

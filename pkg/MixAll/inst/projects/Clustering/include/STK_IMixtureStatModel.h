@@ -38,15 +38,9 @@
 
 #include <StatModels/include/STK_IStatModelBase.h>
 
-#include <Arrays/include/STK_CArrayPoint.h>
-#include <Arrays/include/STK_CArrayVector.h>
-#include <Arrays/include/STK_CArray.h>
-
-#include <STatistiK/include/STK_Stat_Functors.h>
-
 #include "STK_Clust_Util.h"
-#include "STK_IMixture.h"
 #include "STK_IMixtureManager.h"
+#include <STatistiK/include/STK_Stat_Functors.h>
 
 
 namespace STK
@@ -95,15 +89,15 @@ namespace STK
  * Template functions allowing to interact with the composer are
  * @code
  *   template<class DataHandler>
- *   void createMixture(IMixtureManager<DataHandler>& manager);
+ *   void createMixture(IMixtureManager<Derived>& manager);
  *   template<class DataHandler>
- *   IMixture* createMixture(IMixtureManager<DataHandler>& manager, String const& idData);
+ *   IMixture* createMixture(IMixtureManager<Derived>& manager, String const& idData);
  *   template<class DataHandler>
- *   void removeMixture(IMixtureManager<DataHandler>& manager, String const& idData);
+ *   void removeMixture(IMixtureManager<Derived>& manager, String const& idData);
  *   template<class DataHandler, class Parameters>
- *   void getParameters(IMixtureManager<DataHandler> const& manager, String const& idData, Parameters& param) const;
+ *   void getParameters(IMixtureManager<Derived> const& manager, String const& idData, Parameters& param) const;
  *   template<class DataHandler, class Parameters>
- *   void setParameters(IMixtureManager<DataHandler> const& manager, String const& idData, Parameters const& param);
+ *   void setParameters(IMixtureManager<Derived> const& manager, String const& idData, Parameters const& param);
  *   template<class Array>
  *   void setMixtureParameters( Array const& tik);
  *   template<class Array, class RowVector>
@@ -193,11 +187,6 @@ class IMixtureStatModel: public IStatModelBase
       *  @return the number of missing values
       **/
      int computeNbMissingValues() const;
-     /** @brief compute the number of variables of the model.
-      *  lookup on the mixtures and sum the nbFreeParameter.
-      *  @return the number of variables
-      **/
-     int computeNbVariables() const;
 
     // pure virtual
     /** create pattern */
@@ -253,37 +242,37 @@ class IMixtureStatModel: public IStatModelBase
      *  data handler of a mixture manager and to register them.
      *  @param manager the manager with the responsibility of the creation.
      **/
-    template<class DataHandler>
-    void createMixture(IMixtureManager<DataHandler>& manager);
+    template<class Manager>
+    void createMixture(IMixtureManager<Manager>& manager);
     /** Utility method allowing to create a mixture with a given data set
      *  and register it. The Mixture Manager will find the associated model
      *  to use with this data set.
      *  @param manager the manager with the responsibility of the creation.
      *  @param idData the id name of the data to modelize.
      **/
-    template<class DataHandler>
-    IMixture* createMixture(IMixtureManager<DataHandler>& manager, String const& idData);
+    template<class Manager>
+    IMixture* createMixture(IMixtureManager<Manager>& manager, String const& idData);
     /** Utility method allowing to release completely a mixture with its data set.
      *  The MixtureManager will find and release the associated data set.
      *  @param manager the manager with the responsibility of the release.
      *  @param idData the id name of the data to modelize.
      **/
-    template<class DataHandler>
-    void removeMixture(IMixtureManager<DataHandler>& manager, String const& idData);
+    template<class Manager>
+    void removeMixture(IMixtureManager<Manager>& manager, String const& idData);
     /** Utility method allowing to get the parameters of a specific mixture.
      *  @param manager the manager with the responsibility of the parameters
      *  @param idData the Id of the data we want the parameters
      *  @param param the structure which will receive the parameters
      **/
-    template<class DataHandler, class Parameters>
-    void getParameters(IMixtureManager<DataHandler> const& manager, String const& idData, Parameters& param) const;
+    template<class Manager, class Parameters>
+    void getParameters(IMixtureManager<Manager> const& manager, String const& idData, Parameters& param) const;
     /** Utility method allowing to set the parameters to a specific mixture.
      *  @param manager the manager with the responsibility of the parameters
      *  @param idData Id of the data we want to set the parameters
      *  @param param structure which contains the parameters
      **/
-    template<class DataHandler, class Parameters>
-    void setParameters(IMixtureManager<DataHandler> const& manager, String const& idData, Parameters const& param);
+    template<class Manager, class Parameters>
+    void setParameters(IMixtureManager<Manager> const& manager, String const& idData, Parameters const& param);
     /** set the mixture parameters using an array of posterior probabilities.
      *  Proportions, numbers in each class and class labels are computed
      *  using these posterior probabilities.
@@ -353,8 +342,8 @@ void IMixtureStatModel::createMixture(IMixtureManager<DataHandler>& manager)
  *  @param manager the manager with the responsibility of the creation.
  *  @param idData the id name of the data to modelize.
  **/
-template<class DataHandler>
-IMixture* IMixtureStatModel::createMixture(IMixtureManager<DataHandler>& manager, String const& idData)
+template<class Manager>
+IMixture* IMixtureStatModel::createMixture(IMixtureManager<Manager>& manager, String const& idData)
 {
   IMixture* p_mixture = manager.createMixture( idData, nbCluster());
 #ifdef STK_MIXTURE_DEBUG
@@ -370,8 +359,8 @@ IMixture* IMixtureStatModel::createMixture(IMixtureManager<DataHandler>& manager
  *  @param manager the manager with the responsibility of the release.
  *  @param idData the id name of the data to modelize.
  **/
-template<class DataHandler>
-void IMixtureStatModel::removeMixture(IMixtureManager<DataHandler>& manager, String const& idData)
+template<class Manager>
+void IMixtureStatModel::removeMixture(IMixtureManager<Manager>& manager, String const& idData)
 {
   IMixture* p_mixture = getMixture(idData);
 #ifdef STK_MIXTURE_DEBUG
@@ -390,8 +379,8 @@ void IMixtureStatModel::removeMixture(IMixtureManager<DataHandler>& manager, Str
  *  @param idData the Id of the data we want the parameters
  *  @param param the structure which will receive the parameters
  **/
-template<class DataHandler, class Parameters>
-void IMixtureStatModel::getParameters(IMixtureManager<DataHandler> const& manager, String const& idData, Parameters& param) const
+template<class Manager, class Parameters>
+void IMixtureStatModel::getParameters(IMixtureManager<Manager> const& manager, String const& idData, Parameters& param) const
 {  IMixture* p_mixture= getMixture(idData);
    if (p_mixture) manager.getParameters(p_mixture, param);
 }
@@ -400,8 +389,8 @@ void IMixtureStatModel::getParameters(IMixtureManager<DataHandler> const& manage
  *  @param idData Id of the data we want to set the parameters
  *  @param param structure which contains the parameters
  **/
-template<class DataHandler, class Parameters>
-void IMixtureStatModel::setParameters(IMixtureManager<DataHandler> const& manager, String const& idData, Parameters const& param)
+template<class Manager, class Parameters>
+void IMixtureStatModel::setParameters(IMixtureManager<Manager> const& manager, String const& idData, Parameters const& param)
 { IMixture* p_mixture= getMixture(idData);
   if (p_mixture) manager.setParameters(p_mixture, param);
 }
@@ -447,7 +436,7 @@ void IMixtureStatModel::setProportions( RowVector const& pk)
 {
 #ifdef STK_MIXTURE_DEBUG
   if (pk_.size() != nbCluster())
-  { STKRUNTIME_ERROR_2ARG(IMixtureLearner::setProportions,pk_.size(),tik_.nbCluster(),Numbers of class in pk differs);}
+  { STKRUNTIME_ERROR_2ARG(IMixtureLearner::setProportions,pk_.size(),nbCluster(),Numbers of class in pk differs);}
 #endif
   pk_  = pk;
 }

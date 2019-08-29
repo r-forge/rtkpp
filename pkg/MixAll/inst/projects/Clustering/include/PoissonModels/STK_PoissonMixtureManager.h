@@ -36,8 +36,10 @@
 #ifndef STK_POISSONMIXTUREMANAGER_H
 #define STK_POISSONMIXTUREMANAGER_H
 
-#include "../PoissonModels/STK_PoissonBridge.h"
+#include "../STK_Clust_Util.h"
 #include "../STK_IMixtureManager.h"
+
+#include "STK_PoissonBridge.h"
 
 
 #define STK_CREATE_MIXTURE(Data, Bridge) \
@@ -48,6 +50,40 @@
 
 namespace STK
 {
+
+// forward declaration
+template<class DataHandler> class PoissonMixtureManager;
+
+namespace hidden
+{
+/** @ingroup hidden
+ *  Partial specialization for PoissonMixtureManager
+ **/
+template <class DataHandler_>
+struct MixtureManagerTraits <PoissonMixtureManager<DataHandler_> >
+{
+  /** type of data */
+  typedef DataHandler_ DataHandler;
+  /** type of data */
+  typedef Integer Type;
+  /** Type of the array storing missing values indexes */
+  typedef std::vector< std::pair<int,int> > MissingIndexes;
+  /** Type of the array storing missing values */
+  typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
+
+  // All data handlers will store and return a specific container for
+  // the data they handle. The DataHandlerTraits class allow us to know the
+  // type of these containers when data is of type Type.
+  /** */
+  /** type of the data set */
+  typedef typename DataHandlerTraits<DataHandler, Type>::Data Data;
+  // Classes wrapping the Real and Integer containers
+  /** class wrapping the data set */
+  typedef DataBridge<Data>  DataBridgeType;
+};
+
+} // namespace hidden
+
 /** @ingroup Clustering
  *  @brief A mixture manager is a factory class for injection dependency in the
  *  STK++ derived class of the MixtureComposer class.
@@ -58,36 +94,36 @@ namespace STK
  *  @tparam DataHandler is any concrete class from the interface DataHandlerBase
  */
 template<class DataHandler>
-class PoissonMixtureManager: public IMixtureManager<DataHandler>
+class PoissonMixtureManager: public IMixtureManager< PoissonMixtureManager<DataHandler> >
 {
   public:
-    typedef IMixtureManager<DataHandler> Base;
+    typedef typename hidden::MixtureManagerTraits< PoissonMixtureManager >::Type Type;
+    typedef typename hidden::MixtureManagerTraits< PoissonMixtureManager >::MissingIndexes MissingIndexes;
+    typedef typename hidden::MixtureManagerTraits< PoissonMixtureManager >::MissingValues MissingValues;
+    typedef typename hidden::MixtureManagerTraits< PoissonMixtureManager >::Data Data;
+    typedef typename hidden::MixtureManagerTraits< PoissonMixtureManager >::DataBridgeType DataBridgeType;
+
+    typedef IMixtureManager< PoissonMixtureManager > Base;
     using Base::getDataBridge;
     using Base::getIdModel;
     using Base::registerDataBridge;
     using Base::p_handler;
 
-    // All data handlers will store and return a specific container for
-    // the data they handle. The DataHandlerTraits class allow us to know the
-    // type of these containers when data is Real and Integer.
-    typedef typename hidden::DataHandlerTraits<DataHandler, Integer>::Data DataInt;
-    // Classes wrapping the Real and Integer containers
-    typedef DataBridge<DataInt>  DataBridgeInt;
-
     // All Poisson bridges
-    typedef PoissonBridge<Clust::Poisson_ljk_,  DataInt> MixtureBridge_ljk;
-    typedef PoissonBridge<Clust::Poisson_lk_,  DataInt> MixtureBridge_lk;
-    typedef PoissonBridge<Clust::Poisson_ljlk_, DataInt> MixtureBridge_ljlk;
+    typedef PoissonBridge<Clust::Poisson_ljk_,  Data> MixtureBridge_ljk;
+    typedef PoissonBridge<Clust::Poisson_lk_,   Data> MixtureBridge_lk;
+    typedef PoissonBridge<Clust::Poisson_ljlk_, Data> MixtureBridge_ljlk;
 
     /** Default constructor, need an instance of a DataHandler.  */
     PoissonMixtureManager(DataHandler const& handler): Base(&handler) {}
     /** destructor */
-    virtual ~PoissonMixtureManager() {}
+    ~PoissonMixtureManager() {}
+
     /** get the parameters from an IMixture.
      *  @param p_mixture pointer on the mixture
      *  @param param the array to return with the parameters
      **/
-    void getParameters(IMixture* p_mixture, ArrayXX& param) const
+    void getParametersImpl(IMixture* p_mixture, ArrayXX& param) const
     {
       Clust::Mixture idModel = getIdModel(p_mixture->idData());
       if (idModel == Clust::unknown_mixture_) return;
@@ -112,7 +148,7 @@ class PoissonMixtureManager: public IMixtureManager<DataHandler>
      *  @param p_mixture pointer on the mixture
      *  @param param the array with the parameters to set
      **/
-    virtual void setParameters(IMixture* p_mixture, ArrayXX const& param) const
+    virtual void setParametersImpl(IMixture* p_mixture, ArrayXX const& param) const
     {
       Clust::Mixture idModel = getIdModel(p_mixture->idData());
       if (idModel == Clust::unknown_mixture_) return;
@@ -134,9 +170,9 @@ class PoissonMixtureManager: public IMixtureManager<DataHandler>
       }
     }
 
-  protected:
     /** create a concrete mixture and initialize it.
-     *  @param modelName, idData Id names of the model and of the data
+     *  @param modelName a valid model name
+     *  @param idData Id of the data
      *  @param nbCluster number of cluster of the model
      **/
     virtual IMixture* createMixtureImpl(String const& modelName, String const& idData, int nbCluster)
@@ -153,17 +189,23 @@ class PoissonMixtureManager: public IMixtureManager<DataHandler>
      **/
     IMixture* createMixtureImpl(Clust::Mixture idModel, String const& idData, int nbCluster)
     {
+      DataBridgeType* p_dataBridge = new DataBridgeType(idData);
+      p_handler()->getData(idData, p_dataBridge->dataij() );
+      registerDataBridge(p_dataBridge);
       switch (idModel)
       {
         // Poisson models
         case Clust::Poisson_ljk_:
-        { STK_CREATE_MIXTURE(DataBridgeInt, MixtureBridge_ljk)}
+        {
+          MixtureBridge_ljk* p_mixt = new MixtureBridge_ljk( &(p_dataBridge->dataij()), idData, nbCluster);
+          return p_mixt;
+        }
         break;
         case Clust::Poisson_lk_:
-        { STK_CREATE_MIXTURE(DataBridgeInt, MixtureBridge_lk)}
+        { return new MixtureBridge_lk( &(p_dataBridge->dataij()), idData, nbCluster);}
         break;
         case Clust::Poisson_ljlk_:
-        { STK_CREATE_MIXTURE(DataBridgeInt, MixtureBridge_ljlk)}
+        { return new MixtureBridge_ljlk( &(p_dataBridge->dataij()), idData, nbCluster);}
         break;
         default:
           return 0; // 0 if idModel is not implemented

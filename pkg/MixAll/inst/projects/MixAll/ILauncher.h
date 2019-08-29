@@ -64,17 +64,17 @@ class ILauncher: public ILauncherBase
   protected:
     /** create data sets */
     template<int Rtype>
-    void createDataSets(Rcpp::Matrix<Rtype> const& data, std::string const& idData, Clust::Mixture model)
+    void createDataSets(Rcpp::Matrix<Rtype> const& data, String const& idData, Clust::Mixture model)
     { handler_.addData(data, idData, Clust::mixtureToString(model));}
 
     /** create the data sets with real data */
-    void createContinuousDataSets(std::string const& idData, Rcpp::S4 s4_component, Clust::Mixture model);
+    void createContinuousDataSets(String const& idData, Rcpp::S4 s4_component, Clust::Mixture model);
     /** create the data sets with integer data */
-    void createDiscreteDataSets(std::string const& idData, Rcpp::S4 s4_component, Clust::Mixture model);
+    void createDiscreteDataSets(String const& idData, Rcpp::S4 s4_component, Clust::Mixture model);
     /** create the mixtures in the given model */
     void createMixtures(IMixtureStatModel* p_model);
     /** get the parameters */
-    void getParameters(IMixtureStatModel* p_model, std::string const& idData, Rcpp::S4 s4_component);
+    void getParameters(IMixtureStatModel* p_model, String const& idData, Rcpp::S4 s4_component);
 
     /** vector with the model names to try */
     Rcpp::CharacterVector v_models_;

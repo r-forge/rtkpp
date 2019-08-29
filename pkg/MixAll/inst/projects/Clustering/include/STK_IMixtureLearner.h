@@ -68,32 +68,39 @@ class IMixtureLearner: public IMixtureStatModel //, public IMixture
   public:
     /** destructor */
     virtual ~IMixtureLearner();
-
+    // getters
+    /** @return the predicted class label */
+    inline CVectorXi const& ziPred() const { return ziPred_;};
     /** @return the state of the model*/
     inline Clust::modelState state() const { return state_;}
     /** set the state of the model : should be used by any strategy*/
     inline void setState(Clust::modelState state) { state_ = state;}
-
+    // virtual
+    /** Compute ziPred using the Map estimate. */
+    virtual void mapStep();
     // pure virtual
     /** Compute the model parameters given the current
      *  mixture parameters and imputation/simulation of the missing values.
      **/
     virtual void paramUpdateStep() = 0;
-
-    // not virtual
+    // template
     /** set the mixture parameters using the given class labels.
      *  Posterior probabilities, numbers in each class and proportions are
      *  computed using the class labels.
+     *  @param zi class labels
      **/
     template<class ColVector>
     void setClassLabels( ColVector const& zi);
-    /** set the mixture parameters using the class labels and giving the
-     *  proportions.
+    /** set the mixture parameters using the class labels and giving the proportions.
+     *  @param zi class labels
+     *  @param pk proportions of each class
      **/
     template<class ColVector, class RowVector>
     void setClassLabels( ColVector const& zi, RowVector const& pk);
 
   private:
+    /** The predicted class label */
+    CVectorXi ziPred_;
     /** state of the model*/
     Clust::modelState state_;
 };

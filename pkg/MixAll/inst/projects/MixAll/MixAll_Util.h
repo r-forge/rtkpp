@@ -61,7 +61,7 @@ bool computeKernel( Rcpp::S4 s4_component
  *  otherwise
  **/
 STK::Kernel::IKernel* createKernel( Rcpp::S4 s4_component
-                                  , std::string const& r_kernelName
+                                  , STK::String const& r_kernelName
                                   , Rcpp::DoubleVector const& r_kernelParameters
                                   , bool computeGramMatrix
                                   );

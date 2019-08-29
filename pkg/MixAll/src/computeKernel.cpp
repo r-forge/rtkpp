@@ -59,7 +59,7 @@ bool computeKernel( Rcpp::S4 s4_component
       param1 = r_kernelParameters[0]; param2 =  r_kernelParameters[1];
       break;
   }
-  std::string kernelName = Rcpp::as<std::string>(r_kernelName[0]);
+  STK::String kernelName = Rcpp::as<STK::String>(r_kernelName[0]);
   STK::Kernel::IKernelBase<STK::RMatrix<double> >* p_kerneld =0;
   STK::Kernel::IKernelBase<STK::RMatrix<int> >* p_kerneli =0;
   STK::RMatrix<double> datad;

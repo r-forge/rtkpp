@@ -86,9 +86,9 @@ class Categorical_pk: public CategoricalBase<Categorical_pk<Array> >
     /** Initialize randomly the parameters of the Categorical mixture.
      *  Probabilities will be choosen uniformly.
      */
-    void randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) ;
+    void randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk) ;
     /** Compute the weighted proportions of each class. */
-    bool run( CArrayXX const*  p_tik, CPointX const* p_tk) ;
+    bool run( CArrayXX const* const& p_tik, CPointX const* const& p_tk) ;
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*(this->modalities_.size()-1);}
@@ -99,7 +99,7 @@ class Categorical_pk: public CategoricalBase<Categorical_pk<Array> >
  *  will be set to 1.
  */
 template<class Array>
-void Categorical_pk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) 
+void Categorical_pk<Array>::randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk)
 {
   for (int k = p_tik->beginCols(); k < p_tik->endCols(); ++k)
   {
@@ -110,7 +110,7 @@ void Categorical_pk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p
 
 /* Compute the weighted mean and the common variance. */
 template<class Array>
-bool Categorical_pk<Array>::run( CArrayXX const*  p_tik, CPointX const* p_tk) 
+bool Categorical_pk<Array>::run( CArrayXX const* const& p_tik, CPointX const* const& p_tk)
 {
   for (int k = p_tik->beginCols(); k < p_tik->endCols(); ++k)
   {

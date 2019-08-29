@@ -42,6 +42,8 @@
 #include <Arrays/include/STK_Array1D.h>
 #include <Arrays/include/STK_CArrayPoint.h>
 
+#include <STatistiK/include/STK_Stat_Online.h>
+
 namespace STK
 {
 /** @ingroup Clustering
@@ -54,6 +56,12 @@ struct ModelParameters<Clust::Kmm_s_>
     Real sigma2_;
     /** dimension of the gaussian kernel */
     CPointX dim_;
+
+    /** sigma2 statistics */
+    Stat::Online<Real, Real> stat_sigma2_;
+    /** Array of the dim statistics */
+    Array1D< Stat::Online<Real, Real> > stat_dim_;
+
     /** default constructor
      *  @param nbCluster the number of class of the mixture
      **/
@@ -64,10 +72,19 @@ struct ModelParameters<Clust::Kmm_s_>
     ModelParameters( ModelParameters const& param);
     /** destructor */
     ~ModelParameters();
+
     /** @return the standard deviation of the kth cluster */
     inline Real const& sigma2(int k) const { return sigma2_;}
     /** @return the dimension of the kth cluster */
     inline Real const& dim(int k) const { return dim_[k];}
+
+    /** update statistics of the parameters. */
+    void updateStatistics();
+    /** Set the computed statistics */
+    void setStatistics();
+    /** Release the computed statistics */
+    void releaseStatistics();
+
     /** Set the parameters of the mixture model.
      *  It is assumed that the array params store for each class the sigma2 and
      *  dim parameters on consecutive rows.
@@ -95,6 +112,11 @@ struct ModelParameters<Clust::Kmm_sk_>
     CPointX sigma2_;
     /** dimension of the gaussian kernel */
     CPointX dim_;
+    /** Array of the sigma2 statistics */
+    Array1D< Stat::Online<Real, Real> > stat_sigma2_;
+    /** Array of the dim statistics */
+    Array1D< Stat::Online<Real, Real> > stat_dim_;
+
     /** default constructor
      *  @param nbCluster the number of class of the mixture
      **/
@@ -105,10 +127,19 @@ struct ModelParameters<Clust::Kmm_sk_>
     ModelParameters( ModelParameters const& param);
     /** destructor */
     ~ModelParameters();
+
     /** @return the standard deviation of the kth cluster */
     inline Real const& sigma2(int k) const { return sigma2_[k];}
     /** @return the dimension of the kth cluster */
     inline Real const& dim(int k) const { return dim_[k];}
+
+    /** update statistics of the parameters. */
+    void updateStatistics();
+    /** Set the computed statistics */
+    void setStatistics();
+    /** Release the computed statistics */
+    void releaseStatistics();
+
     /** Set the parameters of the mixture model.
      *  It is assumed that the array params store for each class the sigma2 and
      *  dim parameters on consecutive rows.

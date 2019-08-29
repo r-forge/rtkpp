@@ -47,7 +47,7 @@ namespace STK
 LearnLauncher::LearnLauncher( Rcpp::S4 model, Rcpp::CharacterVector models, Rcpp::S4 algo )
                             : ILauncher(model, models)
                             , s4_algo_(algo)
-                            , criterion_(Rcpp::as<std::string>(s4_model_.slot("criterionName")))
+                            , criterion_(Rcpp::as<String>(s4_model_.slot("criterionName")))
                             , p_algo_(0)
                             , p_criterion_(0)
                             , p_learner_(0)
@@ -61,7 +61,7 @@ LearnLauncher::LearnLauncher( Rcpp::S4 model, Rcpp::CharacterVector models, Rcpp
 LearnLauncher::LearnLauncher( Rcpp::S4 model, Rcpp::S4 algo )
                             : ILauncher(model)
                             , s4_algo_(algo)
-                            , criterion_(Rcpp::as<std::string>(s4_model_.slot("criterionName")))
+                            , criterion_(Rcpp::as<String>(s4_model_.slot("criterionName")))
                             , p_algo_(0)
                             , p_criterion_(0)
                             , p_learner_(0)
@@ -79,13 +79,14 @@ LearnLauncher::~LearnLauncher()
 /* run the estimation */
 bool LearnLauncher::run()
 {
+  bool flag;
   p_criterion_ = Clust::createCriterion(criterion_);
   if (!p_criterion_)
   { msg_error_ = STKERROR_1ARG(LearnLauncher::run,criterion_,Wrong criterion name);
     return false;
   }
   // create algo runner
-  std::string algoName = s4_algo_.slot("algo");
+  String algoName = s4_algo_.slot("algo");
   STK::Real epsilon    = s4_algo_.slot("epsilon");
   int nbIter           = s4_algo_.slot("nbIteration");
   if (toUpperString(algoName) == "SIMUL")  { p_algo_ = new SimulAlgo();}
@@ -108,7 +109,10 @@ bool LearnLauncher::run()
   s4_model_.slot("criterion")       = criter;
   s4_model_.slot("lnLikelihood")    = p_learner_->lnLikelihood();
   s4_model_.slot("nbFreeParameter") = p_learner_->nbFreeParameter();
-
+  // get zi with predictions
+  RVector<int> ziFit = (SEXP)s4_model_.slot("ziFit");
+  ziFit = p_learner_->ziPred();
+   // compute lnFi
   NumericVector fi = s4_model_.slot("lnFi");
   for (int i=0; i< fi.length(); ++i)
   { fi[i] = p_learner_->computeLnLikelihood(i);}
@@ -119,7 +123,7 @@ bool LearnLauncher::run()
 /* get the parameters */
 Real LearnLauncher::selectBestSingleModel()
 {
-  std::string idDataBestModel;
+  String idDataBestModel;
   // component
   Rcpp::S4 s4_component = s4_model_.slot("component");
 
@@ -138,8 +142,8 @@ Real LearnLauncher::selectBestSingleModel()
   for (int l=0; l <v_models_.size(); ++l)
   {
     // create idData
-    std::string idData  = "model" + typeToString<int>(l);
-    std::string idModel = Rcpp::as<std::string>(v_models_[l]);
+    String idData  = "model" + typeToString<int>(l);
+    String idModel = Rcpp::as<String>(v_models_[l]);
     // transform R model names to STK++ model names
     // check have been done on the R side so.... Let's go
     bool freeProp;
@@ -161,8 +165,8 @@ Real LearnLauncher::selectBestSingleModel()
     // loop over all the models
     for (int l=0; l <v_models_.size(); ++l)
     {
-      std::string idData = "model" + typeToString<int>(l);
-      std::string idModel = Rcpp::as<std::string>(v_models_[l]);
+      String idData = "model" + typeToString<int>(l);
+      String idModel = Rcpp::as<String>(v_models_[l]);
       bool freeProp;
       Clust::Mixture model = Clust::stringToMixture(idModel, freeProp);
       // create learner and mixtures
@@ -224,8 +228,8 @@ Real LearnLauncher::selectBestMixedModel()
     {
       // component
       Rcpp::S4 s4_component = s4_list[l];
-      std::string idData  = "model" + typeToString<int>(l);
-      std::string idModel = s4_component.slot("modelName");
+      String idData  = "model" + typeToString<int>(l);
+      String idModel = s4_component.slot("modelName");
       // register
       bool freeMixture;
       Clust::Mixture model           = Clust::stringToMixture(idModel, freeMixture);
@@ -273,7 +277,7 @@ Real LearnLauncher::selectBestMixedModel()
       // component
       Rcpp::S4 s4_component = s4_list[l];
       // id of the data set and of the model
-      std::string idData  = "model" + typeToString<int>(l);
+      String idData  = "model" + typeToString<int>(l);
       getParameters(p_learner_, idData, s4_component);
     }
     //

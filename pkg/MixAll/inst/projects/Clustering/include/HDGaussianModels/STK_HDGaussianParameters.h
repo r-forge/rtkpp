@@ -41,6 +41,8 @@
 #include <Arrays/include/STK_Array1D.h>
 #include <Arrays/include/STK_CArrayPoint.h>
 
+#include <STatistiK/include/STK_Stat_Online.h>
+
 namespace STK
 {
 

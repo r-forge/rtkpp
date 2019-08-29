@@ -49,36 +49,6 @@ ILauncherBase::ILauncherBase( Rcpp::S4 model): IRunnerBase(), s4_model_(model) {
 ILauncherBase::~ILauncherBase() {}
 
 /* fill the s4_component with the parameters */
-void ILauncherBase::setParametersToComponent( IMixtureStatModel* p_model
-                                            , IManager const& manager
-                                            , std::string const& idData
-                                            , Rcpp::S4 s4_component)
-{
-  std::string rModelName = s4_component.slot("modelName");
-  bool freeProp;
-  switch (Clust::mixtureToMixtureClass(Clust::stringToMixture(rModelName, freeProp)))
-  {
-    case Clust::DiagGaussian_:
-      setDiagGaussianParametersToComponent(p_model, manager, idData, s4_component);
-      break;
-    case Clust::Poisson_:
-      setPoissonParametersToComponent(p_model, manager, idData, s4_component);
-      break;
-    case Clust::Gamma_:
-      setGammaParametersToComponent(p_model, manager, idData, s4_component);
-      break;
-    case Clust::Categorical_:
-      setCategoricalParametersToComponent(p_model, manager, idData, s4_component);
-      break;
-    case Clust::Kmm_:
-      break;
-    case Clust::unknown_mixture_class_:
-      break;
-    default:
-      break;
-  }
-}
-
 /* get the parameters of a component given by its ID
  *  @param p_model model with the parameters to get
  *  @param manager mixture manager
@@ -87,11 +57,11 @@ void ILauncherBase::setParametersToComponent( IMixtureStatModel* p_model
  **/
 void ILauncherBase::setParametersToComponent( IMixtureStatModel* p_model
                                             , KernelMixtureManager const& manager
-                                            , std::string const& idData
+                                            , String const& idData
                                             , Rcpp::S4 s4_component
                                             )
 {
-  std::string rModelName = s4_component.slot("modelName");
+  String rModelName = s4_component.slot("modelName");
   bool freeProp;
   switch (Clust::mixtureToMixtureClass(Clust::stringToMixture(rModelName, freeProp)))
   {
@@ -116,8 +86,8 @@ void ILauncherBase::setParametersToComponent( IMixtureStatModel* p_model
 
 /* get the diagonal Gaussian parameters */
 void ILauncherBase::setDiagGaussianParametersToComponent( IMixtureStatModel* p_model
-                                                        , IManager const& manager
-                                                        , std::string const& idData
+                                                        , DiagGaussianMixtureManager<RDataHandler> const& manager
+                                                        , String const& idData
                                                         , Rcpp::S4 s4_component)
 {
   // get parameters
@@ -136,13 +106,13 @@ void ILauncherBase::setDiagGaussianParametersToComponent( IMixtureStatModel* p_m
   s4_component.slot("mean")  = Rcpp::wrap(mean);
   s4_component.slot("sigma") = Rcpp::wrap(sigma);
   // get data
-  s4_component.slot("data")  = Rcpp::wrap(manager.getData<double>(idData));
+  s4_component.slot("data")  = Rcpp::wrap(manager.getData(idData));
 }
 
 /* get the diagonal Gaussian parameters */
 void ILauncherBase::setPoissonParametersToComponent( IMixtureStatModel* p_model
-                                                   , IManager const& manager
-                                                   , std::string const& idData
+                                                   , PoissonMixtureManager<RDataHandler> const& manager
+                                                   , String const& idData
                                                    , Rcpp::S4 s4_component)
 {
   // get parameters
@@ -151,13 +121,13 @@ void ILauncherBase::setPoissonParametersToComponent( IMixtureStatModel* p_model
   // save results in s4_model
   s4_component.slot("lambda")  = Rcpp::wrap(params);
   // get data
-  s4_component.slot("data") =Rcpp::wrap( manager.getData<int>(idData));
+  s4_component.slot("data") =Rcpp::wrap( manager.getData(idData));
 }
 
 /* get the gamma parameters */
 void ILauncherBase::setGammaParametersToComponent( IMixtureStatModel* p_model
-                                                 , IManager const& manager
-                                                 , std::string const& idData
+                                                 , GammaMixtureManager<RDataHandler> const& manager
+                                                 , String const& idData
                                                  , Rcpp::S4 s4_component)
 {
   // get parameters
@@ -176,13 +146,13 @@ void ILauncherBase::setGammaParametersToComponent( IMixtureStatModel* p_model
   s4_component.slot("shape") = Rcpp::wrap(shape);
   s4_component.slot("scale") = Rcpp::wrap(scale);
   // get data
-  s4_component.slot("data") = Rcpp::wrap(manager.getData<double>(idData));
+  s4_component.slot("data") = Rcpp::wrap(manager.getData(idData));
 }
 
 /* get the diagonal Categorical parameters */
 void ILauncherBase::setCategoricalParametersToComponent( IMixtureStatModel* p_model
-                                                       , IManager const& manager
-                                                       , std::string const& idData
+                                                       , CategoricalMixtureManager<RDataHandler> const& manager
+                                                       , String const& idData
                                                        , Rcpp::S4 s4_component)
 {
   // get parameters
@@ -192,13 +162,13 @@ void ILauncherBase::setCategoricalParametersToComponent( IMixtureStatModel* p_mo
   // save results in s4_model
   s4_component.slot("plkj") = Rcpp::wrap(params);
   // get data
-  s4_component.slot("data") = Rcpp::wrap(manager.getData<int>(idData));
+  s4_component.slot("data") = Rcpp::wrap(manager.getData(idData));
 }
 
 /* get the kernel parameters */
 void ILauncherBase::setKernelParametersToComponent( IMixtureStatModel* p_model
                                                   , KernelMixtureManager const& manager
-                                                  , std::string const& idData
+                                                  , String const& idData
                                                   , Rcpp::S4 s4_component)
 {
   // get parameters
@@ -215,10 +185,10 @@ void ILauncherBase::setKernelParametersToComponent( IMixtureStatModel* p_model
  *  @param idData ID of the data
  **/
  ArrayXX ILauncherBase::getParameters( Rcpp::S4 s4_component
-                                     , std::string const& idData
+                                     , String const& idData
                                      )
 {
-  std::string rModelName = s4_component.slot("modelName");
+  String rModelName = s4_component.slot("modelName");
   bool freeProp;
   switch (Clust::mixtureToMixtureClass(Clust::stringToMixture(rModelName, freeProp)))
   {
@@ -248,7 +218,7 @@ void ILauncherBase::setKernelParametersToComponent( IMixtureStatModel* p_model
 
 /* utility function allowing to set parameters when model is DiagGaussian */
 ArrayXX ILauncherBase::getDiagGaussianParameters( Rcpp::S4 s4_component
-                                                , std::string const& idData)
+                                                , String const& idData)
 {
   // get mean and sigma
   RMatrix<double> mean((SEXP)s4_component.slot("mean"));
@@ -266,7 +236,7 @@ ArrayXX ILauncherBase::getDiagGaussianParameters( Rcpp::S4 s4_component
 
 /* utility function allowing to set parameters when model is DiagGaussian */
 ArrayXX ILauncherBase::getGammaParameters( Rcpp::S4 s4_component
-                                         , std::string const& idData)
+                                         , String const& idData)
 {
   // get mean and sigma
   RMatrix<double> shape((SEXP)s4_component.slot("shape"));
@@ -284,7 +254,7 @@ ArrayXX ILauncherBase::getGammaParameters( Rcpp::S4 s4_component
 
 /* utility function allowing to set parameters when model is DiagGaussian */
 ArrayXX ILauncherBase::getCategoricalParameters( Rcpp::S4 s4_component
-                                               , std::string const& idData)
+                                               , String const& idData)
 {
   // get plkj array
   RMatrix<double> plkj((SEXP)s4_component.slot("plkj"));
@@ -294,7 +264,7 @@ ArrayXX ILauncherBase::getCategoricalParameters( Rcpp::S4 s4_component
 
 /* utility function allowing to set parameters when model is Poisson */
 ArrayXX ILauncherBase::getPoissonParameters( Rcpp::S4 s4_component
-                                           , std::string const& idData)
+                                           , String const& idData)
 {
   // get mean and sigma
   RMatrix<double> lambda((SEXP)s4_component.slot("lambda"));
@@ -304,7 +274,7 @@ ArrayXX ILauncherBase::getPoissonParameters( Rcpp::S4 s4_component
 
 /* utility function allowing to set parameters when model is DiagGaussian */
 ArrayXX ILauncherBase::getKernelParameters( Rcpp::S4 s4_component
-                                          , std::string const& idData)
+                                          , String const& idData)
 {
   // get mean and sigma
   RMatrix<double> sigma2((SEXP)s4_component.slot("sigma2"));

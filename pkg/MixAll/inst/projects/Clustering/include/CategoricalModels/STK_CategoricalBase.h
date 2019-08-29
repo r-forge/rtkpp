@@ -37,9 +37,8 @@
 #define STK_CATEGORICALBASE_H
 
 #include "../STK_IMixtureDensity.h"
-
-#include <STatistiK/include/STK_Law_Categorical.h>
 #include "../CategoricalModels/STK_CategoricalParameters.h"
+#include <Arrays/include/STK_Array2DPoint.h>
 
 namespace STK
 {
@@ -95,6 +94,10 @@ class CategoricalBase: public IMixtureDensity<Derived >
       modalities_ = _R(amin, amax);
       // resize vectors of probabilities
       param_.resize(modalities_,p_data()->cols());
+#ifdef STK_MIXTURE_VERBOSE
+      stk_cout << _T("In CatagoricalBase::initializeModelImpl. modalities_ = ")
+               << modalities_ << _T("\n");
+#endif
     }
     /** @return the value of the probability of the i-th sample in the k-th component.
      *  @param i,k indexes of the sample and of the component

@@ -32,7 +32,7 @@
  *  @brief In this file we implement the FullStrategy class
  **/
 
-#include <STKernel/include/STK_Exceptions.h>
+#include <Sdk.h>
 
 #include "../include/MixtureStrategy/STK_FullStrategy.h"
 #include "../include/MixtureInit/STK_MixtureInit.h"
@@ -63,7 +63,7 @@ bool FullStrategy::run()
   p_model_->writeParameters(stk_cout);
 #endif
   Real initialValue = p_model_->lnLikelihood();
-#ifdef STK_MIXTURE_VERY_VERBOSE
+#ifdef STK_MIXTURE_VERBOSE
   stk_cout << _T("<+++\n");
   stk_cout << _T("Entering FullStrategy::run() with nbTry_ = ") << nbTry_
            << _T(", nbShortRun_ = ") << p_param_->nbShortRun_
@@ -195,11 +195,12 @@ bool FullStrategy::run()
 /* Perform the Initialization step*/
 bool FullStrategy::initStep(IMixtureComposer*& p_bestModel)
 {
-#ifdef STK_MIXTURE_VERY_VERBOSE
+#ifdef STK_MIXTURE_VERBOSE
   stk_cout << _T("<+++++\n");
   stk_cout << _T("Entering FullStrategy::initStep\n");
   stk_cout << _T("nbInitRun = ") <<  p_param_->nbInitRun_ << _T("\n");
 #endif
+  bool flag = true;
   IMixtureComposer* p_initModel = 0;
   try
   {
@@ -207,7 +208,8 @@ bool FullStrategy::initStep(IMixtureComposer*& p_bestModel)
     for (int iInitRun=0; iInitRun < p_param_->nbInitRun_; iInitRun++)
     {
       //  Initialize a new model if necessary
-      if (!p_initModel) { p_initModel = p_model_->create();}
+      if (!p_initModel)
+      { p_initModel = p_model_->create();}
       p_init_->setModel(p_initModel);
       if (!p_init_->run())
       {
@@ -249,21 +251,29 @@ bool FullStrategy::initStep(IMixtureComposer*& p_bestModel)
   }
   catch (Exception const& e)
   {
-    // in case all initialization and short algo failed
-    if (!p_bestModel) { p_bestModel = p_model_->clone();}
-    if (p_initModel)  { delete p_initModel; p_initModel = 0;}
     msg_error_ = e.error();
-    return false;
+    flag = false;
   }
   // in case all initialization failed or nbInitRun_ <= 0
   if (!p_bestModel) { p_bestModel = p_model_->clone();}
-  if (p_initModel)  { delete p_initModel; p_initModel = 0;}
-#ifdef STK_MIXTURE_VERY_VERBOSE
+  if (p_initModel)
+  {
+#ifdef STK_MIXTURE_DEBUG_CREATE
+        stk_cout << _T("FullStrategy::initStep terminated. Deleting p_initModel.\n");
+#endif
+    delete p_initModel; p_initModel = 0;
+#ifdef STK_MIXTURE_DEBUG_CREATE
+        stk_cout << _T("FullStrategy::initStep p_initModel deleted.\n");
+        stk_cout << _T("p_bestModel->writeParameters\n");
+        p_bestModel->writeParameters(stk_cout);
+#endif
+  }
+#ifdef STK_MIXTURE_VERBOSE
   stk_cout << _T("FullStrategy::initStep done\n");
   stk_cout << _T("p_bestModel->lnLikelihood() = ") <<  p_bestModel->lnLikelihood() << _T("\n");
   stk_cout << _T("+++++>\n");
 #endif
-  return true;
+  return flag;
 }
 
 } // namespace STK

@@ -31,10 +31,6 @@ and standard deviations give rise to 4 models:
  \item {Proportions can be equal or free.}
  \item {Standard deviations are equal or free for all clusters.}
 }
-
-check if a vector of kernel mixture model (KMM) name is correct.
-
-check if a vector of kernel name is correct.
 }
 \details{
 The model names are summarized in the following array:

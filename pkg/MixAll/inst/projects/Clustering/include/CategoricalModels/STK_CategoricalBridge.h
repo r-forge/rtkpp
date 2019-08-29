@@ -39,7 +39,6 @@
 
 #include "STK_Categorical_pjk.h"
 #include "STK_Categorical_pk.h"
-#include "STK_CategoricalParametersHandler.h"
 #include "../STK_IMixtureBridge.h"
 
 namespace STK
@@ -64,8 +63,10 @@ struct MixtureBridgeTraits< CategoricalBridge<Clust::Categorical_pjk_, Data_> >
   typedef Categorical_pjk<Data> Mixture;
   /** Type of the structure storing the mixture parameters */
   typedef ModelParameters<Clust::Categorical_pjk_> Parameters;
-  /** Type of the parameter handler */
-  typedef ParametersHandler<Clust::Categorical_pjk_> ParamHandler;
+  /** Type of the array storing missing values indexes */
+  typedef std::vector<std::pair<int,int> > MissingIndexes;
+  /** Type of the array storing missing values */
+  typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
   enum
   {
     idMixtureClass_ = Clust::Categorical_
@@ -85,8 +86,10 @@ struct MixtureBridgeTraits< CategoricalBridge< Clust::Categorical_pk_, Data_> >
   typedef Categorical_pk<Data> Mixture;
   /** Type of the structure storing the mixture parameters */
   typedef ModelParameters<Clust::Categorical_pk_> Parameters;
-  /** Type of the parameter handler */
-  typedef ParametersHandler<Clust::Categorical_pk_> ParamHandler;
+  /** Type of the array storing missing values indexes */
+  typedef std::vector<std::pair<int,int> > MissingIndexes;
+  /** Type of the array storing missing values */
+  typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
   enum
   {
     idMixtureClass_ = Clust::Categorical_
@@ -113,7 +116,7 @@ class CategoricalBridge: public IMixtureBridge< CategoricalBridge<Id,Data> >
     // type of Mixture
     typedef typename hidden::MixtureBridgeTraits< CategoricalBridge<Id,Data> >::Mixture Mixture;
     typedef typename hidden::MixtureBridgeTraits< CategoricalBridge<Id,Data> >::Parameters Parameters;
-    typedef typename hidden::MixtureBridgeTraits< CategoricalBridge<Id,Data> >::ParamHandler ParamHandler;
+    typedef typename hidden::MixtureBridgeTraits< CategoricalBridge<Id,Data> >::MissingIndexes MissingIndexes;
     // type of data
     typedef typename Data::Type Type;
     // class of mixture
@@ -122,9 +125,8 @@ class CategoricalBridge: public IMixtureBridge< CategoricalBridge<Id,Data> >
       idMixtureClass_ = Clust::Categorical_
     };
 
-    typedef std::vector<std::pair<int,int> >::const_iterator ConstIterator;
+    typedef typename MissingIndexes::const_iterator ConstIterator;
     using Base::mixture_;
-    using Base::paramHandler_;
     using Base::p_dataij_;
     using Base::p_tik;
     using Base::v_missing_;
@@ -133,12 +135,11 @@ class CategoricalBridge: public IMixtureBridge< CategoricalBridge<Id,Data> >
     /** default constructor.
      *  - Remove the missing values from the data set,
      *  - initialize the mixture by setting the data set
-     *  - initialize the ParamHandler
      *  @param p_dataij pointer on the data set that will be used by the bridge.
      *  @param idData id name of the mixture model
      *  @param nbCluster number of cluster
      **/
-    CategoricalBridge( Data* p_dataij, std::string const& idData, int nbCluster);
+    CategoricalBridge( Data* p_dataij, String const& idData, int nbCluster);
     /** copy constructor */
     CategoricalBridge( CategoricalBridge const& bridge);
     /** destructor */
@@ -160,7 +161,6 @@ class CategoricalBridge: public IMixtureBridge< CategoricalBridge<Id,Data> >
       CategoricalBridge* p_bridge = new CategoricalBridge( mixture_, this->idData(), this->nbCluster());
       p_bridge->p_dataij_ = p_dataij_;
       p_bridge->mixture_.setData(*p_dataij_);
-      p_bridge->paramHandler_.resize(mixture_.modalities(), p_dataij_->cols());
       p_bridge->v_missing_ = v_missing_;
       return p_bridge;
     }
@@ -177,34 +177,29 @@ class CategoricalBridge: public IMixtureBridge< CategoricalBridge<Id,Data> >
      *  @param idData id name of the mixture
      *  @param nbCluster number of cluster
      **/
-    CategoricalBridge( Mixture const& mixture, std::string const& idData, int nbCluster)
-                    : Base(mixture, idData, nbCluster)
+    CategoricalBridge( Mixture const& mixture, String const& idData, int nbCluster)
+                     : Base(mixture, idData, nbCluster)
     {}
 };
 
 /* default constructor.
  *  - Remove the missing values from the data set,
  *  - initialize the mixture by setting the data set
- *  - initialize the ParamHandler
  *  @param p_dataij pointer on the Data set that will be used by the bridge.
  *  @param idData id name of the mixture model
  *  @param nbCluster number of cluster
  **/
 template<int Id, class Data>
-CategoricalBridge<Id,Data>::CategoricalBridge( Data* p_dataij, std::string const& idData, int nbCluster)
+CategoricalBridge<Id,Data>::CategoricalBridge( Data* p_dataij, String const& idData, int nbCluster)
                 : Base( p_dataij, idData, nbCluster)
 {
   removeMissing();
   mixture_.setData(*p_dataij_);
-  paramHandler_.resize(mixture_.modalities(), p_dataij_->cols());
 }
 /* copy constructor */
 template<int Id, class Data>
 CategoricalBridge<Id,Data>::CategoricalBridge( CategoricalBridge const& bridge): Base(bridge)
-{
-  mixture_.setData(*p_dataij_);
-  paramHandler_.resize(mixture_.modalities(), p_dataij_->cols());
-}
+{/*mixture_.setData(*p_dataij_);*/}
 
 /* Compute a safe value for the jth variable by counting the most present
  *  modality.

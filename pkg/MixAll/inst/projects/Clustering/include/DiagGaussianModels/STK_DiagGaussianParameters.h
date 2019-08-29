@@ -43,6 +43,7 @@
 #include <Arrays/include/STK_CArrayPoint.h>
 #include <Arrays/include/STK_CArrayVector.h>
 
+#include <STatistiK/include/STK_Stat_Online.h>
 #include <STatistiK/include/STK_Stat_Functors.h>
 
 namespace STK
@@ -58,6 +59,11 @@ struct ModelParameters<Clust::Gaussian_sjk_>
   Array1D<CPointX> mean_;
   /** standard deviation of the variables */
   Array1D<CPointX> sigma_;
+  /** Array of the mean statistics */
+  Array1D< Stat::Online<CPointX, Real> > stat_mean_;
+  /** Array of the standard deviation statistics */
+  Array1D< Stat::Online<CPointX, Real> > stat_sigma_;
+
   /** default constructor
    *  @param nbCluster the number of class of the mixture
    **/
@@ -72,14 +78,24 @@ struct ModelParameters<Clust::Gaussian_sjk_>
    *  @param param the parameters to copy.
    **/
   ModelParameters& operator=( ModelParameters const& param);
+
   /** @return the mean of the kth cluster and jth variable */
   inline Real const& mean(int k, int j) const { return mean_[k][j];}
   /** @return the standard deviation of the kth cluster and jth variable */
   inline Real const& sigma(int k, int j) const { return sigma_[k][j];}
+
   /** resize and initialize the set of parameter.
    *  @param range range of the variables in the data set
    **/
   void resize(Range const& range);
+
+  /** update statistics of the parameters. */
+  void updateStatistics();
+  /** Set the computed statistics */
+  void setStatistics();
+  /** Release the computed statistics */
+  void releaseStatistics();
+
   /** Set the parameters of the mixture model.
    *  It is assumed that the array params store for each class the mean and
    *  sd parameters on two consecutive rows.
@@ -106,6 +122,11 @@ struct ModelParameters<Clust::Gaussian_sk_>
   Array1D<CPointX> mean_;
   /** standard deviation of the variables */
   Array1D<Real> sigma_;
+  /** Array of the mean statistics */
+  Array1D< Stat::Online<CPointX, Real> > stat_mean_;
+  /** Array of the standard deviation statistics */
+  Array1D< Stat::Online<Real, Real> > stat_sigma_;
+
   /** default constructor
    *  @param nbCluster the number of class of the mixture
    **/
@@ -120,14 +141,24 @@ struct ModelParameters<Clust::Gaussian_sk_>
    *  @param param the parameters to copy.
    **/
   ModelParameters& operator=( ModelParameters const& param);
+
   /** @return the mean of the kth cluster and jth variable */
   inline Real const& mean(int k, int j) const { return mean_[k][j];}
   /** @return the standard deviation of the kth cluster and jth variable */
   inline Real const& sigma(int k, int j) const { return sigma_[k];}
+
   /** resize and initialize the set of parameter.
    *  @param range range of the variables in the data set
    **/
   void resize(Range const& range);
+
+  /** update statistics of the parameters. */
+  void updateStatistics();
+  /** Set the computed statistics */
+  void setStatistics();
+  /** Release the computed statistics */
+  void releaseStatistics();
+
   /** Set the parameters of the mixture model.
    *  It is assumed that the array params store for each class the means and
    *  sd parameters on two consecutive rows.
@@ -154,6 +185,11 @@ struct ModelParameters<Clust::Gaussian_sj_>
   Array1D<CPointX> mean_;
   /** standard deviation of the variables */
   CPointX sigma_;
+  /** Array of the mean statistics */
+  Array1D< Stat::Online<CPointX, Real> > stat_mean_;
+  /** Array of the standard deviation statistics */
+  Stat::Online<CPointX, Real> stat_sigma_;
+
   /** default constructor
    *  @param nbCluster the number of class of the mixture
    **/
@@ -168,14 +204,24 @@ struct ModelParameters<Clust::Gaussian_sj_>
    *  @param param the parameters to copy.
    **/
   ModelParameters& operator=( ModelParameters const& param);
+
   /** @return the mean of the kth cluster and jth variable */
   inline Real const& mean(int k, int j) const { return mean_[k][j];}
   /** @return the standard deviation of the kth cluster and jth variable */
   inline Real const& sigma(int k, int j) const { return sigma_[j];}
+
   /** resize and initialize the set of parameter.
    *  @param range range of the variables in the data set
    **/
   void resize(Range const& range);
+
+  /** update statistics of the parameters. */
+  void updateStatistics();
+  /** Set the computed statistics */
+  void setStatistics();
+  /** Release the computed statistics */
+  void releaseStatistics();
+
   /** Set the parameters of the mixture model.
    *  It is assumed that the array params store for each class the means and
    *  sd parameters on two consecutive rows.
@@ -204,6 +250,11 @@ struct ModelParameters<Clust::Gaussian_s_>
   Array1D<CPointX> mean_;
   /** standard deviation of the variables */
   Real sigma_;
+  /** Array of the mean statistics */
+  Array1D< Stat::Online<CPointX, Real> > stat_mean_;
+  /** Array of the standard deviation statistics */
+  Stat::Online<Real, Real> stat_sigma_;
+
   /** default constructor
    *  @param nbCluster the number of class of the mixture
    **/
@@ -218,14 +269,24 @@ struct ModelParameters<Clust::Gaussian_s_>
    *  @param param the parameters to copy.
    **/
   ModelParameters& operator=( ModelParameters const& param);
+
   /** @return the mean of the kth cluster and jth variable */
   inline Real const& mean(int k, int j) const { return mean_[k][j];}
   /** @return the standard deviation of the kth cluster and jth variable */
   inline Real const& sigma(int k, int j) const { return sigma_;}
+
   /** resize and initialize the set of parameter.
    *  @param range range of the variables in the data set
    **/
   void resize(Range const& range);
+
+  /** update statistics of the parameters. */
+  void updateStatistics();
+  /** Set the computed statistics */
+  void setStatistics();
+  /** Release the computed statistics */
+  void releaseStatistics();
+
   /** Set the parameters of the mixture model.
    *  It is assumed that array params stores for each class the mean and
    *  sd parameters on two consecutive rows.
@@ -256,6 +317,13 @@ struct ModelParameters<Clust::Gaussian_sjsk_>
     CVectorX sigmak_;
     /** standard deviation of the variables by variables */
     CPointX sigmaj_;
+    /** Array of the mean statistics */
+    Array1D< Stat::Online<CPointX, Real> > stat_mean_;
+    /** Array of the standard deviation k statistics */
+    Stat::Online<Real, Real> stat_sigmak_;
+    /** Array of the standard deviation j statistics */
+    Stat::Online<CPointX, Real> stat_sigmaj_;
+
     /** default constructor
      *  @param nbCluster the number of class of the mixture
      **/
@@ -266,12 +334,22 @@ struct ModelParameters<Clust::Gaussian_sjsk_>
     ModelParameters( ModelParameters const& param);
     /** destructor */
     ~ModelParameters();
+
     /** @return the mean of the kth cluster and jth variable */
     inline Real const& mean(int k, int j) const { return mean_[k][j];}
     /** @return the standard deviation of the kth cluster and jth variable */
     inline Real sigma(int k, int j) const { return sigmak_[k] * sigmaj_[j];}
+
     /** resize the set of parameter */
     void resize(Range const& range);
+
+    /** update statistics of the parameters. */
+    void updateStatistics();
+    /** Set the computed statistics */
+    void setStatistics();
+    /** Release the computed statistics */
+    void releaseStatistics();
+
     /** Set the parameters of the mixture model.
      *  It is assumed that the array @c params is of size @c (2*nbCluster, nbVariable).
      **/
@@ -283,7 +361,7 @@ struct ModelParameters<Clust::Gaussian_sjsk_>
       {
           mean_[k]     = params.row(kp);
           sigma.row(k) = params.row(kp+1);
-        }
+      }
       sigmak_ = Stat::meanByRow(sigma.asDerived());
       sigmaj_ = Stat::meanByCol(sigma.asDerived());
       Real cte = std::sqrt((sigma/(sigmak_ * sigmaj_)).mean());
@@ -291,7 +369,6 @@ struct ModelParameters<Clust::Gaussian_sjsk_>
       sigmaj_ *= cte;
     }
 };
-
 
 } // namespace STK
 

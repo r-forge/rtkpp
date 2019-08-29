@@ -37,12 +37,12 @@
 namespace STK
 {
 
-bool RDataHandler::addType(std::string const& idData, int Rtype)
+bool RDataHandler::addType(String const& idData, int Rtype)
 {
   // parse descriptor file
   std::pair<InfoType::iterator,bool> ret;
   // check if identifier is already present
-  ret = infoType_.insert(std::pair<std::string,int>(idData, Rtype));
+  ret = infoType_.insert(std::pair<String,int>(idData, Rtype));
   // if name already exists, check if there is incoherence
   if (ret.second==false)
   {

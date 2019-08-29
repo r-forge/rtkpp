@@ -55,11 +55,8 @@ MixtureComposer::MixtureComposer( MixtureComposer const& composer)
                                 , meanlnLikelihood_(composer.meanlnLikelihood_)
 {}
 
-MixtureComposer::~MixtureComposer()
-{
-  for (MixtIterator it = v_mixtures_.begin() ; it != v_mixtures_.end(); ++it)
-  { delete (*it);}
-}
+/* destructor */
+MixtureComposer::~MixtureComposer() {}
 
 /* clone pattern */
 MixtureComposer* MixtureComposer::clone() const
@@ -83,12 +80,12 @@ Real MixtureComposer::lnComponentProbability(int i, int k) const
 
 void MixtureComposer::paramUpdateStep()
 {
-#ifdef STK_MIXTURE_VERBOSE
+#ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Entering MixtureComposer::paramUpdateStep()\n");
 #endif
   for (MixtIterator it = v_mixtures_.begin() ; it != v_mixtures_.end(); ++it)
   { (*it)->paramUpdateStep();}
-#ifdef STK_MIXTURE_VERBOSE
+#ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("MixtureComposer::paramUpdateStep() done\n");
 #endif
 }
@@ -96,7 +93,6 @@ void MixtureComposer::paramUpdateStep()
 void MixtureComposer::writeParameters(std::ostream& os) const
 {
   os << _T("nbSample = ") << nbSample() << std::endl;
-  os << _T("nbVariable = ") << nbVariable() << std::endl;
   os << _T("nbCluster = ") << nbCluster() << std::endl;
   os << _T("nbFreeParameter = ") << nbFreeParameter() << std::endl;
   os << _T("nbMissingValues = ") << computeNbMissingValues() << std::endl;
@@ -146,8 +142,15 @@ void MixtureComposer::imputationStep()
  */
 void MixtureComposer::samplingStep()
 {
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("Entering MixtureComposer::samplingStep()\n");
+#endif
+
   for (MixtIterator it = v_mixtures_.begin(); it != v_mixtures_.end(); ++it)
   { (*it)->samplingStep();}
+#ifdef STK_MIXTURE_VERY_VERBOSE
+  stk_cout << _T("MixtureComposer::samplingStep() done\n");
+#endif
 }
 
 /* store the  intermediate results */
@@ -212,8 +215,7 @@ MixtureComposerFixedProp::MixtureComposerFixedProp( MixtureComposer const& model
 MixtureComposerFixedProp* MixtureComposerFixedProp::create() const
 {
   MixtureComposerFixedProp* p_composer = new MixtureComposerFixedProp(nbSample(), nbCluster());
-  p_composer->createComposer(v_mixtures());
-  /* remove the count of the pk parameters */
+  p_composer->createComposer(v_mixtures_);
   p_composer->setNbFreeParameter(p_composer->nbFreeParameter()-(nbCluster()-1));
   return p_composer;
 }

@@ -6,7 +6,6 @@
 \alias{missingValues,ClusterMixedDataModel-method}
 \alias{missingValues,ClusterDiagGaussian-method}
 \alias{missingValues,ClusterDiagGaussianComponent-method}
-\alias{missingValues,ClusterDiagGaussian-method}
 \alias{missingValues,ClusterGammaComponent-method}
 \alias{missingValues,ClusterGamma-method}
 \alias{missingValues,ClusterCategoricalComponent-method}

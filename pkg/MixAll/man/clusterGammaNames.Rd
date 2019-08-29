@@ -31,8 +31,6 @@ A vector of character with the model names.
 In a gamma mixture model, we can assume that the shapes are equal in each/all
 cluster(s) or not. We can also assume that the scales are equal in each/all
 cluster(s) or not.
-
-check if a vector of gamma mixture model name is correct.
 }
 \details{
 Some configuration are impossibles. If the shapes are equal between all the

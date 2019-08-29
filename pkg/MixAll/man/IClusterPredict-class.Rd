@@ -25,6 +25,8 @@ the ith individual to belong to kth cluster.}
 \item{\code{zi}}{Vector of integer of size n  with the attributed class label of the individuals}
 
 \item{\code{algo}}{an instance of [\code{\linkS4class{ClusterAlgoPredict}}]}
+
+\item{\code{model}}{an instance of a (derived) [\code{\linkS4class{IClusterModel}}]}
 }}
 
 \examples{

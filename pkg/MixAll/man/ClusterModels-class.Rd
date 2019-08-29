@@ -32,7 +32,9 @@ the ith individual to belong to kth cluster.}
 
 \item{\code{lnFi}}{Vector of size n with the log-likelihood of the ith individuals.}
 
-\item{\code{zi}}{Vector of integer of size n  with the attributed class label of the individuals.}
+\item{\code{zi}}{Vector of integer of size n with the attributed class label of the individuals.}
+
+\item{\code{ziFit}}{Vector of integer of size n with the fitted class label of the individuals (only used in supervised learning).}
 
 \item{\code{lnLikelihood}}{Real given the ln-liklihood of the Cluster model.}
 

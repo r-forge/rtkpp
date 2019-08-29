@@ -4,8 +4,8 @@
 \alias{clusterInit}
 \title{Create an instance of [\code{\linkS4class{ClusterInit}}] class}
 \usage{
-clusterInit(method = "class", nbInit = 5, algo = "EM", nbIteration = 20,
-  epsilon = 0.01)
+clusterInit(method = "class", nbInit = 5, algo = "EM",
+  nbIteration = 20, epsilon = 0.01)
 }
 \arguments{
 \item{method}{Character string with the initialisation method.

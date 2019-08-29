@@ -153,6 +153,8 @@ class KmmBase: public IMixtureDensity<Derived>
      *  using the kernel trick.
      **/
     void compute_dik(CArrayXX const* p_tik, CPointX const* p_tk);
+    /** default implementation of initializeModelImpl (do nothing) */
+    inline void initializeModelImpl() {/* do nothing*/}
 
   private:
     /** @brief Set the data set.
@@ -169,27 +171,28 @@ class KmmBase: public IMixtureDensity<Derived>
 template<class Derived>
 void KmmBase<Derived>::compute_dik(CArrayXX const* p_tik, CPointX const* p_tk)
 {
-#ifdef STK_KernelS_DEBUG
+#ifdef STK_KERNELS_DEBUG
   stk_cout << _T("Entering KmmBase::compute_dik\n");
   stk_cout << _T("dik_.cols() =") << dik_.cols() << _T("\n");
   stk_cout << _T("dik_.rows() =") << dik_.rows() << _T("\n");
 #endif
-  // vector with values wik=\sum_{j=1}^n k(x_i,x_j) t_{jk}/t_{.k}, for k=1,..,K
-  CVectorX wi(dik_.rows());
+  CVectorX wik(dik_.rows());
   for (int k=dik_.beginCols(); k<dik_.endCols(); ++k)
   {
-    for (int i= wi.begin(); i < wi.end(); ++i)
+    // Compute wik=\sum_{j=1}^n k(x_i,x_j) t_{jk}/t_{.k}, for k=1,..,K
+    for (int i= wik.begin(); i < wik.end(); ++i)
     {
-      wi[i] = 0.;
-      for (int j= wi.begin(); j < wi.end(); ++j)
-      { wi[i] += p_kernel_->comp(i, j) * p_tik->elt(j,k)/p_tk->elt(k);}
+      wik[i] = 0.;
+      for (int j= wik.begin(); j < wik.end(); ++j)
+      { wik[i] += p_kernel_->comp(i, j) * p_tik->elt(j,k);}
     }
+    wik /= p_tk->elt(k);
     // compute dik_ = k(i,i) - 2 * wik + \sum_{i=1}^n t_{ik} w_{ik}/t_{.k}
-    Real scal =p_tik->col(k).dot(wi)/p_tk->elt(k);
-    for (int i= wi.begin(); i<wi.end(); ++i)
-    { dik_(i,k) = p_kernel_->diag(i) - 2. * wi[i] + scal  ;}
+    Real dk = p_tik->col(k).dot(wik)/p_tk->elt(k);
+    for (int i= wik.begin(); i<wik.end(); ++i)
+    { dik_(i,k) = p_kernel_->diag(i) - 2. * wik[i] + dk  ;}
   }
-#ifdef STK_KernelS_DEBUG
+#ifdef STK_KERNELS_DEBUG
   stk_cout << _T("KmmBase::compute_dik done\n");
 #endif
 }
@@ -209,8 +212,7 @@ void KmmBase<Derived>::initializeModel()
 {
   // set dimensions
   this->setNbSample(p_kernel_->nbSample());
-  this->setNbVariable(p_kernel_->nbVariable());
-  dik_.resize(nbSample(), nbCluster());
+  dik_.resize(p_kernel_->nbSample(), nbCluster());
   // call specific model initialization stuff (not really necessary)
   this->asDerived().initializeModelImpl();
   //compute_dik();

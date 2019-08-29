@@ -4,8 +4,8 @@
 \alias{clusterMixedData}
 \title{Create an instance of the [\code{\linkS4class{ClusterMixedDataModel}}] class}
 \usage{
-clusterMixedData(data, models, nbCluster = 2, strategy = clusterStrategy(),
-  criterion = "ICL", nbCore = 1)
+clusterMixedData(data, models, nbCluster = 2,
+  strategy = clusterStrategy(), criterion = "ICL", nbCore = 1)
 }
 \arguments{
 \item{data}{[\code{list}] containing the data sets (matrices and/or data.frames).

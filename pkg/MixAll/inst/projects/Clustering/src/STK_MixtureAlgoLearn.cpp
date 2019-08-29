@@ -33,7 +33,8 @@
  *  @brief In this file we implement the run method of the mixture algorithms.
  **/
 
-#include <STKernel/include/STK_Exceptions.h>
+#include <Sdk.h>
+
 #include "../include/MixtureAlgo/STK_MixtureAlgoLearn.h"
 #include "../include/STK_IMixtureLearner.h"
 
@@ -70,6 +71,9 @@ bool ImputeAlgo::run()
       }
       currentLnLikelihood = lnLikelihood;
     }
+    // finalize and compute posterior probabilities and predicted values
+    p_model_->finalizeStep();
+    p_model_->mapStep();
 #ifdef STK_MIXTURE_VERBOSE
     stk_cout << _T("In ImputeAlgo::run() iteration ") << iter << _T("terminated.\n")
              << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");
@@ -120,6 +124,7 @@ bool SimulAlgo::run()
   catch (Clust::exceptions const& error)
   {
     msg_error_ = Clust::exceptionToString(error);
+    p_model_->finalizeStep();
 #ifdef STK_MIXTURE_VERBOSE
     stk_cout << _T("An error occur in SimulAlgo::run(): ") << msg_error_ << _T("\n");
 #endif
@@ -128,7 +133,8 @@ bool SimulAlgo::run()
   if (result)
   {
     // set averaged parameters
-    p_model_->setParametersStep();
+    p_model_->finalizeStep();
+    p_model_->mapStep();
 #ifdef STK_MIXTURE_VERY_VERBOSE
     stk_cout << _T("\nIn SimulAlgo::run(), setParameters done.\n")
              << _T("p_model_->lnLikelihood = ") << p_model_->lnLikelihood() << _T("\n");

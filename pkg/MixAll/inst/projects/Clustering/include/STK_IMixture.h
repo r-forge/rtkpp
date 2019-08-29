@@ -41,6 +41,7 @@
 #include <Arrays/include/STK_CArrayPoint.h>
 #include <Arrays/include/STK_CArrayVector.h>
 #include <Arrays/include/STK_CArray.h>
+#include <Arrays/include/STK_CArrayNumber.h>
 
 namespace STK
 {
@@ -68,7 +69,7 @@ class IMixture
      * @note The Id is provided by the framework if the associated data set is in
      * a STK::IDataHandler struct.
      */
-    IMixture( std::string const& idData = std::string());
+    IMixture( String const& idData = String());
     /**copy constructor.
      * @warning The pointer on the composer is not copied and is set to 0: it has
      * to be set again.
@@ -78,7 +79,7 @@ class IMixture
     virtual ~IMixture();
 
     /** @return the Id data of the mixture */
-    inline std::string const& idData() const { return idData_;}
+    inline String const& idData() const { return idData_;}
     /** @return A constant pointer on the composer. */
     inline IMixtureStatModel const* const p_composer() const { return p_composer_;}
 
@@ -133,10 +134,6 @@ class IMixture
      *  @return Number of missing values
      */
     virtual int nbMissingValues() const = 0;
-    /** This function must return the number of variables (columns).
-     *  @return Number of variables
-     */
-    virtual int nbVariable() const = 0;
     /** @brief This function should be used for Imputation of data.
      *  The default implementation (in the base class) is to do nothing.
      */
@@ -209,7 +206,7 @@ class IMixture
     /** pointer on the main composer model */
     const IMixtureStatModel* p_composer_;
     /** Id name of the mixture */
-    std::string idData_;
+    String idData_;
 };
 
 } // namespace STK

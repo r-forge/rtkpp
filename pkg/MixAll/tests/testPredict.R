@@ -20,7 +20,8 @@ testPredict<-function(nbTrain , nbTest)
   model <- clusterCategorical(train1,2,models = "categorical_p_pjk")
   pred  <- clusterPredict(test1,model)
   # more than 5 classification errors is abnormal
-  if (abs(sum(pred@zi) - nbTest)>5) return(FALSE)
+  if (abs(sum(pred@zi) - nbTest)>5)
+  { print("Predict Categorical failed");return(FALSE)}
   
   ##------------------------------------------------------------------------------
   ## test Poisson predictions
@@ -35,7 +36,8 @@ testPredict<-function(nbTrain , nbTest)
   model <- clusterPoisson(train2,2,models = "poisson_p_lk")
   pred  <- clusterPredict(test2,model)
   # more than 5 classification errors is abnormal
-  if (abs(sum(pred@zi) - nbTest)>5) return(FALSE)
+  if (abs(sum(pred@zi) - nbTest)>5)
+  { print("Predict Poisson failed");return(FALSE)}
   
   ##------------------------------------------------------------------------------
   ## test Gaussian predictions
@@ -50,7 +52,8 @@ testPredict<-function(nbTrain , nbTest)
   model <- clusterDiagGaussian(train3,2,models = "gaussian_p_s")
   pred  <- clusterPredict(test3,model)
   # more than 5 classification errors is abnormal
-  if (abs(sum(pred@zi) - nbTest)>5) return(FALSE)
+  if (abs(sum(pred@zi) - nbTest)>5)
+  { print("Predict Gaussian failed");return(FALSE)}
   
   ##------------------------------------------------------------------------------
   ## test gamma predictions
@@ -65,7 +68,8 @@ testPredict<-function(nbTrain , nbTest)
   model <- clusterGamma(train4, 2, models = "gamma_p_ak_b")
   pred  <- clusterPredict(test4,model)
   # more than 5 classification errors is abnormal
-  if (abs(sum(pred@zi) - nbTest)>5) return(FALSE)
+  if (abs(sum(pred@zi) - nbTest)>5)
+  { print("Predict gamma failed");return(FALSE)}
   
   ##------------------------------------------------------------------------------
   ## test mixed data predictions
@@ -76,7 +80,8 @@ testPredict<-function(nbTrain , nbTest)
   model <- clusterMixedData(train, models, 2)
   pred  <- clusterPredict(test,model)
   # more than 5 classification errors is abnormal
-  if (abs(sum(pred@zi) - nbTest)>5) return(FALSE)
+  if (abs(sum(pred@zi) - nbTest)>5)
+  { print("Predict mixed failed");return(FALSE)}
   
   ##------------------------------------------------------------------------------
   return(TRUE)  

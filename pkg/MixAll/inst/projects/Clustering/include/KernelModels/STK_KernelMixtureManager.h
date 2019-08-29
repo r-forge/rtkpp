@@ -36,12 +36,49 @@
 #ifndef STK_KERNELMIXTUREMANAGER_H
 #define STK_KERNELMIXTUREMANAGER_H
 
+#include "../STK_Clust_Util.h"
+#include "../STK_IMixtureManager.h"
+
 #include "STK_KmmBridge.h"
 #include "STK_KernelHandler.h"
-#include "../STK_IMixtureManager.h"
 
 namespace STK
 {
+// forward declaration
+class KernelMixtureManager;
+
+namespace hidden
+{
+/** @ingroup hidden
+ * Specialization for KernelMixtureManager */
+template<>
+struct MixtureManagerTraits< KernelMixtureManager >
+{
+  private:
+   class Void {};
+  public:
+    /** type of data */
+    typedef KernelHandler DataHandler;
+    /** type of data */
+    typedef Real Type;
+    /** Type of the array storing missing values indexes */
+    typedef std::vector< std::pair<int,int> > MissingIndexes;
+    /** Type of the array storing missing values */
+    typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
+
+    // All data handlers will store and return a specific container for
+    // the data they handle. The DataHandlerTraits class allow us to know the
+    // type of these containers when data is of type Type.
+    /** */
+    /** type of the data set */
+    typedef Void Data;
+    // Classes wrapping the Real and Integer containers
+    /** class wrapping the data set */
+    typedef Void  DataBridgeType;
+};
+
+} // namespace hidden
+
 /** @ingroup Clustering
  *  @brief A mixture manager is a factory class for injection dependency in the
  *  STK++ derived class of the MixtureComposer class.
@@ -49,10 +86,17 @@ namespace STK
  *  It allows to handle all the creation and initialization stuff needed by the
  *  (bridged) mixture models of the stkpp library.
  */
-class KernelMixtureManager: public IMixtureManager<KernelHandler>
+class KernelMixtureManager: public IMixtureManager<KernelMixtureManager>
 {
   public:
-    typedef IMixtureManager<KernelHandler> Base;
+    typedef typename hidden::MixtureManagerTraits< KernelMixtureManager >::DataHandler DataHandler;
+    typedef typename hidden::MixtureManagerTraits< KernelMixtureManager >::Type Type;
+    typedef typename hidden::MixtureManagerTraits< KernelMixtureManager >::MissingIndexes MissingIndexes;
+    typedef typename hidden::MixtureManagerTraits< KernelMixtureManager >::MissingValues MissingValues;
+    typedef typename hidden::MixtureManagerTraits< KernelMixtureManager >::Data Data;
+    typedef typename hidden::MixtureManagerTraits< KernelMixtureManager >::DataBridgeType DataBridgeType;
+
+    typedef IMixtureManager<KernelMixtureManager> Base;
 
     typedef KmmBridge< Clust::Kmm_sk_, CSquareX> KmmBridge_sk;
     typedef KmmBridge< Clust::Kmm_s_, CSquareX> KmmBridge_s;
@@ -60,7 +104,7 @@ class KernelMixtureManager: public IMixtureManager<KernelHandler>
     /** Default constructor, need an instance of a KernelHandler.  */
     KernelMixtureManager(KernelHandler const& handler);
     /** destructor */
-    virtual ~KernelMixtureManager();
+    ~KernelMixtureManager();
 
     /** set the dimension of the kernel mixture model */
     void setDim(IMixture* p_mixture, Real const& dim) const;
@@ -71,19 +115,19 @@ class KernelMixtureManager: public IMixtureManager<KernelHandler>
      *  @param p_mixture pointer on the mixture
      *  @param param the array to return with the parameters
      **/
-    virtual void getParameters(IMixture* p_mixture, ArrayXX& param) const;
+    void getParametersImpl(IMixture* p_mixture, ArrayXX& param) const;
     /** set the parameters from an IMixture.
      *  @param p_mixture pointer on the mixture
      *  @param param the array with the parameters to set
      **/
-    virtual void setParameters(IMixture* p_mixture, ArrayXX const& param) const;
+    void setParametersImpl(IMixture* p_mixture, ArrayXX const& param) const;
 
-  protected:
     /** create a concrete mixture from its string name and initialize it.
-     *  @param modelName, idData name of the model and id of the data
+     *  @param modelName a valid model name
+     *  @param idData Id of the data
      *  @param nbCluster number of cluster of the model
      **/
-    virtual IMixture* createMixtureImpl(String const& modelName, String const& idData, int nbCluster);
+    IMixture* createMixtureImpl(String const& modelName, String const& idData, int nbCluster);
 
   private:
     /** create a concrete mixture and initialize it.

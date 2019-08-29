@@ -153,7 +153,7 @@ learnPoisson <- function( data, labels, prop = NULL
   # Create algorithm
   algo = learnAlgo( algo, nbIter, epsilon)
   # start estimation of the models
-  resFlag = .Call("learnMixture", model, models, algo, criterion, nbCore, PACKAGE="MixAll");
+  resFlag = .Call("learnMixture", model, models, algo, nbCore, PACKAGE="MixAll");
   # set names
   if (resFlag != TRUE ) {cat("WARNING: An error occur during the learning process");}
   colnames(model@component@lambda)  <- colnames(model@component@data);
@@ -188,7 +188,7 @@ learnGamma <- function( data, labels, prop = NULL
   # Create algorithm
   algo = learnAlgo( algo, nbIter, epsilon)
   # start estimation of the models
-  resFlag = .Call("learnMixture", model, models, algo, criterion, nbCore, PACKAGE="MixAll");
+  resFlag = .Call("learnMixture", model, models, algo, nbCore, PACKAGE="MixAll");
   # set names
   if (resFlag != TRUE ) {cat("WARNING: An error occur during the learning process");}
   colnames(model@component@shape) <- colnames(model@component@data);
@@ -365,6 +365,8 @@ learnMixedData <- function( data, models, labels, prop = NULL
   model@pk       = prop
   model
 }
+
+
 
 .checkDataInLearner <- function(data, labels)
 {

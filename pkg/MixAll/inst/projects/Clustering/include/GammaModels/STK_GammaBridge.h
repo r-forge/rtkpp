@@ -49,7 +49,6 @@
 #include "STK_Gamma_ak_bj.h"
 #include "STK_Gamma_ak_bjk.h"
 #include "STK_Gamma_ak_bk.h"
-#include "STK_GammaParametersHandler.h"
 #include "../STK_IMixtureBridge.h"
 
 namespace STK
@@ -73,8 +72,10 @@ struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_ajk_bjk_, Data_> >
   typedef Gamma_ajk_bjk<Data> Mixture;
   /** Type of the structure storing the mixture parameters */
   typedef ModelParameters<Clust::Gamma_ajk_bjk_> Parameters;
-  /** Type of the parameter handler */
-  typedef ParametersHandler<Clust::Gamma_ajk_bjk_> ParamHandler;
+  /** Type of the array storing missing values indexes */
+  typedef std::vector<std::pair<int,int> > MissingIndexes;
+  /** Type of the array storing missing values */
+  typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
   enum
   {
     idMixtureClass_ = Clust::Gamma_
@@ -93,8 +94,10 @@ struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_ajk_bk_, Data_> >
   typedef Gamma_ajk_bk<Data> Mixture;
   /** Type of the structure storing the mixture parameters */
   typedef ModelParameters<Clust::Gamma_ajk_bk_> Parameters;
-  /** Type of the parameter handler */
-  typedef ParametersHandler<Clust::Gamma_ajk_bk_> ParamHandler;
+  /** Type of the array storing missing values indexes */
+  typedef std::vector<std::pair<int,int> > MissingIndexes;
+  /** Type of the array storing missing values */
+  typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
   enum
   {
     idMixtureClass_ = Clust::Gamma_
@@ -113,8 +116,10 @@ struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_ajk_bj_, Data_> >
   typedef Gamma_ajk_bj<Data> Mixture;
   /** Type of the structure storing the mixture parameters */
   typedef ModelParameters<Clust::Gamma_ajk_bj_> Parameters;
-  /** Type of the parameter handler */
-  typedef ParametersHandler<Clust::Gamma_ajk_bj_> ParamHandler;
+  /** Type of the array storing missing values indexes */
+  typedef std::vector<std::pair<int,int> > MissingIndexes;
+  /** Type of the array storing missing values */
+  typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
   enum
   {
     idMixtureClass_ = Clust::Gamma_
@@ -133,8 +138,10 @@ struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_ajk_b_, Data_> >
   typedef Gamma_ajk_b<Data> Mixture;
   /** Type of the structure storing the mixture parameters */
   typedef ModelParameters<Clust::Gamma_ajk_b_> Parameters;
-  /** Type of the parameter handler */
-  typedef ParametersHandler<Clust::Gamma_ajk_b_> ParamHandler;
+  /** Type of the array storing missing values indexes */
+  typedef std::vector<std::pair<int,int> > MissingIndexes;
+  /** Type of the array storing missing values */
+  typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
   enum
   {
     idMixtureClass_ = Clust::Gamma_
@@ -153,8 +160,10 @@ struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_ak_bjk_, Data_> >
   typedef Gamma_ak_bjk<Data> Mixture;
   /** Type of the structure storing the mixture parameters */
   typedef ModelParameters<Clust::Gamma_ak_bjk_> Parameters;
-  /** Type of the parameter handler */
-  typedef ParametersHandler<Clust::Gamma_ak_bjk_> ParamHandler;
+  /** Type of the array storing missing values indexes */
+  typedef std::vector<std::pair<int,int> > MissingIndexes;
+  /** Type of the array storing missing values */
+  typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
   enum
   {
     idMixtureClass_ = Clust::Gamma_
@@ -173,8 +182,10 @@ struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_ak_bk_, Data_> >
   typedef Gamma_ak_bk<Data> Mixture;
   /** Type of the structure storing the mixture parameters */
   typedef ModelParameters<Clust::Gamma_ak_bk_> Parameters;
-  /** Type of the parameter handler */
-  typedef ParametersHandler<Clust::Gamma_ak_bk_> ParamHandler;
+  /** Type of the array storing missing values indexes */
+  typedef std::vector<std::pair<int,int> > MissingIndexes;
+  /** Type of the array storing missing values */
+  typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
   enum
   {
     idMixtureClass_ = Clust::Gamma_
@@ -193,8 +204,10 @@ struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_ak_bj_, Data_> >
   typedef Gamma_ak_bj<Data> Mixture;
   /** Type of the structure storing the mixture parameters */
   typedef ModelParameters<Clust::Gamma_ak_bj_> Parameters;
-  /** Type of the parameter handler */
-  typedef ParametersHandler<Clust::Gamma_ak_bj_> ParamHandler;
+  /** Type of the array storing missing values indexes */
+  typedef std::vector<std::pair<int,int> > MissingIndexes;
+  /** Type of the array storing missing values */
+  typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
   enum
   {
     idMixtureClass_ = Clust::Gamma_
@@ -213,8 +226,10 @@ struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_ak_b_, Data_> >
   typedef Gamma_ak_b<Data> Mixture;
   /** Type of the structure storing the mixture parameters */
   typedef ModelParameters<Clust::Gamma_ak_b_> Parameters;
-  /** Type of the parameter handler */
-  typedef ParametersHandler<Clust::Gamma_ak_b_> ParamHandler;
+  /** Type of the array storing missing values indexes */
+  typedef std::vector<std::pair<int,int> > MissingIndexes;
+  /** Type of the array storing missing values */
+  typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
   enum
   {
     idMixtureClass_ = Clust::Gamma_
@@ -233,8 +248,10 @@ struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_aj_bjk_, Data_> >
   typedef Gamma_aj_bjk<Data> Mixture;
   /** Type of the structure storing the mixture parameters */
   typedef ModelParameters<Clust::Gamma_aj_bjk_> Parameters;
-  /** Type of the parameter handler */
-  typedef ParametersHandler<Clust::Gamma_aj_bjk_> ParamHandler;
+  /** Type of the array storing missing values indexes */
+  typedef std::vector<std::pair<int,int> > MissingIndexes;
+  /** Type of the array storing missing values */
+  typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
   enum
   {
     idMixtureClass_ = Clust::Gamma_
@@ -253,8 +270,10 @@ struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_aj_bk_, Data_> >
   typedef Gamma_aj_bk<Data> Mixture;
   /** Type of the structure storing the mixture parameters */
   typedef ModelParameters<Clust::Gamma_aj_bk_> Parameters;
-  /** Type of the parameter handler */
-  typedef ParametersHandler<Clust::Gamma_aj_bk_> ParamHandler;
+  /** Type of the array storing missing values indexes */
+  typedef std::vector<std::pair<int,int> > MissingIndexes;
+  /** Type of the array storing missing values */
+  typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
   enum
   {
     idMixtureClass_ = Clust::Gamma_
@@ -273,8 +292,10 @@ struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_a_bjk_, Data_> >
   typedef Gamma_a_bjk<Data> Mixture;
   /** Type of the structure storing the mixture parameters */
   typedef ModelParameters<Clust::Gamma_a_bjk_> Parameters;
-  /** Type of the parameter handler */
-  typedef ParametersHandler<Clust::Gamma_a_bjk_> ParamHandler;
+  /** Type of the array storing missing values indexes */
+  typedef std::vector<std::pair<int,int> > MissingIndexes;
+  /** Type of the array storing missing values */
+  typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
   enum
   {
     idMixtureClass_ = Clust::Gamma_
@@ -293,8 +314,10 @@ struct MixtureBridgeTraits< GammaBridge< Clust::Gamma_a_bk_, Data_> >
   typedef Gamma_a_bk<Data> Mixture;
   /** Type of the structure storing the mixture parameters */
   typedef ModelParameters<Clust::Gamma_a_bk_> Parameters;
-  /** Type of the parameter handler */
-  typedef ParametersHandler<Clust::Gamma_a_bk_> ParamHandler;
+  /** Type of the array storing missing values indexes */
+  typedef std::vector<std::pair<int,int> > MissingIndexes;
+  /** Type of the array storing missing values */
+  typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
   enum
   {
     idMixtureClass_ = Clust::Gamma_
@@ -322,7 +345,6 @@ class GammaBridge: public IMixtureBridge< GammaBridge<Id,Data> >
     // type of Mixture
     typedef typename hidden::MixtureBridgeTraits< GammaBridge<Id,Data> >::Mixture Mixture;
     typedef typename hidden::MixtureBridgeTraits< GammaBridge<Id,Data> >::Parameters Parameters;
-    typedef typename hidden::MixtureBridgeTraits< GammaBridge<Id,Data> >::ParamHandler ParamHandler;
     // type of data
     typedef typename Data::Type Type;
     // class of mixture
@@ -332,7 +354,6 @@ class GammaBridge: public IMixtureBridge< GammaBridge<Id,Data> >
     };
     typedef std::vector<std::pair<int,int> >::const_iterator ConstIterator;
     using Base::mixture_;
-    using Base::paramHandler_;
     using Base::p_dataij_;
     using Base::p_tik;
     using Base::v_missing_;
@@ -344,19 +365,16 @@ class GammaBridge: public IMixtureBridge< GammaBridge<Id,Data> >
      *  @param idData id name of the mixture model
      *  @param nbCluster number of cluster
      **/
-    GammaBridge( Data* p_dataij, std::string const& idData, int nbCluster)
-              : Base( p_dataij, idData, nbCluster)
+    GammaBridge( Data* p_dataij, String const& idData, int nbCluster)
+               : Base( p_dataij, idData, nbCluster)
     {
       removeMissing(); // remove missing from data only once at creation
       mixture_.setData(*p_dataij_);
-      paramHandler_.resize(p_dataij_->cols());
     }
     /** copy constructor */
     GammaBridge( GammaBridge const& bridge): Base(bridge)
-    {
-      mixture_.setData(*p_dataij_);
-      paramHandler_.resize(p_dataij_->cols());
-    }
+    {}
+//    { mixture_.setData(*p_dataij_);}
     /** destructor */
     virtual ~GammaBridge() {}
     /** This is a standard clone function in usual sense. It must be defined to
@@ -376,7 +394,6 @@ class GammaBridge: public IMixtureBridge< GammaBridge<Id,Data> >
       GammaBridge* p_bridge = new GammaBridge( mixture_, this->idData(), this->nbCluster());
       p_bridge->p_dataij_ = p_dataij_;
       p_bridge->mixture_.setData(*p_dataij_);
-      p_bridge->paramHandler_.resize(p_dataij_->cols());
       p_bridge->v_missing_ = v_missing_;
       return p_bridge;
     }
@@ -391,7 +408,7 @@ class GammaBridge: public IMixtureBridge< GammaBridge<Id,Data> >
      *  @param idData id name of the mixture
      *  @param nbCluster number of cluster
      **/
-    GammaBridge( Mixture const& mixture, std::string const& idData, int nbCluster)
+    GammaBridge( Mixture const& mixture, String const& idData, int nbCluster)
               : Base(mixture, idData, nbCluster)
     {}
 };

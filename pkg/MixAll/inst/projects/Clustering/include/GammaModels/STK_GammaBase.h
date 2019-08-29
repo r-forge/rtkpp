@@ -37,7 +37,6 @@
 
 #include "../STK_IMixtureDensity.h"
 
-#include <STatistiK/include/STK_Law_Categorical.h>
 #include <STatistiK/include/STK_Law_Gamma.h>
 #include <STatistiK/include/STK_Stat_Functors.h>
 

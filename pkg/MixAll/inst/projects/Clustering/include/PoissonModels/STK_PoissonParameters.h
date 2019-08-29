@@ -42,6 +42,7 @@
 #include <Arrays/include/STK_CArrayPoint.h>
 #include <Arrays/include/STK_CArrayVector.h>
 
+#include <STatistiK/include/STK_Stat_Online.h>
 #include <STatistiK/include/STK_Stat_Functors.h>
 
 namespace STK
@@ -56,6 +57,11 @@ struct ModelParameters<Clust::Poisson_ljlk_>
     CVectorX lambdak_;
     /** intensity of the variables by variables */
     CPointX lambdaj_;
+    /** Array of the lambdak_ statistics */
+    Array1D< Stat::Online<Real, Real> > stat_lambdak_;
+    /** Array of the lambdaj_ statistics */
+    Stat::Online<CVectorX, Real>  stat_lambdaj_;
+
     /** default constructor
      *  @param nbCluster the number of class of the mixture
      **/
@@ -66,10 +72,20 @@ struct ModelParameters<Clust::Poisson_ljlk_>
     ModelParameters( ModelParameters const& param);
     /** destructor */
     ~ModelParameters();
+
     /** @return the intensity of the kth cluster and jth variable */
     inline Real lambda(int k, int j) const { return lambdak_[k] * lambdaj_[j];}
+
     /** resize the set of parameter */
     void resize(Range const& range);
+
+    /** update statistics of the parameters. */
+    void updateStatistics();
+    /** Set the computed statistics */
+    void setStatistics();
+    /** Release the computed statistics */
+    void releaseStatistics();
+
     /** Set the parameters of the mixture model.
      *  It is assumed that the array @c params is of size @c (nbCluster, nbVariable).
      **/
@@ -92,6 +108,9 @@ struct ModelParameters<Clust::Poisson_ljk_>
 {
     /** intensity of the variables */
     Array1D<CPointX> lambda_;
+    /** Array of the lambdak_ statistics */
+    Array1D< Stat::Online<CPointX, Real> > stat_lambda_;
+
     /** default constructor
      *  @param nbCluster the number of class of the mixture
      **/
@@ -102,10 +121,20 @@ struct ModelParameters<Clust::Poisson_ljk_>
     ModelParameters( ModelParameters const& param);
     /** destructor */
     ~ModelParameters();
+
     /** @return the intensity of the kth cluster and jth variable */
     inline Real const& lambda(int k, int j) const { return lambda_[k][j];}
+
     /** resize the set of parameter */
     void resize(Range const& range);
+
+    /** update statistics of the parameters. */
+    void updateStatistics();
+    /** Set the computed statistics */
+    void setStatistics();
+    /** Release the computed statistics */
+    void releaseStatistics();
+
     /** Set the parameters of the mixture model.
      *  It is assumed that the array @c params is of size @c (nbCluster, nbVariable).
      **/
@@ -125,6 +154,9 @@ struct ModelParameters<Clust::Poisson_lk_>
 {
     /** intensity of the variables */
     Array1D<Real> lambda_;
+    /** Array of the lambdak_ statistics */
+    Array1D< Stat::Online<Real, Real> > stat_lambda_;
+
     /** default constructor
      *  @param nbCluster the number of class of the mixture
      **/
@@ -135,10 +167,20 @@ struct ModelParameters<Clust::Poisson_lk_>
     ModelParameters( ModelParameters const& param);
     /** destructor */
     ~ModelParameters();
+
     /** @return the intensity of the kth cluster and jth variable */
     inline Real const& lambda(int k, int j) const { return lambda_[k];}
+
     /** resize the set of parameter */
     void resize(Range const& range);
+
+    /** update statistics of the parameters. */
+    void updateStatistics();
+    /** Set the computed statistics */
+    void setStatistics();
+    /** Release the computed statistics */
+    void releaseStatistics();
+
     /** Set the parameters of the mixture model.
      *  It is assumed that the array @c params is of size @c (nbCluster, nbVariable).
      **/

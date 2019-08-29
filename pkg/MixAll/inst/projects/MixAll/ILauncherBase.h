@@ -47,7 +47,6 @@ namespace STK
 class ILauncherBase: public IRunnerBase
 {
   public:
-    typedef IMixtureManager<RDataHandler> IManager;
     /** constructor with a list of component.
      *  @param model a reference on the current model
      **/
@@ -58,18 +57,19 @@ class ILauncherBase: public IRunnerBase
     inline Rcpp::S4 const& s4_model() const { return s4_model_;}
 
   protected:
-    /** get the parameters of a component given by its ID
+    /** set the parameters of a component given by its ID
      *  @param p_model model with the parameters to get
      *  @param manager mixture manager
      *  @param idData ID of the data
      *  @param s4_component component storing the parameters
      **/
+    template<class Derived>
     void setParametersToComponent( IMixtureStatModel* p_model
-                                 , IManager const& manager
-                                 , std::string const& idData
+                                 , IMixtureManager<Derived> const& manager
+                                 , String const& idData
                                  , Rcpp::S4 s4_component
                                  );
-    /** get the parameters of a component given by its ID
+    /** set the parameters to a component given by its ID
      *  @param p_model model with the parameters to get
      *  @param manager mixture manager
      *  @param idData ID of the data
@@ -77,7 +77,7 @@ class ILauncherBase: public IRunnerBase
      **/
     void setParametersToComponent( IMixtureStatModel* p_model
                                  , KernelMixtureManager const& manager
-                                 , std::string const& idData
+                                 , String const& idData
                                  , Rcpp::S4 s4_component
                                  );
     /** set diagonal Gaussian parameters and data to S4 component
@@ -87,44 +87,44 @@ class ILauncherBase: public IRunnerBase
      *  @param s4_component component storing the parameters
      * */
     void setDiagGaussianParametersToComponent( IMixtureStatModel* p_model
-                                             , IManager const& manager
-                                             , std::string const& idData
+                                             , DiagGaussianMixtureManager<RDataHandler> const& manager
+                                             , String const& idData
                                              , Rcpp::S4 s4_component
                                              );
-    /** get Poisson parameters
+    /** set Poisson parameters
      *  @param p_model model with the parameters to get
      *  @param manager mixture manager
      *  @param idData ID of the data
      *  @param s4_component component storing the parameters
      * */
     void setPoissonParametersToComponent( IMixtureStatModel* p_model
-                                        , IManager const& manager
-                                        , std::string const& idData
+                                        , PoissonMixtureManager<RDataHandler> const& manager
+                                        , String const& idData
                                         , Rcpp::S4 s4_component
                                         );
-    /** get gamma parameters
+    /** set gamma parameters
      *  @param p_model model with the parameters to get
      *  @param manager mixture manager
      *  @param idData ID of the data
      *  @param s4_component component storing the parameters
      *  */
     void setGammaParametersToComponent( IMixtureStatModel* p_model
-                                      , IManager const& manager
-                                      , std::string const& idData
+                                      , GammaMixtureManager<RDataHandler> const& manager
+                                      , String const& idData
                                       , Rcpp::S4 s4_component
                                       );
-    /** get categorical parameters
+    /** set categorical parameters
      *  @param p_model model with the parameters to get
      *  @param manager mixture manager
      *  @param idData ID of the data
      *  @param s4_component component storing the parameters
      * */
     void setCategoricalParametersToComponent( IMixtureStatModel* p_model
-                                            , IManager const& manager
-                                            , std::string const& idData
+                                            , CategoricalMixtureManager<RDataHandler> const& manager
+                                            , String const& idData
                                             , Rcpp::S4 s4_component
                                             );
-    /** get kernel parameters
+    /** set kernel parameters
      *  @param p_model model with the parameters to get
      *  @param manager mixture manager
      *  @param idData ID of the data
@@ -132,7 +132,7 @@ class ILauncherBase: public IRunnerBase
      * */
     void setKernelParametersToComponent( IMixtureStatModel* p_model
                                        , KernelMixtureManager const& manager
-                                       , std::string const& idData
+                                       , String const& idData
                                        , Rcpp::S4 s4_component
                                        );
 
@@ -141,48 +141,81 @@ class ILauncherBase: public IRunnerBase
      *  @param idData ID of the data
      **/
     ArrayXX getParameters( Rcpp::S4 s4_component
-                         , std::string const& idData
+                         , String const& idData
                          );
     /** get diagonal Gaussian parameters
      *  @param s4_component the component with the parameters to get
      *  @param idData ID of the data
      * */
     ArrayXX getDiagGaussianParameters( Rcpp::S4 s4_component
-                                     , std::string const& idData
+                                     , String const& idData
                                      );
     /** get Poisson parameters
      *  @param s4_component the component with the parameters to get
      *  @param idData ID of the data
      * */
     ArrayXX getPoissonParameters( Rcpp::S4 s4_component
-                                , std::string const& idData
+                                , String const& idData
                                 );
     /** get gamma parameters
      *  @param s4_component the component with the parameters to get
      *  @param idData ID of the data
      *  */
     ArrayXX getGammaParameters( Rcpp::S4 s4_component
-                              , std::string const& idData
+                              , String const& idData
                               );
     /** get categorical parameters
      *  @param s4_component the component with the parameters to get
      *  @param idData ID of the data
      * */
     ArrayXX getCategoricalParameters( Rcpp::S4 s4_component
-                                    , std::string const& idData
+                                    , String const& idData
                                     );
     /** get kernel parameters
      *  @param s4_component the component with the parameters to get
      *  @param idData ID of the data
      * */
     ArrayXX getKernelParameters( Rcpp::S4 s4_component
-                               , std::string const& idData
+                               , String const& idData
                                );
 
     /** model from the R side */
     Rcpp::S4 s4_model_;
 
 };
+
+template<class Derived>
+void ILauncherBase::setParametersToComponent( IMixtureStatModel* p_model
+                                            , IMixtureManager<Derived> const& manager
+                                            , String const& idData
+                                            , Rcpp::S4 s4_component)
+{
+  String rModelName = s4_component.slot("modelName");
+  bool freeProp;
+  switch (Clust::mixtureToMixtureClass(Clust::stringToMixture(rModelName, freeProp)))
+  {
+    case Clust::DiagGaussian_:
+      setDiagGaussianParametersToComponent(p_model, manager.asDerived(), idData, s4_component);
+      break;
+    case Clust::Poisson_:
+      setPoissonParametersToComponent(p_model, manager.asDerived(), idData, s4_component);
+      break;
+    case Clust::Gamma_:
+      setGammaParametersToComponent(p_model, manager.asDerived(), idData, s4_component);
+      break;
+    case Clust::Categorical_:
+      setCategoricalParametersToComponent(p_model, manager.asDerived(), idData, s4_component);
+      break;
+    case Clust::Kmm_:
+      setKernelParametersToComponent(p_model, manager.asDerived(), idData, s4_component);
+      break;
+    case Clust::unknown_mixture_class_:
+      break;
+    default:
+      break;
+  }
+}
+
 
 } // namespace STK
 

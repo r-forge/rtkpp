@@ -42,31 +42,93 @@ namespace STK
  *  @param nbCluster the number of class of the mixture
  **/
 ModelParameters<Clust::Kmm_s_>::ModelParameters(int nbCluster)
-                             : sigma2_(1.), dim_(nbCluster, 10) {}
+               : sigma2_(1.), dim_(nbCluster, 10)
+               , stat_sigma2_(), stat_dim_(nbCluster)
+{}
 /* copy constructor.
  *  @param param the parameters to copy.
  **/
 ModelParameters<Clust::Kmm_s_>::ModelParameters( ModelParameters const& param)
                : sigma2_(param.sigma2_), dim_(param.dim_)
+               , stat_sigma2_(param.stat_sigma2_)
+               , stat_dim_(param.stat_dim_)
 {}
 /* destructor */
 ModelParameters<Clust::Kmm_s_>::~ModelParameters() {}
 
+/* update statistics of the parameters. */
+void ModelParameters<Clust::Kmm_s_>::updateStatistics()
+{
+  stat_sigma2_.update(sigma2_);
+  for(int k=stat_dim_.begin(); k<stat_dim_.end(); ++k)
+  { stat_dim_[k].update(dim_[k]);}
+}
+/* Set the computed statistics */
+void ModelParameters<Clust::Kmm_s_>::setStatistics()
+{
+  sigma2_ = stat_sigma2_.mean();
+  stat_sigma2_.release();
+  for(int k=stat_dim_.begin(); k<stat_dim_.end(); ++k)
+  {
+    dim_[k] = stat_dim_[k].mean();
+    stat_dim_[k].release();
+  }
+}
+/* Release the computed statistics */
+void ModelParameters<Clust::Kmm_s_>::releaseStatistics()
+{
+  stat_sigma2_.release();
+  for(int k=stat_dim_.begin(); k<stat_dim_.end(); ++k)
+  { stat_dim_[k].release();}
+}
 
 
 /* default constructor
  *  @param nbCluster the number of class of the mixture
  **/
 ModelParameters<Clust::Kmm_sk_>::ModelParameters(int nbCluster)
-                             : sigma2_(nbCluster, 1.), dim_(nbCluster, 10) {}
+               : sigma2_(nbCluster, 1.), dim_(nbCluster, 10)
+               , stat_sigma2_(nbCluster), stat_dim_(nbCluster)
+{}
 /* copy constructor.
  *  @param param the parameters to copy.
  **/
 ModelParameters<Clust::Kmm_sk_>::ModelParameters( ModelParameters const& param)
                : sigma2_(param.sigma2_), dim_(param.dim_)
+               , stat_sigma2_(param.stat_sigma2_)
+               , stat_dim_(param.stat_dim_)
 {}
 /* destructor */
 ModelParameters<Clust::Kmm_sk_>::~ModelParameters() {}
+
+/* update statistics of the parameters. */
+void ModelParameters<Clust::Kmm_sk_>::updateStatistics()
+{
+  for(int k=stat_dim_.begin(); k<stat_dim_.end(); ++k)
+  {
+    stat_sigma2_[k].update(sigma2_[k]);
+    stat_dim_[k].update(dim_[k]);}
+}
+/* Set the computed statistics */
+void ModelParameters<Clust::Kmm_sk_>::setStatistics()
+{
+  for(int k=stat_dim_.begin(); k<stat_dim_.end(); ++k)
+  {
+    sigma2_[k] = stat_sigma2_[k].mean();
+    stat_sigma2_[k].release();
+    dim_[k] = stat_dim_[k].mean();
+    stat_dim_[k].release();
+  }
+}
+/* Release the computed statistics */
+void ModelParameters<Clust::Kmm_sk_>::releaseStatistics()
+{
+  for(int k=stat_dim_.begin(); k<stat_dim_.end(); ++k)
+  {
+    stat_sigma2_[k].release();
+    stat_dim_[k].release();
+  }
+}
 
 
 } // namespace STK

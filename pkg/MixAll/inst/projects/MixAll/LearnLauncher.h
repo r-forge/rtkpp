@@ -67,7 +67,7 @@ class LearnLauncher: public ILauncher
     /** strategy from the R side */
     Rcpp::S4    s4_algo_;
     /** character string with the model selection criterion name */
-    std::string criterion_;
+    String criterion_;
     /** learning algorithm to run */
     IMixtureAlgoLearn* p_algo_;
     /** criterion to run */

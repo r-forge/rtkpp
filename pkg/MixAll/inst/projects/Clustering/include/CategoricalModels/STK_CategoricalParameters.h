@@ -42,6 +42,8 @@
 #include <Arrays/include/STK_CArray.h>
 #include <Arrays/include/STK_CArrayVector.h>
 
+#include <STatistiK/include/STK_Stat_Online.h>
+
 namespace STK
 {
 
@@ -51,11 +53,12 @@ namespace STK
 template<>
 struct ModelParameters<Clust::Categorical_pjk_>
 {
-    /** array of size nbCluster with the probabilities of the variables in each
-     *  classes */
+    /** array of size nbCluster with the probabilities of the variables */
     Array1D<CArrayXX> proba_;
+    /** Array of size nbCluster with the statistics of the probabilities */
+    Array1D<  Stat::Online<CArrayXX, Real>  > stat_proba_;
     /** default constructor
-     *  @param nbCluster the number of class of the mixture
+     *  @param nbCluster number of class of the mixture
      **/
     ModelParameters(int nbCluster);
     /** copy constructor.
@@ -68,13 +71,25 @@ struct ModelParameters<Clust::Categorical_pjk_>
      *  @param param the parameters to copy.
      **/
     ModelParameters& operator=( ModelParameters const& param);
+
+    // getters
     /** @return the probability of the kth cluster, jth variable, lth modality */
     inline Real const& proba(int k, int j, int l) const { return proba_[k](l,j);}
     /** @return the probabilities of the kth cluster for the jth variable */
     inline CVectorX proba(int k, int j) const { return proba_[k].col(j);}
 
-    /** resize the set of parameter */
+    /** resize the set of parameter
+     *  @param rangeModalities range of the  modalities
+     *  @param rangeCols range of the variables
+     **/
     void resize(Range const& rangeModalities, Range const& rangeCols);
+
+    /** update statistics of the parameters. */
+    void updateStatistics();
+    /** set and release the computed statistics */
+    void setStatistics();
+    /** Set the computed statistics */
+    void releaseStatistics();
 
     /** Set the parameters of the mixture model.
      *  It is assumed that the array params store for each class the proabiliteis
@@ -104,6 +119,9 @@ struct ModelParameters<Clust::Categorical_pk_>
 {
     /** array of size nbCluster with the probabilities of the variables */
     Array1D<CVectorX> proba_;
+    /** array of size nbCluster with the statistics of the probabilities */
+    Array1D<  Stat::Online<CVectorX, Real>  > stat_proba_;
+
     /** default constructor
      *  @param nbCluster the number of class of the mixture
      **/
@@ -118,12 +136,26 @@ struct ModelParameters<Clust::Categorical_pk_>
      *  @param param the parameters to copy.
      **/
     ModelParameters& operator=( ModelParameters const& param);
+
+    // getters
     /** @return the probability of the kth cluster, jth variable, lth modality */
     inline Real const& proba(int k, int j, int l) const { return proba_[k][l];}
     /** @return the probabilities of the kth cluster for the jth variable */
     inline CVectorX proba(int k, int j) const { return proba_[k];}
-    /** resize the set of parameter */
-    void resize(Range const& rangeModalities, Range const& range);
+
+    /** resize the set of parameter
+     *  @param rangeModalities range of the  modalities
+     *  @param rangeCols range of the variables (not used)
+     **/
+    void resize(Range const& rangeModalities, Range const& rangeCols);
+
+    /** update statistics of the parameters. */
+    void updateStatistics();
+    /** set and release the computed statistics */
+    void setStatistics();
+    /** Set the computed statistics */
+    void releaseStatistics();
+
     /** Set the parameters of the mixture model.
      *  It is assumed that the array params store for each class the shapes and
      *  scales parameters on two consecutive rows.

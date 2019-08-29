@@ -18,7 +18,7 @@
 library(MixAll)
 MixAll.version <- packageDescription("MixAll")$Version
 MixAll.date <- packageDescription("MixAll")$Date
-set.seed(2)
+set.seed(39)
 @
 
 \usepackage[utf8]{inputenc}
@@ -73,6 +73,7 @@ set.seed(2)
 \newcommand{\Hil}{\mathcal{H}} %% RKHS
 \newcommand{\scalprod}[2]{\left\langle#1,#2\right\rangle}
 
+\newcommand{\ttcode}[1]{{\tt #1}}
 %---------------------------------------------------------
 \title{\pkg{MixAll}: Learning mixture models}
 \Plaintitle{MixAll:  Learning mixture models with Mixed data and Missing Values}
@@ -124,8 +125,12 @@ with density
 \end{equation}
 parameterized by $\blambda_k$ and $\balpha$.
 
-Given the matrix of obervation$\bx,$ and the vector of labels $\bz$, the learning methods will
-estimate the unknown parameters $\blambda_k$ and $\balpha$.
+Given the matrix of obervation $\bx$ and the vector of labels $\bz$, the
+learning methods will estimate the unknown parameters $\blambda_k$ and
+$\balpha$. The learning R functions will also return a \ttcode{S4} class
+instance containing the posterior probabilities membership $t_{ik}$ and the
+predicted class membership $z_i$ of each individuals (\ttcode{ziFit} data member
+class).
 
 \section{Learning with MixAll}
 \label{sec:LearnWithMixAll}
@@ -186,26 +191,26 @@ is 1, 0 for all cores. \\
 \label{tab:learnCommon}
 \end{table}
 
-The \code{learnKernel} function has two more arguments described in
-table~\ref{tab:learnKernel}.
-\begin{table}[H]
-\centering
-\begin{tabular}{|p{0.3\textwidth}|p{0.65\textwidth}|}
-\hline
-Input Parameter & Description \\
-\hline
-\code{kernelName} & A \code{string} defining the kernel to use. Use
-a \code{"gaussian"} kernel by default. Possible values are \code{"gaussian"},
-"polynomial" or "exponential".\\
-\hline
-\code{kernelParameters} & A vector with the kernel parameter value(s). Default
-value is $1$.\\
-\hline
-\end{tabular}
-\caption{List of all the specific parameters of the
-\code{learnKernel} function.}
-\label{tab:learnKernel}
-\end{table}
+%The \code{learnKernel} function has two more arguments described in
+%table~\ref{tab:learnKernel}.
+%\begin{table}[H]
+%\centering
+%\begin{tabular}{|p{0.3\textwidth}|p{0.65\textwidth}|}
+%\hline
+%Input Parameter & Description \\
+%\hline
+%\code{kernelName} & A \code{string} defining the kernel to use. Use
+%a \code{"gaussian"} kernel by default. Possible values are \code{"gaussian"},
+%"polynomial" or "exponential".\\
+%\hline
+%\code{kernelParameters} & A vector with the kernel parameter value(s). Default
+%value is $1$.\\
+%\hline
+%\end{tabular}
+%\caption{List of all the specific parameters of the
+%\code{learnKernel} function.}
+%\label{tab:learnKernel}
+%\end{table}
 
 \subsection{Learning Multivariate (diagonal) Gaussian Mixture Models}
 \label{subsec:learnDiagGaussian}
@@ -213,15 +218,28 @@ value is $1$.\\
 Multivariate Gaussian mixture models (without correlations) can be learned using
 the \code{learnDiagGaussian} function. We illustrate this function with the well
 known geyser data set (\cite{azzalini1990},\cite{hardle1991}).
-<<fig=TRUE>>=
+
+The model selected by ICL criteria among the models with fixed proportion
+is Gaussian with the same standard deviations among the groups and the
+variables.
+<<>>=
 data(iris);
 x <- as.matrix(iris[,1:4]); z <- as.vector(iris[,5]); n <- nrow(x); p <- ncol(x);
 indexes <- matrix(c(round(runif(5,1,n)), round(runif(5,1,p))), ncol=2);
-cbind(indexes, x[indexes]) # display true values
-x[indexes] <- NA;          # set them as missing
-model <- learnDiagGaussian(data=x, labels = z, models = clusterDiagGaussianNames(prop = "equal"))
+cbind(indexes, x[indexes]) # store true values
+x[indexes] <- NA;          # and set them as missing
+model <- learnDiagGaussian( data=x, labels = z
+                          , models = clusterDiagGaussianNames(prop = "equal"))
 summary(model)
+@
+
+Estimated missing values and comparison between the true membership labels class
+and the fitted membership labels class are given below.
+<<fig=TRUE>>=
+# get estimated missing vallues
 missingValues(model)
+# compare predictions with true values
+table(model@zi,model@ziFit)
 plot(model)
 @
 
@@ -229,22 +247,27 @@ plot(model)
 \label{subsec:learnCategorical}
 
 Categorical (nominal) data can be learned using the \code{learnCategorical}
-function.
-
-
-We illustrate this function with the birds data set.
-<<fig=TRUE>>=
+function. We illustrate this function with the birds data set.
+<<>>=
 data(birds)
 ## add 10 missing values
 x <- as.matrix(birds[,2:5]); z <- as.vector(birds[,1]); n <- nrow(x); p <- ncol(x);
-indexes <- matrix(c(round(runif(5,1,n)), round(runif(5,1,p))), ncol=2);
-cbind(indexes, x[indexes]) # display true values
+indexes <- matrix(c(round(runif(5,1,n)), round(runif(5,1,p))), ncol=2)
+cbind(indexes, x[indexes]) # print true values
 x[indexes] <- NA;          # set them as missing
 model <- learnCategorical( data=x, labels=z
                          , models = clusterCategoricalNames(prop = "equal")
                          , algo="simul", nbIter = 2)
 summary(model)
+@
+
+Estimated missing values and comparison between the true membership labels class
+and the fitted membership labels class are given below.
+<<fig=TRUE>>=
+# get estimated missing vallues
 missingValues(model)
+# compare predictions
+table(model@zi,model@ziFit)
 plot(model)
 @
 
@@ -253,20 +276,27 @@ plot(model)
 \label{subsec:learnGamma}
 
 Gamma data can be learned using the \code{learnGamma} function.
-
 We illustrate this function with the iris data set.
-<<fig=TRUE>>=
+<<>>=
 data(iris)
 x <- as.matrix(iris[,1:4]); z <- as.vector(iris[,5]); n <- nrow(x); p <- ncol(x);
 indexes <- matrix(c(round(runif(5,1,n)), round(runif(5,1,p))), ncol=2);
-cbind(indexes, x[indexes]) # display true values
+cbind(indexes, x[indexes]) # print true values
 x[indexes] <- NA;          # set them as missing
-model <- learnGamma( data=x, labels= z,
-                    , models = clusterGammaNames(prop = "equal")
-                    , algo = "simul", nbIter = 2, epsilon = 1e-08
+model <- learnGamma( data=x, labels= z
+                   , models = clusterGammaNames(prop = "equal")
+                   , algo = "simul", nbIter = 2, epsilon = 1e-08
                 )
 summary(model)
+# get estimated missing values
 missingValues(model)
+@
+  
+Estimated missing values and comparison between the true membership labels class
+and the fitted membership labels class are given below.
+<<fig=TRUE>>=
+  # compare predictions
+table(model@zi,model@ziFit)
 plot(model)
 @
 
@@ -277,18 +307,26 @@ Poisson data (count data) can be learned using the \code{learnPoisson}
 function.
 
 We illustrate this function with the debTrivedi data set.
-<<fig=TRUE>>=
+<<>>=
 data(DebTrivedi)
 x <- DebTrivedi[, c(1, 6, 8, 15)]; z <- DebTrivedi$medicaid; n <- nrow(x); p <- ncol(x);
 indexes <- matrix(c(round(runif(5,1,n)), round(runif(5,1,p))), ncol=2);
-cbind(indexes, x[indexes]) # display true values
+cbind(indexes, x[indexes]) # print true values
 x[indexes] <- NA;          # set them as missing
 model <- learnPoisson( data=x, labels=z
                      , models = clusterPoissonNames(prop = "equal")
                      , algo="simul", nbIter = 2, epsilon =  1e-08
 )
 summary(model)
+# get estimated missing vallues
 missingValues(model)
+@
+  
+Estimated missing values and comparison between the true membership labels class
+and the fitted membership labels class are given below.
+<<fig=TRUE>>=
+# compare predictions
+table(model@zi,model@ziFit)
 plot(model)
 @
 
@@ -318,10 +356,10 @@ Mixed data sets can be learned using the \code{learnMixedData}
 function. The original mixed data set has to be splited in multiple
 homogeneous data sets and each one associated to a mixture model name.
 
+We illustrate this function with the HeartDisease data set
+(\cite{detrano1989international}).
 
-We illustrate this function with the HeartDisease data set.
-
-<<fig=TRUE>>=
+<<>>=
 data(HeartDisease.cat)
 data(HeartDisease.cont)
 data(HeartDisease.target)
@@ -330,7 +368,15 @@ models = c("categorical_pk_pjk","gaussian_pk_sjk")
 z<-HeartDisease.target[[1]];
 model <- learnMixedData(ldata, models, z, algo="simul", nbIter=2)
 summary(model)
+@
+
+Estimated missing values and comparison between the true membership labels class
+and the fitted membership labels class are given below.
+<<fig=TRUE>>=
+# get estimated missing values
 missingValues(model)
+# compare predictions
+table(model@zi,model@ziFit)
 plot(model)
 @
 

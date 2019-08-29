@@ -55,6 +55,7 @@ class DiagGaussianBase: public IMixtureDensity<Derived >
   public:
     typedef IMixtureDensity<Derived > Base;
     using Base::nbCluster;
+    using Base::nbSample;
     using Base::param_;
     using Base::p_data;
 
@@ -149,8 +150,8 @@ void DiagGaussianBase<Derived>::randomMean( CArrayXX const*  p_tik)
 {
   // indexes array
   VectorXi indexes(p_data()->rows());
-  for(int i=p_data()->beginRows(); i< p_data()->endRows(); ++i) { indexes[i] = i;}
-  Range rind = p_data()->rows();
+  for(int i=indexes.begin(); i< indexes.end(); ++i) { indexes[i] = i;}
+  Range rind(p_data()->rows());
   // sample without repetition
   for (int k= p_tik->beginCols(); k < p_tik->endCols(); ++k)
   {

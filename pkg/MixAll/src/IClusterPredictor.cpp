@@ -49,7 +49,7 @@ IClusterPredictor::~IClusterPredictor()
 /* utility function creating STK algorithm from R algorithm */
 IMixtureAlgoPredict* IClusterPredictor::createAlgo()
 {
-   std::string algoName = s4_algo_.slot("algo");
+   String algoName = s4_algo_.slot("algo");
    int nbIterBurn = s4_algo_.slot("nbIterBurn");
    int nbIterLong = s4_algo_.slot("nbIterLong");
    double epsilon = s4_algo_.slot("epsilon");

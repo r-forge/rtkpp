@@ -34,7 +34,6 @@
  * @brief define the main interface for linking specific mixture model to the
  * composer.
  */
-#include <string>
 
 #include "../include/STK_IMixture.h"
 #include "../include/STK_IMixtureStatModel.h"
@@ -43,7 +42,7 @@ namespace STK
 {
 
 /* constructor */
-IMixture::IMixture( std::string const& idData)
+IMixture::IMixture( String const& idData)
                   : p_composer_(0), idData_(idData)
 {}
 

@@ -35,6 +35,7 @@
 #' @slot lnFi      Vector of size n with the log-likelihood of the ith individuals.
 #' @slot zi        Vector of integer of size n  with the attributed class label of the individuals
 #' @slot algo      an instance of [\code{\linkS4class{ClusterAlgoPredict}}] 
+#' @slot model     an instance of a (derived) [\code{\linkS4class{IClusterModel}}] 
 #'
 #'
 #' @examples
@@ -50,14 +51,15 @@ setClass(
   Class = "IClusterPredict",
   # members
   representation( nbSample  = "numeric"
-           , nbCluster = "numeric"
-           , pk        = "numeric"
-           , tik       = "matrix"
-           , lnFi      = "numeric"
-           , zi        = "integer"
-           , algo      = "ClusterAlgoPredict"
-           , "VIRTUAL"
-           ),
+                , nbCluster = "numeric"
+                , pk        = "numeric"
+                , tik       = "matrix"
+                , lnFi      = "numeric"
+                , zi        = "integer"
+                , algo      = "ClusterAlgoPredict"
+                , model     = "IClusterModel"
+                , "VIRTUAL"
+                ),
   # validity function
   validity=function(object)
   {
@@ -110,23 +112,24 @@ setClass(
 setMethod(
   f="initialize",
   signature=c("IClusterPredict"),
-  definition=function(.Object, nbSample, nbCluster, algo)
+  definition=function(.Object, nbSample, model, algo)
   {
     # for nbCluster
     if(missing(nbSample)) { stop("nbSample is mandatory in IClusterPredict.")}
     .Object@nbSample<-nbSample
     
     # for nbCluster
-    if(missing(nbCluster)) { stop("nbCluster is mandatory in IClusterPredict.")}
-    .Object@nbCluster<-nbCluster
+    if(missing(model)) { stop("model is mandatory in IClusterPredict.")}
+    .Object@model<-model
+    .Object@nbCluster<-model@nbCluster
     
     # for nbCluster
     if(missing(algo)) { stop("algo is mandatory in IClusterPredict.")}
     .Object@algo<-algo
     
     # create arrays
-    .Object@pk   <- rep(1/nbCluster, nbCluster)
-    .Object@tik  <- matrix(1/nbCluster, .Object@nbSample, nbCluster)
+    .Object@pk   <- model@pk
+    .Object@tik  <- matrix(1/.Object@nbCluster, .Object@nbSample, .Object@nbCluster)
     .Object@lnFi <- rep(0, .Object@nbSample)
     .Object@zi   <- as.integer(rep(1, .Object@nbSample))
     .Object@algo <- algo

@@ -11,9 +11,9 @@ learnDiagGaussian(data, labels, prop = NULL,
   models = clusterDiagGaussianNames(prop = "equal"), algo = "simul",
   nbIter = 100, epsilon = 1e-08, criterion = "ICL", nbCore = 1)
 
-learnPoisson(data, labels, prop = NULL, models = clusterPoissonNames(prop =
-  "equal"), algo = "simul", nbIter = 100, epsilon = 1e-08,
-  criterion = "ICL", nbCore = 1)
+learnPoisson(data, labels, prop = NULL,
+  models = clusterPoissonNames(prop = "equal"), algo = "simul",
+  nbIter = 100, epsilon = 1e-08, criterion = "ICL", nbCore = 1)
 
 learnGamma(data, labels, prop = NULL, models = clusterGammaNames(prop =
   "equal"), algo = "simul", nbIter = 100, epsilon = 1e-08,

@@ -33,9 +33,8 @@
  *  @brief In this file we implement the class MixtureLearner.
  **/
 
-#include "../include/STK_IMixture.h"
 #include "../include/STK_MixtureLearner.h"
-#include "Arrays/include/STK_Display.h"
+#include <Arrays/include/STK_Display.h>
 
 namespace STK
 {
@@ -44,8 +43,8 @@ namespace STK
  *  @param nbCluster,nbSample, number of clusters and samples.
  */
 MixtureLearner::MixtureLearner( int nbSample, int nbCluster)
-                                : IMixtureLearner( nbSample, nbCluster)
-                                , meanlnLikelihood_(0.)
+                              : IMixtureLearner( nbSample, nbCluster)
+                              , meanlnLikelihood_(0.)
 { setNbFreeParameter(nbCluster-1);}
 
 /* copy constructor.
@@ -56,11 +55,7 @@ MixtureLearner::MixtureLearner( MixtureLearner const& learner)
                               , meanlnLikelihood_(learner.meanlnLikelihood_)
 {}
 
-MixtureLearner::~MixtureLearner()
-{
-  for (MixtIterator it = v_mixtures_.begin() ; it != v_mixtures_.end(); ++it)
-  { delete (*it);}
-}
+MixtureLearner::~MixtureLearner() {}
 
 /* clone pattern */
 MixtureLearner* MixtureLearner::clone() const
@@ -92,7 +87,6 @@ void MixtureLearner::paramUpdateStep()
 void MixtureLearner::writeParameters(std::ostream& os) const
 {
   os << _T("Learner nbSample = ") << nbSample() << std::endl;
-  os << _T("Learner nbVariable = ") << nbVariable() << std::endl;
   os << _T("Learner nbCluster = ") << nbCluster() << std::endl;
   os << _T("Learner nbFreeParameter = ") << nbFreeParameter() << std::endl;
   os << _T("Learner lnLikelihood = ") << lnLikelihood() << std::endl;
@@ -171,7 +165,7 @@ void MixtureLearner::finalizeStep()
  * reused in derived classes. */
 void MixtureLearner::createLearner( std::vector<IMixture*> const& v_mixtures)
 {
-  initialize(nbSample(), nbVariable());
+  initialize(nbSample(), 0);
   v_mixtures_.resize( v_mixtures.size());
   for (size_t l = 0; l < v_mixtures_.size(); ++l)
   {
@@ -179,8 +173,7 @@ void MixtureLearner::createLearner( std::vector<IMixture*> const& v_mixtures)
     v_mixtures_[l]->setMixtureModel(this);
     v_mixtures_[l]->initializeStep();
   }
-  // compute number of free parameters and of variables
-  setNbVariable(computeNbVariables());
+  // compute number of free parameters
   setNbFreeParameter(computeNbFreeParameters());
 }
 

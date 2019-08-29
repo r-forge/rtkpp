@@ -56,9 +56,9 @@ RcppExport SEXP learnMixture( SEXP model, SEXP models, SEXP algo, SEXP nbCore )
   Rcpp::S4 s4_algo(algo);
   // create a launcher
   STK::LearnLauncher launcher(s4_model, r_models, s4_algo);
-  // return result
-  return Rcpp::wrap(launcher.run());
-
+  // launch computations
+  bool flag = launcher.run();
+  return Rcpp::wrap(flag);
   END_RCPP
 }
 

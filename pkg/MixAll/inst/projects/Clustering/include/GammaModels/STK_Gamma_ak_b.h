@@ -93,9 +93,9 @@ class Gamma_ak_b: public GammaBase<Gamma_ak_b<Array> >
      *  will be selected randomly among the data set and the standard-deviation
      *  will be set to 1.
      */
-    void randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) ;
+    void randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk) ;
     /** Compute the weighted mean and the common variance. */
-    bool run( CArrayXX const*  p_tik, CPointX const* p_tk) ;
+    bool run( CArrayXX const* const& p_tik, CPointX const* const& p_tk) ;
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const { return this->nbCluster() + 1;}
 };
@@ -105,7 +105,7 @@ class Gamma_ak_b: public GammaBase<Gamma_ak_b<Array> >
  *  will be set to 1.
  */
 template<class Array>
-void Gamma_ak_b<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) 
+void Gamma_ak_b<Array>::randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk) 
 {
     // compute moments
     this->moments(p_tik);
@@ -126,7 +126,7 @@ void Gamma_ak_b<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)
 
 /* Compute the weighted mean and the common variance. */
 template<class Array>
-bool Gamma_ak_b<Array>::run( CArrayXX const*  p_tik, CPointX const* p_tk) 
+bool Gamma_ak_b<Array>::run( CArrayXX const* const& p_tik, CPointX const* const& p_tk) 
 {
   if (!this->moments(p_tik)) { return false;}
   // start estimations of the ajk and bj
@@ -151,7 +151,7 @@ bool Gamma_ak_b<Array>::run( CArrayXX const*  p_tik, CPointX const* p_tk)
       {
         param_.shape_[k]= x0; // use moment estimate
 #ifdef STK_MIXTURE_DEBUG
-        stk_cout << _T("ML estimation failed in Gamma_ak_bj::run( CArrayXX const*  p_tik, CPointX const* p_tk) \n");
+        stk_cout << _T("ML estimation failed in Gamma_ak_bj::run( CArrayXX const* const& p_tik, CPointX const* const& p_tk) \n");
         stk_cout << "x0 =" << x0 << _T("\n";);
         stk_cout << "f(x0) =" << f(x0) << _T("\n";);
         stk_cout << "x1 =" << x1 << _T("\n";);
@@ -173,7 +173,7 @@ bool Gamma_ak_b<Array>::run( CArrayXX const*  p_tik, CPointX const* p_tk)
 #ifdef STK_MIXTURE_DEBUG
     if (value < qvalue)
     {
-      stk_cout << _T("In Gamma_ak_b::run( CArrayXX const*  p_tik, CPointX const* p_tk) : run( CArrayXX const*  p_tik, CPointX const* p_tk)  diverge\n");
+      stk_cout << _T("In Gamma_ak_b::run( CArrayXX const* const& p_tik, CPointX const* const& p_tk) : run( CArrayXX const* const& p_tik, CPointX const* const& p_tk)  diverge\n");
       stk_cout << _T("New value =") << value << _T(", qvalue =") << qvalue << _T("\n");
     }
 #endif
@@ -183,7 +183,7 @@ bool Gamma_ak_b<Array>::run( CArrayXX const*  p_tik, CPointX const* p_tk)
 #ifdef STK_MIXTURE_DEBUG
   if (iter == MAXITER)
   {
-    stk_cout << _T("In Gamma_ak_b::run( CArrayXX const*  p_tik, CPointX const* p_tk) : run( CArrayXX const*  p_tik, CPointX const* p_tk)  did not converge\n");
+    stk_cout << _T("In Gamma_ak_b::run( CArrayXX const* const& p_tik, CPointX const* const& p_tk) : run( CArrayXX const* const& p_tik, CPointX const* const& p_tk)  did not converge\n");
     stk_cout << _T("qvalue =") << qvalue << _T("\n");
   }
 #endif

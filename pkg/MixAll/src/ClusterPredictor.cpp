@@ -45,11 +45,11 @@ ClusterPredictor::~ClusterPredictor() {}
 /* run the estimation */
 bool ClusterPredictor::run()
 {
-  std::string idModel = s4_component_.slot("modelName");
+  String idModel = s4_component_.slot("modelName");
   bool freeProp;
   Clust::Mixture model           = Clust::stringToMixture(idModel, freeProp);
   Clust::MixtureClass classModel = Clust::mixtureToMixtureClass(model);
-  std::string idData = Clust::mixtureToString(model);
+  String idData = Clust::mixtureToString(model);
 
   // put data set to data handler
   int nbSample;
@@ -57,18 +57,18 @@ bool ClusterPredictor::run()
   {
     Rcpp::IntegerMatrix r_data_int = s4_clusterPredict_.slot("data");
     nbSample  = r_data_int.rows();
-    facade_.handler_.addData(r_data_int, idData, idModel);
+    facade_.handler().addData(r_data_int, idData, idModel);
   }
   else
   {
     Rcpp::NumericMatrix r_data_num = s4_clusterPredict_.slot("data");
     nbSample  = r_data_num.rows();
-    facade_.handler_.addData(r_data_num, idData, idModel);
+    facade_.handler().addData(r_data_num, idData, idModel);
   }
 
   // create composer and mixtures
   int nbCluster = s4_model_.slot("nbCluster");
-  facade_.p_composer_ = new MixtureComposer(nbSample, nbCluster);
+  facade_.createComposer(nbSample, nbCluster);
   facade_.createMixtures();
 
   // set proportions parameters
@@ -81,18 +81,18 @@ bool ClusterPredictor::run()
   if (!facade_.setParameters( idData, params)) { return false;};
 
   // run prediction algorithm
-  p_algo_->setModel(facade_.p_composer_);
+  p_algo_->setModel(facade_.p_composer());
   bool flag = p_algo_->run();
   // get results
-  s4_clusterPredict_.slot("pk")  = Rcpp::wrap(facade_.p_composer_->pk());
-  s4_clusterPredict_.slot("tik") = Rcpp::wrap(facade_.p_composer_->tik());
-  s4_clusterPredict_.slot("zi")  = Rcpp::wrap(facade_.p_composer_->zi());
+  s4_clusterPredict_.slot("pk")  = Rcpp::wrap(facade_.p_composer()->pk());
+  s4_clusterPredict_.slot("tik") = Rcpp::wrap(facade_.p_composer()->tik());
+  s4_clusterPredict_.slot("zi")  = Rcpp::wrap(facade_.p_composer()->zi());
 
   Rcpp::NumericVector fi = s4_clusterPredict_.slot("lnFi");
   Rcpp::IntegerVector zi = s4_clusterPredict_.slot("zi");
   for (int i=0; i< fi.length(); ++i)
   {
-    fi[i] = facade_.p_composer_->computeLnLikelihood(i);
+    fi[i] = facade_.p_composer()->computeLnLikelihood(i);
     zi[i] += (1 - baseIdx);  // set base 1 for the class labels
   }
   //

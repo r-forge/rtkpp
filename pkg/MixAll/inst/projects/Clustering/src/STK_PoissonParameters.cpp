@@ -40,13 +40,16 @@ namespace STK
 /* default constructor
  *  @param nbCluster the number of class of the mixture
  **/
-ModelParameters<Clust::Poisson_ljk_>::ModelParameters(int nbCluster)
-                            : lambda_(nbCluster) {}
+ModelParameters<Clust::Poisson_ljk_>::ModelParameters( int nbCluster)
+                                                     : lambda_(nbCluster)
+                                                     , stat_lambda_(nbCluster)
+{}
 /* copy constructor.
  *  @param param the parameters to copy.
  **/
 ModelParameters<Clust::Poisson_ljk_>::ModelParameters( ModelParameters const& param)
-               : lambda_(param.lambda_)
+                                                     : lambda_(param.lambda_)
+                                                     , stat_lambda_(param.stat_lambda_)
 {}
 /* destructor */
 ModelParameters<Clust::Poisson_ljk_>::~ModelParameters() {}
@@ -54,45 +57,134 @@ ModelParameters<Clust::Poisson_ljk_>::~ModelParameters() {}
 void ModelParameters<Clust::Poisson_ljk_>::resize(Range const& range)
 {
   for (int k = lambda_.begin(); k< lambda_.end(); ++k)
-  { lambda_[k].resize(range) = 1.;}
+  {
+    lambda_[k].resize(range) = 1.;
+    stat_lambda_[k].resize(range);
+  }
 }
+/* update statistics of the parameters. */
+void ModelParameters<Clust::Poisson_ljk_>::updateStatistics()
+{
+  for(int k=stat_lambda_.begin(); k<stat_lambda_.end(); ++k)
+  { stat_lambda_[k].update(lambda_[k]);}
+}
+/* Set the computed statistics */
+void ModelParameters<Clust::Poisson_ljk_>::setStatistics()
+{
+  for(int k=stat_lambda_.begin(); k<stat_lambda_.end(); ++k)
+  {
+    lambda_[k] = stat_lambda_[k].mean();
+    stat_lambda_[k].release();
+  }
+}
+/* Release the computed statistics */
+void ModelParameters<Clust::Poisson_ljk_>::releaseStatistics()
+{
+  for(int k=stat_lambda_.begin(); k<stat_lambda_.end(); ++k)
+  { stat_lambda_[k].release();}
+}
+
 
 /* default constructor
  *  @param nbCluster the number of class of the mixture
  **/
 ModelParameters<Clust::Poisson_ljlk_>::ModelParameters(int nbCluster)
-                : lambdak_(nbCluster), lambdaj_() {}
+                : lambdak_(nbCluster), lambdaj_()
+                , stat_lambdak_(nbCluster), stat_lambdaj_()
+{}
 /* copy constructor.
  *  @param param the parameters to copy.
  **/
 ModelParameters<Clust::Poisson_ljlk_>::ModelParameters( ModelParameters const& param)
-               : lambdak_(param.lambdak_), lambdaj_(param.lambdaj_)
+               : lambdak_(param.lambdak_)
+               , lambdaj_(param.lambdaj_)
+               , stat_lambdak_(param.stat_lambdak_)
+               , stat_lambdaj_(param.stat_lambdaj_)
 {}
 /* destructor */
 ModelParameters<Clust::Poisson_ljlk_>::~ModelParameters() {}
 /* resize the set of parameter */
 void ModelParameters<Clust::Poisson_ljlk_>::resize(Range const& range)
 {
-  for (int k = lambdak_.begin(); k< lambdak_.end(); ++k) { lambdak_[k] = 1.;}
+  for (int k = lambdak_.begin(); k< lambdak_.end(); ++k)
+  {
+    lambdak_[k] = 1.;
+    stat_lambdak_[k].release();
+  }
   lambdaj_.resize(range) = 1;
+  stat_lambdaj_.resize(range);
+}
+
+/* update statistics of the parameters. */
+void ModelParameters<Clust::Poisson_ljlk_>::updateStatistics()
+{
+  for(int k=stat_lambdak_.begin(); k<stat_lambdak_.end(); ++k)
+  { stat_lambdak_[k].update(lambdak_[k]);}
+  stat_lambdaj_.update(lambdaj_);
+}
+/* Set the computed statistics */
+void ModelParameters<Clust::Poisson_ljlk_>::setStatistics()
+{
+  for(int k=stat_lambdak_.begin(); k<stat_lambdak_.end(); ++k)
+  {
+    lambdak_[k] = stat_lambdak_[k].mean();
+    stat_lambdak_[k].release();
+  }
+  lambdaj_ = stat_lambdaj_.mean();
+  stat_lambdaj_.release();
+
+}
+/* Release the computed statistics */
+void ModelParameters<Clust::Poisson_ljlk_>::releaseStatistics()
+{
+  for(int k=stat_lambdak_.begin(); k<stat_lambdak_.end(); ++k)
+  { stat_lambdak_[k].release();}
+  stat_lambdaj_.release();
 }
 
 /* default constructor
  *  @param nbCluster the number of class of the mixture
  **/
-ModelParameters<Clust::Poisson_lk_>::ModelParameters(int nbCluster): lambda_(nbCluster) {}
+ModelParameters<Clust::Poisson_lk_>::ModelParameters(int nbCluster)
+               : lambda_(nbCluster), stat_lambda_(nbCluster)
+{}
 /* copy constructor.
  *  @param param the parameters to copy.
  **/
 ModelParameters<Clust::Poisson_lk_>::ModelParameters( ModelParameters const& param)
-               : lambda_(param.lambda_)
+               : lambda_(param.lambda_), stat_lambda_(param.stat_lambda_)
 {}
 /* destructor */
 ModelParameters<Clust::Poisson_lk_>::~ModelParameters() {}
 /* resize the set of parameter */
 void ModelParameters<Clust::Poisson_lk_>::resize(Range const& range)
 {
-  for (int k = lambda_.begin(); k< lambda_.end(); ++k) { lambda_[k] = 1.;}
+  for (int k = lambda_.begin(); k< lambda_.end(); ++k)
+  { lambda_[k] = 1.;
+   stat_lambda_[k].release();
+  }
+}
+
+/* update statistics of the parameters. */
+void ModelParameters<Clust::Poisson_lk_>::updateStatistics()
+{
+  for(int k=stat_lambda_.begin(); k<stat_lambda_.end(); ++k)
+  { stat_lambda_[k].update(lambda_[k]);}
+}
+/* Set the computed statistics */
+void ModelParameters<Clust::Poisson_lk_>::setStatistics()
+{
+  for(int k=stat_lambda_.begin(); k<stat_lambda_.end(); ++k)
+  {
+    lambda_[k] = stat_lambda_[k].mean();
+    stat_lambda_[k].release();
+  }
+}
+/* Release the computed statistics */
+void ModelParameters<Clust::Poisson_lk_>::releaseStatistics()
+{
+  for(int k=stat_lambda_.begin(); k<stat_lambda_.end(); ++k)
+  { stat_lambda_[k].release();}
 }
 
 } // namespace STK

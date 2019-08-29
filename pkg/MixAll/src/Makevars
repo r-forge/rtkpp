@@ -27,11 +27,14 @@ PKGLIB_DIR = $(PKG_DIR)/lib
 PKGLIB     = $(PKGLIB_DIR)/$(LIB_MIXALL_A)
 
 ## Use the R_HOME indirection to support installations of multiple R version
-PKG_CXXFLAGS = `${R_HOME}/bin/Rscript -e "rtkore:::CxxFlags()"` -I../inst/projects/ -I../inst/include/
-PKG_CPPFLAGS = `${R_HOME}/bin/Rscript -e "rtkore:::CppFlags()"`
+CXX_STD = CXX11
+PKG_CXXFLAGS = `${R_HOME}/bin/Rscript -e "rtkore:::CxxFlags()"` -I../inst/projects/ -I../inst/include/ \
+               $(SHLIB_OPENMP_CXXFLAGS)
+PKG_CPPFLAGS = `${R_HOME}/bin/Rscript -e "rtkore:::CppFlags()"` \
+ 								#-DSTK_MIXTURE_DEBUG -DSTK_MIXTURE_VERBOSE -DSTK_MIXTURE_VERY_VERBOSE
 
 PKG_LIBS = $(PKGLIB) `$(R_HOME)/bin/Rscript -e "rtkore:::LdFlags()"` \
-           $(SHLIB_OPENMP_CFLAGS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
+           $(SHLIB_OPENMP_CXXFLAGS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
 
 STK_CPPFLAGS  = $(ALL_CPPFLAGS) #-DSTK_MIXTURE_DEBUG -DSTK_MIXTURE_VERBOSE -DSTK_MIXTURE_VERY_VERBOSE
 STK_CXXFLAGS  = $(ALL_CXXFLAGS)

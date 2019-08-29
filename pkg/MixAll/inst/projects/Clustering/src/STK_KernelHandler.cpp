@@ -38,12 +38,11 @@
 namespace STK
 {
 /* default constructor */
-KernelHandler::KernelHandler(): Base(), nbSample_(0), nbVariable_(0) {}
+KernelHandler::KernelHandler(): Base(), nbSample_(0) {}
 /* constructor with an instance of a kernel to handle*/
-KernelHandler::KernelHandler(Kernel::IKernel* p_kernel, std::string const& idData, std::string const& idModel)
-            : Base()
-             , nbSample_(p_kernel->nbSample())
-             , nbVariable_(p_kernel->nbVariable())
+KernelHandler::KernelHandler( Kernel::IKernel* p_kernel, String const& idData, String const& idModel)
+                            : Base()
+                            , nbSample_(p_kernel->nbSample())
 {}
 /* destructor */
 KernelHandler::~KernelHandler()
@@ -67,7 +66,7 @@ KernelHandler::~KernelHandler()
  * @return @c true if the pair (idData,idModel) has been successfully added
  * to the handler
  */
-bool KernelHandler::addKernel(Kernel::IKernel* p_kernel, std::string const& idData, std::string const& idModel)
+bool KernelHandler::addKernel(Kernel::IKernel* p_kernel, String const& idData, String const& idModel)
 {
   if (!p_kernel) return false;
   if (!addInfo(idData, idModel)) return false; // there exists an idData with an other idModel
@@ -82,7 +81,6 @@ bool KernelHandler::addKernel(Kernel::IKernel* p_kernel, std::string const& idDa
   {
     v_kernel_.push_back(TaggedKernel(p_kernel, idData));
     nbSample_   = p_kernel->nbSample();
-    nbVariable_ += p_kernel->nbVariable();
   }
   return true;
 }
@@ -91,7 +89,7 @@ bool KernelHandler::addKernel(Kernel::IKernel* p_kernel, std::string const& idDa
  * @return @c 0 if the idData has not been found, a pointer to the kernel
  * otherwise
  */
-Kernel::IKernel const* KernelHandler::getKernel( std::string const& idData) const
+Kernel::IKernel const* KernelHandler::getKernel( String const& idData) const
 {
   // check if the idData already exists
   Array1D< TaggedKernel >::ConstIterator it;
@@ -104,7 +102,7 @@ Kernel::IKernel const* KernelHandler::getKernel( std::string const& idData) cons
 /* remove an instance of a kernel to the handler
  *  @param idData can be any string given by the user for identifying data.
  */
-void KernelHandler::removeKernel( std::string const& idData)
+void KernelHandler::removeKernel( String const& idData)
 {
   // check if the idData exists
   Array1D< TaggedKernel >::Iterator it;
@@ -114,7 +112,6 @@ void KernelHandler::removeKernel( std::string const& idData)
   // check if kernel has been found
   if (it != v_kernel_.endIterator())
   {
-    nbVariable_ -= it->first->nbVariable();
     Kernel::IKernel* p = it->first;
     it->first = 0;
     if (!isHandled(p)) delete p;

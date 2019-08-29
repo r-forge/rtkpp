@@ -89,12 +89,12 @@ class DiagGaussian_sj: public DiagGaussianBase<DiagGaussian_sj<Array> >
      *  will be selected randomly among the data set and the standard-deviation
      *  will be set to 1.
      */
-    void randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) ;
+    void randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk) ;
     /** Compute the weighted mean and the common standard deviation. */
-    bool run( CArrayXX const*  p_tik, CPointX const* p_tk) ;
+    bool run( CArrayXX const* const& p_tik, CPointX const* const& p_tk) ;
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
-    { return this->nbCluster()*this->nbVariable()+this->nbVariable();}
+    { return this->nbCluster()*p_data()->sizeCols()+p_data()->sizeCols();}
 };
 
 /* Initialize randomly the parameters of the Gaussian mixture. The centers
@@ -102,7 +102,7 @@ class DiagGaussian_sj: public DiagGaussianBase<DiagGaussian_sj<Array> >
  *  will be set to 1.
  */
 template<class Array>
-void DiagGaussian_sj<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) 
+void DiagGaussian_sj<Array>::randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk) 
 {
   // compute the initial mean
   this->randomMean(p_tik);
@@ -111,20 +111,20 @@ void DiagGaussian_sj<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* 
   for (int k= p_tik->beginCols(); k < p_tik->endCols(); ++k)
   {
     variance += p_tik->col(k).transpose()
-               *(*p_data() - (Const::Vector<Real>(p_data()->rows()) * param_.mean_[k])
+               *(*p_data() - (Const::Vector<Real>(this->nbSample()) * param_.mean_[k])
                 ).square()
                 ;
   }
   // store the standard deviation
   param_.sigma_ = (variance /= this->nbSample()).sqrt();
 #ifdef STK_MIXTURE_VERY_VERBOSE
-  stk_cout << _T("DiagGaussian_sj<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)  done\n");
+  stk_cout << _T("DiagGaussian_sj<Array>::randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk)  done\n");
 #endif
 }
 
 /* Compute the weighted mean and the common standard deviation. */
 template<class Array>
-bool DiagGaussian_sj<Array>::run( CArrayXX const*  p_tik, CPointX const* p_tk) 
+bool DiagGaussian_sj<Array>::run( CArrayXX const* const& p_tik, CPointX const* const& p_tk) 
 {
   // compute the means
   if (!this->updateMean(p_tik)) return false;
@@ -133,12 +133,12 @@ bool DiagGaussian_sj<Array>::run( CArrayXX const*  p_tik, CPointX const* p_tk)
   for (int k= p_tik->beginCols(); k < p_tik->endCols(); ++k)
   {
     variance += p_tik->col(k).transpose()
-               *(*p_data() - (Const::Vector<Real>(p_data()->rows()) * param_.mean_[k])
+               *(*p_data() - (Const::Vector<Real>(this->nbSample()) * param_.mean_[k])
                 ).square()
                 ;
   }
-//  if (variance.nbAvailableValues() != this->nbVariable()) return false;
-//  if ((variance > 0.).template cast<int>().sum() != this->nbVariable()) return false;
+//  if (variance.nbAvailableValues() != p_data()->sizeCols()) return false;
+//  if ((variance > 0.).template cast<int>().sum() != p_data()->sizeCols()) return false;
   // compute the standard deviation
   param_.sigma_ = (variance /= this->nbSample()).sqrt();
   return true;

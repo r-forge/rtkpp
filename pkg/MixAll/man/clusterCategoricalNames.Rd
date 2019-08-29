@@ -25,8 +25,6 @@ In a Categorical mixture model, we can build 4 models:
  \item {The proportions can be equal or free.}
  \item {The probabilities can be equal or free for all the variables.}
 }
-
-check if a vector of Categorical mixture model name is correct.
 }
 \details{
 The model names are summarized in the following array:

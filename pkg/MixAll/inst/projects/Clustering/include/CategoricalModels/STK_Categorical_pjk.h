@@ -86,9 +86,9 @@ class Categorical_pjk: public CategoricalBase<Categorical_pjk<Array> >
     ~Categorical_pjk() {}
 //    Real lnComponentProbability(int i, int k) const;
     /** Initialize randomly the parameters of the Categorical mixture. */
-    void randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) ;
+    void randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk) ;
     /** Compute the weighted probabilities. */
-    bool run( CArrayXX const*  p_tik, CPointX const* p_tk) ;
+    bool run( CArrayXX const* const& p_tik, CPointX const* const& p_tk) ;
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
     { return this->nbCluster()*((this->nbModalities_-1).sum());}
@@ -96,7 +96,7 @@ class Categorical_pjk: public CategoricalBase<Categorical_pjk<Array> >
 
 /* Initialize randomly the parameters of the Categorical mixture. */
 template<class Array>
-void Categorical_pjk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) 
+void Categorical_pjk<Array>::randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk)
 {
   for (int k = p_tik->beginCols(); k < p_tik->endCols(); ++k)
   {
@@ -109,7 +109,7 @@ void Categorical_pjk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* 
 
 /* Compute the modalities probabilities */
 template<class Array>
-bool Categorical_pjk<Array>::run( CArrayXX const*  p_tik, CPointX const* p_tk)
+bool Categorical_pjk<Array>::run( CArrayXX const* const& p_tik, CPointX const* const& p_tk)
 {
   for (int k = p_tik->beginCols(); k < p_tik->endCols(); ++k)
   {

@@ -95,7 +95,7 @@ clusterPredict <- function( data, model, algo = clusterAlgoPredict(), nbCore = 1
         dim(model@lcomponent[[i]]@plkj) <- c(modelDim[1] * modelDim[2], modelDim[3])
       }
     }
-    result = new("ClusterPredictMixedData", data, model@nbCluster, algo)
+    result = new("ClusterPredictMixedData", data, model, algo)
   }
   else
   {
@@ -104,7 +104,7 @@ clusterPredict <- function( data, model, algo = clusterAlgoPredict(), nbCore = 1
     # check dimension
     if (ncol(model@component@data) != ncol(data))
     { stop("data does not have the same number of variables than the model")}  
-    result = new("ClusterPredict", data, model@nbCluster, algo)
+    result = new("ClusterPredict", data, model, algo)
     # transform plkj in matrix
     if ( is(model,"ClusterCategorical") )
     {
@@ -114,7 +114,7 @@ clusterPredict <- function( data, model, algo = clusterAlgoPredict(), nbCore = 1
   }
   
   # start estimation of the models
-  resFlag = .Call("clusterPredict", model, result, PACKAGE="MixAll");
+  resFlag = .Call("clusterPredict", model, result, nbCore, PACKAGE="MixAll");
   if (resFlag != TRUE ) { cat("WARNING: An error occur during the clustering process");}
   
   # set plkj as array
@@ -131,7 +131,7 @@ clusterPredict <- function( data, model, algo = clusterAlgoPredict(), nbCore = 1
       if (.hasSlot(model@lcomponent[[i]],"plkj"))
       {
         nbVariable <- dim(model@lcomponent[[i]]@plkj)[2]
-        modelDim   <- c(model@component@nbModalities, model@nbCluster, nbVariable)
+        modelDim   <- c(model@lcomponent[[i]]@nbModalities, model@nbCluster, nbVariable)
         dim(model@lcomponent[[i]]@plkj) <- modelDim
       }
     }
@@ -190,17 +190,18 @@ setClass(
 setMethod(
   f="initialize",
   signature=c("ClusterPredict"),
-  definition=function(.Object, data, nbCluster, algo = clusterAlgoPredict())
+  definition=function(.Object, data, model, algo = clusterAlgoPredict())
   {
     # for data
     if(missing(data)) { stop("data is mandatory in ClusterPredict.")}
-    .Object@data <- data
+    .Object@data     <- as.matrix(data)
     .Object@missing  <- which(is.na(.Object@data), arr.ind=TRUE);
+    
     # for nbCluster
-    if(missing(nbCluster)) { stop("nbCluster is mandatory in ClusterPredict.")}
-    .Object@nbCluster<-nbCluster
-    # creata base class
-    .Object <- callNextMethod(.Object, nrow(data), nbCluster, algo)
+    if(missing(model)) { stop("model is mandatory in ClusterPredict.")}
+    
+    # create base class
+    .Object <- callNextMethod(.Object, nrow(data), model, algo)
     
     # valid object
     validObject(.Object)
@@ -309,31 +310,45 @@ setClass(
 setMethod(
   f="initialize",
   signature=c("ClusterPredictMixedData"),
-  definition=function(.Object, ldata, nbCluster, algo = clusterAlgoPredict())
+  definition=function(.Object, ldata, model, algo = clusterAlgoPredict())
   {
-    # for data
+    # for ldata
     if(missing(ldata)) { stop("data is mandatory in ClusterPredictMixedData.")}
     .Object@ldata <- ldata
-    
-    # for nbCluster
-    if(missing(nbCluster)) { stop("nbCluster is mandatory in ClusterPredictMixedData.")}
-    .Object@nbCluster<-nbCluster
-    
+
+    # for model
+    if(missing(model)) { stop("model is mandatory in ClusterPredictMixedData.")}
+
     # for nbComponent
-    nbComponent<- length(.Object@ldata)
-    if (nbComponent < 1)
-    {stop("Error in ClusterPredictMixedData. There is no data")}
+    nbComponent<- length(ldata)
+    if (nbComponent != length(model@lcomponent))
+    { stop("Error in ClusterPredictMixedData. length(ldata) != length(model@lcomponent)")}
     
-    # get nbSample using first data set
+    # check nbSample using first data set
     nbSample <- nrow(ldata[[1]])
-    
-    # add missing values
     .Object@lmissing <- vector("list", nbComponent)
     for(i in 1:nbComponent)
-    { .Object@lmissing[[i]]  <- which(is.na(.Object@ldata[[i]]), arr.ind=TRUE)}
+    {
+      if (nrow(ldata[[i]]) != nbSample)
+      { stop("Error in ClusterPredictMixedData initialize. all data must have the same number of rows.")}
+      else
+      { 
+        if ( class(model@lcomponent[[i]]) == "ClusterCategoricalComponent")
+        {
+          data <- as.data.frame(ldata[[i]])
+          levels <- model@lcomponent[[i]]@levels
+          for ( j in 1:length(data) )
+          { data[,j] <- as.integer(factor(data[,j]), levels = levels[[j]])}
+          .Object@ldata[[i]] <- as.matrix(data)
+        }
+        else
+        { .Object@ldata[[i]] <- as.matrix(ldata[[i]]) }
+        .Object@lmissing[[i]] <- which(is.na(.Object@ldata[[i]]), arr.ind=TRUE)
+      }
+    }
     
     # create base class
-    .Object <- callNextMethod(.Object, nbSample, nbCluster, algo)
+    .Object <- callNextMethod(.Object, nbSample, model, algo)
     
     # valid object
     validObject(.Object)

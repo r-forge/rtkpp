@@ -38,7 +38,6 @@
 
 #include "STK_Kmm_s.h"
 #include "STK_Kmm_sk.h"
-#include "STK_KernelParametersHandler.h"
 #include "../STK_IMixtureBridge.h"
 
 namespace STK
@@ -61,8 +60,10 @@ struct MixtureBridgeTraits< KmmBridge< Clust::Kmm_sk_, Data_> >
   typedef Kmm_sk Mixture;
   /** Type of the structure storing the mixture parameters */
   typedef ModelParameters<Clust::Kmm_sk_> Parameters;
-  /** Type of the parameter handler */
-  typedef ParametersHandler<Clust::Kmm_sk_> ParamHandler;
+  /** Type of the array storing missing values indexes */
+  typedef std::vector<std::pair<int,int> > MissingIndexes;
+  /** Type of the array storing missing values */
+  typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
   // class of mixture
   enum
   {
@@ -83,8 +84,10 @@ struct MixtureBridgeTraits< KmmBridge< Clust::Kmm_s_, Data_> >
   typedef Kmm_s Mixture;
   /** Type of the structure storing the mixture parameters */
   typedef ModelParameters<Clust::Kmm_s_> Parameters;
-  /** Type of the parameter handler */
-  typedef ParametersHandler<Clust::Kmm_s_> ParamHandler;
+  /** Type of the array storing missing values indexes */
+  typedef std::vector<std::pair<int,int> > MissingIndexes;
+  /** Type of the array storing missing values */
+  typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
   // class of mixture
   enum
   {
@@ -117,12 +120,10 @@ class KmmBridge: public IMixtureBridge< KmmBridge<Id,Data> >
     typedef IMixtureBridge< KmmBridge<Id,Data> > Base;
     typedef typename hidden::MixtureBridgeTraits< KmmBridge<Id,Data> >::Mixture Mixture;
     typedef typename hidden::MixtureBridgeTraits< KmmBridge<Id,Data> >::Parameters Parameters;
-    typedef typename hidden::MixtureBridgeTraits< KmmBridge<Id,Data> >::ParamHandler ParamHandler;
     typedef typename Data::Type Type;
 
     // parameters type to get
     using Base::mixture_;
-    using Base::paramHandler_;
     using Base::p_tik;
     using Base::p_tk;
 
@@ -131,7 +132,7 @@ class KmmBridge: public IMixtureBridge< KmmBridge<Id,Data> >
      *  @param idData id name of the mixture model
      *  @param nbCluster number of cluster
      **/
-    KmmBridge( Data* p_dataij, std::string const& idData, int nbCluster)
+    KmmBridge( Data* p_dataij, String const& idData, int nbCluster)
              : Base( p_dataij, idData, nbCluster)
     { initializeBridge();}
     /** copy constructor */
@@ -192,7 +193,7 @@ class KmmBridge: public IMixtureBridge< KmmBridge<Id,Data> >
      *  @param idData id name of the mixture
      *  @param nbCluster number of cluster
      **/
-    KmmBridge( Mixture const& mixture, std::string const& idData, int nbCluster)
+    KmmBridge( Mixture const& mixture, String const& idData, int nbCluster)
              : Base( mixture, idData, nbCluster)
     {}
 };

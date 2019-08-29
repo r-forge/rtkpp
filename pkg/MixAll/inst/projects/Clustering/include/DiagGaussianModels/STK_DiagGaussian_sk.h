@@ -87,12 +87,12 @@ class DiagGaussian_sk: public DiagGaussianBase<DiagGaussian_sk<Array> >
      *  will be selected randomly among the data set and the standard-deviations
      *  will be set to 1.
      */
-    void randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) ;
+    void randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk) ;
     /** Compute the weighted mean and the common standard deviation. */
-    bool run( CArrayXX const*  p_tik, CPointX const* p_tk) ;
+    bool run( CArrayXX const* const& p_tik, CPointX const* const& p_tk) ;
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
-    { return this->nbCluster()*this->nbVariable() + this->nbCluster();}
+    { return this->nbCluster()*p_data()->sizeCols() + this->nbCluster();}
 };
 
 /* Initialize randomly the parameters of the Gaussian mixture. The centers
@@ -100,7 +100,7 @@ class DiagGaussian_sk: public DiagGaussianBase<DiagGaussian_sk<Array> >
  *  will be set to 1.
  */
 template<class Array>
-void DiagGaussian_sk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) 
+void DiagGaussian_sk<Array>::randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk) 
 {
   this->randomMean(p_tik);
   // compute the standard deviation
@@ -108,22 +108,22 @@ void DiagGaussian_sk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* 
   for (int k= p_tik->beginCols(); k < p_tik->endCols(); ++k)
   {
     variance = sqrt( ( p_tik->col(k).transpose()
-                     *(*p_data() - (Const::Vector<Real>(p_data()->rows()) * param_.mean_[k])
+                     *(*p_data() - (Const::Vector<Real>(this->nbSample()) * param_.mean_[k])
                       ).square()
                      ).sum() / (p_data()->sizeCols()*p_tk->elt(k))
                    );
     param_.sigma_[k] = ((variance<=0) || !Arithmetic<Real>::isFinite(variance))
                        ? 1.
-                       : std::sqrt(variance/(this->nbSample()*this->nbVariable()));
+                       : std::sqrt(variance/(this->nbSample()*p_data()->sizeCols()));
   }
 #ifdef STK_MIXTURE_VERY_VERBOSE
-  stk_cout << _T("DiagGaussian_sk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk)  done\n");
+  stk_cout << _T("DiagGaussian_sk<Array>::randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk)  done\n");
 #endif
 }
 
 /* Compute the weighted mean and the common standard deviation. */
 template<class Array>
-bool DiagGaussian_sk<Array>::run( CArrayXX const*  p_tik, CPointX const* p_tk) 
+bool DiagGaussian_sk<Array>::run( CArrayXX const* const& p_tik, CPointX const* const& p_tk) 
 {
   // compute the means
   if (!this->updateMean(p_tik)) return false;
@@ -132,7 +132,7 @@ bool DiagGaussian_sk<Array>::run( CArrayXX const*  p_tik, CPointX const* p_tk)
   {
     param_.sigma_[k]
     = sqrt( ( p_tik->col(k).transpose()
-             *(*p_data() - (Const::Vector<Real>(p_data()->rows()) * param_.mean_[k])
+             *(*p_data() - (Const::Vector<Real>(this->nbSample()) * param_.mean_[k])
               ).square()
             ).sum()
            /(p_data()->sizeCols()*p_tk->elt(k))

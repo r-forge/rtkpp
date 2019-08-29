@@ -25,8 +25,6 @@ In a Poisson mixture model, we can build 4 models:
  \item {The proportions can be equal or free.}
  \item {The means can be equal, free or proportional for all the variables.}
 }
-
-check if a vector of Poisson mixture model name is correct.
 }
 \details{
 The model names are summarized in the following array:

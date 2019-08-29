@@ -8,30 +8,18 @@
 \alias{summary,IClusterComponent-method}
 \alias{summary}
 \alias{summary,IClusterModel-method}
-\alias{summary}
-\alias{summary}
 \alias{summary,ClusterCategoricalComponent-method}
 \alias{summary-ClusterCategoricalComponent,ClusterCategoricalComponent,ClusterCategoricalComponent-method}
 \alias{summary,ClusterCategorical-method}
-\alias{summary}
 \alias{summary,ClusterDiagGaussian-method}
-\alias{summary}
 \alias{summary,ClusterGamma-method}
-\alias{summary}
 \alias{summary,ClusterMixedDataModel-method}
-\alias{summary}
 \alias{summary,ClusterPoisson-method}
-\alias{summary}
 \alias{summary,IClusterPredict-method}
-\alias{summary}
 \alias{summary,ClusterPredict-method}
-\alias{summary}
 \alias{summary,ClusterPredictMixedData-method}
-\alias{summary}
 \alias{summary,KmmModel-method}
-\alias{summary}
 \alias{summary,KmmMixedDataModel-method}
-\alias{summary}
 \title{Produce summary of a MixAll S4 class.}
 \usage{
 \S4method{summary}{IClusterComponent}(object, ...)

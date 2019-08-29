@@ -40,7 +40,6 @@
 #include "STK_Poisson_ljk.h"
 #include "STK_Poisson_ljlk.h"
 #include "STK_Poisson_lk.h"
-#include "STK_PoissonParametersHandler.h"
 #include "../STK_IMixtureBridge.h"
 
 namespace STK
@@ -65,8 +64,11 @@ struct MixtureBridgeTraits< PoissonBridge<Clust::Poisson_ljk_, Data_> >
   typedef Poisson_ljk<Data> Mixture;
   /** Type of the structure storing the mixture parameters */
   typedef ModelParameters<Clust::Poisson_ljk_> Parameters;
-  /** Type of the parameter handler */
-  typedef ParametersHandler<Clust::Poisson_ljk_> ParamHandler;
+  /** Type of the array storing missing values indexes */
+  typedef std::vector<std::pair<int,int> > MissingIndexes;
+  /** Type of the array storing missing values */
+  typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
+  // class of mixture
   enum
   {
     idMixtureClass_ = Clust::Poisson_
@@ -87,8 +89,11 @@ struct MixtureBridgeTraits< PoissonBridge<Clust::Poisson_lk_, Data_> >
   typedef Poisson_lk<Data> Mixture;
   /** Type of the structure storing the mixture parameters */
   typedef ModelParameters<Clust::Poisson_lk_> Parameters;
-  /** Type of the parameter handler */
-  typedef ParametersHandler<Clust::Poisson_lk_> ParamHandler;
+  /** Type of the array storing missing values indexes */
+  typedef std::vector<std::pair<int,int> > MissingIndexes;
+  /** Type of the array storing missing values */
+  typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
+  // class of mixture
   enum
   {
     idMixtureClass_ = Clust::Poisson_
@@ -108,8 +113,11 @@ struct MixtureBridgeTraits< PoissonBridge< Clust::Poisson_ljlk_, Data_> >
   typedef Poisson_ljlk<Data> Mixture;
   /** Type of the structure storing the mixture parameters */
   typedef ModelParameters<Clust::Poisson_ljlk_> Parameters;
-  /** Type of the parameter handler */
-  typedef ParametersHandler<Clust::Poisson_ljlk_> ParamHandler;
+  /** Type of the array storing missing values indexes */
+  typedef std::vector<std::pair<int,int> > MissingIndexes;
+  /** Type of the array storing missing values */
+  typedef std::vector< std::pair<std::pair<int,int>, Type > > MissingValues;
+  // class of mixture
   enum
   {
     idMixtureClass_ = Clust::Poisson_
@@ -133,7 +141,6 @@ class PoissonBridge: public IMixtureBridge< PoissonBridge<Id,Data> >
     typedef IMixtureBridge< PoissonBridge<Id,Data> > Base;
     typedef typename hidden::MixtureBridgeTraits< PoissonBridge<Id,Data> >::Mixture Mixture;
     typedef typename hidden::MixtureBridgeTraits< PoissonBridge<Id,Data> >::Parameters Parameters;
-    typedef typename hidden::MixtureBridgeTraits< PoissonBridge<Id,Data> >::ParamHandler ParamHandler;
     typedef typename Data::Type Type;
     // class of mixture
     enum
@@ -142,7 +149,6 @@ class PoissonBridge: public IMixtureBridge< PoissonBridge<Id,Data> >
     };
     typedef std::vector<std::pair<int,int> >::const_iterator ConstIterator;
     using Base::mixture_;
-    using Base::paramHandler_;
     using Base::p_dataij_;
     using Base::v_missing_;
     using Base::removeMissing;
@@ -153,21 +159,33 @@ class PoissonBridge: public IMixtureBridge< PoissonBridge<Id,Data> >
      *  @param idData id name of the mixture model
      *  @param nbCluster number of cluster
      **/
-    PoissonBridge( Data* p_dataij, std::string const& idData, int nbCluster)
-                : Base(p_dataij, idData, nbCluster)
+    PoissonBridge( Data* p_dataij, String const& idData, int nbCluster)
+                 : Base(p_dataij, idData, nbCluster)
     {
       removeMissing(); // remove missing from data only once at creation
       mixture_.setData(*p_dataij_);
-      paramHandler_.resize(p_dataij_->cols());
     }
     /** copy constructor */
-    PoissonBridge( PoissonBridge const& bridge): Base(bridge)
-    {
-      mixture_.setData(*p_dataij_);
-      paramHandler_.resize(p_dataij_->cols());
-    }
+    PoissonBridge( PoissonBridge const& bridge): Base(bridge) {}
     /** destructor */
-    virtual ~PoissonBridge() {}
+    virtual ~PoissonBridge()
+    {
+#ifdef STK_MIXTURE_DEBUG_CREATE
+        stk_cout << _T("Entering PoissonBridge::~PoissonBridge()\n");
+        stk_cout << _T("this =") << this << _T("\n");
+#endif
+
+    }
+  private:
+    /** private constructor used in order to create a bridge.
+     *  @param mixture the mixture to copy
+     *  @param idData id name of the mixture
+     *  @param nbCluster number of cluster
+     **/
+    PoissonBridge( Mixture const& mixture, String const& idData, int nbCluster)
+                 : Base(mixture, idData, nbCluster)
+    {}
+  public:
     /** This is a standard clone function in usual sense. It must be defined to
      *  provide new object of your class with values of various parameters
      *  equal to the values of calling object. In other words, this is
@@ -182,13 +200,22 @@ class PoissonBridge: public IMixtureBridge< PoissonBridge<Id,Data> >
      */
     virtual PoissonBridge* create() const
     {
+#ifdef STK_MIXTURE_DEBUG_CREATE
+        stk_cout << _T("Entering PoissonBridge::create()\n");
+        stk_cout << _T("this =") << this << _T("\n");
+#endif
+
       PoissonBridge* p_bridge = new PoissonBridge( mixture_, this->idData(), this->nbCluster());
+#ifdef STK_MIXTURE_DEBUG_CREATE
+        stk_cout << _T("p_bridge created\n");
+        stk_cout << _T("p_bridge =") << p_bridge << _T("\n");
+#endif
       p_bridge->p_dataij_ = p_dataij_;
       p_bridge->mixture_.setData(*p_dataij_);
-      p_bridge->paramHandler_.resize(p_dataij_->cols());
       p_bridge->v_missing_ = v_missing_;
       return p_bridge;
     }
+
     /** @return a safe value for the jth variable
      *  @param j index of the column with the safe value needed */
     Type safeValue( int j) const
@@ -205,16 +232,6 @@ class PoissonBridge: public IMixtureBridge< PoissonBridge<Id,Data> >
       int l; count.maxElt(l);
       return l;
     }
-
-  private:
-    /** protected constructor to use in order to create a bridge.
-     *  @param mixture the mixture to copy
-     *  @param idData id name of the mixture
-     *  @param nbCluster number of cluster
-     **/
-    PoissonBridge( Mixture const& mixture, std::string const& idData, int nbCluster)
-                 : Base(mixture, idData, nbCluster)
-    {}
 };
 
 } // namespace STK

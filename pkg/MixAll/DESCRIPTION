@@ -1,13 +1,14 @@
 Package: MixAll
-Version: 1.4.3
-Date: 2018-04-06
+Encoding: UTF-8
+Version: 1.5.0
+Date: 2019-08-15
 Title: Clustering and Classification using Model-Based Mixture Models
 Authors@R: c(person("Serge", "Iovleff", role = c("aut","cre"), email = "Serge.Iovleff@stkpp.org")
             ,person("Parmeet", "Bathia", role = c("ctb"), email = "Bathia.Parmeet@gmail.com")
             )
 Author: Serge Iovleff [aut, cre], Parmeet Bathia [ctb]
 Maintainer: Serge Iovleff <Serge.Iovleff@stkpp.org>
-Copyright: inria, University Lille 1
+Copyright: inria, University of Lille
 Depends:
     R (>= 3.0.2),
     rtkore (>= 1.5.0)
@@ -17,8 +18,9 @@ Description: Algorithms and methods for model-based clustering and classificatio
  It supports various types of data: continuous, categorical and counting
  and can handle mixed data of these types. It can fit Gaussian (with diagonal
  covariance structure), gamma, categorical and Poisson models. The algorithms
- also support missing values. This package can be used as an independent alternative to the
- (not free) 'mixtcomp' software available at <https://massiccc.lille.inria.fr/>.
+ also support missing values. This package can be used as an independent
+ alternative to the (not free) 'mixtcomp' software available at
+ <https://massiccc.lille.inria.fr/>.
 License: GPL (>= 2)
 LinkingTo: Rcpp (>= 0.11.0), rtkore (>= 1.5.0)
 Roxygen: list(wrap = FALSE)
@@ -46,4 +48,4 @@ Collate:
     'kmm.R'
     'kmmMixedData.R'
     'missingValues.R'
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1

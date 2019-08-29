@@ -31,8 +31,6 @@ and standard deviations give rise to 8 models:
  \item {The standard deviations can be equal or free for all the variables.}
  \item {The standard deviations can be equal or free for all the clusters.}
 }
-
-check if a vector of diagonal Gaussian mixture model name is correct.
 }
 \details{
 The model names are summarized in the following array:

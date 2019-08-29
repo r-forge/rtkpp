@@ -38,7 +38,7 @@
 #ifndef STK_IMIXTURECRITERION_H
 #define STK_IMIXTURECRITERION_H
 
-#include <Sdk/include/STK_IRunner.h>
+#include <Sdk.h>
 #include "../STK_IMixtureStatModel.h"
 
 namespace STK

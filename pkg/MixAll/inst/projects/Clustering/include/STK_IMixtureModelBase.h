@@ -75,26 +75,18 @@ class IMixtureModelBase
     /** @return the Log of the total available observations */
     inline Real lnNbSample() const
     { return (nbSample_ <= 0) ? -Arithmetic<Real>::infinity() : std::log((Real)nbSample_);}
-    /** @return the total available variables */
-    inline int nbVariable() const { return nbVariable_;}
 
   protected:
     /** Set the number of sample of the model
      *  @param nbSample number of sample of the model
      * */
     inline void setNbSample( int nbSample) { nbSample_ = nbSample;}
-    /** Set the number of variables of the model
-     *  @param nbVariable number of variables of the model
-     * */
-    inline void setNbVariable( int nbVariable) { nbVariable_ = nbVariable;}
 
   private:
     /** number of cluster. */
     int nbCluster_;
     /** total available samples */
     int nbSample_;
-    /** total available variables */
-    int nbVariable_;
 };
 
 } // namespace STK

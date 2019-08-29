@@ -6,8 +6,8 @@
 \usage{
 kmm(data, nbCluster = 2, dim = 10, models = "kmm_pk_s",
   kernelName = "Gaussian", kernelParameters = c(1),
-  kernelComputation = TRUE, strategy = kmmStrategy(), criterion = "ICL",
-  nbCore = 1)
+  kernelComputation = TRUE, strategy = kmmStrategy(),
+  criterion = "ICL", nbCore = 1)
 }
 \arguments{
 \item{data}{frame or matrix containing the data. Rows correspond to observations

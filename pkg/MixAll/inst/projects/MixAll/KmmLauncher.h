@@ -54,9 +54,9 @@ class KmmLauncher: public ILauncherBase
      *  @param models a vector of string with the model names to try
      **/
     KmmLauncher( Rcpp::S4 s4_model
-             , Rcpp::IntegerVector const& nbCluster
-             , Rcpp::CharacterVector const& models
-             );
+               , Rcpp::IntegerVector const& nbCluster
+               , Rcpp::CharacterVector const& models
+               );
     /** constructor for mixed data
      *  @param model ClusterMixedDataModel S4 class
      *  @param nbCluster a vector with the number of clusters to test
@@ -78,7 +78,7 @@ class KmmLauncher: public ILauncherBase
     /** strategy from the R side */
     Rcpp::S4              s4_strategy_;
     /** character string with the model selection criterion name */
-    std::string           criterion_;
+    String           criterion_;
 
     /** Is the model with mixed data ? */
     bool isMixedData_;
@@ -89,7 +89,7 @@ class KmmLauncher: public ILauncherBase
      *  @param idData  Id of the data set of the kernel
      *  @param manager manager storing the KmmBridge
      **/
-    Kernel::IKernel* createKernel(Rcpp::S4 s4_component, std::string const& idData, KernelMixtureManager& manager);
+    Kernel::IKernel* createKernel(Rcpp::S4 s4_component, String const& idData, KernelMixtureManager& manager);
     /** Select the best model among the models and nbCluster given.
      *  @return the value of the best criteria.
      **/

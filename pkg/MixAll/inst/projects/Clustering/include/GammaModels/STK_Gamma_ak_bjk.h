@@ -91,12 +91,12 @@ class Gamma_ak_bjk: public GammaBase< Gamma_ak_bjk<Array> >
      *  and the scale will be selected randomly using an exponential of parameter
      *  variance/mean.
      */
-    void randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) ;
-    /** Compute the run( CArrayXX const*  p_tik, CPointX const* p_tk) . */
-    bool run( CArrayXX const*  p_tik, CPointX const* p_tk) ;
+    void randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk) ;
+    /** Compute the run( CArrayXX const* const& p_tik, CPointX const* const& p_tk) . */
+    bool run( CArrayXX const* const& p_tik, CPointX const* const& p_tk) ;
     /** @return the number of free parameters of the model */
     inline int computeNbFreeParameters() const
-    { return this->nbCluster()*this->nbVariable()+this->nbCluster();}
+    { return this->nbCluster()*p_data()->sizeCols()+this->nbCluster();}
 };
 
 /* Initialize randomly the parameters of the Gaussian mixture. The centers
@@ -104,7 +104,7 @@ class Gamma_ak_bjk: public GammaBase< Gamma_ak_bjk<Array> >
  *  will be set to 1.
  */
 template<class Array>
-void Gamma_ak_bjk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) 
+void Gamma_ak_bjk<Array>::randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk) 
 {
     // compute moments
     this->moments(p_tik);
@@ -117,7 +117,7 @@ void Gamma_ak_bjk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_t
       param_.scale_[k][j] = Law::Exponential::rand((variance/mean));
       value += mean*mean/variance;
     }
-    param_.shape_[k]= Law::Exponential::rand(value/(this->nbVariable()));
+    param_.shape_[k]= Law::Exponential::rand(value/(p_data()->sizeCols()));
   }
 #ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T(" Gamma_ak_bjk<Array>::randomInit done\n");
@@ -126,7 +126,7 @@ void Gamma_ak_bjk<Array>::randomInit( CArrayXX const*  p_tik, CPointX const* p_t
 
 /* Compute the weighted mean and the common variance. */
 template<class Array>
-bool Gamma_ak_bjk<Array>::run( CArrayXX const*  p_tik, CPointX const* p_tk) 
+bool Gamma_ak_bjk<Array>::run( CArrayXX const* const& p_tik, CPointX const* const& p_tk) 
 {
   if (!this->moments(p_tik)) { return false;}
   // estimate a and b
@@ -143,7 +143,7 @@ bool Gamma_ak_bjk<Array>::run( CArrayXX const*  p_tik, CPointX const* p_tk)
     if (!Arithmetic<Real>::isFinite(a))
     {
 #ifdef STK_MIXTURE_DEBUG
-        stk_cout << "ML estimation failed in Gamma_ak_bjk::run( CArrayXX const*  p_tik, CPointX const* p_tk) \n";
+        stk_cout << "ML estimation failed in Gamma_ak_bjk::run( CArrayXX const* const& p_tik, CPointX const* const& p_tk) \n";
         stk_cout << "x0 =" << x0 << _T("\n";);
         stk_cout << "f(x0) =" << f(x0) << _T("\n";);
         stk_cout << "x1 =" << x1 << _T("\n";);

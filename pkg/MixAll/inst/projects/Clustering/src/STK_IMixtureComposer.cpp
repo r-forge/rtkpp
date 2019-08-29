@@ -90,8 +90,6 @@ void IMixtureComposer::initializeStep()
   setLnLikelihood(computeLnLikelihood());
   // compute the number of free parameters
   setNbFreeParameter(computeNbFreeParameters());
-  // compute number of free parameters and of variables
-  setNbVariable(computeNbVariables());
   // update state
   setState(Clust::modelInitialized_);
 #ifdef STK_MIXTURE_VERBOSE
@@ -150,14 +148,14 @@ void IMixtureComposer::randomFuzzyInit()
 /* cStep */
 int IMixtureComposer::cStep()
 {
-#ifdef STK_MIXTURE_VERBOSE
+#ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Entering IMixtureComposer::cStep()\n");
 #endif
   for (int i=tik_.beginRows(); i < tik_.endRows(); i++)
   { cStep(i);}
   // count the number of individuals in each class
   tk_= Stat::sum(tik_);
-#ifdef STK_MIXTURE_VERBOSE
+#ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("IMixtureComposer::cStep() tk_ = ") << tk_;
   stk_cout << _T("IMixtureComposer::cStep() done\n");
 #endif
@@ -168,12 +166,12 @@ int IMixtureComposer::cStep()
 /* compute tik, default implementation. */
 int IMixtureComposer::sStep()
 {
-#ifdef STK_MIXTURE_VERBOSE
+#ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Entering IMixtureComposer::sStep()\n");
 #endif
   // simulate zi
   for (int i = zi_.begin(); i< zi_.end(); ++i) { sStep(i);}
-#ifdef STK_MIXTURE_VERBOSE
+#ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("IMixtureComposer::sStep() done\n");
 #endif
   return cStep();
@@ -181,7 +179,7 @@ int IMixtureComposer::sStep()
 
 Real IMixtureComposer::eStep()
 {
-#ifdef STK_MIXTURE_VERBOSE
+#ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("Entering IMixtureComposer::eStep()\n");
 #endif
   Real sum = 0.;
@@ -194,7 +192,7 @@ Real IMixtureComposer::eStep()
   setLnLikelihood(sum);
   // compute proportions
   tk_ = Stat::sumByCol(tik_);
-#ifdef STK_MIXTURE_VERBOSE
+#ifdef STK_MIXTURE_VERY_VERBOSE
   stk_cout << _T("IMixtureComposer::eStep() lnLikelihood =") << sum << _T("\n");
   stk_cout << _T("IMixtureComposer::eStep() done\n");
   if (!isFinite(sum))
@@ -232,7 +230,7 @@ Real IMixtureComposer::eStep(int i)
   { lnComp_[k] = std::log(pk_[k])+lnComponentProbability(i,k);}
   if (lnComp_.isInfinite().any())
   {
-#ifdef STK_MIXTURE_VERBOSE
+#ifdef STK_MIXTURE_VERY_VERBOSE
     stk_cout << _T("IMixtureComposer::eStep(") << i << _T(")\n");
     stk_cout << _T("pk_ =") << pk_;
     stk_cout << _T("tk_ =") << tk_;

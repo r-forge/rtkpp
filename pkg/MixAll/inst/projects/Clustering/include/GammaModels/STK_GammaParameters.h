@@ -41,6 +41,8 @@
 #include <Arrays/include/STK_Array1D.h>
 #include <Arrays/include/STK_CArrayPoint.h>
 
+#include <STatistiK/include/STK_Stat_Online.h>
+
 namespace STK
 {
 /** base class of the Gamma models Parameter Handler */
@@ -52,6 +54,7 @@ struct ParametersGammaBase
   Array1D<CPointX> meanLog_;
   /** variance_ */
   Array1D<CPointX> variance_;
+
   /** default constructor */
   ParametersGammaBase( int nbCluster);
   /** copy constructor */
@@ -74,7 +77,12 @@ struct ModelParameters<Clust::Gamma_a_bjk_>: ParametersGammaBase
     Real shape_;
     /** scales of the variables */
     Array1D<CPointX>  scale_;
-    /** default constructor
+    /** shape statistics */
+    Stat::Online<Real, Real> stat_shape_;
+    /** Array of the scale statistics */
+    Array1D< Stat::Online<CPointX, Real> > stat_scale_;
+
+   /** default constructor
      *  @param nbCluster the number of class of the mixture
      **/
     ModelParameters(int nbCluster);
@@ -84,12 +92,24 @@ struct ModelParameters<Clust::Gamma_a_bjk_>: ParametersGammaBase
     ModelParameters( ModelParameters const& param);
     /** destructor */
     ~ModelParameters();
+
     /** @return the mean of the kth cluster and jth variable */
     inline Real const& shape(int k, int j) const { return shape_;}
     /** @return the standard deviation of the kth cluster and jth variable */
     inline Real const& scale(int k, int j) const { return scale_[k][j];}
-    /** resize the set of parameter */
+
+    /** resize and initialize the set of parameter.
+     *  @param range range of the variables in the data set
+     **/
     void resize(Range const& range);
+
+    /** update statistics of the parameters. */
+    void updateStatistics();
+    /** Set the computed statistics */
+    void setStatistics();
+    /** Release the computed statistics */
+    void releaseStatistics();
+
     /** Set the parameters of the mixture model.
      *  It is assumed that the array params store for each class the shapes and
      *  scales parameters on two consecutive rows.
@@ -118,6 +138,11 @@ struct ModelParameters<Clust::Gamma_a_bk_>: public ParametersGammaBase
     Real shape_;
     /** scales of the variables */
     Array1D<Real>  scale_;
+    /** shape statistics */
+    Stat::Online<Real, Real> stat_shape_;
+    /** Array of the standard deviation statistics */
+    Array1D< Stat::Online<Real, Real> > stat_scale_;
+
     /** default constructor
      *  @param nbCluster the number of class of the mixture
      **/
@@ -128,12 +153,24 @@ struct ModelParameters<Clust::Gamma_a_bk_>: public ParametersGammaBase
     ModelParameters( ModelParameters const& param);
     /** destructor */
     ~ModelParameters();
+
     /** @return the mean of the kth cluster and jth variable */
     inline Real const& shape(int k, int j) const { return shape_;}
     /** @return the standard deviation of the kth cluster and jth variable */
     inline Real const& scale(int k, int j) const { return scale_[k];}
-    /** resize the set of parameter */
+
+    /** resize and initialize the set of parameter.
+     *  @param range range of the variables in the data set
+     **/
     void resize(Range const& range);
+
+    /** update statistics of the parameters. */
+    void updateStatistics();
+    /** Set the computed statistics */
+    void setStatistics();
+    /** Release the computed statistics */
+    void releaseStatistics();
+
     /** Set the parameters of the mixture model.
      *  It is assumed that the array params store for each class the shapes and
      *  scales parameters on two consecutive rows.
@@ -162,6 +199,11 @@ struct ModelParameters<Clust::Gamma_aj_bjk_>: public ParametersGammaBase
     CPointX shape_;
     /** scales of the variables */
     Array1D<CPointX>  scale_;
+    /** shape statistics */
+    Stat::Online<CPointX, Real> stat_shape_;
+    /** Array of the scale statistics */
+    Array1D< Stat::Online<CPointX, Real> > stat_scale_;
+
     /** default constructor
      *  @param nbCluster the number of class of the mixture
      **/
@@ -172,12 +214,24 @@ struct ModelParameters<Clust::Gamma_aj_bjk_>: public ParametersGammaBase
     ModelParameters( ModelParameters const& param);
     /** destructor */
     ~ModelParameters();
+
     /** @return the mean of the kth cluster and jth variable */
     inline Real const& shape(int k, int j) const { return shape_[k];}
     /** @return the standard deviation of the kth cluster and jth variable */
     inline Real const& scale(int k, int j) const { return scale_[k][j];}
-    /** resize the set of parameter */
+
+    /** resize and initialize the set of parameter.
+     *  @param range range of the variables in the data set
+     **/
     void resize(Range const& range);
+
+    /** update statistics of the parameters. */
+    void updateStatistics();
+    /** Set the computed statistics */
+    void setStatistics();
+    /** Release the computed statistics */
+    void releaseStatistics();
+
     /** Set the parameters of the mixture model.
      *  It is assumed that the array params store for each class the shapes and
      *  scales parameters on two consecutive rows.
@@ -206,6 +260,11 @@ struct ModelParameters<Clust::Gamma_aj_bk_>: public ParametersGammaBase
     CPointX shape_;
     /** scales of the variables */
     Array1D<Real>  scale_;
+    /** shape statistics */
+    Stat::Online<CPointX, Real> stat_shape_;
+    /** Array of the standard deviation statistics */
+    Array1D< Stat::Online<Real, Real> > stat_scale_;
+
     /** default constructor
      *  @param nbCluster the number of class of the mixture
      **/
@@ -216,12 +275,24 @@ struct ModelParameters<Clust::Gamma_aj_bk_>: public ParametersGammaBase
     ModelParameters( ModelParameters const& param);
     /** destructor */
     ~ModelParameters();
+
     /** @return the mean of the kth cluster and jth variable */
     inline Real const& shape(int k, int j) const { return shape_[j];}
     /** @return the standard deviation of the kth cluster and jth variable */
     inline Real const& scale(int k, int j) const { return scale_[k];}
-    /** resize the set of parameter */
+
+    /** resize and initialize the set of parameter.
+     *  @param range range of the variables in the data set
+     **/
     void resize(Range const& range);
+
+    /** update statistics of the parameters. */
+    void updateStatistics();
+    /** Set the computed statistics */
+    void setStatistics();
+    /** Release the computed statistics */
+    void releaseStatistics();
+
     /** Set the parameters of the mixture model.
      *  It is assumed that the array params store for each class the shapes and
      *  scales parameters on two consecutive rows.
@@ -250,6 +321,11 @@ struct ModelParameters<Clust::Gamma_ajk_b_>: public ParametersGammaBase
     Array1D<CPointX> shape_;
     /** scales of the variables */
     Real  scale_;
+    /** Array of the mean statistics */
+    Array1D< Stat::Online<CPointX, Real> > stat_shape_;
+    /** Array of the standard deviation statistics */
+    Stat::Online<Real, Real> stat_scale_;
+
     /** default constructor
      *  @param nbCluster the number of class of the mixture
      **/
@@ -260,12 +336,24 @@ struct ModelParameters<Clust::Gamma_ajk_b_>: public ParametersGammaBase
     ModelParameters( ModelParameters const& param);
     /** destructor */
     ~ModelParameters();
+
     /** @return the mean of the kth cluster and jth variable */
     inline Real const& shape(int k, int j) const { return shape_[k][j];}
     /** @return the standard deviation of the kth cluster and jth variable */
     inline Real const& scale(int k, int j) const { return scale_;}
-    /** resize the set of parameter */
+
+    /** resize and initialize the set of parameter.
+     *  @param range range of the variables in the data set
+     **/
     void resize(Range const& range);
+
+    /** update statistics of the parameters. */
+    void updateStatistics();
+    /** Set the computed statistics */
+    void setStatistics();
+    /** Release the computed statistics */
+    void releaseStatistics();
+
     /** Set the parameters of the mixture model.
      *  It is assumed that the array params store for each class the shapes and
      *  scales parameters on two consecutive rows.
@@ -294,6 +382,11 @@ struct ModelParameters<Clust::Gamma_ajk_bj_>: public ParametersGammaBase
     Array1D<CPointX> shape_;
     /** scales of the variables */
     CPointX  scale_;
+    /** Array of the mean statistics */
+    Array1D< Stat::Online<CPointX, Real> > stat_shape_;
+    /** Array of the standard deviation statistics */
+    Stat::Online<CPointX, Real> stat_scale_;
+
     /** default constructor
      *  @param nbCluster the number of class of the mixture
      **/
@@ -304,12 +397,24 @@ struct ModelParameters<Clust::Gamma_ajk_bj_>: public ParametersGammaBase
     ModelParameters( ModelParameters const& param);
     /** destructor */
     ~ModelParameters();
+
     /** @return the mean of the kth cluster and jth variable */
     inline Real const& shape(int k, int j) const { return shape_[k][j];}
     /** @return the standard deviation of the kth cluster and jth variable */
     inline Real const& scale(int k, int j) const { return scale_[j];}
-    /** resize the set of parameter */
+
+    /** resize and initialize the set of parameter.
+     *  @param range range of the variables in the data set
+     **/
     void resize(Range const& range);
+
+    /** update statistics of the parameters. */
+    void updateStatistics();
+    /** Set the computed statistics */
+    void setStatistics();
+    /** Release the computed statistics */
+    void releaseStatistics();
+
     /** Set the parameters of the mixture model.
      *  It is assumed that the array params store for each class the shapes and
      *  scales parameters on two consecutive rows.
@@ -338,6 +443,11 @@ struct ModelParameters<Clust::Gamma_ajk_bjk_>: public ParametersGammaBase
     Array1D<CPointX> shape_;
     /** scales of the variables */
     Array1D<CPointX> scale_;
+    /** Array of the mean statistics */
+    Array1D< Stat::Online<CPointX, Real> > stat_shape_;
+    /** Array of the standard deviation statistics */
+    Array1D< Stat::Online<CPointX, Real> > stat_scale_;
+
     /** default constructor
      *  @param nbCluster the number of class of the mixture
      **/
@@ -348,12 +458,24 @@ struct ModelParameters<Clust::Gamma_ajk_bjk_>: public ParametersGammaBase
     ModelParameters( ModelParameters const& param);
     /** destructor */
     ~ModelParameters();
+
     /** @return the mean of the kth cluster and jth variable */
     inline Real const& shape(int k, int j) const { return shape_[k][j];}
     /** @return the standard deviation of the kth cluster and jth variable */
     inline Real const& scale(int k, int j) const { return scale_[k][j];}
-    /** resize the set of parameter */
+
+    /** resize and initialize the set of parameter.
+     *  @param range range of the variables in the data set
+     **/
     void resize(Range const& range);
+
+    /** update statistics of the parameters. */
+    void updateStatistics();
+    /** Set the computed statistics */
+    void setStatistics();
+    /** Release the computed statistics */
+    void releaseStatistics();
+
     /** Set the parameters of the mixture model.
      *  It is assumed that the array params store for each class the shapes and
      *  scales parameters on two consecutive rows.
@@ -380,6 +502,11 @@ struct ModelParameters<Clust::Gamma_ajk_bk_>: public ParametersGammaBase
     Array1D<CPointX> shape_;
     /** scales of the variables */
     Array1D<Real> scale_;
+    /** Array of the mean statistics */
+    Array1D< Stat::Online<CPointX, Real> > stat_shape_;
+    /** Array of the standard deviation statistics */
+    Array1D< Stat::Online<Real, Real> > stat_scale_;
+
     /** default constructor
      *  @param nbCluster the number of class of the mixture
      **/
@@ -390,12 +517,24 @@ struct ModelParameters<Clust::Gamma_ajk_bk_>: public ParametersGammaBase
     ModelParameters( ModelParameters const& param);
     /** destructor */
     ~ModelParameters();
+
     /** @return the mean of the kth cluster and jth variable */
     inline Real const& shape(int k, int j) const { return shape_[k][j];}
     /** @return the standard deviation of the kth cluster and jth variable */
     inline Real const& scale(int k, int j) const { return scale_[k];}
-    /** resize the set of parameter */
+
+    /** resize and initialize the set of parameter.
+     *  @param range range of the variables in the data set
+     **/
     void resize(Range const& range);
+
+    /** update statistics of the parameters. */
+    void updateStatistics();
+    /** Set the computed statistics */
+    void setStatistics();
+    /** Release the computed statistics */
+    void releaseStatistics();
+
     /** Set the parameters of the mixture model.
      *  It is assumed that the array params store for each class the shapes and
      *  scales parameters on two consecutive rows.
@@ -422,6 +561,11 @@ struct ModelParameters<Clust::Gamma_ak_b_>: public ParametersGammaBase
     Array1D<Real> shape_;
     /** scales of the variables */
     Real  scale_;
+    /** Array of the mean statistics */
+    Array1D< Stat::Online<Real, Real> > stat_shape_;
+    /** Array of the standard deviation statistics */
+    Stat::Online<Real, Real> stat_scale_;
+
     /** default constructor
      *  @param nbCluster the number of class of the mixture
      **/
@@ -432,12 +576,24 @@ struct ModelParameters<Clust::Gamma_ak_b_>: public ParametersGammaBase
     ModelParameters( ModelParameters const& param);
     /** destructor */
     ~ModelParameters();
+
     /** @return the mean of the kth cluster and jth variable */
     inline Real const& shape(int k, int j) const { return shape_[k];}
     /** @return the standard deviation of the kth cluster and jth variable */
     inline Real const& scale(int k, int j) const { return scale_;}
-    /** resize the set of parameter */
+
+    /** resize and initialize the set of parameter.
+     *  @param range range of the variables in the data set
+     **/
     void resize(Range const& range);
+
+    /** update statistics of the parameters. */
+    void updateStatistics();
+    /** Set the computed statistics */
+    void setStatistics();
+    /** Release the computed statistics */
+    void releaseStatistics();
+
     /** Set the parameters of the mixture model.
      *  It is assumed that the array params store for each class the shapes and
      *  scales parameters on two consecutive rows.
@@ -466,6 +622,11 @@ struct ModelParameters<Clust::Gamma_ak_bj_>: public ParametersGammaBase
     Array1D<Real> shape_;
     /** scales of the variables */
     CPointX  scale_;
+    /** Array of the mean statistics */
+    Array1D< Stat::Online<Real, Real> > stat_shape_;
+    /** Array of the standard deviation statistics */
+    Stat::Online<CPointX, Real> stat_scale_;
+
     /** default constructor
      *  @param nbCluster the number of class of the mixture
      **/
@@ -476,12 +637,24 @@ struct ModelParameters<Clust::Gamma_ak_bj_>: public ParametersGammaBase
     ModelParameters( ModelParameters const& param);
     /** destructor */
     ~ModelParameters();
+
     /** @return the mean of the kth cluster and jth variable */
     inline Real const& shape(int k, int j) const { return shape_[k];}
     /** @return the standard deviation of the kth cluster and jth variable */
     inline Real const& scale(int k, int j) const { return scale_[j];}
-    /** resize the set of parameter */
+
+    /** resize and initialize the set of parameter.
+     *  @param range range of the variables in the data set
+     **/
     void resize(Range const& range);
+
+    /** update statistics of the parameters. */
+    void updateStatistics();
+    /** Set the computed statistics */
+    void setStatistics();
+    /** Release the computed statistics */
+    void releaseStatistics();
+
     /** Set the parameters of the mixture model.
      *  It is assumed that the array params store for each class the shapes and
      *  scales parameters on two consecutive rows.
@@ -510,6 +683,11 @@ struct ModelParameters<Clust::Gamma_ak_bjk_>: public ParametersGammaBase
     Array1D<Real> shape_;
     /** scales of the variables */
     Array1D<CPointX> scale_;
+    /** Array of the mean statistics */
+    Array1D< Stat::Online<Real, Real> > stat_shape_;
+    /** Array of the standard deviation statistics */
+    Array1D< Stat::Online<CPointX, Real> > stat_scale_;
+
     /** default constructor
      *  @param nbCluster the number of class of the mixture
      **/
@@ -520,12 +698,24 @@ struct ModelParameters<Clust::Gamma_ak_bjk_>: public ParametersGammaBase
     ModelParameters( ModelParameters const& param);
     /** destructor */
     ~ModelParameters();
+
     /** @return the mean of the kth cluster and jth variable */
     inline Real const& shape(int k, int j) const { return shape_[k];}
     /** @return the standard deviation of the kth cluster and jth variable */
     inline Real const& scale(int k, int j) const { return scale_[k][j];}
-    /** resize the set of parameter */
+
+    /** resize and initialize the set of parameter.
+     *  @param range range of the variables in the data set
+     **/
     void resize(Range const& range);
+
+    /** update statistics of the parameters. */
+    void updateStatistics();
+    /** Set the computed statistics */
+    void setStatistics();
+    /** Release the computed statistics */
+    void releaseStatistics();
+
     /** Set the parameters of the mixture model.
      *  It is assumed that the array params store for each class the shapes and
      *  scales parameters on two consecutive rows.
@@ -552,6 +742,11 @@ struct ModelParameters<Clust::Gamma_ak_bk_>: public ParametersGammaBase
     Array1D<Real> shape_;
     /** scales of the variables */
     Array1D<Real> scale_;
+    /** Array of the mean statistics */
+    Array1D< Stat::Online<Real, Real> > stat_shape_;
+    /** Array of the standard deviation statistics */
+    Array1D< Stat::Online<Real, Real> > stat_scale_;
+
     /** default constructor
      *  @param nbCluster the number of class of the mixture
      **/
@@ -562,12 +757,24 @@ struct ModelParameters<Clust::Gamma_ak_bk_>: public ParametersGammaBase
     ModelParameters( ModelParameters const& param);
     /** destructor */
     ~ModelParameters();
+
     /** @return the mean of the kth cluster and jth variable */
     inline Real const& shape(int k, int j) const { return shape_[k];}
     /** @return the standard deviation of the kth cluster and jth variable */
     inline Real const& scale(int k, int j) const { return scale_[k];}
-    /** resize the set of parameter */
+
+    /** resize and initialize the set of parameter.
+     *  @param range range of the variables in the data set
+     **/
     void resize(Range const& range);
+
+    /** update statistics of the parameters. */
+    void updateStatistics();
+    /** Set the computed statistics */
+    void setStatistics();
+    /** Release the computed statistics */
+    void releaseStatistics();
+
     /** Set the parameters of the mixture model.
      *  It is assumed that the array params store for each class the shapes and
      *  scales parameters on two consecutive rows.

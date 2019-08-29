@@ -74,8 +74,8 @@ template <int Id> struct ModelParameters;
  *   Type impute(int i, int j, Weights const& pk) const;
  *   Type rand(int i, int j, int k) const;
  *   Real lnComponentProbability(int i, int k) const;
- *   void randomInit( CArrayXX const*  p_tik, CPointX const* p_tk) ;
- *   bool run( CArrayXX const*  p_tik, CPointX const* p_tk) ;
+ *   void randomInit( CArrayXX const* const& p_tik, CPointX const* const& p_tk) ;
+ *   bool run( CArrayXX const* const& p_tik, CPointX const* const& p_tk) ;
  * int computeNbFreeParameters() const;
  * @endcode
  *

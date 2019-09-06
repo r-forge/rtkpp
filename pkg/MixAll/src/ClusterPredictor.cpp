@@ -46,10 +46,9 @@ ClusterPredictor::~ClusterPredictor() {}
 bool ClusterPredictor::run()
 {
   String idModel = s4_component_.slot("modelName");
-  bool freeProp;
-  Clust::Mixture model           = Clust::stringToMixture(idModel, freeProp);
+  Clust::Mixture model           = Clust::stringToMixture(idModel);
   Clust::MixtureClass classModel = Clust::mixtureToMixtureClass(model);
-  String idData = Clust::mixtureToString(model);
+  String idData                  = Clust::mixtureToString(model);
 
   // put data set to data handler
   int nbSample;
@@ -57,44 +56,54 @@ bool ClusterPredictor::run()
   {
     Rcpp::IntegerMatrix r_data_int = s4_clusterPredict_.slot("data");
     nbSample  = r_data_int.rows();
-    facade_.handler().addData(r_data_int, idData, idModel);
+    handler_.addData(r_data_int, idData, idModel);
   }
   else
   {
     Rcpp::NumericMatrix r_data_num = s4_clusterPredict_.slot("data");
     nbSample  = r_data_num.rows();
-    facade_.handler().addData(r_data_num, idData, idModel);
+    handler_.addData(r_data_num, idData, idModel);
   }
-
   // create composer and mixtures
   int nbCluster = s4_model_.slot("nbCluster");
-  facade_.createComposer(nbSample, nbCluster);
-  facade_.createMixtures();
+  p_composer_ = new MixtureComposer(nbSample, nbCluster);
+  createMixtures(p_composer_);
 
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("In ClusterPredictor::run. Setting model parameters\n");
+#endif
   // set proportions parameters
+  // get parameters from component and set them to composer
   RVector<double> pk((SEXP)s4_model_.slot("pk"));
-  facade_.setProportions(pk);
+  p_composer_->setProportions(pk);
+//  ArrayXX params;
+//  params.move(getParameters(idData, s4_component_));
+//  if (!setParameters(p_composer_, idData, params)) { return false;};
+  if (!setParameters(p_composer_, idData, getParameters(idData, s4_component_))) { return false;};
 
-  // get parameters from component and set them to facade_
-  ArrayXX params;
-  params.move(getParameters(s4_component_,idData));
-  if (!facade_.setParameters( idData, params)) { return false;};
-
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("In ClusterPredictor::run. running Algo\n");
+#endif
   // run prediction algorithm
-  p_algo_->setModel(facade_.p_composer());
+  p_algo_->setModel(p_composer_);
   bool flag = p_algo_->run();
-  // get results
-  s4_clusterPredict_.slot("pk")  = Rcpp::wrap(facade_.p_composer()->pk());
-  s4_clusterPredict_.slot("tik") = Rcpp::wrap(facade_.p_composer()->tik());
-  s4_clusterPredict_.slot("zi")  = Rcpp::wrap(facade_.p_composer()->zi());
 
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("In ClusterPredictor::run. Getting parameters\n");
+#endif
+  // get results
+  s4_clusterPredict_.slot("pk")  = Rcpp::wrap(p_composer_->pk());
+  s4_clusterPredict_.slot("tik") = Rcpp::wrap(p_composer_->tik());
+  s4_clusterPredict_.slot("zi")  = Rcpp::wrap(p_composer_->zi());
   Rcpp::NumericVector fi = s4_clusterPredict_.slot("lnFi");
   Rcpp::IntegerVector zi = s4_clusterPredict_.slot("zi");
   for (int i=0; i< fi.length(); ++i)
   {
-    fi[i] = facade_.p_composer()->computeLnLikelihood(i);
+    fi[i] = p_composer_->computeLnLikelihood(i);
     zi[i] += (1 - baseIdx);  // set base 1 for the class labels
   }
+  // get missing values
+  getMissingValues(classModel, idData);
   //
   return flag;
 }

@@ -114,6 +114,27 @@ class CategoricalMixtureManager: public IMixtureManager< CategoricalMixtureManag
     /** destructor */
     ~CategoricalMixtureManager() {}
 
+    /** get the missing values from an IMixture.
+     *  @param p_mixture pointer on the mixture
+     *  @param missing structure to return with the missing values
+     **/
+    void getMissingValuesImpl(IMixture* p_mixture, MissingValues& missing) const
+    {
+      Clust::Mixture idModel = getIdModel(p_mixture->idData());
+      if (idModel == Clust::unknown_mixture_) return;
+      // up-cast... (Yes it's bad....;)...)
+      switch (idModel)
+      {
+        case Clust::Categorical_pjk_:
+        { static_cast<MixtureBridge_pjk*>(p_mixture)->getMissingValues(missing);}
+        break;
+        case Clust::Categorical_pk_:
+        { static_cast<MixtureBridge_pk*>(p_mixture)->getMissingValues(missing);}
+        break;
+        default: // idModel is not implemented
+        break;
+      }
+    }
     /** get the parameters from an IMixture.
      *  @param p_mixture pointer on the mixture
      *  @param param the array to return with the parameters
@@ -125,7 +146,6 @@ class CategoricalMixtureManager: public IMixtureManager< CategoricalMixtureManag
       // up-cast... (Yes it's bad....;)...)
       switch (idModel)
       {
-        // Categorical models
         case Clust::Categorical_pjk_:
         { static_cast<MixtureBridge_pjk*>(p_mixture)->getParameters(param);}
         break;
@@ -147,7 +167,6 @@ class CategoricalMixtureManager: public IMixtureManager< CategoricalMixtureManag
       // up-cast... (Yes it's bad....;)...)
       switch (idModel)
       {
-        // Categorical models
         case Clust::Categorical_pjk_:
         { static_cast<MixtureBridge_pjk*>(p_mixture)->setParameters(param);}
         break;
@@ -158,7 +177,6 @@ class CategoricalMixtureManager: public IMixtureManager< CategoricalMixtureManag
         break;
       }
     }
-
     /** create a concrete mixture and initialize it.
      *  @param modelName a valid model name
      *  @param idData Id of the data

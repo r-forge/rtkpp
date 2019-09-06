@@ -33,9 +33,10 @@ NULL
 #' and the number of clusters given in \code{nbCluster}, using the strategy
 #' specified in \code{strategy}.
 #'
-#' @param data frame or matrix containing the data. Rows correspond to observations
-#' and columns correspond to variables. If the data set contains NA values, they
-#' will be estimated during the estimation process.
+#' @param data a data.frame or a matrix containing the data. Rows correspond to
+#' observations and columns correspond to variables. data will be coerced as
+#' an integer matrix. If data set contains NA values, they will be estimated
+#' during the estimation process.
 #' @param nbCluster  [\code{\link{vector}}] listing the number of clusters to test.
 #' @param models [\code{\link{vector}}] of model names to run. By default
 #' the categorical models "categorical_pk_pjk" and "categorical_p_pjk" are estimated.
@@ -94,7 +95,6 @@ clusterCategorical <- function( data, nbCluster=2
   { stop("criterion is not valid. See ?clusterCategorical for the list of valid criterion\n")}
 
   # get data
-  data <- as.matrix(data);
   if (nrow(data) <= 3*nbClusterMax) {stop("There is not enough individuals (rows) in the data set\n")}
   if (ncol(data) <= 1) {stop("Error: empty data set or not enough columns (must be greater than 1 for Categorical variables)\n")}
 
@@ -176,19 +176,20 @@ setMethod(
       if(missing(data)) {stop("data is mandatory in ClusterCategoricalComponent.")}
       # check model name
       if (!clusterValidCategoricalNames(modelName)) { stop("modelName is invalid");}
-      # prepare data and compute number of modalities
+      # Compute number of modalities
       data           <- as.data.frame(data)
-      .Object@levels <- vector("list", length(data));
+      .Object@levels <- vector("list", ncol(data));
       nbModalities <- 0;
-      for ( j in 1:length(data) )
+      for ( j in 1:ncol(data) )
       {
         nbModalities <- max(nbModalities, nlevels(factor(data[,j])))
-        .Object@levels[[j]] <- levels(factor(data[,j]))
-        data[,j] <- as.integer(factor(data[,j]))
+        fj <- factor(data[,j])
+        .Object@levels[[j]] <- levels(fj)
+        data[,j] <- as.integer(fj)
       }
+      .Object@nbModalities = nbModalities
       # initialize base class
-      .Object <- callNextMethod(.Object, data, modelName);
-      .Object@nbModalities = nbModalities;
+      .Object <- callNextMethod(.Object, data, modelName)
       # create slots
       nbVariable = ncol(.Object@data);
       .Object@plkj <- array(data = 1/nbModalities, dim=c(nbModalities,nbCluster,nbVariable))

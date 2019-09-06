@@ -37,15 +37,16 @@
 namespace STK
 {
 IClusterPredictor::IClusterPredictor( Rcpp::S4 s4_model,  Rcpp::S4 s4_clusterPredict)
-                                  : ILauncherBase(s4_model)
+                                  : ILauncher(s4_model)
                                   , s4_clusterPredict_(s4_clusterPredict)
                                   , s4_algo_(s4_clusterPredict_.slot("algo"))
-                                  , facade_()
                                   , p_algo_(createAlgo())
+                                  , p_composer_(0)
 {}
 IClusterPredictor::~IClusterPredictor()
-{ if (p_algo_) delete p_algo_;}
-
+{ if (p_algo_) delete p_algo_;
+  if (p_composer_) delete p_composer_;
+}
 /* utility function creating STK algorithm from R algorithm */
 IMixtureAlgoPredict* IClusterPredictor::createAlgo()
 {
@@ -55,6 +56,99 @@ IMixtureAlgoPredict* IClusterPredictor::createAlgo()
    double epsilon = s4_algo_.slot("epsilon");
    Clust::algoPredictType algoType = Clust::stringToPredictAlgo(algoName);
    return Clust::createPredictAlgo(algoType,nbIterBurn,nbIterLong,epsilon);
+}
+
+/* get missing values */
+void IClusterPredictor::getMissingValues(Clust::MixtureClass const& classModel, String const& idData)
+{
+  switch (classModel)
+  {
+    case Clust::Categorical_:
+    {
+  #ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("In IClusterPredictor::getMissingValues. Getting Categorical missing values\n");
+  #endif
+      RMatrix<Integer> r_data_int = (SEXP)s4_clusterPredict_.slot("data");
+      setCategoricalMissingValuesToMatrix(p_composer_,  idData, r_data_int);
+    }
+    break;
+    case Clust::Poisson_:
+    {
+  #ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("In IClusterPredictor::getMissingValues. Getting Poisson missing values\n");
+  #endif
+      RMatrix<Integer> r_data_int = (SEXP)s4_clusterPredict_.slot("data");
+      setPoissonMissingValuesToMatrix(p_composer_, idData, r_data_int);
+    }
+    break;
+    case Clust::DiagGaussian_:
+    {
+  #ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("IClusterPredictor::getMissingValues. Getting Diagonal Gaussian missing values\n");
+  #endif
+      RMatrix<Real> r_data_num = (SEXP)s4_clusterPredict_.slot("data");
+      setDiagGaussianMissingValuesToMatrix(p_composer_, idData, r_data_num);
+    }
+    break;
+    case Clust::Gamma_:
+    {
+  #ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("In IClusterPredictor::getMissingValues. Getting Gamma missing values\n");
+  #endif
+      RMatrix<Real> r_data_num = (SEXP)s4_clusterPredict_.slot("data");
+      setGammaMissingValuesToMatrix(p_composer_, idData, r_data_num);
+    }
+    break;
+    default:
+      break;
+  }
+}
+
+/* get missing values */
+void IClusterPredictor::getMissingValues(Clust::MixtureClass const& classModel, String const& idData, int l)
+{
+  Rcpp::List ldata_ =s4_clusterPredict_.slot("ldata");
+  switch (classModel)
+  {
+    case Clust::Categorical_:
+    {
+  #ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("In IClusterPredictor::getMissingValues. Getting Categorical missing values\n");
+  #endif
+      RMatrix<Integer> r_data_int = (SEXP)ldata_[l];
+      setCategoricalMissingValuesToMatrix(p_composer_,  idData, r_data_int);
+    }
+    break;
+    case Clust::Poisson_:
+    {
+  #ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("In IClusterPredictor::getMissingValues. Getting Poisson missing values\n");
+  #endif
+      RMatrix<Integer> r_data_int = (SEXP)ldata_[l];
+      setPoissonMissingValuesToMatrix(p_composer_, idData, r_data_int);
+    }
+    break;
+    case Clust::DiagGaussian_:
+    {
+  #ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("IClusterPredictor::getMissingValues. Getting Diagonal Gaussian missing values\n");
+  #endif
+      RMatrix<Real> r_data_num = (SEXP)ldata_[l];
+      setDiagGaussianMissingValuesToMatrix(p_composer_, idData, r_data_num);
+    }
+    break;
+    case Clust::Gamma_:
+    {
+  #ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("In IClusterPredictor::getMissingValues. Getting Gamma missing values\n");
+  #endif
+      RMatrix<Real> r_data_num = (SEXP)ldata_[l];
+      setGammaMissingValuesToMatrix(p_composer_, idData, r_data_num);
+    }
+    break;
+    default:
+      break;
+  }
 }
 
 

@@ -55,11 +55,12 @@ namespace STK
  *  - It allows also to set parameters to a specific mixture,
  *  - all data set are enclosed in a DataBridge structure and stored in vector v_data_
  *
- *  The pure virtual method to implement in derived classes are
+ *  The pseudo pure virtual method to implement in derived classes are
  *  @code
- *    virtual void getParameters(IMixture* p_mixture, ArrayXX& data) const =0;
- *    virtual void setParameters(IMixture* p_mixture, ArrayXX const& data) const =0;
- *    virtual IMixture* createMixtureImpl(String const& modelName, String const& idData, int nbCluster) =0;
+ *    void getMissingValuesImpl(
+ *    void getParametersImpl(IMixture* p_mixture, ArrayXX& data) const;
+ *    void setParametersImpl(IMixture* p_mixture, ArrayXX const& data) const;
+ *    IMixture* createMixtureImpl(String const& modelName, String const& idData, int nbCluster);
  *  @endcode
  *
  *  @tparam DataHandler any concrete class from the interface STK::DataHandlerBase
@@ -96,8 +97,8 @@ class IMixtureManager: public IRecursiveTemplate<Derived>
 
     /** @brief create a mixture and initialize it.
      *  This method get the modelName from the DataHandler and then delegate
-     *  the concrete creation to derived class using the pure virtual method
-     *   @c createMixtureImpl.
+     *  the concrete creation to derived class using the pseudo pure virtual method
+     *   @c createMixture( modelName, idData, nbCluster).
      *  @param idData name of the model
      *  @param nbCluster number of cluster of the model
      *  @return 0 if the idData is not find, the result of
@@ -122,24 +123,24 @@ class IMixtureManager: public IRecursiveTemplate<Derived>
      **/
     Data const& getData( String const& idData) const;
 
+    // pure virtual methods
     /** get the missing values
-     *  @param idData id of the data set
+     *  @param p_mixture pointer on the mixture
      *  @param missing array with the indexes and the missing values
      **/
-    void getMissingValues(String const& idData, MissingValues& missing) const;
-
-    // pure virtual methods
+    inline void getMissingValues(IMixture* p_mixture, MissingValues& missing) const
+    {this->asDerived().getMissingValuesImpl(p_mixture, missing);}
     /** get the parameters from an IMixture.
      *  @param p_mixture pointer on the mixture
      *  @param data the array to return with the parameters
      **/
-    void getParameters(IMixture* p_mixture, ArrayXX& data) const
+    inline void getParameters(IMixture* p_mixture, ArrayXX& data) const
     { this->asDerived().getParametersImpl(p_mixture, data);}
     /** set the parameters from an IMixture.
      *  @param p_mixture pointer on the mixture
      *  @param data the array with the parameters to set
      **/
-    void setParameters(IMixture* p_mixture, ArrayXX const& data) const
+    inline void setParameters(IMixture* p_mixture, ArrayXX const& data) const
     { this->asDerived().setParametersImpl(p_mixture, data);}
 
   protected:
@@ -159,7 +160,7 @@ class IMixtureManager: public IRecursiveTemplate<Derived>
      *  @param modelName, idData strings with the Id name of the model and of the data
      *  @param nbCluster number of cluster of the model
      **/
-    IMixture* createMixture(String const& modelName, String const& idData, int nbCluster)
+    inline IMixture* createMixture(String const& modelName, String const& idData, int nbCluster)
     { return this->asDerived().createMixtureImpl(modelName, idData, nbCluster);}
 };
 
@@ -250,26 +251,6 @@ void IMixtureManager<Derived>::releaseDataBridge(String const& idData)
   typedef std::vector<IDataBridge*>::iterator DataIterator;
   for (DataIterator it = v_data_.begin(); it != v_data_.end(); ++it)
   { if ((*it)->idData() == idData) {delete (*it); v_data_.erase(it); break;}}
-}
-
-/* get the missing values
- *  @param p_mixture pointer on the mixture
- *  @param param the array to return with the parameters
- **/
-template<class Derived>
-void IMixtureManager<Derived>::getMissingValues(String const& idData, MissingValues& missing) const
-{
-  IDataBridge* p_ibridge = getDataBridge(idData);
-  if (p_ibridge)
-  {
-    DataBridgeType* p_bridge = static_cast<DataBridgeType*>(p_ibridge);
-    missing.resize(p_bridge->v_missing().size());
-    for(size_t i = 0; i< p_bridge->v_missing().size(); ++i)
-    {
-      missing[i].first  = p_bridge->v_missing()[i];
-      missing[i].second = p_bridge->dataij()(missing[i].first.first, missing[i].first.second);
-    }
-  }
 }
 
 /* Utility lookup function allowing to find a DataBridge from its idData

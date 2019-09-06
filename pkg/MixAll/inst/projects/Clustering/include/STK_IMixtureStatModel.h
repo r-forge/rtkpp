@@ -88,20 +88,30 @@ namespace STK
  *
  * Template functions allowing to interact with the composer are
  * @code
- *   template<class DataHandler>
- *   void createMixture(IMixtureManager<Derived>& manager);
- *   template<class DataHandler>
- *   IMixture* createMixture(IMixtureManager<Derived>& manager, String const& idData);
- *   template<class DataHandler>
- *   void removeMixture(IMixtureManager<Derived>& manager, String const& idData);
- *   template<class DataHandler, class Parameters>
- *   void getParameters(IMixtureManager<Derived> const& manager, String const& idData, Parameters& param) const;
- *   template<class DataHandler, class Parameters>
- *   void setParameters(IMixtureManager<Derived> const& manager, String const& idData, Parameters const& param);
  *   template<class Array>
  *   void setMixtureParameters( Array const& tik);
  *   template<class Array, class RowVector>
  *   void setMixtureParameters( Array const& tik, RowVector const& pk);
+ *   template<class RowVector>
+ *   void setProportions( RowVector const& pk);
+ *
+ *   template<class Manager, class Parameters>
+ *   void setParameters(IMixtureManager<Manager> const& manager, String const& idData, Parameters const& param);
+ *
+ *   template<class Manager>
+ *   void createMixture(IMixtureManager<Manager>& manager);
+ *   template<class DataHandler>
+ *   IMixture* createMixture(IMixtureManager<Manager>& manager, String const& idData);
+ *   template<class DataHandler>
+ *   void removeMixture(IMixtureManager<Manager>& manager, String const& idData);
+ * @endcode
+ *
+ * Template functions allowing to get results from the composer are
+ * @code
+ *   template<class Manager, class Parameters>
+ *   void getParameters(IMixtureManager<Manager> const& manager, String const& idData, Parameters& param) const;
+ *   template<class Manager, class MissingValues>
+ *   void getMissingValues(IMixtureManager<Manager> const& manager, String const& idData, MissingValues& missing) const;
  * @endcode
  *
  * @sa IMixtureComposer, IMixtureLearner, IMixtureManager
@@ -238,41 +248,7 @@ class IMixtureStatModel: public IStatModelBase
     /** write the parameters of the model in the stream os. */
     virtual void writeParameters(ostream& os) const {};
 
-    /** Utility method allowing to create all the mixtures registered in the
-     *  data handler of a mixture manager and to register them.
-     *  @param manager the manager with the responsibility of the creation.
-     **/
-    template<class Manager>
-    void createMixture(IMixtureManager<Manager>& manager);
-    /** Utility method allowing to create a mixture with a given data set
-     *  and register it. The Mixture Manager will find the associated model
-     *  to use with this data set.
-     *  @param manager the manager with the responsibility of the creation.
-     *  @param idData the id name of the data to modelize.
-     **/
-    template<class Manager>
-    IMixture* createMixture(IMixtureManager<Manager>& manager, String const& idData);
-    /** Utility method allowing to release completely a mixture with its data set.
-     *  The MixtureManager will find and release the associated data set.
-     *  @param manager the manager with the responsibility of the release.
-     *  @param idData the id name of the data to modelize.
-     **/
-    template<class Manager>
-    void removeMixture(IMixtureManager<Manager>& manager, String const& idData);
-    /** Utility method allowing to get the parameters of a specific mixture.
-     *  @param manager the manager with the responsibility of the parameters
-     *  @param idData the Id of the data we want the parameters
-     *  @param param the structure which will receive the parameters
-     **/
-    template<class Manager, class Parameters>
-    void getParameters(IMixtureManager<Manager> const& manager, String const& idData, Parameters& param) const;
-    /** Utility method allowing to set the parameters to a specific mixture.
-     *  @param manager the manager with the responsibility of the parameters
-     *  @param idData Id of the data we want to set the parameters
-     *  @param param structure which contains the parameters
-     **/
-    template<class Manager, class Parameters>
-    void setParameters(IMixtureManager<Manager> const& manager, String const& idData, Parameters const& param);
+    // initialization of the arrays pk_, tik_, tk_ and zi_
     /** set the mixture parameters using an array of posterior probabilities.
      *  Proportions, numbers in each class and class labels are computed
      *  using these posterior probabilities.
@@ -294,6 +270,54 @@ class IMixtureStatModel: public IStatModelBase
      **/
     template<class RowVector>
     void setProportions( RowVector const& pk);
+
+    // allow to update specific mixture parameters values
+    /** Utility method allowing to set the parameters to a specific mixture.
+     *  @param manager the manager with the responsibility of the parameters
+     *  @param idData Id of the data we want to set the parameters
+     *  @param param structure which contains the parameters
+     **/
+    template<class Manager, class Parameters>
+    void setParameters(IMixtureManager<Manager> const& manager, String const& idData, Parameters const& param);
+
+    // utilities methods
+    /** Utility method allowing to create all the mixtures registered in the
+     *  data handler of a mixture manager and to register them.
+     *  @param manager the manager with the responsibility of the creation.
+     **/
+    template<class Manager>
+    void createMixture(IMixtureManager<Manager>& manager);
+    /** Utility method allowing to create a mixture with a given data set
+     *  and register it. The Mixture Manager will find the associated model
+     *  to use with this data set.
+     *  @param manager the manager with the responsibility of the creation.
+     *  @param idData the id name of the data to modelize.
+     **/
+    template<class Manager>
+    IMixture* createMixture(IMixtureManager<Manager>& manager, String const& idData);
+    /** Utility method allowing to release completely a mixture with its data set.
+     *  The MixtureManager will find and release the associated data set.
+     *  @param manager the manager with the responsibility of the release.
+     *  @param idData the id name of the data to modelize.
+     **/
+    template<class Manager>
+    void removeMixture(IMixtureManager<Manager>& manager, String const& idData);
+
+    /** Utility method allowing to get the parameters of a specific mixture.
+     *  @param manager the manager with the responsibility of the parameters
+     *  @param idData the Id of the data we want the parameters
+     *  @param param the structure which will receive the parameters
+     **/
+    template<class Manager, class Parameters>
+    void getParameters(IMixtureManager<Manager> const& manager, String const& idData, Parameters& param) const;
+
+    /** Utility method allowing to get the missing values of a specific mixture.
+     *  @param manager the manager with the responsibility of the parameters
+     *  @param idData the Id of the data we want the parameters
+     *  @param missing the structure which will receive the missing values
+     **/
+    template<class Manager, class MissingValues>
+    void getMissingValues(IMixtureManager<Manager> const& manager, String const& idData, MissingValues& missing) const;
 
   protected:
     /** set the number of cluster of the model
@@ -374,16 +398,6 @@ void IMixtureStatModel::removeMixture(IMixtureManager<Manager>& manager, String 
   }
 }
 
-/* Utility method allowing to get the parameters of a specific mixture.
- *  @param manager the manager with the responsibility of the parameters
- *  @param idData the Id of the data we want the parameters
- *  @param param the structure which will receive the parameters
- **/
-template<class Manager, class Parameters>
-void IMixtureStatModel::getParameters(IMixtureManager<Manager> const& manager, String const& idData, Parameters& param) const
-{  IMixture* p_mixture= getMixture(idData);
-   if (p_mixture) manager.getParameters(p_mixture, param);
-}
 /* Utility method allowing to set the parameters to a specific mixture.
  *  @param manager the manager with the responsibility of the parameters
  *  @param idData Id of the data we want to set the parameters
@@ -440,6 +454,29 @@ void IMixtureStatModel::setProportions( RowVector const& pk)
 #endif
   pk_  = pk;
 }
+
+/* Utility method allowing to get the parameters of a specific mixture.
+ *  @param manager the manager with the responsibility of the parameters
+ *  @param idData the Id of the data we want the parameters
+ *  @param param the structure which will receive the parameters
+ **/
+template<class Manager, class Parameters>
+void IMixtureStatModel::getParameters(IMixtureManager<Manager> const& manager, String const& idData, Parameters& param) const
+{  IMixture* p_mixture= getMixture(idData);
+   if (p_mixture) manager.getParameters(p_mixture, param);
+}
+/* Utility method allowing to get the missing values of a specific mixture.
+ *  @param manager the manager with the responsibility of the parameters
+ *  @param idData the Id of the data we want the parameters
+ *  @param missing the structure which will receive the missing values
+ **/
+template<class Manager, class MissingValues>
+void IMixtureStatModel::getMissingValues(IMixtureManager<Manager> const& manager, String const& idData, MissingValues& missing) const
+{
+  IMixture* p_mixture= getMixture(idData);
+  if (p_mixture) manager.getMissingValues(p_mixture, missing);
+}
+
 
 
 } // namespace STK

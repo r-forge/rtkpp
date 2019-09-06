@@ -73,25 +73,9 @@ class ILauncher: public ILauncherBase
     void createDiscreteDataSets(String const& idData, Rcpp::S4 s4_component, Clust::Mixture model);
     /** create the mixtures in the given model */
     void createMixtures(IMixtureStatModel* p_model);
-    /** get the parameters */
-    void getParameters(IMixtureStatModel* p_model, String const& idData, Rcpp::S4 s4_component);
 
     /** vector with the model names to try */
     Rcpp::CharacterVector v_models_;
-    /** data handler */
-    RDataHandler handler_;
-    /** kernel handler */
-    KernelHandler kerHandler_;
-    /** diagonal Gaussian mixture models manager */
-    DiagGaussianMixtureManager<RDataHandler> diagGaussianManager_;
-    /** Poisson mixture models manager */
-    PoissonMixtureManager<RDataHandler> poissonManager_;
-    /** gamma mixture models manager */
-    GammaMixtureManager<RDataHandler> gammaManager_;
-    /** categorical mixture models manager */
-    CategoricalMixtureManager<RDataHandler> categoricalManager_;
-    /** categorical mixture models manager */
-    KernelMixtureManager kernelManager_;
 };
 
 } // namespace STK

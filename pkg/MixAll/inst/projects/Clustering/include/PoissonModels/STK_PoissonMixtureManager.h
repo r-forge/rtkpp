@@ -119,6 +119,30 @@ class PoissonMixtureManager: public IMixtureManager< PoissonMixtureManager<DataH
     /** destructor */
     ~PoissonMixtureManager() {}
 
+    /** get the missing values from an IMixture.
+     *  @param p_mixture pointer on the mixture
+     *  @param missing structure to return with the missing values
+     **/
+    void getMissingValuesImpl(IMixture* p_mixture, MissingValues& missing) const
+    {
+      Clust::Mixture idModel = getIdModel(p_mixture->idData());
+      if (idModel == Clust::unknown_mixture_) return;
+      // up-cast... (Yes it's bad....;)...)
+      switch (idModel)
+      {
+        case Clust::Poisson_ljk_:
+        { static_cast<MixtureBridge_ljk*>(p_mixture)->getMissingValues(missing);}
+        break;
+        case Clust::Poisson_lk_:
+        { static_cast<MixtureBridge_lk*>(p_mixture)->getMissingValues(missing);}
+        break;
+        case Clust::Poisson_ljlk_:
+        { static_cast<MixtureBridge_ljlk*>(p_mixture)->getMissingValues(missing);}
+        break;
+        default: // idModel is not implemented
+        break;
+      }
+    }
     /** get the parameters from an IMixture.
      *  @param p_mixture pointer on the mixture
      *  @param param the array to return with the parameters
@@ -130,7 +154,6 @@ class PoissonMixtureManager: public IMixtureManager< PoissonMixtureManager<DataH
       // up-cast... (Yes it's bad....;)...)
       switch (idModel)
       {
-        // Poisson models
         case Clust::Poisson_ljk_:
         { static_cast<MixtureBridge_ljk*>(p_mixture)->getParameters(param);}
         break;
@@ -148,14 +171,13 @@ class PoissonMixtureManager: public IMixtureManager< PoissonMixtureManager<DataH
      *  @param p_mixture pointer on the mixture
      *  @param param the array with the parameters to set
      **/
-    virtual void setParametersImpl(IMixture* p_mixture, ArrayXX const& param) const
+    void setParametersImpl(IMixture* p_mixture, ArrayXX const& param) const
     {
       Clust::Mixture idModel = getIdModel(p_mixture->idData());
       if (idModel == Clust::unknown_mixture_) return;
       // up-cast... (Yes it's bad....;)...)
       switch (idModel)
       {
-        // Poisson models
         case Clust::Poisson_ljk_:
         { static_cast<MixtureBridge_ljk*>(p_mixture)->setParameters(param);}
         break;
@@ -169,13 +191,12 @@ class PoissonMixtureManager: public IMixtureManager< PoissonMixtureManager<DataH
         break;
       }
     }
-
     /** create a concrete mixture and initialize it.
      *  @param modelName a valid model name
      *  @param idData Id of the data
      *  @param nbCluster number of cluster of the model
      **/
-    virtual IMixture* createMixtureImpl(String const& modelName, String const& idData, int nbCluster)
+    IMixture* createMixtureImpl(String const& modelName, String const& idData, int nbCluster)
     {
       Clust::Mixture idModel = Clust::stringToMixture(modelName);
       return createMixtureImpl(idModel, idData, nbCluster);
@@ -194,7 +215,6 @@ class PoissonMixtureManager: public IMixtureManager< PoissonMixtureManager<DataH
       registerDataBridge(p_dataBridge);
       switch (idModel)
       {
-        // Poisson models
         case Clust::Poisson_ljk_:
         {
           MixtureBridge_ljk* p_mixt = new MixtureBridge_ljk( &(p_dataBridge->dataij()), idData, nbCluster);

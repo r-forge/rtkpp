@@ -47,12 +47,6 @@ namespace STK
 ILauncher::ILauncher( Rcpp::S4 model, Rcpp::CharacterVector models)
                     : ILauncherBase(model)
                     , v_models_(models)
-                    , handler_()
-                    , diagGaussianManager_(handler_)
-                    , poissonManager_(handler_)
-                    , gammaManager_(handler_)
-                    , categoricalManager_(handler_)
-                    , kernelManager_(kerHandler_)
 {}
 /* facade design pattern.
  * The ILauncher allow to create the strategy for estimating a mixture model
@@ -61,12 +55,6 @@ ILauncher::ILauncher( Rcpp::S4 model, Rcpp::CharacterVector models)
 ILauncher::ILauncher( Rcpp::S4 model)
                     : ILauncherBase(model)
                     , v_models_()
-                    , handler_()
-                    , diagGaussianManager_(handler_)
-                    , poissonManager_(handler_)
-                    , gammaManager_(handler_)
-                    , categoricalManager_(handler_)
-                    , kernelManager_(kerHandler_)
 {}
 
 /* destructor. */
@@ -101,35 +89,6 @@ void ILauncher::createMixtures(IMixtureStatModel* p_model)
   p_model->createMixture(poissonManager_);
   p_model->createMixture(gammaManager_);
   p_model->createMixture(categoricalManager_);
-}
-
-/* fill the s4_component with the parameters */
-void ILauncher::getParameters(IMixtureStatModel* p_model, String const& idData, Rcpp::S4 s4_component)
-{
-  String rModelName = s4_component.slot("modelName");
-  bool freeProp;
-  switch (Clust::mixtureToMixtureClass(Clust::stringToMixture(rModelName, freeProp)))
-  {
-    case Clust::DiagGaussian_:
-      setDiagGaussianParametersToComponent(p_model, diagGaussianManager_, idData, s4_component);
-      break;
-    case Clust::Poisson_:
-      setPoissonParametersToComponent(p_model, poissonManager_, idData, s4_component);
-      break;
-    case Clust::Gamma_:
-      setGammaParametersToComponent(p_model, gammaManager_, idData, s4_component);
-      break;
-    case Clust::Categorical_:
-      setCategoricalParametersToComponent(p_model, categoricalManager_, idData, s4_component);
-      break;
-    case Clust::Kmm_:
-      setKernelParametersToComponent(p_model, kernelManager_, idData, s4_component);
-      break;
-    case Clust::unknown_mixture_class_:
-      break;
-    default:
-      break;
-  }
 }
 
 } // namespace STK

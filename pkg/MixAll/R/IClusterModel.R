@@ -68,9 +68,9 @@ setMethod(
   definition=function(.Object, data, modelName)
   {
     # fill data missing and modelName
-    .Object@data      <- as.matrix(data);
-    .Object@missing   <- which(is.na(.Object@data), arr.ind=TRUE);
-    .Object@modelName <- modelName;
+    .Object@data      <- as.matrix(data)
+    .Object@missing   <- which(is.na(.Object@data), arr.ind=TRUE)
+    .Object@modelName <- modelName
     return(.Object)
   }
 )

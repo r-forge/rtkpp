@@ -49,7 +49,7 @@ class ClusterLauncher: public ILauncher
 {
   public:
     /** constructor.
-     * @param model a reference on the current model
+     *  @param model a reference on the current model
      *  @param nbCluster a vector with the number of clusters to test
      *  @param models a vector of string with the model names to test
      **/

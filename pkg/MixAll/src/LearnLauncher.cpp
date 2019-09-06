@@ -87,8 +87,8 @@ bool LearnLauncher::run()
   }
   // create algo runner
   String algoName = s4_algo_.slot("algo");
-  STK::Real epsilon    = s4_algo_.slot("epsilon");
-  int nbIter           = s4_algo_.slot("nbIteration");
+  Real epsilon    = s4_algo_.slot("epsilon");
+  int nbIter      = s4_algo_.slot("nbIteration");
   if (toUpperString(algoName) == "SIMUL")  { p_algo_ = new SimulAlgo();}
   else if (toUpperString(algoName) == "IMPUTE") { p_algo_ = new ImputeAlgo();}
     else
@@ -167,8 +167,6 @@ Real LearnLauncher::selectBestSingleModel()
     {
       String idData = "model" + typeToString<int>(l);
       String idModel = Rcpp::as<String>(v_models_[l]);
-      bool freeProp;
-      Clust::Mixture model = Clust::stringToMixture(idModel, freeProp);
       // create learner and mixtures
       p_current = new MixtureLearner(nbSample, K);
       p_current->setMixtureParameters(tik, pk);
@@ -193,7 +191,7 @@ Real LearnLauncher::selectBestSingleModel()
       }
     }
     // get specific parameters
-    getParameters(p_learner_, idDataBestModel, s4_component);
+    setParametersToComponent(p_learner_, idDataBestModel, s4_component);
     return critValue;
   }
   catch (Exception const& e)
@@ -278,7 +276,7 @@ Real LearnLauncher::selectBestMixedModel()
       Rcpp::S4 s4_component = s4_list[l];
       // id of the data set and of the model
       String idData  = "model" + typeToString<int>(l);
-      getParameters(p_learner_, idData, s4_component);
+      setParametersToComponent(p_learner_, idData, s4_component);
     }
     //
     return criter;

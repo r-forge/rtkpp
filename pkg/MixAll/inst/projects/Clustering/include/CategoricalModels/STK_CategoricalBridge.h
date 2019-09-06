@@ -191,7 +191,7 @@ class CategoricalBridge: public IMixtureBridge< CategoricalBridge<Id,Data> >
  **/
 template<int Id, class Data>
 CategoricalBridge<Id,Data>::CategoricalBridge( Data* p_dataij, String const& idData, int nbCluster)
-                : Base( p_dataij, idData, nbCluster)
+                                             : Base( p_dataij, idData, nbCluster)
 {
   removeMissing();
   mixture_.setData(*p_dataij_);

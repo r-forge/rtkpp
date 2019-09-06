@@ -8,9 +8,9 @@ clusterPoisson(data, nbCluster = 2, models = clusterPoissonNames(),
   strategy = clusterStrategy(), criterion = "ICL", nbCore = 1)
 }
 \arguments{
-\item{data}{frame or matrix containing the data. Rows correspond to observations
-and columns correspond to variables. If the data set contains NA values, they
-will be estimated during the estimation process.}
+\item{data}{a data.frame or matrix containing the data. Rows correspond to observations
+and columns correspond to variables. data will be coerced as an integer matrix.
+If data set contains NA values, they will be estimated during the estimation process.}
 
 \item{nbCluster}{[\code{\link{vector}}] listing the number of clusters to test.}
 

@@ -74,6 +74,11 @@ class LearnLauncher: public ILauncher
     IMixtureCriterion* p_criterion_;
 
   private:
+    /** pointer on the main learner */
+    IMixtureLearner* p_learner_;
+    /** Is the model with mixed data ? */
+    bool isMixedData_;
+
     /** Select the best model among the models and nbCluster given.
      *  @return the value of the best criteria.
      **/
@@ -82,11 +87,6 @@ class LearnLauncher: public ILauncher
      *  @return the value of the best criteria.
      **/
     Real selectBestMixedModel();
-
-    /** pointer on the main learner */
-    IMixtureLearner* p_learner_;
-    /** Is the model with mixed data ? */
-    bool isMixedData_;
 };
 
 } // namespace STK

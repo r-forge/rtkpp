@@ -124,6 +124,58 @@ class GammaMixtureManager: public IMixtureManager<GammaMixtureManager<DataHandle
     GammaMixtureManager(DataHandler const& handler): Base(&handler) {}
     /** destructor */
     ~GammaMixtureManager() {}
+
+    /** get the missing values from an IMixture.
+     *  @param p_mixture pointer on the mixture
+     *  @param missing structure to return with the missing values
+     **/
+    void getMissingValuesImpl(IMixture* p_mixture, MissingValues& missing) const
+    {
+      Clust::Mixture idModel = getIdModel(p_mixture->idData());
+      if (idModel == Clust::unknown_mixture_) return;
+      // up-cast... (Yes it's bad....;)...)
+      switch (idModel)
+      {
+        case Clust::Gamma_ajk_bjk_:
+        { static_cast<MixtureBridge_ajk_bjk*>(p_mixture)->getMissingValues(missing);}
+        break;
+        case Clust::Gamma_ajk_bk_:
+        { static_cast<MixtureBridge_ajk_bk*>(p_mixture)->getMissingValues(missing);}
+        break;
+        case Clust::Gamma_ajk_bj_:
+        { static_cast<MixtureBridge_ajk_bj*>(p_mixture)->getMissingValues(missing);}
+        break;
+        case Clust::Gamma_ajk_b_:
+        { static_cast<MixtureBridge_ajk_b*>(p_mixture)->getMissingValues(missing);}
+        break;
+        case Clust::Gamma_ak_bjk_:
+        { static_cast<MixtureBridge_ak_bjk*>(p_mixture)->getMissingValues(missing);}
+        break;
+        case Clust::Gamma_ak_bk_:
+        { static_cast<MixtureBridge_ak_bk*>(p_mixture)->getMissingValues(missing);}
+        break;
+        case Clust::Gamma_ak_bj_:
+        { static_cast<MixtureBridge_ak_bj*>(p_mixture)->getMissingValues(missing);}
+        break;
+        case Clust::Gamma_ak_b_:
+        { static_cast<MixtureBridge_ak_b*>(p_mixture)->getMissingValues(missing);}
+        break;
+        case Clust::Gamma_aj_bjk_:
+        { static_cast<MixtureBridge_aj_bjk*>(p_mixture)->getMissingValues(missing);}
+        break;
+        case Clust::Gamma_aj_bk_:
+        { static_cast<MixtureBridge_aj_bk*>(p_mixture)->getMissingValues(missing);}
+        break;
+        case Clust::Gamma_a_bjk_:
+        { static_cast<MixtureBridge_a_bjk*>(p_mixture)->getMissingValues(missing);}
+        break;
+        case Clust::Gamma_a_bk_:
+        { static_cast<MixtureBridge_a_bk*>(p_mixture)->getMissingValues(missing);}
+        break;
+        default: // idModel is not implemented
+        break;
+      }
+    }
     /** get the parameters from an IMixture.
      *  @param p_mixture pointer on the mixture
      *  @param param the array to return with the parameters
@@ -135,7 +187,6 @@ class GammaMixtureManager: public IMixtureManager<GammaMixtureManager<DataHandle
       // up-cast... (Yes it's bad....;)...)
       switch (idModel)
       {
-        // gamma models
         case Clust::Gamma_ajk_bjk_:
         { static_cast<MixtureBridge_ajk_bjk*>(p_mixture)->getParameters(param);}
         break;
@@ -187,7 +238,6 @@ class GammaMixtureManager: public IMixtureManager<GammaMixtureManager<DataHandle
       // up-cast... (Yes it's bad....;)...)
       switch (idModel)
       {
-        // gamma models
         case Clust::Gamma_ajk_bjk_:
         { static_cast<MixtureBridge_ajk_bjk*>(p_mixture)->setParameters(param);}
         break;

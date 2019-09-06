@@ -124,11 +124,17 @@ Real ClusterLauncher::selectBestSingleModel()
     // structure thus there is no difficulties in doing so
     if ((classModel == Clust::Categorical_)||(classModel == Clust::Poisson_))
     {
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("In ClusterLauncher::selectBestSingleModel. Creating IntegerMatrix\n");
+#endif
       Rcpp::IntegerMatrix m_data_int=s4_component.slot("data");
       createDataSets(m_data_int, idData, model);
     }
     else
     {
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("In ClusterLauncher::selectBestSingleModel. Creating NumericMatrix\n");
+#endif
       Rcpp::NumericMatrix m_data_num=s4_component.slot("data");
       createDataSets(m_data_num, idData, model);
     }
@@ -181,7 +187,10 @@ Real ClusterLauncher::selectBestSingleModel()
     // release
     if (p_criterion) { delete p_criterion; p_criterion = 0;}
     // get specific parameters
-    getParameters(p_composer_, idDataBestModel, s4_component);
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("In ClusterLauncher::selectBestSingleModel. Getting Parameters from best model\n");
+#endif
+    setParametersToComponent(p_composer_, idDataBestModel, s4_component);
     return critValue;
   }
   catch (Exception const& e)
@@ -265,11 +274,11 @@ Real ClusterLauncher::selectBestMixedModel()
     // get parameters
     for (int l=0; l <s4_list.size(); ++l)
     {
-      // component
+      // get component
       Rcpp::S4 s4_component = s4_list[l];
       // id of the data set and of the model
       String idData  = "model" + typeToString<int>(l);
-      getParameters(p_composer_, idData, s4_component);
+      setParametersToComponent(p_composer_, idData, s4_component);
     }
     //
     return criter;

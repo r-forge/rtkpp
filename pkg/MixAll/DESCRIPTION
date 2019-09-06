@@ -1,7 +1,7 @@
 Package: MixAll
 Encoding: UTF-8
-Version: 1.5.0
-Date: 2019-08-15
+Version: 1.5.1
+Date: 2019-09-06
 Title: Clustering and Classification using Model-Based Mixture Models
 Authors@R: c(person("Serge", "Iovleff", role = c("aut","cre"), email = "Serge.Iovleff@stkpp.org")
             ,person("Parmeet", "Bathia", role = c("ctb"), email = "Bathia.Parmeet@gmail.com")

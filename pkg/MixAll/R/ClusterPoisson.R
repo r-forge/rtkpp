@@ -33,9 +33,9 @@ NULL
 #' and the number of clusters given in [\code{nbCluster}], using the strategy
 #' specified in [\code{strategy}].
 #'
-#' @param data frame or matrix containing the data. Rows correspond to observations
-#' and columns correspond to variables. If the data set contains NA values, they
-#' will be estimated during the estimation process.
+#' @param data a data.frame or matrix containing the data. Rows correspond to observations
+#' and columns correspond to variables. data will be coerced as an integer matrix.
+#' If data set contains NA values, they will be estimated during the estimation process.
 #' @param nbCluster  [\code{\link{vector}}] listing the number of clusters to test.
 #' @param models [\code{\link{vector}}] of model names to run. By default all
 #' poisson models are estimated.  All the model names are given by
@@ -91,7 +91,6 @@ clusterPoisson <- function( data, nbCluster=2
   { stop("criterion is not valid. See ?clusterPoisson for the list of valid criterion")}
 
   # check data
-  data = as.matrix(data)
   if (nrow(data) <= 3*nbClusterMax) {stop("There is not enough individuals (rows) in the data set")}
   if (ncol(data) < 1) {stop("Error: empty data set")}
 
@@ -168,7 +167,9 @@ setMethod(
       if (!clusterValidPoissonNames(modelName))
       { stop(paste(modelName,"modelName is invalid in ClusterPoissonComponent."));}
       # call base class
+      data <- as.data.frame(data)
       .Object <- callNextMethod(.Object, data, modelName)
+      #.Object@data <- as.integer(.Object@data)
       # create slots
       nbVariable = ncol(.Object@data);
       .Object@lambda = matrix(1., nrow=nbCluster, ncol=nbVariable);

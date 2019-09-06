@@ -119,7 +119,37 @@ class DiagGaussianMixtureManager: public IMixtureManager<DiagGaussianMixtureMana
     /** destructor */
     ~DiagGaussianMixtureManager() {}
 
-    /** get the parameters from an IMixture.
+    /** get the missing values from an IMixture.
+     *  @param p_mixture pointer on the mixture
+     *  @param missing structure to return with the missing values
+     **/
+    void getMissingValuesImpl(IMixture* p_mixture, MissingValues& missing) const
+    {
+      Clust::Mixture idModel = getIdModel(p_mixture->idData());
+      if (idModel == Clust::unknown_mixture_) return;
+      // up-cast... (Yes it's bad....;)...)
+      switch (idModel)
+      {
+        case Clust::Gaussian_sjk_:
+        { static_cast<MixtureBridge_sjk*>(p_mixture)->getMissingValues(missing);}
+        break;
+        case Clust::Gaussian_sk_:
+        { static_cast<MixtureBridge_sk*>(p_mixture)->getMissingValues(missing);}
+        break;
+        case Clust::Gaussian_sj_:
+        { static_cast<MixtureBridge_sj*>(p_mixture)->getMissingValues(missing);}
+        break;
+        case Clust::Gaussian_sjsk_:
+        { static_cast<MixtureBridge_sjsk*>(p_mixture)->getMissingValues(missing);}
+        break;
+        case Clust::Gaussian_s_:
+        { static_cast<MixtureBridge_s*>(p_mixture)->getMissingValues(missing);}
+        break;
+        default: // idModel is not implemented
+        break;
+      }
+    }
+   /** get the parameters from an IMixture.
      *  @param p_mixture pointer on the mixture
      *  @param param the array to return with the parameters
      **/
@@ -181,17 +211,14 @@ class DiagGaussianMixtureManager: public IMixtureManager<DiagGaussianMixtureMana
         break;
       }
     }
-
     /** create a concrete mixture and initialize it.
      *  @param modelName a valid model name
      *  @param idData Id of the data
      *  @param nbCluster number of cluster of the model
      **/
     IMixture* createMixtureImpl(String const& modelName, String const& idData, int nbCluster)
-    {
-      Clust::Mixture idModel = Clust::stringToMixture(modelName);
-      return createMixtureImpl(idModel, idData, nbCluster);
-    }
+    { return createMixtureImpl(Clust::stringToMixture(modelName), idData, nbCluster);}
+
 
   private:
     /** create a concrete mixture and initialize it.

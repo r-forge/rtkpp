@@ -55,10 +55,16 @@ extern "C" SEXP clusterMixture( SEXP model, SEXP nbCluster, SEXP models, SEXP nb
   Rcpp::S4 s4_model(model);
   Rcpp::IntegerVector r_nbCluster(nbCluster);
   Rcpp::CharacterVector r_models(models);
-
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("Creating Launcher\n");
+#endif
   // create a launcher
   STK::ClusterLauncher launcher(s4_model, r_nbCluster, r_models);
-  // return result
+
+#ifdef STK_MIXTURE_VERBOSE
+  stk_cout << _T("Run Launcher\n");
+#endif
+// return result
   return Rcpp::wrap(launcher.run());
 
   END_RCPP

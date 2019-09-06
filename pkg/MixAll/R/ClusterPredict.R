@@ -115,7 +115,7 @@ clusterPredict <- function( data, model, algo = clusterAlgoPredict(), nbCore = 1
   
   # start estimation of the models
   resFlag = .Call("clusterPredict", model, result, nbCore, PACKAGE="MixAll");
-  if (resFlag != TRUE ) { cat("WARNING: An error occur during the clustering process");}
+  if (resFlag != TRUE ) { cat("WARNING: An error occur during the predicting process");}
   
   # set plkj as array
   if ( is(model,"ClusterCategorical") )
@@ -335,14 +335,17 @@ setMethod(
       { 
         if ( class(model@lcomponent[[i]]) == "ClusterCategoricalComponent")
         {
-          data <- as.data.frame(ldata[[i]])
+          data   <- as.data.frame(ldata[[i]])
           levels <- model@lcomponent[[i]]@levels
           for ( j in 1:length(data) )
-          { data[,j] <- as.integer(factor(data[,j]), levels = levels[[j]])}
-          .Object@ldata[[i]] <- as.matrix(data)
+          { 
+            data[,j] <- as.integer(factor(data[,j]), levels = levels[[j]])}
+            .Object@ldata[[i]] <- as.matrix(data)
         }
         else
-        { .Object@ldata[[i]] <- as.matrix(ldata[[i]]) }
+        { 
+          .Object@ldata[[i]] <- as.matrix(ldata[[i]])
+        }
         .Object@lmissing[[i]] <- which(is.na(.Object@ldata[[i]]), arr.ind=TRUE)
       }
     }

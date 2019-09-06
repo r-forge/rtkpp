@@ -43,7 +43,7 @@ namespace STK
 {
 
 /** ClusterPredictor class allows **/
-class IClusterPredictor: public ILauncherBase
+class IClusterPredictor: public ILauncher
 {
   public:
     /** constructor.
@@ -59,10 +59,15 @@ class IClusterPredictor: public ILauncherBase
     /** predict algorithm from the R side */
     Rcpp::S4 s4_algo_;
 
-    /** facade for the data to predict */
-    MixtureComposerFacade<RDataHandler> facade_;
     /** algorithm to use */
     IMixtureAlgoPredict* p_algo_;
+    /** pointer on the main composer */
+    IMixtureComposer* p_composer_;
+
+    /** Get missing values for single component */
+    void getMissingValues(Clust::MixtureClass const& classModel, String const& idData);
+    /** Get missing values for mixed data */
+    void getMissingValues(Clust::MixtureClass const& classModel, String const& idData, int l);
 
   private:
     /** utility function creating STK algorithm from R algorithm */

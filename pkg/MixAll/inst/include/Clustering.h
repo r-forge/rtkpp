@@ -80,7 +80,6 @@
 #include <Clustering/include/MixtureInit/STK_MixtureInit.h>
 
 #include <Clustering/include/STK_MixtureComposer.h>
-#include <Clustering/include/STK_MixtureComposerFacade.h>
 #include <Clustering/include/STK_MixtureLearner.h>
 #include <Clustering/include/STK_MixtureSemiLearner.h>
 #include <Clustering/include/STK_MixtureFacade.h>

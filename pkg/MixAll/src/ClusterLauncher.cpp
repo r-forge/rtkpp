@@ -76,6 +76,7 @@ bool ClusterLauncher::run()
   // compute the best model
   Real initCriter = s4_model_.slot("criterion");
   Real criter = (isMixedData_) ? selectBestMixedModel() : selectBestSingleModel();
+  if (!Arithmetic<Real>::isFinite(criter)) return false;
 
   // get result common part of the estimated model
   s4_model_.slot("criterion")      = criter;

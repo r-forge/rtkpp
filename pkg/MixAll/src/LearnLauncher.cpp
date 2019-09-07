@@ -79,7 +79,6 @@ LearnLauncher::~LearnLauncher()
 /* run the estimation */
 bool LearnLauncher::run()
 {
-  bool flag;
   p_criterion_ = Clust::createCriterion(criterion_);
   if (!p_criterion_)
   { msg_error_ = STKERROR_1ARG(LearnLauncher::run,criterion_,Wrong criterion name);
@@ -101,9 +100,11 @@ bool LearnLauncher::run()
   Real initCriter = s4_model_.slot("criterion");
   Real criter = (isMixedData_) ? selectBestMixedModel()
                                : selectBestSingleModel();
+
   // release criterion and algo,
   delete p_criterion_; p_criterion_ = 0;
   delete p_algo_; p_algo_ = 0;
+  if (!Arithmetic<Real>::isFinite(criter)) return false;
 
   // get result common part of the estimated model
   s4_model_.slot("criterion")       = criter;
@@ -116,6 +117,7 @@ bool LearnLauncher::run()
   NumericVector fi = s4_model_.slot("lnFi");
   for (int i=0; i< fi.length(); ++i)
   { fi[i] = p_learner_->computeLnLikelihood(i);}
+  // results
   if (criter == initCriter || !Arithmetic<Real>::isFinite(criter)) return false;
   return true;
 }

@@ -80,6 +80,8 @@ bool KmmLauncher::run()
   Real initCriter = s4_model_.slot("criterion");
   Real criter = (isMixedData_) ? selectBestMixedModel() : selectBestSingleModel();
   if (!p_composer_) return false;
+  if (!Arithmetic<Real>::isFinite(criter)) return false;
+
   // get result common part of the estimated model
   s4_model_.slot("criterion")      = criter;
   s4_model_.slot("nbCluster")      = p_composer_->nbCluster();

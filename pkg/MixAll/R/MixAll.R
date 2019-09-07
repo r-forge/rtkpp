@@ -22,52 +22,31 @@
 #    Contact : S..._Dot_I..._At_stkpp_Dot_org (see copyright for ...)
 #
 #-----------------------------------------------------------------------
-# MixAll allows to estimate parametric mixture models with mixed data
-# sets and missing data.
-#
-# This package contains methods allowing R users to use the clustering methods
-# of the STK++ library.
-#
-# As described at the STK++ project's home page, \url{http://www.stkpp.org},
-# STK++ is a versatile, fast, reliable and elegant collection of C++ classes
-# for statistics, clustering, linear algebra, arrays (with an Eigen-like API),
-# regression, dimension reduction, etc. Some functionalities provided by the
-# library are available in the R environment as R functions in MixAll.
-#
-# The available functionalities are:
-# \enumerate{
-#    \item the \link{clusterDiagGaussian} method allowing to discover group structures in
-# multivariate quantitative data sets using diagonal Gaussian multidimensional models (8 models).
-#    \item the \link{clusterCategorical} method allowing to discover group structures in
-# multivariate discrete data sets using categorical multidimensional models (24 models).
-#    \item the \link{clusterGamma} method allowing to discover group structures in
-# multivariate quantitative positive data sets using gamma multidimensional models (24 models).
-#    \item the \link{clusterPoisson} method allowing to discover group structures in
-# multivariate counting data sets using Poisson multidimensional models (8 models).
-#    \item the \link{clusterKernel} method allowing to discover group structures in
-# any data sets using kernel trick (4 models).
-#    \item the \link{clusterMixedData} method allowing to discover group structures in
-# mixed data sets.
-#  }
-#
-# \tabular{ll}{
-#   Package: \tab MixAll\cr
-#   Type: \tab Package\cr
-#   Version: \tab 0.8.1\cr
-#   Date: \tab 2018-03-19\cr
-#   License: \tab GPL for the MixAll and rtkore side, LGPL for the stkpp side  + file LICENSE\cr
-#   LazyLoad: \tab yes\cr
-# }
-#
-# @rdname MixAll-package
-# @name MixAll
-# @aliases MixAll
-# @docType package
-# @keywords STK++, stkpp
-#
-# @author
-# Author: Serge Iovleff \email{contact@@stkpp.org}
-#
+#' MixAll
+#' Allows to estimate parametric mixture models with mixed data
+#'  sets and missing data.
+#'
+#' This package contains methods allowing R users to use the clustering methods
+#' of the STK++ library.
+#'
+#' As described at the STK++ project's home page, \url{https://www.stkpp.org},
+#' STK++ is a versatile, fast, reliable and elegant collection of C++ classes
+#' for statistics, clustering, linear algebra, arrays (with an Eigen-like API),
+#' regression, dimension reduction, etc. Some functionalities provided by the
+#' library are available in the R environment as R functions in MixAll.
+#'
+#' The available functionalities are:
+#' \enumerate{
+#'    \item Clustering (\link{clusterDiagGaussian}, \link{clusterCategorical},
+#' \link{clusterPoisson}, \link{clusterGamma}, \link{clusterMixedData})
+#'    \item Learning ( (\link{learnDiagGaussian}, \link{learnCategorical},
+#' \link{learnPoisson}, \link{learnGamma}, \link{learnMixedData}),
+#'    \item Prediction (\link{clusterPredict}).
+#'  }
+#'
+#' @name MixAll
+#' @docType package
+#' @author Serge Iovleff
 NULL
 
 #' Counting Data: DebTrivedi

@@ -39,11 +39,13 @@ NULL
 #' }
 #' For example if \code{nbInit} is 5 and \code{nbShortRun} is also 5, there will
 #' be 5 packets of 5 models initialized. In each packet, the best model will be
-#' ameliorated using a short run. Among the 5 models ameliorated one will be
-#' estimated until convergence using a long run. In total there were 25 initializations.
+#' ameliorated using a short run. Among the 5 models ameliorated the best one will be
+#' estimated until convergence using a long run. In total there will be 25 initializations,
+#' 5 short runs and one long-run.
 #'
 #' The whole process can be repeated at least \code{nbTry} times. If a try
-#' success, the estimated model is returned, otherwise an empty model is returned.
+#' success, the estimated model is returned, otherwise an empty model is returned
+#' (with an error message).
 #'
 #' @param nbInit Integer defining the number of initialization to try. Default value: 3.
 #' @param initMethod Character string with the initialization method, see [\code{\link{clusterInit}}]$

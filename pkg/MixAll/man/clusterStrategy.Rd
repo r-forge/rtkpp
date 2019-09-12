@@ -76,9 +76,8 @@ when using an EM algorithm or its variants. A ``try'' is composed of three stage
 }
 For example if \code{nbInit} is 5 and \code{nbShortRun} is also 5, there will
 be 5 packets of 5 models initialized. In each packet, the best model will be
-ameliorated using a short run. Among the 5 models ameliorated the best one will be
-estimated until convergence using a long run. In total there will be 25 initializations,
-5 short runs and one long-run.
+ameliorated using a short run. Among the 5 models ameliorated one will be
+estimated until convergence using a long run. In total there were 25 initializations.
 
 \code{clusterSemiSEMStrategy()} create an instance of [\code{\linkS4class{ClusterStrategy}}]
 for users with many missing values uning a semiSem algorithm.
@@ -90,8 +89,7 @@ for users with many missing values using a SEM algorithm.
 }
 \details{
 The whole process can be repeated at least \code{nbTry} times. If a try
-success, the estimated model is returned, otherwise an empty model is returned
-(with an error message).
+success, the estimated model is returned, otherwise an empty model is returned.
 }
 \examples{
    clusterStrategy()

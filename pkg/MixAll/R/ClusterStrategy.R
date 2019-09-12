@@ -47,34 +47,34 @@ NULL
 #' success, the estimated model is returned, otherwise an empty model is returned
 #' (with an error message).
 #'
-#' @param nbInit Integer defining the number of initialization to try. Default value: 3.
+#' @param nbInit Integer defining the number of initialization to try. Default value: 5.
 #' @param initMethod Character string with the initialization method, see [\code{\link{clusterInit}}]$
-#' for possible values. Default is "class".
+#' for possible values. Default value: "class".
 #' @param initAlgo Character string with the algorithm to use in the initialization stage,
 #' [\code{\link{clusterAlgo}}] for possible values. Default value: "EM".
-#' @param nbInitIteration Integer defining the maximal number of iterations in initialization algorithm
-#' if \code{initAlgo} = "EM", "CEM" or "SemiSEM". This is the number of iterations if \code{initAlgo} = "SEM".
-#' Default value: 20.
+#' @param nbInitIteration Integer defining the maximal number of iterations in
+#' initialization algorithm. If \code{initAlgo} = "EM", "CEM" or "SemiSEM", this
+#' is the number of iterations if \code{initAlgo} = "SEM". Default value: 20.
 #' @param initEpsilon Real defining the epsilon value for the algorithm.
 #' \code{initEpsilon} is not used by the \code{SEM} algorithm. Default value: 0.01.
 #'
 #' @param nbShortRun Integer defining the number of short run to try
 #' (the strategy launch an initialization before each short run). Default value: 5.
-#' @param shortRunAlgo A character string with the algorithm to use in the short run stage
-#' Default value: "EM".
-#' @param nbShortIteration Integer defining the maximal number of iterations in the short runs
-#' if \code{shortRunAlgo} = "EM", "CEM" or "semiSEM", or the number of iterations if \code{shortRunAlgo} = "SEM".
-#' Default value: 100.
+#' @param shortRunAlgo A character string with the algorithm to use in the short
+#' run stage. Default value: "EM".
+#' @param nbShortIteration Integer defining the maximal number of iterations in
+#' a short run if \code{shortRunAlgo} = "EM", "CEM" or "semiSEM", or the number
+#' of iterations if \code{shortRunAlgo} = "SEM". Default value: 100.
 #' @param shortEpsilon Real defining the epsilon value for the algorithm.
-#' epsilon is not used by the \code{SEM} algorithm. Default value: 1e-04.
+#' \code{shortEpsilon} is not used by the \code{SEM} algorithm. Default value: 1e-04.
 #'
 #' @param longRunAlgo A character string with the algorithm to use in the long run stage
 #' Default value: "EM".
 #' @param nbLongIteration  Integer defining the maximal number of iterations in the short runs
-#' if \code{shortRunAlgo} = "EM", "CEM" or "SemiSEM", or the number of iterations if \code{shortRunAlgo} = "SEM".
-#' Default value: 1000.
+#' if \code{shortRunAlgo} = "EM", "CEM" or "SemiSEM", or the number of iterations
+#' if \code{shortRunAlgo} = "SEM". Default value: 1000.
 #' @param longEpsilon Real defining the epsilon value for the algorithm.
-#' epsilon is not used by the \code{SEM} algorithm. Default value: 1e-07.
+#' \code{longEpsilon} is not used by the \code{SEM} algorithm. Default value: 1e-07.
 #'
 #' @param nbTry number of estimation to attempt.
 #'

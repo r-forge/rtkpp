@@ -44,7 +44,8 @@
 #'    \item Prediction (\link{clusterPredict}).
 #'  }
 #'
-#' @name MixAll
+#' @name MixAll-package
+#' @rdname MixAll-package
 #' @docType package
 #' @author Serge Iovleff
 NULL

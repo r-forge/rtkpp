@@ -23,17 +23,17 @@ clusterFastStrategy()
 \arguments{
 \item{nbTry}{number of estimation to attempt.}
 
-\item{nbInit}{Integer defining the number of initialization to try. Default value: 3.}
+\item{nbInit}{Integer defining the number of initialization to try. Default value: 5.}
 
 \item{initMethod}{Character string with the initialization method, see [\code{\link{clusterInit}}]$
-for possible values. Default is "class".}
+for possible values. Default value: "class".}
 
 \item{initAlgo}{Character string with the algorithm to use in the initialization stage,
 [\code{\link{clusterAlgo}}] for possible values. Default value: "EM".}
 
-\item{nbInitIteration}{Integer defining the maximal number of iterations in initialization algorithm
-if \code{initAlgo} = "EM", "CEM" or "SemiSEM". This is the number of iterations if \code{initAlgo} = "SEM".
-Default value: 20.}
+\item{nbInitIteration}{Integer defining the maximal number of iterations in
+initialization algorithm. If \code{initAlgo} = "EM", "CEM" or "SemiSEM", this
+is the number of iterations if \code{initAlgo} = "SEM". Default value: 20.}
 
 \item{initEpsilon}{Real defining the epsilon value for the algorithm.
 \code{initEpsilon} is not used by the \code{SEM} algorithm. Default value: 0.01.}
@@ -41,25 +41,25 @@ Default value: 20.}
 \item{nbShortRun}{Integer defining the number of short run to try
 (the strategy launch an initialization before each short run). Default value: 5.}
 
-\item{shortRunAlgo}{A character string with the algorithm to use in the short run stage
-Default value: "EM".}
+\item{shortRunAlgo}{A character string with the algorithm to use in the short
+run stage. Default value: "EM".}
 
-\item{nbShortIteration}{Integer defining the maximal number of iterations in the short runs
-if \code{shortRunAlgo} = "EM", "CEM" or "semiSEM", or the number of iterations if \code{shortRunAlgo} = "SEM".
-Default value: 100.}
+\item{nbShortIteration}{Integer defining the maximal number of iterations in
+a short run if \code{shortRunAlgo} = "EM", "CEM" or "semiSEM", or the number
+of iterations if \code{shortRunAlgo} = "SEM". Default value: 100.}
 
 \item{shortEpsilon}{Real defining the epsilon value for the algorithm.
-epsilon is not used by the \code{SEM} algorithm. Default value: 1e-04.}
+\code{shortEpsilon} is not used by the \code{SEM} algorithm. Default value: 1e-04.}
 
 \item{longRunAlgo}{A character string with the algorithm to use in the long run stage
 Default value: "EM".}
 
 \item{nbLongIteration}{Integer defining the maximal number of iterations in the short runs
-if \code{shortRunAlgo} = "EM", "CEM" or "SemiSEM", or the number of iterations if \code{shortRunAlgo} = "SEM".
-Default value: 1000.}
+if \code{shortRunAlgo} = "EM", "CEM" or "SemiSEM", or the number of iterations
+if \code{shortRunAlgo} = "SEM". Default value: 1000.}
 
 \item{longEpsilon}{Real defining the epsilon value for the algorithm.
-epsilon is not used by the \code{SEM} algorithm. Default value: 1e-07.}
+\code{longEpsilon} is not used by the \code{SEM} algorithm. Default value: 1e-07.}
 }
 \value{
 a [\code{\linkS4class{ClusterStrategy}}] object
@@ -76,8 +76,9 @@ when using an EM algorithm or its variants. A ``try'' is composed of three stage
 }
 For example if \code{nbInit} is 5 and \code{nbShortRun} is also 5, there will
 be 5 packets of 5 models initialized. In each packet, the best model will be
-ameliorated using a short run. Among the 5 models ameliorated one will be
-estimated until convergence using a long run. In total there were 25 initializations.
+ameliorated using a short run. Among the 5 models ameliorated the best one will be
+estimated until convergence using a long run. In total there will be 25 initializations,
+5 short runs and one long-run.
 
 \code{clusterSemiSEMStrategy()} create an instance of [\code{\linkS4class{ClusterStrategy}}]
 for users with many missing values uning a semiSem algorithm.
@@ -89,7 +90,8 @@ for users with many missing values using a SEM algorithm.
 }
 \details{
 The whole process can be repeated at least \code{nbTry} times. If a try
-success, the estimated model is returned, otherwise an empty model is returned.
+success, the estimated model is returned, otherwise an empty model is returned
+(with an error message).
 }
 \examples{
    clusterStrategy()
